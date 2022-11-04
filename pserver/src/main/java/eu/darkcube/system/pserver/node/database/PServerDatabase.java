@@ -1,18 +1,13 @@
 package eu.darkcube.system.pserver.node.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
+import java.sql.*;
+import java.util.*;
 
-import de.dytanic.cloudnet.CloudNet;
-import de.dytanic.cloudnet.database.AbstractDatabaseProvider;
-import de.dytanic.cloudnet.ext.database.mysql.MySQLDatabaseProvider;
-import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.UniqueId;
+import de.dytanic.cloudnet.*;
+import de.dytanic.cloudnet.database.*;
+import de.dytanic.cloudnet.database.sql.*;
+import eu.darkcube.system.pserver.common.*;
+import eu.darkcube.system.pserver.node.*;
 
 public class PServerDatabase extends Database {
 
@@ -28,19 +23,18 @@ public class PServerDatabase extends Database {
 
 	private Connection getConnection() {
 		try {
-			MySQLDatabaseProvider provider = ((MySQLDatabaseProvider) CloudNet.getInstance()
+			SQLDatabaseProvider provider = ((SQLDatabaseProvider) CloudNet.getInstance()
 					.getServicesRegistry()
-					.getService(AbstractDatabaseProvider.class, "mysql"));
+					.getService(AbstractDatabaseProvider.class, PServerModule.getInstance().sqlDatabase));
 			try {
 				return provider.getConnection();
 			} catch (Exception ex) {
 			}
 			provider.init();
 			return provider.getConnection();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			throw new UnsupportedOperationException(e);
 		}
-		return null;
 	}
 
 	public boolean update(PServer pserver) {

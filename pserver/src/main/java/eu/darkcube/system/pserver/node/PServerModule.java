@@ -63,6 +63,7 @@ public class PServerModule extends DriverModule {
 	public static final String PLUGIN_NAME = new File(
 			PServerModule.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 	public Listener listener;
+	public String sqlDatabase;
 
 	private List<String> deploymentExclusions;
 
@@ -72,6 +73,10 @@ public class PServerModule extends DriverModule {
 
 	public static String getSelf() {
 		return getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode().getUniqueId();
+	}
+
+	public void loadConfig() {
+		sqlDatabase = getConfig().getString("database", "h2");
 	}
 
 	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED)
@@ -103,7 +108,7 @@ public class PServerModule extends DriverModule {
 		pm.registerHandler(PacketWrapperNodeSetRunning.class, new HandlerSetRunning());
 		pm.registerHandler(PacketWrapperNodeStart.class, new HandlerStart());
 		pm.registerHandler(PacketWrapperNodeStop.class, new HandlerStop());
-		
+
 		getLogger().info("PServer initializing!");
 		AsyncExecutor.start();
 

@@ -4,7 +4,6 @@ dependencies {
     implementation cloudnet
     implementation cloudnetWrapper
     implementation cloudnetBridge
-    implementation cloudnetDatabaseMysql
     implementation project('pserver-common')
     implementation project(':bukkit:commandapi')
 }
