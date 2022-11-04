@@ -1,0 +1,5 @@
+main: eu.darkcube.system.cloudban.bukkit.Main
+name: CloudNet-Ban
+version: 1.0
+author: DasBabyPixel
+depend: [System]

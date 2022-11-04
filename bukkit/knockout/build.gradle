@@ -1,4 +1,4 @@
 dependencies {
     implementation project(':bukkit:darkcubesystem')
-    implementation "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
+    implementation cloudnetDriver
 }

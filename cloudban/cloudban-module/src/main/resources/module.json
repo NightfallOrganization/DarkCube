@@ -1,0 +1,13 @@
+{
+	"runtimeModule": true,
+	"group": "de.pixel.cloudnet.modules",
+	"name": "CloudNet-Ban",
+	"version": "1.0",
+	"author": "DasBabyPixel",
+	"description": "CloudBan",
+	"main": "eu.darkcube.system.cloudban.module.Module",
+	"storesSensitiveData": true,
+	"dependencies": [
+		
+	]
+}

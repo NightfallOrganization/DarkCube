@@ -1,6 +1,14 @@
 ext {
     cloudnetVersion = '3.4.0-SNAPSHOT'
     luckpermsVersion = '5.4'
+    bungeeVersion = '1.19-R0.1-SNAPSHOT'
+    
+    cloudnetDriver = "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
+    cloudnet = "de.dytanic.cloudnet:cloudnet:$cloudnetVersion"
+    cloudnetBridge = "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
+    cloudnetWrapper = "de.dytanic.cloudnet:cloudnet-wrapper-jvm:$cloudnetVersion"
+    cloudnetDatabaseMysql = "de.dytanic.cloudnet:cloudnet-database-mysql:$cloudnetVersion"
+    bungee = "net.md-5:bungeecord-api:$bungeeVersion"
 }
 
 allprojects {
@@ -32,6 +40,9 @@ allprojects {
 		java {
     		toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 		}
+	
+		compileJava.options.encoding = 'UTF-8'
+		compileTestJava.options.encoding = 'UTF-8'
     }
 }
 

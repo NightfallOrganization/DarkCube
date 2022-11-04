@@ -32,12 +32,12 @@ public class ChatUtils {
 	private static final Constructor<?> C_PACKETPLAYOUTCHAT = getConstructor(CL_PACKETPLAYOUTCHAT,
 			CL_ICHATBASECOMPONENT, byte.class);
 
-	public static final Object chat(String text) {
+	public static final ChatBaseComponent chat(String text) {
 		return chat(new ChatEntry.Builder().text(text).build());
 	}
 
-	public static final Object chat(ChatEntry... entries) {
-		return ChatEntry.buildArray(entries).getComponent();
+	public static final ChatBaseComponent chat(ChatEntry... entries) {
+		return ChatEntry.buildArray(entries);
 	}
 
 	public static class ChatEntry {

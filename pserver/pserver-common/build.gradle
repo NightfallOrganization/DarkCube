@@ -1,5 +1,5 @@
 apply plugin: 'java'
 
 dependencies {
-    implementation "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
+    implementation cloudnetDriver
 }
