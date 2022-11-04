@@ -1,0 +1,5 @@
+main: eu.darkcube.system.holograms.Holograms
+name: Holograms
+version: 1.0
+author: DasBabyPixel
+depend: [CommandAPI]

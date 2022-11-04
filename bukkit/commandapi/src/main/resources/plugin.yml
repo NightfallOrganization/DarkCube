@@ -1,0 +1,6 @@
+main: eu.darkcube.system.commandapi.CommandAPIPlugin
+name: CommandAPI
+author: DasBabyPixel
+version: 3.0
+load: startup
+softdepend: [System]

@@ -1,0 +1,7 @@
+main: de.pixel.bedwars.Main
+name: Bedwars
+author: DasBabyPixel
+version: 1.0
+credits: [Qzon, mcPATmc]
+softdepend: [System]
+depend: [ProtocolLib]

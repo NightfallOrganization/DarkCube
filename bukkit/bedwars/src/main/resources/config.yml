@@ -1,0 +1,3 @@
+maxTeamPlayers: 1
+at_all: '@a'
+at_team: '@t'

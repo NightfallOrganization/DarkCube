@@ -1,0 +1,6 @@
+main: eu.darkcube.system.stats.api.StatsPlugin
+version: 1.0
+name: StatsAPI
+author: DasBabyPixel
+
+softdepend: [System]

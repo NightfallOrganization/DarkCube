@@ -1,0 +1,24 @@
+{
+	"runtimeModule": true,
+	"group": "de.pixel.cloudnet.modules",
+	"name": "CloudNet-StatsReset",
+	"version": "1.0",
+	"author": "DasBabyPixel",
+	"description": "StatsReset",
+	"main": "eu.darkcube.system.module.statsreset.Main",
+	"storesSensitiveData": true,
+	"dependencies": [
+		{
+			"group": "mysql",
+			"name": "mysql-connector-java",
+			"version": "5.1.47",
+			"repo": "maven"
+    	},
+    	{
+			"group": "com.zaxxer",
+			"name": "HikariCP",
+			"version": "2.7.9",
+			"repo": "maven"
+    	}
+	]
+}

@@ -1,0 +1,5 @@
+main: eu.darkcube.system.DarkCubePlugin
+name: System
+version: 1.0
+load: startup
+loadbefore: [LabyModAddon]

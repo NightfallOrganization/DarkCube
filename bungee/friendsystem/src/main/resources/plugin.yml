@@ -1,0 +1,5 @@
+name: FriendSystem
+main: eu.darkcube.system.friend.Main
+author: DasBabyPixel
+softdepend: [System]
+version: 1.0

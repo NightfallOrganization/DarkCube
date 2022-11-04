@@ -1,0 +1,6 @@
+main: eu.darkcube.system.commons.Commons
+load: startup
+name: APICommons
+author: DasBabyPixel
+version: 1.0
+depend: [System]

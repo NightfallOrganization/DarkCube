@@ -1,0 +1,5 @@
+main: eu.darkcube.system.bungee.party.Main
+version: 1.0
+name: PartySystem
+author: DasBabyPixel
+description: PartySystem

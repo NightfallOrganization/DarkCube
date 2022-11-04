@@ -1,0 +1,5 @@
+name: CloudNet-Ban
+version: 1.0
+author: DasBabyPixel
+description: BanSystem
+main: eu.darkcube.system.cloudban.bungee.Main

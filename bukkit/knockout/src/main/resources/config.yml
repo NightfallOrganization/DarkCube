@@ -1,0 +1,10 @@
+mapSwitchCooldownSeconds: 1200
+shopEntityName: '&7» &dShop &7«'
+
+coins:
+  lostOnDeath: 5
+  receivedOnKill: 10
+  
+killstreak:
+  coins: 2000
+  multiplier: 2

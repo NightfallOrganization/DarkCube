@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+dependencies {
+    implementation project(':pserver:pserver-common')
+    implementation project(':bukkit:commandapi')
+    implementation project(':bukkit:languageapi')
+    implementation project(':bukkit:inventoryapi')
+    implementation project(':bukkit:woolbattle')
+    implementation "net.luckperms:api:$luckpermsVersion"
+}

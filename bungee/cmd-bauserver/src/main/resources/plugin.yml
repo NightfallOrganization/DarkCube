@@ -1,0 +1,5 @@
+main: eu.darkcube.system.bungee.cmd_bauserver.Main
+version: 1.0
+name: cmd_Bauserver
+author: DasBabyPixel
+description: Bauserver-Command

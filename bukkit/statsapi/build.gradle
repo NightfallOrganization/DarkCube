@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':bukkit:darkcubesystem')
+    implementation "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
+    implementation "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
+    implementation "de.dytanic.cloudnet:cloudnet-wrapper-jvm:$cloudnetVersion"
+}

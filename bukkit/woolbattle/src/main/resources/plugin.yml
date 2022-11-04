@@ -1,0 +1,5 @@
+main: eu.darkcube.minigame.woolbattle.Main
+version: 1.0
+author: DasBabyPixel
+name: WoolBattle
+softdepend: [System, CommandAPI]

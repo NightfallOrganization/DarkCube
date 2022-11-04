@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':bukkit:darkcubesystem')
+    implementation project(':bukkit:statsapi')
+    implementation project(':bukkit:languageapi')
+    implementation project(':bukkit:commandapi')
+    implementation 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
+    implementation "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
+    implementation "de.dytanic.cloudnet:cloudnet-wrapper-jvm:$cloudnetVersion"
+}

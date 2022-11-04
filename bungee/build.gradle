@@ -1,0 +1,10 @@
+subprojects {
+    apply plugin: 'java'
+	
+	dependencies {
+		implementation 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+	}
+	
+	compileJava.options.encoding = 'UTF-8'
+	compileTestJava.options.encoding = 'UTF-8'
+}

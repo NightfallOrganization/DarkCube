@@ -1,0 +1,19 @@
+main: de.dasbabypixel.prefixplugin.Main
+name: PrefixPlugin
+version: 1.2
+author: DasBabyPixel
+softdepend: [LuckPerms, DarkPerms, System]
+
+commands: 
+  reloadprefixes:
+    permission: prefixplugin.reloadprefixes
+    usage: /reloadprefixes
+  addname:
+    permission: prefixplugin.addname
+    usage: /addname <Player> <Name>
+  removename:
+    permission: prefixplugin.removename
+    usage: /removename <Player>
+  listnames:
+    permission: prefixplugin.listnames
+    usage: /listnames

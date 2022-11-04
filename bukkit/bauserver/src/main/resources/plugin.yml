@@ -1,0 +1,4 @@
+main: eu.darkcube.system.bauserver.Main
+version: 1.0
+name: BauServer
+author: DasBabyPixel

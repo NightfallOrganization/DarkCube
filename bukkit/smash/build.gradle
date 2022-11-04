@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':bukkit:darkcubesystem')
+	implementation project(':bukkit:inventoryapi')
+	implementation 'com.comphenix.protocol:ProtocolLib:4.8.0'
+	implementation 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
+    implementation "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
+}

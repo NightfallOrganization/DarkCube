@@ -1,0 +1,5 @@
+name: LanguageAPICore
+author: DasBabyPixel
+version: 1.0
+main: eu.darkcube.system.language.core.LanguageAPICore
+load: startup

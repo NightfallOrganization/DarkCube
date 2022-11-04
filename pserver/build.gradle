@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+dependencies {
+    implementation "de.dytanic.cloudnet:cloudnet:$cloudnetVersion"
+    implementation "de.dytanic.cloudnet:cloudnet-wrapper-jvm:$cloudnetVersion"
+    implementation "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
+    implementation "de.dytanic.cloudnet:cloudnet-database-mysql:$cloudnetVersion"
+    implementation project('pserver-common')
+    implementation project(':bukkit:commandapi')
+}

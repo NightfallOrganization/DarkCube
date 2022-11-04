@@ -1,0 +1,25 @@
+# Change the Join-Message
+joinmessage: '&7[&a+&7] %prefix%%player%%suffix%'
+
+# Change the Quit-Message
+quitmessage: '&7[&c-&7] %prefix%%player%%suffix%'
+
+# Change the Chat format
+# >> stands for »
+chatformat: '%prefix%%player%%suffix% &8>> &7%message%'
+
+# Command-Prefix (Probably your server name)
+commandprefix: '&9PrefixPlugin&c4&7&l&b&lLuck&3&lPerms&7&l'
+
+# Whether or not the luckperms prefix shall be used
+luckpermsprefix: true
+
+# Whether or not the luckperms suffix shall be used
+luckpermssuffix: true
+
+#
+# For developers: To change the prefix / suffix of a player use PrefixPlugin#getApi.
+#
+
+# Advanced. Use only if you have a cloud system that uses sth. like '&' as color char. Default '§' 
+console-color-char: '§'
