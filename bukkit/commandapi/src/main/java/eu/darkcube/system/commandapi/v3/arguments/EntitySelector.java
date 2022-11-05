@@ -28,16 +28,27 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class EntitySelector {
 
 	private final int limit;
+
 	private final boolean includeNonPlayers;
+
 	private final boolean currentWordOnly;
+
 	private final Predicate<Entity> filter;
+
 	private final MinMaxBounds.FloatBound distance;
+
 	private final Function<Vector3d, Vector3d> positionGetter;
+
 	private final BoundingBox bb;
+
 	private final BiConsumer<Vector3d, List<? extends Entity>> sorter;
+
 	private final boolean self;
+
 	private final String username;
+
 	private final UUID uuid;
+
 	private final EntityType type;
 
 	public EntitySelector(int limit, boolean includeNonPlayers, boolean currentWordOnly, Predicate<Entity> filter,
@@ -59,7 +70,7 @@ public class EntitySelector {
 	}
 
 	public int getLimit() {
-		return limit;
+		return this.limit;
 	}
 
 	public boolean includesEntities() {
@@ -74,7 +85,7 @@ public class EntitySelector {
 		return this.currentWordOnly;
 	}
 
-	private void checkPermission(CommandSource source) throws CommandSyntaxException {
+	private void checkPermission(CommandSource source) {
 	}
 
 	public Entity selectOne(CommandSource source) throws CommandSyntaxException {
@@ -90,12 +101,12 @@ public class EntitySelector {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<? extends Entity> select(CommandSource source) throws CommandSyntaxException {
+	public List<? extends Entity> select(CommandSource source) {
 		this.checkPermission(source);
 		if (!this.includeNonPlayers) {
 			return this.selectPlayers(source);
 		} else if (this.username != null) {
-			Player player = Bukkit.getPlayer(username);
+			Player player = Bukkit.getPlayer(this.username);
 			return player == null ? Collections.emptyList() : Lists.newArrayList(player);
 		} else if (this.uuid != null) {
 			for (World world : Bukkit.getWorlds()) {
@@ -113,18 +124,17 @@ public class EntitySelector {
 				return (List<? extends Entity>) (source.getEntity() != null && predicate.test(source.getEntity())
 						? Lists.newArrayList(source.getEntity())
 						: Collections.emptyList());
-			} else {
-				List<Entity> list = Lists.newArrayList();
-				if (this.isWorldLimited()) {
-					this.getEntities(list, source.getWorld(), vector3d, predicate);
-				} else {
-					for (World serverworld : Bukkit.getWorlds()) {
-						this.getEntities(list, serverworld, vector3d, predicate);
-					}
-				}
-
-				return this.sortAndLimit(vector3d, list);
 			}
+			List<Entity> list = Lists.newArrayList();
+			if (this.isWorldLimited()) {
+				this.getEntities(list, source.getWorld(), vector3d, predicate);
+			} else {
+				for (World serverworld : Bukkit.getWorlds()) {
+					this.getEntities(list, serverworld, vector3d, predicate);
+				}
+			}
+
+			return this.sortAndLimit(vector3d, list);
 		}
 	}
 
@@ -149,15 +159,14 @@ public class EntitySelector {
 		List<Player> list = this.selectPlayers(source);
 		if (list.size() != 1) {
 			throw EntityArgument.PLAYER_NOT_FOUND.create();
-		} else {
-			return list.get(0);
 		}
+		return list.get(0);
 	}
 
-	public List<Player> selectPlayers(CommandSource source) throws CommandSyntaxException {
+	public List<Player> selectPlayers(CommandSource source) {
 		this.checkPermission(source);
 		if (this.username != null) {
-			Player player = Bukkit.getPlayer(username);
+			Player player = Bukkit.getPlayer(this.username);
 			return player == null ? Collections.emptyList() : Lists.newArrayList(player);
 		} else if (this.uuid != null) {
 			Player player = Bukkit.getPlayer(this.uuid);
@@ -174,22 +183,21 @@ public class EntitySelector {
 				}
 
 				return Collections.emptyList();
+			}
+			List<Player> list;
+			if (this.isWorldLimited()) {
+				list = source.getWorld().getPlayers().stream().filter(predicate).collect(Collectors.toList());
 			} else {
-				List<Player> list;
-				if (this.isWorldLimited()) {
-					list = source.getWorld().getPlayers().stream().filter(predicate).collect(Collectors.toList());
-				} else {
-					list = Lists.newArrayList();
+				list = Lists.newArrayList();
 
-					for (Player serverplayerentity : Bukkit.getOnlinePlayers()) {
-						if (predicate.test(serverplayerentity)) {
-							list.add(serverplayerentity);
-						}
+				for (Player serverplayerentity : Bukkit.getOnlinePlayers()) {
+					if (predicate.test(serverplayerentity)) {
+						list.add(serverplayerentity);
 					}
 				}
-
-				return this.sortAndLimit(vector3d, list);
 			}
+
+			return this.sortAndLimit(vector3d, list);
 		}
 	}
 

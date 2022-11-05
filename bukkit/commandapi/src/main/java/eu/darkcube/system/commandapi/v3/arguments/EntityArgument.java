@@ -44,15 +44,14 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 		if (entityselector.getLimit() > 1 && this.single) {
 			if (this.playersOnly) {
 				reader.setCursor(0);
-				throw TOO_MANY_PLAYERS.createWithContext(reader);
-			} else {
-				reader.setCursor(0);
-				throw TOO_MANY_ENTITIES.createWithContext(reader);
+				throw EntityArgument.TOO_MANY_PLAYERS.createWithContext(reader);
 			}
+			reader.setCursor(0);
+			throw EntityArgument.TOO_MANY_ENTITIES.createWithContext(reader);
 		} else if (entityselector.includesEntities() && this.playersOnly
 						&& !entityselector.isSelfSelector()) {
 			reader.setCursor(0);
-			throw ONLY_PLAYERS_ALLOWED.createWithContext(reader);
+			throw EntityArgument.ONLY_PLAYERS_ALLOWED.createWithContext(reader);
 		} else {
 			return entityselector;
 		}
@@ -66,12 +65,11 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 	public static Collection<? extends Entity> getEntities(
 					CommandContext<CommandSource> context, String name)
 					throws CommandSyntaxException {
-		Collection<? extends Entity> collection = getEntitiesAllowingNone(context, name);
+		Collection<? extends Entity> collection = EntityArgument.getEntitiesAllowingNone(context, name);
 		if (collection.isEmpty()) {
-			throw ENTITY_NOT_FOUND.create();
-		} else {
-			return collection;
+			throw EntityArgument.ENTITY_NOT_FOUND.create();
 		}
+		return collection;
 	}
 
 	@Override
@@ -95,9 +93,8 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 								: Iterables.concat(collection, suggestionProvider.getTargetedEntity());
 				ISuggestionProvider.suggest(iterable, sbuilder);
 			});
-		} else {
-			return Suggestions.empty();
 		}
+		return Suggestions.empty();
 	}
 
 	public static Player getPlayer(CommandContext<CommandSource> context,
@@ -108,23 +105,20 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 	public static Collection<Player> getPlayers(
 					CommandContext<CommandSource> context, String name)
 					throws CommandSyntaxException {
-		Collection<Player> list = getPlayersAllowingNone(context, name);
+		Collection<Player> list = EntityArgument.getPlayersAllowingNone(context, name);
 		if (list.isEmpty()) {
-			throw PLAYER_NOT_FOUND.create();
-		} else {
-			return list;
+			throw EntityArgument.PLAYER_NOT_FOUND.create();
 		}
+		return list;
 	}
 
 	public static Collection<? extends Entity> getEntitiesAllowingNone(
-					CommandContext<CommandSource> context, String name)
-					throws CommandSyntaxException {
+					CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, EntitySelector.class).select(context.getSource());
 	}
 
 	public static Collection<Player> getPlayersAllowingNone(
-					CommandContext<CommandSource> context, String name)
-					throws CommandSyntaxException {
+					CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, EntitySelector.class).selectPlayers(context.getSource());
 	}
 

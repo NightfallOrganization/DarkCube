@@ -28,17 +28,17 @@ public enum Direction {
 	private final Direction.Axis axis;
 	private final Direction.AxisDirection axisDirection;
 	private final Vector3i directionVec;
-	private static final Direction[] VALUES = values();
-	private static final Map<String, Direction> NAME_LOOKUP = Arrays.stream(VALUES)
+	private static final Direction[] VALUES = Direction.values();
+	private static final Map<String, Direction> NAME_LOOKUP = Arrays.stream(Direction.VALUES)
 			.collect(Collectors.toMap(Direction::getName2, (p_199787_0_) -> {
 				return p_199787_0_;
 			}));
-	private static final Direction[] BY_INDEX = Arrays.stream(VALUES).sorted(Comparator.comparingInt((p_199790_0_) -> {
+	private static final Direction[] BY_INDEX = Arrays.stream(Direction.VALUES).sorted(Comparator.comparingInt((p_199790_0_) -> {
 		return p_199790_0_.index;
 	})).toArray((p_199788_0_) -> {
 		return new Direction[p_199788_0_];
 	});
-	private static final Direction[] BY_HORIZONTAL_INDEX = Arrays.stream(VALUES).filter((p_199786_0_) -> {
+	private static final Direction[] BY_HORIZONTAL_INDEX = Arrays.stream(Direction.VALUES).filter((p_199786_0_) -> {
 		return p_199786_0_.getAxis().isHorizontal();
 	}).sorted(Comparator.comparingInt((p_199789_0_) -> {
 		return p_199789_0_.horizontalIndex;
@@ -77,15 +77,14 @@ public enum Direction {
 		Direction direction2 = flag2 ? SOUTH : NORTH;
 		if (f6 > f8) {
 			if (f7 > f9) {
-				return compose(direction1, direction, direction2);
-			} else {
-				return f10 > f7 ? compose(direction, direction2, direction1)
-						: compose(direction, direction1, direction2);
+				return Direction.compose(direction1, direction, direction2);
 			}
+			return f10 > f7 ? Direction.compose(direction, direction2, direction1)
+					: Direction.compose(direction, direction1, direction2);
 		} else if (f7 > f10) {
-			return compose(direction1, direction2, direction);
+			return Direction.compose(direction1, direction2, direction);
 		} else {
-			return f9 > f7 ? compose(direction2, direction, direction1) : compose(direction2, direction1, direction);
+			return f9 > f7 ? Direction.compose(direction2, direction, direction1) : Direction.compose(direction2, direction1, direction);
 		}
 	}
 
@@ -97,7 +96,7 @@ public enum Direction {
 		Vector3i vector3i = directionIn.getDirectionVec();
 		Vector4f vector4f = new Vector4f(vector3i.getX(), vector3i.getY(), vector3i.getZ(), 0.0F);
 		vector4f.transform(matrixIn);
-		return getFacingFromVector(vector4f.getX(), vector4f.getY(), vector4f.getZ());
+		return Direction.getFacingFromVector(vector4f.getX(), vector4f.getY(), vector4f.getZ());
 	}
 
 	public Quaternion getRotation() {
@@ -135,7 +134,7 @@ public enum Direction {
 	}
 
 	public Direction getOpposite() {
-		return byIndex(this.opposite);
+		return Direction.byIndex(this.opposite);
 	}
 
 	public Direction rotateY() {
@@ -193,19 +192,19 @@ public enum Direction {
 	}
 
 	public static Direction byName(String name) {
-		return name == null ? null : NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
+		return name == null ? null : Direction.NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
 	}
 
 	public static Direction byIndex(int index) {
-		return BY_INDEX[MathHelper.abs(index % BY_INDEX.length)];
+		return Direction.BY_INDEX[MathHelper.abs(index % Direction.BY_INDEX.length)];
 	}
 
 	public static Direction byHorizontalIndex(int horizontalIndexIn) {
-		return BY_HORIZONTAL_INDEX[MathHelper.abs(horizontalIndexIn % BY_HORIZONTAL_INDEX.length)];
+		return Direction.BY_HORIZONTAL_INDEX[MathHelper.abs(horizontalIndexIn % Direction.BY_HORIZONTAL_INDEX.length)];
 	}
 
 	public static Direction fromAngle(double angle) {
-		return byHorizontalIndex(MathHelper.floor(angle / 90.0D + 0.5D) & 3);
+		return Direction.byHorizontalIndex(MathHelper.floor(angle / 90.0D + 0.5D) & 3);
 	}
 
 	public static Direction getFacingFromAxisDirection(Direction.Axis axisIn, Direction.AxisDirection axisDirectionIn) {
@@ -225,14 +224,14 @@ public enum Direction {
 	}
 
 	public static Direction getFacingFromVector(double x, double y, double z) {
-		return getFacingFromVector((float) x, (float) y, (float) z);
+		return Direction.getFacingFromVector((float) x, (float) y, (float) z);
 	}
 
 	public static Direction getFacingFromVector(float x, float y, float z) {
 		Direction direction = NORTH;
 		float f = Float.MIN_VALUE;
 
-		for (Direction direction1 : VALUES) {
+		for (Direction direction1 : Direction.VALUES) {
 			float f1 = x * direction1.directionVec.getX() + y * direction1.directionVec.getY()
 					+ z * direction1.directionVec.getZ();
 			if (f1 > f) {
@@ -254,7 +253,7 @@ public enum Direction {
 	}
 
 	public static Direction getFacingFromAxis(Direction.AxisDirection axisDirectionIn, Direction.Axis axisIn) {
-		for (Direction direction : VALUES) {
+		for (Direction direction : Direction.VALUES) {
 			if (direction.getAxisDirection() == axisDirectionIn && direction.getAxis() == axisIn) {
 				return direction;
 			}
@@ -309,8 +308,8 @@ public enum Direction {
 			}
 		};
 
-		private static final Direction.Axis[] VALUES = values();
-		private static final Map<String, Direction.Axis> NAME_LOOKUP = Arrays.stream(VALUES)
+		private static final Direction.Axis[] VALUES = Axis.values();
+		private static final Map<String, Direction.Axis> NAME_LOOKUP = Arrays.stream(Axis.VALUES)
 				.collect(Collectors.toMap(Direction.Axis::getName2, (p_199785_0_) -> {
 					return p_199785_0_;
 				}));
@@ -321,7 +320,7 @@ public enum Direction {
 		}
 
 		public static Direction.Axis byName(String name) {
-			return NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
+			return Axis.NAME_LOOKUP.get(name.toLowerCase(Locale.ROOT));
 		}
 
 		public String getName2() {

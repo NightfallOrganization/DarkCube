@@ -55,9 +55,8 @@ public class LocationInput implements ILocationArgument {
 			LocationInput locationinput = (LocationInput) p_equals_1_;
 			if (!this.x.equals(locationinput.x)) {
 				return false;
-			} else {
-				return !this.y.equals(locationinput.y) ? false : this.z.equals(locationinput.z);
 			}
+			return !this.y.equals(locationinput.y) ? false : this.z.equals(locationinput.z);
 		}
 	}
 
@@ -71,14 +70,12 @@ public class LocationInput implements ILocationArgument {
 				reader.skip();
 				LocationPart locationpart2 = LocationPart.parseInt(reader);
 				return new LocationInput(locationpart, locationpart1, locationpart2);
-			} else {
-				reader.setCursor(i);
-				throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 			}
-		} else {
 			reader.setCursor(i);
 			throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 		}
+		reader.setCursor(i);
+		throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 	}
 
 	public static LocationInput parseDouble(StringReader reader, boolean centerIntegers) throws CommandSyntaxException {
@@ -91,14 +88,12 @@ public class LocationInput implements ILocationArgument {
 				reader.skip();
 				LocationPart locationpart2 = LocationPart.parseDouble(reader, centerIntegers);
 				return new LocationInput(locationpart, locationpart1, locationpart2);
-			} else {
-				reader.setCursor(i);
-				throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 			}
-		} else {
 			reader.setCursor(i);
 			throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 		}
+		reader.setCursor(i);
+		throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 	}
 
 	public static LocationInput current() {

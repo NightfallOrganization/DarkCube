@@ -5,12 +5,20 @@ import java.util.UUID;
 import java.util.function.IntPredicate;
 
 public class MathHelper {
-	public static final float SQRT_2 = sqrt(2.0F);
+
+	public static final float SQRT_2 = MathHelper.sqrt(2.0F);
+
 	private static final Random RANDOM = new Random();
-	private static final int[] MULTIPLY_DE_BRUIJN_BIT_POSITION = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15,
-			25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
+
+	private static final int[] MULTIPLY_DE_BRUIJN_BIT_POSITION = new int[] {
+			0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11,
+			5, 10, 9
+	};
+
 	private static final double FRAC_BIAS = Double.longBitsToDouble(4805340802404319232L);
+
 	private static final double[] ASINE_TAB = new double[257];
+
 	private static final double[] COS_TAB = new double[257];
 
 	public static float sin(float value) {
@@ -69,41 +77,36 @@ public class MathHelper {
 	public static int clamp(int num, int min, int max) {
 		if (num < min) {
 			return min;
-		} else {
-			return num > max ? max : num;
 		}
+		return num > max ? max : num;
 	}
 
 	public static long clamp(long num, long min, long max) {
 		if (num < min) {
 			return min;
-		} else {
-			return num > max ? max : num;
 		}
+		return num > max ? max : num;
 	}
 
 	public static float clamp(float num, float min, float max) {
 		if (num < min) {
 			return min;
-		} else {
-			return num > max ? max : num;
 		}
+		return num > max ? max : num;
 	}
 
 	public static double clamp(double num, double min, double max) {
 		if (num < min) {
 			return min;
-		} else {
-			return num > max ? max : num;
 		}
+		return num > max ? max : num;
 	}
 
 	public static double clampedLerp(double lowerBnd, double upperBnd, double slide) {
 		if (slide < 0.0D) {
 			return lowerBnd;
-		} else {
-			return slide > 1.0D ? upperBnd : lerp(slide, lowerBnd, upperBnd);
 		}
+		return slide > 1.0D ? upperBnd : MathHelper.lerp(slide, lowerBnd, upperBnd);
 	}
 
 	public static double absMax(double x, double y) {
@@ -204,32 +207,32 @@ public class MathHelper {
 	}
 
 	public static float wrapSubtractDegrees(float p_203302_0_, float p_203302_1_) {
-		return wrapDegrees(p_203302_1_ - p_203302_0_);
+		return MathHelper.wrapDegrees(p_203302_1_ - p_203302_0_);
 	}
 
 	public static float degreesDifferenceAbs(float p_203301_0_, float p_203301_1_) {
-		return abs(wrapSubtractDegrees(p_203301_0_, p_203301_1_));
+		return MathHelper.abs(MathHelper.wrapSubtractDegrees(p_203301_0_, p_203301_1_));
 	}
 
 	public static float func_219800_b(float p_219800_0_, float p_219800_1_, float p_219800_2_) {
-		float f = wrapSubtractDegrees(p_219800_0_, p_219800_1_);
-		float f1 = clamp(f, -p_219800_2_, p_219800_2_);
+		float f = MathHelper.wrapSubtractDegrees(p_219800_0_, p_219800_1_);
+		float f1 = MathHelper.clamp(f, -p_219800_2_, p_219800_2_);
 		return p_219800_1_ - f1;
 	}
 
 	public static float approach(float p_203300_0_, float p_203300_1_, float p_203300_2_) {
-		p_203300_2_ = abs(p_203300_2_);
-		return p_203300_0_ < p_203300_1_ ? clamp(p_203300_0_ + p_203300_2_, p_203300_0_, p_203300_1_)
-				: clamp(p_203300_0_ - p_203300_2_, p_203300_1_, p_203300_0_);
+		p_203300_2_ = MathHelper.abs(p_203300_2_);
+		return p_203300_0_ < p_203300_1_ ? MathHelper.clamp(p_203300_0_ + p_203300_2_, p_203300_0_, p_203300_1_)
+				: MathHelper.clamp(p_203300_0_ - p_203300_2_, p_203300_1_, p_203300_0_);
 	}
 
 	public static float approachDegrees(float p_203303_0_, float p_203303_1_, float p_203303_2_) {
-		float f = wrapSubtractDegrees(p_203303_0_, p_203303_1_);
-		return approach(p_203303_0_, p_203303_0_ + f, p_203303_2_);
+		float f = MathHelper.wrapSubtractDegrees(p_203303_0_, p_203303_1_);
+		return MathHelper.approach(p_203303_0_, p_203303_0_ + f, p_203303_2_);
 	}
 
 	public static int getInt(String value, int defaultValue) {
-		return toInt(value, defaultValue);
+		return MathHelper.toInt(value, defaultValue);
 	}
 
 	private static int toInt(String s, int defaultV) {
@@ -255,12 +258,12 @@ public class MathHelper {
 	}
 
 	public static int log2DeBruijn(int value) {
-		value = isPowerOfTwo(value) ? value : smallestEncompassingPowerOfTwo(value);
-		return MULTIPLY_DE_BRUIJN_BIT_POSITION[(int) (value * 125613361L >> 27) & 31];
+		value = MathHelper.isPowerOfTwo(value) ? value : MathHelper.smallestEncompassingPowerOfTwo(value);
+		return MathHelper.MULTIPLY_DE_BRUIJN_BIT_POSITION[(int) (value * 125613361L >> 27) & 31];
 	}
 
 	public static int log2(int value) {
-		return log2DeBruijn(value) - (isPowerOfTwo(value) ? 0 : 1);
+		return MathHelper.log2DeBruijn(value) - (MathHelper.isPowerOfTwo(value) ? 0 : 1);
 	}
 
 	public static int roundUp(int number, int interval) {
@@ -279,7 +282,8 @@ public class MathHelper {
 	}
 
 	public static int rgb(float rIn, float gIn, float bIn) {
-		return rgb(floor(rIn * 255.0F), floor(gIn * 255.0F), floor(bIn * 255.0F));
+		return MathHelper.rgb(MathHelper.floor(rIn * 255.0F), MathHelper.floor(gIn * 255.0F),
+				MathHelper.floor(bIn * 255.0F));
 	}
 
 	public static int rgb(int rIn, int gIn, int bIn) {
@@ -288,15 +292,15 @@ public class MathHelper {
 	}
 
 	public static float frac(float number) {
-		return number - floor(number);
+		return number - MathHelper.floor(number);
 	}
 
 	public static double frac(double number) {
-		return number - lfloor(number);
+		return number - MathHelper.lfloor(number);
 	}
 
 	public static long getPositionRandom(Vector3i pos) {
-		return getCoordinateRandom(pos.getX(), pos.getY(), pos.getZ());
+		return MathHelper.getCoordinateRandom(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public static long getCoordinateRandom(int x, int y, int z) {
@@ -312,7 +316,7 @@ public class MathHelper {
 	}
 
 	public static UUID getRandomUUID() {
-		return getRandomUUID(RANDOM);
+		return MathHelper.getRandomUUID(MathHelper.RANDOM);
 	}
 
 	public static double func_233020_c_(double p_233020_0_, double p_233020_2_, double p_233020_4_) {
@@ -323,49 +327,48 @@ public class MathHelper {
 		double d0 = p_181159_2_ * p_181159_2_ + p_181159_0_ * p_181159_0_;
 		if (Double.isNaN(d0)) {
 			return Double.NaN;
-		} else {
-			boolean flag = p_181159_0_ < 0.0D;
-			if (flag) {
-				p_181159_0_ = -p_181159_0_;
-			}
-
-			boolean flag1 = p_181159_2_ < 0.0D;
-			if (flag1) {
-				p_181159_2_ = -p_181159_2_;
-			}
-
-			boolean flag2 = p_181159_0_ > p_181159_2_;
-			if (flag2) {
-				double d1 = p_181159_2_;
-				p_181159_2_ = p_181159_0_;
-				p_181159_0_ = d1;
-			}
-
-			double d9 = fastInvSqrt(d0);
-			p_181159_2_ = p_181159_2_ * d9;
-			p_181159_0_ = p_181159_0_ * d9;
-			double d2 = FRAC_BIAS + p_181159_0_;
-			int i = (int) Double.doubleToRawLongBits(d2);
-			double d3 = ASINE_TAB[i];
-			double d4 = COS_TAB[i];
-			double d5 = d2 - FRAC_BIAS;
-			double d6 = p_181159_0_ * d4 - p_181159_2_ * d5;
-			double d7 = (6.0D + d6 * d6) * d6 * 0.16666666666666666D;
-			double d8 = d3 + d7;
-			if (flag2) {
-				d8 = (Math.PI / 2D) - d8;
-			}
-
-			if (flag1) {
-				d8 = Math.PI - d8;
-			}
-
-			if (flag) {
-				d8 = -d8;
-			}
-
-			return d8;
 		}
+		boolean flag = p_181159_0_ < 0.0D;
+		if (flag) {
+			p_181159_0_ = -p_181159_0_;
+		}
+
+		boolean flag1 = p_181159_2_ < 0.0D;
+		if (flag1) {
+			p_181159_2_ = -p_181159_2_;
+		}
+
+		boolean flag2 = p_181159_0_ > p_181159_2_;
+		if (flag2) {
+			double d1 = p_181159_2_;
+			p_181159_2_ = p_181159_0_;
+			p_181159_0_ = d1;
+		}
+
+		double d9 = MathHelper.fastInvSqrt(d0);
+		p_181159_2_ = p_181159_2_ * d9;
+		p_181159_0_ = p_181159_0_ * d9;
+		double d2 = MathHelper.FRAC_BIAS + p_181159_0_;
+		int i = (int) Double.doubleToRawLongBits(d2);
+		double d3 = MathHelper.ASINE_TAB[i];
+		double d4 = MathHelper.COS_TAB[i];
+		double d5 = d2 - MathHelper.FRAC_BIAS;
+		double d6 = p_181159_0_ * d4 - p_181159_2_ * d5;
+		double d7 = (6.0D + d6 * d6) * d6 * 0.16666666666666666D;
+		double d8 = d3 + d7;
+		if (flag2) {
+			d8 = (Math.PI / 2D) - d8;
+		}
+
+		if (flag1) {
+			d8 = Math.PI - d8;
+		}
+
+		if (flag) {
+			d8 = -d8;
+		}
+
+		return d8;
 	}
 
 	public static float fastInvSqrt(float number) {
@@ -437,9 +440,9 @@ public class MathHelper {
 					+ saturation + ", " + value);
 		}
 
-		int j = clamp((int) (f4 * 255.0F), 0, 255);
-		int k = clamp((int) (f5 * 255.0F), 0, 255);
-		int l = clamp((int) (f6 * 255.0F), 0, 255);
+		int j = MathHelper.clamp((int) (f4 * 255.0F), 0, 255);
+		int k = MathHelper.clamp((int) (f5 * 255.0F), 0, 255);
+		int l = MathHelper.clamp((int) (f6 * 255.0F), 0, 255);
 		return j << 16 | k << 8 | l;
 	}
 
@@ -478,15 +481,16 @@ public class MathHelper {
 
 	public static double lerp2(double p_219804_0_, double p_219804_2_, double p_219804_4_, double p_219804_6_,
 			double p_219804_8_, double p_219804_10_) {
-		return lerp(p_219804_2_, lerp(p_219804_0_, p_219804_4_, p_219804_6_),
-				lerp(p_219804_0_, p_219804_8_, p_219804_10_));
+		return MathHelper.lerp(p_219804_2_, MathHelper.lerp(p_219804_0_, p_219804_4_, p_219804_6_),
+				MathHelper.lerp(p_219804_0_, p_219804_8_, p_219804_10_));
 	}
 
 	public static double lerp3(double p_219807_0_, double p_219807_2_, double p_219807_4_, double p_219807_6_,
 			double p_219807_8_, double p_219807_10_, double p_219807_12_, double p_219807_14_, double p_219807_16_,
 			double p_219807_18_, double p_219807_20_) {
-		return lerp(p_219807_4_, lerp2(p_219807_0_, p_219807_2_, p_219807_6_, p_219807_8_, p_219807_10_, p_219807_12_),
-				lerp2(p_219807_0_, p_219807_2_, p_219807_14_, p_219807_16_, p_219807_18_, p_219807_20_));
+		return MathHelper.lerp(p_219807_4_,
+				MathHelper.lerp2(p_219807_0_, p_219807_2_, p_219807_6_, p_219807_8_, p_219807_10_, p_219807_12_),
+				MathHelper.lerp2(p_219807_0_, p_219807_2_, p_219807_14_, p_219807_16_, p_219807_18_, p_219807_20_));
 	}
 
 	public static double perlinFade(double p_219801_0_) {
@@ -496,13 +500,12 @@ public class MathHelper {
 	public static int signum(double x) {
 		if (x == 0.0D) {
 			return 0;
-		} else {
-			return x > 0.0D ? 1 : -1;
 		}
+		return x > 0.0D ? 1 : -1;
 	}
 
 	public static float interpolateAngle(float p_219805_0_, float p_219805_1_, float p_219805_2_) {
-		return p_219805_1_ + p_219805_0_ * wrapDegrees(p_219805_2_ - p_219805_1_);
+		return p_219805_1_ + p_219805_0_ * MathHelper.wrapDegrees(p_219805_2_ - p_219805_1_);
 	}
 
 	@Deprecated
@@ -543,9 +546,10 @@ public class MathHelper {
 		for (int i = 0; i < 257; ++i) {
 			double d0 = i / 256.0D;
 			double d1 = Math.asin(d0);
-			COS_TAB[i] = Math.cos(d1);
-			ASINE_TAB[i] = d1;
+			MathHelper.COS_TAB[i] = Math.cos(d1);
+			MathHelper.ASINE_TAB[i] = d1;
 		}
 
 	}
+
 }

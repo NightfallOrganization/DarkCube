@@ -18,7 +18,7 @@ public class MessageArgument implements ArgumentType<MessageArgument.Message> {
 	}
 
 	public static String getMessage(CommandContext<CommandSource> context,
-					String name) throws CommandSyntaxException {
+					String name) {
 		return context.getArgument(name, MessageArgument.Message.class).getText();
 	}
 
@@ -30,7 +30,7 @@ public class MessageArgument implements ArgumentType<MessageArgument.Message> {
 
 	@Override
 	public Collection<String> getExamples() {
-		return EXAMPLES;
+		return MessageArgument.EXAMPLES;
 	}
 
 	public static class Message {
@@ -41,10 +41,10 @@ public class MessageArgument implements ArgumentType<MessageArgument.Message> {
 		}
 
 		public String getText() {
-			return text;
+			return this.text;
 		}
 
-		public static MessageArgument.Message parse(StringReader reader) throws CommandSyntaxException {
+		public static MessageArgument.Message parse(StringReader reader) {
 			String s = reader.getString().substring(reader.getCursor(), reader.getTotalLength());
 			reader.setCursor(reader.getTotalLength());
 			return new Message(s);

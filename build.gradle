@@ -1,13 +1,14 @@
 ext {
     cloudnetVersion = '3.4.0-SNAPSHOT'
-    luckpermsVersion = '5.4'
-    bungeeVersion = '1.19-R0.1-SNAPSHOT'
     
     cloudnetDriver = "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
     cloudnet = "de.dytanic.cloudnet:cloudnet:$cloudnetVersion"
     cloudnetBridge = "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
     cloudnetWrapper = "de.dytanic.cloudnet:cloudnet-wrapper-jvm:$cloudnetVersion"
-    bungee = "net.md-5:bungeecord-api:$bungeeVersion"
+    bungee = "net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT"
+    luckperms = "net.luckperms:api:5.4"
+    npclib = "com.github.juliarn:npc-lib:2.6-RELEASE"
+    protocollib = "com.comphenix.protocol:ProtocolLib:4.8.0"
 }
 
 allprojects {
@@ -15,7 +16,7 @@ allprojects {
 		mavenCentral()
 		mavenLocal()
 	    maven {
-        	url = uri("https://repo.papermc.io/repository/maven-public/")
+        	url = uri('https://repo.papermc.io/repository/maven-public/')
     	}
     	maven {
     	    url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
@@ -32,7 +33,6 @@ allprojects {
 		maven { url = 'https://repo.cloudnetservice.eu/repository/snapshots/' }
 		maven { url = 'https://jitpack.io'}
 
-		
     }
     
     pluginManager.withPlugin('java') {
@@ -42,6 +42,23 @@ allprojects {
 	
 		compileJava.options.encoding = 'UTF-8'
 		compileTestJava.options.encoding = 'UTF-8'
+    }
+
+    pluginManager.withPlugin('java-library') {
+        configurations {
+            embedApi
+        }
+        
+        dependencies {
+            configurations.api.extendsFrom(configurations.embedApi)
+        }
+        
+        jar {
+        	dependsOn configurations.embedApi
+            from {
+                configurations.embedApi.collect { it.isDirectory() ? it : zipTree(it) }
+            }
+        }
     }
 }
 

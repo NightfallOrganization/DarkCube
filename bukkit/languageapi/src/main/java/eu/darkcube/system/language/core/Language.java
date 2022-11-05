@@ -45,7 +45,7 @@ public enum Language {
 
 	public String getMessage(String key, Object... replacements) {
 		if (this.bundle.containsKey(key)) {
-			return String.format(locale, this.bundle.getObject(key).toString(), replacements);
+			return String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
 		}
 		return new StringBuilder()
 				.append(key).append('[').append(String.join(", ", Arrays.asList(replacements).stream()
@@ -55,11 +55,11 @@ public enum Language {
 
 	public static void setLanguage(UUID uuid, Language language) {
 		JsonDocument document = new JsonDocument().append("language", language);
-		getDatabase().containsAsync(uuid.toString()).onComplete(b -> {
+		Language.getDatabase().containsAsync(uuid.toString()).onComplete(b -> {
 			if (b) {
-				getDatabase().updateAsync(uuid.toString(), document);
+				Language.getDatabase().updateAsync(uuid.toString(), document);
 			} else {
-				getDatabase().insertAsync(uuid.toString(), document);
+				Language.getDatabase().insertAsync(uuid.toString(), document);
 			}
 		});
 	}
@@ -74,18 +74,18 @@ public enum Language {
 		for (String key : entrySet) {
 			String mapped = keyModifier.apply(key);
 			if (!this.bundle.containsKey(mapped)) {
-				System.out.println("Missing translation for language " + toString() + ": " + mapped);
+				System.out.println("Missing translation for language " + this.toString() + ": " + mapped);
 			}
 		}
 	}
 
 	public static ITask<Language> getLanguageAsync(UUID uuid) {
-		return getDatabase().getAsync(uuid.toString())
-				.map(json -> json == null ? DEFAULT : json.get("language", Language.class));
+		return Language.getDatabase().getAsync(uuid.toString())
+				.map(json -> json == null ? Language.DEFAULT : json.get("language", Language.class));
 	}
 
 	public static Language getLanguage(UUID uuid) {
-		return getLanguageAsync(uuid).getDef(DEFAULT);
+		return Language.getLanguageAsync(uuid).getDef(Language.DEFAULT);
 	}
 
 	public void registerLookup(Map<String, Object> lookup, Function<String, String> keyModifier) {
@@ -103,12 +103,12 @@ public enum Language {
 	}
 
 	public static Database getDatabase() {
-		return DATABASE;
+		return Language.DATABASE;
 	}
 
 	public void registerLookup(ClassLoader loader, String path, Function<String, String> keyModifier)
 			throws IOException {
-		this.registerLookup(getReader(getResource(loader, path)), keyModifier);
+		this.registerLookup(Language.getReader(Language.getResource(loader, path)), keyModifier);
 	}
 
 	public void registerLookup(ClassLoader loader, String path) throws IOException {
@@ -120,7 +120,7 @@ public enum Language {
 	}
 
 	public static Reader getReader(InputStream stream) {
-		return new InputStreamReader(stream, getCharset());
+		return new InputStreamReader(stream, Language.getCharset());
 	}
 
 	public static Charset getCharset() {
@@ -128,11 +128,11 @@ public enum Language {
 	}
 
 	public Locale getLocale() {
-		return locale;
+		return this.locale;
 	}
 
 	public ResourceBundle getBundle() {
-		return bundle;
+		return this.bundle;
 	}
 
 	public static Language fromString(String language) {
@@ -170,18 +170,18 @@ public enum Language {
 			if (key == null) {
 				throw new NullPointerException();
 			}
-			return lookup.get(key);
+			return this.lookup.get(key);
 		}
 
 		@Override
 		public Enumeration<String> getKeys() {
 			ResourceBundle parent = this.parent;
-			return new ResourceBundleEnumeration(lookup.keySet(), (parent != null) ? parent.getKeys() : null);
+			return new ResourceBundleEnumeration(this.lookup.keySet(), (parent != null) ? parent.getKeys() : null);
 		}
 
 		@Override
 		public Set<String> handleKeySet() {
-			return lookup.keySet();
+			return this.lookup.keySet();
 		}
 
 		public class ResourceBundleEnumeration implements Enumeration<String> {
@@ -207,30 +207,29 @@ public enum Language {
 
 			@Override
 			public boolean hasMoreElements() {
-				if (next == null) {
-					if (iterator.hasNext()) {
-						next = iterator.next();
-					} else if (enumeration != null) {
-						while (next == null && enumeration.hasMoreElements()) {
-							next = enumeration.nextElement();
-							if (set.contains(next)) {
-								next = null;
+				if (this.next == null) {
+					if (this.iterator.hasNext()) {
+						this.next = this.iterator.next();
+					} else if (this.enumeration != null) {
+						while (this.next == null && this.enumeration.hasMoreElements()) {
+							this.next = this.enumeration.nextElement();
+							if (this.set.contains(this.next)) {
+								this.next = null;
 							}
 						}
 					}
 				}
-				return next != null;
+				return this.next != null;
 			}
 
 			@Override
 			public String nextElement() {
-				if (hasMoreElements()) {
-					String result = next;
-					next = null;
+				if (this.hasMoreElements()) {
+					String result = this.next;
+					this.next = null;
 					return result;
-				} else {
-					throw new NoSuchElementException();
 				}
+				throw new NoSuchElementException();
 			}
 		}
 	}

@@ -135,57 +135,57 @@ public class Ingame implements Enableable {
 	public Team winner;
 
 	public Ingame() {
-		listenerItemPickup = new ListenerItemPickup();
-		listenerItemDrop = new ListenerItemDrop();
-		listenerBlockBreak = new ListenerBlockBreak();
-		listenerBlockPlace = new ListenerBlockPlace();
-		listenerBlockCanBuild = new ListenerBlockCanBuild();
-		listenerPlayerJoin = new ListenerPlayerJoin();
-		listenerPlayerQuit = new ListenerPlayerQuit();
-		listenerPlayerLogin = new ListenerPlayerLogin();
-		listenerEntityDamageByEntity = new ListenerEntityDamageByEntity();
-		listenerDoubleJump = new ListenerDoubleJump();
-		listenerEntityDamage = new ListenerEntityDamage();
-		listenerChangeBlock = new ListenerChangeBlock();
-		listenerProjectileHit = new ListenerProjectileHit();
-		listenerProjectileLaunch = new ListenerProjectileLaunch();
-		listenerInventoryClick = new ListenerInventoryClick();
-		listenerInventoryDrag = new ListenerInventoryDrag();
-		listenerCapsule = new ListenerCapsuleInteract();
-		listenerSwitcherLaunch = new ListenerSwitcherLaunchable();
-		listenerSwitcherSwitch = new ListenerSwitcherSwitch();
-		listenerInteract = new ListenerInteract();
-		listenerGameModeChange = new ListenerGameModeChange();
-		listenerPlayerMove = new ListenerPlayerMove();
-		listenerEntitySpawn = new ListenerEntitySpawn();
-		listenerWoolBombInteract = new ListenerWoolBombInteract();
-		listenerWoolBombLaunch = new ListenerWoolBombLaunchable();
-		listenerTNTEntityDamageByEntity = new ListenerTNTEntityDamageByEntity();
-		listenerWoolBombHit = new ListenerWoolBombHit();
-		listenerWoolBombExplode = new ListenerExplode();
-		listenerLineBuilderInteract = new ListenerLineBuilderInteract();
-		listenerRonjasToiletInteract = new ListenerRonjasToiletInteract();
-		listenerRonjasToiletLaunch = new ListenerRonjasToiletLaunch();
-		listenerRonjasToiletHit = new ListenerRonjasToiletHit();
-		listenerRonjasToiletEntityDamageByEntity = new ListenerRonjasToiletEntityDamageByEntity();
-		listenerEnderpearlLaunchable = new ListenerEnderpearlLaunchable();
-		listenerSafetyPlatformInteract = new ListenerSafetyPlatformInteract();
-		listenerBlinkInteract = new ListenerBlinkLaunchable();
-		listenerWallGeneratorInteract = new ListenerWallGeneratorInteract();
-		listenerGrandpasClockInteract = new ListenerGrandpasClockInteract();
-		listenerGhostInteract = new ListenerGhostInteract();
-		listenerGhostEntityDamageByEntity = new ListenerGhostEntityDamage();
-		listenerMinigunInteract = new ListenerMinigunInteract();
-		listenerDeathMove = new ListenerDeathMove();
-		listenerGrabberInteract = new ListenerGrabberInteract();
-		listenerBoosterInteract = new ListenerBoosterInteract();
-		listenerGrapplingHookFishing = new ListenerGrapplingHookFishing();
-		listenerRopeInteract = new ListenerRopeInteract();
+		this.listenerItemPickup = new ListenerItemPickup();
+		this.listenerItemDrop = new ListenerItemDrop();
+		this.listenerBlockBreak = new ListenerBlockBreak();
+		this.listenerBlockPlace = new ListenerBlockPlace();
+		this.listenerBlockCanBuild = new ListenerBlockCanBuild();
+		this.listenerPlayerJoin = new ListenerPlayerJoin();
+		this.listenerPlayerQuit = new ListenerPlayerQuit();
+		this.listenerPlayerLogin = new ListenerPlayerLogin();
+		this.listenerEntityDamageByEntity = new ListenerEntityDamageByEntity();
+		this.listenerDoubleJump = new ListenerDoubleJump();
+		this.listenerEntityDamage = new ListenerEntityDamage();
+		this.listenerChangeBlock = new ListenerChangeBlock();
+		this.listenerProjectileHit = new ListenerProjectileHit();
+		this.listenerProjectileLaunch = new ListenerProjectileLaunch();
+		this.listenerInventoryClick = new ListenerInventoryClick();
+		this.listenerInventoryDrag = new ListenerInventoryDrag();
+		this.listenerCapsule = new ListenerCapsuleInteract();
+		this.listenerSwitcherLaunch = new ListenerSwitcherLaunchable();
+		this.listenerSwitcherSwitch = new ListenerSwitcherSwitch();
+		this.listenerInteract = new ListenerInteract();
+		this.listenerGameModeChange = new ListenerGameModeChange();
+		this.listenerPlayerMove = new ListenerPlayerMove();
+		this.listenerEntitySpawn = new ListenerEntitySpawn();
+		this.listenerWoolBombInteract = new ListenerWoolBombInteract();
+		this.listenerWoolBombLaunch = new ListenerWoolBombLaunchable();
+		this.listenerTNTEntityDamageByEntity = new ListenerTNTEntityDamageByEntity();
+		this.listenerWoolBombHit = new ListenerWoolBombHit();
+		this.listenerWoolBombExplode = new ListenerExplode();
+		this.listenerLineBuilderInteract = new ListenerLineBuilderInteract();
+		this.listenerRonjasToiletInteract = new ListenerRonjasToiletInteract();
+		this.listenerRonjasToiletLaunch = new ListenerRonjasToiletLaunch();
+		this.listenerRonjasToiletHit = new ListenerRonjasToiletHit();
+		this.listenerRonjasToiletEntityDamageByEntity = new ListenerRonjasToiletEntityDamageByEntity();
+		this.listenerEnderpearlLaunchable = new ListenerEnderpearlLaunchable();
+		this.listenerSafetyPlatformInteract = new ListenerSafetyPlatformInteract();
+		this.listenerBlinkInteract = new ListenerBlinkLaunchable();
+		this.listenerWallGeneratorInteract = new ListenerWallGeneratorInteract();
+		this.listenerGrandpasClockInteract = new ListenerGrandpasClockInteract();
+		this.listenerGhostInteract = new ListenerGhostInteract();
+		this.listenerGhostEntityDamageByEntity = new ListenerGhostEntityDamage();
+		this.listenerMinigunInteract = new ListenerMinigunInteract();
+		this.listenerDeathMove = new ListenerDeathMove();
+		this.listenerGrabberInteract = new ListenerGrabberInteract();
+		this.listenerBoosterInteract = new ListenerBoosterInteract();
+		this.listenerGrapplingHookFishing = new ListenerGrapplingHookFishing();
+		this.listenerRopeInteract = new ListenerRopeInteract();
 
-		schedulerParticles = new Scheduler() {
+		this.schedulerParticles = new Scheduler() {
 			@Override
 			public void run() {
-				for (Arrow arrow : arrows.keySet()) {
+				for (Arrow arrow : Ingame.this.arrows.keySet()) {
 					Location loc = arrow.getLocation();
 					loc.add(arrow.getVelocity().multiply(10));
 					for (int x = -1; x < 2; x++) {
@@ -201,46 +201,46 @@ public class Ingame implements Enableable {
 										|| !((Player) arrow.getShooter()).isOnline()
 										|| !arrow.getLocation().getChunk().isLoaded()) {
 							arrow.remove();
-							arrows.remove(arrow);
+							Ingame.this.arrows.remove(arrow);
 							break;
 						}
 						User user = Main.getInstance().getUserWrapper().getUser(((Player) arrow.getShooter()).getUniqueId());
 						ParticleEffect.BLOCK_CRACK.display(new ParticleEffect.BlockData(
 										Material.WOOL,
-										user.getTeam().getType().getWoolColor()), 0, 0, 0, 1, 8, arrow.getLocation(), particlePlayers);
+										user.getTeam().getType().getWoolColor()), 0, 0, 0, 1, 8, arrow.getLocation(), Ingame.this.particlePlayers);
 					}
 				}
 			}
 		};
-		schedulerGlobalSpawnProtection = new Scheduler() {
-			public int protectionTicks = SPAWNPROTECTION_TICKS_GLOBAL;
+		this.schedulerGlobalSpawnProtection = new Scheduler() {
+			public int protectionTicks = Ingame.SPAWNPROTECTION_TICKS_GLOBAL;
 
 			@Override
 			public void run() {
-				if (protectionTicks - 1 <= 0
-								|| SPAWNPROTECTION_TICKS_GLOBAL == 0) {
-					protectionTicks = SPAWNPROTECTION_TICKS_GLOBAL;
+				if (this.protectionTicks - 1 <= 0
+								|| Ingame.SPAWNPROTECTION_TICKS_GLOBAL == 0) {
+					this.protectionTicks = Ingame.SPAWNPROTECTION_TICKS_GLOBAL;
 					this.cancel();
 					return;
 				}
-				isGlobalSpawnProtection = true;
-				protectionTicks--;
+				Ingame.this.isGlobalSpawnProtection = true;
+				this.protectionTicks--;
 				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
-					user.getBukkitEntity().setExp((float) protectionTicks
-									/ (float) SPAWNPROTECTION_TICKS_GLOBAL);
+					user.getBukkitEntity().setExp((float) this.protectionTicks
+									/ (float) Ingame.SPAWNPROTECTION_TICKS_GLOBAL);
 				}
 			}
 
 			@Override
 			public void cancel() {
-				if (!isCancelled()) {
-					isGlobalSpawnProtection = false;
-					schedulerResetSpawnProtetion.runTaskTimer(1);
+				if (!this.isCancelled()) {
+					Ingame.this.isGlobalSpawnProtection = false;
+					Ingame.this.schedulerResetSpawnProtetion.runTaskTimer(1);
 					super.cancel();
 				}
 			}
 		};
-		schedulerTick = new Scheduler() {
+		this.schedulerTick = new Scheduler() {
 			@Override
 			public void run() {
 				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
@@ -252,11 +252,11 @@ public class Ingame implements Enableable {
 				}
 			}
 		};
-		schedulerResetSpawnProtetion = new Scheduler() {
+		this.schedulerResetSpawnProtetion = new Scheduler() {
 			@Override
 			public void run() {
 				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
-					if (SPAWNPROTECTION_TICKS != 0) {
+					if (Ingame.SPAWNPROTECTION_TICKS != 0) {
 						if (user.getSpawnProtectionTicks() > 0) {
 							user.setSpawnProtectionTicks(user.getSpawnProtectionTicks()
 											- 1);
@@ -265,19 +265,19 @@ public class Ingame implements Enableable {
 				}
 			}
 		};
-		schedulerResetWool = new Scheduler() {
+		this.schedulerResetWool = new Scheduler() {
 			@SuppressWarnings("deprecation")
 			@Override
 			public synchronized void run() {
-				for (Block b : breakedWool.keySet()) {
+				for (Block b : Ingame.this.breakedWool.keySet()) {
 					b.setType(Material.WOOL);
-					b.setData(breakedWool.get(b));
+					b.setData(Ingame.this.breakedWool.get(b));
 				}
-				breakedWool.clear();
+				Ingame.this.breakedWool.clear();
 			}
 		};
-		schedulerHeightDisplay = new SchedulerHeightDisplay();
-		schedulerGhostItemFix = new Scheduler() {
+		this.schedulerHeightDisplay = new SchedulerHeightDisplay();
+		this.schedulerGhostItemFix = new Scheduler() {
 			@Override
 			public void run() {
 				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
@@ -292,14 +292,14 @@ public class Ingame implements Enableable {
 	}
 
 	public Team getLastTeam(User user) {
-		return lastTeam.containsKey(user) ? lastTeam.get(user) : user.getTeam();
+		return this.lastTeam.containsKey(user) ? this.lastTeam.get(user) : user.getTeam();
 	}
 
 	@Override
 	public void onEnable() {
-		startingIngame = true;
+		this.startingIngame = true;
 		CloudNetLink.update();
-		splitPlayersToTeams();
+		this.splitPlayersToTeams();
 		Main.getInstance().getSchedulers().clear();
 		int lifes = -1;
 		if (!Main.getInstance().getLobby().VOTES_LIFES.isEmpty()) {
@@ -329,41 +329,41 @@ public class Ingame implements Enableable {
 			team.setLifes(lifes);
 		}
 
-		listenerLineBuilderInteract.cooldownTasks.clear();
-		listenerLineBuilderInteract.lastLine.clear();
-		listenerLineBuilderInteract.lines.clear();
-		listenerLineBuilderInteract.placeTasks.clear();
-		listenerDoubleJump.cooldown.clear();
-		listenerPlayerMove.ghostBlockFixCount.clear();
-		listenerGhostInteract.ghosts.clear();
-		listenerGhostEntityDamageByEntity.attacks.clear();
+		this.listenerLineBuilderInteract.cooldownTasks.clear();
+		this.listenerLineBuilderInteract.lastLine.clear();
+		this.listenerLineBuilderInteract.lines.clear();
+		this.listenerLineBuilderInteract.placeTasks.clear();
+		this.listenerDoubleJump.cooldown.clear();
+		this.listenerPlayerMove.ghostBlockFixCount.clear();
+		this.listenerGhostInteract.ghosts.clear();
+		this.listenerGhostEntityDamageByEntity.attacks.clear();
 
-		if (placedBlocks != null)
-			for (Block b : placedBlocks) {
+		if (this.placedBlocks != null)
+			for (Block b : this.placedBlocks) {
 				b.setType(Material.AIR);
-				resetBlockDamage(b);
+				Ingame.resetBlockDamage(b);
 			}
 
-		Main.registerListeners(listenerBlockBreak, listenerBlockPlace, listenerItemDrop, listenerItemPickup, listenerBlockCanBuild, listenerPlayerJoin, listenerPlayerQuit, listenerPlayerLogin, listenerEntityDamageByEntity, listenerDoubleJump, listenerEntityDamage, listenerChangeBlock, listenerProjectileHit, listenerProjectileLaunch, listenerInventoryClick, listenerInventoryDrag, listenerCapsule, listenerSwitcherLaunch, listenerSwitcherSwitch, listenerInteract, listenerGameModeChange, listenerPlayerMove, listenerEntitySpawn, listenerEnderpearlLaunchable, listenerSafetyPlatformInteract, listenerWoolBombInteract, listenerWoolBombLaunch, listenerTNTEntityDamageByEntity, listenerWoolBombHit, listenerWoolBombExplode, listenerLineBuilderInteract, listenerRonjasToiletInteract, listenerRonjasToiletHit, listenerRonjasToiletEntityDamageByEntity, listenerRonjasToiletLaunch, listenerBlinkInteract, listenerWallGeneratorInteract, listenerGrandpasClockInteract, listenerGhostInteract, listenerGhostEntityDamageByEntity, listenerMinigunInteract, listenerDeathMove, listenerGrabberInteract, listenerBoosterInteract, listenerGrapplingHookFishing, listenerRopeInteract);
+		Main.registerListeners(this.listenerBlockBreak, this.listenerBlockPlace, this.listenerItemDrop, this.listenerItemPickup, this.listenerBlockCanBuild, this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerLogin, this.listenerEntityDamageByEntity, this.listenerDoubleJump, this.listenerEntityDamage, this.listenerChangeBlock, this.listenerProjectileHit, this.listenerProjectileLaunch, this.listenerInventoryClick, this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcherLaunch, this.listenerSwitcherSwitch, this.listenerInteract, this.listenerGameModeChange, this.listenerPlayerMove, this.listenerEntitySpawn, this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract, this.listenerWoolBombInteract, this.listenerWoolBombLaunch, this.listenerTNTEntityDamageByEntity, this.listenerWoolBombHit, this.listenerWoolBombExplode, this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit, this.listenerRonjasToiletEntityDamageByEntity, this.listenerRonjasToiletLaunch, this.listenerBlinkInteract, this.listenerWallGeneratorInteract, this.listenerGrandpasClockInteract, this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity, this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract, this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract);
 //		Main.registerListeners(listenerEnderpearlLaunchable);
 
 		Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
-			loadScoreboardObjective(u);
+			this.loadScoreboardObjective(u);
 			u.loadPerks();
 			u.getBukkitEntity().closeInventory();
-			setPlayerItems(u);
+			this.setPlayerItems(u);
 			u.setTicksAfterLastHit(1200);
 			u.getBukkitEntity().teleport(u.getTeam().getSpawn());
 		});
 
-		isGlobalSpawnProtection = true;
+		this.isGlobalSpawnProtection = true;
 
-		schedulerResetWool.runTaskTimer(16);
-		schedulerParticles.runTaskTimer(1);
+		this.schedulerResetWool.runTaskTimer(16);
+		this.schedulerParticles.runTaskTimer(1);
 		// This one also starts the normal spawnprotection scheduler
-		schedulerGlobalSpawnProtection.runTaskTimer(1);
-		schedulerTick.runTaskTimer(1);
-		schedulerHeightDisplay.start();
+		this.schedulerGlobalSpawnProtection.runTaskTimer(1);
+		this.schedulerTick.runTaskTimer(1);
+		this.schedulerHeightDisplay.start();
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			for (Player t : Bukkit.getOnlinePlayers()) {
@@ -374,50 +374,50 @@ public class Ingame implements Enableable {
 				}
 			}
 		}
-		startingIngame = false;
+		this.startingIngame = false;
 	}
 
 	@Override
 	public void onDisable() {
-		schedulerGlobalSpawnProtection.cancel();
-		schedulerResetSpawnProtetion.cancel();
-		schedulerParticles.cancel();
-		schedulerResetWool.cancel();
-		schedulerTick.cancel();
-		schedulerHeightDisplay.stop();
-		Main.unregisterListeners(listenerBlockBreak, listenerBlockPlace, listenerItemDrop, listenerItemPickup, listenerBlockCanBuild, listenerPlayerJoin, listenerPlayerQuit, listenerPlayerLogin, listenerEntityDamageByEntity, listenerDoubleJump, listenerEntityDamage, listenerChangeBlock, listenerProjectileHit, listenerProjectileLaunch, listenerInventoryClick, listenerInventoryDrag, listenerCapsule, listenerSwitcherLaunch, listenerSwitcherSwitch, listenerInteract, listenerGameModeChange, listenerPlayerMove, listenerEntitySpawn, listenerEnderpearlLaunchable, listenerSafetyPlatformInteract, listenerWoolBombInteract, listenerWoolBombLaunch, listenerTNTEntityDamageByEntity, listenerWoolBombHit, listenerWoolBombExplode, listenerLineBuilderInteract, listenerRonjasToiletInteract, listenerRonjasToiletHit, listenerRonjasToiletEntityDamageByEntity, listenerRonjasToiletLaunch, listenerBlinkInteract, listenerWallGeneratorInteract, listenerGrandpasClockInteract, listenerGhostInteract, listenerGhostEntityDamageByEntity, listenerMinigunInteract, listenerDeathMove, listenerGrabberInteract, listenerBoosterInteract, listenerGrapplingHookFishing, listenerRopeInteract);
-		listenerEnderpearlLaunchable.disable();
-		for (Block b : placedBlocks) {
+		this.schedulerGlobalSpawnProtection.cancel();
+		this.schedulerResetSpawnProtetion.cancel();
+		this.schedulerParticles.cancel();
+		this.schedulerResetWool.cancel();
+		this.schedulerTick.cancel();
+		this.schedulerHeightDisplay.stop();
+		Main.unregisterListeners(this.listenerBlockBreak, this.listenerBlockPlace, this.listenerItemDrop, this.listenerItemPickup, this.listenerBlockCanBuild, this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerLogin, this.listenerEntityDamageByEntity, this.listenerDoubleJump, this.listenerEntityDamage, this.listenerChangeBlock, this.listenerProjectileHit, this.listenerProjectileLaunch, this.listenerInventoryClick, this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcherLaunch, this.listenerSwitcherSwitch, this.listenerInteract, this.listenerGameModeChange, this.listenerPlayerMove, this.listenerEntitySpawn, this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract, this.listenerWoolBombInteract, this.listenerWoolBombLaunch, this.listenerTNTEntityDamageByEntity, this.listenerWoolBombHit, this.listenerWoolBombExplode, this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit, this.listenerRonjasToiletEntityDamageByEntity, this.listenerRonjasToiletLaunch, this.listenerBlinkInteract, this.listenerWallGeneratorInteract, this.listenerGrandpasClockInteract, this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity, this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract, this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract);
+		this.listenerEnderpearlLaunchable.disable();
+		for (Block b : this.placedBlocks) {
 			b.setType(Material.AIR);
-			resetBlockDamage(b);
+			Ingame.resetBlockDamage(b);
 		}
 	}
 
 	public int getKillstreak(User user) {
-		return killstreak.getOrDefault(user, 0);
+		return this.killstreak.getOrDefault(user, 0);
 	}
 
 	public void kill(User user) {
-		kill(user, false);
+		this.kill(user, false);
 	}
 
 	public void kill(User user, boolean leaving) {
-		User killer = user.getLastHit();
+		final User killer = user.getLastHit();
 		EventPlayerDeath pe1 = new EventPlayerDeath(user);
 		Bukkit.getPluginManager().callEvent(pe1);
-		boolean countAsDeath = killer != null
+		final boolean countAsDeath = killer != null
 						? user.getTicksAfterLastHit() <= 200
 						: false;
 		if (countAsDeath) {
-			killstreak.remove(user);
+			this.killstreak.remove(user);
 			EventPlayerKill pe2 = new EventPlayerKill(user, killer);
 			Bukkit.getPluginManager().callEvent(pe2);
 			if (!pe2.isCancelled()) {
 				killer.setKills(killer.getKills() + 1);
 				user.setDeaths(user.getDeaths() + 1);
-				killstreak.put(killer, getKillstreak(killer) + 1);
-				int killstreak = getKillstreak(killer);
-				if (killstreak > 0 && killstreak % killsFor1Life == 0) {
+				this.killstreak.put(killer, this.getKillstreak(killer) + 1);
+				int killstreak = this.getKillstreak(killer);
+				if (killstreak > 0 && killstreak % this.killsFor1Life == 0) {
 					new Scheduler() {
 						@Override
 						public void run() {
@@ -433,14 +433,14 @@ public class Ingame implements Enableable {
 		}
 
 		if (leaving) {
-			killstreak.remove(user);
+			this.killstreak.remove(user);
 		}
 
 		if (!countAsDeath && !leaving) {
 			user.getBukkitEntity().teleport(user.getTeam().getSpawn());
 			if (killer != null) {
 				user.setLastHit(null);
-				user.setSpawnProtectionTicks(SPAWNPROTECTION_TICKS);
+				user.setSpawnProtectionTicks(Ingame.SPAWNPROTECTION_TICKS);
 			}
 			return;
 		}
@@ -469,7 +469,7 @@ public class Ingame implements Enableable {
 //				Main.getInstance().sendMessage(msg.getKey(), msg.getValue());
 //			}
 //			msgs.clear();
-			for (Entry<User, Team> e : lastTeam.entrySet()) {
+			for (Entry<User, Team> e : this.lastTeam.entrySet()) {
 				if (e.getValue() == userTeam) {
 					StatsLink.addLoss(e.getKey());
 				}
@@ -481,7 +481,7 @@ public class Ingame implements Enableable {
 			if (leaving) {
 				user.getBukkitEntity().kickPlayer("Disconnected");
 			}
-			checkGameEnd();
+			this.checkGameEnd();
 //			List<Team> teams = Main.getInstance().getTeamManager().getTeams().stream().filter(t -> t.getUsers().size() >= 1).collect(Collectors.toList());
 //			if (teams.size() == 1) {
 //				this.winner = teams.get(0);
@@ -499,11 +499,11 @@ public class Ingame implements Enableable {
 			}
 		}
 		user.getBukkitEntity().teleport(user.getTeam().getSpawn());
-		user.setSpawnProtectionTicks(SPAWNPROTECTION_TICKS);
+		user.setSpawnProtectionTicks(Ingame.SPAWNPROTECTION_TICKS);
 	}
 
 	public void checkGameEnd() {
-		if (startingIngame)
+		if (this.startingIngame)
 			return;
 		List<Team> teams = Main.getInstance().getTeamManager().getTeams().stream().filter(t -> t.getUsers().size() >= 1).collect(Collectors.toList());
 		if (teams.size() == 1) {
@@ -511,7 +511,7 @@ public class Ingame implements Enableable {
 			for (User i : this.winner.getUsers()) {
 				StatsLink.addWin(i);
 			}
-			disable();
+			this.disable();
 			Main.getInstance().getEndgame().enable();
 		}
 	}
@@ -526,16 +526,16 @@ public class Ingame implements Enableable {
 			t.setSuffix(ChatColor.GOLD.toString() + Characters.SHIFT_SHIFT_LEFT
 							+ team.getName(user));
 			obj.setScore(team.getType().getInvisibleTag(), i++);
-			reloadScoreboardLifes(sb, team);
+			this.reloadScoreboardLifes(sb, team);
 		}
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 	}
 
 	public boolean revive(User target) {
-		if (!lastTeam.containsKey(target)) {
+		if (!this.lastTeam.containsKey(target)) {
 			return false;
 		}
-		Main.getInstance().getTeamManager().setTeam(target, lastTeam.remove(target));
+		Main.getInstance().getTeamManager().setTeam(target, this.lastTeam.remove(target));
 		return true;
 	}
 
@@ -595,7 +595,7 @@ public class Ingame implements Enableable {
 	public void setArmor(User user) {
 		Player p = user.getBukkitEntity();
 		Color color = DyeColor.getByData(user.getTeam().getType().getWoolColor()).getColor();
-		if (listenerGhostInteract.ghosts.containsKey(user)) {
+		if (this.listenerGhostInteract.ghosts.containsKey(user)) {
 			color = Color.WHITE;
 		}
 		ItemStack boots = Item.ARMOR_LEATHER_BOOTS.getItem(user);
@@ -621,11 +621,11 @@ public class Ingame implements Enableable {
 	}
 
 	public void setPlayerItems(User user) {
-		if (!isEnabled()) {
+		if (!this.isEnabled()) {
 			return;
 		}
 		if (user.getTeam().getType() == TeamType.SPECTATOR) {
-			fixSpectator(user);
+			this.fixSpectator(user);
 			return;
 		}
 
@@ -636,15 +636,15 @@ public class Ingame implements Enableable {
 		v.getTopInventory().clear();
 		v.setCursor(new ItemStack(Material.AIR));
 
-		setArmor(user);
+		this.setArmor(user);
 
 		PlayerPerks perks = user.getData().getPerks();
 
-		setPlayerItem(v, perks.getSlotBow(), Item.DEFAULT_BOW.getItem(user));
-		setPlayerItem(v, perks.getSlotArrow(), Item.DEFAULT_ARROW.getItem(user));
+		this.setPlayerItem(v, perks.getSlotBow(), Item.DEFAULT_BOW.getItem(user));
+		this.setPlayerItem(v, perks.getSlotArrow(), Item.DEFAULT_ARROW.getItem(user));
 //		v.setItem(perks.getSlotBow(), Item.DEFAULT_BOW.getItem(user));
 //		v.setItem(perks.getSlotArrow(), Item.DEFAULT_ARROW.getItem(user));
-		setPlayerItem(v, perks.getSlotShears(), Item.DEFAULT_SHEARS.getItem(user));
+		this.setPlayerItem(v, perks.getSlotShears(), Item.DEFAULT_SHEARS.getItem(user));
 		user.getEnderPearl().setItem();
 //		v.setItem(user.getData().getPerks().getSlotPearl(), Item.DEFAULT_PEARL.getItem(user));
 //		v.setItem(perks.getSlotShears(), Item.DEFAULT_SHEARS.getItem(user));
@@ -676,7 +676,7 @@ public class Ingame implements Enableable {
 
 	public void fixSpectator(User user) {
 		if (user.getTeam() != null)
-			lastTeam.put(user, user.getTeam());
+			this.lastTeam.put(user, user.getTeam());
 		Player p = user.getBukkitEntity();
 //		Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
 		Scoreboard sb = new Scoreboard();
@@ -694,8 +694,8 @@ public class Ingame implements Enableable {
 				sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
 			}
 		});
-		loadScoreboardObjective(user);
-		reloadTab(user);
+		this.loadScoreboardObjective(user);
+		this.reloadTab(user);
 		p.spigot().setCollidesWithEntities(false);
 		p.setAllowFlight(true);
 		p.getInventory().clear();
@@ -736,7 +736,7 @@ public class Ingame implements Enableable {
 	public void reloadScoreboardLifes(User user) {
 		Scoreboard sb = new Scoreboard(user);
 		for (Team team : Main.getInstance().getTeamManager().getTeams()) {
-			reloadScoreboardLifes(sb, team);
+			this.reloadScoreboardLifes(sb, team);
 		}
 	}
 
@@ -784,9 +784,9 @@ public class Ingame implements Enableable {
 						&& user.getTeam().getType() == TeamType.SPECTATOR) {
 			return true;
 		}
-		if ((!isGlobalSpawnProtection && !target.hasSpawnProtection()
+		if ((!this.isGlobalSpawnProtection && !target.hasSpawnProtection()
 						&& target.getTeam() != user.getTeam()
-						&& (!listenerGhostInteract.ghosts.containsKey(target)
+						&& (!this.listenerGhostInteract.ghosts.containsKey(target)
 										|| ignoreGhost))
 						|| user.isTrollMode()) {
 			target.setLastHit(user);
@@ -797,7 +797,7 @@ public class Ingame implements Enableable {
 	}
 
 	public boolean attack(User user, User target) {
-		return attack(user, target, false);
+		return this.attack(user, target, false);
 	}
 
 	public static int getBlockDamage(Block block) {
@@ -805,7 +805,7 @@ public class Ingame implements Enableable {
 //			return 0;
 //		return block.getMetadata("arrowDamage").get(0).asInt();
 		MetadataValue v;
-		return ((v = getMetaData(block, "arrowDamage")) == null) ? 0
+		return ((v = Ingame.getMetaData(block, "arrowDamage")) == null) ? 0
 						: v.asInt();
 	}
 
@@ -827,11 +827,11 @@ public class Ingame implements Enableable {
 	@SuppressWarnings("deprecation")
 	public static void setBlockDamage(Block block, int damage) {
 		EventDamageBlock damageBlock = new EventDamageBlock(block,
-						getBlockDamage(block), damage);
+						Ingame.getBlockDamage(block), damage);
 		if (damageBlock.isCancelled()) {
 			return;
 		}
-		if (damage >= MAX_BLOCK_ARROW_HITS) {
+		if (damage >= Ingame.MAX_BLOCK_ARROW_HITS) {
 			EventDestroyBlock destroyBlock = new EventDestroyBlock(block);
 			if (!destroyBlock.isCancelled()) {
 				Ingame ingame = Main.getInstance().getIngame();
@@ -841,12 +841,12 @@ public class Ingame implements Enableable {
 					ingame.breakedWool.put(block, block.getData());
 				}
 				block.setType(Material.AIR);
-				resetBlockDamage(block);
+				Ingame.resetBlockDamage(block);
 				return;
 			}
 		}
 //		block.setMetadata("arrowDamage", new FixedMetadataValue(Main.getInstance(), damage));
-		setMetaData(block, "arrowDamage", damage);
+		Ingame.setMetaData(block, "arrowDamage", damage);
 	}
 
 	public static void setMetaData(Block block, String key, Object value) {

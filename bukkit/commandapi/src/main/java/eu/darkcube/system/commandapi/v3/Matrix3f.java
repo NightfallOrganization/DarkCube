@@ -1,17 +1,29 @@
 package eu.darkcube.system.commandapi.v3;
 
 public final class Matrix3f {
+
 	private static final float G = 3.0F + 2.0F * (float) Math.sqrt(2.0D);
+
 	private static final float CS = (float) Math.cos((Math.PI / 8D));
+
 	private static final float SS = (float) Math.sin((Math.PI / 8D));
+
 	protected float m00;
+
 	protected float m01;
+
 	protected float m02;
+
 	protected float m10;
+
 	protected float m11;
+
 	protected float m12;
+
 	protected float m20;
+
 	protected float m21;
+
 	protected float m22;
 
 	public Matrix3f() {
@@ -76,12 +88,11 @@ public final class Matrix3f {
 
 	private static Pair<Float, Float> approxGivensQuat(float p_226113_0_, float p_226113_1_, float p_226113_2_) {
 		float f = 2.0F * (p_226113_0_ - p_226113_2_);
-		if (G * p_226113_1_ * p_226113_1_ < f * f) {
+		if (Matrix3f.G * p_226113_1_ * p_226113_1_ < f * f) {
 			float f1 = MathHelper.fastInvSqrt(p_226113_1_ * p_226113_1_ + f * f);
 			return Pair.of(f1 * p_226113_1_, f1 * f);
-		} else {
-			return Pair.of(SS, CS);
 		}
+		return Pair.of(Matrix3f.SS, Matrix3f.CS);
 	}
 
 	private static Pair<Float, Float> qrGivensQuat(float p_226112_0_, float p_226112_1_) {
@@ -104,7 +115,7 @@ public final class Matrix3f {
 		Matrix3f matrix3f = new Matrix3f();
 		Quaternion quaternion = Quaternion.ONE.copy();
 		if (p_226120_0_.m01 * p_226120_0_.m01 + p_226120_0_.m10 * p_226120_0_.m10 > 1.0E-6F) {
-			Pair<Float, Float> pair = approxGivensQuat(p_226120_0_.m00, 0.5F * (p_226120_0_.m01 + p_226120_0_.m10),
+			Pair<Float, Float> pair = Matrix3f.approxGivensQuat(p_226120_0_.m00, 0.5F * (p_226120_0_.m01 + p_226120_0_.m10),
 					p_226120_0_.m11);
 			Float f = pair.getFirst();
 			Float f1 = pair.getSecond();
@@ -126,7 +137,7 @@ public final class Matrix3f {
 		}
 
 		if (p_226120_0_.m02 * p_226120_0_.m02 + p_226120_0_.m20 * p_226120_0_.m20 > 1.0E-6F) {
-			Pair<Float, Float> pair1 = approxGivensQuat(p_226120_0_.m00, 0.5F * (p_226120_0_.m02 + p_226120_0_.m20),
+			Pair<Float, Float> pair1 = Matrix3f.approxGivensQuat(p_226120_0_.m00, 0.5F * (p_226120_0_.m02 + p_226120_0_.m20),
 					p_226120_0_.m22);
 			float f5 = -pair1.getFirst();
 			Float f7 = pair1.getSecond();
@@ -148,7 +159,7 @@ public final class Matrix3f {
 		}
 
 		if (p_226120_0_.m12 * p_226120_0_.m12 + p_226120_0_.m21 * p_226120_0_.m21 > 1.0E-6F) {
-			Pair<Float, Float> pair2 = approxGivensQuat(p_226120_0_.m11, 0.5F * (p_226120_0_.m12 + p_226120_0_.m21),
+			Pair<Float, Float> pair2 = Matrix3f.approxGivensQuat(p_226120_0_.m11, 0.5F * (p_226120_0_.m12 + p_226120_0_.m21),
 					p_226120_0_.m22);
 			Float f6 = pair2.getFirst();
 			Float f8 = pair2.getSecond();
@@ -192,14 +203,14 @@ public final class Matrix3f {
 		matrix3f.mul(this);
 
 		for (int i = 0; i < 5; ++i) {
-			quaternion1.multiply(stepJacobi(matrix3f));
+			quaternion1.multiply(Matrix3f.stepJacobi(matrix3f));
 		}
 
 		quaternion1.normalize();
 		Matrix3f matrix3f4 = new Matrix3f(this);
 		matrix3f4.mul(new Matrix3f(quaternion1));
 		float f = 1.0F;
-		Pair<Float, Float> pair = qrGivensQuat(matrix3f4.m00, matrix3f4.m10);
+		Pair<Float, Float> pair = Matrix3f.qrGivensQuat(matrix3f4.m00, matrix3f4.m10);
 		Float f1 = pair.getFirst();
 		Float f2 = pair.getSecond();
 		float f3 = f2 * f2 - f1 * f1;
@@ -216,7 +227,7 @@ public final class Matrix3f {
 		matrix3f1.m22 = f5;
 		f = f * f5;
 		matrix3f1.mul(matrix3f4);
-		pair = qrGivensQuat(matrix3f1.m00, matrix3f1.m20);
+		pair = Matrix3f.qrGivensQuat(matrix3f1.m00, matrix3f1.m20);
 		float f6 = -pair.getFirst();
 		Float f7 = pair.getSecond();
 		float f8 = f7 * f7 - f6 * f6;
@@ -233,7 +244,7 @@ public final class Matrix3f {
 		matrix3f2.m11 = f10;
 		f = f * f10;
 		matrix3f2.mul(matrix3f1);
-		pair = qrGivensQuat(matrix3f2.m11, matrix3f2.m21);
+		pair = Matrix3f.qrGivensQuat(matrix3f2.m11, matrix3f2.m21);
 		Float f11 = pair.getFirst();
 		Float f12 = pair.getSecond();
 		float f13 = f12 * f12 - f11 * f11;
@@ -362,9 +373,8 @@ public final class Matrix3f {
 		if (Math.abs(f) > 1.0E-6F) {
 			this.mul(f);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	public void func_232605_a_(int p_232605_1_, int p_232605_2_, float p_232605_3_) {
@@ -434,4 +444,5 @@ public final class Matrix3f {
 	public Matrix3f copy() {
 		return new Matrix3f(this);
 	}
+
 }

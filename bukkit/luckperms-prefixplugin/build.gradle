@@ -1,4 +1,4 @@
 dependencies {
     implementation project(':bukkit:darkcubesystem')
-    implementation "net.luckperms:api:$luckpermsVersion"
+    implementation luckperms
 }

@@ -45,10 +45,9 @@ public class EntityAnchorArgument
 		EntityAnchorArgument.Type entityanchorargument$type = EntityAnchorArgument.Type.getByName(s);
 		if (entityanchorargument$type == null) {
 			reader.setCursor(i);
-			throw ANCHOR_INVALID.createWithContext(reader, s);
-		} else {
-			return entityanchorargument$type;
+			throw EntityAnchorArgument.ANCHOR_INVALID.createWithContext(reader, s);
 		}
+		return entityanchorargument$type;
 	}
 
 	@Override
@@ -59,7 +58,7 @@ public class EntityAnchorArgument
 
 	@Override
 	public Collection<String> getExamples() {
-		return EXMAPLES;
+		return EntityAnchorArgument.EXMAPLES;
 	}
 
 	public static enum Type {
@@ -74,8 +73,8 @@ public class EntityAnchorArgument
 
 		private static final Map<String, EntityAnchorArgument.Type> BY_NAME = Maps.newHashMap();
 		static {
-			for (EntityAnchorArgument.Type type : values()) {
-				BY_NAME.put(type.name, type);
+			for (EntityAnchorArgument.Type type : Type.values()) {
+				Type.BY_NAME.put(type.name, type);
 			}
 		}
 		private final String name;
@@ -88,7 +87,7 @@ public class EntityAnchorArgument
 		}
 
 		public static EntityAnchorArgument.Type getByName(String nameIn) {
-			return BY_NAME.get(nameIn);
+			return Type.BY_NAME.get(nameIn);
 		}
 
 		public Vector3d apply(Entity entityIn) {

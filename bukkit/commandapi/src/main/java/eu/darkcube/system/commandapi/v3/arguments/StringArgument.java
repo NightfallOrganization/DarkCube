@@ -25,7 +25,7 @@ public class StringArgument implements ArgumentType<String> {
 	}
 
 	public static String getString(CommandContext<CommandSource> context,
-					String name) throws CommandSyntaxException {
+					String name) {
 		return context.getArgument(name, String.class);
 	}
 
@@ -37,6 +37,6 @@ public class StringArgument implements ArgumentType<String> {
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(
 					CommandContext<S> context, SuggestionsBuilder builder) {
-		return ISuggestionProvider.suggest(suggestions, builder);
+		return ISuggestionProvider.suggest(this.suggestions, builder);
 	}
 }

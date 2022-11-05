@@ -26,21 +26,20 @@ public class LocationPart {
 		if (reader.canRead() && reader.peek() == '^') {
 			throw Vec3Argument.POS_MIXED_TYPES.createWithContext(reader);
 		} else if (!reader.canRead()) {
-			throw EXPECTED_DOUBLE.createWithContext(reader);
+			throw LocationPart.EXPECTED_DOUBLE.createWithContext(reader);
 		} else {
-			boolean flag = isRelative(reader);
+			boolean flag = LocationPart.isRelative(reader);
 			int i = reader.getCursor();
 			double d0 = reader.canRead() && reader.peek() != ' ' ? reader.readDouble() : 0.0D;
 			String s = reader.getString().substring(i, reader.getCursor());
 			if (flag && s.isEmpty()) {
 				return new LocationPart(true, 0.0D);
-			} else {
-				if (!s.contains(".") && !flag && centerIntegers) {
-					d0 += 0.5D;
-				}
-
-				return new LocationPart(flag, d0);
 			}
+			if (!s.contains(".") && !flag && centerIntegers) {
+				d0 += 0.5D;
+			}
+
+			return new LocationPart(flag, d0);
 		}
 	}
 
@@ -48,9 +47,9 @@ public class LocationPart {
 		if (reader.canRead() && reader.peek() == '^') {
 			throw Vec3Argument.POS_MIXED_TYPES.createWithContext(reader);
 		} else if (!reader.canRead()) {
-			throw EXPECTED_INT.createWithContext(reader);
+			throw LocationPart.EXPECTED_INT.createWithContext(reader);
 		} else {
-			boolean flag = isRelative(reader);
+			boolean flag = LocationPart.isRelative(reader);
 			double d0;
 			if (reader.canRead() && reader.peek() != ' ') {
 				d0 = flag ? reader.readDouble() : (double) reader.readInt();
@@ -84,9 +83,8 @@ public class LocationPart {
 			LocationPart locationpart = (LocationPart) p_equals_1_;
 			if (this.relative != locationpart.relative) {
 				return false;
-			} else {
-				return Double.compare(locationpart.value, this.value) == 0;
 			}
+			return Double.compare(locationpart.value, this.value) == 0;
 		}
 	}
 

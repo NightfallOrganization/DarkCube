@@ -77,12 +77,12 @@ public class EntitySelectorParser {
 	private MinMaxBoundsWrapped xRotation = MinMaxBoundsWrapped.UNBOUNDED;
 	private MinMaxBoundsWrapped yRotation = MinMaxBoundsWrapped.UNBOUNDED;
 	private Predicate<Entity> filter = entity -> true;
-	private BiConsumer<Vector3d, List<? extends Entity>> sorter = ARBITRARY;
+	private BiConsumer<Vector3d, List<? extends Entity>> sorter = EntitySelectorParser.ARBITRARY;
 	private boolean self;
 	private String username;
 	private int cursorStart;
 	private UUID uuid;
-	private BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionHandler = SUGGEST_NONE;
+	private BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionHandler = EntitySelectorParser.SUGGEST_NONE;
 	private boolean hasNameEquals;
 	private boolean hasNameNotEquals;
 	private boolean isLimited;
@@ -170,57 +170,54 @@ public class EntitySelectorParser {
 			double d2 = MathHelper.wrapDegrees(angleFunc.applyAsDouble(p_197374_5_));
 			if (d0 > d1) {
 				return d2 >= d0 || d2 <= d1;
-			} else {
-				return d2 >= d0 && d2 <= d1;
 			}
+			return d2 >= d0 && d2 <= d1;
 		};
 	}
 
 	protected void parseSelector() throws CommandSyntaxException {
 		this.suggestionHandler = this::suggestSelector;
 		if (!this.reader.canRead()) {
-			throw SELECTOR_TYPE_MISSING.createWithContext(this.reader);
+			throw EntitySelectorParser.SELECTOR_TYPE_MISSING.createWithContext(this.reader);
+		}
+		int i = this.reader.getCursor();
+		char c0 = this.reader.read();
+		if (c0 == 'p') {
+			this.limit = 1;
+			this.includeNonPlayers = false;
+			this.sorter = EntitySelectorParser.NEAREST;
+			this.setEntityType(EntityType.PLAYER);
+		} else if (c0 == 'a') {
+			this.limit = Integer.MAX_VALUE;
+			this.includeNonPlayers = false;
+			this.sorter = EntitySelectorParser.ARBITRARY;
+			this.setEntityType(EntityType.PLAYER);
+		} else if (c0 == 'r') {
+			this.limit = 1;
+			this.includeNonPlayers = false;
+			this.sorter = EntitySelectorParser.RANDOM;
+			this.setEntityType(EntityType.PLAYER);
+		} else if (c0 == 's') {
+			this.limit = 1;
+			this.includeNonPlayers = true;
+			this.self = true;
 		} else {
-			int i = this.reader.getCursor();
-			char c0 = this.reader.read();
-			if (c0 == 'p') {
-				this.limit = 1;
-				this.includeNonPlayers = false;
-				this.sorter = NEAREST;
-				this.setEntityType(EntityType.PLAYER);
-			} else if (c0 == 'a') {
-				this.limit = Integer.MAX_VALUE;
-				this.includeNonPlayers = false;
-				this.sorter = ARBITRARY;
-				this.setEntityType(EntityType.PLAYER);
-			} else if (c0 == 'r') {
-				this.limit = 1;
-				this.includeNonPlayers = false;
-				this.sorter = RANDOM;
-				this.setEntityType(EntityType.PLAYER);
-			} else if (c0 == 's') {
-				this.limit = 1;
-				this.includeNonPlayers = true;
-				this.self = true;
-			} else {
-				if (c0 != 'e') {
-					this.reader.setCursor(i);
-					throw UNKNOWN_SELECTOR_TYPE.createWithContext(this.reader, '@' + String.valueOf(c0));
-				}
-
-				this.limit = Integer.MAX_VALUE;
-				this.includeNonPlayers = true;
-				this.sorter = ARBITRARY;
-				this.filter = e -> !e.isDead() && e.isValid();
+			if (c0 != 'e') {
+				this.reader.setCursor(i);
+				throw EntitySelectorParser.UNKNOWN_SELECTOR_TYPE.createWithContext(this.reader, '@' + String.valueOf(c0));
 			}
 
-			this.suggestionHandler = this::suggestOpenBracket;
-			if (this.reader.canRead() && this.reader.peek() == '[') {
-				this.reader.skip();
-				this.suggestionHandler = this::suggestOptionsOrEnd;
-				this.parseArguments();
-			}
+			this.limit = Integer.MAX_VALUE;
+			this.includeNonPlayers = true;
+			this.sorter = EntitySelectorParser.ARBITRARY;
+			this.filter = e -> !e.isDead() && e.isValid();
+		}
 
+		this.suggestionHandler = this::suggestOpenBracket;
+		if (this.reader.canRead() && this.reader.peek() == '[') {
+			this.reader.skip();
+			this.suggestionHandler = this::suggestOptionsOrEnd;
+			this.parseArguments();
 		}
 	}
 
@@ -238,7 +235,7 @@ public class EntitySelectorParser {
 		} catch (IllegalArgumentException illegalargumentexception) {
 			if (s.isEmpty() || s.length() > 16) {
 				this.reader.setCursor(i);
-				throw INVALID_ENTITY_NAME_OR_UUID.createWithContext(this.reader);
+				throw EntitySelectorParser.INVALID_ENTITY_NAME_OR_UUID.createWithContext(this.reader);
 			}
 
 			this.includeNonPlayers = false;
@@ -261,12 +258,12 @@ public class EntitySelectorParser {
 				this.reader.skipWhitespace();
 				if (!this.reader.canRead() || this.reader.peek() != '=') {
 					this.reader.setCursor(i);
-					throw EXPECTED_VALUE_FOR_OPTION.createWithContext(this.reader, s);
+					throw EntitySelectorParser.EXPECTED_VALUE_FOR_OPTION.createWithContext(this.reader, s);
 				}
 
 				this.reader.skip();
 				this.reader.skipWhitespace();
-				this.suggestionHandler = SUGGEST_NONE;
+				this.suggestionHandler = EntitySelectorParser.SUGGEST_NONE;
 				entityoptions$ifilter.handle(this);
 				this.reader.skipWhitespace();
 				this.suggestionHandler = this::suggestCommaOrEnd;
@@ -281,17 +278,17 @@ public class EntitySelectorParser {
 				}
 
 				if (this.reader.peek() != ']') {
-					throw EXPECTED_END_OF_OPTIONS.createWithContext(this.reader);
+					throw EntitySelectorParser.EXPECTED_END_OF_OPTIONS.createWithContext(this.reader);
 				}
 			}
 
 			if (this.reader.canRead()) {
 				this.reader.skip();
-				this.suggestionHandler = SUGGEST_NONE;
+				this.suggestionHandler = EntitySelectorParser.SUGGEST_NONE;
 				return;
 			}
 
-			throw EXPECTED_END_OF_OPTIONS.createWithContext(this.reader);
+			throw EntitySelectorParser.EXPECTED_END_OF_OPTIONS.createWithContext(this.reader);
 		}
 	}
 
@@ -301,9 +298,8 @@ public class EntitySelectorParser {
 			this.reader.skip();
 			this.reader.skipWhitespace();
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	public boolean isOfType() {
@@ -312,9 +308,8 @@ public class EntitySelectorParser {
 			this.reader.skip();
 			this.reader.skipWhitespace();
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	public StringReader getReader() {
@@ -426,7 +421,7 @@ public class EntitySelectorParser {
 		this.suggestionHandler = this::suggestNameOrSelector;
 		if (this.reader.canRead() && this.reader.peek() == '@') {
 			if (!this.hasPermission) {
-				throw SELECTOR_NOT_ALLOWED.createWithContext(this.reader);
+				throw EntitySelectorParser.SELECTOR_NOT_ALLOWED.createWithContext(this.reader);
 			}
 
 			this.reader.skip();
@@ -451,7 +446,7 @@ public class EntitySelectorParser {
 			Consumer<SuggestionsBuilder> consumer) {
 		consumer.accept(suggestionBuilder);
 		if (this.hasPermission) {
-			fillSelectorSuggestions(suggestionBuilder);
+			EntitySelectorParser.fillSelectorSuggestions(suggestionBuilder);
 		}
 
 		return suggestionBuilder.buildFuture();
@@ -467,7 +462,7 @@ public class EntitySelectorParser {
 	private CompletableFuture<Suggestions> suggestSelector(SuggestionsBuilder builder,
 			Consumer<SuggestionsBuilder> consumer) {
 		SuggestionsBuilder suggestionsbuilder = builder.createOffset(builder.getStart() - 1);
-		fillSelectorSuggestions(suggestionsbuilder);
+		EntitySelectorParser.fillSelectorSuggestions(suggestionsbuilder);
 		builder.add(suggestionsbuilder);
 		return builder.buildFuture();
 	}

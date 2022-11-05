@@ -40,7 +40,7 @@ public class Vec3Argument implements ArgumentType<ILocationArgument> {
 		return new Vec3Argument(centerIntegersIn);
 	}
 
-	public static Vector3d getVec3(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
+	public static Vector3d getVec3(CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, ILocationArgument.class).getPosition(context.getSource());
 	}
 
@@ -59,20 +59,19 @@ public class Vec3Argument implements ArgumentType<ILocationArgument> {
 			SuggestionsBuilder builder) {
 		if (!(source.getSource() instanceof ISuggestionProvider)) {
 			return Suggestions.empty();
-		} else {
-			String s = builder.getRemaining();
-			Collection<ISuggestionProvider.Coordinates> collection;
-			if (!s.isEmpty() && s.charAt(0) == '^') {
-				collection = Collections.singleton(ISuggestionProvider.Coordinates.DEFAULT_LOCAL);
-			} else {
-				collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
-			}
-			return ISuggestionProvider.suggestVec3(s, collection, builder, Commands.predicate(this::parse));
 		}
+		String s = builder.getRemaining();
+		Collection<ISuggestionProvider.Coordinates> collection;
+		if (!s.isEmpty() && s.charAt(0) == '^') {
+			collection = Collections.singleton(ISuggestionProvider.Coordinates.DEFAULT_LOCAL);
+		} else {
+			collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
+		}
+		return ISuggestionProvider.suggestVec3(s, collection, builder, Commands.predicate(this::parse));
 	}
 
 	@Override
 	public Collection<String> getExamples() {
-		return EXAMPLES;
+		return Vec3Argument.EXAMPLES;
 	}
 }

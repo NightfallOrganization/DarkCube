@@ -16,7 +16,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import de.pixel.bedwars.util.ReflectionUtils.PackageType;
+import eu.darkcube.system.ReflectionUtils;
+import eu.darkcube.system.ReflectionUtils.PackageType;
 
 /**
  * <b>ParticleEffect Library</b>

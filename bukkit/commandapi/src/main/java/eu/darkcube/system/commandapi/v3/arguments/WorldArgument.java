@@ -29,7 +29,7 @@ public class WorldArgument implements ArgumentType<World> {
 	}
 
 	public static World getWorld(CommandContext<CommandSource> context,
-					String name) throws CommandSyntaxException {
+					String name) {
 		return context.getArgument(name, World.class);
 	}
 
@@ -41,7 +41,7 @@ public class WorldArgument implements ArgumentType<World> {
 				return world;
 			}
 		}
-		throw INVALID_WORLD.createWithContext(reader, worldname);
+		throw WorldArgument.INVALID_WORLD.createWithContext(reader, worldname);
 	}
 
 	@Override

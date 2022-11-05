@@ -34,7 +34,7 @@ public class Vec2Argument implements ArgumentType<ILocationArgument> {
 		return new Vec2Argument(true);
 	}
 
-	public static Vector2f getVec2f(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
+	public static Vector2f getVec2f(CommandContext<CommandSource> context, String name) {
 		Vector3d vector3d = context.getArgument(name, ILocationArgument.class).getPosition(context.getSource());
 		return new Vector2f((float) vector3d.x, (float) vector3d.z);
 	}
@@ -43,18 +43,16 @@ public class Vec2Argument implements ArgumentType<ILocationArgument> {
 	public ILocationArgument parse(StringReader reader) throws CommandSyntaxException {
 		int i = reader.getCursor();
 		if (!reader.canRead()) {
-			throw VEC2_INCOMPLETE.createWithContext(reader);
-		} else {
-			LocationPart locationpart = LocationPart.parseDouble(reader, this.centerIntegers);
-			if (reader.canRead() && reader.peek() == ' ') {
-				reader.skip();
-				LocationPart locationpart1 = LocationPart.parseDouble(reader, this.centerIntegers);
-				return new LocationInput(locationpart, new LocationPart(true, 0.0D), locationpart1);
-			} else {
-				reader.setCursor(i);
-				throw VEC2_INCOMPLETE.createWithContext(reader);
-			}
+			throw Vec2Argument.VEC2_INCOMPLETE.createWithContext(reader);
 		}
+		LocationPart locationpart = LocationPart.parseDouble(reader, this.centerIntegers);
+		if (reader.canRead() && reader.peek() == ' ') {
+			reader.skip();
+			LocationPart locationpart1 = LocationPart.parseDouble(reader, this.centerIntegers);
+			return new LocationInput(locationpart, new LocationPart(true, 0.0D), locationpart1);
+		}
+		reader.setCursor(i);
+		throw Vec2Argument.VEC2_INCOMPLETE.createWithContext(reader);
 	}
 
 	@Override
@@ -62,22 +60,21 @@ public class Vec2Argument implements ArgumentType<ILocationArgument> {
 			SuggestionsBuilder builder) {
 		if (!(source.getSource() instanceof ISuggestionProvider)) {
 			return Suggestions.empty();
-		} else {
-			String s = builder.getRemaining();
-			Collection<ISuggestionProvider.Coordinates> collection;
-			if (!s.isEmpty() && s.charAt(0) == '^') {
-				collection = Collections.singleton(ISuggestionProvider.Coordinates.DEFAULT_LOCAL);
-			} else {
-				collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
-			}
-
-			return ISuggestionProvider.suggestVec2(s, collection, builder,
-					Commands.predicate(this::parse));
 		}
+		String s = builder.getRemaining();
+		Collection<ISuggestionProvider.Coordinates> collection;
+		if (!s.isEmpty() && s.charAt(0) == '^') {
+			collection = Collections.singleton(ISuggestionProvider.Coordinates.DEFAULT_LOCAL);
+		} else {
+			collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
+		}
+
+		return ISuggestionProvider.suggestVec2(s, collection, builder,
+				Commands.predicate(this::parse));
 	}
 
 	@Override
 	public Collection<String> getExamples() {
-		return EXAMPLES;
+		return Vec2Argument.EXAMPLES;
 	}
 }

@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':cloudban:cloudban-common')
+    embedApi project(':cloudban:cloudban-common')
     implementation project(':bukkit:darkcubesystem')
     implementation cloudnetWrapper
 }

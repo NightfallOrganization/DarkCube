@@ -17,7 +17,7 @@ public class CustomComponentBuilder {
 	public CustomComponentBuilder(CustomComponentBuilder original) {
 		this.current = new TextComponent(original.current);
 		for (TextComponent baseComponent : original.parts) {
-			this.parts.add((TextComponent) baseComponent.duplicate());
+			this.parts.add(baseComponent.duplicate());
 		}
 	}
 
@@ -125,7 +125,7 @@ public class CustomComponentBuilder {
 
 	public CustomComponentBuilder append(TextComponent... components) {
 		for (TextComponent component : components) {
-			component = (TextComponent) component.duplicate();
+			component = component.duplicate();
 			TextComponent previous = this.current;
 			this.current = component;
 
@@ -137,13 +137,13 @@ public class CustomComponentBuilder {
 	}
 
 	public TextComponent getCurrent() {
-		return current;
+		return this.current;
 	}
 
 	public List<TextComponent> getParts() {
-		List<TextComponent> l = new ArrayList<>(parts);
-		if (current != null)
-			l.add(current);
+		List<TextComponent> l = new ArrayList<>(this.parts);
+		if (this.current != null)
+			l.add(this.current);
 		return l;
 	}
 

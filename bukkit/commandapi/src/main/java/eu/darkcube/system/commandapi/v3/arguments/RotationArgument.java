@@ -35,39 +35,36 @@ public class RotationArgument implements ArgumentType<ILocationArgument> {
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> source, SuggestionsBuilder builder) {
 		if (!(source.getSource() instanceof ISuggestionProvider)) {
 			return Suggestions.empty();
-		} else {
-			String s = builder.getRemaining();
-			Collection<ISuggestionProvider.Coordinates> collection;
-			if (!s.isEmpty() && s.charAt(0) == '^') {
-				collection = Collections.emptyList();
-			} else {
-				collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
-			}
-
-			return ISuggestionProvider.suggestVec2(s, collection, builder, Commands.predicate(this::parse));
 		}
+		String s = builder.getRemaining();
+		Collection<ISuggestionProvider.Coordinates> collection;
+		if (!s.isEmpty() && s.charAt(0) == '^') {
+			collection = Collections.emptyList();
+		} else {
+			collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
+		}
+
+		return ISuggestionProvider.suggestVec2(s, collection, builder, Commands.predicate(this::parse));
 	}
 
 	@Override
 	public ILocationArgument parse(StringReader reader) throws CommandSyntaxException {
 		int i = reader.getCursor();
 		if (!reader.canRead()) {
-			throw ROTATION_INCOMPLETE.createWithContext(reader);
-		} else {
-			LocationPart yaw = LocationPart.parseDouble(reader, false);
-			if (reader.canRead() && reader.peek() == ' ') {
-				reader.skip();
-				LocationPart pitch = LocationPart.parseDouble(reader, false);
-				return new LocationInput(yaw, pitch, new LocationPart(true, 0.0D));
-			} else {
-				reader.setCursor(i);
-				throw ROTATION_INCOMPLETE.createWithContext(reader);
-			}
+			throw RotationArgument.ROTATION_INCOMPLETE.createWithContext(reader);
 		}
+		LocationPart yaw = LocationPart.parseDouble(reader, false);
+		if (reader.canRead() && reader.peek() == ' ') {
+			reader.skip();
+			LocationPart pitch = LocationPart.parseDouble(reader, false);
+			return new LocationInput(yaw, pitch, new LocationPart(true, 0.0D));
+		}
+		reader.setCursor(i);
+		throw RotationArgument.ROTATION_INCOMPLETE.createWithContext(reader);
 	}
 
 	@Override
 	public Collection<String> getExamples() {
-		return EXAMPLES;
+		return RotationArgument.EXAMPLES;
 	}
 }

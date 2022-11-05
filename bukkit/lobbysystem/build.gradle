@@ -1,0 +1,15 @@
+dependencies {
+    implementation project(':bukkit:darkcubesystem')
+    implementation project(':bukkit:languageapi')
+    implementation project(':bukkit:inventoryapi')
+    implementation project(':pserver:pserver-common')
+    implementation project(':pserver')
+	implementation project(':bukkit:cubesapi')
+    embedApi project(':common:labymod-emotes')
+    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation cloudnetDriver
+    implementation cloudnetWrapper
+    implementation cloudnetBridge
+    implementation npclib
+    implementation luckperms
+}

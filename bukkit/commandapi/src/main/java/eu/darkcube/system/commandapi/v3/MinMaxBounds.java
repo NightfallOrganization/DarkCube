@@ -14,10 +14,14 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 public abstract class MinMaxBounds<T extends Number> {
+
 	public static final SimpleCommandExceptionType ERROR_EMPTY = Message.ERROR_EMPTY.newSimpleCommandExceptionType();
+
 	public static final SimpleCommandExceptionType ERROR_SWAPPED = Message.ERROR_SWAPPED
 			.newSimpleCommandExceptionType();
+
 	protected final T min;
+
 	protected final T max;
 
 	protected MinMaxBounds(T min, T max) {
@@ -62,15 +66,13 @@ public abstract class MinMaxBounds<T extends Number> {
 			if (JSONUtils.isNumber(element)) {
 				T t2 = biFunction.apply(element, "value");
 				return boundedFactory.create(t2, t2);
-			} else {
-				JsonObject jsonobject = JSONUtils.getJsonObject(element, "value");
-				T t = jsonobject.has("min") ? biFunction.apply(jsonobject.get("min"), "min") : null;
-				T t1 = jsonobject.has("max") ? biFunction.apply(jsonobject.get("max"), "max") : null;
-				return boundedFactory.create(t, t1);
 			}
-		} else {
-			return defaultIn;
+			JsonObject jsonobject = JSONUtils.getJsonObject(element, "value");
+			T t = jsonobject.has("min") ? biFunction.apply(jsonobject.get("min"), "min") : null;
+			T t1 = jsonobject.has("max") ? biFunction.apply(jsonobject.get("max"), "max") : null;
+			return boundedFactory.create(t, t1);
 		}
+		return defaultIn;
 	}
 
 	protected static <T extends Number, R extends MinMaxBounds<T>> R fromReader(StringReader reader,
@@ -78,34 +80,32 @@ public abstract class MinMaxBounds<T extends Number> {
 			Supplier<DynamicCommandExceptionType> commandExceptionSupplier, Function<T, T> function)
 			throws CommandSyntaxException {
 		if (!reader.canRead()) {
-			throw ERROR_EMPTY.createWithContext(reader);
-		} else {
-			int i = reader.getCursor();
+			throw MinMaxBounds.ERROR_EMPTY.createWithContext(reader);
+		}
+		int i = reader.getCursor();
 
-			try {
-				T t = optionallyFormat(readNumber(reader, valueFunction, commandExceptionSupplier), function);
-				T t1;
-				if (reader.canRead(2) && reader.peek() == '.' && reader.peek(1) == '.') {
-					reader.skip();
-					reader.skip();
-					t1 = optionallyFormat(readNumber(reader, valueFunction, commandExceptionSupplier), function);
-					if (t == null && t1 == null) {
-						throw ERROR_EMPTY.createWithContext(reader);
-					}
-				} else {
-					t1 = t;
-				}
-
+		try {
+			T t = MinMaxBounds.optionallyFormat(MinMaxBounds.readNumber(reader, valueFunction, commandExceptionSupplier), function);
+			T t1;
+			if (reader.canRead(2) && reader.peek() == '.' && reader.peek(1) == '.') {
+				reader.skip();
+				reader.skip();
+				t1 = MinMaxBounds.optionallyFormat(MinMaxBounds.readNumber(reader, valueFunction, commandExceptionSupplier), function);
 				if (t == null && t1 == null) {
-					throw ERROR_EMPTY.createWithContext(reader);
-				} else {
-					return minMaxReader.create(reader, t, t1);
+					throw MinMaxBounds.ERROR_EMPTY.createWithContext(reader);
 				}
-			} catch (CommandSyntaxException commandsyntaxexception) {
-				reader.setCursor(i);
-				throw new CommandSyntaxException(commandsyntaxexception.getType(),
-						commandsyntaxexception.getRawMessage(), commandsyntaxexception.getInput(), i);
+			} else {
+				t1 = t;
 			}
+
+			if (t == null && t1 == null) {
+				throw MinMaxBounds.ERROR_EMPTY.createWithContext(reader);
+			}
+			return minMaxReader.create(reader, t, t1);
+		} catch (CommandSyntaxException commandsyntaxexception) {
+			reader.setCursor(i);
+			throw new CommandSyntaxException(commandsyntaxexception.getType(), commandsyntaxexception.getRawMessage(),
+					commandsyntaxexception.getInput(), i);
 		}
 	}
 
@@ -113,19 +113,18 @@ public abstract class MinMaxBounds<T extends Number> {
 			Supplier<DynamicCommandExceptionType> commandExceptionSupplier) throws CommandSyntaxException {
 		int i = reader.getCursor();
 
-		while (reader.canRead() && isAllowedInputChat(reader)) {
+		while (reader.canRead() && MinMaxBounds.isAllowedInputChat(reader)) {
 			reader.skip();
 		}
 
 		String s = reader.getString().substring(i, reader.getCursor());
 		if (s.isEmpty()) {
 			return null;
-		} else {
-			try {
-				return stringToValueFunction.apply(s);
-			} catch (NumberFormatException numberformatexception) {
-				throw commandExceptionSupplier.get().createWithContext(reader, s);
-			}
+		}
+		try {
+			return stringToValueFunction.apply(s);
+		} catch (NumberFormatException numberformatexception) {
+			throw commandExceptionSupplier.get().createWithContext(reader, s);
 		}
 	}
 
@@ -134,12 +133,10 @@ public abstract class MinMaxBounds<T extends Number> {
 		if ((c0 < '0' || c0 > '9') && c0 != '-') {
 			if (c0 != '.') {
 				return false;
-			} else {
-				return !reader.canRead(2) || reader.peek(1) != '.';
 			}
-		} else {
-			return true;
+			return !reader.canRead(2) || reader.peek(1) != '.';
 		}
+		return true;
 	}
 
 	private static <T> T optionallyFormat(T value, Function<T, T> formatterFunction) {
@@ -147,17 +144,19 @@ public abstract class MinMaxBounds<T extends Number> {
 	}
 
 	public static class FloatBound extends MinMaxBounds<Float> {
+
 		public static final MinMaxBounds.FloatBound UNBOUNDED = new MinMaxBounds.FloatBound((Float) null, (Float) null);
+
 		private final Double minSquared;
+
 		private final Double maxSquared;
 
 		private static MinMaxBounds.FloatBound create(StringReader reader, Float min, Float max)
 				throws CommandSyntaxException {
 			if (min != null && max != null && min > max) {
-				throw ERROR_SWAPPED.createWithContext(reader);
-			} else {
-				return new MinMaxBounds.FloatBound(min, max);
+				throw MinMaxBounds.ERROR_SWAPPED.createWithContext(reader);
 			}
+			return new MinMaxBounds.FloatBound(min, max);
 		}
 
 		private static Double square(Float value) {
@@ -166,8 +165,8 @@ public abstract class MinMaxBounds<T extends Number> {
 
 		private FloatBound(Float min, Float max) {
 			super(min, max);
-			this.minSquared = square(min);
-			this.maxSquared = square(max);
+			this.minSquared = FloatBound.square(min);
+			this.maxSquared = FloatBound.square(max);
 		}
 
 		public static MinMaxBounds.FloatBound atLeast(float value) {
@@ -177,56 +176,59 @@ public abstract class MinMaxBounds<T extends Number> {
 		public boolean test(float value) {
 			if (this.min != null && this.min > value) {
 				return false;
-			} else {
-				return this.max == null || !(this.max < value);
 			}
+			return this.max == null || !(this.max < value);
 		}
 
 		public boolean testSquared(double value) {
 			if (this.minSquared != null && this.minSquared > value) {
 				return false;
-			} else {
-				return this.maxSquared == null || !(this.maxSquared < value);
 			}
+			return this.maxSquared == null || !(this.maxSquared < value);
 		}
 
 		public static MinMaxBounds.FloatBound fromJson(JsonElement element) {
-			return fromJson(element, UNBOUNDED, JSONUtils::getFloat, MinMaxBounds.FloatBound::new);
+			return MinMaxBounds.fromJson(element, FloatBound.UNBOUNDED, JSONUtils::getFloat, MinMaxBounds.FloatBound::new);
 		}
 
 		public static MinMaxBounds.FloatBound fromReader(StringReader reader) throws CommandSyntaxException {
-			return fromReader(reader, (p_211358_0_) -> {
+			return FloatBound.fromReader(reader, (p_211358_0_) -> {
 				return p_211358_0_;
 			});
 		}
 
 		public static MinMaxBounds.FloatBound fromReader(StringReader reader, Function<Float, Float> valueFunction)
 				throws CommandSyntaxException {
-			return fromReader(reader, MinMaxBounds.FloatBound::create, Float::parseFloat,
+			return MinMaxBounds.fromReader(reader, MinMaxBounds.FloatBound::create, Float::parseFloat,
 					CommandSyntaxException.BUILT_IN_EXCEPTIONS::readerInvalidFloat, valueFunction);
 		}
+
 	}
 
 	@FunctionalInterface
 	public interface IBoundFactory<T extends Number, R extends MinMaxBounds<T>> {
+
 		R create(T p_create_1_, T p_create_2_);
+
 	}
 
 	@FunctionalInterface
 	public interface IBoundReader<T extends Number, R extends MinMaxBounds<T>> {
+
 		R create(StringReader p_create_1_, T p_create_2_, T p_create_3_) throws CommandSyntaxException;
+
 	}
 
 	public static class IntBound extends MinMaxBounds<Integer> {
+
 		public static final MinMaxBounds.IntBound UNBOUNDED = new MinMaxBounds.IntBound((Integer) null, (Integer) null);
 
 		private static MinMaxBounds.IntBound create(StringReader reader, Integer min, Integer max)
 				throws CommandSyntaxException {
 			if (min != null && max != null && min > max) {
-				throw ERROR_SWAPPED.createWithContext(reader);
-			} else {
-				return new MinMaxBounds.IntBound(min, max);
+				throw MinMaxBounds.ERROR_SWAPPED.createWithContext(reader);
 			}
+			return new MinMaxBounds.IntBound(min, max);
 		}
 
 		private static Long square(Integer value) {
@@ -235,8 +237,8 @@ public abstract class MinMaxBounds<T extends Number> {
 
 		private IntBound(Integer min, Integer max) {
 			super(min, max);
-			square(min);
-			square(max);
+			IntBound.square(min);
+			IntBound.square(max);
 		}
 
 		public static MinMaxBounds.IntBound exactly(int value) {
@@ -250,25 +252,26 @@ public abstract class MinMaxBounds<T extends Number> {
 		public boolean test(int value) {
 			if (this.min != null && this.min > value) {
 				return false;
-			} else {
-				return this.max == null || this.max >= value;
 			}
+			return this.max == null || this.max >= value;
 		}
 
 		public static MinMaxBounds.IntBound fromJson(JsonElement element) {
-			return fromJson(element, UNBOUNDED, JSONUtils::getInt, MinMaxBounds.IntBound::new);
+			return MinMaxBounds.fromJson(element, IntBound.UNBOUNDED, JSONUtils::getInt, MinMaxBounds.IntBound::new);
 		}
 
 		public static MinMaxBounds.IntBound fromReader(StringReader reader) throws CommandSyntaxException {
-			return fromReader(reader, (p_211346_0_) -> {
+			return IntBound.fromReader(reader, (p_211346_0_) -> {
 				return p_211346_0_;
 			});
 		}
 
 		public static MinMaxBounds.IntBound fromReader(StringReader reader, Function<Integer, Integer> valueFunction)
 				throws CommandSyntaxException {
-			return fromReader(reader, MinMaxBounds.IntBound::create, Integer::parseInt,
+			return MinMaxBounds.fromReader(reader, MinMaxBounds.IntBound::create, Integer::parseInt,
 					CommandSyntaxException.BUILT_IN_EXCEPTIONS::readerInvalidInt, valueFunction);
 		}
+
 	}
+
 }

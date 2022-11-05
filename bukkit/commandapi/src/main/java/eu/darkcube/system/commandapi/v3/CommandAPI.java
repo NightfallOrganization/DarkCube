@@ -30,17 +30,17 @@ public class CommandAPI {
 	private static CommandAPI instance;
 
 	private CommandAPI(JavaPlugin plugin) {
-		if (instance != null) {
+		if (CommandAPI.instance != null) {
 			throw new IllegalAccessError(
 							"You may not initialize the CommandAPI twice!");
 		}
 		this.plugin = plugin;
 		this.commands = new Commands();
-		instance = this;
+		CommandAPI.instance = this;
 	}
 
 	public static CommandAPI getInstance() {
-		return instance;
+		return CommandAPI.instance;
 	}
 
 	public static CommandAPI init(JavaPlugin plugin) {
@@ -48,8 +48,8 @@ public class CommandAPI {
 	}
 
 	public void register(CommandExecutor command) {
-		command.register(commands.getDispatcher());
-		pluginRegisterCommand(command);
+		command.register(this.commands.getDispatcher());
+		this.pluginRegisterCommand(command);
 	}
 
 	public void dispatchCommand(String commandLine, CommandSender sender) {
@@ -72,12 +72,12 @@ public class CommandAPI {
 								"Can't register command with whitespace in name!");
 			}
 			final String[] aliases = command.getAliases();
-			final PluginCommand plugincommand = constructor.newInstance(name, plugin);
+			final PluginCommand plugincommand = constructor.newInstance(name, this.plugin);
 			plugincommand.setAliases(Arrays.asList(aliases));
 			plugincommand.setUsage("/" + name);
 			plugincommand.setPermission(command.getPermission());
-			plugincommand.setExecutor(executor);
-			plugincommand.setTabCompleter(executor);
+			plugincommand.setExecutor(this.executor);
+			plugincommand.setTabCompleter(this.executor);
 //			plugincommand.timings = TimingsManager.getCommandTiming(plugin.getName().toLowerCase(), plugincommand);
 			final Object server = Bukkit.getServer();
 			final Method methodGETCOMMANDMAP = server.getClass().getMethod("getCommandMap");
@@ -93,11 +93,11 @@ public class CommandAPI {
 				}
 				for (String n : command.getNames()) {
 					final String registerName = prefix + ":" + n;
-					checkAmbiguities(registerName, knownCommands, plugincommand);
+					this.checkAmbiguities(registerName, knownCommands, plugincommand);
 				}
 			}
 			for (String n : command.getNames()) {
-				checkAmbiguities(n, knownCommands, plugincommand);
+				this.checkAmbiguities(n, knownCommands, plugincommand);
 			}
 			for (final String n : command.getNames()) {
 				knownCommands.put(n.toLowerCase(), plugincommand);
@@ -118,11 +118,11 @@ public class CommandAPI {
 	}
 
 	public Commands getCommands() {
-		return commands;
+		return this.commands;
 	}
 
 	public JavaPlugin getPlugin() {
-		return plugin;
+		return this.plugin;
 	}
 
 	private void checkAmbiguities(String registerName,
@@ -131,14 +131,13 @@ public class CommandAPI {
 			Command cmd = knownCommands.get(registerName);
 			if (cmd instanceof PluginCommand) {
 				PluginCommand pcmd = (PluginCommand) cmd;
-				if (pcmd.getExecutor() == executor
-								&& pcmd.getTabCompleter() == executor) {
+				if (pcmd.getExecutor() == this.executor
+								&& pcmd.getTabCompleter() == this.executor) {
 					return;
-				} else {
-					Bukkit.getConsoleSender().sendMessage("§6Overriding command "
-									+ registerName + " from Plugin "
-									+ pcmd.getPlugin().getName() + "!");
 				}
+				Bukkit.getConsoleSender().sendMessage("§6Overriding command "
+								+ registerName + " from Plugin "
+								+ pcmd.getPlugin().getName() + "!");
 			} else {
 				Bukkit.getConsoleSender().sendMessage("§6Overriding command "
 								+ registerName + " from type "
@@ -153,10 +152,10 @@ public class CommandAPI {
 		@Override
 		public List<String> onTabComplete(CommandSender sender, Command command,
 						String label, String[] args) {
-			String commandLine = sjoin(label, args);
-			String commandLine2 = sjoin(label, Arrays.copyOfRange(args, 0, args.length
+			String commandLine = CommandAPI.this.sjoin(label, args);
+			String commandLine2 = CommandAPI.this.sjoin(label, Arrays.copyOfRange(args, 0, args.length
 							- 1)) + " ";
-			List<Suggestion> completions = commands.getTabCompletions(sender, commandLine);
+			List<Suggestion> completions = CommandAPI.this.commands.getTabCompletions(sender, commandLine);
 			ICommandExecutor executor = new BukkitCommandExecutor(sender);
 			if (!completions.isEmpty()) {
 				executor.sendMessage(new TextComponent(" "));
@@ -172,8 +171,8 @@ public class CommandAPI {
 		@Override
 		public boolean onCommand(CommandSender sender, Command command,
 						String label, String[] args) {
-			String commandLine = sjoin(label, args);
-			dispatchCommand(commandLine, sender);
+			String commandLine = CommandAPI.this.sjoin(label, args);
+			CommandAPI.this.dispatchCommand(commandLine, sender);
 			return true;
 		}
 	}

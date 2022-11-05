@@ -18,17 +18,17 @@ public class BoundingBox {
 
 	private static final Method M_GETHANDLE = Reflection
 			.getMethod(Reflection.getVersionClass(Reflection.CRAFTBUKKIT_PREFIX, "entity.CraftEntity"), "getHandle");
-	private static final Method M_GETBB = Reflection.getMethod(M_GETHANDLE.getReturnType(), "getBoundingBox");
-	private static final Field F_A = Reflection.getField(M_GETBB.getReturnType(), "a");
-	private static final Field F_B = Reflection.getField(M_GETBB.getReturnType(), "b");
-	private static final Field F_C = Reflection.getField(M_GETBB.getReturnType(), "c");
-	private static final Field F_D = Reflection.getField(M_GETBB.getReturnType(), "d");
-	private static final Field F_E = Reflection.getField(M_GETBB.getReturnType(), "e");
-	private static final Field F_F = Reflection.getField(M_GETBB.getReturnType(), "f");
+	private static final Method M_GETBB = Reflection.getMethod(BoundingBox.M_GETHANDLE.getReturnType(), "getBoundingBox");
+	private static final Field F_A = Reflection.getField(BoundingBox.M_GETBB.getReturnType(), "a");
+	private static final Field F_B = Reflection.getField(BoundingBox.M_GETBB.getReturnType(), "b");
+	private static final Field F_C = Reflection.getField(BoundingBox.M_GETBB.getReturnType(), "c");
+	private static final Field F_D = Reflection.getField(BoundingBox.M_GETBB.getReturnType(), "d");
+	private static final Field F_E = Reflection.getField(BoundingBox.M_GETBB.getReturnType(), "e");
+	private static final Field F_F = Reflection.getField(BoundingBox.M_GETBB.getReturnType(), "f");
 
 	private static double f(Entity entity, Field field) {
 		return (double) Reflection.getFieldValue(field,
-				Reflection.invokeMethod(M_GETBB, Reflection.invokeMethod(M_GETHANDLE, entity)));
+				Reflection.invokeMethod(BoundingBox.M_GETBB, Reflection.invokeMethod(BoundingBox.M_GETHANDLE, entity)));
 	}
 
 	private double minX, minY, minZ, maxX, maxY, maxZ;
@@ -48,7 +48,7 @@ public class BoundingBox {
 	}
 
 	public BoundingBox(Entity entity) {
-		this(f(entity, F_A), f(entity, F_B), f(entity, F_C), f(entity, F_D), f(entity, F_E), f(entity, F_F));
+		this(BoundingBox.f(entity, BoundingBox.F_A), BoundingBox.f(entity, BoundingBox.F_B), BoundingBox.f(entity, BoundingBox.F_C), BoundingBox.f(entity, BoundingBox.F_D), BoundingBox.f(entity, BoundingBox.F_E), BoundingBox.f(entity, BoundingBox.F_F));
 	}
 
 	public BoundingBox(double x1, double y1, double z1, double x2, double y2, double z2) {
@@ -224,7 +224,7 @@ public class BoundingBox {
 	}
 
 	public BoundingBox offset(Block block) {
-		return offset(Vector3d.position(block.getLocation()));
+		return this.offset(Vector3d.position(block.getLocation()));
 	}
 
 	public BoundingBox offset(Vector3d vec) {
@@ -280,13 +280,12 @@ public class BoundingBox {
 		double d0 = to.x - from.x;
 		double d1 = to.y - from.y;
 		double d2 = to.z - from.z;
-		Direction direction = calcSideHit(this, from, adouble, (Direction) null, d0, d1, d2);
+		Direction direction = BoundingBox.calcSideHit(this, from, adouble, (Direction) null, d0, d1, d2);
 		if (direction == null) {
 			return Optional.empty();
-		} else {
-			double d3 = adouble[0];
-			return Optional.of(from.add(d3 * d0, d3 * d1, d3 * d2));
 		}
+		double d3 = adouble[0];
+		return Optional.of(from.add(d3 * d0, d3 * d1, d3 * d2));
 	}
 
 //	public static BlockRayTraceResult rayTrace(Iterable<BoundingBox> boxes, Vector3d start, Vector3d end,
@@ -314,26 +313,26 @@ public class BoundingBox {
 	private static Direction calcSideHit(BoundingBox aabb, Vector3d start, double[] minDistance, Direction facing,
 			double deltaX, double deltaY, double deltaZ) {
 		if (deltaX > 1.0E-7D) {
-			facing = checkSideForHit(minDistance, facing, deltaX, deltaY, deltaZ, aabb.minX, aabb.minY, aabb.maxY,
+			facing = BoundingBox.checkSideForHit(minDistance, facing, deltaX, deltaY, deltaZ, aabb.minX, aabb.minY, aabb.maxY,
 					aabb.minZ, aabb.maxZ, Direction.WEST, start.x, start.y, start.z);
 		} else if (deltaX < -1.0E-7D) {
-			facing = checkSideForHit(minDistance, facing, deltaX, deltaY, deltaZ, aabb.maxX, aabb.minY, aabb.maxY,
+			facing = BoundingBox.checkSideForHit(minDistance, facing, deltaX, deltaY, deltaZ, aabb.maxX, aabb.minY, aabb.maxY,
 					aabb.minZ, aabb.maxZ, Direction.EAST, start.x, start.y, start.z);
 		}
 
 		if (deltaY > 1.0E-7D) {
-			facing = checkSideForHit(minDistance, facing, deltaY, deltaZ, deltaX, aabb.minY, aabb.minZ, aabb.maxZ,
+			facing = BoundingBox.checkSideForHit(minDistance, facing, deltaY, deltaZ, deltaX, aabb.minY, aabb.minZ, aabb.maxZ,
 					aabb.minX, aabb.maxX, Direction.DOWN, start.y, start.z, start.x);
 		} else if (deltaY < -1.0E-7D) {
-			facing = checkSideForHit(minDistance, facing, deltaY, deltaZ, deltaX, aabb.maxY, aabb.minZ, aabb.maxZ,
+			facing = BoundingBox.checkSideForHit(minDistance, facing, deltaY, deltaZ, deltaX, aabb.maxY, aabb.minZ, aabb.maxZ,
 					aabb.minX, aabb.maxX, Direction.UP, start.y, start.z, start.x);
 		}
 
 		if (deltaZ > 1.0E-7D) {
-			facing = checkSideForHit(minDistance, facing, deltaZ, deltaX, deltaY, aabb.minZ, aabb.minX, aabb.maxX,
+			facing = BoundingBox.checkSideForHit(minDistance, facing, deltaZ, deltaX, deltaY, aabb.minZ, aabb.minX, aabb.maxX,
 					aabb.minY, aabb.maxY, Direction.NORTH, start.z, start.x, start.y);
 		} else if (deltaZ < -1.0E-7D) {
-			facing = checkSideForHit(minDistance, facing, deltaZ, deltaX, deltaY, aabb.maxZ, aabb.minX, aabb.maxX,
+			facing = BoundingBox.checkSideForHit(minDistance, facing, deltaZ, deltaX, deltaY, aabb.maxZ, aabb.minX, aabb.maxX,
 					aabb.minY, aabb.maxY, Direction.SOUTH, start.z, start.x, start.y);
 		}
 
@@ -351,9 +350,8 @@ public class BoundingBox {
 				&& minOtherB - 1.0E-7D < d2 && d2 < maxOtherB + 1.0E-7D) {
 			minDistance[0] = d0;
 			return hitSide;
-		} else {
-			return prevDirection;
 		}
+		return prevDirection;
 	}
 
 	@Override

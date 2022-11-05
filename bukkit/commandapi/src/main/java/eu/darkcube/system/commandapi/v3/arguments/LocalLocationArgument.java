@@ -62,22 +62,20 @@ public class LocalLocationArgument implements ILocationArgument {
 
 	public static LocalLocationArgument parse(StringReader reader) throws CommandSyntaxException {
 		int i = reader.getCursor();
-		double d0 = parseCoord(reader, i);
+		double d0 = LocalLocationArgument.parseCoord(reader, i);
 		if (reader.canRead() && reader.peek() == ' ') {
 			reader.skip();
-			double d1 = parseCoord(reader, i);
+			double d1 = LocalLocationArgument.parseCoord(reader, i);
 			if (reader.canRead() && reader.peek() == ' ') {
 				reader.skip();
-				double d2 = parseCoord(reader, i);
+				double d2 = LocalLocationArgument.parseCoord(reader, i);
 				return new LocalLocationArgument(d0, d1, d2);
-			} else {
-				reader.setCursor(i);
-				throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 			}
-		} else {
 			reader.setCursor(i);
 			throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 		}
+		reader.setCursor(i);
+		throw Vec3Argument.POS_INCOMPLETE.createWithContext(reader);
 	}
 
 	private static double parseCoord(StringReader reader, int start) throws CommandSyntaxException {

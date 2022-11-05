@@ -16,6 +16,7 @@ import net.md_5.bungee.chat.ComponentSerializer;
 public final class Book {
 
 	private List<TextComponent[]> pages = new ArrayList<>();
+
 	private static final Method M_a = Reflection.getMethod(
 			Reflection.getVersionClass(Reflection.MINECRAFT_PREFIX, "IChatBaseComponent.ChatSerializer"), "a",
 			String.class);
@@ -24,11 +25,13 @@ public final class Book {
 	}
 
 	public Book addPage(TextComponent[] components) {
-		pages.add(components);
+		this.pages.add(components);
 		return this;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({
+			"unchecked", "rawtypes"
+	})
 	public ItemStack build() {
 		ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
 		BookMeta meta = (BookMeta) book.getItemMeta();
@@ -37,12 +40,13 @@ public final class Book {
 			Field f = meta.getClass().getDeclaredField("pages");
 			f.setAccessible(true);
 			list = (List<?>) f.get(meta);
+			for (TextComponent[] page : this.pages) {
+				list.add(Reflection.invokeMethod(Book.M_a, null, ComponentSerializer.toString(page)));
+			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		for (TextComponent[] page : this.pages) {
-			list.add(Reflection.invokeMethod(M_a, null, ComponentSerializer.toString(page)));
+			throw new IllegalStateException(ex);
 		}
 		return book;
 	}
+
 }

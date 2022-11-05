@@ -151,22 +151,22 @@ public final class Matrix4f {
 	}
 
 	public void write(FloatBuffer floatBufferIn) {
-		floatBufferIn.put(bufferIndex(0, 0), this.m00);
-		floatBufferIn.put(bufferIndex(0, 1), this.m01);
-		floatBufferIn.put(bufferIndex(0, 2), this.m02);
-		floatBufferIn.put(bufferIndex(0, 3), this.m03);
-		floatBufferIn.put(bufferIndex(1, 0), this.m10);
-		floatBufferIn.put(bufferIndex(1, 1), this.m11);
-		floatBufferIn.put(bufferIndex(1, 2), this.m12);
-		floatBufferIn.put(bufferIndex(1, 3), this.m13);
-		floatBufferIn.put(bufferIndex(2, 0), this.m20);
-		floatBufferIn.put(bufferIndex(2, 1), this.m21);
-		floatBufferIn.put(bufferIndex(2, 2), this.m22);
-		floatBufferIn.put(bufferIndex(2, 3), this.m23);
-		floatBufferIn.put(bufferIndex(3, 0), this.m30);
-		floatBufferIn.put(bufferIndex(3, 1), this.m31);
-		floatBufferIn.put(bufferIndex(3, 2), this.m32);
-		floatBufferIn.put(bufferIndex(3, 3), this.m33);
+		floatBufferIn.put(Matrix4f.bufferIndex(0, 0), this.m00);
+		floatBufferIn.put(Matrix4f.bufferIndex(0, 1), this.m01);
+		floatBufferIn.put(Matrix4f.bufferIndex(0, 2), this.m02);
+		floatBufferIn.put(Matrix4f.bufferIndex(0, 3), this.m03);
+		floatBufferIn.put(Matrix4f.bufferIndex(1, 0), this.m10);
+		floatBufferIn.put(Matrix4f.bufferIndex(1, 1), this.m11);
+		floatBufferIn.put(Matrix4f.bufferIndex(1, 2), this.m12);
+		floatBufferIn.put(Matrix4f.bufferIndex(1, 3), this.m13);
+		floatBufferIn.put(Matrix4f.bufferIndex(2, 0), this.m20);
+		floatBufferIn.put(Matrix4f.bufferIndex(2, 1), this.m21);
+		floatBufferIn.put(Matrix4f.bufferIndex(2, 2), this.m22);
+		floatBufferIn.put(Matrix4f.bufferIndex(2, 3), this.m23);
+		floatBufferIn.put(Matrix4f.bufferIndex(3, 0), this.m30);
+		floatBufferIn.put(Matrix4f.bufferIndex(3, 1), this.m31);
+		floatBufferIn.put(Matrix4f.bufferIndex(3, 2), this.m32);
+		floatBufferIn.put(Matrix4f.bufferIndex(3, 3), this.m33);
 	}
 
 	public void setIdentity() {
@@ -262,9 +262,8 @@ public final class Matrix4f {
 		if (Math.abs(f) > 1.0E-6F) {
 			this.mul(f);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	public void mul(Matrix4f matrix) {

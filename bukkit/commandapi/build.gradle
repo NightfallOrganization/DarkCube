@@ -1,4 +1,4 @@
 dependencies {
-    implementation 'com.mojang:brigadier:1.0.17'
-    implementation project(':bukkit:commons')
+    compileOnlyApi 'com.mojang:brigadier:1.0.17'
+    api project(':bukkit:commons')
 }

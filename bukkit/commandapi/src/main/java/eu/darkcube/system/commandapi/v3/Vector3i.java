@@ -44,9 +44,8 @@ public class Vector3i implements Comparable<Vector3i> {
 		if (this.getY() == p_compareTo_1_.getY()) {
 			return this.getZ() == p_compareTo_1_.getZ() ? this.getX() - p_compareTo_1_.getX()
 					: this.getZ() - p_compareTo_1_.getZ();
-		} else {
-			return this.getY() - p_compareTo_1_.getY();
 		}
+		return this.getY() - p_compareTo_1_.getY();
 	}
 
 	public int getX() {
@@ -138,7 +137,7 @@ public class Vector3i implements Comparable<Vector3i> {
 
 	@Override
 	public String toString() {
-		return getCoordinatesAsString();
+		return this.getCoordinatesAsString();
 	}
 
 	public String getCoordinatesAsString() {

@@ -85,14 +85,13 @@ public int hashCode() {
       float f = this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
       if (f < 1.0E-5D) {
          return false;
-      } else {
-         float f1 = MathHelper.fastInvSqrt(f);
-         this.x *= f1;
-         this.y *= f1;
-         this.z *= f1;
-         this.w *= f1;
-         return true;
       }
+	float f1 = MathHelper.fastInvSqrt(f);
+	 this.x *= f1;
+	 this.y *= f1;
+	 this.z *= f1;
+	 this.w *= f1;
+	 return true;
    }
 
    public void transform(Matrix4f matrixIn) {

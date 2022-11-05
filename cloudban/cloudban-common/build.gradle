@@ -1,4 +1,4 @@
 dependencies {
-    implementation cloudnetDriver
-    implementation cloudnetBridge
+    compileOnlyApi cloudnetDriver
+    compileOnlyApi cloudnetBridge
 }

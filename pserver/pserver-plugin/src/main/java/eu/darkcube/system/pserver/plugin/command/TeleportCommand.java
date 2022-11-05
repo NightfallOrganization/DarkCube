@@ -33,32 +33,32 @@ public class TeleportCommand extends PServerExecutor {
 						"tp"
 		}, b -> b.then(Commands.argument("targets", EntityArgument.entities()).executes(source -> {
 			// When tp @e[limit=1] for example
-			return teleportToSingleEntity(source.getSource(), EntityArgument.getEntities(source, "targets"));
+			return TeleportCommand.teleportToSingleEntity(source.getSource(), EntityArgument.getEntities(source, "targets"));
 		}).then(Commands.argument("destination", EntityArgument.entity()).executes(source -> {
-			return teleportToEntity(source.getSource(), EntityArgument.getEntities(source, "targets"), EntityArgument.getEntity(source, "destination"));
+			return TeleportCommand.teleportToEntity(source.getSource(), EntityArgument.getEntities(source, "targets"), EntityArgument.getEntity(source, "destination"));
 		})).then(Commands.argument("location", Vec3Argument.vec3()).executes(source -> {
-			return teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, null);
+			return TeleportCommand.teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, null);
 		}).then(Commands.argument("rotation", RotationArgument.rotation()).executes(source -> {
-			return teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), RotationArgument.getRotation(source, "rotation"), null);
+			return TeleportCommand.teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), RotationArgument.getRotation(source, "rotation"), null);
 		})).then(Commands.literal("facing").then(Commands.literal("entity").then(Commands.argument("facingEntity", EntityArgument.entity()).executes(source -> {
-			return teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, new Facing(
+			return TeleportCommand.teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, new Facing(
 							EntityArgument.getEntity(source, "facingEntity"),
 							EntityAnchorArgument.Type.FEET));
 		}).then(Commands.argument("facingAnchor", EntityAnchorArgument.entityAnchor()).executes(source -> {
-			return teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, new Facing(
+			return TeleportCommand.teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, new Facing(
 							EntityArgument.getEntity(source, "facingEntity"),
 							EntityAnchorArgument.getEntityAnchor(source, "facingAnchor")));
 		})))).then(Commands.argument("facingLocation", Vec3Argument.vec3()).executes(source -> {
-			return teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, new Facing(
+			return TeleportCommand.teleportToPos(source.getSource(), EntityArgument.getEntities(source, "targets"), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, new Facing(
 							Vec3Argument.getVec3(source, "facingLocation")));
 		})))))
 //						.then(Commands.argument("destination", EntityArgument.entity()).executes(source -> {
 //			return teleportToEntity(source.getSource(), Collections.singleton(source.getSource().assertIsEntity()), EntityArgument.getEntity(source, "destination"));
 //		}))
 						.then(Commands.argument("location", Vec3Argument.vec3()).executes(source -> {
-							return teleportToPos(source.getSource(), Collections.singleton(source.getSource().assertIsEntity()), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, null);
+							return TeleportCommand.teleportToPos(source.getSource(), Collections.singleton(source.getSource().assertIsEntity()), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), null, null);
 						}).then(Commands.argument("rotation", RotationArgument.rotation()).executes(source -> {
-							return teleportToPos(source.getSource(), Collections.singleton(source.getSource().assertIsEntity()), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), RotationArgument.getRotation(source, "rotation"), null);
+							return TeleportCommand.teleportToPos(source.getSource(), Collections.singleton(source.getSource().assertIsEntity()), source.getSource().getWorld(), Vec3Argument.getLocation(source, "location"), RotationArgument.getRotation(source, "rotation"), null);
 						}))));
 	}
 
@@ -66,7 +66,7 @@ public class TeleportCommand extends PServerExecutor {
 					Collection<? extends Entity> destinations)
 					throws CommandSyntaxException {
 		if (destinations.size() > 1) {
-			throw TOO_MANY_ENTITIES.create();
+			throw TeleportCommand.TOO_MANY_ENTITIES.create();
 		}
 		Entity destination = destinations.stream().findAny().get();
 		source.assertIsEntity().teleport(destination);
@@ -78,7 +78,7 @@ public class TeleportCommand extends PServerExecutor {
 					Collection<? extends Entity> targets, Entity destination) {
 		Location loc = destination.getLocation();
 		for (Entity entity : targets) {
-			teleport(source, entity, destination.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), null);
+			TeleportCommand.teleport(source, entity, destination.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), null);
 		}
 		if (targets.size() == 1) {
 			source.sendFeedback(Message.TELEPORTED_TO_ENTITY_SINGLE.getMessage(source, targets.stream().findAny().get().getName(), destination.getName()), true);
@@ -90,17 +90,17 @@ public class TeleportCommand extends PServerExecutor {
 
 	public static int teleportToPos(CommandSource source,
 					Collection<? extends Entity> targets, World world,
-					ILocationArgument position, ILocationArgument rotation,
+					ILocationArgument position, final ILocationArgument rotation,
 					Facing facing) {
 		Vector3d vector3d = position.getPosition(source);
-		Vector2f vector2f = rotation == null ? null
+		final Vector2f vector2f = rotation == null ? null
 						: rotation.getRotation(source);
 
 		for (Entity entity : targets) {
-			if (rotation == null) {
-				teleport(source, entity, world, vector3d.x, vector3d.y, vector3d.z, entity.getLocation().getYaw(), entity.getLocation().getPitch(), facing);
+			if (vector2f == null) {
+				TeleportCommand.teleport(source, entity, world, vector3d.x, vector3d.y, vector3d.z, entity.getLocation().getYaw(), entity.getLocation().getPitch(), facing);
 			} else {
-				teleport(source, entity, world, vector3d.x, vector3d.y, vector3d.z, vector2f.x, vector2f.y, facing);
+				TeleportCommand.teleport(source, entity, world, vector3d.x, vector3d.y, vector3d.z, vector2f.x, vector2f.y, facing);
 			}
 		}
 
@@ -141,13 +141,13 @@ public class TeleportCommand extends PServerExecutor {
 		public void updateLook(CommandSource source, Entity entityIn) {
 			if (this.entity != null) {
 				if (entityIn instanceof Player) {
-					lookAt(entityIn, source.getEntityAnchorType(), this.entity, this.anchor);
+					TeleportCommand.lookAt(entityIn, source.getEntityAnchorType(), this.entity, this.anchor);
 
 				} else {
-					lookAt(entityIn, source.getEntityAnchorType(), this.position);
+					TeleportCommand.lookAt(entityIn, source.getEntityAnchorType(), this.position);
 				}
 			} else {
-				lookAt(entityIn, source.getEntityAnchorType(), this.position);
+				TeleportCommand.lookAt(entityIn, source.getEntityAnchorType(), this.position);
 			}
 
 		}
@@ -155,7 +155,7 @@ public class TeleportCommand extends PServerExecutor {
 
 	private static void lookAt(Entity entity, EntityAnchorArgument.Type anchor,
 					Entity target, EntityAnchorArgument.Type targetAnchor) {
-		lookAt(entity, anchor, targetAnchor.apply(target));
+		TeleportCommand.lookAt(entity, anchor, targetAnchor.apply(target));
 	}
 
 	private static void lookAt(Entity entity, EntityAnchorArgument.Type anchor,

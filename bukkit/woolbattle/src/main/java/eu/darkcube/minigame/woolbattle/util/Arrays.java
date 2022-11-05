@@ -15,7 +15,7 @@ public class Arrays {
 	public static <T> T[] addBefore(T[] array, T t) {
 		List<T> list = new ArrayList<>();
 		list.add(t);
-		list.addAll(asList(array));
+		list.addAll(Arrays.asList(array));
 		return list.toArray(array);
 	}
 
@@ -23,7 +23,7 @@ public class Arrays {
 	public static <T> T[] addAfter(T[] array, T... t) {
 		List<T> list = new ArrayList<>(array.length + 1);
 		list.addAll(Arrays.asList(array));
-		list.addAll(asList(t));
+		list.addAll(Arrays.asList(t));
 		return list.toArray(array);
 	}
 
@@ -53,18 +53,18 @@ public class Arrays {
 	}
 
 	public static <T> List<String> toSortedStringList(T[] array, T[] exclusion, String start) {
-		return toSortedStringList(asList(array), asList(exclusion), start);
+		return Arrays.toSortedStringList(Arrays.asList(array), Arrays.asList(exclusion), start);
 	}
 
 	public static <T> List<String> toSortedStringList(T[] array, String start) {
-		return toSortedStringList(asList(array), start);
+		return Arrays.toSortedStringList(Arrays.asList(array), start);
 	}
 
 	public static <T> List<String> toSortedStringList(Collection<? extends T> collection,
 			Collection<? extends T> exclusion, String start) {
 		collection = new ArrayList<>(collection);
 		collection.removeAll(exclusion);
-		return toSortedStringList(collection, start);
+		return Arrays.toSortedStringList(collection, start);
 	}
 
 	public static <T> List<String> toSortedStringList(Collection<? extends T> collection, String start) {
@@ -81,8 +81,10 @@ public class Arrays {
 				break;
 			}
 		}
+		if (method == null)
+			throw new IllegalStateException();
 		ConvertingRule<?> theRule = null;
-		for (ConvertingRule<?> rule : CONVERTING_RULES) {
+		for (ConvertingRule<?> rule : Arrays.CONVERTING_RULES) {
 			if (rule.getConvertingClass().isAssignableFrom(clazz)) {
 				if (theRule == null) {
 					theRule = rule;
@@ -120,7 +122,7 @@ public class Arrays {
 	}
 
 	public static boolean addConvertingRule(ConvertingRule<?> rule) {
-		return CONVERTING_RULES.add(rule);
+		return Arrays.CONVERTING_RULES.add(rule);
 	}
 
 	public static abstract class ConvertingRule<T> {
@@ -130,4 +132,5 @@ public class Arrays {
 		public abstract String convert(T object);
 
 	}
+
 }

@@ -14,7 +14,6 @@ import org.bukkit.entity.LivingEntity;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 
 import eu.darkcube.system.commandapi.v3.CommandSource;
@@ -49,7 +48,7 @@ public class EffectCommand extends PServerExecutor {
 							boolean force = source.get("force", false);
 							Collection<? extends Entity> targets = source.get("targets", Collections.singleton(source.asPlayer()));
 							PotionEffect type = EnumArgument.getEnumArgument(context, "effect", PotionEffect.class);
-							return giveEffect(context, targets, type, level, duration, ambient, particles, force);
+							return EffectCommand.giveEffect(context, targets, type, level, duration, ambient, particles, force);
 						})).build();
 						give.addChild(giveEffect);
 
@@ -97,12 +96,12 @@ public class EffectCommand extends PServerExecutor {
 			{
 				ArgumentBuilder<CommandSource, ?> b_clear = Commands.literal("clear");
 				b_clear.executes(context -> {
-					return clearEffects(context, Collections.singleton(context.getSource().asPlayer()), Arrays.asList(PotionEffect.values()));
+					return EffectCommand.clearEffects(context, Collections.singleton(context.getSource().asPlayer()), Arrays.asList(PotionEffect.values()));
 				});
 				{
 					ArgumentBuilder<CommandSource, ?> b_clearTargets = Commands.argument("targets", EntityArgument.entities());
 					b_clearTargets.executes(context -> {
-						return clearEffects(context, EntityArgument.getEntities(context, "targets"), Arrays.asList(PotionEffect.values()));
+						return EffectCommand.clearEffects(context, EntityArgument.getEntities(context, "targets"), Arrays.asList(PotionEffect.values()));
 					});
 					b_clear.then(b_clearTargets);
 				}
@@ -120,7 +119,7 @@ public class EffectCommand extends PServerExecutor {
 	private static int giveEffect(CommandContext<CommandSource> context,
 					Collection<? extends Entity> targets, PotionEffect effect,
 					int level, int duration, boolean ambient, boolean particles,
-					boolean force) throws CommandSyntaxException {
+					boolean force) {
 		CommandSource source = context.getSource();
 		Collection<LivingEntity> failed = new HashSet<>();
 		Collection<LivingEntity> added = new HashSet<>();
