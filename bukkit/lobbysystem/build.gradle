@@ -10,6 +10,5 @@ dependencies {
     implementation cloudnetDriver
     implementation cloudnetWrapper
     implementation cloudnetBridge
-    implementation npclib
     implementation luckperms
 }

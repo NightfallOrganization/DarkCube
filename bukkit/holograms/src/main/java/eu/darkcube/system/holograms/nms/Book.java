@@ -9,7 +9,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import eu.darkcube.system.Reflection;
+import eu.darkcube.system.ReflectionUtils;
+import eu.darkcube.system.ReflectionUtils.PackageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
@@ -17,9 +18,11 @@ public final class Book {
 
 	private List<TextComponent[]> pages = new ArrayList<>();
 
-	private static final Method M_a = Reflection.getMethod(
-			Reflection.getVersionClass(Reflection.MINECRAFT_PREFIX, "IChatBaseComponent.ChatSerializer"), "a",
-			String.class);
+//	private static final Method M_a = Reflection.getMethod(
+//			Reflection.getVersionClass(Reflection.MINECRAFT_PREFIX, "IChatBaseComponent.ChatSerializer"), "a",
+//			String.class);
+	private static final Method METHOD_a = ReflectionUtils.getMethod("IChatBaseComponent.ChatSerializer",
+			PackageType.MINECRAFT_SERVER, "a", String.class);
 
 	public Book() {
 	}
@@ -41,7 +44,7 @@ public final class Book {
 			f.setAccessible(true);
 			list = (List<?>) f.get(meta);
 			for (TextComponent[] page : this.pages) {
-				list.add(Reflection.invokeMethod(Book.M_a, null, ComponentSerializer.toString(page)));
+				list.add(ReflectionUtils.invokeMethod(null, Book.METHOD_a, ComponentSerializer.toString(page)));
 			}
 		} catch (Exception ex) {
 			throw new IllegalStateException(ex);

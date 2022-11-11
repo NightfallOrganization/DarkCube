@@ -8,32 +8,33 @@ import java.util.UUID;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import eu.darkcube.system.Reflection;
+import eu.darkcube.system.ReflectionUtils;
 
 public class SkullUtils {
 
-	private static final Class<?> GAME_PROFILE = Reflection.getClass("com.mojang.authlib.GameProfile");
+	private static final Class<?> GAME_PROFILE = ReflectionUtils.getClass("com.mojang.authlib.GameProfile");
 
-	private static final Class<?> PROPERTY = Reflection.getClass("com.mojang.authlib.properties.Property");
+	private static final Class<?> PROPERTY = ReflectionUtils.getClass("com.mojang.authlib.properties.Property");
 
-	private static final Constructor<?> PROPERTY_NEW = Reflection.getConstructor(SkullUtils.PROPERTY, String.class,
+	private static final Constructor<?> PROPERTY_NEW = ReflectionUtils.getConstructor(SkullUtils.PROPERTY, String.class,
 			String.class);
 
-	private static final Class<?> PROPERTY_MAP = Reflection.getClass("com.mojang.authlib.properties.PropertyMap");
+	private static final Class<?> PROPERTY_MAP = ReflectionUtils.getClass("com.mojang.authlib.properties.PropertyMap");
 
-	private static final Constructor<?> GAME_PROFILE_NEW = Reflection.getConstructor(SkullUtils.GAME_PROFILE,
+	private static final Constructor<?> GAME_PROFILE_NEW = ReflectionUtils.getConstructor(SkullUtils.GAME_PROFILE,
 			UUID.class, String.class);
 
-	private static final Method GET_PROPERTIES = Reflection.getMethod(SkullUtils.GAME_PROFILE, "getProperties");
+	private static final Method GET_PROPERTIES = ReflectionUtils.getMethod(SkullUtils.GAME_PROFILE, "getProperties");
 
-	private static final Method PUT = Reflection.getMethod(SkullUtils.PROPERTY_MAP, "put", Object.class, Object.class);
-	
+	private static final Method PUT = ReflectionUtils.getMethod(SkullUtils.PROPERTY_MAP, "put", Object.class,
+			Object.class);
+
 	public static final void setSkullTextureId(ItemStack skull, String textureValue) {
 //		Object profile = new GameProfile(UUID.randomUUID(), null);
-		Object profile = Reflection.newInstance(SkullUtils.GAME_PROFILE_NEW, UUID.randomUUID(), null);
-		Object propertyMap = Reflection.invokeMethod(SkullUtils.GET_PROPERTIES, profile);
-		Object property = Reflection.newInstance(SkullUtils.PROPERTY_NEW, "textures", textureValue);
-		Reflection.invokeMethod(SkullUtils.PUT, propertyMap, "textures", property);
+		Object profile = ReflectionUtils.instantiateObject(SkullUtils.GAME_PROFILE_NEW, UUID.randomUUID(), null);
+		Object propertyMap = ReflectionUtils.invokeMethod(profile, SkullUtils.GET_PROPERTIES);
+		Object property = ReflectionUtils.instantiateObject(SkullUtils.PROPERTY_NEW, "textures", textureValue);
+		ReflectionUtils.invokeMethod(propertyMap, SkullUtils.PUT, "textures", property);
 //		profile.getProperties().put("textures", new Property("textures", textureValue));
 		ItemMeta meta = skull.getItemMeta();
 		try {

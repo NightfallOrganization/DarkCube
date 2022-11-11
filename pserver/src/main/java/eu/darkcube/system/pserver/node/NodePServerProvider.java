@@ -1,6 +1,5 @@
 package eu.darkcube.system.pserver.node;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import de.dytanic.cloudnet.CloudNet;
@@ -23,6 +22,7 @@ import de.dytanic.cloudnet.driver.service.ServiceRemoteInclusion;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
 import de.dytanic.cloudnet.driver.service.ServiceTemplate;
 import de.dytanic.cloudnet.driver.template.TemplateStorage;
+import de.dytanic.cloudnet.service.EmptyGroupConfiguration;
 import de.dytanic.cloudnet.template.LocalTemplateStorage;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServerProvider;
@@ -43,8 +43,11 @@ public class NodePServerProvider extends PServerProvider {
 	private static NodePServerProvider instance = new NodePServerProvider();
 
 	public ServiceTask worldPServer;
+
 	public ServiceTemplate globalTemplate;
+
 	public ServiceTemplate worldTemplate;
+
 	private TemplateStorage storage = CloudNetDriver.getInstance().getLocalTemplateStorage();
 
 	private NodePServerProvider() {
@@ -68,37 +71,28 @@ public class NodePServerProvider extends PServerProvider {
 				int startPort = 20000;
 				int minServiceCount = 0;
 
-				worldPServer = new ServiceTask(includes, templates, deployments, name, runtime, maintenance,
+				this.worldPServer = new ServiceTask(includes, templates, deployments, name, runtime, maintenance,
 						autoDeleteOnStop, staticServices, associatedNodes, groups, deletedFilesAfterStop,
 						processConfiguration, startPort, minServiceCount);
-				CloudNet.getInstance().getServiceTaskProvider().addPermanentServiceTask(worldPServer);
+				CloudNet.getInstance().getServiceTaskProvider().addPermanentServiceTask(this.worldPServer);
 			} else {
-				worldPServer = CloudNet.getInstance().getServiceTaskProvider().getServiceTask(name);
+				this.worldPServer = CloudNet.getInstance().getServiceTaskProvider().getServiceTask(name);
 			}
 		}
 		// ServiceTemplates
 		{
 			String name = ".global";
-			globalTemplate = new ServiceTemplate(getTemplatePrefix(), name,
+			this.globalTemplate = new ServiceTemplate(PServerProvider.getTemplatePrefix(), name,
 					LocalTemplateStorage.LOCAL_TEMPLATE_STORAGE);
 
-			if (!storage.has(globalTemplate)) {
-				storage.create(globalTemplate);
-				try {
-					storage.createDirectory(globalTemplate, "plugins");
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-				try {
-					storage.createFile(globalTemplate, "plugins/" + PServerModule.PLUGIN_NAME);
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
+			if (!this.storage.has(this.globalTemplate)) {
+				this.storage.create(this.globalTemplate);
 			}
 			name = ".world";
-			worldTemplate = new ServiceTemplate(getTemplatePrefix(), name, LocalTemplateStorage.LOCAL_TEMPLATE_STORAGE);
-			if (!storage.has(worldTemplate)) {
-				storage.create(worldTemplate);
+			this.worldTemplate = new ServiceTemplate(PServerProvider.getTemplatePrefix(), name,
+					LocalTemplateStorage.LOCAL_TEMPLATE_STORAGE);
+			if (!this.storage.has(this.worldTemplate)) {
+				this.storage.create(this.worldTemplate);
 			}
 		}
 
@@ -108,7 +102,10 @@ public class NodePServerProvider extends PServerProvider {
 
 	@Override
 	public String newName() {
-		Collection<String> used = pservers.values().stream().map(PServer::getServerName).collect(Collectors.toList());
+		Collection<String> used = this.pservers.values()
+				.stream()
+				.map(PServer::getServerName)
+				.collect(Collectors.toList());
 		for (int big = 1; true; big++) {
 			for (int major = 1; major <= 10; major++) {
 				for (int minor = 1; minor <= 10; minor++) {
@@ -132,17 +129,17 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	public void remove(NodePServer pserver) {
-		sendUpdate(pserver);
+		this.sendUpdate(pserver);
 		new PacketNodeWrapperRemovePServer(pserver.getId()).sendAsync();
-		pservers.remove(pserver.getId());
+		this.pservers.remove(pserver.getId());
 	}
 
 	private void addOrUpdate(NodePServer pserver) {
-		if (!pservers.containsKey(pserver.getId())) {
-			pservers.put(pserver.getId(), pserver);
+		if (!this.pservers.containsKey(pserver.getId())) {
+			this.pservers.put(pserver.getId(), pserver);
 			new PacketNodeWrapperAddPServer(pserver.getSerializable()).sendAsync();
 		}
-		sendUpdate(pserver);
+		this.sendUpdate(pserver);
 	}
 
 	private void sendUpdate(NodePServer pserver) {
@@ -152,7 +149,7 @@ public class NodePServerProvider extends PServerProvider {
 	@Override
 	public void addOwner(UniqueId id, UUID owner) {
 		DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, owner);
-		getPServerOptional(id).ifPresent(ps -> {
+		this.getPServerOptional(id).ifPresent(ps -> {
 			ps.getOwners().add(owner);
 			ps.rebuildSerializable();
 		});
@@ -162,7 +159,7 @@ public class NodePServerProvider extends PServerProvider {
 	@Override
 	public void removeOwner(UniqueId id, UUID owner) {
 		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, owner);
-		getPServerOptional(id).ifPresent(ps -> {
+		this.getPServerOptional(id).ifPresent(ps -> {
 			ps.getOwners().remove(owner);
 			ps.rebuildSerializable();
 		});
@@ -171,17 +168,17 @@ public class NodePServerProvider extends PServerProvider {
 
 	@Override
 	public Optional<NodePServer> getPServerOptional(UniqueId uuid) {
-		return Optional.ofNullable(getPServer(uuid));
+		return Optional.ofNullable(this.getPServer(uuid));
 	}
 
 	@Override
 	public NodePServer getPServer(UniqueId uuid) {
-		return pservers.getOrDefault(uuid, null);
+		return this.pservers.getOrDefault(uuid, null);
 	}
 
 	@Override
 	public Collection<NodePServer> getPServers() {
-		return pservers.values();
+		return this.pservers.values();
 	}
 
 	@Override
@@ -190,42 +187,47 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	public static NodePServerProvider getInstance() {
-		return instance;
+		return NodePServerProvider.instance;
 	}
 
 	@Override
 	public NodePServer createPServer(PServerSerializable configuration) {
-		return createPServer(configuration, null);
+		return this.createPServer(configuration, null);
 	}
 
 	@Override
 	public NodePServer createPServer(PServerSerializable configuration, ServiceTask task) {
-		if (isPServer(configuration.id)) {
-			return getPServer(configuration.id);
+		if (this.isPServer(configuration.id)) {
+			return this.getPServer(configuration.id);
 		}
 		if (task == null) {
-			task = worldPServer;
+			task = this.worldPServer;
 		}
-		NodePServer pserver = newPServer(configuration, task);
-		addOrUpdate(pserver);
+		NodePServer pserver = this.newPServer(configuration, task);
+		this.addOrUpdate(pserver);
 		return pserver;
 	}
 
 	public Collection<ServiceTemplate> getAllTemplates() {
-		return storage.getTemplates().stream().filter(s -> s.getPrefix().equals(getTemplatePrefix()))
+		return this.storage.getTemplates()
+				.stream()
+				.filter(s -> s.getPrefix().equals(PServerProvider.getTemplatePrefix()))
 				.collect(Collectors.toList());
 	}
 
 	public Collection<String> getAllTemplateIDs() {
-		return storage.getTemplates().stream().filter(s -> s.getPrefix().equals(getTemplatePrefix()))
-				.map(ServiceTemplate::getName).filter(s -> !(s.equals(".world") || s.equals(".global")))
+		return this.storage.getTemplates()
+				.stream()
+				.filter(s -> s.getPrefix().equals(PServerProvider.getTemplatePrefix()))
+				.map(ServiceTemplate::getName)
+				.filter(s -> !(s.equals(".world") || s.equals(".global")))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public void delete(UniqueId pserver) {
-		executor.submit(() -> {
-			getPServerOptional(pserver).ifPresent(ps -> {
+		NodePServerProvider.executor.submit(() -> {
+			this.getPServerOptional(pserver).ifPresent(ps -> {
 				ServiceInfoSnapshot snap = ps.getSnapshot();
 				ps.stop();
 				if (snap != null) {
@@ -234,19 +236,36 @@ public class NodePServerProvider extends PServerProvider {
 				}
 			});
 			ServiceTemplate template = PServerProvider.getTemplate(pserver);
-			if (storage.has(template)) {
-				storage.delete(template);
+			if (this.storage.has(template)) {
+				this.storage.delete(template);
 			}
 		});
 	}
 
 	public NodePServer newPServer(PServerSerializable s, ServiceTask task) {
-		ServiceConfiguration.Builder confb = ServiceConfiguration.builder().task(task).task(worldPServer.getName())
-				.staticService(false).addTemplates(this.globalTemplate);
+		String groupGlobalName = "pserver-global";
+		if (!CloudNet.getInstance().getGroupConfigurationProvider().isGroupConfigurationPresent(groupGlobalName)) {
+			CloudNet.getInstance()
+					.getGroupConfigurationProvider()
+					.addGroupConfiguration(new EmptyGroupConfiguration(groupGlobalName));
+		}
+		ServiceConfiguration.Builder confb = ServiceConfiguration.builder()
+				.task(task)
+				.task(this.worldPServer.getName())
+				.staticService(false)
+				.addTemplates(this.globalTemplate)
+				.addGroups("pserver-global");
 		if (!s.temporary) {
+			String groupWorldName = "pserver-world";
+			if (!CloudNet.getInstance().getGroupConfigurationProvider().isGroupConfigurationPresent(groupWorldName)) {
+				CloudNet.getInstance()
+						.getGroupConfigurationProvider()
+						.addGroupConfiguration(new EmptyGroupConfiguration(groupWorldName));
+			}
+			confb.addGroups(groupWorldName);
 			confb.addTemplates(this.worldTemplate);
 			ServiceTemplate template = PServerProvider.getTemplate(s.id);
-			storage.create(template);
+			this.storage.create(template);
 			confb.addTemplates(template);
 			ServiceDeployment deployment = new ServiceDeployment(template,
 					PServerModule.getInstance().getDeploymentExclusions());
@@ -265,7 +284,7 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	public boolean isPServer(UniqueId uniqueId) {
-		return pservers.containsKey(uniqueId);
+		return this.pservers.containsKey(uniqueId);
 	}
 
 	@Override
@@ -282,4 +301,5 @@ public class NodePServerProvider extends PServerProvider {
 	public PServer getCurrentPServer() throws IllegalStateException {
 		throw new IllegalStateException();
 	}
+
 }

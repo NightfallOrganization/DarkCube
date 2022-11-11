@@ -14,11 +14,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.api.cubes.CubesAPI;
+import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots;
 import eu.darkcube.system.lobbysystem.util.ParticleEffect;
 import eu.darkcube.system.lobbysystem.util.UUIDManager;
@@ -31,7 +31,7 @@ public abstract class User {
 
 	protected UUID uuid;
 
-	protected Inventory openInventory;
+	protected volatile IInventory openInventory;
 
 	protected boolean buildMode = false;
 
@@ -46,7 +46,7 @@ public abstract class User {
 	private Set<Integer> rewardSlotsUsed;
 
 	public User(Language language, Gadget gadget, boolean sounds, boolean animations, UUID uuid, long lastDailyReward,
-			Inventory openInventory, Set<Integer> rewardSlotsUsed) {
+			IInventory openInventory, Set<Integer> rewardSlotsUsed) {
 		this.rewardSlotsUsed = rewardSlotsUsed;
 		this.lastDailyReward = lastDailyReward;
 		this.sounds = sounds;
@@ -76,11 +76,11 @@ public abstract class User {
 		return this.slots;
 	}
 
-	public Inventory getOpenInventory() {
+	public IInventory getOpenInventory() {
 		return this.openInventory;
 	}
 
-	public User setOpenInventory(Inventory openInventory) {
+	public User setOpenInventory(IInventory openInventory) {
 		boolean oldAnimations = this.isAnimations();
 		if (this.openInventory != null && openInventory.getClass().equals(this.openInventory.getClass())) {
 			this.setAnimations(false);
@@ -92,20 +92,19 @@ public abstract class User {
 
 				@Override
 				public void run() {
-					if (openInventory.getHandle() != null) {
-						p.openInventory(openInventory.getHandle());
-					}
+//					if (openInventory.getHandle() != null) {
+//						p.openInventory(openInventory.getHandle());
+//					}
 					User.this.openInventory = openInventory;
 					if (openInventory.getHandle() != null) {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 100, false, false),
 								true);
-						p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 1000000, 100, false, false),
-								true);
-						if (User.this.isAnimations()) {
-							openInventory.playAnimation(User.this);
-						} else {
-							openInventory.skipAnimation(User.this);
-						}
+						openInventory.open(p);
+//						if (User.this.isAnimations()) {
+//							openInventory.playAnimation(User.this);
+//						} else {
+//							openInventory.skipAnimation(User.this);
+//						}
 					}
 				}
 

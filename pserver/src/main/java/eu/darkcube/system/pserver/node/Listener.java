@@ -24,10 +24,10 @@ public class Listener {
 
 	@EventListener
 	public void handle(CloudServicePreStartEvent e) {
-		File file = getFile(e.getCloudService());
-		if (file.exists()) {
-			copy(e.getCloudService());
-		}
+//		File file = getFile(e.getCloudService());
+//		if (file.exists()) {
+		this.copy(e.getCloudService());
+//		}
 	}
 
 	@EventListener
@@ -54,7 +54,7 @@ public class Listener {
 	}
 
 	private void copy(ICloudService service) {
-		File file = getFile(service);
+		File file = this.getFile(service);
 		file.delete();
 		DefaultModuleHelper.copyCurrentModuleInstanceFromClass(Listener.class, file.toPath());
 	}
@@ -64,4 +64,5 @@ public class Listener {
 		folder.mkdirs();
 		return new File(folder, PServerModule.PLUGIN_NAME);
 	}
+
 }

@@ -24,14 +24,16 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.darkcube.system.Reflection;
+import eu.darkcube.system.ReflectionUtils;
+import eu.darkcube.system.ReflectionUtils.PackageType;
 
 public class DefaultCommandMap implements ICommandMap {
 
-	private static final Class<?> CLS_VANILLA_COMMAND_WRAPPER = Reflection
-			.getVersionClass(Reflection.CRAFTBUKKIT_PREFIX, "command.VanillaCommandWrapper");
+	private static final Class<?> CLS_VANILLA_COMMAND_WRAPPER = ReflectionUtils.getClass("VanillaCommandWrapper",
+			PackageType.CRAFTBUKKIT_COMMAND);
 
 	private final Map<String, Command> registeredCommands = new ConcurrentHashMap<>();
+
 	private final JavaPlugin plugin;
 
 	public DefaultCommandMap(JavaPlugin plugin) {
@@ -40,7 +42,7 @@ public class DefaultCommandMap implements ICommandMap {
 
 	@Override
 	public Collection<Command> getCommands() {
-		return new HashSet<>(registeredCommands.values());
+		return new HashSet<>(this.registeredCommands.values());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -49,28 +51,32 @@ public class DefaultCommandMap implements ICommandMap {
 			Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class,
 					Plugin.class);
 			constructor.setAccessible(true);
-			PluginCommand plugincommand = constructor.newInstance(command.getNames()[0], plugin);
+			PluginCommand plugincommand = constructor.newInstance(command.getNames()[0], this.plugin);
 			String name = command.getNames()[0];
 			String[] aliases = Arrays.copyOfRange(command.getNames(), 1, command.getNames().length);
 			plugincommand.setAliases(Arrays.asList(aliases));
 			plugincommand.setUsage("/" + name);
 			plugincommand.setPermission(command.getPermission());
 			plugincommand.setExecutor(new CommandExecutor() {
+
 				@Override
 				public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label,
 						String[] args) {
 					String commandLine = label + " " + String.join(" ", args);
-					dispatchCommand(new BukkitCommandExecutor(sender), commandLine);
+					DefaultCommandMap.this.dispatchCommand(new BukkitCommandExecutor(sender), commandLine);
 					return true;
 				}
+
 			});
 			plugincommand.setTabCompleter(new TabCompleter() {
+
 				@Override
 				public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command,
 						String label, String[] args) {
 					String commandLine = label + " " + String.join(" ", args);
-					return tabCompleteCommand(commandLine);
+					return DefaultCommandMap.this.tabCompleteCommand(commandLine);
 				}
+
 			});
 			Object server = Bukkit.getServer();
 			Method methodGETCOMMANDMAP = server.getClass().getMethod("getCommandMap");
@@ -81,7 +87,7 @@ public class DefaultCommandMap implements ICommandMap {
 			Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) f
 					.get(commandMap);
 			for (String n : command.getNames()) {
-				if (CLS_VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(n.toLowerCase()))) {
+				if (DefaultCommandMap.CLS_VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(n.toLowerCase()))) {
 					knownCommands.put(n.toLowerCase(), plugincommand);
 				}
 			}
@@ -113,7 +119,7 @@ public class DefaultCommandMap implements ICommandMap {
 	@Override
 	public void unregisterCommand(Command command) {
 		Collection<String> names = new ArrayList<>();
-		for (String key : registeredCommands.keySet()) {
+		for (String key : this.registeredCommands.keySet()) {
 			if (this.registeredCommands.get(key).equals(command)) {
 				names.add(key);
 			}
@@ -167,7 +173,8 @@ public class DefaultCommandMap implements ICommandMap {
 	@Override
 	public List<String> tabCompleteCommand(String commandLine) {
 		if (commandLine.isEmpty() || commandLine.indexOf(' ') == -1) {
-			return this.getCommandNames().stream()
+			return this.getCommandNames()
+					.stream()
 					.filter(name -> name != null && name.toLowerCase().startsWith(commandLine.toLowerCase()))
 					.collect(Collectors.toList());
 		}
@@ -206,7 +213,8 @@ public class DefaultCommandMap implements ICommandMap {
 		Command command = this.getCommand(args[0]);
 
 		if (command == null) {
-			return this.getCommandNames().stream()
+			return this.getCommandNames()
+					.stream()
 					.filter(name -> name != null && name.toLowerCase().startsWith(args[0].toLowerCase()))
 					.collect(Collectors.toList());
 		}
@@ -323,4 +331,5 @@ public class DefaultCommandMap implements ICommandMap {
 
 		return newArgs.toArray(new String[0]);
 	}
+
 }

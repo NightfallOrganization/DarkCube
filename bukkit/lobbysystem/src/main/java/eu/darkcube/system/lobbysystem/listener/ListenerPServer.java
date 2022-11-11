@@ -13,11 +13,11 @@ import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventPServerMayJoin;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
 import eu.darkcube.system.lobbysystem.inventory.InventoryLoading;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryGameServerSelection;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryNewPServerSlot;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
@@ -49,7 +49,7 @@ public class ListenerPServer extends BaseListener {
 		ItemBuilder itemb = new ItemBuilder(item);
 		String itemid = Item.getItemId(item);
 		User user = UserWrapper.getUser(e.getWhoClicked().getUniqueId());
-		Inventory inv = user.getOpenInventory();
+		IInventory inv = user.getOpenInventory();
 		if (itemid == null) {
 			return;
 		}
@@ -70,7 +70,7 @@ public class ListenerPServer extends BaseListener {
 				String psid = itemb.getUnsafe().getString(InventoryPServer.META_KEY_PSERVER);
 				PServer ps = PServerProvider.getInstance().getPServer(new UniqueId(psid));
 				if (ps == null) {
-					cinv.recalculate(user);
+					cinv.recalculate();
 					return;
 				}
 				e.getWhoClicked().closeInventory();
@@ -85,7 +85,7 @@ public class ListenerPServer extends BaseListener {
 			if (itemid.equals(Item.GAME_PSERVER.getItemId())) {
 				user.setOpenInventory(new InventoryGameServerSelection(user, cinv.psslot, cinv.slot));
 			} else if (itemid.equals(Item.WORLD_PSERVER.getItemId())) {
-				user.setOpenInventory(new InventoryLoading("Creating Server...", u -> {
+				user.setOpenInventory(new InventoryLoading("Creating Server...", user, u -> {
 					PServerUserSlot slot = cinv.psslot;
 					UniqueId uid = UniqueIdProvider.getInstance().newUniqueId();
 					slot.load(uid);
@@ -109,7 +109,7 @@ public class ListenerPServer extends BaseListener {
 			eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection cinv = (eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection) inv;
 			if (itemid.equals(
 					eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection.ITEMID)) {
-				user.setOpenInventory(new InventoryLoading(inv.getHandle().getTitle(), u -> {
+				user.setOpenInventory(new InventoryLoading(inv.getHandle().getTitle(), user, u -> {
 					JsonObject extra = new Gson().fromJson(itemb.getUnsafe()
 							.getString(
 									eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection.GAMESERVER_META_KEY),
@@ -141,7 +141,7 @@ public class ListenerPServer extends BaseListener {
 		} else if (inv instanceof InventoryPServerConfiguration) {
 			InventoryPServerConfiguration cinv = (InventoryPServerConfiguration) inv;
 			if (itemid.equals(Item.PSERVER_DELETE.getItemId())) {
-				user.setOpenInventory(new InventoryConfirm(cinv.getHandle().getTitle(), () -> {
+				user.setOpenInventory(new InventoryConfirm(cinv.getHandle().getTitle(), user, () -> {
 					cinv.psslot.delete();
 					user.setOpenInventory(new InventoryPServerOwn(user));
 				}, () -> {
@@ -150,10 +150,12 @@ public class ListenerPServer extends BaseListener {
 			} else if (itemid.equals(Item.START_PSERVER.getItemId())) {
 				AsyncExecutor.service().submit(() -> {
 					new BukkitRunnable() {
+
 						@Override
 						public void run() {
 							e.getWhoClicked().closeInventory();
 						}
+
 					}.runTask(Lobby.getInstance());
 					PServer ps = cinv.psslot.startPServer();
 					Lobby.getInstance().getPServerJoinOnStart().register(user, ps);
@@ -173,7 +175,7 @@ public class ListenerPServer extends BaseListener {
 					if (ps != null) {
 						ps.setPrivate(true);
 					}
-					cinv.recalculateAll();
+					cinv.recalculate();
 				});
 			} else if (itemid.equals(Item.PSERVER_PRIVATE.getItemId())) {
 				AsyncExecutor.service().submit(() -> {
@@ -183,7 +185,7 @@ public class ListenerPServer extends BaseListener {
 					if (ps != null) {
 						ps.setPrivate(false);
 					}
-					cinv.recalculateAll();
+					cinv.recalculate();
 				});
 			}
 		}
@@ -201,4 +203,5 @@ public class ListenerPServer extends BaseListener {
 		Bukkit.getPluginManager().callEvent(e);
 		return e.mayJoin();
 	}
+
 }

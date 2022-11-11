@@ -1,6 +1,5 @@
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
@@ -8,10 +7,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.DefaultPagedInventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.PagedInventory;
+import eu.darkcube.system.inventory.api.v1.AsyncPagedInventory;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventory.api.v1.PageArrow;
+import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
@@ -19,7 +19,9 @@ import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.UUIDManager;
 
-public class InventoryPServerOwn extends DefaultPagedInventory {
+public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
+
+	private static final InventoryType type_pserver_own = InventoryType.of("pserver_own");
 
 	public static final String META_KEY_SLOT = "lobbysystem.pserver.own.slot";
 
@@ -28,13 +30,14 @@ public class InventoryPServerOwn extends DefaultPagedInventory {
 	public static final String ITEMID_EXISTING = "InventoryPServerOwnPServerSlotExisting";
 
 	public InventoryPServerOwn(User user) {
-		super(Item.PSERVER_OWN_MENU.getDisplayName(user), Item.PSERVER_OWN_MENU, InventoryType.PSERVER_OWN,
-				PagedInventory.box(3, 3, 4, 7));
+		super(InventoryPServerOwn.type_pserver_own, Item.PSERVER_OWN_MENU.getDisplayName(user), 6 * 9,
+				AsyncPagedInventory.box(3, 3, 4, 7), user);
 	}
 
 	@Override
-	protected Map<Integer, ItemStack> contents(User user) {
-		Player p = UUIDManager.getPlayerByUUID(user.getUniqueId());
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		super.fillItems(items);
+		Player p = UUIDManager.getPlayerByUUID(this.user.getUniqueId());
 		int pservercount = 0;
 		for (PermissionAttachmentInfo info : p.getEffectivePermissions()) {
 			if (info.getValue()) {
@@ -49,16 +52,14 @@ public class InventoryPServerOwn extends DefaultPagedInventory {
 		}
 		final int pagesize = this.getPageSize();
 
-		Map<Integer, ItemStack> m = new HashMap<>();
-
-		PServerUserSlots slots = user.getSlots();
+		PServerUserSlots slots = this.user.getSlots();
 
 		for (int slot = 0; slot < pservercount; slot++) {
 			PServerUserSlot pslot = slots.getSlot(slot);
-			ItemBuilder item = PServerDataManager.getDisplayItem(user, pslot);
+			ItemBuilder item = PServerDataManager.getDisplayItem(this.user, pslot);
 
 			if (item == null) {
-				item = new ItemBuilder(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(user));
+				item = new ItemBuilder(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user));
 				item.meta(null);
 			} else {
 				item.build();
@@ -69,12 +70,11 @@ public class InventoryPServerOwn extends DefaultPagedInventory {
 			ItemBuilder.Unsafe unsafe = item.getUnsafe();
 			unsafe.setInt(InventoryPServerOwn.META_KEY_SLOT, slot);
 
-			m.put(slot, item.build());
+			items.put(slot, item.build());
 		}
 		for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize; slot < pagesize; slot++) {
-			m.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(user));
+			items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user));
 		}
-		return m;
 	}
 
 //	private Map<User, Map<Integer, ItemStack>> contents = new HashMap<>();
@@ -146,19 +146,19 @@ public class InventoryPServerOwn extends DefaultPagedInventory {
 //	}
 
 	@Override
-	protected void insertDefaultItems(InventoryManager manager) {
-		super.insertDefaultItems(manager);
-		manager.arrowSlots.put(ArrowType.PREV, new Integer[] {
-				Inventory.s(3, 2), Inventory.s(4, 2)
+	protected void insertDefaultItems0() {
+		super.insertDefaultItems0();
+		this.arrowSlots.put(PageArrow.PREVIOUS, new Integer[] {
+				IInventory.slot(3, 2), IInventory.slot(4, 2)
 		});
-		manager.arrowSlots.put(ArrowType.NEXT, new Integer[] {
-				Inventory.s(3, 8), Inventory.s(4, 8)
+		this.arrowSlots.put(PageArrow.NEXT, new Integer[] {
+				IInventory.slot(3, 8), IInventory.slot(4, 8)
 		});
 
-		manager.setFallbackItem(Inventory.s(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(manager.user));
-		manager.setFallbackItem(Inventory.s(1, 5), Item.LIME_GLASS_PANE.getItem(manager.user));
-		manager.setFallbackItem(Inventory.s(1, 6), Item.INVENTORY_PSERVER_PRIVATE.getItem(manager.user));
-		manager.setFallbackItem(Inventory.s(1, 7), Item.LIME_GLASS_PANE.getItem(manager.user));
+		this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user));
+		this.fallbackItems.put(IInventory.slot(1, 5), Item.LIME_GLASS_PANE.getItem(this.user));
+		this.fallbackItems.put(IInventory.slot(1, 6), Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user));
+		this.fallbackItems.put(IInventory.slot(1, 7), Item.LIME_GLASS_PANE.getItem(this.user));
 	}
 
 }

@@ -8,6 +8,10 @@
 	"main": "eu.darkcube.system.pserver.node.PServerModule",
 	"storesSensitiveData": true,
 	"dependencies": [
-		
+		{
+			"group": "de.dytanic.cloudnet.modules",
+			"name": "CloudNet-Database-MySQL",
+			"version": "1.0"
+		}
 	]
 }

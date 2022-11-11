@@ -10,26 +10,26 @@ import eu.darkcube.system.inventory.api.v1.PageArrow;
 import eu.darkcube.system.pserver.plugin.Item;
 import eu.darkcube.system.pserver.plugin.user.User;
 
-public class DefaultPServerAsyncPagedInventory
-				extends DefaultAsyncPagedInventory {
+public class DefaultPServerAsyncPagedInventory extends DefaultAsyncPagedInventory {
 
 	public final User user;
+
 	protected final Deque<Condition> conditions;
+
 	private boolean apply = false;
 
-	public DefaultPServerAsyncPagedInventory(User user,
-					InventoryType inventoryType, String title) {
-		super(inventoryType, title);
+	public DefaultPServerAsyncPagedInventory(User user, InventoryType inventoryType, String title) {
+		// TODO: Instant to animations
+		super(inventoryType, title, () -> true);
 		this.user = user;
 		this.conditions = new ConcurrentLinkedDeque<>();
-		addConditions(this.conditions);
-		tryFillInv();
+		this.addConditions(this.conditions);
+		this.tryFillInv();
 	}
-	
+
 	protected void tryFillInv() {
-		insertArrowItems();
-		insertDefaultItems();
-		offerAnimations(informations);
+		this.insertDefaultItems();
+		this.offerAnimations(this.informations);
 	}
 
 	protected void addConditions(Deque<Condition> conditions) {
@@ -37,11 +37,11 @@ public class DefaultPServerAsyncPagedInventory
 	}
 
 	protected boolean conditionsApply() {
-		if (apply) {
+		if (this.apply) {
 			return true;
 		}
-		if (conditions != null) {
-			for (Condition condition : conditions) {
+		if (this.conditions != null) {
+			for (Condition condition : this.conditions) {
 				if (!condition.applies()) {
 					return false;
 				}
@@ -53,37 +53,40 @@ public class DefaultPServerAsyncPagedInventory
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	@Override
-	protected void offerAnimations(
-					Collection<AnimationInformation> informations) {
-		if (conditionsApply()) {
+	protected void offerAnimations(Collection<AnimationInformation> informations) {
+		if (this.conditionsApply()) {
 			super.offerAnimations(informations);
 		}
 	}
 
 	@Override
 	protected void insertDefaultItems() {
-		if (conditionsApply()) {
+		if (this.conditionsApply()) {
 			super.insertDefaultItems();
 		}
 	}
 
 	@Override
 	protected void insertArrowItems() {
-		if (conditionsApply()) {
-			this.arrowItem.put(PageArrow.PREVIOUS, Item.ARROW_PREVIOUS.getItem(user));
-			this.arrowItem.put(PageArrow.NEXT, Item.ARROW_NEXT.getItem(user));
+		if (this.conditionsApply()) {
+			this.arrowItem.put(PageArrow.PREVIOUS, Item.ARROW_PREVIOUS.getItem(this.user));
+			this.arrowItem.put(PageArrow.NEXT, Item.ARROW_NEXT.getItem(this.user));
+			super.insertArrowItems();
 		}
 	}
 
 	public void open() {
-		this.open(user.getOnlinePlayer());
+		this.open(this.user.getOnlinePlayer());
 	}
 
 	public static interface Condition {
+
 		boolean applies();
+
 	}
+
 }

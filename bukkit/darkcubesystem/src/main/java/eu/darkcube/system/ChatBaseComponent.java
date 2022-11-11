@@ -1,7 +1,5 @@
 package eu.darkcube.system;
 
-import static eu.darkcube.system.Reflection.*;
-
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -9,17 +7,27 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import eu.darkcube.system.ReflectionUtils.PackageType;
+
 public class ChatBaseComponent {
 
-	private static final Class<?> CL_ICHATBASECOMPONENT = getVersionClass(MINECRAFT_PREFIX, "IChatBaseComponent");
-	private static final Class<?> CL_PACKETPLAYOUTCHAT = getVersionClass(MINECRAFT_PREFIX, "PacketPlayOutChat");
-	private static final Constructor<?> C_PACKETPLAYOUTCHAT = getConstructor(CL_PACKETPLAYOUTCHAT,
-			CL_ICHATBASECOMPONENT, byte.class);
+	private static final Class<?> CL_ICHATBASECOMPONENT = ReflectionUtils.getClass("IChatBaseComponent",
+			PackageType.MINECRAFT_SERVER);
+
+	private static final Class<?> CL_PACKETPLAYOUTCHAT = ReflectionUtils.getClass("PacketPlayOutChat",
+			PackageType.MINECRAFT_SERVER);
+
+//	private static final Constructor<?> C_PACKETPLAYOUTCHAT = getConstructor(CL_PACKETPLAYOUTCHAT,
+//			CL_ICHATBASECOMPONENT, byte.class);
+	private static final Constructor<?> C_PACKETPLAYOUTCHAT = ReflectionUtils.getConstructor(
+			ChatBaseComponent.CL_PACKETPLAYOUTCHAT, ChatBaseComponent.CL_ICHATBASECOMPONENT, byte.class);
 
 	private Object component;
+
 	private Consumer<Object> consumer = con -> {
 //		con.sendPacket(new PacketPlayOutChat(component, (byte) 0));
-		Plugin.sendPacket(con, newInstance(C_PACKETPLAYOUTCHAT, component, (byte) 0));
+		ReflectionUtils.instantiateObject(ChatBaseComponent.C_PACKETPLAYOUTCHAT, this.component, (byte) 0);
+//		Plugin.sendPacket(con, newInstance(ChatBaseComponent.C_PACKETPLAYOUTCHAT, this.component, (byte) 0));
 	};
 
 	ChatBaseComponent(Object component) {
@@ -32,7 +40,7 @@ public class ChatBaseComponent {
 	}
 
 	public Object getComponent() {
-		return component;
+		return this.component;
 	}
 
 	public void setComponent(Object component) {
@@ -40,14 +48,15 @@ public class ChatBaseComponent {
 	}
 
 	public void sendServer() {
-		sendPlayer(Bukkit.getOnlinePlayers().toArray(new Player[] {}));
+		this.sendPlayer(Bukkit.getOnlinePlayers().toArray(new Player[] {}));
 	}
 
 	public void sendPlayer(Player... players) {
-		Arrays.asList(players).stream().map(p -> Plugin.playerConnection(p)).forEach(consumer::accept);
+		Arrays.asList(players).stream().map(p -> Plugin.playerConnection(p)).forEach(this.consumer::accept);
 //		Packet<?> packet = new PacketPlayOutChat(component);
 //		for (Player player : players) {
 //			((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
 //		}
 	}
+
 }

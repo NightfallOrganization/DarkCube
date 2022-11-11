@@ -1,0 +1,6 @@
+main: eu.darkcube.system.voidworldplugin.Main
+name: AutoVoidWorld
+author: DasBabyPixel
+version: 1.0
+load: startup
+depend: [System]

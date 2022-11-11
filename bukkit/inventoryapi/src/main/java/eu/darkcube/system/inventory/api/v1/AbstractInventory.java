@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -23,7 +24,7 @@ public abstract class AbstractInventory implements IInventory {
 	public AbstractInventory(final InventoryType inventoryType,
 					final String title, final int size) {
 		this.inventoryType = inventoryType;
-		this.handle = Bukkit.createInventory(null, size, title);
+		this.handle = Bukkit.createInventory(null, size, ChatColor.stripColor(title));
 		this.listener = new InventoryListener();
 		Bukkit.getPluginManager().registerEvents(this.listener, InventoryAPI.getInstance());
 	}
@@ -59,14 +60,14 @@ public abstract class AbstractInventory implements IInventory {
 
 	@Override
 	public Inventory getHandle() {
-		return handle;
+		return this.handle;
 	}
 
 	protected class InventoryListener implements Listener {
 
 		@EventHandler
 		public void handle(InventoryCloseEvent event) {
-			if (isOpened(event.getPlayer())) {
+			if (AbstractInventory.this.isOpened(event.getPlayer())) {
 				AbstractInventory.this.handleClose(event.getPlayer());
 			}
 		}

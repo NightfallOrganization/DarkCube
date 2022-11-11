@@ -22,22 +22,30 @@ public class Border implements Serializable {
 
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(Location.class, new JsonSerializer<Location>() {
+
 				@Override
 				public JsonElement serialize(Location loc, Type type, JsonSerializationContext con) {
 					return new JsonPrimitive(Locations.serialize(loc));
 				}
-			}).registerTypeAdapter(Location.class, new JsonDeserializer<Location>() {
+
+			})
+			.registerTypeAdapter(Location.class, new JsonDeserializer<Location>() {
+
 				@Override
 				public Location deserialize(JsonElement json, Type type, JsonDeserializationContext con)
 						throws JsonParseException {
 					return Locations.deserialize(json.getAsString(), null);
 				}
 
-			}).create();
+			})
+			.create();
 
 	private Shape shape;
+
 	private double radius;
+
 	private Location loc;
+
 	private Location loc2;
 
 	public Border(Shape shape, double radius, Location loc, Location loc2) {
@@ -49,22 +57,22 @@ public class Border implements Serializable {
 
 	public boolean isInside(Entity ent) {
 		boolean inside = false;
-		if (loc.getWorld() != ent.getWorld())
+		if (this.loc.getWorld() != ent.getWorld())
 			return true;
 		Location o = ent.getLocation();
-		switch (shape) {
+		switch (this.shape) {
 		case CIRCLE:
-			inside = loc.distance(o) < radius;
+			inside = this.loc.distance(o) < this.radius;
 			break;
 		case RECTANGLE:
-			if (loc2 == null)
+			if (this.loc2 == null)
 				return true;
-			double sx = Math.min(loc.getX(), loc2.getX());
-			double sy = Math.min(loc.getY(), loc2.getY());
-			double sz = Math.min(loc.getZ(), loc2.getZ());
-			double bx = Math.max(loc.getX(), loc2.getX());
-			double by = Math.max(loc.getY(), loc2.getY());
-			double bz = Math.max(loc.getZ(), loc2.getZ());
+			double sx = Math.min(this.loc.getX(), this.loc2.getX());
+			double sy = Math.min(this.loc.getY(), this.loc2.getY());
+			double sz = Math.min(this.loc.getZ(), this.loc2.getZ());
+			double bx = Math.max(this.loc.getX(), this.loc2.getX());
+			double by = Math.max(this.loc.getY(), this.loc2.getY());
+			double bz = Math.max(this.loc.getZ(), this.loc2.getZ());
 			double x = o.getX();
 			double y = o.getY();
 			double z = o.getZ();
@@ -77,50 +85,63 @@ public class Border implements Serializable {
 	}
 
 	public Location getLoc1() {
-		return loc.clone();
+		return this.loc.clone();
 	}
 
 	public Location getLoc2() {
-		return loc2 == null ? null : loc2.clone();
+		return this.loc2 == null ? null : this.loc2.clone();
 	}
 
 	public double getRadius() {
-		return radius;
+		return this.radius;
 	}
 
 	public Shape getShape() {
-		return shape;
+		return this.shape;
 	}
 
 	public boolean isOutside(Entity ent) {
-		return !isInside(ent);
+		return !this.isInside(ent);
 	}
 
 	@Override
 	public String serialize() {
-		return GSON.toJson(this);
+		return Border.GSON.toJson(this);
 	}
 
 	public void boost(Entity ent) {
-		Location mid = getMid();
+		Location mid = this.getMid();
 		double x = mid.getX() - ent.getLocation().getX();
-		double y = ent.getLocation().getY() > Math.max(loc.getY(), loc2.getY()) ? mid.getY() - ent.getLocation().getY()
-				: 2;
+//		double y = ent.getLocation().getY() > Math.max(this.loc.getY(), this.loc2.getY()) ? mid.getY() - ent.getLocation().getY()
+//				: 2;
+		double ymax;
+		switch (this.shape) {
+		case CIRCLE:
+			ymax = this.loc.getY() + this.radius;
+			break;
+		case RECTANGLE:
+			ymax = Math.max(this.loc.getY(), this.loc2.getY());
+			break;
+		default:
+			throw new UnsupportedOperationException();
+		}
+		double y = ent.getLocation().getY() > ymax ? mid.getY() - ent.getLocation().getY() : 2;
 		double z = mid.getZ() - ent.getLocation().getZ();
 		ent.setVelocity(new Vector(x, y, z).normalize().multiply(2));
 	}
 
 	public Location getMid() {
-		switch (shape) {
+		switch (this.shape) {
 		case CIRCLE:
-			return loc;
+			return this.loc;
 		case RECTANGLE:
-			return loc.clone().add(loc2).multiply(.5);
+			return this.loc.clone().add(this.loc2).multiply(.5);
 		}
-		return loc;
+		return this.loc;
 	}
 
 	public static enum Shape {
 		RECTANGLE, CIRCLE
 	}
+
 }

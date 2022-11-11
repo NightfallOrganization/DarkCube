@@ -1,7 +1,5 @@
 package eu.darkcube.system;
 
-import static eu.darkcube.system.Reflection.*;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -20,20 +18,29 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import eu.darkcube.system.ReflectionUtils.PackageType;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ChatUtils {
 
-	private static final Class<?> CL_CHATSERIALIZER = getVersionClass(MINECRAFT_PREFIX,
-			"IChatBaseComponent$ChatSerializer");
-	private static final Method M_a = getMethod(CL_CHATSERIALIZER, "a", String.class);
-	private static final Class<?> CL_ICHATBASECOMPONENT = getVersionClass(MINECRAFT_PREFIX, "IChatBaseComponent");
-	private static final Class<?> CL_PACKETPLAYOUTCHAT = getVersionClass(MINECRAFT_PREFIX, "PacketPlayOutChat");
-	private static final Constructor<?> C_PACKETPLAYOUTCHAT = getConstructor(CL_PACKETPLAYOUTCHAT,
-			CL_ICHATBASECOMPONENT, byte.class);
+	private static final Class<?> CLASS_CHATSERIALIZER = PackageType.MINECRAFT_SERVER
+			.getClass("IChatBaseComponent$ChatSerializer");
+
+	private static final Method METHOD_a = ReflectionUtils.getMethod(ChatUtils.CLASS_CHATSERIALIZER, "a", String.class);
+
+	private static final Class<?> CLASS_ICHATBASECOMPONENT = ReflectionUtils.getClass("IChatBaseComponent",
+			PackageType.MINECRAFT_SERVER);
+
+	private static final Class<?> CLASS_PACKETPLAYOUTCHAT = ReflectionUtils.getClass("PacketPlayOutChat",
+			PackageType.MINECRAFT_SERVER);
+
+//	private static final Constructor<?> CONSTRUCTOR_PACKETPLAYOUTCHAT = getConstructor(ChatUtils.CL_PACKETPLAYOUTCHAT,
+//			ChatUtils.CL_ICHATBASECOMPONENT, byte.class);
+	private static final Constructor<?> CONSTRUCTOR_PACKETPLAYOUTCHAT = ReflectionUtils
+			.getConstructor(ChatUtils.CLASS_PACKETPLAYOUTCHAT, ChatUtils.CLASS_ICHATBASECOMPONENT, byte.class);
 
 	public static final ChatBaseComponent chat(String text) {
-		return chat(new ChatEntry.Builder().text(text).build());
+		return ChatUtils.chat(new ChatEntry.Builder().text(text).build());
 	}
 
 	public static final ChatBaseComponent chat(ChatEntry... entries) {
@@ -45,7 +52,7 @@ public class ChatUtils {
 		private JsonObject json;
 
 		private ChatEntry() {
-			json = new JsonObject();
+			this.json = new JsonObject();
 		}
 
 		public static ChatBaseComponent buildArray(ChatEntry... entries) {
@@ -54,12 +61,12 @@ public class ChatUtils {
 				array.add(new Gson().fromJson(entry.toString(), JsonElement.class));
 			}
 //			return new ChatBaseComponent(ChatSerializer.a(array.toString()));
-			return new ChatBaseComponent(invokeMethod(M_a, null, array.toString()));
+			return new ChatBaseComponent(ReflectionUtils.invokeMethod(null, ChatUtils.METHOD_a, array.toString()));
 		}
 
 		public ChatBaseComponent build() {
 //			return new ChatBaseComponent(ChatSerializer.a(toString()));
-			return new ChatBaseComponent(invokeMethod(M_a, null, toString()));
+			return new ChatBaseComponent(ReflectionUtils.invokeMethod(null, ChatUtils.METHOD_a, this.toString()));
 		}
 
 		public static ChatBaseComponent buildActionbar(ChatEntry... entries) {
@@ -109,15 +116,16 @@ public class ChatUtils {
 //			msg.append(arr.toString());
 //			IChatBaseComponent comp = ChatSerializer.a(msg.toString());
 //			PacketPlayOutChat c = new PacketPlayOutChat(null, (byte) 2);
-			Object c = newInstance(C_PACKETPLAYOUTCHAT, null, (byte) 2);
-			Field f_components = getField(c.getClass(), "components");
-			try {
-				f_components.set(c, ComponentSerializer.parse(msg.toString()));
-			} catch (IllegalArgumentException ex) {
-				ex.printStackTrace();
-			} catch (IllegalAccessException ex) {
-				ex.printStackTrace();
-			}
+			Object c = ReflectionUtils.instantiateObject(ChatUtils.CONSTRUCTOR_PACKETPLAYOUTCHAT, null, (byte) 2);
+			Field f_components = ReflectionUtils.getField(c.getClass(), true, "components");
+			ReflectionUtils.setValue(c, f_components, ComponentSerializer.parse(msg.toString()));
+//			try {
+//				f_components.set(c, ComponentSerializer.parse(msg.toString()));
+//			} catch (IllegalArgumentException ex) {
+//				ex.printStackTrace();
+//			} catch (IllegalAccessException ex) {
+//				ex.printStackTrace();
+//			}
 //			c.components = ComponentSerializer.parse(msg.toString());
 			return new ChatBaseComponent(null, con -> {
 //				con.sendPacket(c);
@@ -126,7 +134,7 @@ public class ChatUtils {
 		}
 
 		public JsonObject getJson() {
-			return json;
+			return this.json;
 		}
 
 		static ChatEntry byJsonObject(JsonObject o) {
@@ -138,43 +146,47 @@ public class ChatUtils {
 		}
 
 		public static ChatEntry getByJson(String json) {
-			return byJsonObject(new JsonParser().parse(json).getAsJsonObject());
+			return ChatEntry.byJsonObject(new JsonParser().parse(json).getAsJsonObject());
 		}
 
 		@Override
 		public String toString() {
-			return json.toString();
+			return this.json.toString();
 		}
 
 		public static class Builder {
 
 			private static final Map<String, Boolean> DEFAULT_FORMATS;
+
 			private static final Map<ChatColor, String> KEY_BY_FORMAT;
+
 			private static final String[] DEFAULT_FORMAT_KEYS = new String[] {
 					"bold", "italic", "strikethrough", "underlined", "obfuscated"
 			};
 
 			static {
 				DEFAULT_FORMATS = new HashMap<>();
-				for (String key : DEFAULT_FORMAT_KEYS)
-					DEFAULT_FORMATS.put(key, Boolean.FALSE);
+				for (String key : Builder.DEFAULT_FORMAT_KEYS)
+					Builder.DEFAULT_FORMATS.put(key, Boolean.FALSE);
 				KEY_BY_FORMAT = new HashMap<>();
-				KEY_BY_FORMAT.put(ChatColor.BOLD, "bold");
-				KEY_BY_FORMAT.put(ChatColor.ITALIC, "italic");
-				KEY_BY_FORMAT.put(ChatColor.STRIKETHROUGH, "strikethrough");
-				KEY_BY_FORMAT.put(ChatColor.UNDERLINE, "underlined");
-				KEY_BY_FORMAT.put(ChatColor.MAGIC, "obfuscated");
+				Builder.KEY_BY_FORMAT.put(ChatColor.BOLD, "bold");
+				Builder.KEY_BY_FORMAT.put(ChatColor.ITALIC, "italic");
+				Builder.KEY_BY_FORMAT.put(ChatColor.STRIKETHROUGH, "strikethrough");
+				Builder.KEY_BY_FORMAT.put(ChatColor.UNDERLINE, "underlined");
+				Builder.KEY_BY_FORMAT.put(ChatColor.MAGIC, "obfuscated");
 			}
 
 			private String text;
+
 			private JsonObject clickEvent;
+
 			private JsonObject hoverEvent;
 
 			public Builder() {
 			}
 
 			public ChatEntry[] build() {
-				if (text == null)
+				if (this.text == null)
 					return new ChatEntry[] {
 							ChatEntry.getByJson("{\"text\":\"null\"}")
 					};
@@ -186,18 +198,18 @@ public class ChatUtils {
 				JsonObject json = new JsonObject();
 				ChatColor old = null;
 
-				for (int i = 0; i < text.length(); i++) {
-					char colorChar = text.charAt(i);
-					if (colorChar == ChatColor.COLOR_CHAR && i - 1 != text.length()) {
-						char afterColor = text.charAt(i + 1);
+				for (int i = 0; i < this.text.length(); i++) {
+					char colorChar = this.text.charAt(i);
+					if (colorChar == ChatColor.COLOR_CHAR && i - 1 != this.text.length()) {
+						char afterColor = this.text.charAt(i + 1);
 						ChatColor color = ChatColor.getByChar(afterColor);
 						if (color != null) {
 							i++;
 							if (color.isFormat()) {
-								String key = KEY_BY_FORMAT.get(color);
+								String key = Builder.KEY_BY_FORMAT.get(color);
 								formats.add(key);
 							}
-							build0(old, formats, json, current, entries);
+							this.build0(old, formats, json, current, entries);
 							if (!color.isFormat())
 								formats.clear();
 							json = new JsonObject();
@@ -212,7 +224,7 @@ public class ChatUtils {
 					}
 				}
 				if (old != null) {
-					build0(old, formats, json, current, entries);
+					this.build0(old, formats, json, current, entries);
 				}
 				return entries.toArray(new ChatEntry[entries.size()]);
 			}
@@ -224,10 +236,10 @@ public class ChatUtils {
 						json.addProperty(format, true);
 					if (current.toString() != null)
 						json.addProperty("text", current.toString());
-					if (clickEvent != null)
-						json.add("clickEvent", clickEvent);
-					if (hoverEvent != null)
-						json.add("hoverEvent", hoverEvent);
+					if (this.clickEvent != null)
+						json.add("clickEvent", this.clickEvent);
+					if (this.hoverEvent != null)
+						json.add("hoverEvent", this.hoverEvent);
 					json.addProperty("color", old.name().toLowerCase());
 
 					entries.add(ChatEntry.byJsonObject(json));
@@ -240,31 +252,33 @@ public class ChatUtils {
 			}
 
 			public Builder text(String text) {
-				return textRaw(text + ChatColor.RESET);
+				return this.textRaw(text + ChatColor.RESET);
 			}
 
 			public Builder click(String command) {
-				return click("run_command", ChatColor.stripColor(command));
+				return this.click("run_command", ChatColor.stripColor(command));
 			}
 
 			public Builder click(String action, String value) {
-				clickEvent = new JsonObject();
-				clickEvent.addProperty("action", action);
-				clickEvent.addProperty("value", value);
+				this.clickEvent = new JsonObject();
+				this.clickEvent.addProperty("action", action);
+				this.clickEvent.addProperty("value", value);
 				return this;
 			}
 
 			public Builder hover(String text) {
-				return hover("show_text", text);
+				return this.hover("show_text", text);
 			}
 
 			public Builder hover(String action, String value) {
-				hoverEvent = new JsonObject();
-				hoverEvent.addProperty("action", action);
-				hoverEvent.addProperty("value", value);
+				this.hoverEvent = new JsonObject();
+				this.hoverEvent.addProperty("action", action);
+				this.hoverEvent.addProperty("value", value);
 				return this;
 			}
+
 		}
 
 	}
+
 }

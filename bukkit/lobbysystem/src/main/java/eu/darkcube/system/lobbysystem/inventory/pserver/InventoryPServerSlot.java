@@ -1,36 +1,43 @@
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.lobbysystem.inventory.abstraction.DefaultPagedInventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
 
-public class InventoryPServerSlot extends DefaultPagedInventory {
+public class InventoryPServerSlot extends LobbyAsyncPagedInventory {
+
+	private static final InventoryType type_pserver_slot = InventoryType.of("pserver_slot");
 
 	private PServerUserSlot slot;
 
 	public InventoryPServerSlot(User user, PServerUserSlot psslot, int slot) {
-		super(Item.PSERVER_SLOT.getDisplayName(user, Integer.toString(slot)), Item.PSERVER_SLOT,
-				InventoryType.PSERVER_SLOT);
+		super(InventoryPServerSlot.type_pserver_slot, Item.PSERVER_SLOT.getDisplayName(user, Integer.toString(slot)),
+				user);
 		this.slot = psslot;
 	}
 
 	@Override
-	protected Map<Integer, ItemStack> contents(User user) {
-		Map<Integer, ItemStack> m = new HashMap<>();
-		if (slot.isUsed()) {
-			
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 5), Item.PSERVER_SLOT.getItem(this.user));
+		super.insertFallbackItems();
+	}
+
+	@Override
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		if (this.slot.isUsed()) {
+
 		} else {
-			for (int s = 0; s < getPageSize(); s++) {
-				m.put(s, Item.LOADING.getItem(user));
+			for (int s = 0; s < this.getPageSize(); s++) {
+				items.put(s, Item.LOADING.getItem(this.user));
 			}
 		}
-		return m;
 	}
+
 }

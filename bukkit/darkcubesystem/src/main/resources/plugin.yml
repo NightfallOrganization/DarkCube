@@ -1,4 +1,4 @@
-main: eu.darkcube.system.DarkCubePlugin
+main: eu.darkcube.system.DarkCubeSystem
 name: System
 version: 1.0
 load: startup

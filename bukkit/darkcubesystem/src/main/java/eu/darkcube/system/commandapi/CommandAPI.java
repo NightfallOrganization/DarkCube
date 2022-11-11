@@ -16,21 +16,28 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.darkcube.system.Reflection;
+import eu.darkcube.system.ReflectionUtils;
+import eu.darkcube.system.ReflectionUtils.PackageType;
 
 public class CommandAPI {
 
-	private static final Class<?> CLS_VANILLA_COMMAND_WRAPPER = Reflection
-			.getVersionClass(Reflection.CRAFTBUKKIT_PREFIX, "command.VanillaCommandWrapper");
+//	private static final Class<?> CLS_VANILLA_COMMAND_WRAPPER = Reflection
+//			.getVersionClass(ReflectionUtils.CRAFTBUKKIT_PREFIX, "command.VanillaCommandWrapper");
+	private static final Class<?> CLS_VANILLA_COMMAND_WRAPPER = ReflectionUtils.getClass("VanillaCommandWrapper",
+			PackageType.CRAFTBUKKIT_COMMAND);
 
 	protected Command main_command;
+
 	protected String prefix = "§7§l[§5Dark§dCube§7§l] ";
+
 	protected JavaPlugin plugin;
+
 	protected static final CommandPosition standartPos = new CommandPosition(-1);
+
 	protected Set<String> knownPermissions = new HashSet<>();
 
 	public Set<String> getKnownPermissions() {
-		return knownPermissions;
+		return this.knownPermissions;
 	}
 
 	public void setPrefix(String prefix) {
@@ -48,7 +55,7 @@ public class CommandAPI {
 	 * @return CommandAPI - The CommandAPI instance
 	 */
 	public static synchronized CommandAPI enable(JavaPlugin plugin, Command owner) {
-		owner.setPositions(standartPos);
+		owner.setPositions(CommandAPI.standartPos);
 
 		CommandAPI api = new CommandAPI(plugin, owner);
 		for (Command apicmd : api.getMainCommand().getAllChilds()) {
@@ -56,7 +63,7 @@ public class CommandAPI {
 		}
 		api.getMainCommand().instance = api;
 		api.getMainCommand().loadSimpleLongUsage();
-		registerCommands(plugin, owner);
+		CommandAPI.registerCommands(plugin, owner);
 		PluginCommand cmd = plugin.getCommand(owner.getName());
 
 		CommandHandler handler = new CommandHandler(api);
@@ -94,11 +101,12 @@ public class CommandAPI {
 				f.setAccessible(true);
 				Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) f
 						.get(commandMap);
-				if (CLS_VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(owner.getName().toLowerCase()))) {
+				if (CommandAPI.CLS_VANILLA_COMMAND_WRAPPER
+						.isInstance(knownCommands.get(owner.getName().toLowerCase()))) {
 					knownCommands.put(owner.getName().toLowerCase(), plugincommand);
 				}
 				for (String alias : owner.getAliases()) {
-					if (CLS_VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(alias.toLowerCase()))) {
+					if (CommandAPI.CLS_VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(alias.toLowerCase()))) {
 						knownCommands.put(alias.toLowerCase(), plugincommand);
 					}
 				}
@@ -123,26 +131,26 @@ public class CommandAPI {
 	public Set<Command> getDeepSubCommands(Command cmd) {
 		Set<Command> subs = cmd.getChilds();
 		for (Command sub : new HashSet<>(subs)) {
-			subs.addAll(getDeepSubCommands(sub));
+			subs.addAll(this.getDeepSubCommands(sub));
 		}
 		return subs;
 	}
 
 	private void loadPermissions(Command cmd) {
-		Set<Command> childs = checkPermissionAndAdd(cmd);
+		Set<Command> childs = this.checkPermissionAndAdd(cmd);
 		for (Command child : childs)
-			loadPermissions(child);
+			this.loadPermissions(child);
 	}
 
 	private Set<Command> checkPermissionAndAdd(Command cmd) {
-		if (!knownPermissions.contains(cmd.getPermission()))
-			knownPermissions.add(cmd.getPermission());
+		if (!this.knownPermissions.contains(cmd.getPermission()))
+			this.knownPermissions.add(cmd.getPermission());
 		cmd.instance = this;
 		return cmd.getChilds();
 	}
 
 	public Command getMainCommand() {
-		return main_command;
+		return this.main_command;
 	}
 
 }

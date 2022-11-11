@@ -1,12 +1,14 @@
 package eu.darkcube.system.commandapi;
 
-import eu.darkcube.system.Reflection;
+import eu.darkcube.system.ReflectionUtils;
 
 public enum Message {
 
-	NO_PERMISSION(Reflection.getFieldValue(
-			Reflection.getField(Reflection.getClass("org.spigotmc.SpigotConfig"), "unknownCommandMessage"), null)
-			.toString());
+//	NO_PERMISSION(ReflectionUtils.getValue(
+//			Reflection.getField(ReflectionUtils.getClass("org.spigotmc.SpigotConfig"), "unknownCommandMessage"), null)
+//			.toString());
+	NO_PERMISSION(
+			ReflectionUtils.getValue(null, "org.spigotmc.SpigotConfig", false, "unknownCommandMessage").toString());
 
 	private String msg;
 
@@ -19,6 +21,7 @@ public enum Message {
 	}
 
 	public String getMessage() {
-		return msg;
+		return this.msg;
 	}
+
 }

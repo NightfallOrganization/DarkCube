@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.github.juliarn.npc.NPC;
 import com.github.juliarn.npc.SpawnCustomizer;
+import com.github.juliarn.npc.modifier.MetadataModifier;
 import com.github.juliarn.npc.profile.Profile;
 
 import eu.darkcube.system.lobbysystem.Lobby;
@@ -27,7 +28,7 @@ public class WoolBattleNPC {
 
 					@Override
 					public void handleSpawn(@NotNull NPC npc, @NotNull Player player) {
-
+						npc.metadata().queue(MetadataModifier.EntityMetadata.SKIN_LAYERS, true).send();
 					}
 
 				})

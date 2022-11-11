@@ -55,15 +55,17 @@ public class ItemBuilder {
 
 	private String displayname;
 
-	private List<String> lore = new ArrayList<>();
+	private final List<String> lore = new ArrayList<>();
 
-	private List<ItemFlag> flags = new ArrayList<>();
+	private final List<ItemFlag> flags = new ArrayList<>();
 
 	private FireworkEffect fireworkEffect = null;
 
 	private boolean andSymbol = true;
 
 	private boolean unsafeStackSize = false;
+
+	private boolean unbreakable = false;
 
 	/** Initalizes the ItemBuilder with {@link org.bukkit.Material} */
 	public ItemBuilder(Material material) {
@@ -116,23 +118,24 @@ public class ItemBuilder {
 	public ItemBuilder(ItemStack item) {
 		Validate.notNull(item, "The Item is null.");
 		this.item = item;
-		if (item.hasItemMeta())
-			this.meta = item.getItemMeta();
 		this.material = item.getType();
 		this.amount = item.getAmount();
 		this.data = item.getData();
 		this.damage = item.getDurability();
 		this.enchantments = item.getEnchantments();
 		if (item.hasItemMeta()) {
-			ItemMeta meta = item.getItemMeta();
-			this.displayname = meta.getDisplayName();
-			this.lore = meta.getLore();
-			for (ItemFlag f : meta.getItemFlags()) {
+			this.meta = item.getItemMeta();
+			this.unbreakable = this.meta.spigot().isUnbreakable();
+			this.displayname = this.meta.getDisplayName();
+			List<String> mlore = this.meta.getLore();
+			if (mlore != null)
+				this.lore.addAll(mlore);
+			for (ItemFlag f : this.meta.getItemFlags()) {
 				this.flags.add(f);
 			}
-			if (meta instanceof FireworkEffectMeta) {
-				if (((FireworkEffectMeta) meta).hasEffect()) {
-					this.fireworkEffect = ((FireworkEffectMeta) meta).getEffect();
+			if (this.meta instanceof FireworkEffectMeta) {
+				if (((FireworkEffectMeta) this.meta).hasEffect()) {
+					this.fireworkEffect = ((FireworkEffectMeta) this.meta).getEffect();
 				}
 			}
 		}
@@ -167,6 +170,7 @@ public class ItemBuilder {
 		Validate.notNull(builder, "The ItemBuilder is null.");
 		this.item = builder.item;
 		this.meta = builder.meta;
+		this.unbreakable = builder.unbreakable;
 		this.material = builder.material;
 		this.amount = builder.amount;
 		this.damage = builder.damage;
@@ -174,8 +178,9 @@ public class ItemBuilder {
 		this.damage = builder.damage;
 		this.enchantments = builder.enchantments;
 		this.displayname = builder.displayname;
-		this.lore = builder.lore;
-		this.flags = builder.flags;
+		this.fireworkEffect = builder.fireworkEffect;
+		this.lore.addAll(builder.lore);
+		this.flags.addAll(builder.flags);
 	}
 
 	/**
@@ -242,6 +247,7 @@ public class ItemBuilder {
 	public ItemBuilder meta(ItemMeta meta) {
 		Validate.notNull(meta, "The Meta is null.");
 		this.meta = meta;
+		this.unbreakable = meta.spigot().isUnbreakable();
 		return this;
 	}
 
@@ -297,7 +303,8 @@ public class ItemBuilder {
 	 */
 	public ItemBuilder lore(List<String> lore) {
 		Validate.notNull(lore, "The Lores are null.");
-		this.lore = lore;
+		this.lore.clear();
+		this.lore.addAll(lore);
 		return this;
 	}
 
@@ -359,7 +366,8 @@ public class ItemBuilder {
 	 */
 	public ItemBuilder flag(List<ItemFlag> flags) {
 		Validate.notNull(flags, "The Flags are null.");
-		this.flags = flags;
+		this.flags.clear();
+		this.flags.addAll(flags);
 		return this;
 	}
 
@@ -369,8 +377,16 @@ public class ItemBuilder {
 	 * @param unbreakable If it should be unbreakable
 	 */
 	public ItemBuilder unbreakable(boolean unbreakable) {
-		this.meta.spigot().setUnbreakable(unbreakable);
+//		this.meta.spigot().setUnbreakable(unbreakable);
+		this.unbreakable = unbreakable;
 		return this;
+	}
+
+	/**
+	 * @return if this item is unbreakable
+	 */
+	public boolean isUnbreakable() {
+		return this.unbreakable;
 	}
 
 	/** Makes the ItemStack Glow like it had a Enchantment */
@@ -400,9 +416,7 @@ public class ItemBuilder {
 	public ItemBuilder owner(String user) {
 		Validate.notNull(user, "The Username is null.");
 		if ((this.material == Material.SKULL_ITEM) || (this.material == Material.SKULL)) {
-			SkullMeta smeta = (SkullMeta) this.meta;
-			smeta.setOwner(user);
-			this.meta = smeta;
+			((SkullMeta) this.meta).setOwner(user);
 		}
 		return this;
 	}
@@ -610,14 +624,18 @@ public class ItemBuilder {
 			this.data = b.data;
 		if (b.material != null)
 			this.material = b.material;
-		if (b.lore != null)
-			this.lore = b.lore;
+		if (b.lore != null) {
+			this.lore.clear();
+			this.lore.addAll(b.lore);
+		}
 		if (b.enchantments != null)
 			this.enchantments = b.enchantments;
 		if (b.item != null)
 			this.item = b.item;
-		if (b.flags != null)
-			this.flags = b.flags;
+		if (b.flags != null) {
+			this.flags.clear();
+			this.flags.addAll(b.flags);
+		}
 		this.damage = b.damage;
 		this.amount = b.amount;
 		return this;
@@ -628,19 +646,20 @@ public class ItemBuilder {
 		this.item.setType(this.material);
 		this.item.setAmount(this.amount);
 		this.item.setDurability(this.damage);
-		this.meta = this.item.getItemMeta();
 		if (this.data != null) {
 			this.item.setData(this.data);
 		}
 		if (this.enchantments.size() > 0) {
 			this.item.addUnsafeEnchantments(this.enchantments);
 		}
+		this.meta = this.item.getItemMeta();
 		if (this.displayname != null) {
 			this.meta.setDisplayName(this.displayname);
 		}
 		if (this.lore.size() > 0) {
 			this.meta.setLore(this.lore);
 		}
+		this.meta.spigot().setUnbreakable(this.unbreakable);
 		if (this.flags.size() > 0) {
 			for (ItemFlag f : this.flags) {
 				this.meta.addItemFlags(f);
@@ -742,12 +761,12 @@ public class ItemBuilder {
 		 * This Class contains highly sensitive NMS Code that should not be touched
 		 * unless you want to break the ItemBuilder
 		 */
-		public class ReflectionUtils {
+		private class ReflectionUtils {
 
 			public String getString(ItemStack item, String key) {
 				Object compound = this.getNBTTagCompound(this.getItemAsNMSStack(item));
 				if (compound == null) {
-					compound = this.getNewNBTTagCompound();
+					return null;
 				}
 				try {
 					return (String) compound.getClass().getMethod("getString", String.class).invoke(compound, key);
@@ -775,7 +794,7 @@ public class ItemBuilder {
 			public int getInt(ItemStack item, String key) {
 				Object compound = this.getNBTTagCompound(this.getItemAsNMSStack(item));
 				if (compound == null) {
-					compound = this.getNewNBTTagCompound();
+					return 0;
 				}
 				try {
 					return (Integer) compound.getClass().getMethod("getInt", String.class).invoke(compound, key);
@@ -792,7 +811,7 @@ public class ItemBuilder {
 					compound = this.getNewNBTTagCompound();
 				}
 				try {
-					compound.getClass().getMethod("setInt", String.class, Integer.class).invoke(compound, key, value);
+					compound.getClass().getMethod("setInt", String.class, int.class).invoke(compound, key, value);
 					nmsItem = this.setNBTTag(compound, nmsItem);
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
 					ex.printStackTrace();
@@ -803,7 +822,7 @@ public class ItemBuilder {
 			public double getDouble(ItemStack item, String key) {
 				Object compound = this.getNBTTagCompound(this.getItemAsNMSStack(item));
 				if (compound == null) {
-					compound = this.getNewNBTTagCompound();
+					return 0;
 				}
 				try {
 					return (Double) compound.getClass().getMethod("getDouble", String.class).invoke(compound, key);
@@ -820,7 +839,7 @@ public class ItemBuilder {
 					compound = this.getNewNBTTagCompound();
 				}
 				try {
-					compound.getClass().getMethod("setDouble", String.class, Double.class).invoke(compound, key, value);
+					compound.getClass().getMethod("setDouble", String.class, double.class).invoke(compound, key, value);
 					nmsItem = this.setNBTTag(compound, nmsItem);
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
 					ex.printStackTrace();
@@ -831,7 +850,7 @@ public class ItemBuilder {
 			public boolean getBoolean(ItemStack item, String key) {
 				Object compound = this.getNBTTagCompound(this.getItemAsNMSStack(item));
 				if (compound == null) {
-					compound = this.getNewNBTTagCompound();
+					return false;
 				}
 				try {
 					return (Boolean) compound.getClass().getMethod("getBoolean", String.class).invoke(compound, key);
@@ -849,7 +868,7 @@ public class ItemBuilder {
 				}
 				try {
 					compound.getClass()
-							.getMethod("setBoolean", String.class, Boolean.class)
+							.getMethod("setBoolean", String.class, boolean.class)
 							.invoke(compound, key, value);
 					nmsItem = this.setNBTTag(compound, nmsItem);
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
@@ -861,7 +880,7 @@ public class ItemBuilder {
 			public boolean hasKey(ItemStack item, String key) {
 				Object compound = this.getNBTTagCompound(this.getItemAsNMSStack(item));
 				if (compound == null) {
-					compound = this.getNewNBTTagCompound();
+					return false;
 				}
 				try {
 					return (Boolean) compound.getClass().getMethod("hasKey", String.class).invoke(compound, key);
@@ -872,7 +891,7 @@ public class ItemBuilder {
 			}
 
 			public Object getNewNBTTagCompound() {
-				String ver = Bukkit.getServer().getClass().getPackage().getName().split(".")[3];
+				String ver = Bukkit.getServer().getClass().getName().split("\\.")[3];
 				try {
 					return Class.forName("net.minecraft.server." + ver + ".NBTTagCompound").newInstance();
 				} catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
@@ -883,7 +902,7 @@ public class ItemBuilder {
 
 			public Object setNBTTag(Object tag, Object item) {
 				try {
-					item.getClass().getMethod("setTag", item.getClass()).invoke(item, tag);
+					item.getClass().getMethod("setTag", tag.getClass()).invoke(item, tag);
 					return item;
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
 					ex.printStackTrace();
@@ -893,6 +912,9 @@ public class ItemBuilder {
 
 			public Object getNBTTagCompound(Object nmsStack) {
 				try {
+					if (nmsStack == null) {
+						return null;
+					}
 					return nmsStack.getClass().getMethod("getTag").invoke(nmsStack);
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
 					ex.printStackTrace();
@@ -903,7 +925,7 @@ public class ItemBuilder {
 			public Object getItemAsNMSStack(ItemStack item) {
 				try {
 					Method m = this.getCraftItemStackClass().getMethod("asNMSCopy", ItemStack.class);
-					return m.invoke(this.getCraftItemStackClass(), item);
+					return m.invoke(null, item);
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
 					ex.printStackTrace();
 				}
@@ -912,8 +934,8 @@ public class ItemBuilder {
 
 			public ItemStack getItemAsBukkitStack(Object nmsStack) {
 				try {
-					Method m = this.getCraftItemStackClass().getMethod("asCraftMirror", nmsStack.getClass());
-					return (ItemStack) m.invoke(this.getCraftItemStackClass(), nmsStack);
+					Method m = this.getCraftItemStackClass().getMethod("asBukkitCopy", nmsStack.getClass());
+					return (ItemStack) m.invoke(null, nmsStack);
 				} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 					ex.printStackTrace();
 				}
@@ -921,7 +943,7 @@ public class ItemBuilder {
 			}
 
 			public Class<?> getCraftItemStackClass() {
-				String ver = Bukkit.getServer().getClass().getPackage().getName().split(".")[3];
+				String ver = Bukkit.getServer().getClass().getName().split("\\.")[3];
 				try {
 					return Class.forName("org.bukkit.craftbukkit." + ver + ".inventory.CraftItemStack");
 				} catch (ClassNotFoundException ex) {

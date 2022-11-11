@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -34,74 +35,94 @@ import eu.darkcube.system.inventory.api.util.ItemBuilder;
 public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 	protected final AtomicInteger page = new AtomicInteger(1);
+
 	protected final ConcurrentMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
+
 	protected final ConcurrentMap<Integer, ItemStack> pageItems = new ConcurrentHashMap<>();
+
 	protected final ConcurrentMap<Integer, ItemStack> fallbackItems = new ConcurrentHashMap<>();
+
 	protected final ConcurrentMap<Integer, ItemStack> staticItems = new ConcurrentHashMap<>();
+
 	protected final ConcurrentMap<PageArrow, Integer[]> arrowSlots = new ConcurrentHashMap<>();
+
 	protected final ConcurrentMap<PageArrow, ItemStack> arrowItem = new ConcurrentHashMap<>();
+
 	protected final ConcurrentMap<Integer, Double> updateAtSort = new ConcurrentHashMap<>();
+
 	protected final Set<PageArrow> enabledArrows = Collections.synchronizedSet(new HashSet<>());
+
 	protected final Queue<Integer> updateSlots = new ConcurrentLinkedQueue<>();
+
 	protected final AtomicDouble currentSort = new AtomicDouble();
+
 	protected final PagedListener listener;
+
 	protected final double[] SORT;
-	protected final double[] PAGE_SORT;
+
+//	protected final double[] PAGE_SORT;
+
 	protected final int[] SLOTS;
+
 	protected final int[] PAGE_SLOTS;
+
 	protected final int pageSize;
 
 	private static final String META_KEY_ARROW_TYPE = "InventoryAPI_PagedInventory_ArrowType";
 
-	public AsyncPagedInventory(InventoryType inventoryType, String title,
-					int size, int[] pageSlots, int startSlot) {
-		super(inventoryType, title, size);
-		SLOTS = new int[size];
-		for (int i = 0; i < SLOTS.length; i++) {
-			SLOTS[i] = i;
+	public AsyncPagedInventory(InventoryType inventoryType, String title, int size, BooleanSupplier instant,
+			int[] pageSlots, int startSlot) {
+		super(inventoryType, title, size, instant);
+		this.SLOTS = new int[size];
+		for (int i = 0; i < this.SLOTS.length; i++) {
+			this.SLOTS[i] = i;
 		}
 
-		PAGE_SLOTS = pageSlots;
-		PAGE_SORT = new double[PAGE_SLOTS.length];
-		for (int i = 0; i < PAGE_SORT.length; i++) {
-			PAGE_SORT[i] = IInventory.distance(PAGE_SLOTS[i], startSlot);
+		this.PAGE_SLOTS = pageSlots;
+//		this.PAGE_SORT = new double[this.PAGE_SLOTS.length];
+//		for (int i = 0; i < this.PAGE_SORT.length; i++) {
+//			this.PAGE_SORT[i] = IInventory.distance(this.PAGE_SLOTS[i], startSlot);
+//		}
+		this.SORT = new double[this.SLOTS.length];
+		for (int i = 0; i < this.SORT.length; i++) {
+			this.SORT[i] = IInventory.distance(this.SLOTS[i], startSlot);
 		}
-		SORT = new double[SLOTS.length];
-		for (int i = 0; i < SORT.length; i++) {
-			SORT[i] = IInventory.distance(SLOTS[i], startSlot);
-		}
-		pageSize = PAGE_SLOTS.length;
+		this.pageSize = this.PAGE_SLOTS.length;
 
-		for (int i = 0; i < SLOTS.length; i++) {
-			int slot = SLOTS[i];
-			double sort = SORT[i];
-			updateAtSort.put(slot, sort);
-		}
+		this.updateSorts();
 
 		this.insertDefaultItems();
-		listener = new PagedListener();
-		Bukkit.getPluginManager().registerEvents(listener, InventoryAPI.getInstance());
-		startAnimation();
+		this.listener = new PagedListener();
+		Bukkit.getPluginManager().registerEvents(this.listener, InventoryAPI.getInstance());
+		this.startAnimation();
+	}
+	
+	protected void updateSorts() {
+		for (int i = 0; i < this.SLOTS.length; i++) {
+			int slot = this.SLOTS[i];
+			double sort = this.SORT[i];
+			this.updateAtSort.put(slot, sort);
+		}
 	}
 
 	@Override
 	protected void tick() {
 		this.currentSort.addAndGet(1);
 		List<Integer> updateDone = new ArrayList<>();
-		for (int slot : updateAtSort.keySet()) {
-			double sort = updateAtSort.get(slot);
-			if (shouldDisplaySort(sort)) {
+		for (int slot : this.updateAtSort.keySet()) {
+			double sort = this.updateAtSort.get(slot);
+			if (this.shouldDisplaySort(sort)) {
 				this.updateSlots.offer(slot);
 				updateDone.add(slot);
 			}
 		}
-		updateDone.forEach(updateAtSort::remove);
+		updateDone.forEach(this.updateAtSort::remove);
 		Integer slot;
-		while ((slot = updateSlots.poll()) != null) {
-			ItemStack item = getItem(slot);
+		while ((slot = this.updateSlots.poll()) != null) {
+			ItemStack item = this.getItem(slot);
 			this.informations.add(new AnimationInformation(slot, item));
 		}
-		postTick(!updateDone.isEmpty());
+		this.postTick(!updateDone.isEmpty());
 	}
 
 	protected abstract void postTick(boolean changedInformations);
@@ -110,34 +131,34 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		Set<Integer> update = new HashSet<>();
 		update.addAll(this.pageItems.keySet());
 		this.pageItems.clear();
-		final int page = getPage();
-		final int skip = (page - 1) * pageSize;
-		for (Entry<Integer, ItemStack> e : items.entrySet()) {
+		final int page = this.getPage();
+		final int skip = (page - 1) * this.pageSize;
+		for (Entry<Integer, ItemStack> e : this.items.entrySet()) {
 			int slot = e.getKey();
 			slot -= skip;
-			if (slot >= PAGE_SLOTS.length || slot < 0) {
+			if (slot >= this.PAGE_SLOTS.length || slot < 0) {
 				// Slot is out of page range
 				continue;
 			}
-			pageItems.put(PAGE_SLOTS[slot], e.getValue());
+			this.pageItems.put(this.PAGE_SLOTS[slot], e.getValue());
 		}
 		update.addAll(this.pageItems.keySet());
 		this.updateSlots.addAll(update);
-		calculateArrows();
+		this.calculateArrows();
 	}
 
 	protected void calculateArrows() {
-		for (PageArrow arrow : new HashSet<>(enabledArrows)) {
-			hideArrow(arrow);
+		for (PageArrow arrow : new HashSet<>(this.enabledArrows)) {
+			this.hideArrow(arrow);
 		}
-		final int page = getPage();
+		final int page = this.getPage();
 		final int maxSlot = this.items.keySet().stream().mapToInt(i -> i).max().orElse(0);
-		final int maxPage = maxSlot / pageSize + 1;
+		final int maxPage = maxSlot / this.pageSize + 1;
 		if (maxPage > page) {
-			showArrow(PageArrow.NEXT);
+			this.showArrow(PageArrow.NEXT);
 		}
 		if (page > 1) {
-			showArrow(PageArrow.PREVIOUS);
+			this.showArrow(PageArrow.PREVIOUS);
 		}
 	}
 
@@ -157,13 +178,13 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 	public void setPage(int page) {
 		this.page.set(page);
-		calculatePageItems();
+		this.calculatePageItems();
 	}
 
 	@Override
 	protected void destroy() {
 		super.destroy();
-		HandlerList.unregisterAll(listener);
+		HandlerList.unregisterAll(this.listener);
 		this.items.clear();
 		this.updateSlots.clear();
 	}
@@ -171,54 +192,58 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	protected abstract void insertDefaultItems();
 
 	public ItemStack getItem(int slot) {
-		double sort = SORT[slot];
-		if (!shouldDisplaySort(sort)) {
+		double sort = this.SORT[slot];
+		if (!this.shouldDisplaySort(sort)) {
 			return null;
 		}
-		if (Arrays.asList(arrowSlots.getOrDefault(PageArrow.PREVIOUS, new Integer[0])).contains(slot)
-						&& isArrowVisible(PageArrow.PREVIOUS)) {
-			return addArrowMeta(arrowItem.get(PageArrow.PREVIOUS), PageArrow.PREVIOUS);
+		if (Arrays.asList(this.arrowSlots.getOrDefault(PageArrow.PREVIOUS, new Integer[0])).contains(slot)
+				&& this.isArrowVisible(PageArrow.PREVIOUS)) {
+			return this.addArrowMeta(this.arrowItem.get(PageArrow.PREVIOUS), PageArrow.PREVIOUS);
 		}
-		if (Arrays.asList(arrowSlots.getOrDefault(PageArrow.NEXT, new Integer[0])).contains(slot)
-						&& isArrowVisible(PageArrow.NEXT)) {
-			return addArrowMeta(arrowItem.get(PageArrow.NEXT), PageArrow.NEXT);
+		if (Arrays.asList(this.arrowSlots.getOrDefault(PageArrow.NEXT, new Integer[0])).contains(slot)
+				&& this.isArrowVisible(PageArrow.NEXT)) {
+			return this.addArrowMeta(this.arrowItem.get(PageArrow.NEXT), PageArrow.NEXT);
 		}
-		return pageItems.getOrDefault(slot, staticItems.getOrDefault(slot, fallbackItems.getOrDefault(slot, null)));
+		return this.pageItems.getOrDefault(slot,
+				this.staticItems.getOrDefault(slot, this.fallbackItems.getOrDefault(slot, null)));
 	}
 
 	private ItemStack addArrowMeta(ItemStack arrowItem, PageArrow arrow) {
-		return new ItemBuilder(
-						arrowItem).getUnsafe().setString(META_KEY_ARROW_TYPE, arrow.name()).builder().build();
+		if (arrowItem == null || !arrowItem.hasItemMeta()) {
+			System.out.println("Broken inventory: No arrow item " + this.toString());
+			return arrowItem;
+		}
+		return new ItemBuilder(arrowItem).getUnsafe()
+				.setString(AsyncPagedInventory.META_KEY_ARROW_TYPE, arrow.name())
+				.builder()
+				.build();
 	}
 
 	private PageArrow getArrowType(ItemStack arrowItem) {
 		Map<String, PageArrow> arrowNames = new HashMap<>();
 		Arrays.asList(PageArrow.values()).stream().forEach(a -> arrowNames.put(a.name(), a));
-		return arrowNames.get(new ItemBuilder(
-						arrowItem).getUnsafe().getString(META_KEY_ARROW_TYPE));
+		return arrowNames
+				.get(new ItemBuilder(arrowItem).getUnsafe().getString(AsyncPagedInventory.META_KEY_ARROW_TYPE));
 	}
 
 	private boolean isArrowItem(ItemStack arrowItem) {
-		List<String> arrowNames = Arrays.asList(PageArrow.values()).stream().map(Enum::name).collect(Collectors.toList());
+		List<String> arrowNames = Arrays.asList(PageArrow.values())
+				.stream()
+				.map(Enum::name)
+				.collect(Collectors.toList());
 		ItemBuilder b = new ItemBuilder(arrowItem);
-		return b.getUnsafe().getString(META_KEY_ARROW_TYPE) != null
-						&& arrowNames.contains(b.getUnsafe().getString(META_KEY_ARROW_TYPE));
+		return b.getUnsafe().getString(AsyncPagedInventory.META_KEY_ARROW_TYPE) != null
+				&& arrowNames.contains(b.getUnsafe().getString(AsyncPagedInventory.META_KEY_ARROW_TYPE));
 	}
 
 	public boolean shouldDisplaySort(double sort) {
-		return sort <= this.currentSort.get();
+		return this.isInstant() || sort <= this.currentSort.get();
 	}
 
 	@Override
-	public void open(HumanEntity player) {
-		super.open(player);
-	}
-
-	@Override
-	protected void asyncOfferAnimations(
-					Collection<AnimationInformation> informations) {
+	protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
 		Map<Integer, ItemStack> items = new HashMap<>();
-		fillItems(items);
+		this.fillItems(items);
 		this.items.putAll(items);
 		this.calculatePageItems();
 	}
@@ -226,31 +251,26 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	protected abstract void fillItems(Map<Integer, ItemStack> items);
 
 	public int getPageSize() {
-		return pageSize;
+		return this.pageSize;
 	}
 
 	public int getPage() {
 		return this.page.get();
 	}
 
-	@Override
-	protected void handleClose(HumanEntity player) {
-		super.handleClose(player);
-	}
-
 	protected void handleClick(InventoryClickEvent event) {
 		event.setCancelled(true);
-		handlePageLogic(event);
+		this.handlePageLogic(event);
 	}
 
 	protected void handlePageLogic(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
-		if (isArrowItem(item)) {
-			PageArrow arrow = getArrowType(item);
+		if (this.isArrowItem(item)) {
+			PageArrow arrow = this.getArrowType(item);
 			if (arrow == PageArrow.PREVIOUS) {
-				setPage(getPage() - 1);
+				this.setPage(this.getPage() - 1);
 			} else if (arrow == PageArrow.NEXT) {
-				setPage(getPage() + 1);
+				this.setPage(this.getPage() + 1);
 			}
 		}
 	}
@@ -260,19 +280,20 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		@EventHandler
 		public void handle(InventoryClickEvent event) {
 			HumanEntity human = event.getWhoClicked();
-			if (isOpened(human)) {
+			if (AsyncPagedInventory.this.isOpened(human)) {
 				if (event.getView().getTopInventory().equals(event.getClickedInventory())) {
-					handleClick(event);
+					AsyncPagedInventory.this.handleClick(event);
 				}
 			}
 		}
 
 		@EventHandler
 		public void handle(InventoryDragEvent event) {
-			if (isOpened(event.getWhoClicked())) {
+			if (AsyncPagedInventory.this.isOpened(event.getWhoClicked())) {
 				event.setCancelled(true);
 			}
 		}
+
 	}
 
 	protected static int[] box(int r1, int i1, int r2, int i2) {
@@ -289,4 +310,5 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		}
 		return res;
 	}
+
 }

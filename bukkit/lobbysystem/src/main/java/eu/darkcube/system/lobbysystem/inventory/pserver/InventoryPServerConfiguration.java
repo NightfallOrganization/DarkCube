@@ -1,6 +1,5 @@
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
@@ -10,9 +9,9 @@ import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.DefaultPagedInventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.user.User;
@@ -21,12 +20,15 @@ import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.wrapper.event.PServerUpdateEvent;
 
-public class InventoryPServerConfiguration extends DefaultPagedInventory {
+public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
+
+	private static final InventoryType type_pserver_configuration = InventoryType.of("type_pserver_configuration");
 
 	public final PServerUserSlot psslot;
 
 	public InventoryPServerConfiguration(User user, PServerUserSlot psslot) {
-		super(InventoryPServerConfiguration.getDisplayName(user, psslot), InventoryType.PSERVER_CONFIGURATION);
+		super(InventoryPServerConfiguration.type_pserver_configuration,
+				InventoryPServerConfiguration.getDisplayName(user, psslot), user);
 		this.psslot = psslot;
 		CloudNetDriver.getInstance().getEventManager().registerListener(this);
 	}
@@ -37,14 +39,14 @@ public class InventoryPServerConfiguration extends DefaultPagedInventory {
 	}
 
 	@Override
-	protected Map<Integer, ItemStack> contents(User user) {
-		Map<Integer, ItemStack> m = new HashMap<>();
-		m.put(8, Item.PSERVER_DELETE.getItem(user));
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		super.fillItems(items);
+		items.put(8, Item.PSERVER_DELETE.getItem(this.user));
 		State state = this.psslot.getPServer() == null ? State.OFFLINE : this.psslot.getPServer().getState();
 		if (state == State.OFFLINE) {
-			m.put(12, Item.START_PSERVER.getItem(user));
+			items.put(12, Item.START_PSERVER.getItem(this.user));
 		} else {
-			m.put(12, Item.STOP_PSERVER.getItem(user));
+			items.put(12, Item.STOP_PSERVER.getItem(this.user));
 		}
 		JsonObject data = this.psslot.getData();
 		PServer ps = this.psslot.getPServer();
@@ -53,22 +55,22 @@ public class InventoryPServerConfiguration extends DefaultPagedInventory {
 			this.psslot.setChanged();
 		}
 		if (ps == null ? data.get("private").getAsBoolean() : ps.isPrivate()) {
-			m.put(10, Item.PSERVER_PRIVATE.getItem(user));
+			items.put(10, Item.PSERVER_PRIVATE.getItem(this.user));
 		} else {
-			m.put(10, Item.PSERVER_PUBLIC.getItem(user));
+			items.put(10, Item.PSERVER_PUBLIC.getItem(this.user));
 		}
-		return m;
 	}
 
 	@Override
-	protected void onClose0(User user) {
+	protected void destroy() {
 		CloudNetDriver.getInstance().getEventManager().unregisterListener(this);
 	}
 
 	@Override
-	protected void insertDefaultItems(InventoryManager manager) {
-		super.insertDefaultItems(manager);
-		manager.setFallbackItem(Inventory.s(1, 5), PServerDataManager.getDisplayItem(manager.user, this.psslot).build());
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 5),
+				PServerDataManager.getDisplayItem(this.user, this.psslot).build());
+		super.insertFallbackItems();
 	}
 
 	@EventListener
@@ -79,6 +81,7 @@ public class InventoryPServerConfiguration extends DefaultPagedInventory {
 		if (!this.psslot.getPServerId().equals(event.getPServer().getId())) {
 			return;
 		}
-		this.recalculateAll();
+		this.recalculate();
 	}
+
 }

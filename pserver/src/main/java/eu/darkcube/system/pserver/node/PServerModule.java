@@ -60,28 +60,32 @@ import eu.darkcube.system.pserver.node.packethandler.HandlerStop;
 public class PServerModule extends DriverModule {
 
 	private static PServerModule instance;
+
 	public static final String PLUGIN_NAME = new File(
 			PServerModule.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+
 	public Listener listener;
+
 	public String sqlDatabase;
 
 	private List<String> deploymentExclusions;
 
 	public PServerModule() {
-		instance = this;
+		PServerModule.instance = this;
 	}
 
 	public static String getSelf() {
-		return getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode().getUniqueId();
+		return PServerModule.getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode().getUniqueId();
 	}
 
+	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.LOADED)
 	public void loadConfig() {
-		sqlDatabase = getConfig().getString("database", "h2");
+		this.sqlDatabase = this.getConfig().getString("database", "h2");
 	}
 
 	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED)
 	public void load() {
-		getLogger().info("Enabling module PServer");
+		this.getLogger().info("Enabling module PServer");
 		NodeServiceInfoUtil.init();
 		NodePServerProvider.init();
 		NodeUniqueIdProvider.init();
@@ -109,18 +113,20 @@ public class PServerModule extends DriverModule {
 		pm.registerHandler(PacketWrapperNodeStart.class, new HandlerStart());
 		pm.registerHandler(PacketWrapperNodeStop.class, new HandlerStop());
 
-		getLogger().info("PServer initializing!");
+		this.getLogger().info("PServer initializing!");
 		AsyncExecutor.start();
 
-		deploymentExclusions = this.getConfig().get("deploymentExclusions", new TypeToken<List<String>>() {
+		this.deploymentExclusions = this.getConfig().get("deploymentExclusions", new TypeToken<List<String>>() {
+
 			private static final long serialVersionUID = 1L;
+
 		}.getType(), Arrays.asList("paper.jar"));
 		this.saveConfig();
 	}
 
 	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED)
 	public void start() {
-		getCloudNet().getEventManager().registerListener((listener = new Listener()));
+		PServerModule.getCloudNet().getEventManager().registerListener((this.listener = new Listener()));
 	}
 
 	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STOPPED)
@@ -134,19 +140,19 @@ public class PServerModule extends DriverModule {
 	}
 
 	public void addDeploymentExclusion(String exclusion) {
-		deploymentExclusions.add(exclusion);
-		this.getConfig().append("deploymentExclusions", deploymentExclusions);
+		this.deploymentExclusions.add(exclusion);
+		this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
 		this.saveConfig();
 	}
 
 	public void removeDeploymentExclusion(String exclusion) {
-		deploymentExclusions.remove(exclusion);
-		this.getConfig().append("deploymentExclusions", deploymentExclusions);
+		this.deploymentExclusions.remove(exclusion);
+		this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
 		this.saveConfig();
 	}
 
 	public List<String> getDeploymentExclusions() {
-		return Collections.unmodifiableList(deploymentExclusions);
+		return Collections.unmodifiableList(this.deploymentExclusions);
 	}
 
 	public static final CloudNet getCloudNet() {
@@ -154,7 +160,7 @@ public class PServerModule extends DriverModule {
 	}
 
 	public static PServerModule getInstance() {
-		return instance;
+		return PServerModule.instance;
 	}
 
 	public static Collection<UniqueId> getCurrentPServerIDs() {
@@ -164,4 +170,5 @@ public class PServerModule extends DriverModule {
 	public static Collection<UniqueId> getUsedPServerIDs() {
 		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getUsedPServerIDs();
 	}
+
 }

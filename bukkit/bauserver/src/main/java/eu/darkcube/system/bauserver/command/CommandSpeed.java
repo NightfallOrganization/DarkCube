@@ -1,17 +1,17 @@
 package eu.darkcube.system.bauserver.command;
 
-import org.bukkit.*;
-import org.bukkit.command.*;
-import org.bukkit.entity.*;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-import eu.darkcube.system.bauserver.*;
-import eu.darkcube.system.commandapi.*;
+import eu.darkcube.system.bauserver.Main;
+import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
 
 public class CommandSpeed extends Command {
 
 	public CommandSpeed() {
-		super(Main.getInstance(), "speed", new Command[0], "Ändert deine Geschwindigkeit",
+		super(Main.getInstance(), "speed", new Command[0], "Ã„ndert deine Geschwindigkeit",
 				new Argument("Speed", "Geschwindigkeit (0-20)"));
 	}
 
@@ -27,21 +27,21 @@ public class CommandSpeed extends Command {
 						throw new IllegalArgumentException();
 					}
 				} catch (Exception ex) {
-					Main.getInstance().sendMessage("§cBitte gib eine Zahl von 0-20 ein.", p);
+					Main.getInstance().sendMessage("Â§cBitte gib eine Zahl von 0-20 ein.", p);
 					return true;
 				}
 				
 				speed /= 20F;
 				if(p.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.AIR) {
 					p.setFlySpeed(speed);
-					Main.getInstance().sendMessage("§aFlug-Geschwindigkeit auf §6" + speed * 20, p);
+					Main.getInstance().sendMessage("Â§aFlug-Geschwindigkeit auf Â§6" + speed * 20, p);
 				} else {
 					p.setWalkSpeed(speed);
-					Main.getInstance().sendMessage("§aLauf-Geschwindigkeit auf §6" + speed * 20, p);
+					Main.getInstance().sendMessage("Â§aLauf-Geschwindigkeit auf Â§6" + speed * 20, p);
 				}
 				return true;
 			}
-			Main.getInstance().sendMessage("§cBitte gib eine Zahl von 0-20 ein.", p);
+			Main.getInstance().sendMessage("Â§cBitte gib eine Zahl von 0-20 ein.", p);
 			return true;
 		}
 		return false;

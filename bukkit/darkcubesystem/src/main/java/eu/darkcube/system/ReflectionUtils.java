@@ -47,17 +47,20 @@ public final class ReflectionUtils {
 	 * @see DataType#getPrimitive(Class[])
 	 * @see DataType#compare(Class[], Class[])
 	 */
-	public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes)
-			throws NoSuchMethodException {
-		Class<?>[] primitiveTypes = DataType.getPrimitive(parameterTypes);
-		for (Constructor<?> constructor : clazz.getConstructors()) {
-			if (!DataType.compare(DataType.getPrimitive(constructor.getParameterTypes()), primitiveTypes)) {
-				continue;
+	public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes) {
+		try {
+			Class<?>[] primitiveTypes = DataType.getPrimitive(parameterTypes);
+			for (Constructor<?> constructor : clazz.getConstructors()) {
+				if (!DataType.compare(DataType.getPrimitive(constructor.getParameterTypes()), primitiveTypes)) {
+					continue;
+				}
+				return constructor;
 			}
-			return constructor;
+			throw new NoSuchMethodException(
+					"There is no such constructor in this class with the specified parameter types");
+		} catch (NoSuchMethodException ex) {
+			throw new ReflectionException(ex);
 		}
-		throw new NoSuchMethodException(
-				"There is no such constructor in this class with the specified parameter types");
 	}
 
 	/**
@@ -76,9 +79,17 @@ public final class ReflectionUtils {
 	 * @see #getClass(String, PackageType)
 	 * @see #getConstructor(Class, Class...)
 	 */
-	public static Constructor<?> getConstructor(String className, PackageType packageType, Class<?>... parameterTypes)
-			throws NoSuchMethodException, ClassNotFoundException {
+	public static Constructor<?> getConstructor(String className, PackageType packageType, Class<?>... parameterTypes) {
 		return ReflectionUtils.getConstructor(packageType.getClass(className), parameterTypes);
+	}
+
+	public static Object instantiateObject(Constructor<?> constructor, Object... arguments) {
+		try {
+			return constructor.newInstance(arguments);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -102,9 +113,13 @@ public final class ReflectionUtils {
 	 * @throws NoSuchMethodException     If the desired constructor with the
 	 *                                   specified arguments cannot be found
 	 */
-	public static Object instantiateObject(Class<?> clazz, Object... arguments) throws InstantiationException,
-			IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
-		return ReflectionUtils.getConstructor(clazz, DataType.getPrimitive(arguments)).newInstance(arguments);
+	public static Object instantiateObject(Class<?> clazz, Object... arguments) {
+		try {
+			return ReflectionUtils.getConstructor(clazz, DataType.getPrimitive(arguments)).newInstance(arguments);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -134,9 +149,7 @@ public final class ReflectionUtils {
 	 * @see #getClass(String, PackageType)
 	 * @see #instantiateObject(Class, Object...)
 	 */
-	public static Object instantiateObject(String className, PackageType packageType, Object... arguments)
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, ClassNotFoundException {
+	public static Object instantiateObject(String className, PackageType packageType, Object... arguments) {
 		return ReflectionUtils.instantiateObject(packageType.getClass(className), arguments);
 	}
 
@@ -154,18 +167,21 @@ public final class ReflectionUtils {
 	 * @see DataType#getPrimitive(Class[])
 	 * @see DataType#compare(Class[], Class[])
 	 */
-	public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes)
-			throws NoSuchMethodException {
-		Class<?>[] primitiveTypes = DataType.getPrimitive(parameterTypes);
-		for (Method method : clazz.getMethods()) {
-			if (!method.getName().equals(methodName)
-					|| !DataType.compare(DataType.getPrimitive(method.getParameterTypes()), primitiveTypes)) {
-				continue;
+	public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		try {
+			Class<?>[] primitiveTypes = DataType.getPrimitive(parameterTypes);
+			for (Method method : clazz.getMethods()) {
+				if (!method.getName().equals(methodName)
+						|| !DataType.compare(DataType.getPrimitive(method.getParameterTypes()), primitiveTypes)) {
+					continue;
+				}
+				return method;
 			}
-			return method;
+			throw new NoSuchMethodException(
+					"There is no such method in this class with the specified name and parameter types");
+		} catch (NoSuchMethodException ex) {
+			throw new ReflectionException(ex);
 		}
-		throw new NoSuchMethodException(
-				"There is no such method in this class with the specified name and parameter types");
 	}
 
 	/**
@@ -186,8 +202,28 @@ public final class ReflectionUtils {
 	 * @see #getMethod(Class, String, Class...)
 	 */
 	public static Method getMethod(String className, PackageType packageType, String methodName,
-			Class<?>... parameterTypes) throws NoSuchMethodException, ClassNotFoundException {
+			Class<?>... parameterTypes) {
 		return ReflectionUtils.getMethod(packageType.getClass(className), methodName, parameterTypes);
+	}
+
+	public static Class<?> getClass(String className, PackageType packageType) {
+		return packageType.getClass(className);
+	}
+
+	public static Class<?> getClass(String className) {
+		try {
+			return Class.forName(className);
+		} catch (ClassNotFoundException ex) {
+			throw new ReflectionException(ex);
+		}
+	}
+
+	public static Object invokeMethod(Object instance, Method method, Object... arguments) {
+		try {
+			return method.invoke(instance, arguments);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -211,10 +247,13 @@ public final class ReflectionUtils {
 	 * @see #getMethod(Class, String, Class...)
 	 * @see DataType#getPrimitive(Object[])
 	 */
-	public static Object invokeMethod(Object instance, String methodName, Object... arguments)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
-		return ReflectionUtils.getMethod(instance.getClass(), methodName, DataType.getPrimitive(arguments))
-				.invoke(instance, arguments);
+	public static Object invokeMethod(Object instance, String methodName, Object... arguments) {
+		try {
+			return ReflectionUtils.getMethod(instance.getClass(), methodName, DataType.getPrimitive(arguments))
+					.invoke(instance, arguments);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -239,10 +278,13 @@ public final class ReflectionUtils {
 	 * @see #getMethod(Class, String, Class...)
 	 * @see DataType#getPrimitive(Object[])
 	 */
-	public static Object invokeMethod(Object instance, Class<?> clazz, String methodName, Object... arguments)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
-		return ReflectionUtils.getMethod(clazz, methodName, DataType.getPrimitive(arguments))
-				.invoke(instance, arguments);
+	public static Object invokeMethod(Object instance, Class<?> clazz, String methodName, Object... arguments) {
+		try {
+			return ReflectionUtils.getMethod(clazz, methodName, DataType.getPrimitive(arguments))
+					.invoke(instance, arguments);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -271,8 +313,7 @@ public final class ReflectionUtils {
 	 * @see #invokeMethod(Object, Class, String, Object...)
 	 */
 	public static Object invokeMethod(Object instance, String className, PackageType packageType, String methodName,
-			Object... arguments) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, ClassNotFoundException {
+			Object... arguments) {
 		return ReflectionUtils.invokeMethod(instance, packageType.getClass(className), methodName, arguments);
 	}
 
@@ -287,11 +328,14 @@ public final class ReflectionUtils {
 	 *                              be found
 	 * @throws SecurityException    If the desired field cannot be made accessible
 	 */
-	public static Field getField(Class<?> clazz, boolean declared, String fieldName)
-			throws NoSuchFieldException, SecurityException {
-		Field field = declared ? clazz.getDeclaredField(fieldName) : clazz.getField(fieldName);
-		field.setAccessible(true);
-		return field;
+	public static Field getField(Class<?> clazz, boolean declared, String fieldName) {
+		try {
+			Field field = declared ? clazz.getDeclaredField(fieldName) : clazz.getField(fieldName);
+			field.setAccessible(true);
+			return field;
+		} catch (NoSuchFieldException | SecurityException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -309,8 +353,7 @@ public final class ReflectionUtils {
 	 *                                name and package cannot be found
 	 * @see #getField(Class, boolean, String)
 	 */
-	public static Field getField(String className, PackageType packageType, boolean declared, String fieldName)
-			throws NoSuchFieldException, SecurityException, ClassNotFoundException {
+	public static Field getField(String className, PackageType packageType, boolean declared, String fieldName) {
 		return ReflectionUtils.getField(packageType.getClass(className), declared, fieldName);
 	}
 
@@ -331,9 +374,24 @@ public final class ReflectionUtils {
 	 *                                  accessible
 	 * @see #getField(Class, boolean, String)
 	 */
-	public static Object getValue(Object instance, Class<?> clazz, boolean declared, String fieldName)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		return ReflectionUtils.getField(clazz, declared, fieldName).get(instance);
+	public static Object getValue(Object instance, Class<?> clazz, boolean declared, String fieldName) {
+		try {
+			return ReflectionUtils.getField(clazz, declared, fieldName).get(instance);
+		} catch (IllegalArgumentException | IllegalAccessException ex) {
+			throw new ReflectionException(ex);
+		}
+	}
+
+	public static Object getValue(Object instance, Field field) {
+		try {
+			return field.get(instance);
+		} catch (IllegalArgumentException | IllegalAccessException ex) {
+			throw new ReflectionException(ex);
+		}
+	}
+
+	public static Object getValue(Object instance, String className, boolean declared, String fieldName) {
+		return ReflectionUtils.getValue(instance, ReflectionUtils.getField(ReflectionUtils.getClass(className), declared, fieldName));
 	}
 
 	/**
@@ -357,8 +415,7 @@ public final class ReflectionUtils {
 	 * @see #getValue(Object, Class, boolean, String)
 	 */
 	public static Object getValue(Object instance, String className, PackageType packageType, boolean declared,
-			String fieldName) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
-			SecurityException, ClassNotFoundException {
+			String fieldName) {
 		return ReflectionUtils.getValue(instance, packageType.getClass(className), declared, fieldName);
 	}
 
@@ -380,8 +437,7 @@ public final class ReflectionUtils {
 	 *                                  accessible
 	 * @see #getValue(Object, Class, boolean, String)
 	 */
-	public static Object getValue(Object instance, boolean declared, String fieldName)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public static Object getValue(Object instance, boolean declared, String fieldName) {
 		return ReflectionUtils.getValue(instance, instance.getClass(), declared, fieldName);
 	}
 
@@ -402,9 +458,20 @@ public final class ReflectionUtils {
 	 *                                  accessible
 	 * @see #getField(Class, boolean, String)
 	 */
-	public static void setValue(Object instance, Class<?> clazz, boolean declared, String fieldName, Object value)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		ReflectionUtils.getField(clazz, declared, fieldName).set(instance, value);
+	public static void setValue(Object instance, Class<?> clazz, boolean declared, String fieldName, Object value) {
+		try {
+			ReflectionUtils.getField(clazz, declared, fieldName).set(instance, value);
+		} catch (IllegalArgumentException | IllegalAccessException ex) {
+			throw new ReflectionException(ex);
+		}
+	}
+
+	public static void setValue(Object instance, Field field, Object value) {
+		try {
+			field.set(instance, value);
+		} catch (IllegalArgumentException | IllegalAccessException ex) {
+			throw new ReflectionException(ex);
+		}
 	}
 
 	/**
@@ -428,8 +495,7 @@ public final class ReflectionUtils {
 	 * @see #setValue(Object, Class, boolean, String, Object)
 	 */
 	public static void setValue(Object instance, String className, PackageType packageType, boolean declared,
-			String fieldName, Object value) throws IllegalArgumentException, IllegalAccessException,
-			NoSuchFieldException, SecurityException, ClassNotFoundException {
+			String fieldName, Object value) {
 		ReflectionUtils.setValue(instance, packageType.getClass(className), declared, fieldName, value);
 	}
 
@@ -449,8 +515,7 @@ public final class ReflectionUtils {
 	 *                                  accessible
 	 * @see #setValue(Object, Class, boolean, String, Object)
 	 */
-	public static void setValue(Object instance, boolean declared, String fieldName, Object value)
-			throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	public static void setValue(Object instance, boolean declared, String fieldName, Object value) {
 		ReflectionUtils.setValue(instance, instance.getClass(), declared, fieldName, value);
 	}
 
@@ -524,8 +589,12 @@ public final class ReflectionUtils {
 		 * @throws ClassNotFoundException If the desired class with the specified name
 		 *                                and package cannot be found
 		 */
-		public Class<?> getClass(String className) throws ClassNotFoundException {
-			return Class.forName(this + "." + className);
+		public Class<?> getClass(String className) {
+			try {
+				return Class.forName(this + "." + className);
+			} catch (ClassNotFoundException ex) {
+				throw new ReflectionException(ex);
+			}
 		}
 
 		// Override for convenience
@@ -545,6 +614,31 @@ public final class ReflectionUtils {
 
 	}
 
+	public static class ReflectionException extends RuntimeException {
+
+		public ReflectionException() {
+			super();
+		}
+
+		public ReflectionException(String message, Throwable cause, boolean enableSuppression,
+				boolean writableStackTrace) {
+			super(message, cause, enableSuppression, writableStackTrace);
+		}
+
+		public ReflectionException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public ReflectionException(String message) {
+			super(message);
+		}
+
+		public ReflectionException(Throwable cause) {
+			super(cause);
+		}
+
+	}
+
 	/**
 	 * Represents an enumeration of Java data types with corresponding classes
 	 * <p>
@@ -554,6 +648,7 @@ public final class ReflectionUtils {
 	 * @author DarkBlade12
 	 * @since 1.0
 	 */
+	@Deprecated
 	public enum DataType {
 
 		BYTE(byte.class, Byte.class),

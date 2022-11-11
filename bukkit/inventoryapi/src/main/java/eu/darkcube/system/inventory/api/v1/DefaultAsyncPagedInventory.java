@@ -1,6 +1,7 @@
 package eu.darkcube.system.inventory.api.v1;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -10,16 +11,19 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 
-	public DefaultAsyncPagedInventory(InventoryType inventoryType,
-					String title) {
-		super(inventoryType, title, 6 * 9, box(3, 2, 5, 8),
-						IInventory.slot(1, 5));
+	public DefaultAsyncPagedInventory(InventoryType inventoryType, String title, BooleanSupplier instant) {
+		this(inventoryType, title, 6 * 9, AsyncPagedInventory.box(3, 2, 5, 8), instant);
+	}
+
+	public DefaultAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
+			BooleanSupplier instant) {
+		super(inventoryType, title, size, instant, box, IInventory.slot(1, 5));
 	}
 
 	@Override
 	protected void postTick(boolean changedInformations) {
 		if (changedInformations) {
-			playSound();
+			this.playSound();
 		}
 	}
 
@@ -34,11 +38,23 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 
 	}
 
-	protected abstract void insertArrowItems();
+	protected void insertArrowItems() {
+		this.arrowSlots.putIfAbsent(PageArrow.PREVIOUS, new Integer[] {
+				IInventory.slot(3, 1), IInventory.slot(4, 1), IInventory.slot(5, 1)
+		});
+		this.arrowSlots.putIfAbsent(PageArrow.NEXT, new Integer[] {
+				IInventory.slot(3, 9), IInventory.slot(4, 9), IInventory.slot(5, 9)
+		});
+	}
 
 	@Override
 	protected void insertDefaultItems() {
 		this.insertArrowItems();
+		this.insertFallbackItems();
+	}
+
+	protected void insertFallbackItems() {
+
 		ItemStack l = new ItemStack(Material.STAINED_GLASS_PANE);
 		l.setDurability((short) 7);
 		ItemMeta meta = l.getItemMeta();
@@ -47,73 +63,65 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 		ItemStack d = new ItemStack(Material.STAINED_GLASS_PANE);
 		d.setDurability((short) 15);
 		d.setItemMeta(meta);
-		this.fallbackItems.put(IInventory.slot0(1, 1), l);
-		this.fallbackItems.put(IInventory.slot0(2, 1), l);
-		this.fallbackItems.put(IInventory.slot0(3, 1), l);
-		this.fallbackItems.put(IInventory.slot0(4, 1), l);
-		this.fallbackItems.put(IInventory.slot0(5, 1), d);
-		this.fallbackItems.put(IInventory.slot0(6, 1), l);
-		this.fallbackItems.put(IInventory.slot0(7, 1), l);
-		this.fallbackItems.put(IInventory.slot0(8, 1), l);
-		this.fallbackItems.put(IInventory.slot0(9, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(1, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(2, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(3, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(4, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(5, 1), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(6, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(7, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(8, 1), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(9, 1), l);
 
-		this.fallbackItems.put(IInventory.slot0(1, 2), d);
-		this.fallbackItems.put(IInventory.slot0(2, 2), d);
-		this.fallbackItems.put(IInventory.slot0(3, 2), d);
-		this.fallbackItems.put(IInventory.slot0(4, 2), l);
-		this.fallbackItems.put(IInventory.slot0(5, 2), l);
-		this.fallbackItems.put(IInventory.slot0(6, 2), l);
-		this.fallbackItems.put(IInventory.slot0(7, 2), d);
-		this.fallbackItems.put(IInventory.slot0(8, 2), d);
-		this.fallbackItems.put(IInventory.slot0(9, 2), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(1, 2), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(2, 2), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(3, 2), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(4, 2), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(5, 2), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(6, 2), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(7, 2), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(8, 2), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(9, 2), d);
 
-		this.fallbackItems.put(IInventory.slot0(1, 3), l);
-		this.fallbackItems.put(IInventory.slot0(2, 3), d);
-		this.fallbackItems.put(IInventory.slot0(3, 3), d);
-		this.fallbackItems.put(IInventory.slot0(4, 3), d);
-		this.fallbackItems.put(IInventory.slot0(5, 3), l);
-		this.fallbackItems.put(IInventory.slot0(6, 3), d);
-		this.fallbackItems.put(IInventory.slot0(7, 3), d);
-		this.fallbackItems.put(IInventory.slot0(8, 3), d);
-		this.fallbackItems.put(IInventory.slot0(9, 3), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(1, 3), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(2, 3), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(3, 3), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(4, 3), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(5, 3), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(6, 3), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(7, 3), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(8, 3), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(9, 3), l);
 
-		this.fallbackItems.put(IInventory.slot0(1, 4), d);
-		this.fallbackItems.put(IInventory.slot0(2, 4), l);
-		this.fallbackItems.put(IInventory.slot0(3, 4), d);
-		this.fallbackItems.put(IInventory.slot0(4, 4), l);
-		this.fallbackItems.put(IInventory.slot0(5, 4), d);
-		this.fallbackItems.put(IInventory.slot0(6, 4), l);
-		this.fallbackItems.put(IInventory.slot0(7, 4), d);
-		this.fallbackItems.put(IInventory.slot0(8, 4), l);
-		this.fallbackItems.put(IInventory.slot0(9, 4), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(1, 4), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(2, 4), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(3, 4), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(4, 4), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(5, 4), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(6, 4), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(7, 4), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(8, 4), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(9, 4), d);
 
-		this.fallbackItems.put(IInventory.slot0(1, 5), l);
-		this.fallbackItems.put(IInventory.slot0(2, 5), d);
-		this.fallbackItems.put(IInventory.slot0(3, 5), l);
-		this.fallbackItems.put(IInventory.slot0(4, 5), d);
-		this.fallbackItems.put(IInventory.slot0(5, 5), l);
-		this.fallbackItems.put(IInventory.slot0(6, 5), d);
-		this.fallbackItems.put(IInventory.slot0(7, 5), l);
-		this.fallbackItems.put(IInventory.slot0(8, 5), d);
-		this.fallbackItems.put(IInventory.slot0(9, 5), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(1, 5), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(2, 5), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(3, 5), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(4, 5), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(5, 5), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(6, 5), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(7, 5), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(8, 5), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(9, 5), l);
 
-		this.fallbackItems.put(IInventory.slot0(1, 6), l);
-		this.fallbackItems.put(IInventory.slot0(2, 6), l);
-		this.fallbackItems.put(IInventory.slot0(3, 6), d);
-		this.fallbackItems.put(IInventory.slot0(4, 6), d);
-		this.fallbackItems.put(IInventory.slot0(5, 6), d);
-		this.fallbackItems.put(IInventory.slot0(6, 6), d);
-		this.fallbackItems.put(IInventory.slot0(7, 6), d);
-		this.fallbackItems.put(IInventory.slot0(8, 6), l);
-		this.fallbackItems.put(IInventory.slot0(9, 6), l);
-
-		arrowSlots.put(PageArrow.PREVIOUS, new Integer[] {
-						IInventory.slot(3, 1), IInventory.slot(4, 1),
-						IInventory.slot(5, 1)
-		});
-		arrowSlots.put(PageArrow.NEXT, new Integer[] {
-						IInventory.slot(3, 9), IInventory.slot(4, 9),
-						IInventory.slot(5, 9)
-		});
+		this.fallbackItems.putIfAbsent(IInventory.slot0(1, 6), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(2, 6), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(3, 6), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(4, 6), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(5, 6), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(6, 6), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(7, 6), d);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(8, 6), l);
+		this.fallbackItems.putIfAbsent(IInventory.slot0(9, 6), l);
 	}
+
 }

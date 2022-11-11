@@ -6,34 +6,43 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventory.api.v1.AsyncPagedInventory;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.PagedInventory;
+import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.PositionedIterator;
 
-public class InventoryLoading extends PagedInventory {
+public class InventoryLoading extends LobbyAsyncPagedInventory {
 
-	private final Function<User, Inventory> inventoryFunction;
+	private static final InventoryType type_loading = InventoryType.of("loading");
+
+	private final Function<User, IInventory> inventoryFunction;
+
 	private final Map<User, Map<Integer, ItemStack>> contents = new HashMap<>();
+
 	private final Map<User, Integer> counts = new HashMap<>();
+
 	private final Map<User, Runner> runnables = new HashMap<>();
 
 	private final PositionedIterator<ItemStack> iterator;
+
 	private static final int[] MAP = new int[] {
-			Inventory.s(2, 4), Inventory.s(2, 5), Inventory.s(2, 6), Inventory.s(3, 6), Inventory.s(4, 6), Inventory.s(4, 5), Inventory.s(4, 4), Inventory.s(3, 4)
+			IInventory.slot(2, 4), IInventory.slot(2, 5), IInventory.slot(2, 6), IInventory.slot(3, 6),
+			IInventory.slot(4, 6), IInventory.slot(4, 5), IInventory.slot(4, 4), IInventory.slot(3, 4)
 	};
 
-	public InventoryLoading(String title, Function<User, Inventory> inventoryFunction) {
-		super(title, null, 5 * 9, InventoryType.LOADING, PagedInventory.box(1, 1, 5, 9));
+	public InventoryLoading(String title, User user, Function<User, IInventory> inventoryFunction) {
+		super(InventoryLoading.type_loading, title, 5 * 9, AsyncPagedInventory.box(1, 1, 5, 9), user);
 		Arrays.fill(this.SORT, 0);
-		Arrays.fill(this.TOTAL_SORT, 0);
+//		Arrays.fill(this.TOTAL_SORT, 0);
 		this.inventoryFunction = inventoryFunction;
 
 		final ItemStack loading = new ItemBuilder(Material.BARRIER).displayname(" ").build();
@@ -48,6 +57,7 @@ public class InventoryLoading extends PagedInventory {
 
 		public Runner(User user) {
 			this.run = new BukkitRunnable() {
+
 				@Override
 				public void run() {
 					if (InventoryLoading.this.counts.containsKey(user)) {
@@ -63,11 +73,12 @@ public class InventoryLoading extends PagedInventory {
 							}
 						}
 						InventoryLoading.this.contents.put(user, contents);
-						InventoryLoading.this.update(user);
+						InventoryLoading.this.recalculate();
 					} else {
 						this.cancel();
 					}
 				}
+
 			};
 			this.run.runTaskTimer(Lobby.getInstance(), 2, 2);
 		}
@@ -75,56 +86,60 @@ public class InventoryLoading extends PagedInventory {
 		public void stop() {
 			this.run.cancel();
 		}
+
 	}
 
 	@Override
-	protected Map<Integer, ItemStack> getContents(User user) {
-		if (this.contents.containsKey(user)) {
-			return this.contents.get(user);
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		if (this.contents.containsKey(this.user)) {
+			items.putAll(this.contents.get(this.user));
 		}
-		return new HashMap<>();
+		super.fillItems(items);
 	}
 
 	@Override
-	protected void onOpen(User user) {
-		if (this.contents.containsKey(user)) {
+	public void open(HumanEntity player) {
+		super.open(player);
+		if (this.contents.containsKey(this.user)) {
 			return;
 		}
-		this.contents.put(user, new HashMap<>());
-		this.counts.put(user, 0);
-		this.runnables.put(user, new Runner(user));
+		this.contents.put(this.user, new HashMap<>());
+		this.counts.put(this.user, 0);
+		this.runnables.put(this.user, new Runner(this.user));
 		new BukkitRunnable() {
+
 			@Override
 			public void run() {
-				Inventory inv = InventoryLoading.this.inventoryFunction.apply(user);
-				user.setOpenInventory(inv);
+				IInventory inv = InventoryLoading.this.inventoryFunction.apply(InventoryLoading.this.user);
+				InventoryLoading.this.user.setOpenInventory(inv);
 			}
+
 		}.runTaskAsynchronously(Lobby.getInstance());
 	}
 
 	@Override
-	protected void onClose(User user) {
-		if (!this.contents.containsKey(user)) {
+	protected void destroy() {
+		super.destroy();
+		if (!this.contents.containsKey(this.user)) {
 			return;
 		}
-		this.contents.remove(user);
-		this.counts.remove(user);
-		this.runnables.remove(user).stop();
+		this.contents.remove(this.user);
+		this.counts.remove(this.user);
+		this.runnables.remove(this.user).stop();
 	}
 
 	@Override
-	protected Map<Integer, ItemStack> getStaticContents(User user) {
-		return new HashMap<>();
-	}
-
-	@Override
-	protected void insertDefaultItems(InventoryManager manager) {
-		ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(manager.user);
-		for (int i = 0; i < this.TOTAL_SLOTS.length; i++) {
-			int slot = this.TOTAL_SLOTS[i];
-			manager.setFallbackItem(slot, l);
+	protected void insertFallbackItems() {
+		ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user);
+		for (int i = 0; i < this.SLOTS.length; i++) {
+			int slot = this.SLOTS[i];
+			this.fallbackItems.put(slot, l);
 		}
-		manager.playSound = false;
-		super.insertDefaultItems(manager);
+		super.insertFallbackItems();
 	}
+
+	@Override
+	protected void playSound() {
+	}
+
 }

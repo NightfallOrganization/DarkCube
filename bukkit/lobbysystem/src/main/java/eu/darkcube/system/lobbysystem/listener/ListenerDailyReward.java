@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
+import eu.darkcube.system.lobbysystem.inventory.InventoryDailyReward;
 import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Message;
@@ -24,7 +24,7 @@ public class ListenerDailyReward extends BaseListener {
 	public void handle(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
 		User user = UserWrapper.getUser(p.getUniqueId());
-		if (user.getOpenInventory().getType() != InventoryType.DAILY_REWARD) {
+		if (user.getOpenInventory().getType() != InventoryDailyReward.type_daily_reward) {
 			return;
 		}
 		ItemStack item = e.getCurrentItem();
@@ -55,8 +55,8 @@ public class ListenerDailyReward extends BaseListener {
 		e.setCurrentItem(item);
 		p.sendMessage(Message.REWARD_COINS.getMessage(user, Integer.toString(coins)));
 		p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
-		
-		
+
 		user.save();
 	}
+
 }

@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
+import eu.darkcube.system.lobbysystem.inventory.InventoryGadget;
 import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
@@ -14,24 +14,24 @@ import eu.darkcube.system.lobbysystem.util.Item;
 public class ListenerGadget extends BaseListener {
 
 	public static ListenerGadget instance;
-	
+
 	public ListenerGadget() {
-		instance = this;
+		ListenerGadget.instance = this;
 	}
-	
+
 	@EventHandler
 	public void handle(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
+		User user = UserWrapper.getUser(p.getUniqueId());
+		if (user.getOpenInventory().getType() != InventoryGadget.type_gadget) {
+			return;
+		}
 		ItemStack item = e.getCurrentItem();
 		if (item == null) {
 			return;
 		}
 		String itemid = Item.getItemId(item);
 		if (itemid == null || itemid.isEmpty()) {
-			return;
-		}
-		User user = UserWrapper.getUser(p.getUniqueId());
-		if(user.getOpenInventory().getType() != InventoryType.GADGET) {
 			return;
 		}
 		boolean b = true;
@@ -46,4 +46,5 @@ public class ListenerGadget extends BaseListener {
 			p.closeInventory();
 		}
 	}
+
 }

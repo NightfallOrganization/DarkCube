@@ -22,25 +22,47 @@ import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import eu.darkcube.system.GameState;
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
 
-public abstract class MinigameInventory extends DefaultPagedInventory {
+public abstract class MinigameInventory extends LobbyAsyncPagedInventory
+
+{
+
+	private boolean done = false;
 
 	private Item minigameItem;
+
 //	private Map<User, BukkitRunnable> runnables = new HashMap<>();
 //	private Map<User, Map<Integer, ItemStack>> contents = new HashMap<>();
 
-	public MinigameInventory(String title, Item minigameItem, InventoryType type) {
-		super(title, type);
+	public MinigameInventory(String title, Item minigameItem, InventoryType type, User user) {
+		super(type, title, user);
 		this.minigameItem = minigameItem;
+		this.done = true;
+		this.complete();
 	}
 
 	protected abstract Set<String> getCloudTasks();
 
+	@Override
+	protected boolean done() {
+		return super.done() && this.done;
+	}
+
+	@Override
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user));
+		super.insertFallbackItems();
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
-	protected Map<Integer, ItemStack> contents(User user) {
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		super.fillItems(items);
+
 		Collection<ServiceInfoSnapshot> servers = new HashSet<>();
 		this.getCloudTasks()
 				.stream()
@@ -102,14 +124,21 @@ public abstract class MinigameInventory extends DefaultPagedInventory {
 		}
 
 		Collections.sort(itemSortingInfos);
-
-		Map<Integer, ItemStack> m = new HashMap<>();
 		for (int slot = 0; slot < itemSortingInfos.size(); slot++) {
-			ItemSortingInfo info = itemSortingInfos.get(slot);
-			m.put(slot, info.getItem());
+			items.put(slot, itemSortingInfos.get(slot).getItem());
 		}
-		return m;
 	}
+
+//	@SuppressWarnings("deprecation")
+//	@Override
+//	protected Map<Integer, ItemStack> contents(User user) {
+//		Map<Integer, ItemStack> m = new HashMap<>();
+//		for (int slot = 0; slot < itemSortingInfos.size(); slot++) {
+//			ItemSortingInfo info = itemSortingInfos.get(slot);
+//			m.put(slot, info.getItem());
+//		}
+//		return m;
+//	}
 
 //	@Override
 //	protected void onOpen(User user) {
@@ -206,12 +235,6 @@ public abstract class MinigameInventory extends DefaultPagedInventory {
 //		}
 //		return m;
 //	}
-
-	@Override
-	protected void insertDefaultItems(InventoryManager manager) {
-		super.insertDefaultItems(manager);
-		manager.setFallbackItem(Inventory.s(1, 5), this.minigameItem.getItem(manager.user));
-	}
 
 	protected class ItemSortingInfo implements Comparable<ItemSortingInfo> {
 

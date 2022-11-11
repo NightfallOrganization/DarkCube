@@ -1,56 +1,45 @@
 package eu.darkcube.system.lobbysystem.inventory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.PagedInventory;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
 
-public class InventoryConfirm extends PagedInventory {
+public class InventoryConfirm extends LobbyAsyncPagedInventory {
+
+	private static final InventoryType type_confirm = InventoryType.of("confirm");
 
 	public final Runnable onConfirm;
+
 	public final Runnable onCancel;
 
-	public InventoryConfirm(String title, Runnable onConfirm, Runnable onCancel) {
-		super(title, null, 3 * 9, InventoryType.CONFIRM, box(1, 1, 3, 9));
+	public InventoryConfirm(String title, User user, Runnable onConfirm, Runnable onCancel) {
+		super(InventoryConfirm.type_confirm, title, user);
+//		super(title, null, 3 * 9, InventoryConfirm.type_confirm, box(1, 1, 3, 9));
 		this.onConfirm = onConfirm;
 		this.onCancel = onCancel;
 	}
 
 	@Override
-	protected void onOpen(User user) {
-
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		super.fillItems(items);
+		items.put(IInventory.slot(2, 3), Item.CANCEL.getItem(this.user));
+		items.put(IInventory.slot(2, 7), Item.CONFIRM.getItem(this.user));
 	}
 
 	@Override
-	protected void onClose(User user) {
-
-	}
-
-	@Override
-	protected Map<Integer, ItemStack> getContents(User user) {
-		Map<Integer, ItemStack> map = new HashMap<>();
-		map.put(s(2, 3), Item.CANCEL.getItem(user));
-		map.put(s(2, 7), Item.CONFIRM.getItem(user));
-		return map;
-	}
-
-	@Override
-	protected Map<Integer, ItemStack> getStaticContents(User user) {
-		return new HashMap<>();
-	}
-
-	@Override
-	protected void insertDefaultItems(InventoryManager manager) {
-		ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(manager.user);
-		for (int i = 0; i < this.TOTAL_SLOTS.length; i++) {
-			int slot = this.TOTAL_SLOTS[i];
-			manager.setFallbackItem(slot, l);
+	protected void insertFallbackItems() {
+		ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user);
+		for (int i = 0; i < this.SLOTS.length; i++) {
+			int slot = this.SLOTS[i];
+			this.fallbackItems.put(slot, l);
 		}
-		super.insertDefaultItems(manager);
+		super.insertFallbackItems();
 	}
+
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,55 +19,69 @@ import eu.darkcube.system.inventory.api.InventoryAPI;
 public abstract class AnimatedInventory extends AbstractInventory {
 
 	protected final AtomicBoolean animationRunning = new AtomicBoolean(false);
+
 	protected final AtomicLong animationStarted = new AtomicLong();
+
 	protected final AtomicReference<AnimationRunnable> animation = new AtomicReference<>();
+
 	protected final List<AnimationInformation> informations = Collections.synchronizedList(new ArrayList<>());
+
+	private final BooleanSupplier instant;
 //					(i1, i2) -> Long.valueOf(i1.showAfter).compareTo(Long.valueOf(i2.showAfter)));
 
-	public AnimatedInventory(InventoryType inventoryType, String title,
-					int size) {
+	public AnimatedInventory(InventoryType inventoryType, String title, int size, BooleanSupplier instant) {
 		super(inventoryType, title, size);
+		this.instant = instant;
 	}
 
 	protected class AnimationRunnable extends BukkitRunnable {
+
 		@Override
 		public void run() {
 			boolean updated = false;
-			final long started = animationStarted.get();
+			final long started = AnimatedInventory.this.animationStarted.get();
 			final long time = System.currentTimeMillis();
-			tick();
+			AnimatedInventory.this.tick();
 			List<AnimationInformation> toRemove = new ArrayList<>();
-			for (AnimationInformation information : informations) {
+			for (AnimationInformation information : AnimatedInventory.this.informations) {
 				if (information.showAfter + started > time) {
 					continue;
 				}
 				toRemove.add(information);
-				handle.setItem(information.slot, information.item);
+				AnimatedInventory.this.handle.setItem(information.slot, information.item);
 				updated = true;
 			}
-			informations.removeAll(toRemove);
+			AnimatedInventory.this.informations.removeAll(toRemove);
 			if (updated) {
-				opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> p.updateInventory());
+				AnimatedInventory.this.opened.stream()
+						.filter(p -> p instanceof Player)
+						.map(p -> (Player) p)
+						.forEach(p -> p.updateInventory());
 			}
 		}
+
+	}
+
+	public boolean isInstant() {
+		return this.instant.getAsBoolean();
 	}
 
 	protected void tick() {
 	}
 
-	protected void offerAnimations(
-					final Collection<AnimationInformation> informations) {
-		AsyncExecutor.service().submit(() -> asyncOfferAnimations(informations));
+	protected void offerAnimations(final Collection<AnimationInformation> informations) {
+		AsyncExecutor.service().submit(() -> this.asyncOfferAnimations(informations));
 	}
 
-	protected void asyncOfferAnimations(
-					final Collection<AnimationInformation> informations) {
+	protected void asyncOfferAnimations(final Collection<AnimationInformation> informations) {
 	}
 
 	public class AnimationInformation {
 
 		public final long showAfter;
+
 		public final int slot;
+
 		public final ItemStack item;
 
 		public AnimationInformation(long showAfter, int slot, ItemStack item) {
@@ -78,22 +93,28 @@ public abstract class AnimatedInventory extends AbstractInventory {
 		public AnimationInformation(int slot, ItemStack item) {
 			this(-1, slot, item);
 		}
+
 	}
 
-	public void startAnimation() {
-		if (animation.get() == null
-						&& animationRunning.compareAndSet(false, true)) {
-			offerAnimations(informations);
+	protected void startAnimation() {
+		if (this.animation.get() == null && this.animationRunning.compareAndSet(false, true)) {
+			this.offerAnimations(this.informations);
 			AnimationRunnable runnable = new AnimationRunnable();
-			animation.set(runnable);
+			this.animation.set(runnable);
 			runnable.runTaskTimer(InventoryAPI.getInstance(), 0, 1);
-			animationStarted.set(System.currentTimeMillis());
+			this.animationStarted.set(System.currentTimeMillis());
+		}
+	}
+	
+	public void recalculate() {
+		if(this.animationRunning.get()) {
+			 this.offerAnimations(this.informations);
 		}
 	}
 
 	private void stopAnimation() {
-		if (animationRunning.compareAndSet(true, false)) {
-			animation.get().cancel();
+		if (this.animationRunning.compareAndSet(true, false)) {
+			this.animation.get().cancel();
 		}
 	}
 
@@ -102,4 +123,5 @@ public abstract class AnimatedInventory extends AbstractInventory {
 		super.destroy();
 		this.stopAnimation();
 	}
+
 }

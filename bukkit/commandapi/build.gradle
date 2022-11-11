@@ -1,4 +1,4 @@
 dependencies {
-    compileOnlyApi 'com.mojang:brigadier:1.0.17'
+    embedApi 'com.mojang:brigadier:1.0.17'
     api project(':bukkit:commons')
 }

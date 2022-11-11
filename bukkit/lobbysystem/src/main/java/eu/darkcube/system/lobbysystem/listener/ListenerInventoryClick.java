@@ -7,14 +7,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
 import eu.darkcube.system.lobbysystem.inventory.InventorySettings;
 import eu.darkcube.system.lobbysystem.inventory.InventoryWoolBattle;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.PagedInventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.PagedInventoryOld;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerOwn;
 import eu.darkcube.system.lobbysystem.user.User;
@@ -85,22 +83,22 @@ public class ListenerInventoryClick extends BaseListener {
 		}
 
 		// PagedInventories
-		Inventory inv = user.getOpenInventory();
-		if (inv instanceof PagedInventoryOld) {
-			PagedInventoryOld pinv = (PagedInventoryOld) inv;
-			if (itemid.equals(Item.NEXT.getItemId())) {
-				pinv.setPage(user, pinv.getPage(user) + 1);
-			} else if (itemid.equals(Item.PREV.getItemId())) {
-				pinv.setPage(user, pinv.getPage(user) - 1);
-			}
-		} else if (inv instanceof PagedInventory) {
-			PagedInventory pinv = (PagedInventory) inv;
-			if (itemid.equals(Item.NEXT.getItemId())) {
-				pinv.setPage(user, pinv.getPage(user) + 1);
-			} else if (itemid.equals(Item.PREV.getItemId())) {
-				pinv.setPage(user, pinv.getPage(user) - 1);
-			}
-		}
+		IInventory inv = user.getOpenInventory();
+//		if (inv instanceof PagedInventoryOld) {
+//			PagedInventoryOld pinv = (PagedInventoryOld) inv;
+//			if (itemid.equals(Item.NEXT.getItemId())) {
+//				pinv.setPage(user, pinv.getPage(user) + 1);
+//			} else if (itemid.equals(Item.PREV.getItemId())) {
+//				pinv.setPage(user, pinv.getPage(user) - 1);
+//			}
+//		} else if (inv instanceof PagedInventory) {
+//			PagedInventory pinv = (PagedInventory) inv;
+//			if (itemid.equals(Item.NEXT.getItemId())) {
+//				pinv.setPage(user, pinv.getPage(user) + 1);
+//			} else if (itemid.equals(Item.PREV.getItemId())) {
+//				pinv.setPage(user, pinv.getPage(user) - 1);
+//			}
+//		}
 		
 		if (inv instanceof InventoryConfirm) {
 			InventoryConfirm cinv = (InventoryConfirm) inv;

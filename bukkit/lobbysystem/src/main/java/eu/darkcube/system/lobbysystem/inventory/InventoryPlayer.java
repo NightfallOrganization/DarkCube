@@ -1,22 +1,32 @@
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.lobbysystem.inventory.abstraction.Inventory;
-import eu.darkcube.system.lobbysystem.inventory.abstraction.InventoryType;
-import eu.darkcube.system.lobbysystem.user.User;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 
-public class InventoryPlayer extends Inventory {
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventory.api.v1.InventoryType;
 
-	public InventoryPlayer() {
-		super(null, InventoryType.PLAYER);
+public class InventoryPlayer implements IInventory {
+
+	private static final InventoryType player = InventoryType.of("player");
+
+	@Override
+	public InventoryType getType() {
+		return InventoryPlayer.player;
 	}
 
 	@Override
-	public void playAnimation(User user) {
-		
+	public Inventory getHandle() {
+		return null;
 	}
 
 	@Override
-	public void skipAnimation(User user) {
-		
+	public void open(HumanEntity player) {
 	}
+
+	@Override
+	public boolean isOpened(HumanEntity player) {
+		return true;
+	}
+
 }

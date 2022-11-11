@@ -9,6 +9,7 @@ import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandDisable;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandEnable;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandInfo;
+import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandSetDeathHeight;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandSetIcon;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.system.commandapi.SpacedCommand;
@@ -16,9 +17,10 @@ import eu.darkcube.system.commandapi.SpacedCommand;
 public class CommandMap extends SpacedCommand {
 
 	public CommandMap() {
-		super(Main.getInstance(), "map",
-				new SubCommand[] { new CommandSetIcon(), new CommandEnable(), new CommandDisable(), new CommandInfo() },
-				"Map HauptCommand", CommandArgument.MAP);
+		super(Main.getInstance(), "map", new SubCommand[] {
+				new CommandSetIcon(), new CommandEnable(), new CommandDisable(), new CommandInfo(),
+				new CommandSetDeathHeight()
+		}, "Map HauptCommand", CommandArgument.MAP);
 	}
 
 	@Override
@@ -33,4 +35,5 @@ public class CommandMap extends SpacedCommand {
 		}
 		return super.onTabComplete(args);
 	}
+
 }

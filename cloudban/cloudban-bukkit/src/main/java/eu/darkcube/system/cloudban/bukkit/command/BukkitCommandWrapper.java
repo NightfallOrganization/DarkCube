@@ -1,24 +1,34 @@
 package eu.darkcube.system.cloudban.bukkit.command;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.bukkit.*;
-import org.bukkit.command.*;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.*;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.darkcube.system.*;
-import eu.darkcube.system.cloudban.bukkit.*;
+import eu.darkcube.system.ReflectionUtils;
+import eu.darkcube.system.ReflectionUtils.PackageType;
+import eu.darkcube.system.cloudban.bukkit.Main;
 import eu.darkcube.system.cloudban.command.Command;
-import eu.darkcube.system.cloudban.command.wrapper.*;
+import eu.darkcube.system.cloudban.command.wrapper.CommandWrapper;
 
 public class BukkitCommandWrapper implements TabExecutor {
 
-	private static final Class<?> VANILLA_COMMAND_WRAPPER = Reflection.getVersionClass(Reflection.CRAFTBUKKIT_PREFIX,
-			"command.VanillaCommandWrapper");
+	private static final Class<?> VANILLA_COMMAND_WRAPPER = ReflectionUtils.getClass("VanillaCommandWrapper",
+			PackageType.CRAFTBUKKIT_COMMAND);
 
 	public static void create() {
 		CommandWrapper.load();
@@ -30,19 +40,19 @@ public class BukkitCommandWrapper implements TabExecutor {
 	private Command handle;
 
 	private BukkitCommandWrapper(Command handle) {
-		registerCommands(Main.getPlugin(Main.class), handle);
+		this.registerCommands(JavaPlugin.getPlugin(Main.class), handle);
 		this.handle = handle;
 	}
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command cmd, String label,
 			String[] args) {
-		return handle.onTabComplete(new CommandSenderBukkit(sender), cmd.getName(), args, label);
+		return this.handle.onTabComplete(new CommandSenderBukkit(sender), cmd.getName(), args, label);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
-		handle.execute(new CommandSenderBukkit(sender), cmd.getName(), args, label);
+		this.handle.execute(new CommandSenderBukkit(sender), cmd.getName(), args, label);
 		return true;
 	}
 
@@ -69,11 +79,13 @@ public class BukkitCommandWrapper implements TabExecutor {
 				f.setAccessible(true);
 				Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) f
 						.get(commandMap);
-				if (VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(owner.getNames()[0].toLowerCase()))) {
+				if (BukkitCommandWrapper.VANILLA_COMMAND_WRAPPER
+						.isInstance(knownCommands.get(owner.getNames()[0].toLowerCase()))) {
 					knownCommands.put(owner.getNames()[0].toLowerCase(), plugincommand);
 				}
 				for (String alias : aliases) {
-					if (VANILLA_COMMAND_WRAPPER.isInstance(knownCommands.get(alias.toLowerCase()))) {
+					if (BukkitCommandWrapper.VANILLA_COMMAND_WRAPPER
+							.isInstance(knownCommands.get(alias.toLowerCase()))) {
 						knownCommands.put(alias.toLowerCase(), plugincommand);
 					}
 				}
@@ -98,4 +110,5 @@ public class BukkitCommandWrapper implements TabExecutor {
 		}
 		return null;
 	}
+
 }
