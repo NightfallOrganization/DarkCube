@@ -16,13 +16,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.generator.CustomChunkGenerator;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -48,7 +50,6 @@ import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClick;
 import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClose;
 import eu.darkcube.minigame.woolbattle.listener.ListenerLaunchable;
 import eu.darkcube.minigame.woolbattle.listener.ListenerPlayerInteract;
-import eu.darkcube.minigame.woolbattle.listener.ListenerVoidWorld;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerWeatherChange;
 import eu.darkcube.minigame.woolbattle.map.DefaultMapManager;
 import eu.darkcube.minigame.woolbattle.map.Map;
@@ -80,6 +81,7 @@ import eu.darkcube.minigame.woolbattle.util.convertingrule.ConvertingRuleTeam;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.GameState;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.CommandAPI;
@@ -108,7 +110,6 @@ public class Main extends Plugin {
 	private Collection<SchedulerTask> schedulers;
 	private PluginClassLoader pluginClassLoader;
 	private BukkitTask tickTask;
-	private ListenerVoidWorld listenerVoidWorld;
 	private ListenerPlayerInteract listenerPlayerInteract;
 	private ListenerInventoryClick listenerInventoryClick;
 	private ListenerInventoryClose listenerInventoryClose;
@@ -133,7 +134,6 @@ public class Main extends Plugin {
 
 	@Override
 	public void onLoad() {
-
 		pluginClassLoader = new ReflectionClassLoader(this);
 		new DependencyManager(this).loadDependencies(Dependency.values());
 
@@ -149,71 +149,9 @@ public class Main extends Plugin {
 		languageEntries.addAll(Arrays.asList(Item.values()).stream().map(i -> Message.ITEM_PREFIX
 						+ i.getKey()).collect(Collectors.toList()));
 		languageEntries.addAll(Arrays.asList(Item.values()).stream().filter(i -> i.getBuilder().getLores().size() > 0).map(i -> Message.ITEM_PREFIX
-						+ Message.LORE_PREFIX
-						+ i.getKey()).collect(Collectors.toList()));
+						+ Message.LORE_PREFIX + i.getKey()).collect(Collectors.toList()));
 		Language.validateEntries(languageEntries.toArray(new String[languageEntries.size()]), s -> Message.KEY_PREFIX
 						+ s);
-
-//		for (Language language : Language.values()) {
-//			if (language.getBundle() != null) {
-//				for (Message message : Message.values()) {
-//					if (message.getMessage(language).startsWith(message.name())) {
-//						sendConsole("§cCould not load message " + message.name()
-//										+ " in language " + language.name());
-//					}
-//				}
-//				for (Item item : Item.values()) {
-//					String id = ItemManager.getItemId(item);
-//					try {
-//						language.getBundle().getString(id);
-//					} catch (Exception ex) {
-//						sendConsole("§cCould not load item name " + id
-//										+ " in language " + language.name());
-//					}
-//					if (item.getBuilder().getLores().size() != 0) {
-//						id = item.name();
-//						try {
-//							language.getBundle().getString(Message.ITEM_PREFIX
-//											+ Message.LORE_PREFIX + id);
-//						} catch (Exception ex) {
-//							sendConsole("§cCould not load item lore "
-//											+ Message.ITEM_PREFIX
-//											+ Message.LORE_PREFIX + id
-//											+ " in language "
-//											+ language.name());
-//						}
-//					}
-//				}
-//				for (ScoreboardObjective obj : ScoreboardObjective.values()) {
-//					try {
-//						language.getBundle().getString(obj.getMessageKey());
-//					} catch (Exception ex) {
-//						sendConsole("§cCould not load scoreboard objective "
-//										+ obj.getMessageKey() + " in language "
-//										+ language.name());
-//					}
-//				}
-//				for (ObjectiveTeam team : ObjectiveTeam.values()) {
-//					try {
-//						language.getBundle().getString(team.getMessagePrefix());
-//					} catch (Exception ex) {
-//						sendConsole("§cCould not load objective team prefix "
-//										+ team.getMessagePrefix()
-//										+ " in language " + language.name());
-//					}
-//					try {
-//						language.getBundle().getString(team.getMessageSuffix());
-//					} catch (Exception ex) {
-//						sendConsole("§cCould not load objective team suffix "
-//										+ team.getMessageSuffix()
-//										+ " in language " + language.name());
-//					}
-//				}
-//			} else {
-//				sendConsole("§cLanguage bundle for language " + language.name()
-//								+ " could not be found!");
-//			}
-//		}
 
 		// Create Array converting rules
 		Arrays.addConvertingRule(new ConvertingRuleLanguage());
@@ -243,7 +181,6 @@ public class Main extends Plugin {
 		this.schedulers = new ArrayList<>();
 
 		// Init listeners
-		this.listenerVoidWorld = new ListenerVoidWorld();
 		this.listenerInventoryClose = new ListenerInventoryClose();
 		this.listenerInventoryClick = new ListenerInventoryClick();
 		this.listenerPlayerInteract = new ListenerPlayerInteract();
@@ -295,6 +232,16 @@ public class Main extends Plugin {
 		lobby = new Lobby();
 		ingame = new Ingame();
 		endgame = new Endgame();
+
+		// Gotta do this so the listener may be registered
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerInterface(VoidWorldPluginLoader.class);
+		try {
+			org.bukkit.plugin.Plugin vwp = pm.loadPlugin(VoidWorldPluginLoader.file);
+		} catch (UnknownDependencyException | InvalidPluginException
+						| InvalidDescriptionException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
@@ -311,15 +258,10 @@ public class Main extends Plugin {
 		lobby.recalculateMap();
 		lobby.recalculateEpGlitch();
 
-		// Server-Client sync problem fixing -> player has to rejoin
-//		Bukkit.getOnlinePlayers().forEach(p -> {
-//			p.kickPlayer("§cReloading");
-//		});
-
 		// Enable void worlds
-		Bukkit.getWorlds().forEach(world -> {
-			listenerVoidWorld.handle(new WorldInitEvent(world));
-		});
+//		Bukkit.getWorlds().forEach(world -> {
+//			listenerVoidWorld.handle(new WorldInitEvent(world));
+//		});
 
 		// load user wrapper
 		userWrapper = new DefaultUserWrapper();
@@ -337,7 +279,6 @@ public class Main extends Plugin {
 		}.runTaskTimer(this, 0, 1);
 
 		// Register default listeners
-		registerListeners(listenerVoidWorld);
 		registerListeners(listenerInventoryClick);
 		registerListeners(listenerInventoryClose);
 		registerListeners(listenerPlayerInteract);
@@ -350,7 +291,7 @@ public class Main extends Plugin {
 		// Load worlds (At serverstart there are no worlds but if the plugin
 		// gets
 		// reloaded there are)
-		loadWorlds();
+//		loadWorlds();
 
 		// Enable Lobbystate
 		lobby.enable();
@@ -360,7 +301,6 @@ public class Main extends Plugin {
 		CommandAPI.enable(this, new CommandFix());
 		CommandAPI.enable(this, new CommandIsStats());
 		CommandAPI.enable(this, new CommandLanguage());
-//		CommandAPI.enable(this, new CommandSetLifesDeprecated());
 		CommandAPI.enable(this, new CommandSetMap());
 		CommandAPI.enable(this, new CommandSettings());
 		CommandAPI.enable(this, new CommandTimer());
@@ -449,8 +389,7 @@ public class Main extends Plugin {
 		if (getLobby().isEnabled()) {
 			Scoreboard sb = new Scoreboard(user);
 			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(ObjectiveTeam.MAP.getKey());
-			String suffix = baseMap == null
-							? (map == null ? "§cNo Maps" : map.getName())
+			String suffix = baseMap == null ? (map == null ? "§cNo Maps" : map.getName())
 							: baseMap.getName();
 			team.setSuffix(suffix);
 		}
@@ -465,8 +404,7 @@ public class Main extends Plugin {
 
 	public static final void initScoreboard(Scoreboard sb, User owner) {
 //		Spectator is not included in "Team"
-		Collection<Team> teams = new HashSet<>(
-						Main.getInstance().getTeamManager().getTeams());
+		Collection<Team> teams = new HashSet<>(Main.getInstance().getTeamManager().getTeams());
 		teams.add(Main.getInstance().getTeamManager().getSpectator());
 		for (Team t : teams) {
 			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.createTeam(t.getType().getScoreboardTag());
@@ -525,12 +463,11 @@ public class Main extends Plugin {
 	}
 
 	@Override
-	public ChunkGenerator getDefaultWorldGenerator(String worldName,
-					String id) {
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		return new ChunkGenerator() {
 			@Override
-			public ChunkData generateChunkData(World world, Random random,
-							int x, int z, BiomeGrid biome) {
+			public ChunkData generateChunkData(World world, Random random, int x, int z,
+							BiomeGrid biome) {
 				return createChunkData(world);
 			}
 		};
@@ -549,15 +486,13 @@ public class Main extends Plugin {
 	}
 
 	public final void loadWorld(World world) {
-		boolean b = true;
-		if (b)
-			return;
 		CraftWorld w = (CraftWorld) world;
 		// Setting gamerules
 		w.getHandle().tracker = new CustomEntityTracker(w.getHandle());
 		w.setDifficulty(Difficulty.PEACEFUL);
 		w.setKeepSpawnInMemory(false);
 		w.setFullTime(0);
+		w.setTime(6000);
 		w.setGameRuleValue("commandBlockOutput", "false");
 		w.setGameRuleValue("doDaylightCycle", "false");
 		w.setGameRuleValue("doEntityDrops", "false");
@@ -575,20 +510,15 @@ public class Main extends Plugin {
 		w.setGameRuleValue("showDeathMessages", "false");
 		try {
 			// Setting all chunkgenerator fields for world
-			sendConsole("Preparing void world generation for world '"
-							+ world.getName() + "'");
+			sendConsole("Preparing void world generation for world '" + world.getName() + "'");
 			w.getHandle().generator = getDefaultWorldGenerator(world.getName(), world.getName());
 			Field field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("dataManager");
 			field.setAccessible(true);
 			IDataManager manager = (IDataManager) field.get(w.getHandle());
-			IChunkProvider gen = new CustomChunkGenerator(w.getHandle(),
-							w.getHandle().getSeed(), w.getHandle().generator) {
-
-			};
+			IChunkProvider gen = new CustomChunkGenerator(w.getHandle(), w.getHandle().getSeed(),
+							w.getHandle().generator);
 			gen = new ChunkProviderServer(w.getHandle(),
-							manager.createChunkLoader(w.getHandle().worldProvider),
-							gen) {
-			};
+							manager.createChunkLoader(w.getHandle().worldProvider), gen);
 			w.getHandle().chunkProviderServer = (ChunkProviderServer) gen;
 			field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("chunkProvider");
 			field.setAccessible(true);
@@ -611,30 +541,19 @@ public class Main extends Plugin {
 		if (!new File(this.getServer().getWorldContainer(), world).exists()
 						&& !new File(this.getServer().getWorldContainer().getParent(),
 										world).exists()) {
+			System.out.println("World " + world + " not found");
 			return;
 		}
-		if (Bukkit.getWorld(world) == null
-						&& !new File(Bukkit.getWorldContainer(),
-										world).exists()) {
+		if (Bukkit.getWorld(world) == null) {
+//						&& !new File(Bukkit.getWorldContainer(), world).exists()) {
 			try {
 				WorldCreator creator = new WorldCreator(
 								world).generator(getDefaultWorldGenerator(world, world));
 				creator.createWorld();
 			} catch (NullPointerException ex) {
+				ex.printStackTrace();
 			}
 		} else {
-			if (new File(Bukkit.getWorldContainer(), world).exists()) {
-				File serverfolder = new File(System.getProperty("user.dir"));
-				YamlConfiguration cfg = YamlConfiguration.loadConfiguration(new File(
-								serverfolder, "bukkit.yml"));
-				cfg.set("worlds." + world + ".generator", "WoolBattle");
-				try {
-					cfg.save(new File(serverfolder, "bukkit.yml"));
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-				return;
-			}
 			loadWorld(Bukkit.getWorld(world));
 		}
 	}
@@ -647,8 +566,7 @@ public class Main extends Plugin {
 		sendMessage(msg, (u) -> replacements);
 	}
 
-	public final <T> void sendMessage(Message msg,
-					Function<User, Object[]> function) {
+	public final <T> void sendMessage(Message msg, Function<User, Object[]> function) {
 		for (User user : getUserWrapper().getUsers()) {
 			Object[] replacements = new Object[0];
 			replacements = Arrays.addAfter(replacements, function.apply(user));

@@ -139,7 +139,7 @@ public class InventoryLoading extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void playSound() {
+	protected void playSound0() {
 	}
 
 }

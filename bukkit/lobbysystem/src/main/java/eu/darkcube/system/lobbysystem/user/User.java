@@ -45,8 +45,9 @@ public abstract class User {
 
 	private Set<Integer> rewardSlotsUsed;
 
-	public User(Language language, Gadget gadget, boolean sounds, boolean animations, UUID uuid, long lastDailyReward,
-			IInventory openInventory, Set<Integer> rewardSlotsUsed) {
+	public User(Language language, Gadget gadget, boolean sounds,
+					boolean animations, UUID uuid, long lastDailyReward,
+					IInventory openInventory, Set<Integer> rewardSlotsUsed) {
 		this.rewardSlotsUsed = rewardSlotsUsed;
 		this.lastDailyReward = lastDailyReward;
 		this.sounds = sounds;
@@ -82,7 +83,8 @@ public abstract class User {
 
 	public User setOpenInventory(IInventory openInventory) {
 		boolean oldAnimations = this.isAnimations();
-		if (this.openInventory != null && openInventory.getClass().equals(this.openInventory.getClass())) {
+		if (this.openInventory != null
+						&& openInventory.getClass().equals(this.openInventory.getClass())) {
 			this.setAnimations(false);
 		}
 
@@ -95,11 +97,12 @@ public abstract class User {
 //					if (openInventory.getHandle() != null) {
 //						p.openInventory(openInventory.getHandle());
 //					}
-					User.this.openInventory = openInventory;
 					if (openInventory.getHandle() != null) {
-						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 100, false, false),
-								true);
 						openInventory.open(p);
+						p.addPotionEffect(new PotionEffect(
+										PotionEffectType.BLINDNESS, 1000000,
+										100, false, false), true);
+						User.this.openInventory = openInventory;
 //						if (User.this.isAnimations()) {
 //							openInventory.playAnimation(User.this);
 //						} else {
@@ -158,7 +161,8 @@ public abstract class User {
 		}
 	}
 
-	public void playSound(Location loc, Sound sound, float volume, float pitch) {
+	public void playSound(Location loc, Sound sound, float volume,
+					float pitch) {
 		if (!this.isSounds())
 			return;
 		Player p = UUIDManager.getPlayerByUUID(this.getUniqueId());
@@ -175,7 +179,8 @@ public abstract class User {
 //				@Override
 //				public void run() {
 ////					p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 100, false, false), true);
-			p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 100, false, false), true);
+			p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100,
+							100, false, false), true);
 //					p.setGameMode(GameMode.SPECTATOR);
 //					PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
 //					try {
@@ -256,7 +261,9 @@ public abstract class User {
 	}
 
 	public UserData newUserData() {
-		return new UserData(this.language, this.gadget, this.sounds, this.animations, this.lastDailyReward, this.rewardSlotsUsed);
+		return new UserData(this.language, this.gadget, this.sounds,
+						this.animations, this.lastDailyReward,
+						this.rewardSlotsUsed);
 	}
 
 	public User setGadget(Gadget gadget) {

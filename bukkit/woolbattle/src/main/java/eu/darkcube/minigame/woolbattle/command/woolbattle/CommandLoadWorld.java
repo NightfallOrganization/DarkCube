@@ -41,6 +41,7 @@ public class CommandLoadWorld extends SubCommand {
 			Main.getInstance().saveConfig(cfg);
 			Main.getInstance().loadWorld(worldName);
 			p.sendMessage("§aWelt geladen");
+			return true;
 		}
 		return false;
 	}

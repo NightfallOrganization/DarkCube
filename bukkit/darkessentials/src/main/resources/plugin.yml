@@ -1,0 +1,4 @@
+main: eu.darkcube.system.darkessentials.Main
+name: DarkEssentials
+version: 1.0
+depend: [System]

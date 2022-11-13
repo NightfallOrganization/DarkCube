@@ -24,14 +24,31 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 	private boolean displayedRewards = false;
 
 	public InventoryDailyReward(User user) {
-		super(InventoryDailyReward.type_daily_reward, Message.INVENTORY_NAME_DAILY_REWARD.getMessage(user), 5 * 9,
-				AsyncPagedInventory.box(1, 1, 5, 9), user);
+		super(InventoryDailyReward.type_daily_reward,
+						Message.INVENTORY_NAME_DAILY_REWARD.getMessage(user),
+						5 * 9, AsyncPagedInventory.box(1, 1, 5, 9), user);
+
+		this.SORT[IInventory.slot(5, 2)] = this.SORT[IInventory.slot(5, 1)] + 1;
+		this.SORT[IInventory.slot(5, 3)] = this.SORT[IInventory.slot(5, 2)] + 1;
+		this.SORT[IInventory.slot(5, 4)] = this.SORT[IInventory.slot(5, 3)] + 1;
+		this.SORT[IInventory.slot(5, 5)] = this.SORT[IInventory.slot(5, 4)] + 1;
+		this.SORT[IInventory.slot(5, 6)] = this.SORT[IInventory.slot(5, 5)] - 1;
+		this.SORT[IInventory.slot(5, 7)] = this.SORT[IInventory.slot(5, 6)] - 1;
+		this.SORT[IInventory.slot(5, 8)] = this.SORT[IInventory.slot(5, 7)] - 1;
+
+		this.SORT[IInventory.slot(3, 4)] = this.SORT[IInventory.slot(5, 5)] + 2;
+		this.SORT[IInventory.slot(3, 5)] = this.SORT[IInventory.slot(5, 5)] + 2;
+		this.SORT[IInventory.slot(3, 6)] = this.SORT[IInventory.slot(5, 5)] + 2;
+		updateSorts();
 //		super(Bukkit.createInventory(null, 5 * 9, Message.INVENTORY_NAME_DAILY_REWARD.getMessage(user)),
 //				InventoryType.DAILY_REWARD);
 	}
 
 	@Override
 	protected void postTick(boolean changedInformations) {
+		if (!displayedRewards) {
+			displayedRewards = currentSort.get() >= this.SORT[IInventory.slot(3, 5)];
+		}
 		if (changedInformations) {
 			if (this.displayedRewards) {
 				this.playSound();
@@ -40,7 +57,7 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void playSound() {
+	protected void playSound0() {
 		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
 			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
 		});
@@ -48,7 +65,8 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void insertFallbackItems() {
-		ItemStack l = new ItemBuilder(Material.STAINED_GLASS_PANE).displayname("§6").durability(7).build();
+		ItemStack l = new ItemBuilder(
+						Material.STAINED_GLASS_PANE).displayname("§6").durability(7).build();
 		this.fallbackItems.put(IInventory.slot(1, 1), l);
 		this.fallbackItems.put(IInventory.slot(1, 2), l);
 		this.fallbackItems.put(IInventory.slot(1, 3), l);
@@ -76,17 +94,6 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 		this.fallbackItems.put(IInventory.slot(5, 8), l);
 		this.fallbackItems.put(IInventory.slot(5, 9), l);
 
-		this.SORT[IInventory.slot(5, 2)] = this.SORT[IInventory.slot(5, 1)] + 1;
-		this.SORT[IInventory.slot(5, 3)] = this.SORT[IInventory.slot(5, 2)] + 1;
-		this.SORT[IInventory.slot(5, 4)] = this.SORT[IInventory.slot(5, 3)] + 1;
-		this.SORT[IInventory.slot(5, 5)] = this.SORT[IInventory.slot(5, 4)] + 1;
-		this.SORT[IInventory.slot(5, 6)] = this.SORT[IInventory.slot(5, 5)] - 1;
-		this.SORT[IInventory.slot(5, 7)] = this.SORT[IInventory.slot(5, 6)] - 1;
-		this.SORT[IInventory.slot(5, 8)] = this.SORT[IInventory.slot(5, 7)] - 1;
-
-		this.SORT[IInventory.slot(3, 4)] = this.SORT[IInventory.slot(5, 5)] + 2;
-		this.SORT[IInventory.slot(3, 5)] = this.SORT[IInventory.slot(5, 5)] + 2;
-		this.SORT[IInventory.slot(3, 6)] = this.SORT[IInventory.slot(5, 5)] + 2;
 	}
 
 	@Override
@@ -99,30 +106,36 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 			this.user.getRewardSlotsUsed().clear();
 		}
 
-		ItemStack used = new ItemBuilder(Material.SULPHUR)
-				.displayname(Message.REWARD_ALREADY_USED.getMessage(this.user))
-				.build();
-		ItemStack unused = new ItemBuilder(Material.GLOWSTONE_DUST).displayname("§e???").build();
+		ItemStack used = new ItemBuilder(
+						Material.SULPHUR).displayname(Message.REWARD_ALREADY_USED.getMessage(this.user)).build();
+		ItemStack unused = new ItemBuilder(
+						Material.GLOWSTONE_DUST).displayname("§e???").build();
 		Set<Integer> usedSlots = this.user.getRewardSlotsUsed();
 		if (usedSlots.contains(1)) {
-			used = new ItemBuilder(used).getUnsafe().setInt("reward", 1).builder().build();
+			used = new ItemBuilder(
+							used).getUnsafe().setInt("reward", 1).builder().build();
 			items.put(21, used);
 		} else {
-			unused = new ItemBuilder(unused).getUnsafe().setInt("reward", 1).builder().build();
+			unused = new ItemBuilder(
+							unused).getUnsafe().setInt("reward", 1).builder().build();
 			items.put(21, unused);
 		}
 		if (usedSlots.contains(2)) {
-			used = new ItemBuilder(used).getUnsafe().setInt("reward", 2).builder().build();
+			used = new ItemBuilder(
+							used).getUnsafe().setInt("reward", 2).builder().build();
 			items.put(22, used);
 		} else {
-			unused = new ItemBuilder(unused).getUnsafe().setInt("reward", 2).builder().build();
+			unused = new ItemBuilder(
+							unused).getUnsafe().setInt("reward", 2).builder().build();
 			items.put(22, unused);
 		}
 		if (usedSlots.contains(3)) {
-			used = new ItemBuilder(used).getUnsafe().setInt("reward", 3).builder().build();
+			used = new ItemBuilder(
+							used).getUnsafe().setInt("reward", 3).builder().build();
 			items.put(23, used);
 		} else {
-			unused = new ItemBuilder(unused).getUnsafe().setInt("reward", 3).builder().build();
+			unused = new ItemBuilder(
+							unused).getUnsafe().setInt("reward", 3).builder().build();
 			items.put(23, unused);
 		}
 	}

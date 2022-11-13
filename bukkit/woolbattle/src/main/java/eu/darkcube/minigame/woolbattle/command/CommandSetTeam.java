@@ -16,7 +16,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class CommandSetTeam extends CommandExecutor {
 
 	public CommandSetTeam() {
-		super("woolbattle", "setTeam", "woolbattle.command.setteam",
+		super("woolbattle", "setteam", "woolbattle.command.setteam",
 						new String[0], b -> {
 							b.then(Commands.argument("player", EntityArgument.player()).then(Commands.argument("team", TeamArgument.teamArgument()).executes(context -> {
 								Player player = EntityArgument.getPlayer(context, "player");

@@ -31,8 +31,7 @@ public class CommandAPI {
 
 	private CommandAPI(JavaPlugin plugin) {
 		if (CommandAPI.instance != null) {
-			throw new IllegalAccessError(
-							"You may not initialize the CommandAPI twice!");
+			throw new IllegalAccessError("You may not initialize the CommandAPI twice!");
 		}
 		this.plugin = plugin;
 		this.commands = new Commands();
@@ -57,8 +56,7 @@ public class CommandAPI {
 	}
 
 	private String sjoin(String label, String[] args) {
-		return args.length == 0 ? label
-						: (label + " " + String.join(" ", args));
+		return args.length == 0 ? label : (label + " " + String.join(" ", args));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,6 +76,10 @@ public class CommandAPI {
 			plugincommand.setPermission(command.getPermission());
 			plugincommand.setExecutor(this.executor);
 			plugincommand.setTabCompleter(this.executor);
+			Field ftimings = plugincommand.getClass().getField("timings");
+			Method timingsOf = Class.forName("co.aikar.timings.Timings").getMethod("of", Plugin.class, String.class);
+			ftimings.set(plugincommand, timingsOf.invoke(null, plugin, plugin.getName() + ":"
+							+ command.getName()));
 //			plugincommand.timings = TimingsManager.getCommandTiming(plugin.getName().toLowerCase(), plugincommand);
 			final Object server = Bukkit.getServer();
 			final Method methodGETCOMMANDMAP = server.getClass().getMethod("getCommandMap");
@@ -125,8 +127,8 @@ public class CommandAPI {
 		return this.plugin;
 	}
 
-	private void checkAmbiguities(String registerName,
-					Map<String, Command> knownCommands, PluginCommand command) {
+	private void checkAmbiguities(String registerName, Map<String, Command> knownCommands,
+					PluginCommand command) {
 		if (knownCommands.containsKey(registerName)) {
 			Command cmd = knownCommands.get(registerName);
 			if (cmd instanceof PluginCommand) {
@@ -135,13 +137,11 @@ public class CommandAPI {
 								&& pcmd.getTabCompleter() == this.executor) {
 					return;
 				}
-				Bukkit.getConsoleSender().sendMessage("§6Overriding command "
-								+ registerName + " from Plugin "
-								+ pcmd.getPlugin().getName() + "!");
+				Bukkit.getConsoleSender().sendMessage("§6Overriding command " + registerName
+								+ " from Plugin " + pcmd.getPlugin().getName() + "!");
 			} else {
-				Bukkit.getConsoleSender().sendMessage("§6Overriding command "
-								+ registerName + " from type "
-								+ cmd.getClass().getSimpleName() + "!");
+				Bukkit.getConsoleSender().sendMessage("§6Overriding command " + registerName
+								+ " from type " + cmd.getClass().getSimpleName() + "!");
 			}
 		}
 		knownCommands.put(registerName, command);
@@ -150,8 +150,8 @@ public class CommandAPI {
 	private class Executor implements TabExecutor {
 
 		@Override
-		public List<String> onTabComplete(CommandSender sender, Command command,
-						String label, String[] args) {
+		public List<String> onTabComplete(CommandSender sender, Command command, String label,
+						String[] args) {
 			String commandLine = CommandAPI.this.sjoin(label, args);
 			String commandLine2 = CommandAPI.this.sjoin(label, Arrays.copyOfRange(args, 0, args.length
 							- 1)) + " ";
@@ -169,8 +169,8 @@ public class CommandAPI {
 		}
 
 		@Override
-		public boolean onCommand(CommandSender sender, Command command,
-						String label, String[] args) {
+		public boolean onCommand(CommandSender sender, Command command, String label,
+						String[] args) {
 			String commandLine = CommandAPI.this.sjoin(label, args);
 			CommandAPI.this.dispatchCommand(commandLine, sender);
 			return true;

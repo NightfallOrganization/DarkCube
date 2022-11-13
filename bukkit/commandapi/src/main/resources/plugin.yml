@@ -3,4 +3,4 @@ name: CommandAPI
 author: DasBabyPixel
 version: 3.0
 load: startup
-softdepend: [System]
+depend: [System]

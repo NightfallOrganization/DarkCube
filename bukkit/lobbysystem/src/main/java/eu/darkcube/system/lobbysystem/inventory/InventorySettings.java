@@ -17,15 +17,15 @@ public class InventorySettings extends LobbyAsyncPagedInventory {
 	private static final InventoryType type_settings = InventoryType.of("settings");
 
 	public InventorySettings(User user) {
-		super(InventorySettings.type_settings, Item.INVENTORY_SETTINGS.getDisplayName(user), user);
+		super(InventorySettings.type_settings,
+						Item.INVENTORY_SETTINGS.getDisplayName(user), user);
 	}
 
 	@Override
 	protected void insertFallbackItems() {
-		super.insertFallbackItems();
 		this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_SETTINGS.getItem(this.user));
-		this.pageItems.put(IInventory.slot(4, 3),
-				this.user.isSounds() ? Item.INVENTORY_SETTINGS_SOUNDS_ON.getItem(this.user)
+		this.fallbackItems.put(IInventory.slot(4, 3), this.user.isSounds()
+						? Item.INVENTORY_SETTINGS_SOUNDS_ON.getItem(this.user)
 						: Item.INVENTORY_SETTINGS_SOUNDS_OFF.getItem(this.user));
 
 		String textureId = "";
@@ -33,29 +33,29 @@ public class InventorySettings extends LobbyAsyncPagedInventory {
 		switch (this.user.getLanguage()) {
 		case ENGLISH:
 			textureId = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1"
-					+ "cmUvYTE3MDFmMjE4MzVhODk4YjIwNzU5ZmIzMGE1ODNhMzhiOTk0YWJmNjBkMzkxMmFiNGNlOWYyMzExZTc0Zj"
-					+ "cyIn19fQ==";
+							+ "cmUvYTE3MDFmMjE4MzVhODk4YjIwNzU5ZmIzMGE1ODNhMzhiOTk0YWJmNjBkMzkxMmFiNGNlOWYyMzExZTc0Zj"
+							+ "cyIn19fQ==";
 			name = "English";
-			break;
+		break;
 		case GERMAN:
 			textureId = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1"
-					+ "cmUvNWU3ODk5YjQ4MDY4NTg2OTdlMjgzZjA4NGQ5MTczZmU0ODc4ODY0NTM3NzQ2MjZiMjRiZDhjZmVjYzc3Yj"
-					+ "NmIn19fQ==";
+							+ "cmUvNWU3ODk5YjQ4MDY4NTg2OTdlMjgzZjA4NGQ5MTczZmU0ODc4ODY0NTM3NzQ2MjZiMjRiZDhjZmVjYzc3Yj"
+							+ "NmIn19fQ==";
 			name = "Deutsch";
-			break;
+		break;
 		}
 		ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName("§e" + name);
 		item.setItemMeta(meta);
-		item = new ItemBuilder(item).getUnsafe()
-				.setString("language", this.user.getLanguage().name())
-				.builder()
-				.build();
+		item = new ItemBuilder(
+						item).getUnsafe().setString("language", this.user.getLanguage().name()).builder().build();
 		SkullUtils.setSkullTextureId(item, textureId);
-		this.pageItems.put(IInventory.slot(4, 5), item);
-		this.pageItems.put(IInventory.slot(4, 7), this.user.isAnimations() ? Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItem(this.user)
-				: Item.INVENTORY_SETTINGS_ANIMATIONS_OFF.getItem(this.user));
+		this.fallbackItems.put(IInventory.slot(4, 5), item);
+		this.fallbackItems.put(IInventory.slot(4, 7), this.user.isAnimations()
+						? Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItem(this.user)
+						: Item.INVENTORY_SETTINGS_ANIMATIONS_OFF.getItem(this.user));
+		super.insertFallbackItems();
 //		if (user.isAnimations()) {
 //		InventorySettings.this.handle.setItem(33, Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItem(user));
 //	} else {

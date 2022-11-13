@@ -18,10 +18,22 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
 		this.complete();
 	}
 
-	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box, User user) {
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
+					User user) {
 		super(inventoryType, title, size, box, () -> !user.isAnimations());
 		this.user = user;
 		this.complete();
+	}
+
+	@Override
+	protected final void playSound() {
+		if (user.isSounds()) {
+			playSound0();
+		}
+	}
+
+	protected void playSound0() {
+		super.playSound();
 	}
 
 	protected void complete() {
@@ -33,7 +45,7 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
 	public User getUser() {
 		return this.user;
 	}
-	
+
 	protected boolean done() {
 		return this.done;
 	}

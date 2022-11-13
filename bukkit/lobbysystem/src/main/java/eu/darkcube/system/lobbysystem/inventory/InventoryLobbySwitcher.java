@@ -1,9 +1,6 @@
 package eu.darkcube.system.lobbysystem.inventory;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,7 +45,12 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 //	}
 //	
 	public InventoryLobbySwitcher(User user) {
-		super(InventoryLobbySwitcher.type_lobby_switcher, Item.INVENTORY_LOBBY_SWITCHER.getDisplayName(user), user);
+		super(InventoryLobbySwitcher.type_lobby_switcher,
+						Item.INVENTORY_LOBBY_SWITCHER.getDisplayName(user),
+						user);
+		for (int i = 0; i < SLOTS.length; i++) {
+			PAGE_SLOTS[i] = SLOTS[i];
+		}
 	}
 
 //	@Override
@@ -91,85 +93,65 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 		super.fillItems(items);
 		ServiceId service = Wrapper.getInstance().getServiceId();
 		String taskName = service.getTaskName();
-		List<ServiceInfoSnapshot> lobbies = CloudNetDriver.getInstance()
-				.getCloudServiceProvider()
-				.getCloudServices(taskName)
-				.stream()
-				.filter(ServiceInfoSnapshot::isConnected)
-				.filter(s -> s.getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false))
-				.sorted(new Comparator<ServiceInfoSnapshot>() {
+		List<ServiceInfoSnapshot> lobbies = CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(taskName).stream().filter(ServiceInfoSnapshot::isConnected).filter(s -> s.getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false)).sorted(new Comparator<ServiceInfoSnapshot>() {
 
-					@Override
-					public int compare(ServiceInfoSnapshot o1, ServiceInfoSnapshot o2) {
-						return Integer.compare(o1.getServiceId().getTaskServiceId(),
-								o2.getServiceId().getTaskServiceId());
-					}
+			@Override
+			public int compare(ServiceInfoSnapshot o1, ServiceInfoSnapshot o2) {
+				return Integer.compare(o1.getServiceId().getTaskServiceId(), o2.getServiceId().getTaskServiceId());
+			}
 
-				})
-				.collect(Collectors.toList());
+		}).collect(Collectors.toList());
 
 		if (lobbies == null || lobbies.isEmpty()) {
 			ItemStack item = new ItemStack(Material.BARRIER);
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("§cUnable to load lobbies!");
-			this.handle.setItem(InventoryLobbySwitcher.SLOTS[0], item);
+			items.put(0, item);
 			return;
 		}
 		final ServiceInfoSnapshot thisLobby = Wrapper.getInstance().getCurrentServiceInfoSnapshot();
 		final int lobbyCount = lobbies.size();
 
-		final Map<Integer, Map<Integer, ServiceInfoSnapshot>> slots = new HashMap<>();
-
-		final List<Integer> usedSlots = new ArrayList<>();
 		for (int i = 0; i < Math.min(InventoryLobbySwitcher.SLOTS.length, lobbyCount); i++) {
-			Map<Integer, ServiceInfoSnapshot> m = slots.get(InventoryLobbySwitcher.SORT[i]);
-			if (m == null) {
-				m = new HashMap<>();
-				slots.put(InventoryLobbySwitcher.SORT[i], m);
+			ServiceInfoSnapshot s = lobbies.get(i);
+			ItemStack item = Item.INVENTORY_LOBBY_SWITCHER_OTHER.getItem(this.user);
+			ItemMeta meta = item.getItemMeta();
+			String id = s.getServiceId().getName();
+			if (id.length() > 0) {
+				id = Character.toUpperCase(id.charAt(0))
+								+ id.substring(1, id.length()).replace("-", " ");
 			}
-			usedSlots.add(InventoryLobbySwitcher.SLOTS[i]);
-			m.put(InventoryLobbySwitcher.SLOTS[i], lobbies.get(i));
-		}
-		Collections.sort(usedSlots);
-
-//		final Map<Integer, Map<Integer, ItemStack>> slots1 = new HashMap<>();
-
-		int pointer = 0;
-		for (int slot : usedSlots) {
-			for (int count : slots.keySet()) {
-//				Map<Integer, ItemStack> map = slots1.get(count);
-//				if (map == null) {
-//					map = new HashMap<>();
-//					slots1.put(count, map);
-//				}
-				for (int oslot : slots.get(count).keySet()) {
-					if (oslot != slot) {
-						continue;
-					}
-					ServiceInfoSnapshot s = lobbies.get(pointer++);
-					ItemStack item = Item.INVENTORY_LOBBY_SWITCHER_OTHER.getItem(this.user);
-					ItemMeta meta = item.getItemMeta();
-					String id = s.getServiceId().getName();
-					if (id.length() > 0) {
-						id = Character.toUpperCase(id.charAt(0)) + id.substring(1, id.length()).replace("-", " ");
-					}
-					if (s.getServiceId().equals(thisLobby.getServiceId())) {
-						item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user);
-						meta.setDisplayName("§c" + id);
-					} else {
-						meta.setDisplayName("§a" + id);
-					}
-					item.setItemMeta(meta);
-					item = new ItemBuilder(item).getUnsafe()
-							.setString("server", s.getServiceId().getName())
-							.builder()
-							.build();
-					this.pageItems.put(slot, item);
-					this.updateSlots.add(slot);
-//					map.put(slot, item);
-				}
+			if (s.getServiceId().equals(thisLobby.getServiceId())) {
+				item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user);
+				meta.setDisplayName("§c" + id);
+			} else {
+				meta.setDisplayName("§a" + id);
 			}
+			item.setItemMeta(meta);
+			item = new ItemBuilder(
+							item).getUnsafe().setString("server", s.getServiceId().getName()).builder().build();
+			items.put(i, item);
 		}
+
+//		int pointer = 0;
+//		ServiceInfoSnapshot s = lobbies.get(pointer++);
+//		ItemStack item = Item.INVENTORY_LOBBY_SWITCHER_OTHER.getItem(this.user);
+//		ItemMeta meta = item.getItemMeta();
+//		String id = s.getServiceId().getName();
+//		if (id.length() > 0) {
+//			id = Character.toUpperCase(id.charAt(0))
+//							+ id.substring(1, id.length()).replace("-", " ");
+//		}
+//		if (s.getServiceId().equals(thisLobby.getServiceId())) {
+//			item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user);
+//			meta.setDisplayName("§c" + id);
+//		} else {
+//			meta.setDisplayName("§a" + id);
+//		}
+//		item.setItemMeta(meta);
+//		item = new ItemBuilder(
+//						item).getUnsafe().setString("server", s.getServiceId().getName()).builder().build();
+//		items.put(slot, item);
 	}
 
 //	private void animate(User user, boolean instant) {

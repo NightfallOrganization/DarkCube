@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -115,7 +116,8 @@ public class Lobby implements Enableable {
 
 		timer = new SimpleObservableInteger() {
 			@Override
-			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
+							Integer newValue) {
 				if (isEnabled()) {
 					if (newValue <= 1) {
 						Bukkit.getOnlinePlayers().forEach(p -> {
@@ -126,7 +128,8 @@ public class Lobby implements Enableable {
 						Main.getInstance().getIngame().enable();
 						return;
 					}
-					AtomicDouble exp = new AtomicDouble((float) newValue / (MAX_TIMER_SECONDS * 20F));
+					AtomicDouble exp = new AtomicDouble(
+									(float) newValue / (MAX_TIMER_SECONDS * 20F));
 					if (exp.get() > 1)
 						exp.set(0.9999);
 					Bukkit.getOnlinePlayers().forEach(p -> {
@@ -134,23 +137,26 @@ public class Lobby implements Enableable {
 						p.setExp((float) exp.get());
 					});
 					Main.getInstance().getUserWrapper().getUsers().forEach(user -> {
-						new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey())
-								.setSuffix(Integer.toString(newValue / 20));
+						new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey()).setSuffix(Integer.toString(newValue
+										/ 20));
 					});
 				}
 			}
 
 			@Override
-			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
+							Integer newValue) {
 			}
 		};
 		overrideTimer = new SimpleObservableInteger() {
 			@Override
-			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
+							Integer newValue) {
 			}
 
 			@Override
-			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
+							Integer newValue) {
 				timer.setObject(newValue);
 			}
 		};
@@ -236,30 +242,20 @@ public class Lobby implements Enableable {
 		}
 		MAX_PLAYER_COUNT = i;
 
-		Main.registerListeners(listenerItemTeams, listenerItemPerks, listenerItemVoting, listenerItemGadgets,
-				listenerItemParticles, listenerBlockBreak, listenerBlockPlace, listenerPlayerJoin, listenerPlayerQuit,
-				listenerPlayerDropItem, listenerEntityDamage, listenerInteractMenuBack, listenerPlayerLogin,
-				listenerItemSettings, listenerInteract);
+		Main.registerListeners(listenerItemTeams, listenerItemPerks, listenerItemVoting, listenerItemGadgets, listenerItemParticles, listenerBlockBreak, listenerBlockPlace, listenerPlayerJoin, listenerPlayerQuit, listenerPlayerDropItem, listenerEntityDamage, listenerInteractMenuBack, listenerPlayerLogin, listenerItemSettings, listenerInteract);
 		timerTask.runTaskTimer(1);
 		deathLineTask.runTaskTimer(20);
 	}
 
 	@Override
 	public void onDisable() {
-		Main.unregisterListeners(listenerItemTeams, listenerItemPerks, listenerItemVoting, listenerItemGadgets,
-				listenerItemParticles, listenerBlockBreak, listenerBlockPlace, listenerPlayerJoin, listenerPlayerQuit,
-				listenerPlayerDropItem, listenerEntityDamage, listenerInteractMenuBack, listenerPlayerLogin,
-				listenerItemSettings, listenerInteract);
+		Main.unregisterListeners(listenerItemTeams, listenerItemPerks, listenerItemVoting, listenerItemGadgets, listenerItemParticles, listenerBlockBreak, listenerBlockPlace, listenerPlayerJoin, listenerPlayerQuit, listenerPlayerDropItem, listenerEntityDamage, listenerInteractMenuBack, listenerPlayerLogin, listenerItemSettings, listenerInteract);
 		timerTask.cancel();
 		deathLineTask.cancel();
 	}
 
 	public void recalculateMap() {
-		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(
-				VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()),
-				Main.getInstance().getMapManager().getMaps().stream().filter(m -> m.isEnabled())
-						.collect(Collectors.toSet()),
-				Main.getInstance().getMap());
+		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()), Main.getInstance().getMapManager().getMaps().stream().filter(m -> m.isEnabled()).collect(Collectors.toSet()), Main.getInstance().getMap());
 		if (map != null)
 			if (!map.isEnabled())
 				map = null;
@@ -280,8 +276,7 @@ public class Lobby implements Enableable {
 		});
 		SCOREBOARD_MISSING_USERS.values().forEach(users -> users.add(user));
 		SCOREBOARD_MISSING_USERS.put(user, missing);
-		SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag())
-				.addPlayer(user.getPlayerName());
+		SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
 	}
 
 	public void setParticlesItem(User user, Player p) {
@@ -296,8 +291,7 @@ public class Lobby implements Enableable {
 	public void reloadUsers(User user) {
 		Scoreboard sb = SCOREBOARD_BY_USER.get(user);
 		for (User u : SCOREBOARD_MISSING_USERS.get(user)) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb
-					.getTeam(u.getTeam().getType().getScoreboardTag());
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(u.getTeam().getType().getScoreboardTag());
 			team.addPlayer(u.getPlayerName());
 		}
 	}
@@ -307,16 +301,20 @@ public class Lobby implements Enableable {
 //		Footer footer = new Footer(Main.getInstance().getConfig("config").getString(Config.TAB_FOOTER));
 		Header header = new Header(Main.tab_header);
 		Footer footer = new Footer(Main.tab_footer);
-		header.setMessage(header.getMessage().replace("%map%",
-				Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
-		footer.setMessage(footer.getMessage().replace("%map%",
-				Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
+		header.setMessage(header.getMessage().replace("%map%", Main.getInstance().getMap() == null
+						? "Unknown Map"
+						: Main.getInstance().getMap().getName()));
+		footer.setMessage(footer.getMessage().replace("%map%", Main.getInstance().getMap() == null
+						? "Unknown Map"
+						: Main.getInstance().getMap().getName()));
 		header.setMessage(header.getMessage().replace("%name%", Main.getInstance().name));
 		footer.setMessage(footer.getMessage().replace("%name%", Main.getInstance().name));
-		header.setMessage(header.getMessage().replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6"
-				+ Main.getInstance().tabprefix + " &8" + Characters.SHIFT_SHIFT_LEFT));
-		footer.setMessage(footer.getMessage().replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6"
-				+ Main.getInstance().tabprefix + " &8" + Characters.SHIFT_SHIFT_LEFT));
+		header.setMessage(header.getMessage().replace("%prefix%", "&8"
+						+ Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix
+						+ " &8" + Characters.SHIFT_SHIFT_LEFT));
+		footer.setMessage(footer.getMessage().replace("%prefix%", "&8"
+						+ Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix
+						+ " &8" + Characters.SHIFT_SHIFT_LEFT));
 		header.setMessage(header.getMessage().replace("%server%", Bukkit.getServerName()));
 		footer.setMessage(footer.getMessage().replace("%server%", Bukkit.getServerName()));
 		header.setMessage(ChatColor.translateAlternateColorCodes('&', header.getMessage()).replace("\\n", "\n"));
@@ -338,9 +336,15 @@ public class Lobby implements Enableable {
 
 	public Location getSpawn() {
 		if (spawn == null)
-			spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"),
-					Locations.DEFAULT_LOCATION);
+			spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"), Locations.DEFAULT_LOCATION);
 		return spawn.clone();
+	}
+
+	public void setSpawn(Location spawn) {
+		this.spawn = spawn;
+		YamlConfiguration cfg = Main.getInstance().getConfig("spawns");
+		cfg.set("lobby", Locations.serialize(spawn));
+		Main.getInstance().saveConfig(cfg);
 	}
 
 	public Map<User, Scoreboard> getScoreboardByUser() {

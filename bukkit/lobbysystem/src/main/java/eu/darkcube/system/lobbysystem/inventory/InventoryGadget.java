@@ -17,7 +17,7 @@ public class InventoryGadget extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_COMPASS.getItem(this.user));
+		this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_GADGET.getItem(this.user));
 		this.fallbackItems.put(IInventory.slot(4, 4), Item.GADGET_HOOK_ARROW.getItem(this.user));
 		this.fallbackItems.put(IInventory.slot(4, 6), Item.GADGET_GRAPPLING_HOOK.getItem(this.user));
 		super.insertFallbackItems();
