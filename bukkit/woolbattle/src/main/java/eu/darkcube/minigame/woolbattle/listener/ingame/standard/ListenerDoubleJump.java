@@ -39,8 +39,8 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 		}
 		if (e.isFlying())
 			e.setCancelled(true);
-		if (refresh(p) && e.isFlying()) {
-			cooldown.get(p).setObject(COOLDOWN);
+		if (this.refresh(p) && e.isFlying()) {
+			this.cooldown.get(p).setObject(ListenerDoubleJump.COOLDOWN);
 			Vector velo = p.getLocation().getDirection();
 			velo.setY(0).normalize().multiply(0.1);
 //			velo.multiply(0.1);
@@ -48,21 +48,21 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 			if (user.getPassivePerk().getPerkName().equals(PerkType.ROCKETJUMP.getPerkName()))
 				heightMult = 1.45;
 			if(user.getPassivePerk().getPerkName().equals(PerkType.LONGJUMP.getPerkName()))
-				velo.multiply(0.3);
+				velo.multiply(5);
 			velo.setY(1.05 * heightMult);
 			p.setAllowFlight(false);
 			p.setVelocity(velo);
 			ItemManager.removeItems(user, p.getInventory(),
-					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()), COST);
+					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()), ListenerDoubleJump.COST);
 			new Scheduler() {
 				@Override
 				public void run() {
-					if (cooldown.get(p).getObject() == 0) {
+					if (ListenerDoubleJump.this.cooldown.get(p).getObject() == 0) {
 						p.setAllowFlight(true);
 						this.cancel();
 						return;
 					}
-					cooldown.get(p).setObject(cooldown.get(p).getObject() - 1);
+					ListenerDoubleJump.this.cooldown.get(p).setObject(ListenerDoubleJump.this.cooldown.get(p).getObject() - 1);
 				}
 			}.runTaskTimer(0, 1);
 		}
@@ -78,8 +78,8 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 			return false;
 		}
 
-		if (!cooldown.containsKey(p)) {
-			cooldown.put(p, new SimpleObservableInteger(0) {
+		if (!this.cooldown.containsKey(p)) {
+			this.cooldown.put(p, new SimpleObservableInteger(0) {
 				@Override
 				public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 					p.setFoodLevel(
@@ -92,8 +92,8 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 			});
 		}
 		if (p.getGameMode() == GameMode.SURVIVAL) {
-			ObservableInteger cdi = cooldown.get(p);
-			if (ItemManager.countItems(Material.WOOL, p.getInventory()) >= COST && cdi.getObject() == 0) {
+			ObservableInteger cdi = this.cooldown.get(p);
+			if (ItemManager.countItems(Material.WOOL, p.getInventory()) >= ListenerDoubleJump.COST && cdi.getObject() == 0) {
 				if (!p.getAllowFlight()) {
 					p.setAllowFlight(true);
 				}
