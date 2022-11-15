@@ -35,7 +35,7 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 				String itemid = ItemManager.getItemId(item);
 				if (itemid.equals(ItemManager.getItemId(Item.LOBBY_VOTING))) {
 					e.setCancelled(true);
-					openInventory(p, user);
+					this.openInventory(p, user);
 					return;
 				}
 				if (user.getOpenInventory() != null) {
@@ -62,10 +62,10 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 							e.setCancelled(true);
 							if (vote) {
 								p.sendMessage(Message.VOTED_FOR_EP_GLITCH.getMessage(user));
-								openEnderpearlGlitchInventory(p, user);
+								this.openEnderpearlGlitchInventory(p, user);
 							} else {
 								p.sendMessage(Message.VOTED_AGAINST_EP_GLITCH.getMessage(user));
-								openEnderpearlGlitchInventory(p, user);
+								this.openEnderpearlGlitchInventory(p, user);
 							}
 						}
 						break;
@@ -85,7 +85,7 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 						Main.getInstance().getLobby().VOTES_MAP.put(user, vote1);
 						Main.getInstance().getLobby().recalculateMap();
 						p.sendMessage(Message.VOTED_FOR_MAP.getMessage(user, map.getName()));
-						openMapsInventory(p, user);
+						this.openMapsInventory(p, user);
 						break;
 					case VOTING_LIFES:
 						if (!itemid.equals("lifes"))
@@ -93,18 +93,18 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 						e.setCancelled(true);
 						int lifes = ItemManager.getLifes(item);
 						p.chat("/votelifes " + lifes);
-						openLifesInventory(p, user);
+						this.openLifesInventory(p, user);
 						break;
 					case VOTING:
 						if (itemid.equals(ItemManager.getItemId(Item.LOBBY_VOTING_EP_GLITCH))) {
 							e.setCancelled(true);
-							openEnderpearlGlitchInventory(p, user);
+							this.openEnderpearlGlitchInventory(p, user);
 						} else if (itemid.equals(ItemManager.getItemId(Item.LOBBY_VOTING_MAPS))) {
 							e.setCancelled(true);
-							openMapsInventory(p, user);
+							this.openMapsInventory(p, user);
 						} else if (itemid.equals(ItemManager.getItemId(Item.LOBBY_VOTING_LIFES))) {
 							e.setCancelled(true);
-							openLifesInventory(p, user);
+							this.openLifesInventory(p, user);
 						}
 						break;
 					default:
@@ -115,8 +115,9 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 		} catch (
 
 		NullPointerException ex) {
-			Main.getInstance().sendConsole(
-					"§cThe Item " + e.getItem().getItemMeta().getDisplayName() + " is not correctly set up");
+			Main.getInstance()
+					.sendConsole(
+							"§cThe Item " + e.getItem().getItemMeta().getDisplayName() + " is not correctly set up");
 			ex.printStackTrace();
 		}
 	}
@@ -129,10 +130,10 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 //			ItemBuilder bu = getLifesBuilder(user, array[i + 1]);
 //			b.setItem(array[i], bu.build());
 //		}
-		b.setItem(1, getLifesBuilder(user, 3).build());
-		b.setItem(3, getLifesBuilder(user, 10).build());
-		b.setItem(5, getLifesBuilder(user, 20).build());
-		b.setItem(7, getLifesBuilder(user, 30).build());
+		b.setItem(1, this.getLifesBuilder(user, 3).build());
+		b.setItem(3, this.getLifesBuilder(user, 10).build());
+		b.setItem(5, this.getLifesBuilder(user, 20).build());
+		b.setItem(7, this.getLifesBuilder(user, 30).build());
 		p.openInventory(b.build());
 		user.setOpenInventory(InventoryId.VOTING_LIFES);
 	}
@@ -156,7 +157,11 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 
 	public void openMapsInventory(Player p, User user) {
 		InventoryBuilder b = new InventoryBuilder(Message.INVENTORY_VOTING_MAPS.getMessage(user));
-		List<Map> maps = Main.getInstance().getMapManager().getMaps().stream().filter(m -> m.isEnabled())
+		List<Map> maps = Main.getInstance()
+				.getMapManager()
+				.getMaps()
+				.stream()
+				.filter(m -> m.isEnabled())
 				.collect(Collectors.toList());
 		b.size(maps.size());
 		Vote<Map> vote = Main.getInstance().getLobby().VOTES_MAP.get(user);
@@ -185,15 +190,19 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 				b2.glow();
 			}
 		p.openInventory(new InventoryBuilder(Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user)).size(9)
-				.setItem(3, b1.build()).setItem(5, b2.build()).build());
+				.setItem(3, b1.build())
+				.setItem(5, b2.build())
+				.build());
 		user.setOpenInventory(InventoryId.VOTING_EP_GLITCH);
 	}
 
 	public void openInventory(Player p, User user) {
 		InventoryBuilder b = new InventoryBuilder(Message.INVENTORY_VOTING.getMessage(user)).size(9);
-		b.setItem(2, Item.LOBBY_VOTING_EP_GLITCH.getItem(user)).setItem(6, Item.LOBBY_VOTING_MAPS.getItem(user))
+		b.setItem(2, Item.LOBBY_VOTING_EP_GLITCH.getItem(user))
+				.setItem(6, Item.LOBBY_VOTING_MAPS.getItem(user))
 				.setItem(4, Item.LOBBY_VOTING_LIFES.getItem(user));
 		p.openInventory(b.build());
 		user.setOpenInventory(InventoryId.VOTING);
 	}
+
 }

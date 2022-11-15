@@ -90,35 +90,35 @@ public class Lobby implements Enableable {
 	private Location spawn;
 
 	public Lobby() {
-		SCOREBOARD_BY_USER = new HashMap<>();
-		SCOREBOARD_MISSING_USERS = new HashMap<>();
+		this.SCOREBOARD_BY_USER = new HashMap<>();
+		this.SCOREBOARD_MISSING_USERS = new HashMap<>();
 
-		listenerPlayerDropItem = new ListenerPlayerDropItem();
-		listenerEntityDamage = new ListenerEntityDamage();
-		listenerBlockBreak = new ListenerBlockBreak();
-		listenerBlockPlace = new ListenerBlockPlace();
-		listenerPlayerJoin = new ListenerPlayerJoin();
-		listenerPlayerQuit = new ListenerPlayerQuit();
-		listenerPlayerLogin = new ListenerPlayerLogin();
-		listenerInteract = new ListenerInteract();
+		this.listenerPlayerDropItem = new ListenerPlayerDropItem();
+		this.listenerEntityDamage = new ListenerEntityDamage();
+		this.listenerBlockBreak = new ListenerBlockBreak();
+		this.listenerBlockPlace = new ListenerBlockPlace();
+		this.listenerPlayerJoin = new ListenerPlayerJoin();
+		this.listenerPlayerQuit = new ListenerPlayerQuit();
+		this.listenerPlayerLogin = new ListenerPlayerLogin();
+		this.listenerInteract = new ListenerInteract();
 
-		listenerItemParticles = new ListenerItemParticles();
-		listenerItemSettings = new ListenerItemSettings();
-		listenerItemGadgets = new ListenerItemGadgets();
-		listenerItemVoting = new ListenerItemVoting();
-		listenerItemTeams = new ListenerItemTeams();
-		listenerItemPerks = new ListenerItemPerks();
+		this.listenerItemParticles = new ListenerItemParticles();
+		this.listenerItemSettings = new ListenerItemSettings();
+		this.listenerItemGadgets = new ListenerItemGadgets();
+		this.listenerItemVoting = new ListenerItemVoting();
+		this.listenerItemTeams = new ListenerItemTeams();
+		this.listenerItemPerks = new ListenerItemPerks();
 
-		listenerInteractMenuBack = new ListenerInteractMenuBack();
+		this.listenerInteractMenuBack = new ListenerInteractMenuBack();
 
-		VOTES_MAP = new HashMap<>();
-		VOTES_EP_GLITCH = new HashMap<>();
+		this.VOTES_MAP = new HashMap<>();
+		this.VOTES_EP_GLITCH = new HashMap<>();
 
-		timer = new SimpleObservableInteger() {
+		this.timer = new SimpleObservableInteger() {
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
 							Integer newValue) {
-				if (isEnabled()) {
+				if (Lobby.this.isEnabled()) {
 					if (newValue <= 1) {
 						Bukkit.getOnlinePlayers().forEach(p -> {
 							p.setLevel(0);
@@ -129,7 +129,7 @@ public class Lobby implements Enableable {
 						return;
 					}
 					AtomicDouble exp = new AtomicDouble(
-									(float) newValue / (MAX_TIMER_SECONDS * 20F));
+									(float) newValue / (Lobby.this.MAX_TIMER_SECONDS * 20F));
 					if (exp.get() > 1)
 						exp.set(0.9999);
 					Bukkit.getOnlinePlayers().forEach(p -> {
@@ -148,7 +148,7 @@ public class Lobby implements Enableable {
 							Integer newValue) {
 			}
 		};
-		overrideTimer = new SimpleObservableInteger() {
+		this.overrideTimer = new SimpleObservableInteger() {
 			@Override
 			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
 							Integer newValue) {
@@ -157,46 +157,46 @@ public class Lobby implements Enableable {
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
 							Integer newValue) {
-				timer.setObject(newValue);
+				Lobby.this.timer.setObject(newValue);
 			}
 		};
-		overrideTimer.setSilent(0);
-		timer.setSilent(MAX_TIMER_SECONDS * 20);
+		this.overrideTimer.setSilent(0);
+		this.timer.setSilent(this.MAX_TIMER_SECONDS * 20);
 
-		deathLineTask = new Scheduler() {
+		this.deathLineTask = new Scheduler() {
 
 			@Override
 			public void run() {
 				Bukkit.getOnlinePlayers().forEach(p -> {
-					if (p.getLocation().getBlockY() < deathline) {
-						p.teleport(getSpawn());
+					if (p.getLocation().getBlockY() < Lobby.this.deathline) {
+						p.teleport(Lobby.this.getSpawn());
 					}
 				});
 			}
 		};
 
-		timerTask = new Scheduler() {
+		this.timerTask = new Scheduler() {
 			private boolean announced = false;
 
 			@Override
 			public void run() {
-				if (MAX_PLAYER_COUNT == 0 && !announced) {
-					announced = true;
+				if (Lobby.this.MAX_PLAYER_COUNT == 0 && !this.announced) {
+					this.announced = true;
 					Main.getInstance().sendConsole("It does not seem that any teams have been set up");
-				} else if (MAX_PLAYER_COUNT != 0) {
+				} else if (Lobby.this.MAX_PLAYER_COUNT != 0) {
 					final int online = Bukkit.getOnlinePlayers().size();
-					if (online >= MIN_PLAYER_COUNT) {
-						if (overrideTimer.getObject() != 0) {
-							overrideTimer.setObject(overrideTimer.getObject() - 1);
+					if (online >= Lobby.this.MIN_PLAYER_COUNT) {
+						if (Lobby.this.overrideTimer.getObject() != 0) {
+							Lobby.this.overrideTimer.setObject(Lobby.this.overrideTimer.getObject() - 1);
 						} else {
-							if (online == MAX_PLAYER_COUNT && timer.getObject() > 200) {
-								setTimer(200);
+							if (online == Lobby.this.MAX_PLAYER_COUNT && Lobby.this.timer.getObject() > 200) {
+								Lobby.this.setTimer(200);
 							}
-							timer.setObject(timer.getObject() - 1);
+							Lobby.this.timer.setObject(Lobby.this.timer.getObject() - 1);
 						}
-					} else if (getTimer() != MAX_TIMER_SECONDS * 20) {
-						overrideTimer.setSilent(0);
-						timer.setObject(MAX_TIMER_SECONDS * 20);
+					} else if (Lobby.this.getTimer() != Lobby.this.MAX_TIMER_SECONDS * 20) {
+						Lobby.this.overrideTimer.setSilent(0);
+						Lobby.this.timer.setObject(Lobby.this.MAX_TIMER_SECONDS * 20);
 					}
 //					if (Bukkit.getOnlinePlayers().size() >= MIN_PLAYER_COUNT) {
 //						if (Bukkit.getOnlinePlayers().size() == MAX_PLAYER_COUNT && getTimer() > 200) {
@@ -218,44 +218,44 @@ public class Lobby implements Enableable {
 		Main.getInstance().reloadConfig("config");
 		Main.getInstance().baseLifes = null;
 		Main.getInstance().getSchedulers().clear();
-		setTimer(60 * 20);
-		VOTES_LIFES.clear();
-		VOTES_MAP.clear();
-		VOTES_EP_GLITCH.clear();
-		SCOREBOARD_BY_USER.clear();
-		SCOREBOARD_MISSING_USERS.clear();
-		Main.getInstance().getUserWrapper().getUsers().forEach(u -> SCOREBOARD_MISSING_USERS.put(u, new HashSet<>()));
+		this.setTimer(60 * 20);
+		this.VOTES_LIFES.clear();
+		this.VOTES_MAP.clear();
+		this.VOTES_EP_GLITCH.clear();
+		this.SCOREBOARD_BY_USER.clear();
+		this.SCOREBOARD_MISSING_USERS.clear();
+		Main.getInstance().getUserWrapper().getUsers().forEach(u -> this.SCOREBOARD_MISSING_USERS.put(u, new HashSet<>()));
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			p.closeInventory();
-			listenerPlayerJoin.handle(new PlayerJoinEvent(p, null));
-			setTimer(getTimer() < 300 ? 300 : getTimer());
-			p.teleport(getSpawn());
+			this.listenerPlayerJoin.handle(new PlayerJoinEvent(p, null));
+			this.setTimer(this.getTimer() < 300 ? 300 : this.getTimer());
+			p.teleport(this.getSpawn());
 		});
-		Main.getInstance().getUserWrapper().getUsers().forEach(u -> reloadUsers(u));
-		MIN_PLAYER_COUNT = Main.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
-		deathline = Main.getInstance().getConfig("spawns").getInt("lobbydeathline");
+		Main.getInstance().getUserWrapper().getUsers().forEach(u -> this.reloadUsers(u));
+		this.MIN_PLAYER_COUNT = Main.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+		this.deathline = Main.getInstance().getConfig("spawns").getInt("lobbydeathline");
 
 		int i = 0;
 		for (Team team : Main.getInstance().getTeamManager().getTeams()) {
 			if (team.getType().isEnabled())
 				i += team.getType().getMaxPlayers();
 		}
-		MAX_PLAYER_COUNT = i;
+		this.MAX_PLAYER_COUNT = i;
 
-		Main.registerListeners(listenerItemTeams, listenerItemPerks, listenerItemVoting, listenerItemGadgets, listenerItemParticles, listenerBlockBreak, listenerBlockPlace, listenerPlayerJoin, listenerPlayerQuit, listenerPlayerDropItem, listenerEntityDamage, listenerInteractMenuBack, listenerPlayerLogin, listenerItemSettings, listenerInteract);
-		timerTask.runTaskTimer(1);
-		deathLineTask.runTaskTimer(20);
+		Main.registerListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting, this.listenerItemGadgets, this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage, this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings, this.listenerInteract);
+		this.timerTask.runTaskTimer(1);
+		this.deathLineTask.runTaskTimer(20);
 	}
 
 	@Override
 	public void onDisable() {
-		Main.unregisterListeners(listenerItemTeams, listenerItemPerks, listenerItemVoting, listenerItemGadgets, listenerItemParticles, listenerBlockBreak, listenerBlockPlace, listenerPlayerJoin, listenerPlayerQuit, listenerPlayerDropItem, listenerEntityDamage, listenerInteractMenuBack, listenerPlayerLogin, listenerItemSettings, listenerInteract);
-		timerTask.cancel();
-		deathLineTask.cancel();
+		Main.unregisterListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting, this.listenerItemGadgets, this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage, this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings, this.listenerInteract);
+		this.timerTask.cancel();
+		this.deathLineTask.cancel();
 	}
 
 	public void recalculateMap() {
-		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()), Main.getInstance().getMapManager().getMaps().stream().filter(m -> m.isEnabled()).collect(Collectors.toSet()), Main.getInstance().getMap());
+		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()), Main.getInstance().getMapManager().getMaps().stream().filter(m -> m.isEnabled()).collect(Collectors.toSet()), Main.getInstance().getMap());
 		if (map != null)
 			if (!map.isEnabled())
 				map = null;
@@ -263,7 +263,7 @@ public class Lobby implements Enableable {
 	}
 
 	public void recalculateEpGlitch() {
-		boolean glitch = Vote.calculateWinner(VOTES_EP_GLITCH.values(), Arrays.asList(true, false), true);
+		boolean glitch = Vote.calculateWinner(this.VOTES_EP_GLITCH.values(), Arrays.asList(true, false), false);
 		Main.getInstance().setEpGlitch(glitch);
 	}
 
@@ -274,9 +274,9 @@ public class Lobby implements Enableable {
 				missing.add(Main.getInstance().getUserWrapper().getUser(p.getUniqueId()));
 			}
 		});
-		SCOREBOARD_MISSING_USERS.values().forEach(users -> users.add(user));
-		SCOREBOARD_MISSING_USERS.put(user, missing);
-		SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
+		this.SCOREBOARD_MISSING_USERS.values().forEach(users -> users.add(user));
+		this.SCOREBOARD_MISSING_USERS.put(user, missing);
+		this.SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
 	}
 
 	public void setParticlesItem(User user, Player p) {
@@ -289,8 +289,8 @@ public class Lobby implements Enableable {
 	}
 
 	public void reloadUsers(User user) {
-		Scoreboard sb = SCOREBOARD_BY_USER.get(user);
-		for (User u : SCOREBOARD_MISSING_USERS.get(user)) {
+		Scoreboard sb = this.SCOREBOARD_BY_USER.get(user);
+		for (User u : this.SCOREBOARD_MISSING_USERS.get(user)) {
 			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(u.getTeam().getType().getScoreboardTag());
 			team.addPlayer(u.getPlayerName());
 		}
@@ -323,21 +323,21 @@ public class Lobby implements Enableable {
 	}
 
 	public void setTimer(int ticks) {
-		timer.setObject(ticks);
+		this.timer.setObject(ticks);
 	}
 
 	public void setOverrideTimer(int ticks) {
-		overrideTimer.setObject(ticks);
+		this.overrideTimer.setObject(ticks);
 	}
 
 	public int getTimer() {
-		return timer.getObject();
+		return this.timer.getObject();
 	}
 
 	public Location getSpawn() {
-		if (spawn == null)
-			spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"), Locations.DEFAULT_LOCATION);
-		return spawn.clone();
+		if (this.spawn == null)
+			this.spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"), Locations.DEFAULT_LOCATION);
+		return this.spawn.clone();
 	}
 
 	public void setSpawn(Location spawn) {
@@ -348,6 +348,6 @@ public class Lobby implements Enableable {
 	}
 
 	public Map<User, Scoreboard> getScoreboardByUser() {
-		return SCOREBOARD_BY_USER;
+		return this.SCOREBOARD_BY_USER;
 	}
 }
