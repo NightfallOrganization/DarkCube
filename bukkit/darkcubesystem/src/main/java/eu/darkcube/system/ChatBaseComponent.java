@@ -26,7 +26,9 @@ public class ChatBaseComponent {
 
 	private Consumer<Object> consumer = con -> {
 //		con.sendPacket(new PacketPlayOutChat(component, (byte) 0));
-		ReflectionUtils.instantiateObject(ChatBaseComponent.C_PACKETPLAYOUTCHAT, this.component, (byte) 0);
+		Object packet = ReflectionUtils.instantiateObject(ChatBaseComponent.C_PACKETPLAYOUTCHAT, this.component,
+				(byte) 0);
+		Plugin.sendPacket(con, packet);
 //		Plugin.sendPacket(con, newInstance(ChatBaseComponent.C_PACKETPLAYOUTCHAT, this.component, (byte) 0));
 	};
 

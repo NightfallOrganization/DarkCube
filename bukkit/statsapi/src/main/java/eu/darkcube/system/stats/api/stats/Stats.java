@@ -17,7 +17,9 @@ import eu.darkcube.system.stats.api.user.User;
 public abstract class Stats {
 
 	private final Duration duration;
+
 	private final GameMode gamemode;
+
 	private final User owner;
 
 	public Stats(User owner, Duration duration, GameMode gamemode) {
@@ -27,38 +29,39 @@ public abstract class Stats {
 	}
 
 	public GameMode getGamemode() {
-		return gamemode;
+		return this.gamemode;
 	}
 
 	public Duration getDuration() {
-		return duration;
+		return this.duration;
 	}
 
 	public User getOwner() {
-		return owner;
+		return this.owner;
 	}
 
 	public final List<ChatEntry> format() {
 		List<ChatEntry> list = new ArrayList<>();
 //		StringBuilder builder = new StringBuilder();
-		list.addAll(Arrays.asList(new Builder().text("§7» §5Wool§dBattle\n §7Statistiken von §a" + owner.getName()).build()));
+		list.addAll(Arrays.asList(
+				new Builder().text("§7» §5Wool§dBattle\n §7Statistiken von §a" + this.owner.getName() + "\n").build()));
 //		builder.append("&7» &5Wool&dBattle &7Statistiken von \n&a").append(getOwner().getName()).append("&7 (")
 //				.append(getDuration().format()).append("&7)\n");
-		insertBreakLine(list);
-		insertFormats(list);
-		insertBreakLine(list);
+		this.insertBreakLine(list);
+		this.insertFormats(list);
+		this.insertBreakLine(list);
 
 		return list;
 	}
-	
+
 	public final ChatBaseComponent formatComponent() {
-		return ChatEntry.buildArray(format().toArray(new ChatEntry[0]));
+		return ChatEntry.buildArray(this.format().toArray(new ChatEntry[0]));
 	}
 
 	protected abstract void insertFormats(List<ChatEntry> list);
 
 	protected final void insertBreakLine(List<ChatEntry> list) {
-		list.addAll(Arrays.asList(new ChatEntry.Builder().text("§8------------------------").build()));
+		list.addAll(Arrays.asList(new ChatEntry.Builder().text("§8------------------------\n").build()));
 	}
 
 	public static final String format(String key, String user, long placement) {
