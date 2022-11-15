@@ -33,7 +33,7 @@ public class ListenerBoosterInteract extends Listener<PlayerInteractEvent> {
 				return;
 			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			Perk perk = user.getPerkByItemId(ItemManager.getItemId(item));
-			if (BOOSTER_COOLDOWN.getItemId().equals(ItemManager.getItemId(item))) {
+			if (ListenerBoosterInteract.BOOSTER_COOLDOWN.getItemId().equals(ItemManager.getItemId(item))) {
 				Ingame.playSoundNotEnoughWool(user);
 				new Scheduler() {
 					@Override
@@ -43,7 +43,7 @@ public class ListenerBoosterInteract extends Listener<PlayerInteractEvent> {
 				}.runTask();
 				e.setCancelled(true);
 				return;
-			} else if (!BOOSTER.getItemId().equals(ItemManager.getItemId(item))) {
+			} else if (!ListenerBoosterInteract.BOOSTER.getItemId().equals(ItemManager.getItemId(item))) {
 				return;
 			} else if (perk == null) {
 				e.setCancelled(true);
@@ -74,12 +74,12 @@ public class ListenerBoosterInteract extends Listener<PlayerInteractEvent> {
 
 				@Override
 				public void run() {
-					if (cd <= 1) {
+					if (this.cd <= 1) {
 						this.cancel();
 						perk.setCooldown(0);
 						return;
 					}
-					perk.setCooldown(--cd);
+					perk.setCooldown(--this.cd);
 				}
 			}.runTaskTimer(20);
 		}

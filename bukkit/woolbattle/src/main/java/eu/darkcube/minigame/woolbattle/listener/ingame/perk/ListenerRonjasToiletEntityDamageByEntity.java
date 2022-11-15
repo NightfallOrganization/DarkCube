@@ -29,8 +29,5 @@ public class ListenerRonjasToiletEntityDamageByEntity extends Listener<EntityDam
 			target.setLastHit(user);
 			target.setTicksAfterLastHit(0);
 		}
-//		Main.getInstance().getUserWrapper().getUser(t.getUniqueId())
-//				.setLastHit(Main.getInstance().getUserWrapper().getUser(p.getUniqueId()));
-//		Main.getInstance().getUserWrapper().getUser(t.getUniqueId()).setTicksAfterLastHit(0);
 	}
 }

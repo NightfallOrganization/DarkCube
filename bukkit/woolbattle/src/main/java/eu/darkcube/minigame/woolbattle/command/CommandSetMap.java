@@ -35,8 +35,8 @@ public class CommandSetMap extends Command {
 				return true;
 			}
 			sender.sendMessage("§aNeue Map: §5" + map.getName());
+			Main.getInstance().baseMap = map;
 			if (Main.getInstance().getLobby().isEnabled()) {
-				Main.getInstance().baseMap = map;
 				Main.getInstance().getUserWrapper().getUsers().forEach(p -> {
 					Main.getInstance().setMap(p);
 				});
