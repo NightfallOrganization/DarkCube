@@ -47,8 +47,10 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 			double heightMult = 1;
 			if (user.getPassivePerk().getPerkName().equals(PerkType.ROCKETJUMP.getPerkName()))
 				heightMult = 1.45;
-			if(user.getPassivePerk().getPerkName().equals(PerkType.LONGJUMP.getPerkName()))
+			if(user.getPassivePerk().getPerkName().equals(PerkType.LONGJUMP.getPerkName())){
 				velo.multiply(5);
+				heightMult = 1.15;
+			}
 			velo.setY(1.05 * heightMult);
 			p.setAllowFlight(false);
 			p.setVelocity(velo);
