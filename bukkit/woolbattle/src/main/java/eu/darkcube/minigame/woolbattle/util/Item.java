@@ -57,6 +57,8 @@ public enum Item {
 
 //	PERK_BACKPACK(item(CHEST).addLore()),
 
+	PERK_LONGJUMP(item(RABBIT_FOOT).addLore()),
+
 	PERK_ROCKETJUMP(item(DIAMOND_BOOTS).addLore()),
 
 	PERK_ARROW_RAIN(item(DISPENSER).addLore()),
@@ -135,7 +137,9 @@ public enum Item {
 	LOBBY_PARTICLES_OFF(item(BLAZE_ROD).addLore()),
 
 	HEIGHT_DISPLAY_ON(item(STAINED_CLAY).setDurability(5).addLore()),
-	HEIGHT_DISPLAY_OFF(item(STAINED_CLAY).setDurability(14).addLore()),  
+	HEIGHT_DISPLAY_OFF(item(STAINED_CLAY).setDurability(14).addLore()),
+
+
 
 	;
 

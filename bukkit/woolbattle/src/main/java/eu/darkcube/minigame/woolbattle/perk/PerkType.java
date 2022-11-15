@@ -57,6 +57,7 @@ public enum PerkType implements Comparable<PerkType> {
 //	BACKPACK(Item.PERK_BACKPACK, Item.PERK_BACKPACK, 0, PerkName.BACKPACK, true,
 //					0),
 
+	LONGJUMP(Item.PERK_LONGJUMP, Item.PERK_LONGJUMP, 0, PerkName.LONGJUMP, true, 0),
 	ROCKETJUMP(Item.PERK_ROCKETJUMP, Item.PERK_ROCKETJUMP, 0,
 					PerkName.ROCKETJUMP, true, 0),
 
