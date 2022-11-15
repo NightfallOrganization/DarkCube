@@ -29,26 +29,37 @@ public class ListenerRonjasToiletHit extends Listener<ProjectileHitEvent> {
 			if (!egg.hasMetadata("perk")) {
 				return;
 			}
-			if (!egg.getMetadata("perk").get(0).asString()
+			if (!egg.getMetadata("perk")
+					.get(0)
+					.asString()
 					.equals(PerkType.RONJAS_TOILET_SPLASH.getPerkName().getName())) {
 				return;
 			}
 			ParticleEffect.DRIP_WATER.display(.3F, 1F, .3F, 1, 250, egg.getLocation(), 50);
 
 			if (egg.getTicksLived() <= 3) {
-				Main.getInstance().getUserWrapper().getUsers().stream()
+				Main.getInstance()
+						.getUserWrapper()
+						.getUsers()
+						.stream()
 						.filter(u -> u.getTeam().getType() != TeamType.SPECTATOR)
-						.filter(u -> u.getBukkitEntity().getLocation().distance(egg.getLocation()) < RANGE)
-						.map(User::getBukkitEntity).forEach(t -> {
+						.filter(u -> u.getBukkitEntity().getLocation().distance(egg.getLocation()) < ListenerRonjasToiletHit.RANGE)
+						.map(User::getBukkitEntity)
+						.forEach(t -> {
 							Vector v = egg.getVelocity().multiply(1.3);
 							v.setY(egg.getVelocity().getY()).normalize().multiply(3).setY(v.getY() + 1.2);
 							t.setVelocity(v);
 						});
 			} else {
-				Main.getInstance().getUserWrapper().getUsers().stream()
+				Main.getInstance()
+						.getUserWrapper()
+						.getUsers()
+						.stream()
 						.filter(u -> u.getTeam().getType() != TeamType.SPECTATOR)
-						.filter(u -> u.getBukkitEntity().getLocation().distance(egg.getLocation()) < RANGE + 1)
-						.map(User::getBukkitEntity).forEach(t -> {
+						.filter(u -> u.getBukkitEntity().getWorld().equals(egg.getWorld()))
+						.filter(u -> u.getBukkitEntity().getLocation().distance(egg.getLocation()) < ListenerRonjasToiletHit.RANGE + 1)
+						.map(User::getBukkitEntity)
+						.forEach(t -> {
 							double x = t.getLocation().getX() - egg.getLocation().getX();
 							double y = t.getLocation().getY() - egg.getLocation().getY();
 							double z = t.getLocation().getZ() - egg.getLocation().getZ();
@@ -57,4 +68,5 @@ public class ListenerRonjasToiletHit extends Listener<ProjectileHitEvent> {
 			}
 		}
 	}
+
 }
