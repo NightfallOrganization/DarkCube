@@ -16,7 +16,8 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 public abstract class PerkListener implements Listener {
 
 	// to add a new Perk you need to add perktype, lore for the perk, perk item,
-	// perk item lore, and thenn add the effect
+	// perk item lore, and then add the effect
+	//lastly register unregister your listener in game.ingame.java
 	/**
 	 * @param user
 	 * @param perk

@@ -174,6 +174,8 @@ public class Ingame extends GamePhase {
 
 	public final ListenerRopeInteract listenerRopeInteract;
 
+	public final ListenerSlimeJump listenerSlimeJump;
+
 	public final Scheduler schedulerResetWool;
 
 	public final Scheduler schedulerResetSpawnProtetion;
@@ -244,6 +246,7 @@ public class Ingame extends GamePhase {
 		this.listenerBoosterInteract = new ListenerBoosterInteract();
 		this.listenerGrapplingHookFishing = new ListenerGrapplingHookFishing();
 		this.listenerRopeInteract = new ListenerRopeInteract();
+		this.listenerSlimeJump = new ListenerSlimeJump();
 
 		this.schedulerParticles = new Scheduler() {
 
@@ -431,7 +434,7 @@ public class Ingame extends GamePhase {
 				this.listenerRonjasToiletLaunch, this.listenerBlinkInteract, this.listenerWallGeneratorInteract,
 				this.listenerGrandpasClockInteract, this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity,
 				this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract,
-				this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract);
+				this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract,this.listenerSlimeJump);
 
 		Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
 			this.loadScoreboardObjective(u);
@@ -485,7 +488,7 @@ public class Ingame extends GamePhase {
 				this.listenerRonjasToiletLaunch, this.listenerBlinkInteract, this.listenerWallGeneratorInteract,
 				this.listenerGrandpasClockInteract, this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity,
 				this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract,
-				this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract);
+				this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract, this.listenerSlimeJump);
 		this.listenerEnderpearlLaunchable.disable();
 		for (Block b : this.placedBlocks) {
 			b.setType(Material.AIR);
