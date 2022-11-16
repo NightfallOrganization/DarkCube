@@ -15,6 +15,7 @@ import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
 import eu.darkcube.minigame.woolbattle.util.ScoreboardObjective;
@@ -30,7 +31,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		Lobby lobby = Main.getInstance().getLobby();
 		Player p = e.getPlayer();
 		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
-//		if (Main.getInstance().getLobby().isEnabled()) {
+		CloudNetLink.update();
 		Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
 		Scoreboard sb = new Scoreboard();
 		Main.initScoreboard(sb, user);
@@ -87,7 +88,6 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		lobby.setParticlesItem(user, p);
 		inv.setItem(0, Item.LOBBY_PERKS.getItem(user));
 		inv.setItem(1, Item.LOBBY_TEAMS.getItem(user));
-//		inv.setItem(7, Item.LOBBY_GADGET.getItem(user));
 		inv.setItem(7, Item.SETTINGS.getItem(user));
 		inv.setItem(8, Item.LOBBY_VOTING.getItem(user));
 
@@ -102,27 +102,8 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 			e.setJoinMessage(null);
 		} else {
 			lobby.setTimer(lobby.getTimer());
-//			}
 		}
 
-//		for (String n : ((CraftPlayer) p).getHandle().playerConnection.networkManager.channel.pipeline().names()) {
-//			ChannelHandler h = ((CraftPlayer) p).getHandle().playerConnection.networkManager.channel.pipeline().get(n);
-//			System.out.println(
-//					"n: " + (h == null ? "null" : h.getClass().getName()));
-//		}
-//		((CraftPlayer) p).getHandle().playerConnection.networkManager.channel.pipeline()
-//				.addBefore("packet_handler", "tempHandler", new ChannelDuplexHandler() {
-//					@Override
-//					public void write(ChannelHandlerContext channelHandlerContext, Object object,
-//							ChannelPromise channelPromise) throws Exception {
-//						if (object instanceof PacketPlayOutKeepAlive || object instanceof PacketPlayOutRelEntityMove
-//								|| object instanceof PacketPlayOutUpdateTime || object instanceof PacketPlayOutChat) {
-//
-//						} else {
-//							System.out.println(object.toString());
-//						}
-//						super.write(channelHandlerContext, object, channelPromise);
-//					}
-//				});
 	}
+
 }

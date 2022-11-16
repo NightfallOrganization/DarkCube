@@ -27,7 +27,6 @@ import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerDropItem;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerJoin;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerLogin;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerQuit;
-import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemGadgets;
 import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemParticles;
 import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemPerks;
 import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemSettings;
@@ -37,7 +36,6 @@ import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Characters;
 import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
-import eu.darkcube.minigame.woolbattle.util.Enableable;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.Locations;
 import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
@@ -51,40 +49,60 @@ import eu.darkcube.minigame.woolbattle.util.tab.Footer;
 import eu.darkcube.minigame.woolbattle.util.tab.Header;
 import eu.darkcube.minigame.woolbattle.util.tab.TabManager;
 
-public class Lobby implements Enableable {
+public class Lobby extends GamePhase {
 
 	public final ListenerPlayerDropItem listenerPlayerDropItem;
+
 	public final ListenerEntityDamage listenerEntityDamage;
+
 	public final ListenerBlockBreak listenerBlockBreak;
+
 	public final ListenerBlockPlace listenerBlockPlace;
+
 	public final ListenerPlayerJoin listenerPlayerJoin;
+
 	public final ListenerPlayerQuit listenerPlayerQuit;
+
 	public final ListenerPlayerLogin listenerPlayerLogin;
+
 	public final ListenerInteract listenerInteract;
 
 	public final ListenerItemParticles listenerItemParticles;
-	public final ListenerItemGadgets listenerItemGadgets;
+
 	public final ListenerItemVoting listenerItemVoting;
+
 	public final ListenerItemPerks listenerItemPerks;
+
 	public final ListenerItemTeams listenerItemTeams;
+
 	public final ListenerItemSettings listenerItemSettings;
+
 	public final ListenerInteractMenuBack listenerInteractMenuBack;
 
 	private final Map<User, Scoreboard> SCOREBOARD_BY_USER;
+
 	private final Map<User, Set<User>> SCOREBOARD_MISSING_USERS;
 
 	public final Map<User, Vote<eu.darkcube.minigame.woolbattle.map.Map>> VOTES_MAP;
+
 	public final Map<User, Vote<Boolean>> VOTES_EP_GLITCH;
+
 	public final Map<User, Integer> VOTES_LIFES = new HashMap<>();
 
 	private final ObservableInteger timer;
+
 	private final ObservableInteger overrideTimer;
+
 	public final int MAX_TIMER_SECONDS = 60;
+
 	private int MIN_PLAYER_COUNT;
+
 	private int MAX_PLAYER_COUNT;
+
 	private int deathline;
 
 	private Scheduler timerTask;
+
 	private Scheduler deathLineTask;
 
 	private Location spawn;
@@ -104,7 +122,6 @@ public class Lobby implements Enableable {
 
 		this.listenerItemParticles = new ListenerItemParticles();
 		this.listenerItemSettings = new ListenerItemSettings();
-		this.listenerItemGadgets = new ListenerItemGadgets();
 		this.listenerItemVoting = new ListenerItemVoting();
 		this.listenerItemTeams = new ListenerItemTeams();
 		this.listenerItemPerks = new ListenerItemPerks();
@@ -115,9 +132,9 @@ public class Lobby implements Enableable {
 		this.VOTES_EP_GLITCH = new HashMap<>();
 
 		this.timer = new SimpleObservableInteger() {
+
 			@Override
-			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
-							Integer newValue) {
+			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 				if (Lobby.this.isEnabled()) {
 					if (newValue <= 1) {
 						Bukkit.getOnlinePlayers().forEach(p -> {
@@ -128,8 +145,7 @@ public class Lobby implements Enableable {
 						Main.getInstance().getIngame().enable();
 						return;
 					}
-					AtomicDouble exp = new AtomicDouble(
-									(float) newValue / (Lobby.this.MAX_TIMER_SECONDS * 20F));
+					AtomicDouble exp = new AtomicDouble((float) newValue / (Lobby.this.MAX_TIMER_SECONDS * 20F));
 					if (exp.get() > 1)
 						exp.set(0.9999);
 					Bukkit.getOnlinePlayers().forEach(p -> {
@@ -137,28 +153,28 @@ public class Lobby implements Enableable {
 						p.setExp((float) exp.get());
 					});
 					Main.getInstance().getUserWrapper().getUsers().forEach(user -> {
-						new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey()).setSuffix(Integer.toString(newValue
-										/ 20));
+						new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey())
+								.setSuffix(Integer.toString(newValue / 20));
 					});
 				}
 			}
 
 			@Override
-			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
-							Integer newValue) {
+			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 			}
+
 		};
 		this.overrideTimer = new SimpleObservableInteger() {
+
 			@Override
-			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
-							Integer newValue) {
+			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 			}
 
 			@Override
-			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
-							Integer newValue) {
+			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 				Lobby.this.timer.setObject(newValue);
 			}
+
 		};
 		this.overrideTimer.setSilent(0);
 		this.timer.setSilent(this.MAX_TIMER_SECONDS * 20);
@@ -173,9 +189,11 @@ public class Lobby implements Enableable {
 					}
 				});
 			}
+
 		};
 
 		this.timerTask = new Scheduler() {
+
 			private boolean announced = false;
 
 			@Override
@@ -209,6 +227,7 @@ public class Lobby implements Enableable {
 //					}
 				}
 			}
+
 		};
 	}
 
@@ -224,7 +243,10 @@ public class Lobby implements Enableable {
 		this.VOTES_EP_GLITCH.clear();
 		this.SCOREBOARD_BY_USER.clear();
 		this.SCOREBOARD_MISSING_USERS.clear();
-		Main.getInstance().getUserWrapper().getUsers().forEach(u -> this.SCOREBOARD_MISSING_USERS.put(u, new HashSet<>()));
+		Main.getInstance()
+				.getUserWrapper()
+				.getUsers()
+				.forEach(u -> this.SCOREBOARD_MISSING_USERS.put(u, new HashSet<>()));
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			p.closeInventory();
 			this.listenerPlayerJoin.handle(new PlayerJoinEvent(p, null));
@@ -242,20 +264,36 @@ public class Lobby implements Enableable {
 		}
 		this.MAX_PLAYER_COUNT = i;
 
-		Main.registerListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting, this.listenerItemGadgets, this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage, this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings, this.listenerInteract);
+		Main.registerListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting,
+				this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin,
+				this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage,
+				this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings,
+				this.listenerInteract);
 		this.timerTask.runTaskTimer(1);
 		this.deathLineTask.runTaskTimer(20);
 	}
 
 	@Override
 	public void onDisable() {
-		Main.unregisterListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting, this.listenerItemGadgets, this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage, this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings, this.listenerInteract);
+		Main.unregisterListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting,
+				this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin,
+				this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage,
+				this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings,
+				this.listenerInteract);
 		this.timerTask.cancel();
 		this.deathLineTask.cancel();
 	}
 
 	public void recalculateMap() {
-		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()), Main.getInstance().getMapManager().getMaps().stream().filter(m -> m.isEnabled()).collect(Collectors.toSet()), Main.getInstance().getMap());
+		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(
+				this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()),
+				Main.getInstance()
+						.getMapManager()
+						.getMaps()
+						.stream()
+						.filter(m -> m.isEnabled())
+						.collect(Collectors.toSet()),
+				Main.getInstance().getMap());
 		if (map != null)
 			if (!map.isEnabled())
 				map = null;
@@ -276,7 +314,9 @@ public class Lobby implements Enableable {
 		});
 		this.SCOREBOARD_MISSING_USERS.values().forEach(users -> users.add(user));
 		this.SCOREBOARD_MISSING_USERS.put(user, missing);
-		this.SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
+		this.SCOREBOARD_BY_USER.get(user)
+				.getTeam(user.getTeam().getType().getScoreboardTag())
+				.addPlayer(user.getPlayerName());
 	}
 
 	public void setParticlesItem(User user, Player p) {
@@ -291,7 +331,8 @@ public class Lobby implements Enableable {
 	public void reloadUsers(User user) {
 		Scoreboard sb = this.SCOREBOARD_BY_USER.get(user);
 		for (User u : this.SCOREBOARD_MISSING_USERS.get(user)) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(u.getTeam().getType().getScoreboardTag());
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb
+					.getTeam(u.getTeam().getType().getScoreboardTag());
 			team.addPlayer(u.getPlayerName());
 		}
 	}
@@ -301,20 +342,20 @@ public class Lobby implements Enableable {
 //		Footer footer = new Footer(Main.getInstance().getConfig("config").getString(Config.TAB_FOOTER));
 		Header header = new Header(Main.tab_header);
 		Footer footer = new Footer(Main.tab_footer);
-		header.setMessage(header.getMessage().replace("%map%", Main.getInstance().getMap() == null
-						? "Unknown Map"
-						: Main.getInstance().getMap().getName()));
-		footer.setMessage(footer.getMessage().replace("%map%", Main.getInstance().getMap() == null
-						? "Unknown Map"
-						: Main.getInstance().getMap().getName()));
+		header.setMessage(header.getMessage()
+				.replace("%map%",
+						Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
+		footer.setMessage(footer.getMessage()
+				.replace("%map%",
+						Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
 		header.setMessage(header.getMessage().replace("%name%", Main.getInstance().name));
 		footer.setMessage(footer.getMessage().replace("%name%", Main.getInstance().name));
-		header.setMessage(header.getMessage().replace("%prefix%", "&8"
-						+ Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix
-						+ " &8" + Characters.SHIFT_SHIFT_LEFT));
-		footer.setMessage(footer.getMessage().replace("%prefix%", "&8"
-						+ Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix
-						+ " &8" + Characters.SHIFT_SHIFT_LEFT));
+		header.setMessage(header.getMessage()
+				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix + " &8"
+						+ Characters.SHIFT_SHIFT_LEFT));
+		footer.setMessage(footer.getMessage()
+				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix + " &8"
+						+ Characters.SHIFT_SHIFT_LEFT));
 		header.setMessage(header.getMessage().replace("%server%", Bukkit.getServerName()));
 		footer.setMessage(footer.getMessage().replace("%server%", Bukkit.getServerName()));
 		header.setMessage(ChatColor.translateAlternateColorCodes('&', header.getMessage()).replace("\\n", "\n"));
@@ -336,7 +377,8 @@ public class Lobby implements Enableable {
 
 	public Location getSpawn() {
 		if (this.spawn == null)
-			this.spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"), Locations.DEFAULT_LOCATION);
+			this.spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"),
+					Locations.DEFAULT_LOCATION);
 		return this.spawn.clone();
 	}
 
@@ -350,4 +392,5 @@ public class Lobby implements Enableable {
 	public Map<User, Scoreboard> getScoreboardByUser() {
 		return this.SCOREBOARD_BY_USER;
 	}
+
 }

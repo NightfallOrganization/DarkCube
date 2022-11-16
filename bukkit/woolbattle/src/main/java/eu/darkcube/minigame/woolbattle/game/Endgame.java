@@ -19,10 +19,9 @@ import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
-import eu.darkcube.minigame.woolbattle.util.Enableable;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
-public class Endgame implements Enableable {
+public class Endgame extends GamePhase {
 
 	public final ListenerPlayerJoin listenerPlayerJoin;
 	public final ListenerPlayerQuit listenerPlayerQuit;
@@ -30,10 +29,10 @@ public class Endgame implements Enableable {
 	public final ListenerEntityDamage listenerEntityDamage;
 
 	public Endgame() {
-		listenerPlayerJoin = new ListenerPlayerJoin();
-		listenerPlayerQuit = new ListenerPlayerQuit();
-		listenerBlockBreak = new ListenerBlockBreak();
-		listenerEntityDamage = new ListenerEntityDamage();
+		this.listenerPlayerJoin = new ListenerPlayerJoin();
+		this.listenerPlayerQuit = new ListenerPlayerQuit();
+		this.listenerBlockBreak = new ListenerBlockBreak();
+		this.listenerEntityDamage = new ListenerEntityDamage();
 	}
 
 	@Override
@@ -42,22 +41,22 @@ public class Endgame implements Enableable {
 		final Main main = Main.getInstance();
 		main.getSchedulers().clear();
 
-		Main.registerListeners(listenerPlayerJoin);
-		Main.registerListeners(listenerPlayerQuit);
-		Main.registerListeners(listenerBlockBreak);
-		Main.registerListeners(listenerEntityDamage);
+		Main.registerListeners(this.listenerPlayerJoin);
+		Main.registerListeners(this.listenerPlayerQuit);
+		Main.registerListeners(this.listenerBlockBreak);
+		Main.registerListeners(this.listenerEntityDamage);
 
 		Team winner = main.getIngame().winner;
 		main.getUserWrapper().getUsers().forEach(u -> {
 			u.getBukkitEntity().teleport(main.getLobby().getSpawn());
 			u.getBukkitEntity().setAllowFlight(false);
-			setPlayerItems(u);
+			this.setPlayerItems(u);
 			MySQL.saveUserData(u);
 		});
 		main.sendMessage(Message.TEAM_HAS_WON, user -> {
 			return new String[] { winner.getName(user) };
 		});
-		User mostKills = getPlayerWithMostKills();
+		User mostKills = this.getPlayerWithMostKills();
 		main.sendMessage(Message.PLAYER_HAS_MOST_KILLS, user -> {
 			return new String[] { mostKills.getTeamPlayerName(), Integer.toString(mostKills.getKills()) };
 		});
@@ -86,16 +85,16 @@ public class Endgame implements Enableable {
 
 		int players = users.size();
 		if (players >= 1) {
-			main.sendMessage(Message.STATS_PLACE_1, "1", val(users.get(0).getKD()), users.get(0).getTeamPlayerName());
+			main.sendMessage(Message.STATS_PLACE_1, "1", this.val(users.get(0).getKD()), users.get(0).getTeamPlayerName());
 			if (players >= 2) {
-				main.sendMessage(Message.STATS_PLACE_2, "2", val(users.get(1).getKD()),
+				main.sendMessage(Message.STATS_PLACE_2, "2", this.val(users.get(1).getKD()),
 						users.get(1).getTeamPlayerName());
 				if (players >= 3) {
-					main.sendMessage(Message.STATS_PLACE_3, "3", val(users.get(2).getKD()),
+					main.sendMessage(Message.STATS_PLACE_3, "3", this.val(users.get(2).getKD()),
 							users.get(2).getTeamPlayerName());
 					if (players >= 4) {
 						for (int i = 3; i < 4; i++) {
-							main.sendMessage(Message.STATS_PLACE_TH, Integer.toString(i + 1), val(users.get(i).getKD()),
+							main.sendMessage(Message.STATS_PLACE_TH, Integer.toString(i + 1), this.val(users.get(i).getKD()),
 									users.get(i).getTeamPlayerName());
 						}
 					}
@@ -109,17 +108,17 @@ public class Endgame implements Enableable {
 			@Override
 			public void run() {
 				for (Player all : Bukkit.getOnlinePlayers()) {
-					if (countdownTicks % 20 == 0)
-						all.setLevel(countdownTicks / 20);
-					all.setExp(countdownTicks / 400F);
+					if (this.countdownTicks % 20 == 0)
+						all.setLevel(this.countdownTicks / 20);
+					all.setExp(this.countdownTicks / 400F);
 				}
-				countdownTicks--;
-				if (countdownTicks <= 0) {
+				this.countdownTicks--;
+				if (this.countdownTicks <= 0) {
 					for (Player all : Bukkit.getOnlinePlayers()) {
 						all.kickPlayer(Bukkit.getShutdownMessage());
 					}
-					disable();
-					cancel();
+					Endgame.this.disable();
+					this.cancel();
 					Bukkit.shutdown();
 //					Main.getInstance().getLobby().enable();
 				}
@@ -163,10 +162,10 @@ public class Endgame implements Enableable {
 
 	@Override
 	public void onDisable() {
-		Main.unregisterListeners(listenerPlayerJoin);
-		Main.unregisterListeners(listenerPlayerQuit);
-		Main.unregisterListeners(listenerBlockBreak);
-		Main.unregisterListeners(listenerEntityDamage);
+		Main.unregisterListeners(this.listenerPlayerJoin);
+		Main.unregisterListeners(this.listenerPlayerQuit);
+		Main.unregisterListeners(this.listenerBlockBreak);
+		Main.unregisterListeners(this.listenerEntityDamage);
 	}
 
 }

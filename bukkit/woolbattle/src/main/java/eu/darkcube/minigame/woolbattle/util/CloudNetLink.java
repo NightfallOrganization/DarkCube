@@ -48,7 +48,7 @@ public class CloudNetLink {
 										.count());
 				json.addProperty("max", Main.getInstance().getMaxPlayers());
 				BridgeServerHelper.setExtra(json.toString());
-				BridgeServerHelper.setMaxPlayers(Main.getInstance().getMaxPlayers() + 200);
+				BridgeServerHelper.setMaxPlayers(1000);
 				String mapname = Main.getInstance().getMap() == null ? "Unknown Map"
 						: Main.getInstance().getMap().getName();
 				BridgeServerHelper.setMotd("§a" + mapname + " §7("
