@@ -32,6 +32,8 @@ public class PerkName {
 	public static final PerkName TNT_ARROW = new PerkName("TNT_ARROW");
 	public static final PerkName ELEVATOR = new PerkName("ELEVATOR");
 	public static final PerkName LONGJUMP = new PerkName("LONGJUMP");
+
+	public static final PerkName SLIMEJUMP = new PerkName("SLIMEJUMP");
 	private final String name;
 
 	public PerkName(String name) {

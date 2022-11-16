@@ -14,8 +14,9 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class PerkListener implements Listener {
 
-    protected boolean checkUsable(User user, Perk perk, Player p) {
-
+    //to add a new Perk you need to add perktype, lore for the perk, perk item, perk item lore, and thenn add the effect
+    protected boolean checkUsable(User user, Player p) {
+        Perk perk = user.getPerkByItemId(ItemManager.getItemId(p.getItemInHand()));
         if (!p.getInventory().contains(Material.WOOL, PerkType.CAPSULE.getCost()) || perk.getCooldown() > 0) {
             Ingame.playSoundNotEnoughWool(user);
             new Scheduler() {
@@ -27,8 +28,10 @@ public abstract class PerkListener implements Listener {
             return false;
         }
 
-
-        return true;
+        if(perk.getItem().equals(p.getItemInHand())){
+            return true;
+        }
+        return false;
     }
 
     protected void payForThePerk(Player p, User user, PerkType perkType) {

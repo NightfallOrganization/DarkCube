@@ -45,6 +45,9 @@ public enum Item {
 	PERK_LINE_BUILDER(ItemBuilder.item(STICK).addLore()),
 	PERK_LINE_BUILDER_COOLDOWN(ItemBuilder.item(STICK).addLore()),
 
+	PERK_SLIMEJUMP(ItemBuilder.item(FIREWORK).addLore()),
+
+	PERK_SLIMEJUMP_COOLDOWN(ItemBuilder.item(FIREWORK).addLore()),
 	PERK_WOOL_BOMB(ItemBuilder.item(TNT).addLore()),
 	PERK_WOOL_BOMB_COOLDOWN(ItemBuilder.item(TNT).addLore()),
 

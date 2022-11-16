@@ -5,6 +5,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 
 public enum PerkType implements Comparable<PerkType> {
 
+	SLIMEJUMP(Item.PERK_SLIMEJUMP, Item.PERK_SLIMEJUMP_COOLDOWN, 20, PerkName.SLIMEJUMP, false, 18),
 	CAPSULE(Item.PERK_CAPSULE, Item.PERK_CAPSULE_COOLDOWN, 30, PerkName.CAPSULE,
 					false, 24),
 
