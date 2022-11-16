@@ -37,14 +37,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 
 	private Item minigameItem;
 
-	private Object listener = new Object() {
-
-		@EventListener
-		public void handle(CloudServiceInfoUpdateEvent event) {
-			MinigameInventory.this.recalculate();
-		}
-
-	};
+	private Listener listener = new Listener();
 
 	public MinigameInventory(String title, Item minigameItem, InventoryType type, User user) {
 		super(type, title, user);
@@ -94,6 +87,9 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 				GameState state = GameState.fromString(server.getProperty(BridgeServiceProperty.STATE).orElse(null));
 				if (state == null || state == GameState.UNKNOWN)
 					throw new NullPointerException();
+				if (state == GameState.STOPPING) {
+					continue;
+				}
 				states.put(server, state);
 			} catch (Exception ex) {
 				servers.remove(server);
@@ -145,18 +141,28 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		}
 
 		Collections.sort(itemSortingInfos);
-		for (int slot = 0; slot < itemSortingInfos.size(); slot++) {
+		int size = itemSortingInfos.size();
+		for (int slot = 0; slot < size; slot++) {
 			items.put(slot, itemSortingInfos.get(slot).getItem());
 		}
+	}
+
+	public class Listener {
+
+		@EventListener
+		public void handle(CloudServiceInfoUpdateEvent event) {
+			MinigameInventory.this.recalculate();
+		}
+
 	}
 
 	protected class ItemSortingInfo implements Comparable<ItemSortingInfo> {
 
 		private ItemStack item;
 
-		private Integer onPlayers;
+		private int onPlayers;
 
-		private Integer maxPlayers;
+		private int maxPlayers;
 
 		private GameState state;
 
@@ -174,42 +180,31 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 			switch (this.state) {
 			case LOBBY:
 				if (other.state != GameState.LOBBY)
-					return 1;
-				amt = Integer.compare(this.item.getAmount(), other.item.getAmount());
+					return -1;
+				amt = Integer.compare(other.onPlayers, this.onPlayers);
 				break;
 			case INGAME:
 				if (other.state == GameState.LOBBY)
-					return -1;
+					return 1;
 				if (other.state != GameState.LOBBY && other.state != GameState.INGAME)
-					return 1;
-				amt = Integer.compare(this.item.getAmount(), other.item.getAmount());
-				break;
-			case STOPPING:
-				if (other.state == GameState.LOBBY || other.state == GameState.INGAME)
 					return -1;
-				if (other.state == GameState.UNKNOWN)
-					return 1;
-				amt = Integer.compare(this.item.getAmount(), other.item.getAmount());
+				amt = Integer.compare(other.onPlayers, this.onPlayers);
 				break;
-			case UNKNOWN:
+			default:
 				if (other.state != GameState.UNKNOWN)
-					return -1;
-				amt = Integer.compare(this.item.getAmount(), other.item.getAmount());
+					return 1;
+				amt = Integer.compare(other.onPlayers, this.onPlayers);
 				break;
 			}
 			if (amt == 0) {
-				if (this.onPlayers > other.onPlayers) {
-					return -1;
-				} else if (this.onPlayers < other.onPlayers) {
-					return 1;
+				amt = Integer.compare(other.onPlayers, this.onPlayers);
+				if (amt != 0) {
+					return amt;
 				}
-				amt = this.maxPlayers.compareTo(other.maxPlayers);
+				amt = Integer.compare(this.maxPlayers, other.maxPlayers);
 				if (amt == 0) {
 					amt = this.getDisplay().orElse("").compareTo(other.getDisplay().orElse(""));
 				}
-
-//				String display = getDisplay().orElse("");
-//				amt = display.compareToIgnoreCase(other.getDisplay().orElse(""));
 			}
 			return amt;
 		}
