@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.event.EventListener;
+import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import eu.darkcube.system.GameState;
@@ -35,14 +37,21 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 
 	private Item minigameItem;
 
-//	private Map<User, BukkitRunnable> runnables = new HashMap<>();
-//	private Map<User, Map<Integer, ItemStack>> contents = new HashMap<>();
+	private Object listener = new Object() {
+
+		@EventListener
+		public void handle(CloudServiceInfoUpdateEvent event) {
+			MinigameInventory.this.recalculate();
+		}
+
+	};
 
 	public MinigameInventory(String title, Item minigameItem, InventoryType type, User user) {
 		super(type, title, user);
 		this.minigameItem = minigameItem;
 		this.done = true;
 		this.complete();
+		CloudNetDriver.getInstance().getEventManager().registerListener(this.listener);
 	}
 
 	protected abstract Set<String> getCloudTasks();
@@ -56,6 +65,16 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 	protected void insertFallbackItems() {
 		this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user));
 		super.insertFallbackItems();
+	}
+
+	@Override
+	protected final void destroy() {
+		CloudNetDriver.getInstance().getEventManager().unregisterListener(this.listener);
+		this.destroy0();
+		super.destroy();
+	}
+
+	protected void destroy0() {
 	}
 
 	@SuppressWarnings("deprecation")
@@ -88,6 +107,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 			int maxPlayers = server.getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1);
 			try {
 				JsonObject json = new Gson().fromJson(extraText, JsonObject.class);
+				if (json == null)
+					continue;
 				online = json.getAsJsonPrimitive("online").getAsInt();
 				maxPlayers = json.getAsJsonPrimitive("max").getAsInt();
 			} catch (Exception ex) {
@@ -128,113 +149,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 			items.put(slot, itemSortingInfos.get(slot).getItem());
 		}
 	}
-
-//	@SuppressWarnings("deprecation")
-//	@Override
-//	protected Map<Integer, ItemStack> contents(User user) {
-//		Map<Integer, ItemStack> m = new HashMap<>();
-//		for (int slot = 0; slot < itemSortingInfos.size(); slot++) {
-//			ItemSortingInfo info = itemSortingInfos.get(slot);
-//			m.put(slot, info.getItem());
-//		}
-//		return m;
-//	}
-
-//	@Override
-//	protected void onOpen(User user) {
-//		runnables.put(user, new BukkitRunnable() {
-//			@SuppressWarnings("deprecation")
-//			@Override
-//			public void run() {
-//				Collection<ServiceInfoSnapshot> servers = new HashSet<>();
-//				getCloudTasks().stream().forEach(
-//						task -> servers.addAll(CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(task)));
-//
-//				Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
-//				for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-//					try {
-//						GameState state = GameState.fromString(ServiceInfoSnapshotUtil.getState(server));
-//						if (state == null || state == GameState.UNKNOWN)
-//							throw new NullPointerException();
-//						states.put(server, state);
-//					} catch (Exception ex) {
-//						servers.remove(server);
-//					}
-//				}
-//				List<ItemSortingInfo> itemSortingInfos = new ArrayList<>();
-//				for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-//					String extraText = ServiceInfoSnapshotUtil.getExtra(server);
-//
-//					int online = ServiceInfoSnapshotUtil.getOnlineCount(server);
-//					int maxPlayers = ServiceInfoSnapshotUtil.getMaxPlayers(server);
-//					try {
-//						JsonObject json = new Gson().fromJson(extraText, JsonObject.class);
-//						online = json.getAsJsonPrimitive("online").getAsInt();
-//						maxPlayers = json.getAsJsonPrimitive("max").getAsInt();
-//					} catch (Exception ex) {
-//						ex.printStackTrace();
-//					}
-//					GameState state = states.get(server);
-//					String motd = ServiceInfoSnapshotUtil.getMotd(server);
-//					if (motd == null || motd.contains("§cLoading...")) {
-//						servers.remove(server);
-//						states.remove(server);
-//						continue;
-//					}
-//					ItemBuilder builder = new ItemBuilder(Material.STAINED_CLAY);
-//					builder.unsafeStackSize(true);
-//					builder.setAmount(online);
-//					builder.setDisplayName(motd);
-//					builder.addLore("§7Spieler: " + online + "/" + maxPlayers);
-//					if (state == GameState.LOBBY) {
-//						builder.setDurability(DyeColor.LIME.getWoolData());
-//					} else if (state == GameState.INGAME) {
-//						builder.setDurability(DyeColor.ORANGE.getWoolData());
-//					} else if (state == GameState.STOPPING) {
-//						builder.setDurability(DyeColor.RED.getWoolData());
-//					} else if (state == GameState.UNKNOWN) {
-//						builder.setDurability(DyeColor.RED.getWoolData());
-//					}
-//					ItemStack item = builder.build();
-//					item = new ItemBuilder(item).getUnsafe()
-//							.setString("minigameServer", server.getServiceId().getUniqueId().toString()).builder()
-//							.getItemStack();
-//					ItemSortingInfo info = new ItemSortingInfo(item, online, maxPlayers, state);
-//					itemSortingInfos.add(info);
-//				}
-//
-//				Collections.sort(itemSortingInfos);
-//
-//				Map<Integer, ItemStack> m = new HashMap<>();
-//				for (int slot = 0; slot < itemSortingInfos.size(); slot++) {
-//					ItemSortingInfo info = itemSortingInfos.get(slot);
-//					m.put(slot, info.getItem());
-//				}
-//				contents.put(user, m);
-//				update(user);
-//
-//			}
-//		});
-//		runnables.get(user).runTaskAsynchronously(Lobby.getInstance());
-//	}
-//
-//	@Override
-//	protected void onClose(User user) {
-//		contents.remove(user);
-//		runnables.remove(user).cancel();
-//	}
-//
-//	@Override
-//	protected Map<Integer, ItemStack> getContents(User user) {
-//		if (contents.containsKey(user)) {
-//			return contents.get(user);
-//		}
-//		Map<Integer, ItemStack> m = new HashMap<>();
-//		for (int i = 0; i < getPageSize(); i++) {
-//			m.put(i, Item.LOADING.getItem(user));
-//		}
-//		return m;
-//	}
 
 	protected class ItemSortingInfo implements Comparable<ItemSortingInfo> {
 

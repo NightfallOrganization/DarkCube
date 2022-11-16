@@ -48,8 +48,8 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 		super(InventoryLobbySwitcher.type_lobby_switcher,
 						Item.INVENTORY_LOBBY_SWITCHER.getDisplayName(user),
 						user);
-		for (int i = 0; i < SLOTS.length; i++) {
-			PAGE_SLOTS[i] = SLOTS[i];
+		for (int i = 0; i < InventoryLobbySwitcher.SLOTS.length; i++) {
+			this.PAGE_SLOTS[i] = InventoryLobbySwitcher.SLOTS[i];
 		}
 	}
 
@@ -70,11 +70,11 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 			40, 39, 41, 38, 42, 37, 43
 	};
 
-	private static final int[] SORT = new int[] {
-			02, 03, 03, 04, 04, 05, 05, 
-			01, 02, 02, 03, 03, 04, 04, 
-			03, 04, 04, 05, 05, 06, 06
-	};
+//	private static final int[] SORT = new int[] {
+//			02, 03, 03, 04, 04, 05, 05, 
+//			01, 02, 02, 03, 03, 04, 04, 
+//			03, 04, 04, 05, 05, 06, 06
+//	};
 	// @formatter:on
 
 	@Override
