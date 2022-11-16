@@ -33,7 +33,7 @@ public class PerkName {
 	public static final PerkName ELEVATOR = new PerkName("ELEVATOR");
 	public static final PerkName LONGJUMP = new PerkName("LONGJUMP");
 
-	public static final PerkName SLIMEJUMP = new PerkName("SLIMEJUMP");
+	public static final PerkName SLIME_PLATFORM = new PerkName("SLIME_PLATFORM");
 	private final String name;
 
 	public PerkName(String name) {
@@ -41,7 +41,7 @@ public class PerkName {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public PerkType toType() {
@@ -51,12 +51,12 @@ public class PerkName {
 	@Override
 	public boolean equals(Object o) {
 		return (o instanceof PerkName
-						&& ((PerkName) o).getName().equals(getName()))
-						|| o != null && o.toString().equals(getName());
+						&& ((PerkName) o).getName().equals(this.getName()))
+						|| o != null && o.toString().equals(this.getName());
 	}
 
 	@Override
 	public String toString() {
-		return getName();
+		return this.getName();
 	}
 }

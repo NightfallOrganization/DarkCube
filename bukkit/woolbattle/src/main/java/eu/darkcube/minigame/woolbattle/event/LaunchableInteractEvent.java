@@ -25,7 +25,7 @@ public class LaunchableInteractEvent extends PlayerEvent implements Cancellable 
 		this.item = item;
 		this.entity = entity;
 		if (entity != null)
-			entityType = entity.getType();
+			this.entityType = entity.getType();
 	}
 
 	public LaunchableInteractEvent(Player who, EntityType entity, ItemStack item) {
@@ -40,29 +40,29 @@ public class LaunchableInteractEvent extends PlayerEvent implements Cancellable 
 	}
 
 	public ItemStack getItem() {
-		return item;
+		return this.item;
 	}
 
 	public Projectile getEntity() {
-		return entity;
+		return this.entity;
 	}
 
 	public EntityType getEntityType() {
-		return entityType;
+		return this.entityType;
 	}
 
 	@Override
 	public HandlerList getHandlers() {
-		return handlers;
+		return LaunchableInteractEvent.handlers;
 	}
 
 	public static HandlerList getHandlerList() {
-		return handlers;
+		return LaunchableInteractEvent.handlers;
 	}
 
 	@Override
 	public boolean isCancelled() {
-		return cancel;
+		return this.cancel;
 	}
 
 	@Override

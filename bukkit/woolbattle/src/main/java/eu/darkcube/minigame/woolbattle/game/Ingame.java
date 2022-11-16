@@ -114,7 +114,7 @@ public class Ingame extends GamePhase {
 
 	public final ListenerInventoryDrag listenerInventoryDrag;
 
-	public final ListenerCapsuleInteract listenerCapsule;
+	public final ListenerCapsule listenerCapsule;
 
 	public final ListenerSwitcherLaunchable listenerSwitcherLaunch;
 
@@ -154,7 +154,7 @@ public class Ingame extends GamePhase {
 
 	public final ListenerWallGeneratorInteract listenerWallGeneratorInteract;
 
-	public final ListenerBlinkLaunchable listenerBlinkInteract;
+	public final ListenerBlink listenerBlinkInteract;
 
 	public final ListenerGrandpasClockInteract listenerGrandpasClockInteract;
 
@@ -168,13 +168,13 @@ public class Ingame extends GamePhase {
 
 	public final ListenerGrabberInteract listenerGrabberInteract;
 
-	public final ListenerBoosterInteract listenerBoosterInteract;
+	public final ListenerBooster listenerBoosterInteract;
 
 	public final ListenerGrapplingHookFishing listenerGrapplingHookFishing;
 
 	public final ListenerRopeInteract listenerRopeInteract;
 
-	public final ListenerSlimeJump listenerSlimeJump;
+	public final ListenerSlimePlatform listenerSlimeJump;
 
 	public final Scheduler schedulerResetWool;
 
@@ -216,7 +216,7 @@ public class Ingame extends GamePhase {
 		this.listenerProjectileLaunch = new ListenerProjectileLaunch();
 		this.listenerInventoryClick = new ListenerInventoryClick();
 		this.listenerInventoryDrag = new ListenerInventoryDrag();
-		this.listenerCapsule = new ListenerCapsuleInteract();
+		this.listenerCapsule = new ListenerCapsule();
 		this.listenerSwitcherLaunch = new ListenerSwitcherLaunchable();
 		this.listenerSwitcherSwitch = new ListenerSwitcherSwitch();
 		this.listenerInteract = new ListenerInteract();
@@ -235,7 +235,7 @@ public class Ingame extends GamePhase {
 		this.listenerRonjasToiletEntityDamageByEntity = new ListenerRonjasToiletEntityDamageByEntity();
 		this.listenerEnderpearlLaunchable = new ListenerEnderpearlLaunchable();
 		this.listenerSafetyPlatformInteract = new ListenerSafetyPlatformInteract();
-		this.listenerBlinkInteract = new ListenerBlinkLaunchable();
+		this.listenerBlinkInteract = new ListenerBlink();
 		this.listenerWallGeneratorInteract = new ListenerWallGeneratorInteract();
 		this.listenerGrandpasClockInteract = new ListenerGrandpasClockInteract();
 		this.listenerGhostInteract = new ListenerGhostInteract();
@@ -243,10 +243,10 @@ public class Ingame extends GamePhase {
 		this.listenerMinigunInteract = new ListenerMinigunInteract();
 		this.listenerDeathMove = new ListenerDeathMove();
 		this.listenerGrabberInteract = new ListenerGrabberInteract();
-		this.listenerBoosterInteract = new ListenerBoosterInteract();
+		this.listenerBoosterInteract = new ListenerBooster();
 		this.listenerGrapplingHookFishing = new ListenerGrapplingHookFishing();
 		this.listenerRopeInteract = new ListenerRopeInteract();
-		this.listenerSlimeJump = new ListenerSlimeJump();
+		this.listenerSlimeJump = new ListenerSlimePlatform();
 
 		this.schedulerParticles = new Scheduler() {
 
@@ -376,7 +376,7 @@ public class Ingame extends GamePhase {
 		this.startingIngame = true;
 		CloudNetLink.update();
 		this.splitPlayersToTeams();
-		Main.getInstance().getSchedulers().clear();
+//		Main.getInstance().getSchedulers().clear();
 		int lifes = -1;
 		if (!Main.getInstance().getLobby().VOTES_LIFES.isEmpty()) {
 			Collection<Integer> list = Main.getInstance().getLobby().VOTES_LIFES.values();

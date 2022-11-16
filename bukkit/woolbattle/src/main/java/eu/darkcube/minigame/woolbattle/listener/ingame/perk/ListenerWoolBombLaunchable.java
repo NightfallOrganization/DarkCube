@@ -20,7 +20,9 @@ import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerWoolBombLaunchable extends Listener<LaunchableInteractEvent> {
+
 	public static final Item BOMB = PerkType.WOOL_BOMB.getItem();
+
 	public static final Item BOMB_COOLDOWN = PerkType.WOOL_BOMB.getCooldownItem();
 
 //	@Override
@@ -50,7 +52,7 @@ public class ListenerWoolBombLaunchable extends Listener<LaunchableInteractEvent
 			Player p = e.getPlayer();
 			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
 
-			ItemStack item = e.getItem() == null ? p.getItemInHand() : e.getItem();
+			ItemStack item = e.getItem();
 			if (item == null) {
 				return;
 			}
@@ -59,15 +61,15 @@ public class ListenerWoolBombLaunchable extends Listener<LaunchableInteractEvent
 			if (perk == null) {
 				return;
 			}
-			if (BOMB_COOLDOWN.getItemId().equals(itemid)) {
-				deny(user, perk);
+			if (ListenerWoolBombLaunchable.BOMB_COOLDOWN.getItemId().equals(itemid)) {
+				this.deny(user, perk);
 				e.setCancelled(true);
 				return;
-			} else if (!BOMB.getItemId().equals(itemid)) {
+			} else if (!ListenerWoolBombLaunchable.BOMB.getItemId().equals(itemid)) {
 				return;
 			}
 			if (perk.getCooldown() > 0 || !p.getInventory().contains(Material.WOOL, PerkType.WOOL_BOMB.getCost())) {
-				deny(user, perk);
+				this.deny(user, perk);
 				e.setCancelled(true);
 				return;
 			}
@@ -83,17 +85,19 @@ public class ListenerWoolBombLaunchable extends Listener<LaunchableInteractEvent
 			bomb.setMetadata("perk", new FixedMetadataValue(Main.getInstance(), perk.getPerkName().getName()));
 
 			new Scheduler() {
+
 				int cd = perk.getMaxCooldown();
 
 				@Override
 				public void run() {
-					if (cd <= 0) {
+					if (this.cd <= 0) {
 						this.cancel();
 						perk.setCooldown(0);
 						return;
 					}
-					perk.setCooldown(cd--);
+					perk.setCooldown(this.cd--);
 				}
+
 			}.runTaskTimer(20);
 		}
 	}
@@ -145,10 +149,11 @@ public class ListenerWoolBombLaunchable extends Listener<LaunchableInteractEvent
 
 	private void deny(User user, Perk perk) {
 		Ingame.playSoundNotEnoughWool(user);
-		setItem(perk);
+		this.setItem(perk);
 	}
 
 	private void setItem(Perk perk) {
 		perk.getOwner().getBukkitEntity().setItemInHand(perk.calculateItem());
 	}
+
 }

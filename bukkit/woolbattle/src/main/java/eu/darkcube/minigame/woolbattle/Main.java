@@ -50,6 +50,7 @@ import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClick;
 import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClose;
 import eu.darkcube.minigame.woolbattle.listener.ListenerLaunchable;
 import eu.darkcube.minigame.woolbattle.listener.ListenerPlayerInteract;
+import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerWeatherChange;
 import eu.darkcube.minigame.woolbattle.map.DefaultMapManager;
 import eu.darkcube.minigame.woolbattle.map.Map;
@@ -617,12 +618,18 @@ public class Main extends Plugin {
 
 	public static final void registerListeners(Listener... listener) {
 		for (Listener l : listener) {
+			if (l instanceof RegisterNotifyListener) {
+				((RegisterNotifyListener) l).registered();
+			}
 			Main.getInstance().getServer().getPluginManager().registerEvents(l, Main.getInstance());
 		}
 	}
 
 	public static final void unregisterListeners(Listener... listener) {
 		for (Listener l : listener) {
+			if (l instanceof RegisterNotifyListener) {
+				((RegisterNotifyListener) l).unregistered();
+			}
 			HandlerList.unregisterAll(l);
 		}
 	}

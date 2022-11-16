@@ -27,15 +27,11 @@ import eu.darkcube.system.inventory.api.util.ItemBuilder;
 public class CommandSpawner extends Command implements Listener {
 
 	public CommandSpawner() {
-		super(Main.getInstance(), "spawner", new Command[0],
-						"Gibt dir einen Monsterspawner", new Argument[] {
-										new Argument("Entity",
-														"Das zu Spawnende Entity"),
-										new Argument("Spieler",
-														"Der Spieler, der den Spawner bekommen soll.",
-														false)
-						});
-		setAliases("d_spawner");
+		super(Main.getInstance(), "spawner", new Command[0], "Gibt dir einen Monsterspawner", new Argument[] {
+				new Argument("Entity", "Das zu Spawnende Entity"),
+				new Argument("Spieler", "Der Spieler, der den Spawner bekommen soll.", false)
+		});
+		this.setAliases("d_spawner");
 		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
 	}
 
@@ -55,49 +51,48 @@ public class CommandSpawner extends Command implements Listener {
 				switch (args[0].toLowerCase()) {
 				case "boneman":
 					entity = EntityType.SKELETON;
-				break;
+					break;
 				case "pigzombie":
 				case "zombie_pigman":
 				case "zombiepigman":
 					entity = EntityType.PIG_ZOMBIE;
-				break;
+					break;
 				case "cavespider":
 					entity = EntityType.CAVE_SPIDER;
-				break;
+					break;
 				case "magmacube":
 				case "magma_slime":
 				case "magmaslime":
 					entity = EntityType.MAGMA_CUBE;
-				break;
+					break;
 				case "enderdragon":
 				case "dragon":
 					entity = EntityType.ENDER_DRAGON;
-				break;
+					break;
 				case "mushroomcow":
 				case "mooshroom":
 					entity = EntityType.MUSHROOM_COW;
-				break;
+					break;
 				case "snow_man":
 				case "snowgolem":
 				case "snow_golem":
 					entity = EntityType.SNOWMAN;
-				break;
+					break;
 				case "cat":
 					entity = EntityType.OCELOT;
-				break;
+					break;
 				case "irongolem":
 				case "golem":
 				case "villager_golem":
 				case "villagergolem":
 					entity = EntityType.IRON_GOLEM;
-				break;
+					break;
 				default:
 					throw new IllegalArgumentException();
 				}
 			}
 		} catch (Exception e) {
-			Main.getInstance().sendMessage(Main.cFail()
-							+ "Du musst ein Mob angeben!", sender);
+			Main.getInstance().sendMessage(Main.cFail() + "Du musst ein Mob angeben!", sender);
 			return true;
 		}
 		args[0] = "%processed%";
@@ -120,10 +115,11 @@ public class CommandSpawner extends Command implements Listener {
 			}
 		}
 		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
-		ItemStack item = new ItemBuilder(
-						Material.MOB_SPAWNER).unsafe().setString("spawnertype", entity.name()).builder().displayname(ChatColor.GOLD
-										+ entity.name() + ChatColor.GRAY
-										+ " Spawner").build();
+		ItemStack item = new ItemBuilder(Material.MOB_SPAWNER).unsafe()
+				.setString("spawnertype", entity.name())
+				.builder()
+				.displayname(ChatColor.GOLD + entity.name() + ChatColor.GRAY + " Spawner")
+				.build();
 //		ItemStack nmsSpawner = CraftItemStack.asNMSCopy(bukkitSpawner);
 //		NBTTagCompound tag = nmsSpawner.getTag();
 //		if (tag == null)
@@ -137,15 +133,14 @@ public class CommandSpawner extends Command implements Listener {
 		int count = 0;
 		for (Player current : players) {
 			current.getInventory().addItem(item);
-			Main.getInstance().sendMessage(Main.cConfirm() + "Du hast einen "
-							+ Main.cValue() + entity.name() + Main.cConfirm()
+			Main.getInstance()
+					.sendMessage(Main.cConfirm() + "Du hast einen " + Main.cValue() + entity.name() + Main.cConfirm()
 							+ "-Spawner erhalten.", sender);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
-			Main.getInstance().sendMessage(Main.cValue() + count
-							+ Main.cConfirm()
-							+ " Spielern einen Spawner gegeben.", sender);
+			Main.getInstance()
+					.sendMessage(Main.cValue() + count + Main.cConfirm() + " Spielern einen Spawner gegeben.", sender);
 		}
 		return true;
 	}
@@ -170,10 +165,10 @@ public class CommandSpawner extends Command implements Listener {
 				return;
 			}
 			String type = b.unsafe().getString("spawnertype");
-			if (type == null) {
+			if (type == null || type.isEmpty()) {
 				return;
 			}
-			EntityType entity = EntityType.valueOf(type);
+			EntityType entity = this.find(type);
 			if (entity == null) {
 				return;
 			}
@@ -183,4 +178,14 @@ public class CommandSpawner extends Command implements Listener {
 			spawner.update(true);
 		}
 	}
+
+	private EntityType find(String type) {
+		for (EntityType e : EntityType.values()) {
+			if (e.name().equals(type)) {
+				return e;
+			}
+		}
+		return null;
+	}
+
 }

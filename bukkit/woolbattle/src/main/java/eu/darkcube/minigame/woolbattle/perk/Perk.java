@@ -24,22 +24,22 @@ public interface Perk {
 	Item getItem();
 
 	default void setItem() {
-		if (getOwner().getPerk(getPerkNumber()) == this) {
-			if (getSlot() == 100) {
-				getOwner().getBukkitEntity().getOpenInventory().setCursor(calculateItem());
+		if (this.getOwner().getPerk(this.getPerkNumber()) == this) {
+			if (this.getSlot() == 100) {
+				this.getOwner().getBukkitEntity().getOpenInventory().setCursor(this.calculateItem());
 			} else {
-				getOwner().getBukkitEntity().getHandle().defaultContainer.getBukkitView().setItem(getSlot(),
-						calculateItem());
+				this.getOwner().getBukkitEntity().getHandle().defaultContainer.getBukkitView().setItem(this.getSlot(),
+						this.calculateItem());
 			}
-			updateInventory();
+			this.updateInventory();
 		}
 	}
 
 	default void updateInventory() {
-		CraftPlayer p = getOwner().getBukkitEntity();
+		CraftPlayer p = this.getOwner().getBukkitEntity();
 		EntityPlayer ep = p.getHandle();
 		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId,
-				getSlot(), CraftItemStack.asNMSCopy(calculateItem())));
+				this.getSlot(), CraftItemStack.asNMSCopy(this.calculateItem())));
 	}
 
 	ItemStack calculateItem();
@@ -57,6 +57,10 @@ public interface Perk {
 	int getSlot();
 
 	ObservableInteger getCooldownLink();
+	
+	int getCost();
+	
+	void setCost(int cost);
 
 	void setCooldown(int cooldown);
 

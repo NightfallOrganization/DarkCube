@@ -12,22 +12,23 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import eu.darkcube.minigame.woolbattle.Main;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerLaunchable implements Listener {
 
 	private Set<Player> executed = new HashSet<>();
 
 	public void start() {
-		new BukkitRunnable() {
+		new Scheduler() {
+
 			@Override
 			public void run() {
-				executed.clear();
+				ListenerLaunchable.this.executed.clear();
 			}
-		}.runTaskTimer(Main.getInstance(), 1, 1);
+
+		}.runTaskTimer(1, 1);
 	}
 
 	@EventHandler
@@ -36,12 +37,11 @@ public class ListenerLaunchable implements Listener {
 			return;
 		}
 		Player p = (Player) e.getEntity().getShooter();
-		if (executed.contains(p)) {
-			executed.remove(p);
+		if (this.executed.contains(p)) {
+			this.executed.remove(p);
 			return;
 		}
-		LaunchableInteractEvent pe = new LaunchableInteractEvent(p, e.getEntity(),
-				null);
+		LaunchableInteractEvent pe = new LaunchableInteractEvent(p, e.getEntity(), p.getItemInHand());
 		Bukkit.getPluginManager().callEvent(pe);
 		if (pe.isCancelled()) {
 			e.setCancelled(true);
@@ -74,17 +74,18 @@ public class ListenerLaunchable implements Listener {
 			type = EntityType.THROWN_EXP_BOTTLE;
 			break;
 		default:
-			return;
+			break;
 		}
-		if (executed.contains(e.getPlayer())) {
+		if (this.executed.contains(e.getPlayer())) {
 			e.setCancelled(true);
 			return;
 		}
-		executed.add(e.getPlayer());
+		this.executed.add(e.getPlayer());
 		LaunchableInteractEvent pe = new LaunchableInteractEvent(e.getPlayer(), type, e.getItem());
 		Bukkit.getPluginManager().callEvent(pe);
 		if (pe.isCancelled()) {
 			e.setCancelled(true);
 		}
 	}
+
 }

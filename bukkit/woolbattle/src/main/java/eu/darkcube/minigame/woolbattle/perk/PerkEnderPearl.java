@@ -13,11 +13,17 @@ import eu.darkcube.minigame.woolbattle.util.observable.SimpleObservableInteger;
 public class PerkEnderPearl implements Perk {
 
 	public static int COOLDOWN = 5;
+
 	public static int COST = 8;
+
 	private final User owner;
+
 	private final Player player;
+
 	private final ObservableInteger slot;
+
 	private final ObservableInteger cooldown;
+
 	private final PerkNumber perkNumber;
 
 	public PerkEnderPearl(User owner) {
@@ -25,40 +31,54 @@ public class PerkEnderPearl implements Perk {
 		this.owner = owner;
 		this.player = Bukkit.getPlayer(owner.getUniqueId());
 		this.cooldown = new SimpleObservableInteger(0) {
+
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
-				setItem();
+				PerkEnderPearl.this.setItem();
 			}
 
 			@Override
 			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
-				
+
 			}
+
 		};
 		this.slot = new SimpleObservableInteger() {
+
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 				if (oldValue != null) {
 					if (oldValue == 100)
-						player.getOpenInventory().setCursor(null);
+						PerkEnderPearl.this.player.getOpenInventory().setCursor(null);
 					else
-						player.getOpenInventory().setItem(oldValue, null);
+						PerkEnderPearl.this.player.getOpenInventory().setItem(oldValue, null);
 				}
-				perkNumber.setRawSlot(owner, newValue);
-				setItem();
+				PerkEnderPearl.this.perkNumber.setRawSlot(owner, newValue);
+				PerkEnderPearl.this.setItem();
 			}
 
 			@Override
 			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
-				perkNumber.setRawSlot(owner, newValue);
+				PerkEnderPearl.this.perkNumber.setRawSlot(owner, newValue);
 			}
+
 		};
-		setSlot(perkNumber.getRawSlot(owner));
+		this.setSlot(this.perkNumber.getRawSlot(owner));
 	}
 
 	@Override
 	public int getMaxCooldown() {
-		return COOLDOWN;
+		return PerkEnderPearl.COOLDOWN;
+	}
+
+	@Override
+	public int getCost() {
+		return PerkEnderPearl.COST;
+	}
+
+	@Override
+	public void setCost(int cost) {
+		PerkEnderPearl.COST = cost;
 	}
 
 	@Override
@@ -78,11 +98,11 @@ public class PerkEnderPearl implements Perk {
 
 	@Override
 	public ItemStack calculateItem() {
-		if (getCooldown() == 0) {
-			return getItem().getItem(owner);
+		if (this.getCooldown() == 0) {
+			return this.getItem().getItem(this.owner);
 		}
-		ItemStack item = getCooldownItem().getItem(owner);
-		item.setAmount(getCooldown());
+		ItemStack item = this.getCooldownItem().getItem(this.owner);
+		item.setAmount(this.getCooldown());
 		return item;
 	}
 
@@ -93,12 +113,12 @@ public class PerkEnderPearl implements Perk {
 
 	@Override
 	public String getDisplayName() {
-		return getItem().getDisplayName(owner);
+		return this.getItem().getDisplayName(this.owner);
 	}
 
 	@Override
 	public ObservableInteger getSlotLink() {
-		return slot;
+		return this.slot;
 	}
 
 	@Override
@@ -108,17 +128,17 @@ public class PerkEnderPearl implements Perk {
 
 	@Override
 	public int getSlot() {
-		return slot.getObject();
+		return this.slot.getObject();
 	}
 
 	@Override
 	public User getOwner() {
-		return owner;
+		return this.owner;
 	}
 
 	@Override
 	public ObservableInteger getCooldownLink() {
-		return cooldown;
+		return this.cooldown;
 	}
 
 	@Override
@@ -128,12 +148,12 @@ public class PerkEnderPearl implements Perk {
 
 	@Override
 	public int getCooldown() {
-		return cooldown.getObject();
+		return this.cooldown.getObject();
 	}
 
 	@Override
 	public PerkNumber getPerkNumber() {
-		return perkNumber;
+		return this.perkNumber;
 	}
 
 	@Override
@@ -149,4 +169,5 @@ public class PerkEnderPearl implements Perk {
 	@Override
 	public void setHardCooldown(boolean hardCooldown) {
 	}
+
 }

@@ -11,16 +11,12 @@ import eu.darkcube.minigame.woolbattle.Main;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.perk.PerkEnderPearl;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerEnderpearlLaunchable extends Listener<LaunchableInteractEvent> {
-
-//	private Set<User> last = new HashSet<>();
-//	private boolean disable = false;
 
 	public void enable() {
 //		disable = false;
@@ -50,7 +46,7 @@ public class ListenerEnderpearlLaunchable extends Listener<LaunchableInteractEve
 			Player p = e.getPlayer();
 			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
 
-			ItemStack item = e.getItem() == null ? p.getItemInHand() : e.getItem();
+			ItemStack item = e.getItem();
 
 			if (item == null)
 				return;
@@ -59,64 +55,55 @@ public class ListenerEnderpearlLaunchable extends Listener<LaunchableInteractEve
 				return;
 			}
 
-//			if (lastUser == user) {
-//				if (System.currentTimeMillis() - lastTime < 20) {
-//					return;
-//				}
-//			}
-//			if (last.contains(user)) {
-//				Main.getInstance().sendMessage("2");
-//				return;
-//			}
-//			last.add(user);
-
-//			lastUser = user;
-//			lastTime = System.currentTimeMillis();
-
 			if (user.getEnderPearl().getCooldown() > 0
-					|| !p.getInventory().contains(Material.WOOL, PerkEnderPearl.COST)) {
+					|| !p.getInventory().contains(Material.WOOL, user.getEnderPearl().getCost())) {
 				if (e.getEntity() != null) {
 					e.getEntity().remove();
-					setItem(user);
+					this.setItem(user);
 				} else {
-					deny(user);
+					this.deny(user);
 				}
 				e.setCancelled(true);
 				return;
 			}
-			ItemManager.removeItems(user, p.getInventory(), user.getSingleWoolItem(), PerkEnderPearl.COST);
+			ItemManager.removeItems(user, p.getInventory(), user.getSingleWoolItem(), user.getEnderPearl().getCost());
 
-			if (e.getItem() != null) {
+			if (e.getEntity() == null) {
 				p.launchProjectile(EnderPearl.class);
 				e.setCancelled(true);
 			}
 			new Scheduler() {
+
 				int cd = user.getEnderPearl().getMaxCooldown();
 
 				@Override
 				public void run() {
-					user.getEnderPearl().setCooldown(cd);
-					if (cd <= 0) {
+					user.getEnderPearl().setCooldown(this.cd);
+					if (this.cd <= 0) {
 						this.cancel();
 						return;
 					}
-					cd--;
+					this.cd--;
 				}
+
 			}.runTaskTimer(20);
 		}
 	}
 
 	private void deny(User user) {
 		Ingame.playSoundNotEnoughWool(user);
-		setItem(user);
+		this.setItem(user);
 	}
 
 	private void setItem(User user) {
 		new Scheduler() {
+
 			@Override
 			public void run() {
 				user.getEnderPearl().setItem();
 			}
+
 		}.runTask();
 	}
+
 }

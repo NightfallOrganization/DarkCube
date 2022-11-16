@@ -22,6 +22,7 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent> {
 
 	public static final Item SWITCHER = PerkType.SWITCHER.getItem();
+
 	public static final Item SWITCHER_COOLDOWN = PerkType.SWITCHER.getCooldownItem();
 
 //	private User lastUser;
@@ -34,7 +35,7 @@ public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent
 			Player p = e.getPlayer();
 			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
 
-			ItemStack item = e.getItem() == null ? p.getItemInHand() : e.getItem();
+			ItemStack item = e.getItem();
 			if (item == null) {
 				return;
 			}
@@ -42,15 +43,15 @@ public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent
 			if (perk == null) {
 				return;
 			}
-			if (SWITCHER_COOLDOWN.getItemId().equals(ItemManager.getItemId(item))) {
-				deny(user, perk);
+			if (ListenerSwitcherLaunchable.SWITCHER_COOLDOWN.getItemId().equals(ItemManager.getItemId(item))) {
+				this.deny(user, perk);
 				e.setCancelled(true);
 				return;
-			} else if (!SWITCHER.getItemId().equals(ItemManager.getItemId(item))) {
+			} else if (!ListenerSwitcherLaunchable.SWITCHER.getItemId().equals(ItemManager.getItemId(item))) {
 				return;
 			}
 			if (perk.getCooldown() > 0 || !p.getInventory().contains(Material.WOOL, PerkType.SWITCHER.getCost())) {
-				deny(user, perk);
+				this.deny(user, perk);
 				e.setCancelled(true);
 				return;
 			}
@@ -78,17 +79,19 @@ public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent
 			ball.setMetadata("perk", new FixedMetadataValue(Main.getInstance(), perk.getPerkName().getName()));
 
 			new Scheduler() {
+
 				int cd = perk.getMaxCooldown();
 
 				@Override
 				public void run() {
-					perk.setCooldown(cd);
-					if (cd <= 0) {
+					perk.setCooldown(this.cd);
+					if (this.cd <= 0) {
 						this.cancel();
 						return;
 					}
-					cd--;
+					this.cd--;
 				}
+
 			}.runTaskTimer(20);
 
 //			ItemManager.removeItems(p.getInventory(),
@@ -179,10 +182,11 @@ public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent
 
 	private void deny(User user, Perk perk) {
 		Ingame.playSoundNotEnoughWool(user);
-		setItem(perk);
+		this.setItem(perk);
 	}
 
 	private void setItem(Perk perk) {
 		perk.setItem();
 	}
+
 }

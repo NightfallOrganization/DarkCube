@@ -5,88 +5,79 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 
 public enum PerkType implements Comparable<PerkType> {
 
-	SLIMEJUMP(Item.PERK_SLIMEJUMP, Item.PERK_SLIMEJUMP_COOLDOWN, 20, PerkName.SLIMEJUMP, false, 18),
-	CAPSULE(Item.PERK_CAPSULE, Item.PERK_CAPSULE_COOLDOWN, 30, PerkName.CAPSULE,
-					false, 24),
+//	SLIME_PLATFORM(Item.PERK_SLIME_PLATFORM, Item.PERK_SLIME_PLATFORM_COOLDOWN, 20, PerkName.SLIME_PLATFORM, false, 18),
 
-	SWITCHER(Item.PERK_SWITCHER, Item.PERK_SWITCHER_COOLDOWN, 7,
-					PerkName.SWITCHER, false, 8),
+	CAPSULE(Item.PERK_CAPSULE, Item.PERK_CAPSULE_COOLDOWN, 30, PerkName.CAPSULE, false, 24),
 
-	LINE_BUILDER(Item.PERK_LINE_BUILDER, Item.PERK_LINE_BUILDER_COOLDOWN, 10,
-					PerkName.LINE_BUILDER, false, 2, true),
+	SWITCHER(Item.PERK_SWITCHER, Item.PERK_SWITCHER_COOLDOWN, 7, PerkName.SWITCHER, false, 8),
 
-	WOOL_BOMB(Item.PERK_WOOL_BOMB, Item.PERK_WOOL_BOMB_COOLDOWN, 14,
-					PerkName.WOOL_BOMB, false, 8),
+	LINE_BUILDER(Item.PERK_LINE_BUILDER, Item.PERK_LINE_BUILDER_COOLDOWN, 10, PerkName.LINE_BUILDER, false, 2, true),
 
-	RONJAS_TOILET_SPLASH(Item.PERK_RONJAS_TOILET_SPLASH,
-					Item.PERK_RONJAS_TOILET_SPLASH_COOLDOWN, 13,
-					PerkName.RONJAS_TOILET_SPLASH, false, 12),
+	WOOL_BOMB(Item.PERK_WOOL_BOMB, Item.PERK_WOOL_BOMB_COOLDOWN, 14, PerkName.WOOL_BOMB, false, 8),
 
-	SAFETY_PLATFORM(Item.PERK_SAFETY_PLATFORM,
-					Item.PERK_SAFETY_PLATFORM_COOLDOWN, 25,
-					PerkName.SAFETY_PLATFORM, false, 24),
+	RONJAS_TOILET_SPLASH(Item.PERK_RONJAS_TOILET_SPLASH, Item.PERK_RONJAS_TOILET_SPLASH_COOLDOWN, 13,
+			PerkName.RONJAS_TOILET_SPLASH, false, 12),
 
-	WALL_GENERATOR(Item.PERK_WALL_GENERATOR, Item.PERK_WALL_GENERATOR_COOLDOWN,
-					9, PerkName.WALL_GENERATOR, false, 1, true),
+	SAFETY_PLATFORM(Item.PERK_SAFETY_PLATFORM, Item.PERK_SAFETY_PLATFORM_COOLDOWN, 25, PerkName.SAFETY_PLATFORM, false,
+			24),
 
-	GRANDPAS_CLOCK(Item.PERK_GRANDPAS_CLOCK, Item.PERK_GRANDPAS_CLOCK_COOLDOWN,
-					16, PerkName.GRANDPAS_CLOCK, false, 18),
+	WALL_GENERATOR(Item.PERK_WALL_GENERATOR, Item.PERK_WALL_GENERATOR_COOLDOWN, 9, PerkName.WALL_GENERATOR, false, 1,
+			true),
 
-	GHOST(Item.PERK_GHOST, Item.PERK_GHOST_COOLDOWN, 30, PerkName.GHOST, false,
-					20),
+	GRANDPAS_CLOCK(Item.PERK_GRANDPAS_CLOCK, Item.PERK_GRANDPAS_CLOCK_COOLDOWN, 16, PerkName.GRANDPAS_CLOCK, false, 18),
 
-	BLINK(Item.PERK_BLINK, Item.PERK_BLINK_COOLDOWN, 15, PerkName.BLINK, false,
-					12),
+	GHOST(Item.PERK_GHOST, Item.PERK_GHOST_COOLDOWN, 30, PerkName.GHOST, false, 20),
 
-	MINIGUN(Item.PERK_MINIGUN, Item.PERK_MINIGUN_COOLDOWN, 10, PerkName.MINIGUN,
-					false, 1),
+	BLINK(Item.PERK_BLINK, Item.PERK_BLINK_COOLDOWN, 15, PerkName.BLINK, false, 12),
 
-	GRABBER(Item.PERK_GRABBER, Item.PERK_GRABBER_COOLDOWN, 7, PerkName.GRABBER,
-					false, 10),
+	MINIGUN(Item.PERK_MINIGUN, Item.PERK_MINIGUN_COOLDOWN, 10, PerkName.MINIGUN, false, 1),
 
-	BOOSTER(Item.PERK_BOOSTER, Item.PERK_BOOSTER_COOLDOWN, 18, PerkName.BOOSTER,
-					false, 12),
+	GRABBER(Item.PERK_GRABBER, Item.PERK_GRABBER_COOLDOWN, 7, PerkName.GRABBER, false, 10),
 
-	GRAPPLING_HOOK(Item.PERK_GRAPPLING_HOOK, Item.PERK_GRAPPLING_HOOK_COOLDOWN, 12,
-					PerkName.GRAPPLING_HOOK, false, 12),
-	
+	BOOSTER(Item.PERK_BOOSTER, Item.PERK_BOOSTER_COOLDOWN, 18, PerkName.BOOSTER, false, 12),
+
+	GRAPPLING_HOOK(Item.PERK_GRAPPLING_HOOK, Item.PERK_GRAPPLING_HOOK_COOLDOWN, 12, PerkName.GRAPPLING_HOOK, false, 12),
+
 	ROPE(Item.PERK_ROPE, Item.PERK_ROPE_COOLDOWN, 12, PerkName.ROPE, false, 12),
 
-	EXTRA_WOOL(Item.PERK_EXTRA_WOOL, Item.PERK_EXTRA_WOOL, 0,
-					PerkName.EXTRA_WOOL, true, 0),
+	EXTRA_WOOL(Item.PERK_EXTRA_WOOL, Item.PERK_EXTRA_WOOL, 0, PerkName.EXTRA_WOOL, true, 0),
 
 //	BACKPACK(Item.PERK_BACKPACK, Item.PERK_BACKPACK, 0, PerkName.BACKPACK, true,
 //					0),
 
 	LONGJUMP(Item.PERK_LONGJUMP, Item.PERK_LONGJUMP, 0, PerkName.LONGJUMP, true, 0),
-	ROCKETJUMP(Item.PERK_ROCKETJUMP, Item.PERK_ROCKETJUMP, 0,
-					PerkName.ROCKETJUMP, true, 0),
+	ROCKETJUMP(Item.PERK_ROCKETJUMP, Item.PERK_ROCKETJUMP, 0, PerkName.ROCKETJUMP, true, 0),
 
-	ARROW_RAIN(Item.PERK_ARROW_RAIN, Item.PERK_ARROW_RAIN_COOLDOWN, 6,
-					PerkName.ARROW_RAIN, true, 10),
+	ARROW_RAIN(Item.PERK_ARROW_RAIN, Item.PERK_ARROW_RAIN_COOLDOWN, 6, PerkName.ARROW_RAIN, true, 10),
 
-	FAST_ARROW(Item.PERK_FAST_ARROW, Item.PERK_FAST_ARROW, 0,
-					PerkName.FAST_ARROW, true, 0),
+	FAST_ARROW(Item.PERK_FAST_ARROW, Item.PERK_FAST_ARROW, 0, PerkName.FAST_ARROW, true, 0),
 
-	TNT_ARROW(Item.PERK_TNT_ARROW, Item.PERK_TNT_ARROW_COOLDOWN, 7,
-					PerkName.TNT_ARROW, true, 16),
+	TNT_ARROW(Item.PERK_TNT_ARROW, Item.PERK_TNT_ARROW_COOLDOWN, 7, PerkName.TNT_ARROW, true, 16),
 
 //	ELEVATOR(Item.PERK_ELEVATOR, Item.PERK_ELEVATOR_COOLDOWN, 5, PerkName.ELEVATOR, true, 8),
 
 	;
 
 	private final Item item;
+
 	private final Item cooldownItem;
+
 	private final PerkName perkName;
+
 	private int cooldown;
+
 	private int cost;
+
 	private final int defaultCost;
+
 	private final int defaultCooldown;
+
 	private final boolean passive;
+
 	private final boolean isCostPerBlock;
 
-	PerkType(Item item, Item cooldownItem, int cooldown, PerkName perkName,
-					boolean passive, int cost, boolean costPerBlock) {
+	PerkType(Item item, Item cooldownItem, int cooldown, PerkName perkName, boolean passive, int cost,
+			boolean costPerBlock) {
 		this.cost = cost;
 		this.defaultCost = cost;
 		this.passive = passive;
@@ -101,21 +92,20 @@ public enum PerkType implements Comparable<PerkType> {
 		this.cooldownItem.setPerk(this);
 	}
 
-	PerkType(Item item, Item cooldownItem, int cooldown, PerkName perkName,
-					boolean passive, int cost) {
+	PerkType(Item item, Item cooldownItem, int cooldown, PerkName perkName, boolean passive, int cost) {
 		this(item, cooldownItem, cooldown, perkName, passive, cost, false);
 	}
 
 	public boolean isCostPerBlock() {
-		return isCostPerBlock;
+		return this.isCostPerBlock;
 	}
 
 	public int getDefaultCost() {
-		return defaultCost;
+		return this.defaultCost;
 	}
 
 	public int getDefaultCooldown() {
-		return defaultCooldown;
+		return this.defaultCooldown;
 	}
 
 	public Perk newPerkTypePerk(User owner, PerkNumber perkNumber) {
@@ -123,31 +113,31 @@ public enum PerkType implements Comparable<PerkType> {
 	}
 
 	public PerkName getPerkName() {
-		return perkName;
+		return this.perkName;
 	}
 
 	public Item getItem() {
-		return item;
+		return this.item;
 	}
 
 	public int getCost() {
-		return cost;
+		return this.cost;
 	}
 
 	public boolean isPassive() {
-		return passive;
+		return this.passive;
 	}
 
 	public Item getCooldownItem() {
-		return cooldownItem;
+		return this.cooldownItem;
 	}
 
 	public boolean hasCooldown() {
-		return getCooldown() != 0;
+		return this.getCooldown() != 0;
 	}
 
 	public int getCooldown() {
-		return cooldown;
+		return this.cooldown;
 	}
 
 	public void setCost(int cost) {
@@ -159,10 +149,11 @@ public enum PerkType implements Comparable<PerkType> {
 	}
 
 	public static PerkType valueOf(PerkName name) {
-		for (PerkType type : values()) {
+		for (PerkType type : PerkType.values()) {
 			if (type.getPerkName().equals(name))
 				return type;
 		}
 		return null;
 	}
+
 }

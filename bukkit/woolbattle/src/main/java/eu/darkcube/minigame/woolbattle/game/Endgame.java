@@ -39,7 +39,7 @@ public class Endgame extends GamePhase {
 	public void onEnable() {
 		CloudNetLink.update();
 		final Main main = Main.getInstance();
-		main.getSchedulers().clear();
+//		main.getSchedulers().clear();
 
 		Main.registerListeners(this.listenerPlayerJoin);
 		Main.registerListeners(this.listenerPlayerQuit);

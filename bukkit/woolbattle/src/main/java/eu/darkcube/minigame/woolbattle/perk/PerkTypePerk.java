@@ -17,11 +17,17 @@ import eu.darkcube.minigame.woolbattle.util.observable.SimpleObservableInteger;
 public class PerkTypePerk implements Perk {
 
 	private final PerkType type;
+
 	private final User owner;
+
 	private final Player player;
+
 	private final ObservableInteger slot;
+
 	private final ObservableInteger cooldown;
+
 	private final PerkNumber perkNumber;
+
 	private boolean hardCooldown = true;
 
 	public PerkTypePerk(PerkType type, User owner, PerkNumber perkNumber) {
@@ -30,46 +36,60 @@ public class PerkTypePerk implements Perk {
 		this.type = type;
 		this.player = Bukkit.getPlayer(owner.getUniqueId());
 		this.cooldown = new SimpleObservableInteger(0) {
+
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 				if (newValue == 0)
-					setHardCooldown(false);
-				if (!isHardCooldown() && newValue == getMaxCooldown())
-					setHardCooldown(true);
-				setItem();
+					PerkTypePerk.this.setHardCooldown(false);
+				if (!PerkTypePerk.this.isHardCooldown() && newValue == PerkTypePerk.this.getMaxCooldown())
+					PerkTypePerk.this.setHardCooldown(true);
+				PerkTypePerk.this.setItem();
 			}
 
 			@Override
 			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 			}
+
 		};
 		this.slot = new SimpleObservableInteger() {
+
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 				if (oldValue != null) {
 					if (oldValue == 100)
-						player.getOpenInventory().setCursor(null);
+						PerkTypePerk.this.player.getOpenInventory().setCursor(null);
 					else
-						player.getOpenInventory().setItem(oldValue, null);
+						PerkTypePerk.this.player.getOpenInventory().setItem(oldValue, null);
 				}
 				perkNumber.setRawSlot(owner, newValue);
-				setItem();
+				PerkTypePerk.this.setItem();
 			}
 
 			@Override
 			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
 				perkNumber.setRawSlot(owner, newValue);
 			}
+
 		};
 		if (perkNumber != PerkNumber.DISPLAY)
-			setSlot(perkNumber.getRawSlot(owner));
+			this.setSlot(perkNumber.getRawSlot(owner));
 		if (type == PerkType.LINE_BUILDER)
-			hardCooldown = false;
+			this.hardCooldown = false;
+	}
+
+	@Override
+	public int getCost() {
+		return this.type.getCost();
+	}
+
+	@Override
+	public void setCost(int cost) {
+		this.type.setCost(cost);
 	}
 
 	@Override
 	public boolean isHardCooldown() {
-		return hardCooldown;
+		return this.hardCooldown;
 	}
 
 	@Override
@@ -79,42 +99,42 @@ public class PerkTypePerk implements Perk {
 
 	@Override
 	public int getMaxCooldown() {
-		return type.getCooldown();
+		return this.type.getCooldown();
 	}
 
 	@Override
 	public boolean hasCooldown() {
-		return type.hasCooldown();
+		return this.type.hasCooldown();
 	}
 
 	@Override
 	public Item getCooldownItem() {
-		return type.getCooldownItem();
+		return this.type.getCooldownItem();
 	}
 
 	@Override
 	public Item getItem() {
-		return type.getItem();
+		return this.type.getItem();
 	}
 
 	@Override
 	public ItemStack calculateItem() {
-		if (getCooldown() == 0
-				|| ((type == PerkType.LINE_BUILDER) && getCooldown() != getMaxCooldown() && !isHardCooldown())) {
-			ItemStack item = getItem().getItem(owner);
-			if (type == PerkType.GRABBER
-					&& Main.getInstance().getIngame().listenerGrabberInteract.grabbed.containsKey(owner)) {
-				item = Item.PERK_GRABBER_GRABBED.getItem(owner);
+		if (this.getCooldown() == 0 || ((this.type == PerkType.LINE_BUILDER)
+				&& this.getCooldown() != this.getMaxCooldown() && !this.isHardCooldown())) {
+			ItemStack item = this.getItem().getItem(this.owner);
+			if (this.type == PerkType.GRABBER
+					&& Main.getInstance().getIngame().listenerGrabberInteract.grabbed.containsKey(this.owner)) {
+				item = Item.PERK_GRABBER_GRABBED.getItem(this.owner);
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName(
-						Main.getInstance().getIngame().listenerGrabberInteract.grabbed.get(owner).getTeamPlayerName());
+				meta.setDisplayName(Main.getInstance().getIngame().listenerGrabberInteract.grabbed.get(this.owner)
+						.getTeamPlayerName());
 				item.setItemMeta(meta);
-			} else if (type == PerkType.ARROW_RAIN) {
+			} else if (this.type == PerkType.ARROW_RAIN) {
 				ItemMeta meta = item.getItemMeta();
 				meta.addEnchant(Enchantment.ARROW_INFINITE, 100, true);
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				item.setItemMeta(meta);
-			} else if (type == PerkType.TNT_ARROW) {
+			} else if (this.type == PerkType.TNT_ARROW) {
 				ItemMeta meta = item.getItemMeta();
 				meta.addEnchant(Enchantment.ARROW_INFINITE, 100, true);
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -122,24 +142,24 @@ public class PerkTypePerk implements Perk {
 			}
 			return item;
 		}
-		ItemStack item = getCooldownItem().getItem(owner);
-		item.setAmount(getCooldown());
+		ItemStack item = this.getCooldownItem().getItem(this.owner);
+		item.setAmount(this.getCooldown());
 		return item;
 	}
 
 	@Override
 	public PerkName getPerkName() {
-		return type.getPerkName();
+		return this.type.getPerkName();
 	}
 
 	@Override
 	public String getDisplayName() {
-		return getItem().getDisplayName(owner);
+		return this.getItem().getDisplayName(this.owner);
 	}
 
 	@Override
 	public ObservableInteger getSlotLink() {
-		return slot;
+		return this.slot;
 	}
 
 	@Override
@@ -149,17 +169,17 @@ public class PerkTypePerk implements Perk {
 
 	@Override
 	public int getSlot() {
-		return slot.getObject();
+		return this.slot.getObject();
 	}
 
 	@Override
 	public User getOwner() {
-		return owner;
+		return this.owner;
 	}
 
 	@Override
 	public ObservableInteger getCooldownLink() {
-		return cooldown;
+		return this.cooldown;
 	}
 
 	@Override
@@ -169,16 +189,17 @@ public class PerkTypePerk implements Perk {
 
 	@Override
 	public int getCooldown() {
-		return cooldown.getObject();
+		return this.cooldown.getObject();
 	}
 
 	@Override
 	public PerkNumber getPerkNumber() {
-		return perkNumber;
+		return this.perkNumber;
 	}
 
 	@Override
 	public void setSlotSilent(int slot) {
 		this.slot.setSilent(slot);
 	}
+
 }

@@ -236,7 +236,7 @@ public class Lobby extends GamePhase {
 		CloudNetLink.update();
 		Main.getInstance().reloadConfig("config");
 		Main.getInstance().baseLifes = null;
-		Main.getInstance().getSchedulers().clear();
+//		Main.getInstance().getSchedulers().clear();
 		this.setTimer(60 * 20);
 		this.VOTES_LIFES.clear();
 		this.VOTES_MAP.clear();

@@ -30,20 +30,9 @@ public class ListenerInteract extends Listener<PlayerInteractEvent> {
 		e.setCancelled(true);
 		if (e.getItem() != null && e.getItem().getType() != Material.AIR
 				&& ItemManager.getItemId(e.getItem()).equals(Item.TELEPORT_COMPASS.getItemId())) {
-			p.openInventory(createInventory(user));
+			p.openInventory(this.createInventory(user));
 			user.setOpenInventory(InventoryId.COMPASS_TELEPORT);
 		}
-//		if(e.getItem() != null) {
-//			Material t = e.getItem().getType();
-//			if(t == Material.SNOW_BALL || t == Material.EGG || t == Material.ENDER_PEARL || t == Material.EYE_OF_ENDER) {
-//				new Scheduler() {
-//					@Override
-//					public void run() {
-//						p.updateInventory();
-//					}
-//				}.runTaskLater(2);
-//			}
-//		}
 	}
 
 	@SuppressWarnings("deprecation")
