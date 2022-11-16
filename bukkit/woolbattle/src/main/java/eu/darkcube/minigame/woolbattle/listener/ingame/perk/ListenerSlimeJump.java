@@ -20,10 +20,8 @@ public class ListenerSlimeJump extends PerkListener{
 
             User user = Main.getInstance().getUserWrapper().getUser(e.getPlayer().getUniqueId());
             if (super.checkUsable(user, Item.PERK_SLIMEJUMP, e.getItem() )){
-
-                new Scheduler(){
-
-                }.runTaskLater(15);
+                super.payForThePerk(e.getPlayer(),user,PerkType.SLIMEJUMP);
+                //todo slime shit
             }
         }
     }
