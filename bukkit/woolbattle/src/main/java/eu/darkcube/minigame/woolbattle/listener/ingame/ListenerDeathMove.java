@@ -17,16 +17,16 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 	@EventHandler
 	public void handle(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
-		User user = main.getUserWrapper().getUser(p.getUniqueId());
+		User user = this.main.getUserWrapper().getUser(p.getUniqueId());
 		if (user.getTeam().getType() != TeamType.SPECTATOR) {
-			if (p.getLocation().getY() <= main.getMap().getDeathHeight()) {
-				if (main.getIngame().listenerGhostInteract.ghosts.containsKey(user)) {
-					main.getIngame().listenerGhostEntityDamageByEntity.reset(user,
-							main.getIngame().listenerGhostInteract.ghosts.get(user));
+			if (p.getLocation().getY() <= this.main.getMap().getDeathHeight()) {
+				if (this.main.getIngame().listenerGhostInteract.ghosts.containsKey(user)) {
+					this.main.getIngame().listenerGhostEntityDamageByEntity.reset(user,
+							this.main.getIngame().listenerGhostInteract.ghosts.get(user));
 					return;
 				}
 				if (user.getTicksAfterLastHit() <= 200) {
-					main.getIngame().kill(user);
+					this.main.getIngame().kill(user);
 					user.setTicksAfterLastHit(201);
 				} else {
 					p.teleport(user.getTeam().getSpawn());
@@ -36,28 +36,7 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 		}
 		if (e.getTo().getY() < 0) {
 			p.teleport(user.getTeam().getSpawn());
-		}
-//		Main main = Main.getInstance();
-//
-//		@Override
-//		public void run() {
-//			for (User user : main.getUserWrapper().getUsers()) {
-//				if (user.getTeam().getType() != TeamType.SPECTATOR) {
-//					if (user.getBukkitEntity().getLocation().getBlockY() <= main.getMap().getDeathHeight()) {
-//						if (listenerGhostInteract.ghosts.containsKey(user)) {
-//							listenerGhostEntityDamageByEntity.reset(user, listenerGhostInteract.ghosts.get(user));
-//							continue;
-//						}
-//						if (user.getTicksAfterLastHit() <= 200) {
-//							kill(user);
-//							user.setTicksAfterLastHit(201);
-//						} else {
-//							user.getBukkitEntity().teleport(user.getTeam().getSpawn());
-//						}
-//					}
-//				}
-//			}
-//		}		
+		}	
 	}
 
 }

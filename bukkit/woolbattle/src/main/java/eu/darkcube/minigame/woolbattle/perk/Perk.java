@@ -6,6 +6,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
+import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -24,12 +26,13 @@ public interface Perk {
 	Item getItem();
 
 	default void setItem() {
-		if (this.getOwner().getPerk(this.getPerkNumber()) == this) {
+		if (Main.getInstance().getIngame().isEnabled() && this.getOwner().getTeam().getType() != TeamType.SPECTATOR
+				&& this.getOwner().getPerk(this.getPerkNumber()) == this) {
 			if (this.getSlot() == 100) {
 				this.getOwner().getBukkitEntity().getOpenInventory().setCursor(this.calculateItem());
 			} else {
-				this.getOwner().getBukkitEntity().getHandle().defaultContainer.getBukkitView().setItem(this.getSlot(),
-						this.calculateItem());
+				this.getOwner().getBukkitEntity().getHandle().defaultContainer.getBukkitView()
+						.setItem(this.getSlot(), this.calculateItem());
 			}
 			this.updateInventory();
 		}
@@ -38,8 +41,8 @@ public interface Perk {
 	default void updateInventory() {
 		CraftPlayer p = this.getOwner().getBukkitEntity();
 		EntityPlayer ep = p.getHandle();
-		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId,
-				this.getSlot(), CraftItemStack.asNMSCopy(this.calculateItem())));
+		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId, this.getSlot(),
+				CraftItemStack.asNMSCopy(this.calculateItem())));
 	}
 
 	ItemStack calculateItem();
@@ -57,9 +60,9 @@ public interface Perk {
 	int getSlot();
 
 	ObservableInteger getCooldownLink();
-	
+
 	int getCost();
-	
+
 	void setCost(int cost);
 
 	void setCooldown(int cooldown);
@@ -77,4 +80,5 @@ public interface Perk {
 	public static Collection<PerkType> getAllPerks() {
 		return Arrays.asList(PerkType.values());
 	}
+
 }
