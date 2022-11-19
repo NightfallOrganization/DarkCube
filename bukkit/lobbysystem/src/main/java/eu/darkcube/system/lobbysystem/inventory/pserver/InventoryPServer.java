@@ -37,7 +37,7 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 	private Listener listener;
 
 	public InventoryPServer(User user) {
-		super(InventoryPServer.type_pserver, Item.PSERVER_MAIN_ITEM.getDisplayName(user), user);
+		super(InventoryPServer.type_pserver, Item.PSERVER_PUBLIC.getDisplayName(user), user);
 //		super(Item.PSERVER_MAIN_ITEM.getDisplayName(user), InventoryPServer.type_pserver);
 		this.listener = new Listener();
 		this.listener.register();
@@ -84,8 +84,6 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 			b.displayname(Message.PSERVER_ITEM_TITLE.getMessage(this.user, ps.getServerName()));
 			b.lore(publicServer ? Message.CLICK_TO_JOIN.getMessage(this.user)
 					: Message.PSERVER_NOT_PUBLIC.getMessage(this.user));
-			b.build();
-			b.meta(null);
 			Item.setItemId(b, InventoryPServer.ITEMID);
 			b.getUnsafe().setString(InventoryPServer.META_KEY_PSERVER, ps.getId().toString());
 

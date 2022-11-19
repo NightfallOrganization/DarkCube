@@ -43,6 +43,8 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
 	public final int slot;
 
+	private boolean done = false;
+
 	public InventoryGameServerSelection(User user, Item item, InventoryType type,
 			Supplier<Collection<ServiceTask>> supplier, BiFunction<User, ServiceTask, ItemBuilder> toItemFunction,
 			PServerUserSlot psslot, int slot) {
@@ -60,6 +62,13 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 				19, 1, 5, 14, 20, 0, 6
 				//@formatter:on
 		};
+		this.done = true;
+		this.complete();
+	}
+
+	@Override
+	protected boolean done() {
+		return super.done() && this.done;
 	}
 
 	@Override
@@ -77,7 +86,6 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 			JsonObject data = new JsonObject();
 			data.addProperty(InventoryGameServerSelection.SLOT, slot);
 			data.addProperty(InventoryGameServerSelection.SERVICETASK, serviceTask.getName());
-			b.meta(null);
 			b.getUnsafe().setString(InventoryGameServerSelection.GAMESERVER_META_KEY, data.toString());
 			Item.setItemId(b, InventoryGameServerSelection.ITEMID);
 			items.put(this.itemSort[slot % this.itemSort.length] + this.itemSort.length * (slot / this.itemSort.length),

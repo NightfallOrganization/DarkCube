@@ -26,16 +26,25 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 
 	public final PServerUserSlot psslot;
 
+	private boolean done = false;
+
 	public InventoryPServerConfiguration(User user, PServerUserSlot psslot) {
 		super(InventoryPServerConfiguration.type_pserver_configuration,
 				InventoryPServerConfiguration.getDisplayName(user, psslot), user);
 		this.psslot = psslot;
 		CloudNetDriver.getInstance().getEventManager().registerListener(this);
+		this.done = true;
+		this.complete();
 	}
 
 	private static String getDisplayName(User user, PServerUserSlot psslot) {
 		ItemBuilder item = PServerDataManager.getDisplayItem(user, psslot);
 		return item == null ? null : item.getDisplayname();
+	}
+
+	@Override
+	protected boolean done() {
+		return super.done() && this.done;
 	}
 
 	@Override

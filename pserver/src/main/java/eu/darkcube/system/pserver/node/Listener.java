@@ -29,6 +29,8 @@ public class Listener {
 		this.copy(e.getCloudService());
 //		}
 	}
+	
+	
 
 	@EventListener
 	public void handle(CloudServicePreStopEvent e) {

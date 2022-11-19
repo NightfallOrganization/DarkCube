@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import eu.darkcube.minigame.woolbattle.Main;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
 
@@ -17,7 +18,7 @@ public class ListenerCapsule extends BasicPerkListener {
 	}
 
 	@Override
-	protected boolean activate(User user) {
+	protected boolean activate(User user, Perk perk) {
 		Player p = user.getBukkitEntity();
 		Location loc = p.getLocation();
 		this.setBlock(loc.subtract(0, 1, 0));

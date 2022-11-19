@@ -128,13 +128,9 @@ public class Ingame extends GamePhase {
 
 	public final ListenerEntitySpawn listenerEntitySpawn;
 
-	public final ListenerWoolBombInteract listenerWoolBombInteract;
-
-	public final ListenerWoolBombLaunchable listenerWoolBombLaunch;
+	public final ListenerWoolBomb listenerWoolBomb;
 
 	public final ListenerTNTEntityDamageByEntity listenerTNTEntityDamageByEntity;
-
-	public final ListenerWoolBombHit listenerWoolBombHit;
 
 	public final ListenerExplode listenerWoolBombExplode;
 
@@ -223,10 +219,8 @@ public class Ingame extends GamePhase {
 		this.listenerGameModeChange = new ListenerGameModeChange();
 		this.listenerPlayerMove = new ListenerPlayerMove();
 		this.listenerEntitySpawn = new ListenerEntitySpawn();
-		this.listenerWoolBombInteract = new ListenerWoolBombInteract();
-		this.listenerWoolBombLaunch = new ListenerWoolBombLaunchable();
 		this.listenerTNTEntityDamageByEntity = new ListenerTNTEntityDamageByEntity();
-		this.listenerWoolBombHit = new ListenerWoolBombHit();
+		this.listenerWoolBomb = new ListenerWoolBomb();
 		this.listenerWoolBombExplode = new ListenerExplode();
 		this.listenerLineBuilderInteract = new ListenerLineBuilderInteract();
 		this.listenerRonjasToiletInteract = new ListenerRonjasToiletInteract();
@@ -427,14 +421,14 @@ public class Ingame extends GamePhase {
 				this.listenerProjectileLaunch, this.listenerInventoryClick, this.listenerInventoryDrag,
 				this.listenerCapsule, this.listenerSwitcherLaunch, this.listenerSwitcherSwitch, this.listenerInteract,
 				this.listenerGameModeChange, this.listenerPlayerMove, this.listenerEntitySpawn,
-				this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract, this.listenerWoolBombInteract,
-				this.listenerWoolBombLaunch, this.listenerTNTEntityDamageByEntity, this.listenerWoolBombHit,
-				this.listenerWoolBombExplode, this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract,
-				this.listenerRonjasToiletHit, this.listenerRonjasToiletEntityDamageByEntity,
-				this.listenerRonjasToiletLaunch, this.listenerBlinkInteract, this.listenerWallGeneratorInteract,
-				this.listenerGrandpasClockInteract, this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity,
-				this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract,
-				this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract,this.listenerSlimeJump);
+				this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract,
+				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerWoolBombExplode,
+				this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit,
+				this.listenerRonjasToiletEntityDamageByEntity, this.listenerRonjasToiletLaunch,
+				this.listenerBlinkInteract, this.listenerWallGeneratorInteract, this.listenerGrandpasClockInteract,
+				this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity, this.listenerMinigunInteract,
+				this.listenerDeathMove, this.listenerGrabberInteract, this.listenerBoosterInteract,
+				this.listenerGrapplingHookFishing, this.listenerRopeInteract, this.listenerSlimeJump);
 
 		Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
 			this.loadScoreboardObjective(u);
@@ -481,14 +475,14 @@ public class Ingame extends GamePhase {
 				this.listenerProjectileLaunch, this.listenerInventoryClick, this.listenerInventoryDrag,
 				this.listenerCapsule, this.listenerSwitcherLaunch, this.listenerSwitcherSwitch, this.listenerInteract,
 				this.listenerGameModeChange, this.listenerPlayerMove, this.listenerEntitySpawn,
-				this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract, this.listenerWoolBombInteract,
-				this.listenerWoolBombLaunch, this.listenerTNTEntityDamageByEntity, this.listenerWoolBombHit,
-				this.listenerWoolBombExplode, this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract,
-				this.listenerRonjasToiletHit, this.listenerRonjasToiletEntityDamageByEntity,
-				this.listenerRonjasToiletLaunch, this.listenerBlinkInteract, this.listenerWallGeneratorInteract,
-				this.listenerGrandpasClockInteract, this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity,
-				this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract,
-				this.listenerBoosterInteract, this.listenerGrapplingHookFishing, this.listenerRopeInteract, this.listenerSlimeJump);
+				this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract,
+				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerWoolBombExplode,
+				this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit,
+				this.listenerRonjasToiletEntityDamageByEntity, this.listenerRonjasToiletLaunch,
+				this.listenerBlinkInteract, this.listenerWallGeneratorInteract, this.listenerGrandpasClockInteract,
+				this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity, this.listenerMinigunInteract,
+				this.listenerDeathMove, this.listenerGrabberInteract, this.listenerBoosterInteract,
+				this.listenerGrapplingHookFishing, this.listenerRopeInteract, this.listenerSlimeJump);
 		this.listenerEnderpearlLaunchable.disable();
 		for (Block b : this.placedBlocks) {
 			b.setType(Material.AIR);

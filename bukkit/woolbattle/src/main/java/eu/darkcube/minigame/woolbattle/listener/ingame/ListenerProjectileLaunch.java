@@ -1,10 +1,7 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import java.lang.reflect.Field;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -25,6 +22,7 @@ import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
+
 	@Override
 	@EventHandler
 	public void handle(ProjectileLaunchEvent e) {
@@ -79,10 +77,12 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 					}
 					if (!p.getInventory().contains(Material.WOOL, PerkType.ARROW_RAIN.getCost())) {
 						new Scheduler() {
+
 							@Override
 							public void run() {
 								user.getPassivePerk().setItem();
 							}
+
 						}.runTask();
 						return;
 					}
@@ -99,8 +99,8 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 
 					user.getPassivePerk().setCooldown(user.getPassivePerk().getMaxCooldown() + arrowCount);
 
-					shootArrows(user, 20F / arrowCount, arrowCount / 2, arrow);
-					shootArrows(user, -20F / arrowCount, arrowCount / 2, arrow);
+					this.shootArrows(user, 20F / arrowCount, arrowCount / 2, arrow);
+					this.shootArrows(user, -20F / arrowCount, arrowCount / 2, arrow);
 
 //					for (int i = 0; i < 4; i++) {
 //						p.launchProjectile(Arrow.class);
@@ -112,57 +112,43 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 					}
 					user.getPassivePerk().setCooldown(user.getPassivePerk().getMaxCooldown());
 					new Scheduler() {
+
 						@Override
 						public void run() {
 							if (arrow.isDead() || !arrow.isValid()) {
-								cancel();
+								this.cancel();
 								if (user.getPassivePerk().getPerkName().equals(PerkType.TNT_ARROW.getPerkName())) {
-//								if (user.getPassivePerk().getCooldown() > 0) {
-//									user.getPassivePerk().setCooldown(user.getPassivePerk().getCooldown() - 1);
-//									return;
-//								}
 									if (!p.getInventory().contains(Material.WOOL, PerkType.TNT_ARROW.getCost())) {
 										new Scheduler() {
+
 											@Override
 											public void run() {
 												user.getPassivePerk().setItem();
 											}
+
 										}.runTask();
 										return;
 									}
 
 									int cost = PerkType.TNT_ARROW.getCost();
-									ItemStack wool =
-											new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor());
+									ItemStack wool = new ItemStack(Material.WOOL, 1,
+											user.getTeam().getType().getWoolColor());
 									if (cost < 0) {
 										wool.setAmount(0 - cost);
 										p.getInventory().addItem(wool);
 									} else {
 										ItemManager.removeItems(user, p.getInventory(), wool, cost);
 									}
-									CraftTNTPrimed tnt =
-											(CraftTNTPrimed) arrow.getWorld().spawn(arrow.getLocation(),
-													TNTPrimed.class);
+									TNTPrimed tnt = arrow.getWorld().spawn(arrow.getLocation(), TNTPrimed.class);
 
 									tnt.setMetadata("boost", new FixedMetadataValue(Main.getInstance(), 2));
+									tnt.setMetadata("source", new FixedMetadataValue(Main.getInstance(), user));
 									tnt.setIsIncendiary(false);
 									tnt.setFuseTicks(2);
-									try {
-										Field f = tnt.getHandle().getClass().getDeclaredField("source");
-										f.setAccessible(true);
-										f.set(tnt.getHandle(), user.getBukkitEntity().getHandle());
-									} catch (NoSuchFieldException ex) {
-										ex.printStackTrace();
-									} catch (SecurityException ex) {
-										ex.printStackTrace();
-									} catch (IllegalArgumentException ex) {
-										ex.printStackTrace();
-									} catch (IllegalAccessException ex) {
-										ex.printStackTrace();
-									}
 								}
 							}
 						}
+
 					}.runTaskTimer(1);
 				}
 			}
@@ -184,4 +170,5 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 			Main.getInstance().getIngame().arrows.put(arrow, user);
 		}
 	}
+
 }

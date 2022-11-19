@@ -123,7 +123,11 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 			builder.displayname(motd);
 			builder.lore("§7Spieler: " + online + "/" + maxPlayers);
 			if (state == GameState.LOBBY) {
-				builder.durability(DyeColor.LIME.getWoolData());
+				if (online == 0) {
+					builder.durability(DyeColor.GRAY.getWoolData());
+				} else {
+					builder.durability(DyeColor.LIME.getWoolData());
+				}
 			} else if (state == GameState.INGAME) {
 				builder.durability(DyeColor.ORANGE.getWoolData());
 			} else if (state == GameState.STOPPING) {

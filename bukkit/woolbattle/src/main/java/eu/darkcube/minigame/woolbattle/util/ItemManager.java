@@ -39,8 +39,7 @@ public class ItemManager {
 		return i - 1;
 	}
 
-	public static void removeItems(User user, Inventory invToRemoveFrom,
-					ItemStack itemToRemove, int count) {
+	public static void removeItems(User user, Inventory invToRemoveFrom, ItemStack itemToRemove, int count) {
 		if (user.getData().getWoolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
 			Map<Integer, ItemStack> leftOver = new HashMap<>();
 			itemToRemove = new ItemStack(itemToRemove);
@@ -50,7 +49,7 @@ public class ItemManager {
 			for (int i = count - 1; i >= 0; i--) {
 				do {
 					int last;
-					if ((last = last(invToRemoveFrom, itemToRemove, false)) == -1) {
+					if ((last = ItemManager.last(invToRemoveFrom, itemToRemove, false)) == -1) {
 						itemToRemove.setAmount(toDelete);
 						leftOver.put(i, itemToRemove);
 						break;
@@ -84,8 +83,7 @@ public class ItemManager {
 		}
 		ItemStack[] inve = inv.getContents();
 		for (int i = inve.length - 1; i >= 0; i--) {
-			if (inve[i] != null && (withAmount ? item.equals(inve[i])
-							: item.isSimilar(inve[i]))) {
+			if (inve[i] != null && (withAmount ? item.equals(inve[i]) : item.isSimilar(inve[i]))) {
 				return i;
 			}
 		}
@@ -114,22 +112,21 @@ public class ItemManager {
 		return i - 1;
 	}
 
-	public static ItemStack getItem(Item item, User user,
-					Object... replacements) {
-		return getItem(item, user, replacements, new Object[0]);
+	public static ItemStack getItem(Item item, User user, Object... replacements) {
+		return ItemManager.getItem(item, user, replacements, new Object[0]);
 	}
 
-	public static ItemStack getItem(Item item, User user, Object[] replacements,
-					Object... loreReplacements) {
-		ItemBuilder builder = item.getBuilder().getUnsafe().setString("itemId", getItemId(item)).builder();
-		String name = getDisplayName(item, user, replacements);
+	public static ItemStack getItem(Item item, User user, Object[] replacements, Object... loreReplacements) {
+		ItemBuilder builder = item.getBuilder().getUnsafe().setString("itemId", ItemManager.getItemId(item)).builder();
+		String name = ItemManager.getDisplayName(item, user, replacements);
 		builder.setDisplayName(name);
 		if (builder.getLores().size() != 0) {
 			builder.getLores().clear();
 			String last = null;
-			for (String lore : Message.getMessage(Message.ITEM_PREFIX
-							+ Message.LORE_PREFIX
-							+ item.name(), user.getLanguage(), loreReplacements).split("\\%n")) {
+			for (String lore : Message
+					.getMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(), user.getLanguage(),
+							loreReplacements)
+					.split("\\R")) {
 				if (last != null) {
 					lore = ChatColor.getLastColors(last) + lore;
 				}
@@ -137,8 +134,7 @@ public class ItemManager {
 				builder.addLore(last);
 			}
 		}
-		if (item.getPerk() != null
-						&& Main.getInstance().getLobby().isEnabled()) {
+		if (item.getPerk() != null && Main.getInstance().getLobby().isEnabled()) {
 			PerkType p = item.getPerk();
 			if (p.getCost() != 0) {
 				if (p.isCostPerBlock()) {
@@ -154,11 +150,11 @@ public class ItemManager {
 	}
 
 	public static ItemBuilder setItemId(ItemBuilder b, String itemId) {
-		return setId(b, "itemId", itemId);
+		return ItemManager.setId(b, "itemId", itemId);
 	}
 
 	public static ItemStack setItemId(ItemStack s, String itemId) {
-		return setItemId(new ItemBuilder(s), itemId).build();
+		return ItemManager.setItemId(new ItemBuilder(s), itemId).build();
 	}
 
 	public static ItemBuilder setId(ItemBuilder b, String key, String id) {
@@ -167,13 +163,13 @@ public class ItemManager {
 	}
 
 	public static ItemStack setId(ItemStack s, String key, String id) {
-		return setId(new ItemBuilder(s), key, id).build();
+		return ItemManager.setId(new ItemBuilder(s), key, id).build();
 	}
 
 	public static String getId(ItemStack s, String key) {
 		if (!s.hasItemMeta())
 			return null;
-		return getNBTValue(new ItemBuilder(s), key);
+		return ItemManager.getNBTValue(new ItemBuilder(s), key);
 	}
 
 	public static String getItemId(Item item) {
@@ -181,27 +177,27 @@ public class ItemManager {
 	}
 
 	public static String getMapId(ItemStack item) {
-		return getNBTValue(new ItemBuilder(item), "map");
+		return ItemManager.getNBTValue(new ItemBuilder(item), "map");
 	}
 
 	public static int getLifes(ItemStack item) {
-		return Integer.parseInt(getNBTValue(new ItemBuilder(item), "lifes"));
+		return Integer.parseInt(ItemManager.getNBTValue(new ItemBuilder(item), "lifes"));
 	}
 
 	public static String getItemId(ItemStack item) {
-		return getId(item, "itemId");
+		return ItemManager.getId(item, "itemId");
 	}
 
 	public static String getTeamId(ItemStack item) {
-		return getNBTValue(new ItemBuilder(item), "team");
+		return ItemManager.getNBTValue(new ItemBuilder(item), "team");
 	}
 
 	private static String getNBTValue(ItemBuilder builder, String key) {
 		return builder.getUnsafe().getString(key);
 	}
 
-	public static String getDisplayName(Item item, User user,
-					Object... replacements) {
-		return Message.getMessage(getItemId(item), user.getLanguage(), replacements);
+	public static String getDisplayName(Item item, User user, Object... replacements) {
+		return Message.getMessage(ItemManager.getItemId(item), user.getLanguage(), replacements);
 	}
+
 }

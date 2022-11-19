@@ -67,7 +67,6 @@ import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.user.UserWrapper;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
-import eu.darkcube.minigame.woolbattle.util.CustomEntityTracker;
 import eu.darkcube.minigame.woolbattle.util.DependencyManager;
 import eu.darkcube.minigame.woolbattle.util.DependencyManager.Dependency;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -90,6 +89,7 @@ import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.loader.PluginClassLoader;
 import eu.darkcube.system.loader.ReflectionClassLoader;
 import net.minecraft.server.v1_8_R3.ChunkProviderServer;
+import net.minecraft.server.v1_8_R3.EntityTracker;
 import net.minecraft.server.v1_8_R3.IChunkProvider;
 import net.minecraft.server.v1_8_R3.IDataManager;
 import net.minecraft.server.v1_8_R3.IScoreboardCriteria;
@@ -529,8 +529,8 @@ public class Main extends Plugin {
 	public final void loadWorld(World world) {
 		CraftWorld w = (CraftWorld) world;
 		// Setting gamerules
-		w.getHandle().tracker = new CustomEntityTracker(w.getHandle());
-		w.setDifficulty(Difficulty.PEACEFUL);
+		w.getHandle().tracker = new EntityTracker(w.getHandle());
+		w.setDifficulty(Difficulty.NORMAL);
 		w.setKeepSpawnInMemory(false);
 		w.setFullTime(0);
 		w.setTime(6000);

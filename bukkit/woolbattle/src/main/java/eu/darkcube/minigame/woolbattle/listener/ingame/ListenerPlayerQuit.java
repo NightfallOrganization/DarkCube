@@ -1,7 +1,6 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -14,6 +13,7 @@ import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 
 public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
+
 	@Override
 	@EventHandler
 	public void handle(PlayerQuitEvent e) {
@@ -25,16 +25,14 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
 			return;
 		}
 		Team t = Main.getInstance().getIngame().lastTeam.remove(user);
-		if(t != null) {
-			if(t.getUsers().size() != 0) {
+		if (t != null) {
+			if (t.getUsers().size() != 0) {
 				StatsLink.addLoss(user);
 			}
 		}
 		Main.getInstance().sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
 		main.getIngame().kill(user, true);
-		Zombie ghost = main.getIngame().listenerGhostInteract.ghosts.remove(user);
-		if(ghost != null) {
-			ghost.remove();
-		}
+		main.getIngame().listenerGhostInteract.ghosts.remove(user);
 	}
+
 }

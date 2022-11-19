@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
 
+import eu.darkcube.system.inventory.api.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
@@ -19,7 +20,7 @@ public class InventoryConfirm extends LobbyAsyncPagedInventory {
 	public final Runnable onCancel;
 
 	public InventoryConfirm(String title, User user, Runnable onConfirm, Runnable onCancel) {
-		super(InventoryConfirm.type_confirm, title, user);
+		super(InventoryConfirm.type_confirm, title, 3 * 9, AsyncPagedInventory.box(1, 1, 3, 9), user);
 //		super(title, null, 3 * 9, InventoryConfirm.type_confirm, box(1, 1, 3, 9));
 		this.onConfirm = onConfirm;
 		this.onCancel = onCancel;

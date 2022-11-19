@@ -102,16 +102,10 @@ public class ListenerEntityDamageByEntity
 						Main.getInstance().getIngame().attack(user, target);
 						e.setCancelled(true);
 						target.getBukkitEntity().damage(0);
-//						target.getBukkitEntity().setVelocity(ball.getVelocity().setY(0).normalize()
-//								.multiply(.47 + new Random().nextDouble() / 70 + 0.9 / 1.42).setY(.400023));
 
 						target.getBukkitEntity().setVelocity(ball.getVelocity().setY(0).normalize().multiply(.47
 										+ new Random().nextDouble() / 70
 										+ 1.1).setY(.400023));
-//						target.getBukkitEntity().setVelocity(arrow.getVelocity().setY(0).normalize().multiply(.47
-//										+ new Random().nextDouble() / 70
-//										+ arrow.getKnockbackStrength()
-//														/ 1.42).setY(.400023));
 					}
 
 				}
@@ -165,7 +159,7 @@ public class ListenerEntityDamageByEntity
 													+ height; yoff++) {
 										for (double zoff = -width; zoff < width
 														+ 1; zoff++) {
-											Location l = loc.clone().add(xoff, yoff, zoff);
+											Location l = this.loc.clone().add(xoff, yoff, zoff);
 											Block b = l.getBlock();
 											if (b.getType() == Material.WOOL) {
 												if (!predicate.test(b)) {
@@ -221,8 +215,8 @@ public class ListenerEntityDamageByEntity
 								double hstart = -1;
 								double height = 4;
 
-								Set<Block> s1 = execute(width, hstart, height, b -> true);
-								execute(capsuleWidth, hstart, height, b -> {
+								Set<Block> s1 = this.execute(width, hstart, height, b -> true);
+								this.execute(capsuleWidth, hstart, height, b -> {
 									MetadataValue v = Ingame.getMetaData(b, "capsule");
 									boolean isCapsule = v != null
 													&& v.asBoolean();
@@ -231,8 +225,6 @@ public class ListenerEntityDamageByEntity
 
 							}
 						}.runTaskLater(3);
-//						target.getBukkitEntity().playSound(target.getBukkitEntity().getLocation(), Sound.ARROW_HIT, 1,
-//								1);
 						target.getBukkitEntity().setVelocity(arrow.getVelocity().setY(0).normalize().multiply(.47
 										+ new Random().nextDouble() / 70
 										+ arrow.getKnockbackStrength()

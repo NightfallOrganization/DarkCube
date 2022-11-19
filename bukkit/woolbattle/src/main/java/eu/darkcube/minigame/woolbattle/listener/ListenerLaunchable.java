@@ -21,14 +21,7 @@ public class ListenerLaunchable implements Listener {
 	private Set<Player> executed = new HashSet<>();
 
 	public void start() {
-		new Scheduler() {
-
-			@Override
-			public void run() {
-				ListenerLaunchable.this.executed.clear();
-			}
-
-		}.runTaskTimer(1, 1);
+		new Scheduler(this.executed::clear).runTaskTimer(1, 1);
 	}
 
 	@EventHandler
@@ -38,7 +31,6 @@ public class ListenerLaunchable implements Listener {
 		}
 		Player p = (Player) e.getEntity().getShooter();
 		if (this.executed.contains(p)) {
-			this.executed.remove(p);
 			return;
 		}
 		LaunchableInteractEvent pe = new LaunchableInteractEvent(p, e.getEntity(), p.getItemInHand());

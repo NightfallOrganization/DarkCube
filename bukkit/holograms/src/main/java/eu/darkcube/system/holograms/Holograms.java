@@ -26,23 +26,21 @@ public class Holograms extends DarkCubePlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		CommandAPI.getInstance().register(new CommandExecutor("holograms",
-						"hologram", new String[0],
+		CommandAPI.getInstance()
+				.register(new CommandExecutor("holograms", "hologram", new String[0],
 						b -> b.then(Commands.literal("create").executes(context -> {
 							Player p = context.getSource().asPlayer();
-							if (editing.contains(p)) {
+							if (this.editing.contains(p)) {
 								return 0;
 							}
 							Book book = new Book();
-							book.addPage(new CustomComponentBuilder(
-											"tasdasd").event(new HoverEvent(
-															HoverEvent.Action.SHOW_TEXT,
-															new CustomComponentBuilder(
-																			"asddsad").create())).event(new ClickEvent(
-																							Action.SUGGEST_COMMAND,
-																							"asdhasdhsad")).create());
+							book.addPage(new CustomComponentBuilder("tasdasd")
+									.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+											new CustomComponentBuilder("asddsad").create()))
+									.event(new ClickEvent(Action.SUGGEST_COMMAND, "asdhasdhsad"))
+									.create());
 							p.setItemInHand(book.build());
-							editing.add(p);
+							this.editing.add(p);
 							return 0;
 						}))));
 		Bukkit.getPluginManager().registerEvents(this, this);
@@ -50,8 +48,8 @@ public class Holograms extends DarkCubePlugin implements Listener {
 
 	@EventHandler
 	public void handle(PlayerEditBookEvent event) {
-		if (editing.contains(event.getPlayer())) {
-			editing.remove(event.getPlayer());
+		if (this.editing.contains(event.getPlayer())) {
+			this.editing.remove(event.getPlayer());
 			List<String> lines = event.getNewBookMeta().getPages();
 			Hologram hologram = new Hologram();
 			hologram.position(event.getPlayer().getEyeLocation());
@@ -59,4 +57,5 @@ public class Holograms extends DarkCubePlugin implements Listener {
 			hologram.create();
 		}
 	}
+
 }

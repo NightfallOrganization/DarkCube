@@ -82,8 +82,8 @@ public class EntityOptions {
 					return (entity.getCustomName() == null ? entity.getName() : entity.getCustomName())
 							.equals(s) != flag;
 				});
-			}, (p_202016_0_) -> {
-				return !p_202016_0_.hasNameEquals();
+			}, (parser) -> {
+				return !parser.hasNameEquals();
 			}, null);
 			EntityOptions.register("distance", (parser) -> {
 				int i = parser.getReader().getCursor();
@@ -97,8 +97,8 @@ public class EntityOptions {
 					parser.getReader().setCursor(i);
 					throw EntityOptions.NEGATIVE_DISTANCE.createWithContext(parser.getReader());
 				}
-			}, (p_202020_0_) -> {
-				return p_202020_0_.getDistance().isUnbounded();
+			}, (parser) -> {
+				return parser.getDistance().isUnbounded();
 			}, null);
 			EntityOptions.register("level", (parser) -> {
 				int i = parser.getReader().getCursor();

@@ -22,7 +22,8 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
 			.of("gameserver_selection_woolbattle");
 
 	public InventoryGameServerSelectionWoolBattle(User user, PServerUserSlot psslot, int slot) {
-		super(user, Item.GAMESERVER_SELECTION_WOOLBATTLE, InventoryGameServerSelectionWoolBattle.type_gameserver_selection_woolbattle, new Sup(), new Func(),
+		super(user, Item.GAMESERVER_SELECTION_WOOLBATTLE,
+				InventoryGameServerSelectionWoolBattle.type_gameserver_selection_woolbattle, new Sup(), new Func(),
 				psslot, slot);
 	}
 
@@ -49,13 +50,9 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
 		@Override
 		public Collection<ServiceTask> get() {
 			final CloudNetDriver cnd = CloudNetDriver.getInstance();
-			return Lobby.getInstance()
-					.getDataManager()
-					.getWoolBattleTasks()
-					.stream()
-					.filter(s -> cnd.getServiceTaskProvider().isServiceTaskPresent(s))
-					.map(s -> cnd.getServiceTaskProvider().getServiceTask(s))
-					.collect(Collectors.toList());
+			return Lobby.getInstance().getDataManager().getWoolBattleTasks().stream().filter(s -> {
+				return cnd.getServiceTaskProvider().isServiceTaskPresent(s);
+			}).map(s -> cnd.getServiceTaskProvider().getServiceTask(s)).collect(Collectors.toList());
 		}
 
 	}

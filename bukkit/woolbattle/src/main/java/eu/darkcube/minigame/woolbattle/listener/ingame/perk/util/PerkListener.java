@@ -38,7 +38,7 @@ public abstract class PerkListener implements Listener {
 	 */
 	protected boolean checkUsable(User user, Perk perk, Runnable successRunnable, Runnable failureRunnable) {
 		Player p = user.getBukkitEntity();
-		if (!p.getInventory().contains(Material.WOOL, PerkType.CAPSULE.getCost()) || perk.getCooldown() > 0) {
+		if (!p.getInventory().contains(Material.WOOL, perk.getCost()) || perk.getCooldown() > 0) {
 			Ingame.playSoundNotEnoughWool(user);
 			new Scheduler() {
 

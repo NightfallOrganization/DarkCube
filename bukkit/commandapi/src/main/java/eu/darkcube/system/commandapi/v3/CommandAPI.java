@@ -13,18 +13,22 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mojang.brigadier.suggestion.Suggestion;
+import com.viaversion.viaversion.api.Via;
 
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandAPI {
 
 	private final JavaPlugin plugin;
+
 	private Commands commands;
+
 	private final Executor executor = new Executor();
 
 	private static CommandAPI instance;
@@ -62,12 +66,12 @@ public class CommandAPI {
 	@SuppressWarnings("unchecked")
 	private void pluginRegisterCommand(final CommandExecutor command) {
 		try {
-			final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+			final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class,
+					Plugin.class);
 			constructor.setAccessible(true);
 			final String name = command.getName().toLowerCase();
 			if (name.contains(" ")) {
-				throw new IllegalArgumentException(
-								"Can't register command with whitespace in name!");
+				throw new IllegalArgumentException("Can't register command with whitespace in name!");
 			}
 			final String[] aliases = command.getAliases();
 			final PluginCommand plugincommand = constructor.newInstance(name, this.plugin);
@@ -78,9 +82,8 @@ public class CommandAPI {
 			plugincommand.setTabCompleter(this.executor);
 			Field ftimings = plugincommand.getClass().getField("timings");
 			Method timingsOf = Class.forName("co.aikar.timings.Timings").getMethod("of", Plugin.class, String.class);
-			ftimings.set(plugincommand, timingsOf.invoke(null, plugin, plugin.getName() + ":"
-							+ command.getName()));
-//			plugincommand.timings = TimingsManager.getCommandTiming(plugin.getName().toLowerCase(), plugincommand);
+			ftimings.set(plugincommand,
+					timingsOf.invoke(null, this.plugin, this.plugin.getName() + ":" + command.getName()));
 			final Object server = Bukkit.getServer();
 			final Method methodGETCOMMANDMAP = server.getClass().getMethod("getCommandMap");
 			final Object commandMap = methodGETCOMMANDMAP.invoke(server);
@@ -90,8 +93,7 @@ public class CommandAPI {
 			final String prefix = command.getPrefix().toLowerCase();
 			if (prefix != null) {
 				if (prefix.contains(" ")) {
-					throw new IllegalArgumentException(
-									"Can't register command with whitespace in prefix!");
+					throw new IllegalArgumentException("Can't register command with whitespace in prefix!");
 				}
 				for (String n : command.getNames()) {
 					final String registerName = prefix + ":" + n;
@@ -106,8 +108,7 @@ public class CommandAPI {
 			}
 			if (command.getPermission() != null) {
 				if (Bukkit.getPluginManager().getPermission(command.getPermission()) == null) {
-					Bukkit.getPluginManager().addPermission(new Permission(
-									command.getPermission()));
+					Bukkit.getPluginManager().addPermission(new Permission(command.getPermission()));
 				}
 			}
 		} catch (final Exception ex) {
@@ -127,21 +128,21 @@ public class CommandAPI {
 		return this.plugin;
 	}
 
-	private void checkAmbiguities(String registerName, Map<String, Command> knownCommands,
-					PluginCommand command) {
+	private void checkAmbiguities(String registerName, Map<String, Command> knownCommands, PluginCommand command) {
 		if (knownCommands.containsKey(registerName)) {
 			Command cmd = knownCommands.get(registerName);
 			if (cmd instanceof PluginCommand) {
 				PluginCommand pcmd = (PluginCommand) cmd;
-				if (pcmd.getExecutor() == this.executor
-								&& pcmd.getTabCompleter() == this.executor) {
+				if (pcmd.getExecutor() == this.executor && pcmd.getTabCompleter() == this.executor) {
 					return;
 				}
-				Bukkit.getConsoleSender().sendMessage("§6Overriding command " + registerName
-								+ " from Plugin " + pcmd.getPlugin().getName() + "!");
+				Bukkit.getConsoleSender()
+						.sendMessage("§6Overriding command " + registerName + " from Plugin "
+								+ pcmd.getPlugin().getName() + "!");
 			} else {
-				Bukkit.getConsoleSender().sendMessage("§6Overriding command " + registerName
-								+ " from type " + cmd.getClass().getSimpleName() + "!");
+				Bukkit.getConsoleSender()
+						.sendMessage("§6Overriding command " + registerName + " from type "
+								+ cmd.getClass().getSimpleName() + "!");
 			}
 		}
 		knownCommands.put(registerName, command);
@@ -150,16 +151,21 @@ public class CommandAPI {
 	private class Executor implements TabExecutor {
 
 		@Override
-		public List<String> onTabComplete(CommandSender sender, Command command, String label,
-						String[] args) {
+		public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 			String commandLine = CommandAPI.this.sjoin(label, args);
-			String commandLine2 = CommandAPI.this.sjoin(label, Arrays.copyOfRange(args, 0, args.length
-							- 1)) + " ";
+			String commandLine2 = CommandAPI.this.sjoin(label, Arrays.copyOfRange(args, 0, args.length - 1)) + " ";
 			List<Suggestion> completions = CommandAPI.this.commands.getTabCompletions(sender, commandLine);
 			ICommandExecutor executor = new BukkitCommandExecutor(sender);
 			if (!completions.isEmpty()) {
-				executor.sendMessage(new TextComponent(" "));
-				executor.sendCompletions(commandLine, completions);
+				if (sender instanceof Player) {
+					Player p = (Player) sender;
+					int version = Via.getAPI().getPlayerVersion(p.getUniqueId());
+					if (version < 393) { // 393 is the version for 1.13
+										 // https://minecraft.fandom.com/wiki/Protocol_version
+						executor.sendMessage(new TextComponent(" "));
+						executor.sendCompletions(commandLine, completions);
+					}
+				}
 			}
 			List<String> r = new ArrayList<>();
 			for (Suggestion completion : completions) {
@@ -169,11 +175,12 @@ public class CommandAPI {
 		}
 
 		@Override
-		public boolean onCommand(CommandSender sender, Command command, String label,
-						String[] args) {
+		public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 			String commandLine = CommandAPI.this.sjoin(label, args);
 			CommandAPI.this.dispatchCommand(commandLine, sender);
 			return true;
 		}
+
 	}
+
 }

@@ -24,10 +24,10 @@ public class NPCKnockbackThread extends Thread {
 		while (true) {
 			this.npc.getLocation()
 					.getWorld()
-					.getNearbyEntities(this.npc.getLocation(), 0.3, 0.3, 0.3)
+					.getNearbyEntities(this.npc.getLocation().clone().add(0, 0.6, 0), 0.3, 0.7, 0.3)
 					.stream()
 					.filter(e -> e instanceof Player)
-					.filter(e -> e.hasPermission("system.npc.knockback.ignore"))
+					.filter(e -> !e.hasPermission("system.npc.knockback.ignore"))
 					.map(e -> (Player) e)
 					.forEach(cons);
 			try {
@@ -50,8 +50,8 @@ public class NPCKnockbackThread extends Thread {
 			double y = loc1.getY() - loc2.getY();
 			double z = loc1.getZ() - loc2.getZ();
 			p.setVelocity(new Vector(x, Math.abs(y) > 1.7 ? 2 : Math.abs(y) + 0.3, z).normalize().multiply(.7));
-			NPCKnockbackThread.this.npc.animation().queue(EntityAnimation.SWING_MAIN_ARM).send();
-			NPCKnockbackThread.this.npc.labymod().queue(LabyModAction.EMOTE, Emotes.KARATE.getId()).send();
+			NPCKnockbackThread.this.npc.animation().queue(EntityAnimation.SWING_MAIN_ARM).send(p);
+			NPCKnockbackThread.this.npc.labymod().queue(LabyModAction.EMOTE, Emotes.KARATE.getId()).send(p);
 		}
 
 	}

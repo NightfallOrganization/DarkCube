@@ -30,7 +30,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 	public static final String ITEMID_EXISTING = "InventoryPServerOwnPServerSlotExisting";
 
 	public InventoryPServerOwn(User user) {
-		super(InventoryPServerOwn.type_pserver_own, Item.PSERVER_OWN_MENU.getDisplayName(user), 6 * 9,
+		super(InventoryPServerOwn.type_pserver_own, Item.PSERVER_PRIVATE.getDisplayName(user), 6 * 9,
 				AsyncPagedInventory.box(3, 3, 4, 7), user);
 	}
 
@@ -38,6 +38,8 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		super.fillItems(items);
 		Player p = UUIDManager.getPlayerByUUID(this.user.getUniqueId());
+		if (p == null)
+			return;
 		int pservercount = 0;
 		for (PermissionAttachmentInfo info : p.getEffectivePermissions()) {
 			if (info.getValue()) {
@@ -46,6 +48,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 						pservercount = Math.max(pservercount, Integer.parseInt(
 								info.getPermission().substring(InventoryPServerOwn.PSERVER_COUNT_PERMISSION.length())));
 					} catch (Exception ex) {
+						ex.printStackTrace();
 					}
 				}
 			}
@@ -60,10 +63,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
 			if (item == null) {
 				item = new ItemBuilder(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user));
-				item.meta(null);
 			} else {
-				item.build();
-				item.meta(null);
 				Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
 			}
 

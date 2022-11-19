@@ -40,9 +40,11 @@ public class NodePServerProvider extends PServerProvider {
 
 	private static final ExecutorService executor = Executors.newFixedThreadPool(1);
 
-	private static NodePServerProvider instance = new NodePServerProvider();
+	private static NodePServerProvider instance;
 
-	public ServiceTask worldPServer;
+	public static final String pserverTaskName = "pserver";
+	
+	public ServiceTask pserverTask;
 
 	public ServiceTemplate globalTemplate;
 
@@ -54,8 +56,7 @@ public class NodePServerProvider extends PServerProvider {
 
 		// ServiceTask
 		{
-			String name = "pserver";
-			if (!CloudNet.getInstance().getServiceTaskProvider().isServiceTaskPresent(name)) {
+			if (!CloudNet.getInstance().getServiceTaskProvider().isServiceTaskPresent(NodePServerProvider.pserverTaskName)) {
 				Collection<ServiceRemoteInclusion> includes = new ArrayList<>();
 				Collection<ServiceTemplate> templates = new ArrayList<>();
 				Collection<ServiceDeployment> deployments = new ArrayList<>();
@@ -71,12 +72,14 @@ public class NodePServerProvider extends PServerProvider {
 				int startPort = 20000;
 				int minServiceCount = 0;
 
-				this.worldPServer = new ServiceTask(includes, templates, deployments, name, runtime, maintenance,
+				this.pserverTask = new ServiceTask(includes, templates, deployments, NodePServerProvider.pserverTaskName, runtime, maintenance,
 						autoDeleteOnStop, staticServices, associatedNodes, groups, deletedFilesAfterStop,
 						processConfiguration, startPort, minServiceCount);
-				CloudNet.getInstance().getServiceTaskProvider().addPermanentServiceTask(this.worldPServer);
+				CloudNet.getInstance().getServiceTaskProvider().addPermanentServiceTask(this.pserverTask);
 			} else {
-				this.worldPServer = CloudNet.getInstance().getServiceTaskProvider().getServiceTask(name);
+				this.pserverTask = CloudNet.getInstance()
+						.getServiceTaskProvider()
+						.getServiceTask(NodePServerProvider.pserverTaskName);
 			}
 		}
 		// ServiceTemplates
@@ -201,7 +204,7 @@ public class NodePServerProvider extends PServerProvider {
 			return this.getPServer(configuration.id);
 		}
 		if (task == null) {
-			task = this.worldPServer;
+			task = this.pserverTask;
 		}
 		NodePServer pserver = this.newPServer(configuration, task);
 		this.addOrUpdate(pserver);
@@ -250,8 +253,8 @@ public class NodePServerProvider extends PServerProvider {
 					.addGroupConfiguration(new EmptyGroupConfiguration(groupGlobalName));
 		}
 		ServiceConfiguration.Builder confb = ServiceConfiguration.builder()
-				.task(task)
-				.task(this.worldPServer.getName())
+				.task(CloudNet.getInstance().getServiceTaskProvider().getServiceTask(task.getName()))
+				.task(NodePServerProvider.pserverTaskName)
 				.staticService(false)
 				.addTemplates(this.globalTemplate)
 				.addGroups("pserver-global");
@@ -280,7 +283,7 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	public static void init() {
-
+		NodePServerProvider.instance = new NodePServerProvider();
 	}
 
 	public boolean isPServer(UniqueId uniqueId) {

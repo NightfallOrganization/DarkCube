@@ -7,8 +7,10 @@ import org.bukkit.inventory.ItemStack;
 import eu.darkcube.minigame.woolbattle.Main;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public abstract class BasicPerkListener extends PerkListener implements RegisterNotifyListener {
 
@@ -34,7 +36,7 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 		return this.perkType;
 	}
 
-	protected abstract boolean activate(User user);
+	protected abstract boolean activate(User user, Perk perk);
 
 	private class Handle implements Listener {
 
@@ -45,11 +47,17 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 				return;
 			}
 			User user = Main.getInstance().getUserWrapper().getUser(event.getPlayer().getUniqueId());
-			if (!BasicPerkListener.this.checkUsable(user, BasicPerkListener.this.perkType, item,
-					() -> event.setCancelled(true))) {
+			if (!BasicPerkListener.this.checkUsable(user, BasicPerkListener.this.perkType, item, () -> {
+				if (event.getEntity() != null) {
+					Perk perk = user.getPerkByItemId(BasicPerkListener.this.perkType.getItem().getItemId());
+					perk.setItem();
+					new Scheduler(perk::setItem).runTask();
+				}
+				event.setCancelled(true);
+			})) {
 				return;
 			}
-			if (!BasicPerkListener.this.activate(user)) {
+			if (!BasicPerkListener.this.activate(user, user.getPerkByItemId(BasicPerkListener.this.perkType.getItem().getItemId()))) {
 				return;
 			}
 			BasicPerkListener.this.payForThePerk(user, BasicPerkListener.this.perkType);
