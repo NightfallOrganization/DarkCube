@@ -674,13 +674,8 @@ public class Ingame extends GamePhase {
 
 	public void setArmor(User user) {
 		Player p = user.getBukkitEntity();
-		System.out.println(user.getTeam());
-		System.out.println(user.getTeam().getType());
-		System.out.println(user.getTeam().getType().getWoolColorByte());
-		System.out.println(user.getTeam().getType().getWoolColor());
 		Color color = user.getTeam().getType().getWoolColor().getColor();
 		if (ListenerGhost.isGhost(user)) {
-			System.out.println("ghost");
 			color = Color.WHITE;
 		}
 		ItemStack boots = Item.ARMOR_LEATHER_BOOTS.getItem(user);
