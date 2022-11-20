@@ -18,7 +18,7 @@ import org.bukkit.ChatColor;
 import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.perk.DefaultPlayerPerks;
 import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.user.DefaultUserData;
@@ -125,12 +125,12 @@ public class MySQL {
 		if (mysql != null)
 			throw new IllegalAccessError("MySQL service is already running!");
 		mysql = this;
-		Main.getInstance().reloadConfig("mysql");
-		host = Main.getInstance().getConfig("mysql").getString("host");
-		port = Main.getInstance().getConfig("mysql").getString("port");
-		database = Main.getInstance().getConfig("mysql").getString("database");
-		username = Main.getInstance().getConfig("mysql").getString("username");
-		password = Main.getInstance().getConfig("mysql").getString("password");
+		WoolBattle.getInstance().reloadConfig("mysql");
+		host = WoolBattle.getInstance().getConfig("mysql").getString("host");
+		port = WoolBattle.getInstance().getConfig("mysql").getString("port");
+		database = WoolBattle.getInstance().getConfig("mysql").getString("database");
+		username = WoolBattle.getInstance().getConfig("mysql").getString("username");
+		password = WoolBattle.getInstance().getConfig("mysql").getString("password");
 	}
 
 	public final void connect() {
@@ -140,21 +140,21 @@ public class MySQL {
 								+ port + "/" + database
 								+ "?characterEncoding=utf8", username, password);
 				TABLES.forEach(t -> this.update(t));
-				Main.getInstance().sendConsole("[MySQL] Connected!");
+				WoolBattle.getInstance().sendConsole("[MySQL] Connected!");
 			} catch (SQLException ex) {
 				if (ex instanceof CommunicationsException) {
-					Main.getInstance().sendConsole(ChatColor.RED
+					WoolBattle.getInstance().sendConsole(ChatColor.RED
 									+ "Could not connect to database. Shutting down server. "
 									+ "\nPlease ensure your IP in the config is correct and the MySQL database is online!");
 					loadError();
 				} else if (ex instanceof MySQLSyntaxErrorException) {
-					Main.getInstance().sendConsole(ChatColor.RED
+					WoolBattle.getInstance().sendConsole(ChatColor.RED
 									+ "Could not connect to database. Shutting down server. "
 									+ "\nPlease ensure your values in the config are correct, such like password, username.\n"
 									+ ex.getMessage());
 					loadError();
 				} else if (ex.getMessage().startsWith("Access denied for user")) {
-					Main.getInstance().sendMessage(ChatColor.RED
+					WoolBattle.getInstance().sendMessage(ChatColor.RED
 									+ "Could not connect to database. Shutting down server. "
 									+ "\nThe entered password is wrong!\n"
 									+ ex.getMessage());
@@ -170,7 +170,7 @@ public class MySQL {
 		if (isConnected()) {
 			try {
 				con.close();
-				Main.getInstance().sendConsole("[MySQL] Disconnected!");
+				WoolBattle.getInstance().sendConsole("[MySQL] Disconnected!");
 			} catch (SQLException ex) {
 				handleException(ex);
 			}
@@ -233,7 +233,7 @@ public class MySQL {
 
 	public void loadError() {
 		try {
-			Main.getInstance().sendMessage(ChatColor.DARK_RED
+			WoolBattle.getInstance().sendMessage(ChatColor.DARK_RED
 							+ "Stopping server!");
 			Thread.sleep(10000);
 		} catch (InterruptedException e1) {

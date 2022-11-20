@@ -9,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerBlockBreak;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerEntityDamage;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerPlayerJoin;
@@ -38,13 +38,13 @@ public class Endgame extends GamePhase {
 	@Override
 	public void onEnable() {
 		CloudNetLink.update();
-		final Main main = Main.getInstance();
+		final WoolBattle main = WoolBattle.getInstance();
 //		main.getSchedulers().clear();
 
-		Main.registerListeners(this.listenerPlayerJoin);
-		Main.registerListeners(this.listenerPlayerQuit);
-		Main.registerListeners(this.listenerBlockBreak);
-		Main.registerListeners(this.listenerEntityDamage);
+		WoolBattle.registerListeners(this.listenerPlayerJoin);
+		WoolBattle.registerListeners(this.listenerPlayerQuit);
+		WoolBattle.registerListeners(this.listenerBlockBreak);
+		WoolBattle.registerListeners(this.listenerEntityDamage);
 
 		Team winner = main.getIngame().winner;
 		main.getUserWrapper().getUsers().forEach(u -> {
@@ -133,7 +133,7 @@ public class Endgame extends GamePhase {
 	public User getPlayerWithMostKills() {
 		User result = null;
 		int kills = -1;
-		for (User player : Main.getInstance().getUserWrapper().getUsers()) {
+		for (User player : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 			if (player.getKills() > kills) {
 				kills = player.getKills();
 				result = player;
@@ -146,7 +146,7 @@ public class Endgame extends GamePhase {
 
 		User result = null;
 		double kd = -1;
-		for (User player : Main.getInstance().getUserWrapper().getUsers()) {
+		for (User player : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 			if (player.getKD() > kd) {
 				kd = player.getKD();
 				result = player;
@@ -162,10 +162,10 @@ public class Endgame extends GamePhase {
 
 	@Override
 	public void onDisable() {
-		Main.unregisterListeners(this.listenerPlayerJoin);
-		Main.unregisterListeners(this.listenerPlayerQuit);
-		Main.unregisterListeners(this.listenerBlockBreak);
-		Main.unregisterListeners(this.listenerEntityDamage);
+		WoolBattle.unregisterListeners(this.listenerPlayerJoin);
+		WoolBattle.unregisterListeners(this.listenerPlayerQuit);
+		WoolBattle.unregisterListeners(this.listenerBlockBreak);
+		WoolBattle.unregisterListeners(this.listenerEntityDamage);
 	}
 
 }

@@ -7,7 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
@@ -17,7 +17,7 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandCreateTeam extends Command {
 
 	public CommandCreateTeam() {
-		super(Main.getInstance(), "createTeam", new Command[0], "Erstellt ein Team", CommandArgument.TEAM,
+		super(WoolBattle.getInstance(), "createTeam", new Command[0], "Erstellt ein Team", CommandArgument.TEAM,
 				CommandArgument.WEIGHT, CommandArgument.WOOL_COLOR, CommandArgument.NAME_COLOR,
 				CommandArgument.MAX_PLAYERS);
 	}

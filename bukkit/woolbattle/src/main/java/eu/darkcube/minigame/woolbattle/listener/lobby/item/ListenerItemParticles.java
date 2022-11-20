@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -20,7 +20,7 @@ public class ListenerItemParticles extends Listener<EventInteract> {
 		if (item.hasItemMeta()) {
 			String itemid = ItemManager.getItemId(item);
 			Player p = e.getPlayer();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			if (itemid.equals(Item.LOBBY_PARTICLES_ON.getItemId())) {
 				e.setCancelled(true);
 				user.getData().setParticles(false);

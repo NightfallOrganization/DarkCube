@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -20,7 +20,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandSetSpawn extends SubCommand {
 
 	public CommandSetSpawn() {
-		super(Main.getInstance(), "setSpawn", new Command[0],
+		super(WoolBattle.getInstance(), "setSpawn", new Command[0],
 						"Setzt den Spawn eines Teams", CommandArgument.MAP,
 						CommandArgument.ARGUMENT_MAKE_NICE);
 	}
@@ -28,7 +28,7 @@ public class CommandSetSpawn extends SubCommand {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length == 1) {
-			return Arrays.toSortedStringList(Main.getInstance().getMapManager().getMaps(), args[0]);
+			return Arrays.toSortedStringList(WoolBattle.getInstance().getMapManager().getMaps(), args[0]);
 		}
 		if (args.length == 2) {
 			return Arrays.toSortedStringList(Arrays.asList(true, false), args[1]);
@@ -43,14 +43,14 @@ public class CommandSetSpawn extends SubCommand {
 				return false;
 			}
 			Player p = (Player) sender;
-			Team team = Main.getInstance().getTeamManager().getTeam(TeamType.byDisplayNameKey(getSpaced()));
+			Team team = WoolBattle.getInstance().getTeamManager().getTeam(TeamType.byDisplayNameKey(getSpaced()));
 			if (team == null || team.getType().isDeleted()) {
 				p.sendMessage("§cEs konnte kein Team mit dem Namen '"
 								+ getSpaced() + "' gefunden werden.");
 				p.sendMessage("§aNach dem erstellen eines Teams muss der Server neugestartet werden um Spawns setzen zu können!");
 				return true;
 			}
-			Map map = Main.getInstance().getMapManager().getMap(args[0]);
+			Map map = WoolBattle.getInstance().getMapManager().getMap(args[0]);
 			if (map == null) {
 				p.sendMessage("§cEs konnte keine Map mit dem Namen '" + args[0]
 								+ "'gefunden werden.");

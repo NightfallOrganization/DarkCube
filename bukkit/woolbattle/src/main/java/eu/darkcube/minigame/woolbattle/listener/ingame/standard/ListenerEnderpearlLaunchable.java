@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
@@ -44,7 +44,7 @@ public class ListenerEnderpearlLaunchable extends Listener<LaunchableInteractEve
 	public void handle(LaunchableInteractEvent e) {
 		if (e.getEntityType() == EntityType.ENDER_PEARL) {
 			Player p = e.getPlayer();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 
 			ItemStack item = e.getItem();
 

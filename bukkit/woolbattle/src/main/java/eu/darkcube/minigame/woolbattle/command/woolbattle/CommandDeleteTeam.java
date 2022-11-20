@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
@@ -13,7 +13,7 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandDeleteTeam extends Command {
 
 	public CommandDeleteTeam() {
-		super(Main.getInstance(), "deleteTeam", new Command[] {}, "Löscht ein Team", CommandArgument.TEAM);
+		super(WoolBattle.getInstance(), "deleteTeam", new Command[] {}, "Löscht ein Team", CommandArgument.TEAM);
 	}
 	
 	@Override

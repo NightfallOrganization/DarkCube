@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Locations;
@@ -16,7 +16,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandSetSpawn extends SubCommand {
 
 	public CommandSetSpawn() {
-		super(Main.getInstance(), "setSpawn", new Command[0], "Setzt den LobbySpawn",
+		super(WoolBattle.getInstance(), "setSpawn", new Command[0], "Setzt den LobbySpawn",
 						CommandArgument.ARGUMENT_MAKE_NICE);
 	}
 
@@ -34,7 +34,7 @@ public class CommandSetSpawn extends SubCommand {
 					p.teleport(loc);
 				}
 			}
-			Main.getInstance().getLobby().setSpawn(loc);
+			WoolBattle.getInstance().getLobby().setSpawn(loc);
 			sender.sendMessage("§aDer LobbySpawn wurde umgesetzt!");
 			return true;
 		}

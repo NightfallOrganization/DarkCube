@@ -8,7 +8,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -32,7 +32,7 @@ public class ListenerSafetyPlatformInteract
 			return;
 		}
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 
 		ItemStack item = e.getItem();
 		if (item == null) {
@@ -162,8 +162,8 @@ public class ListenerSafetyPlatformInteract
 	private void block(Location loc, User u) {
 		if (loc.getBlock().getType() == Material.AIR) {
 			loc.getBlock().setType(Material.WOOL);
-			loc.getBlock().setData(u.getTeam().getType().getWoolColor());
-			Main.getInstance().getIngame().placedBlocks.add(loc.getBlock());
+			loc.getBlock().setData(u.getTeam().getType().getWoolColorByte());
+			WoolBattle.getInstance().getIngame().placedBlocks.add(loc.getBlock());
 		}
 	}
 

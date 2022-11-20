@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
@@ -13,7 +13,7 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandSetMap extends Command {
 
 	public CommandSetMap() {
-		super(Main.getInstance(), "setmap", new Command[0], "Setzt die Map",
+		super(WoolBattle.getInstance(), "setmap", new Command[0], "Setzt die Map",
 						CommandArgument.MAP);
 	}
 
@@ -21,7 +21,7 @@ public class CommandSetMap extends Command {
 	public List<String> onTabComplete(String[] args) {
 		if (args.length == 1) {
 //			return Arrays.toSortedStringList(Arrays.asList(0, 6, 12, 17, 22, 99), args[0]);
-			return Arrays.toSortedStringList(Main.getInstance().getMapManager().getMaps(), args[0]);
+			return Arrays.toSortedStringList(WoolBattle.getInstance().getMapManager().getMaps(), args[0]);
 		}
 		return super.onTabComplete(args);
 	}
@@ -29,20 +29,20 @@ public class CommandSetMap extends Command {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (args.length == 1) {
-			Map map = Main.getInstance().getMapManager().getMap(args[0]);
+			Map map = WoolBattle.getInstance().getMapManager().getMap(args[0]);
 			if (map == null) {
 				sender.sendMessage("§cUnbekannte Map: " + args[0]);
 				return true;
 			}
 			sender.sendMessage("§aNeue Map: §5" + map.getName());
-			Main.getInstance().baseMap = map;
-			if (Main.getInstance().getLobby().isEnabled()) {
-				Main.getInstance().getUserWrapper().getUsers().forEach(p -> {
-					Main.getInstance().setMap(p);
+			WoolBattle.getInstance().baseMap = map;
+			if (WoolBattle.getInstance().getLobby().isEnabled()) {
+				WoolBattle.getInstance().getUserWrapper().getUsers().forEach(p -> {
+					WoolBattle.getInstance().setMap(p);
 				});
-			} else if (Main.getInstance().getIngame().isEnabled()) {
-				Main.getInstance().setMap(map);
-				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
+			} else if (WoolBattle.getInstance().getIngame().isEnabled()) {
+				WoolBattle.getInstance().setMap(map);
+				for (User user : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 					user.getBukkitEntity().teleport(user.getTeam().getSpawn());
 				}
 			}

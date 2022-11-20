@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkEnderPearl;
@@ -22,14 +22,14 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandSetPerk extends Command {
 
 	public CommandSetPerk() {
-		super(Main.getInstance(), "setPerk", new Command[0], "Setzt die Perks eines Spielers",
+		super(WoolBattle.getInstance(), "setPerk", new Command[0], "Setzt die Perks eines Spielers",
 				CommandArgument.PLAYER_OPTIONAL, CommandArgument.PERK_SLOT, CommandArgument.PERK);
 	}
 
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length == 1) {
-			return Arrays.toSortedStringList(Main.getInstance()
+			return Arrays.toSortedStringList(WoolBattle.getInstance()
 					.getUserWrapper()
 					.getUsers()
 					.stream()
@@ -61,13 +61,13 @@ public class CommandSetPerk extends Command {
 		int i = 0;
 		if (args.length == 2) {
 			if (sender instanceof Player) {
-				target = Main.getInstance().getUserWrapper().getUser(((Player) sender).getUniqueId());
+				target = WoolBattle.getInstance().getUserWrapper().getUser(((Player) sender).getUniqueId());
 			}
 		} else if (args.length == 3) {
 			i = 1;
 			Player p = Bukkit.getPlayer(args[0]);
 			if (p != null) {
-				target = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+				target = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			}
 		}
 		if (target == null) {
@@ -75,7 +75,7 @@ public class CommandSetPerk extends Command {
 		}
 		PerkNumber number = number(args[i]);
 		if (number == null) {
-			Main.getInstance().sendMessage("§cInvalid PerkSlot", sender);
+			WoolBattle.getInstance().sendMessage("§cInvalid PerkSlot", sender);
 			return true;
 		}
 		PerkType perk = null;
@@ -88,7 +88,7 @@ public class CommandSetPerk extends Command {
 				}
 			}
 			if (perk == null) {
-				Main.getInstance().sendMessage("§cInvalid Perk", sender);
+				WoolBattle.getInstance().sendMessage("§cInvalid Perk", sender);
 				return true;
 			}
 		}
@@ -107,11 +107,11 @@ public class CommandSetPerk extends Command {
 			target.setEnderPearl(rperk);
 			break;
 		default:
-			Main.getInstance().sendMessage("§cError: " + number, sender);
+			WoolBattle.getInstance().sendMessage("§cError: " + number, sender);
 			return true;
 		}
-		Main.getInstance().getIngame().setPlayerItems(target);
-		Main.getInstance().sendMessage("§aPerk set: " + number + " | " + rperk.getPerkName().getName(), sender);
+		WoolBattle.getInstance().getIngame().setPlayerItems(target);
+		WoolBattle.getInstance().sendMessage("§aPerk set: " + number + " | " + rperk.getPerkName().getName(), sender);
 		return true;
 	}
 

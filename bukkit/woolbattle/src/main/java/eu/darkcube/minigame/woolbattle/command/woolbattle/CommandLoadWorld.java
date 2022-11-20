@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
@@ -15,7 +15,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandLoadWorld extends SubCommand {
 
 	public CommandLoadWorld() {
-		super(Main.getInstance(), "loadWorld", new Command[0], "Nutzt eine Welt für WoolBattle", CommandArgument.WORLD);
+		super(WoolBattle.getInstance(), "loadWorld", new Command[0], "Nutzt eine Welt für WoolBattle", CommandArgument.WORLD);
 	}
 	
 	@Override
@@ -25,12 +25,12 @@ public class CommandLoadWorld extends SubCommand {
 			if (args.length != 1)
 				return false;
 			String worldName = args[0];
-			if (!new File(Main.getInstance().getServer().getWorldContainer(), worldName).exists()
-					&& !new File(Main.getInstance().getServer().getWorldContainer().getParent(), worldName).exists()) {
+			if (!new File(WoolBattle.getInstance().getServer().getWorldContainer(), worldName).exists()
+					&& !new File(WoolBattle.getInstance().getServer().getWorldContainer().getParent(), worldName).exists()) {
 				p.sendMessage("§cDiese Welt existiert nicht");
 				return true;
 			}
-			YamlConfiguration cfg = Main.getInstance().getConfig("worlds");
+			YamlConfiguration cfg = WoolBattle.getInstance().getConfig("worlds");
 			List<String> worlds = cfg.getStringList("worlds");
 			if (worlds.contains(worldName)) {
 				p.sendMessage("§cDiese Welt existiert bereits");
@@ -38,8 +38,8 @@ public class CommandLoadWorld extends SubCommand {
 			}
 			worlds.add(worldName);
 			cfg.set("worlds", worlds);
-			Main.getInstance().saveConfig(cfg);
-			Main.getInstance().loadWorld(worldName);
+			WoolBattle.getInstance().saveConfig(cfg);
+			WoolBattle.getInstance().loadWorld(worldName);
 			p.sendMessage("§aWelt geladen");
 			return true;
 		}

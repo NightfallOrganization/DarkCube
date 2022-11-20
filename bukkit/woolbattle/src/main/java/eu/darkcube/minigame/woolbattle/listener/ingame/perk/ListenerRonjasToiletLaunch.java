@@ -9,7 +9,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -32,7 +32,7 @@ public class ListenerRonjasToiletLaunch extends Listener<ProjectileLaunchEvent> 
 				return;
 			}
 			Player p = (Player) egg.getShooter();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			ItemStack item = p.getItemInHand();
 			if (item == null)
 				return;
@@ -66,10 +66,10 @@ public class ListenerRonjasToiletLaunch extends Listener<ProjectileLaunchEvent> 
 				return;
 			}
 			ItemManager.removeItems(user, p.getInventory(),
-					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()),
+					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()),
 					PerkType.RONJAS_TOILET_SPLASH.getCost());
 
-			egg.setMetadata("perk", new FixedMetadataValue(Main.getInstance(), perk.getPerkName().getName()));
+			egg.setMetadata("perk", new FixedMetadataValue(WoolBattle.getInstance(), perk.getPerkName().getName()));
 			
 			new Scheduler() {
 				int cd = PerkType.RONJAS_TOILET_SPLASH.getCooldown() + 1;

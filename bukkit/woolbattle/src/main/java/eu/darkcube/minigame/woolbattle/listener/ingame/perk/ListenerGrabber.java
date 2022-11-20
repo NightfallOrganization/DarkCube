@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -24,7 +24,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
-public class ListenerGrabberInteract extends Listener<PlayerInteractEvent> {
+public class ListenerGrabber extends Listener<PlayerInteractEvent> {
 	public static final Item GRABBER = PerkType.GRABBER.getItem();
 	public static final Item GRABBER_GRABBED = Item.PERK_GRABBER_GRABBED;
 	public static final Item GRABBER_COOLDOWN = PerkType.GRABBER.getCooldownItem();
@@ -37,7 +37,7 @@ public class ListenerGrabberInteract extends Listener<PlayerInteractEvent> {
 	public void handle(EntityDamageByEntityEvent e) {
 		if (e.getDamager() instanceof Egg && e.getEntity() instanceof Player
 				&& ((Egg) e.getDamager()).getShooter() instanceof Player) {
-			Main main = Main.getInstance();
+			WoolBattle main = WoolBattle.getInstance();
 			Player target = (Player) e.getEntity();
 			User tuser = main.getUserWrapper().getUser(target.getUniqueId());
 			Egg egg = (Egg) e.getDamager();
@@ -67,15 +67,15 @@ public class ListenerGrabberInteract extends Listener<PlayerInteractEvent> {
 		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			ItemStack item = e.getItem();
 			Player p = e.getPlayer();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			if (item == null)
 				return;
 			String itemid = ItemManager.getItemId(item);
 			if (GRABBER_GRABBED.getItemId().equals(itemid)) {
 				if (grabbed.containsKey(user)) {
 					Location loc = user.getBukkitEntity().getLocation();
-					if (loc.getY() < Main.getInstance().getMap().getDeathHeight() + 10) {
-						loc.setY(Main.getInstance().getMap().getDeathHeight() + 10);
+					if (loc.getY() < WoolBattle.getInstance().getMap().getDeathHeight() + 10) {
+						loc.setY(WoolBattle.getInstance().getMap().getDeathHeight() + 10);
 					}
 					grabbed.remove(user).getBukkitEntity().teleport(loc);
 				}
@@ -115,7 +115,7 @@ public class ListenerGrabberInteract extends Listener<PlayerInteractEvent> {
 				return;
 			}
 			ItemManager.removeItems(user, p.getInventory(),
-					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()),
+					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()),
 					PerkType.GRABBER.getCost());
 
 			perks.put(user, perk);
@@ -123,7 +123,7 @@ public class ListenerGrabberInteract extends Listener<PlayerInteractEvent> {
 			Egg egg = p.getWorld().spawn(p.getEyeLocation(), Egg.class);
 			egg.setShooter(p);
 			egg.setVelocity(p.getLocation().getDirection().multiply(2.5));
-			egg.setMetadata("type", new FixedMetadataValue(Main.getInstance(), "grabber"));
+			egg.setMetadata("type", new FixedMetadataValue(WoolBattle.getInstance(), "grabber"));
 			new Scheduler() {
 				int count = 0;
 

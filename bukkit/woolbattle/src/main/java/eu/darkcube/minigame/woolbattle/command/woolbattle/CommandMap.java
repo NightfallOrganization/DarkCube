@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandDisable;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandEnable;
@@ -17,7 +17,7 @@ import eu.darkcube.system.commandapi.SpacedCommand;
 public class CommandMap extends SpacedCommand {
 
 	public CommandMap() {
-		super(Main.getInstance(), "map", new SubCommand[] {
+		super(WoolBattle.getInstance(), "map", new SubCommand[] {
 				new CommandSetIcon(), new CommandEnable(), new CommandDisable(), new CommandInfo(),
 				new CommandSetDeathHeight()
 		}, "Map HauptCommand", CommandArgument.MAP);
@@ -31,7 +31,7 @@ public class CommandMap extends SpacedCommand {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length == 1) {
-			return Arrays.toSortedStringList(Main.getInstance().getMapManager().getMaps(), args[0]);
+			return Arrays.toSortedStringList(WoolBattle.getInstance().getMapManager().getMaps(), args[0]);
 		}
 		return super.onTabComplete(args);
 	}

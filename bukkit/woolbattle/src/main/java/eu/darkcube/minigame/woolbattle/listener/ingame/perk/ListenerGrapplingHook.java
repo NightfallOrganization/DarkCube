@@ -7,15 +7,14 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -23,7 +22,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
-public class ListenerGrapplingHookFishing extends Listener<PlayerFishEvent> {
+public class ListenerGrapplingHook implements Listener {
 
 	public static final Item HOOK = PerkType.GRAPPLING_HOOK.getItem();
 	public static final Item HOOK_COOLDOWN = PerkType.GRAPPLING_HOOK.getCooldownItem();
@@ -62,7 +61,7 @@ public class ListenerGrapplingHookFishing extends Listener<PlayerFishEvent> {
 		if (itemid == null) {
 			return;
 		}
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (itemid.equals(HOOK_COOLDOWN.getItemId())) {
 			Ingame.playSoundNotEnoughWool(user);
 			e.setCancelled(true);
@@ -70,13 +69,11 @@ public class ListenerGrapplingHookFishing extends Listener<PlayerFishEvent> {
 		}
 	}
 
-	@Override
 	@EventHandler
 	public void handle(PlayerFishEvent e) {
 		PlayerFishEvent.State state = e.getState();
-		if (state == PlayerFishEvent.State.IN_GROUND
-						|| state == PlayerFishEvent.State.CAUGHT_ENTITY
-						|| e.getHook().getLocation().subtract(0, 1, 0).getBlock().getType().isSolid()) {
+		if (state == PlayerFishEvent.State.IN_GROUND || state == PlayerFishEvent.State.CAUGHT_ENTITY
+				|| e.getHook().getLocation().subtract(0, 1, 0).getBlock().getType().isSolid()) {
 			Player p = e.getPlayer();
 			FishHook hook = e.getHook();
 			ItemStack item = p.getItemInHand();
@@ -87,7 +84,7 @@ public class ListenerGrapplingHookFishing extends Listener<PlayerFishEvent> {
 			if (itemid == null) {
 				return;
 			}
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			Perk perk = user.getPerkByItemId(itemid);
 			if (perk == null) {
 				return;
@@ -96,7 +93,7 @@ public class ListenerGrapplingHookFishing extends Listener<PlayerFishEvent> {
 				return;
 			}
 			if (!p.getInventory().contains(Material.WOOL, PerkType.GRAPPLING_HOOK.getCost())
-							|| perk.getCooldown() > 0) {
+					|| perk.getCooldown() > 0) {
 				Ingame.playSoundNotEnoughWool(user);
 				new Scheduler() {
 					@Override
@@ -108,9 +105,9 @@ public class ListenerGrapplingHookFishing extends Listener<PlayerFishEvent> {
 				e.setCancelled(true);
 				return;
 			}
-			ItemManager.removeItems(user, p.getInventory(), new ItemStack(
-							Material.WOOL, 1,
-							user.getTeam().getType().getWoolColor()), PerkType.GRAPPLING_HOOK.getCost());
+			ItemManager.removeItems(user, p.getInventory(),
+					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()),
+					PerkType.GRAPPLING_HOOK.getCost());
 
 			Location from = p.getLocation();
 			Location to = hook.getLocation();

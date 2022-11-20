@@ -1,11 +1,11 @@
 package eu.darkcube.minigame.woolbattle.user;
 
 import java.util.UUID;
-
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.inventory.ItemStack;
-
 import eu.darkcube.minigame.woolbattle.gadget.Gadget;
+import eu.darkcube.minigame.woolbattle.nbt.BasicDataStorage;
+import eu.darkcube.minigame.woolbattle.nbt.DataStorage;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkNumber;
 import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
@@ -17,7 +17,8 @@ import net.minecraft.server.v1_8_R3.Packet;
 
 public class ConsoleUser implements User {
 
-	private UserData data = new ConsoleUserData();
+	private final UserData data = new ConsoleUserData();
+	private final DataStorage temporaryDataStorage = new BasicDataStorage();
 
 	@Override
 	public UUID getUniqueId() {
@@ -35,13 +36,17 @@ public class ConsoleUser implements User {
 	}
 
 	@Override
+	public DataStorage getTemporaryDataStorage() {
+		return this.temporaryDataStorage;
+	}
+
+	@Override
 	public Language getLanguage() {
 		return data.getLanguage();
 	}
 
 	@Override
-	public void setLanguage(Language language) {
-	}
+	public void setLanguage(Language language) {}
 
 	@Override
 	public Team getTeam() {
@@ -59,8 +64,7 @@ public class ConsoleUser implements User {
 	}
 
 	@Override
-	public void sendPacket(Packet<?> packet) {
-	}
+	public void sendPacket(Packet<?> packet) {}
 
 	@Override
 	public int getMaxWoolSize() {
@@ -83,12 +87,10 @@ public class ConsoleUser implements User {
 	}
 
 	@Override
-	public void setSpawnProtectionTicks(int ticks) {
-	}
+	public void setSpawnProtectionTicks(int ticks) {}
 
 	@Override
-	public void setTrollMode(boolean trollmode) {
-	}
+	public void setTrollMode(boolean trollmode) {}
 
 	@Override
 	public boolean isTrollMode() {
@@ -106,8 +108,7 @@ public class ConsoleUser implements User {
 	}
 
 	@Override
-	public void setOpenInventory(InventoryId id) {
-	}
+	public void setOpenInventory(InventoryId id) {}
 
 	@Override
 	public int getKills() {
@@ -120,12 +121,10 @@ public class ConsoleUser implements User {
 	}
 
 	@Override
-	public void setKills(int kills) {
-	}
+	public void setKills(int kills) {}
 
 	@Override
-	public void setDeaths(int deaths) {
-	}
+	public void setDeaths(int deaths) {}
 
 	private final class ConsoleUserData implements UserData {
 
@@ -150,8 +149,7 @@ public class ConsoleUser implements User {
 		}
 
 		@Override
-		public void setLanguage(Language language) {
-		}
+		public void setLanguage(Language language) {}
 
 		@Override
 		public boolean isParticles() {
@@ -159,8 +157,7 @@ public class ConsoleUser implements User {
 		}
 
 		@Override
-		public void setParticles(boolean particles) {
-		}
+		public void setParticles(boolean particles) {}
 
 		@Override
 		public HeightDisplay getHeightDisplay() {
@@ -168,8 +165,7 @@ public class ConsoleUser implements User {
 		}
 
 		@Override
-		public void setHeightDisplay(HeightDisplay display) {
-		}
+		public void setHeightDisplay(HeightDisplay display) {}
 
 		@Override
 		public WoolSubtractDirection getWoolSubtractDirection() {
@@ -177,8 +173,7 @@ public class ConsoleUser implements User {
 		}
 
 		@Override
-		public void setWoolSubtractDirection(WoolSubtractDirection dir) {
-		}
+		public void setWoolSubtractDirection(WoolSubtractDirection dir) {}
 
 	}
 

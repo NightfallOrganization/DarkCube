@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 
 public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
@@ -18,7 +18,7 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
 		Player p = e.getPlayer();
 		PermissionInfo info = getPermissionInfo(p);
 
-		boolean full = Main.getInstance().getMaxPlayers() <= Main.getInstance().getUserWrapper().getUsers().size();
+		boolean full = WoolBattle.getInstance().getMaxPlayers() <= WoolBattle.getInstance().getUserWrapper().getUsers().size();
 		boolean shouldKick = info.hasPermission && full;
 
 		Player weakestLink = null;

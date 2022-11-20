@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 
@@ -23,7 +23,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
 		double y = mid.getY();
 		double z = mid.getZ();
 		for (Block b : e.blockList()) {
-			if (b.getType() != Material.WOOL || !Main.getInstance().getIngame().placedBlocks.contains(b)) {
+			if (b.getType() != Material.WOOL || !WoolBattle.getInstance().getIngame().placedBlocks.contains(b)) {
 				continue;
 			}
 			FallingBlock block = b.getWorld().spawnFallingBlock(b.getLocation(), b.getType(), b.getData());

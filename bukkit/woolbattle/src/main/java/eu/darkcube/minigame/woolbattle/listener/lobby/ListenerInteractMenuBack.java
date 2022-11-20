@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.ClickType;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -16,7 +16,7 @@ public class ListenerInteractMenuBack extends Listener<EventInteract> {
 	@EventHandler(priority = EventPriority.LOW)
 	public void handle(EventInteract e) {
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (!e.getItem().hasItemMeta() && e.getClick() == ClickType.RIGHT) {
 			if (user.getOpenInventory() != null) {
 				switch (user.getOpenInventory()) {
@@ -24,7 +24,7 @@ public class ListenerInteractMenuBack extends Listener<EventInteract> {
 				case PERKS_2:
 				case PERKS_3:
 					e.setCancelled(true);
-					Main.getInstance().getLobby().listenerItemPerks.openInventory(p, user);
+					WoolBattle.getInstance().getLobby().listenerItemPerks.openInventory(p, user);
 					break;
 				case TEAMS:
 				case VOTING:
@@ -36,7 +36,7 @@ public class ListenerInteractMenuBack extends Listener<EventInteract> {
 				case VOTING_MAP:
 				case VOTING_LIFES:
 					e.setCancelled(true);
-					Main.getInstance().getLobby().listenerItemVoting.openInventory(p, user);
+					WoolBattle.getInstance().getLobby().listenerItemVoting.openInventory(p, user);
 					break;
 				default:
 					break;

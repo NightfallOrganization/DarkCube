@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -32,7 +32,7 @@ public class ListenerRopeInteract extends Listener<PlayerInteractEvent> {
 			ItemStack item = e.getItem();
 			if (item == null)
 				return;
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			Perk perk = user.getPerkByItemId(ItemManager.getItemId(item));
 			if (ROPE_COOLDOWN.getItemId().equals(ItemManager.getItemId(item))) {
 				Ingame.playSoundNotEnoughWool(user);
@@ -64,7 +64,7 @@ public class ListenerRopeInteract extends Listener<PlayerInteractEvent> {
 			}
 			ItemManager.removeItems(user, p.getInventory(), new ItemStack(
 							Material.WOOL, 1,
-							user.getTeam().getType().getWoolColor()), PerkType.ROPE.getCost());
+							user.getTeam().getType().getWoolColorByte()), PerkType.ROPE.getCost());
 
 			Vector vec = p.getLocation().getDirection().setY(0).normalize();
 			double ax = Math.abs(vec.getX());
@@ -105,8 +105,8 @@ public class ListenerRopeInteract extends Listener<PlayerInteractEvent> {
 	private void setBlock(Location block, User user) {
 		if (block.getBlock().getType() == Material.AIR) {
 			block.getBlock().setType(Material.WOOL);
-			block.getBlock().setData(user.getTeam().getType().getWoolColor());
-			Main.getInstance().getIngame().placedBlocks.add(block.getBlock());
+			block.getBlock().setData(user.getTeam().getType().getWoolColorByte());
+			WoolBattle.getInstance().getIngame().placedBlocks.add(block.getBlock());
 		}
 	}
 }

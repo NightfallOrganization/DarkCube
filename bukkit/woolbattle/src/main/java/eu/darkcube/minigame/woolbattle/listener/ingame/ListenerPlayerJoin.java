@@ -14,7 +14,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 	@EventHandler
 	public void handle(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		final User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		final User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		p.setGameMode(GameMode.SURVIVAL);
 		p.resetMaxHealth();
 		p.resetPlayerTime();
@@ -29,7 +29,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		p.setSaturation(0);
 		e.setJoinMessage(null);
 		user.setTicksAfterLastHit(1200);
-		Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
+		WoolBattle.getInstance().getTeamManager().setTeam(user, WoolBattle.getInstance().getTeamManager().getSpectator());
 //		ingame.setSpectator(user);
 	}
 }

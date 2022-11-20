@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -38,7 +38,7 @@ public class ListenerRonjasToiletHit extends Listener<ProjectileHitEvent> {
 			ParticleEffect.DRIP_WATER.display(.3F, 1F, .3F, 1, 250, egg.getLocation(), 50);
 
 			if (egg.getTicksLived() <= 3) {
-				Main.getInstance()
+				WoolBattle.getInstance()
 						.getUserWrapper()
 						.getUsers()
 						.stream()
@@ -51,7 +51,7 @@ public class ListenerRonjasToiletHit extends Listener<ProjectileHitEvent> {
 							t.setVelocity(v);
 						});
 			} else {
-				Main.getInstance()
+				WoolBattle.getInstance()
 						.getUserWrapper()
 						.getUsers()
 						.stream()

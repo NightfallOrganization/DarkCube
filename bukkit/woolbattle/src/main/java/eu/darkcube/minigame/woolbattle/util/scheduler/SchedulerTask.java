@@ -1,6 +1,6 @@
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 public class SchedulerTask implements Comparable<SchedulerTask> {
@@ -20,7 +20,7 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
 		this.repeat = repeat;
 		this.delay = delay;
 		this.lastExecution = MinecraftServer.currentTick + delay - repeat;
-		Main.getInstance().getSchedulers().add(this);
+		WoolBattle.getInstance().getSchedulers().add(this);
 	}
 
 	SchedulerTask(Scheduler scheduler, long delay, Integer weight) {
@@ -54,7 +54,7 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
 	}
 
 	public final void cancel() {
-		Main.getInstance().getSchedulers().remove(this);
+		WoolBattle.getInstance().getSchedulers().remove(this);
 		scheduler = null;
 		delay = 0;
 		repeat = 0;

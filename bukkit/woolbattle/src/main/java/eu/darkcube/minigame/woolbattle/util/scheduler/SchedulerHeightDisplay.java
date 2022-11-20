@@ -3,7 +3,7 @@ package eu.darkcube.minigame.woolbattle.util.scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
@@ -26,10 +26,10 @@ public class SchedulerHeightDisplay extends Scheduler {
 	}
 
 	public final void display(Player p) {
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		HeightDisplay display = user.getData().getHeightDisplay();
 		if (display.isEnabled()) {
-			int deathHeight = Main.getInstance().getMap().getDeathHeight();
+			int deathHeight = WoolBattle.getInstance().getMap().getDeathHeight();
 			int currentHeight = p.getLocation().getBlockY();
 			int diff = (diff = currentHeight - deathHeight) < 0 ? 0 : diff;
 

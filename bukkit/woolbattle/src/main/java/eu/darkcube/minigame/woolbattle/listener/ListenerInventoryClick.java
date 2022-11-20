@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.user.UserSettings;
@@ -25,7 +25,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 			return;
 		}
 		Player p = (Player) e.getWhoClicked();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		ItemStack item = e.getCurrentItem();
 		if (item == null) {
 			return;
@@ -57,7 +57,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 				char colorChar = ItemManager.getId(item, "color").charAt(0);
 				ChatColor c = ChatColor.getByChar(colorChar);
 				user.getData().getHeightDisplay().setColor(c);
-				Main.getInstance().getIngame().schedulerHeightDisplay.display(p);
+				WoolBattle.getInstance().getIngame().schedulerHeightDisplay.display(p);
 			}
 			e.setCancelled(true);
 		} else if (user.getOpenInventory() == InventoryId.WOOL_DIRECTION) {
@@ -69,7 +69,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 			e.setCancelled(true);
 			UserSettings.openWoolDirection(user);
 		}
-		if (Main.getInstance().getLobby().isEnabled() && e.getHotbarButton() != -1) {
+		if (WoolBattle.getInstance().getLobby().isEnabled() && e.getHotbarButton() != -1) {
 			e.setCancelled(true);
 		}
 

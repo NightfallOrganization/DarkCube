@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -57,7 +57,7 @@ class DefaultTeam implements Team {
 
 	@Override
 	public Collection<? extends User> getUsers() {
-		return Main.getInstance().getUserWrapper().getUsers().stream().filter(user -> user.getTeam().equals(this))
+		return WoolBattle.getInstance().getUserWrapper().getUsers().stream().filter(user -> user.getTeam().equals(this))
 				.collect(Collectors.toSet());
 	}
 
@@ -74,7 +74,7 @@ class DefaultTeam implements Team {
 	@Override
 	public void setLifes(int lifes) {
 		this.lifes = lifes;
-		Main m = Main.getInstance();
+		WoolBattle m = WoolBattle.getInstance();
 		m.getUserWrapper().getUsers().forEach(u -> m.getIngame().reloadScoreboardLifes(u));
 	}
 
@@ -90,7 +90,7 @@ class DefaultTeam implements Team {
 
 	@Override
 	public void setSpawn(Location location) {
-		setSpawn(Main.getInstance().getMap(), location);
+		setSpawn(WoolBattle.getInstance().getMap(), location);
 	}
 
 	@Override
@@ -100,7 +100,7 @@ class DefaultTeam implements Team {
 
 	@Override
 	public Location getSpawn() {
-		return getSpawn(Main.getInstance().getMap());
+		return getSpawn(WoolBattle.getInstance().getMap());
 	}
 
 	@Override

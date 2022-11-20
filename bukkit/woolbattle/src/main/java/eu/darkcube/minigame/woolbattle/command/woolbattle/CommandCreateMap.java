@@ -2,7 +2,7 @@ package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.commandapi.Command;
@@ -10,18 +10,18 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandCreateMap extends Command {
 
 	public CommandCreateMap() {
-		super(Main.getInstance(), "createMap", new Command[0], "Erstellt eine Map", CommandArgument.MAP);
+		super(WoolBattle.getInstance(), "createMap", new Command[0], "Erstellt eine Map", CommandArgument.MAP);
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (args.length == 1) {
-			Map map = Main.getInstance().getMapManager().getMap(args[0]);
+			Map map = WoolBattle.getInstance().getMapManager().getMap(args[0]);
 			if (map != null) {
 				sender.sendMessage("§cEs gibt bereits eine Map mit dem Namen '" + args[0] + "'.");
 				return true;
 			}
-			map = Main.getInstance().getMapManager().createMap(args[0]);
+			map = WoolBattle.getInstance().getMapManager().createMap(args[0]);
 			sender.sendMessage("§aDu hast die Map '" + map.getName() + "' erstellt!");
 			return true;
 		}

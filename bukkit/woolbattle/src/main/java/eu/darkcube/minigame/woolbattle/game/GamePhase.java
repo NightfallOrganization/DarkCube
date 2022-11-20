@@ -26,4 +26,9 @@ public abstract class GamePhase {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T cast() {
+		return (T) this;
+	}
+
 }

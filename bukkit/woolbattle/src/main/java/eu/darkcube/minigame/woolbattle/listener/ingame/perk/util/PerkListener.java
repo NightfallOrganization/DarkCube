@@ -1,10 +1,10 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.util;
 
+import java.util.function.BooleanSupplier;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
@@ -25,8 +25,8 @@ public abstract class PerkListener implements Listener {
 	 * @param perk
 	 * @return if the given perk is usable
 	 */
-	protected boolean checkUsable(User user, Perk perk) {
-		return this.checkUsable(user, perk, null, null);
+	protected boolean checkUsable(Perk perk) {
+		return this.checkUsable(perk, null, null);
 	}
 
 	/**
@@ -36,7 +36,8 @@ public abstract class PerkListener implements Listener {
 	 * @param failureRunnable
 	 * @return if the given perk is usable
 	 */
-	protected boolean checkUsable(User user, Perk perk, Runnable successRunnable, Runnable failureRunnable) {
+	protected boolean checkUsable(Perk perk, Runnable successRunnable, Runnable failureRunnable) {
+		User user = perk.getOwner();
 		Player p = user.getBukkitEntity();
 		if (!p.getInventory().contains(Material.WOOL, perk.getCost()) || perk.getCooldown() > 0) {
 			Ingame.playSoundNotEnoughWool(user);
@@ -66,12 +67,11 @@ public abstract class PerkListener implements Listener {
 	 */
 	protected boolean checkUsable(User user, Item perkItem) {
 		Perk perk = user.getPerkByItemId(perkItem.getItemId());
-		return perk != null ? this.checkUsable(user, perk) : false;
+		return perk != null ? this.checkUsable(perk) : false;
 	}
 
 	/**
-	 * if the usedItem matches the perkItem and the perk given by the perkItem is
-	 * usable
+	 * if the usedItem matches the perkItem and the perk given by the perkItem is usable
 	 * 
 	 * @param user
 	 * @param perkType
@@ -83,8 +83,7 @@ public abstract class PerkListener implements Listener {
 	}
 
 	/**
-	 * if the usedItem matches the perkItem and the perk given by the perkItem is
-	 * usable
+	 * if the usedItem matches the perkItem and the perk given by the perkItem is usable
 	 * 
 	 * Also runs the itemMatchRunnable if the items match
 	 * 
@@ -94,7 +93,8 @@ public abstract class PerkListener implements Listener {
 	 * @param itemMatchRunnable
 	 * @return if the checks are successful
 	 */
-	protected boolean checkUsable(User user, PerkType perkType, ItemStack usedItem, Runnable itemMatchRunnable) {
+	protected boolean checkUsable(User user, PerkType perkType, ItemStack usedItem,
+			Runnable itemMatchRunnable) {
 		String usedItemId = ItemManager.getItemId(usedItem);
 		if (perkType.getItem().getItemId().equals(usedItemId)
 				|| perkType.getCooldownItem().getItemId().equals(usedItemId)) {
@@ -112,32 +112,55 @@ public abstract class PerkListener implements Listener {
 	 * @return if the check is successful
 	 */
 	protected boolean checkPerkInHandUsable(User user) {
-		Perk perk = user.getPerkByItemId(ItemManager.getItemId(user.getBukkitEntity().getItemInHand()));
+		Perk perk =
+				user.getPerkByItemId(ItemManager.getItemId(user.getBukkitEntity().getItemInHand()));
 		if (perk != null) {
-			return this.checkUsable(user, perk);
+			return this.checkUsable(perk);
 		}
 		return false;
 	}
 
-	protected void payForThePerk(User user, PerkType perkType) {
-		ItemManager.removeItems(user, user.getBukkitEntity().getInventory(), user.getSingleWoolItem(),
-				perkType.getCost());
+	protected void payForThePerk(Perk perk) {
+		ItemManager.removeItems(perk.getOwner(), perk.getOwner().getBukkitEntity().getInventory(),
+				perk.getOwner().getSingleWoolItem(), perk.getCost());
 	}
 
-	protected void startCooldown(User user, PerkType perkType) {
-		this.startCooldown(user.getPerkByItemId(perkType.getItem().getItemId()));
+	protected void payForThePerk(User user, PerkType perkType) {
+		ItemManager.removeItems(user, user.getBukkitEntity().getInventory(),
+				user.getSingleWoolItem(), perkType.getCost());
+	}
+
+	protected void startCooldown(User user, PerkType perkType, BooleanSupplier mayCountDown) {
+		this.startCooldown(user.getPerkByItemId(perkType.getItem().getItemId()), mayCountDown);
 	}
 
 	protected void startCooldown(Perk perk) {
+		startCooldown(perk, null);
+	}
+
+	protected void startCooldown(User user, PerkType perkType) {
+		startCooldown(user, perkType, null);
+	}
+
+	protected void startCooldown(Perk perk, BooleanSupplier mayCountDown) {
 
 		// if error add a check for 0 cooldown
-
+		perk.setCooldown(perk.getMaxCooldown());
 		new Scheduler() {
 
 			int cd = perk.getMaxCooldown();
+			int waited = 0;
 
 			@Override
 			public void run() {
+				if (mayCountDown != null && !mayCountDown.getAsBoolean()) {
+					return;
+				}
+				waited++;
+				waited = waited % 20;
+				if (waited != 0) {
+					return;
+				}
 				if (this.cd <= 0) {
 					this.cancel();
 					perk.setCooldown(0);
@@ -146,7 +169,7 @@ public abstract class PerkListener implements Listener {
 				perk.setCooldown(this.cd--);
 			}
 
-		}.runTaskTimer(20);
+		}.runTaskTimer(1);
 	}
 
 }

@@ -2,7 +2,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.standard;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,9 +9,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGhost;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -32,7 +31,7 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 	@EventHandler
 	public void handle(PlayerToggleFlightEvent e) {
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (p.getGameMode() != GameMode.SURVIVAL || user.isTrollMode()
 				|| user.getTeam().getType() == TeamType.SPECTATOR) {
 			return;
@@ -43,11 +42,11 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 			this.cooldown.get(p).setObject(ListenerDoubleJump.COOLDOWN);
 			Vector velo = p.getLocation().getDirection();
 			velo.setY(0).normalize().multiply(0.1);
-//			velo.multiply(0.1);
+			// velo.multiply(0.1);
 			double heightMult = 1;
 			if (user.getPassivePerk().getPerkName().equals(PerkType.ROCKETJUMP.getPerkName()))
 				heightMult = 1.45;
-			if(user.getPassivePerk().getPerkName().equals(PerkType.LONGJUMP.getPerkName())){
+			if (user.getPassivePerk().getPerkName().equals(PerkType.LONGJUMP.getPerkName())) {
 				velo.multiply(5.3);
 				heightMult = 1.08;
 			}
@@ -55,7 +54,8 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 			p.setAllowFlight(false);
 			p.setVelocity(velo);
 			ItemManager.removeItems(user, p.getInventory(),
-					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()), ListenerDoubleJump.COST);
+					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()),
+					ListenerDoubleJump.COST);
 			new Scheduler() {
 				@Override
 				public void run() {
@@ -64,17 +64,15 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 						this.cancel();
 						return;
 					}
-					ListenerDoubleJump.this.cooldown.get(p).setObject(ListenerDoubleJump.this.cooldown.get(p).getObject() - 1);
+					ListenerDoubleJump.this.cooldown.get(p)
+							.setObject(ListenerDoubleJump.this.cooldown.get(p).getObject() - 1);
 				}
 			}.runTaskTimer(0, 1);
 		}
-//		System.out.println(e.isFlying());
-//		System.out.println(e.isCancelled());
 	}
 
 	public boolean refresh(Player p) {
-		if (Main.getInstance().getIngame().listenerGhostInteract.ghosts
-				.containsKey(Main.getInstance().getUserWrapper().getUser(p.getUniqueId()))) {
+		if (ListenerGhost.isGhost(WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId()))) {
 			if (p.getAllowFlight())
 				p.setAllowFlight(false);
 			return false;
@@ -83,19 +81,21 @@ public class ListenerDoubleJump extends Listener<PlayerToggleFlightEvent> {
 		if (!this.cooldown.containsKey(p)) {
 			this.cooldown.put(p, new SimpleObservableInteger(0) {
 				@Override
-				public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
-					p.setFoodLevel(
-							(int) ((ListenerDoubleJump.COOLDOWN - newValue) * 20F / ListenerDoubleJump.COOLDOWN));
+				public void onChange(ObservableObject<Integer> instance, Integer oldValue,
+						Integer newValue) {
+					p.setFoodLevel((int) ((ListenerDoubleJump.COOLDOWN - newValue) * 20F
+							/ ListenerDoubleJump.COOLDOWN));
 				}
 
 				@Override
-				public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
-				}
+				public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
+						Integer newValue) {}
 			});
 		}
 		if (p.getGameMode() == GameMode.SURVIVAL) {
 			ObservableInteger cdi = this.cooldown.get(p);
-			if (ItemManager.countItems(Material.WOOL, p.getInventory()) >= ListenerDoubleJump.COST && cdi.getObject() == 0) {
+			if (ItemManager.countItems(Material.WOOL, p.getInventory()) >= ListenerDoubleJump.COST
+					&& cdi.getObject() == 0) {
 				if (!p.getAllowFlight()) {
 					p.setAllowFlight(true);
 				}

@@ -4,14 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.google.gson.Gson;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.configuration.file.YamlConfiguration;
-
-import com.google.gson.Gson;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer.DontSerialize;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
@@ -26,16 +23,20 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 	private final String displayNameKey;
 	private boolean enabled;
 	private byte woolcolor;
+	@DontSerialize
+	private DyeColor woolcolorDye;
 	private char namecolor;
 	private int maxPlayers;
 	private final int weight;
 	@DontSerialize
 	private int index;
 
-	public TeamType(String displayNameKey, int weight, byte woolcolor, ChatColor namecolor, boolean enabled,
-			int maxPlayers) {
+	@SuppressWarnings("deprecation")
+	public TeamType(String displayNameKey, int weight, byte woolcolor, ChatColor namecolor,
+			boolean enabled, int maxPlayers) {
 		this.displayNameKey = displayNameKey;
 		this.woolcolor = woolcolor;
+		this.woolcolorDye = DyeColor.getByData(woolcolor);
 		this.namecolor = namecolor.getChar();
 		this.maxPlayers = maxPlayers;
 		this.enabled = enabled;
@@ -53,24 +54,25 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 
 	public void save() {
 		TYPES.add(this);
-		YamlConfiguration cfg = Main.getInstance().getConfig("teams");
+		YamlConfiguration cfg = WoolBattle.getInstance().getConfig("teams");
 		List<String> teams = cfg.getStringList("teams");
 		teams.add(serialize());
 		cfg.set("teams", teams);
-		Main.getInstance().saveConfig(cfg);
+		WoolBattle.getInstance().saveConfig(cfg);
 	}
 
 	public boolean isDeleted() {
-		return !Main.getInstance().getConfig("teams").getStringList("teams").contains(serialize());
+		return !WoolBattle.getInstance().getConfig("teams").getStringList("teams")
+				.contains(serialize());
 	}
 
 	public void delete() {
-		YamlConfiguration cfg = Main.getInstance().getConfig("teams");
+		YamlConfiguration cfg = WoolBattle.getInstance().getConfig("teams");
 		List<String> teams = cfg.getStringList("teams");
 		teams.remove(serialize());
 		cfg.set("teams", teams);
 		TYPES.remove(this);
-		Main.getInstance().saveConfig(cfg);
+		WoolBattle.getInstance().saveConfig(cfg);
 	}
 
 	private int index(boolean flag) {
@@ -85,8 +87,16 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 		return this.index;
 	}
 
-	public byte getWoolColor() {
+	public byte getWoolColorByte() {
 		return woolcolor;
+	}
+
+	@SuppressWarnings("deprecation")
+	public DyeColor getWoolColor() {
+		if (woolcolorDye == null) {
+			woolcolorDye = DyeColor.getByData(woolcolor);
+		}
+		return woolcolorDye;
 	}
 
 	public String getDisplayNameKey() {
@@ -118,6 +128,7 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 	@SuppressWarnings("deprecation")
 	public void setWoolColor(DyeColor woolcolor) {
 		delete();
+		this.woolcolorDye = woolcolor;
 		this.woolcolor = woolcolor.getData();
 		save();
 	}
@@ -162,8 +173,9 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 		}
 		TeamType o = (TeamType) obj;
 		if (o.enabled == enabled && o.displayNameKey.equals(displayNameKey) && o.index == index
-				&& o.invisibleTag.equals(invisibleTag) && o.maxPlayers == maxPlayers && o.namecolor == namecolor
-				&& o.scoreboardTag.equals(scoreboardTag) && o.weight == weight && o.woolcolor == woolcolor) {
+				&& o.invisibleTag.equals(invisibleTag) && o.maxPlayers == maxPlayers
+				&& o.namecolor == namecolor && o.scoreboardTag.equals(scoreboardTag)
+				&& o.weight == weight && o.woolcolor == woolcolor) {
 			return true;
 		}
 		return false;
@@ -199,7 +211,7 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 	public static final TeamType[] values() {
 		return TYPES.toArray(new TeamType[0]);
 	}
-	
+
 	public static Collection<TeamType> getTypes() {
 		return TYPES;
 	}

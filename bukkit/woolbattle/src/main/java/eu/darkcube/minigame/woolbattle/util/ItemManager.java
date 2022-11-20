@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -134,7 +134,7 @@ public class ItemManager {
 				builder.addLore(last);
 			}
 		}
-		if (item.getPerk() != null && Main.getInstance().getLobby().isEnabled()) {
+		if (item.getPerk() != null && WoolBattle.getInstance().getLobby().isEnabled()) {
 			PerkType p = item.getPerk();
 			if (p.getCost() != 0) {
 				if (p.isCostPerBlock()) {

@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
@@ -123,10 +123,10 @@ public class PerkTypePerk implements Perk {
 				&& this.getCooldown() != this.getMaxCooldown() && !this.isHardCooldown())) {
 			ItemStack item = this.getItem().getItem(this.owner);
 			if (this.type == PerkType.GRABBER
-					&& Main.getInstance().getIngame().listenerGrabberInteract.grabbed.containsKey(this.owner)) {
+					&& WoolBattle.getInstance().getIngame().listenerGrabberInteract.grabbed.containsKey(this.owner)) {
 				item = Item.PERK_GRABBER_GRABBED.getItem(this.owner);
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName(Main.getInstance().getIngame().listenerGrabberInteract.grabbed.get(this.owner)
+				meta.setDisplayName(WoolBattle.getInstance().getIngame().listenerGrabberInteract.grabbed.get(this.owner)
 						.getTeamPlayerName());
 				item.setItemMeta(meta);
 			} else if (this.type == PerkType.ARROW_RAIN) {

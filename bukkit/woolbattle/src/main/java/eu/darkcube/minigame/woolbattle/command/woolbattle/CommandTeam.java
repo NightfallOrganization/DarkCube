@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.team.CommandSetNameColor;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.team.CommandEnable;
@@ -19,7 +19,7 @@ import eu.darkcube.system.commandapi.SpacedCommand;
 public class CommandTeam extends SpacedCommand {
 
 	public CommandTeam() {
-		super(Main.getInstance(), "team",
+		super(WoolBattle.getInstance(), "team",
 				new SubCommand[] { new CommandSetSpawn(), new CommandDisable(), new CommandEnable(),
 						new CommandSetNameColor(), new CommandSetWoolColor(), new CommandInfo() },
 				"Team Hauptcommand", CommandArgument.TEAM);

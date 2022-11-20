@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.map.Map;
@@ -30,7 +30,7 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 		try {
 			ItemStack item = e.getItem();
 			Player p = e.getPlayer();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			if (e.getItem().hasItemMeta()) {
 				String itemid = ItemManager.getItemId(item);
 				if (itemid.equals(ItemManager.getItemId(Item.LOBBY_VOTING))) {
@@ -47,7 +47,7 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 						} else if (itemid.equals(ItemManager.getItemId(Item.GENERAL_VOTING_AGAINST))) {
 							vote = false;
 						}
-						Vote<Boolean> old = Main.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
+						Vote<Boolean> old = WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
 						if (old != null) {
 							if (old.vote == vote) {
 								p.sendMessage(Message.ALREADY_VOTED_FOR_THIS.getMessage(user));
@@ -56,9 +56,9 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 							}
 						}
 						if (vote != null) {
-							Main.getInstance().getLobby().VOTES_EP_GLITCH.put(user,
+							WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.put(user,
 									new Vote<>(System.currentTimeMillis(), vote));
-							Main.getInstance().getLobby().recalculateEpGlitch();
+							WoolBattle.getInstance().getLobby().recalculateEpGlitch();
 							e.setCancelled(true);
 							if (vote) {
 								p.sendMessage(Message.VOTED_FOR_EP_GLITCH.getMessage(user));
@@ -74,16 +74,16 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 							break;
 						e.setCancelled(true);
 						String mapname = ItemManager.getMapId(item);
-						Map map = Main.getInstance().getMapManager().getMap(mapname);
-						Vote<Map> vote1 = Main.getInstance().getLobby().VOTES_MAP.get(user);
+						Map map = WoolBattle.getInstance().getMapManager().getMap(mapname);
+						Vote<Map> vote1 = WoolBattle.getInstance().getLobby().VOTES_MAP.get(user);
 						if (vote1 != null)
 							if (map.equals(vote1.vote)) {
 								p.sendMessage(Message.ALREADY_VOTED_FOR_MAP.getMessage(user, map.getName()));
 								break;
 							}
 						vote1 = new Vote<>(System.currentTimeMillis(), map);
-						Main.getInstance().getLobby().VOTES_MAP.put(user, vote1);
-						Main.getInstance().getLobby().recalculateMap();
+						WoolBattle.getInstance().getLobby().VOTES_MAP.put(user, vote1);
+						WoolBattle.getInstance().getLobby().recalculateMap();
 						p.sendMessage(Message.VOTED_FOR_MAP.getMessage(user, map.getName()));
 						this.openMapsInventory(p, user);
 						break;
@@ -115,7 +115,7 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 		} catch (
 
 		NullPointerException ex) {
-			Main.getInstance()
+			WoolBattle.getInstance()
 					.sendConsole(
 							"§cThe Item " + e.getItem().getItemMeta().getDisplayName() + " is not correctly set up");
 			ex.printStackTrace();
@@ -146,8 +146,8 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 		builder.getUnsafe().setString("lifes", Integer.toString(lifes)).setString("itemId", "lifes");
 
 		int lifeVotes = 0;
-		if (Main.getInstance().getLobby().VOTES_LIFES.containsKey(user)) {
-			lifeVotes = Main.getInstance().getLobby().VOTES_LIFES.get(user);
+		if (WoolBattle.getInstance().getLobby().VOTES_LIFES.containsKey(user)) {
+			lifeVotes = WoolBattle.getInstance().getLobby().VOTES_LIFES.get(user);
 		}
 		if (lifeVotes == lifes) {
 			builder.glow();
@@ -157,14 +157,14 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 
 	public void openMapsInventory(Player p, User user) {
 		InventoryBuilder b = new InventoryBuilder(Message.INVENTORY_VOTING_MAPS.getMessage(user));
-		List<Map> maps = Main.getInstance()
+		List<Map> maps = WoolBattle.getInstance()
 				.getMapManager()
 				.getMaps()
 				.stream()
 				.filter(m -> m.isEnabled())
 				.collect(Collectors.toList());
 		b.size(maps.size());
-		Vote<Map> vote = Main.getInstance().getLobby().VOTES_MAP.get(user);
+		Vote<Map> vote = WoolBattle.getInstance().getLobby().VOTES_MAP.get(user);
 		for (int i = 0; i < maps.size(); i++) {
 			Map map = maps.get(i);
 			ItemBuilder bu = new ItemBuilder(map.getIcon().getMaterial()).setDurability(map.getIcon().getId());
@@ -182,7 +182,7 @@ public class ListenerItemVoting extends Listener<EventInteract> {
 	public void openEnderpearlGlitchInventory(Player p, User user) {
 		ItemBuilder b1 = new ItemBuilder(Item.GENERAL_VOTING_FOR.getItem(user));
 		ItemBuilder b2 = new ItemBuilder(Item.GENERAL_VOTING_AGAINST.getItem(user));
-		Vote<Boolean> vote = Main.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
+		Vote<Boolean> vote = WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
 		if (vote != null)
 			if (true == vote.vote) {
 				b1.glow();

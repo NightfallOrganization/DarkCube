@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -23,7 +23,7 @@ public class ListenerInteract extends Listener<PlayerInteractEvent> {
 	@EventHandler
 	public void handle(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (user.getTeam().getType() != TeamType.SPECTATOR) {
 			return;
 		}
@@ -39,7 +39,7 @@ public class ListenerInteract extends Listener<PlayerInteractEvent> {
 	private Inventory createInventory(User user) {
 		InventoryBuilder builder = new InventoryBuilder(Message.INVENTORY_COMPASS.getMessage(user));
 		int slot = 0;
-		for (User u : Main.getInstance().getUserWrapper().getUsers()) {
+		for (User u : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 			if (u.getTeam().getType() == TeamType.SPECTATOR) {
 				continue;
 			}

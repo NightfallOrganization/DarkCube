@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -18,7 +18,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 	@Override
 	@EventHandler
 	public void handle(AsyncPlayerChatEvent e) {
-		Main main = Main.getInstance();
+		WoolBattle main = WoolBattle.getInstance();
 		Player p = e.getPlayer();
 		User user = main.getUserWrapper().getUser(p.getUniqueId());
 		String msg = e.getMessage();
@@ -54,7 +54,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 					.map(u -> Bukkit.getPlayer(u.getUniqueId())).collect(Collectors.toSet()));
 			main.sendConsoleWithoutPrefix(msg);
 		} else {
-			for (User t : Main.getInstance().getUserWrapper().getUsers()) {
+			for (User t : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 				String pmsg = msg;
 				if (atall && replace) {
 					pmsg = pmsg.replaceFirst(main.atall, Message.AT_ALL.getMessage(t));
@@ -67,7 +67,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 		}
 	}
 
-	private String getMessage(Player p, String msg, boolean atall, String color, Main main, boolean satall) {
+	private String getMessage(Player p, String msg, boolean atall, String color, WoolBattle main, boolean satall) {
 		return color + (atall && main.getIngame().isEnabled() ? main.atall : "") + color + p.getName() + ChatColor.RESET
 				+ ": " + (satall ? msg.substring(main.atall.length()) : msg);
 	}

@@ -16,6 +16,11 @@ public class DefaultPlayerPerks implements PlayerPerks {
 	private int slotPearl;
 
 	public DefaultPlayerPerks() {
+		reset();
+	}
+
+	@Override
+	public void reset() {
 		active1 = PerkType.CAPSULE.getPerkName();
 		active2 = PerkType.SWITCHER.getPerkName();
 		passive = PerkType.EXTRA_WOOL.getPerkName();

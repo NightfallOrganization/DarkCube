@@ -42,4 +42,6 @@ public interface PlayerPerks {
 
 	void setPassivePerk(PerkName perk);
 
+	void reset();
+
 }

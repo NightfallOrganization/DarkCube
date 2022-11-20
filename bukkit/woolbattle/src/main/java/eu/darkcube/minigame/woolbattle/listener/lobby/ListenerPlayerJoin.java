@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import eu.darkcube.minigame.woolbattle.Config;
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -28,20 +28,20 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 	@Override
 	@EventHandler
 	public void handle(PlayerJoinEvent e) {
-		Lobby lobby = Main.getInstance().getLobby();
+		Lobby lobby = WoolBattle.getInstance().getLobby();
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		CloudNetLink.update();
-		Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
+		WoolBattle.getInstance().getTeamManager().setTeam(user, WoolBattle.getInstance().getTeamManager().getSpectator());
 		Scoreboard sb = new Scoreboard();
-		Main.initScoreboard(sb, user);
+		WoolBattle.initScoreboard(sb, user);
 		lobby.getScoreboardByUser().put(user, sb);
 		lobby.loadScoreboard(user);
 		lobby.reloadTab(user);
 		p.setScoreboard(sb.getScoreboard());
 
 		Objective obj = sb.getObjective(ScoreboardObjective.LOBBY.getKey());
-		int minplayercount = Main.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+		int minplayercount = WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
 		Team needed = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
 		for (int i = 0; i < ObjectiveTeam.values().length; i++) {
 			ObjectiveTeam ot = ObjectiveTeam.values()[i];
@@ -54,16 +54,16 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		}
 
 		needed.setSuffix(Integer.toString(minplayercount));
-		Main.getInstance().setMap(user);
-		Main.getInstance().setOnline(user);
-		Main.getInstance().setEpGlitch(user);
+		WoolBattle.getInstance().setMap(user);
+		WoolBattle.getInstance().setOnline(user);
+		WoolBattle.getInstance().setEpGlitch(user);
 
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-		Main.getInstance().getUserWrapper().getUsers().forEach(t -> {
+		WoolBattle.getInstance().getUserWrapper().getUsers().forEach(t -> {
 			if (e.getJoinMessage() != null)
 				lobby.reloadUsers(t);
-			Main.getInstance().setOnline(t);
+			WoolBattle.getInstance().setOnline(t);
 		});
 
 		if (e.getJoinMessage() != null) {
@@ -94,10 +94,10 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		if (e.getJoinMessage() != null) {
 			lobby.setTimer(lobby.getTimer() < 300 ? 300 : lobby.getTimer());
 
-			for (User t : Main.getInstance().getUserWrapper().getUsers()) {
+			for (User t : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 				t.getBukkitEntity().sendMessage(Message.PLAYER_JOINED.getMessage(t, user.getTeamPlayerName()));
 			}
-			Main.getInstance().sendConsole(Message.PLAYER_JOINED.getServerMessage(user.getTeamPlayerName()));
+			WoolBattle.getInstance().sendConsole(Message.PLAYER_JOINED.getServerMessage(user.getTeamPlayerName()));
 
 			e.setJoinMessage(null);
 		} else {

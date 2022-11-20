@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -32,10 +32,10 @@ public class SetTeamCommand extends PServerExecutor {
 	}
 
 	private static void setTeam(CommandSource source, Collection<Player> players, TeamType teamtype) {
-		Team team = Main.getInstance().getTeamManager().getTeam(teamtype);
+		Team team = WoolBattle.getInstance().getTeamManager().getTeam(teamtype);
 		for (Player player : players) {
-			User user = Main.getInstance().getUserWrapper().getUser(player.getUniqueId());
-			Main.getInstance().getTeamManager().setTeam(user, team);
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(player.getUniqueId());
+			WoolBattle.getInstance().getTeamManager().setTeam(user, team);
 		}
 		if (players.size() == 1) {
 			source.sendFeedback(Message.WOOLBATTLE_SETTEAM_TEAM_SINGLE.getMessage(source,

@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -41,7 +41,7 @@ public class ListenerCapsule extends BasicPerkListener {
 			block.getBlock().setType(Material.WOOL);
 			Ingame.setBlockDamage(block.getBlock(), 2);
 			Ingame.setMetaData(block.getBlock(), "capsule", true);
-			Main.getInstance().getIngame().placedBlocks.add(block.getBlock());
+			WoolBattle.getInstance().getIngame().placedBlocks.add(block.getBlock());
 		}
 	}
 
@@ -49,7 +49,7 @@ public class ListenerCapsule extends BasicPerkListener {
 		if (block.getBlock().getType() == Material.AIR) {
 			block.getBlock().setType(Material.WOOL);
 			Ingame.setMetaData(block.getBlock(), "capsule", true);
-			Main.getInstance().getIngame().placedBlocks.add(block.getBlock());
+			WoolBattle.getInstance().getIngame().placedBlocks.add(block.getBlock());
 		}
 	}
 

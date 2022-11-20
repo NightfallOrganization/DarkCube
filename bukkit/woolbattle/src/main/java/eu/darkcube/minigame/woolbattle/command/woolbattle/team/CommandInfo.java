@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
@@ -12,7 +12,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandInfo extends SubCommand {
 
 	public CommandInfo() {
-		super(Main.getInstance(), "info", new Command[0], "Ruft informationen des Teams ab");
+		super(WoolBattle.getInstance(), "info", new Command[0], "Ruft informationen des Teams ab");
 	}
 
 	@SuppressWarnings("deprecation")
@@ -27,7 +27,7 @@ public class CommandInfo extends SubCommand {
 			StringBuilder b = new StringBuilder();
 			b.append("§aTeam: " + team.getDisplayNameKey()).append("\nNamensfarbe: §").append(team.getNameColor())
 					.append(ChatColor.getByChar(team.getNameColor()).name()).append("\n§aWollfarbe: ")
-					.append(DyeColor.getByData(team.getWoolColor())).append("\nSortierung: ").append(team.getWeight())
+					.append(DyeColor.getByData(team.getWoolColorByte())).append("\nSortierung: ").append(team.getWeight())
 					.append("\nMaximale Spieleranzahl: ").append(team.getMaxPlayers()).append("\nAktiviert: ")
 					.append(team.isEnabled());
 			sender.sendMessage(b.toString());

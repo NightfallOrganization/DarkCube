@@ -1,48 +1,33 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk;
 
 import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import eu.darkcube.minigame.woolbattle.Main;
-import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.PerkListener;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.RayTrace;
 
-public class ListenerBlink extends PerkListener {
+public class ListenerBlink extends BasicPerkListener {
 
-	@EventHandler
-	public void handle(LaunchableInteractEvent e) {
-		if (e.getEntityType() == EntityType.ENDER_SIGNAL || e.getEntityType() == EntityType.ENDER_PEARL) {
-			ItemStack item = e.getItem();
-			if (item == null) {
-				return;
-			}
-			User user = Main.getInstance().getUserWrapper().getUser(e.getPlayer().getUniqueId());
-			if (!this.checkUsable(user, PerkType.BLINK, item, () -> e.setCancelled(true))) {
-				return;
-			}
-			if (!ListenerBlink.teleport(user)) {
-				return;
-			}
-			this.payForThePerk(user, PerkType.BLINK);
-			this.startCooldown(user, PerkType.BLINK);
-		}
+	public ListenerBlink() {
+		super(PerkType.BLINK);
 	}
 
-	public static boolean teleport(User user) {
+	@Override
+	protected boolean activate(User user, Perk perk) {
+		return ListenerBlink.teleport(user);
+	}
+
+	private static boolean teleport(User user) {
 		Player p = user.getBukkitEntity();
 		int dist = 15;
 		if (p.isSneaking()) {
-			RayTrace raytrace = new RayTrace(p.getEyeLocation().toVector(), p.getEyeLocation().getDirection());
+			RayTrace raytrace =
+					new RayTrace(p.getEyeLocation().toVector(), p.getEyeLocation().getDirection());
 			List<Vector> positions = raytrace.traverse(dist, 0.1);
 			for (int i = 0; i < positions.size(); i++) {
 				Location pos = positions.get(i).toLocation(p.getWorld());
@@ -61,7 +46,8 @@ public class ListenerBlink extends PerkListener {
 		for (; dist > 1; dist--) {
 			Location loc = user.getBukkitEntity().getEyeLocation().add(v.clone().multiply(dist));
 			Location loc2 = loc.clone().add(0, 1, 0);
-			if (loc.getBlock().getType() == Material.AIR && loc2.getBlock().getType() == Material.AIR) {
+			if (loc.getBlock().getType() == Material.AIR
+					&& loc2.getBlock().getType() == Material.AIR) {
 				boolean freeUp = ListenerBlink.checkLayer(loc2.clone().add(0, 1, 0));
 				boolean freeHead = ListenerBlink.checkLayer(loc2);
 				boolean freeFoot = ListenerBlink.checkLayer(loc);
@@ -71,7 +57,8 @@ public class ListenerBlink extends PerkListener {
 				if (free) {
 					user.getBukkitEntity().teleport(loc.setDirection(v));
 				} else {
-					user.getBukkitEntity().teleport(loc.getBlock().getLocation().add(.5, .1, .5).setDirection(v));
+					user.getBukkitEntity()
+							.teleport(loc.getBlock().getLocation().add(.5, .1, .5).setDirection(v));
 				}
 				return true;
 			}

@@ -5,11 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
-
-import net.minecraft.server.v1_8_R3.Entity;
 
 public class LaunchableInteractEvent extends PlayerEvent implements Cancellable {
 
@@ -19,6 +17,7 @@ public class LaunchableInteractEvent extends PlayerEvent implements Cancellable 
 	private EntityType entityType = null;
 	private ItemStack item;
 	private boolean cancel = false;
+	private Action action;
 
 	public LaunchableInteractEvent(Player who, Projectile entity, ItemStack item) {
 		super(who);
@@ -26,17 +25,19 @@ public class LaunchableInteractEvent extends PlayerEvent implements Cancellable 
 		this.entity = entity;
 		if (entity != null)
 			this.entityType = entity.getType();
+		action = Action.RIGHT_CLICK_AIR;
 	}
 
-	public LaunchableInteractEvent(Player who, EntityType entity, ItemStack item) {
+	public LaunchableInteractEvent(Player who, EntityType entity, ItemStack item, Action action) {
 		super(who);
 		this.entity = null;
 		this.entityType = entity;
 		this.item = item;
+		this.action = action;
 	}
 
-	public static void launchSilent(Entity ent) {
-		ent.world.addEntity(ent, SpawnReason.CUSTOM);
+	public Action getAction() {
+		return this.action;
 	}
 
 	public ItemStack getItem() {

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.mysql.MySQL;
@@ -34,7 +34,7 @@ public class ListenerItemPerks extends Listener<EventInteract> {
 			if (e.getItem().hasItemMeta()) {
 				String itemid = ItemManager.getItemId(e.getItem());
 				Player p = e.getPlayer();
-				User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+				User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 				InventoryId inv = null;
 				if (itemid.equals(Item.LOBBY_PERKS.getItemId())) {
 					if (user.getOpenInventory() != InventoryId.PERKS) {
@@ -88,7 +88,7 @@ public class ListenerItemPerks extends Listener<EventInteract> {
 				}
 			}
 		} catch (NullPointerException ex) {
-			Main.getInstance().sendConsole(
+			WoolBattle.getInstance().sendConsole(
 					"§cThe Item " + e.getItem().getItemMeta().getDisplayName() + " is not correctly set up: ");
 			ex.printStackTrace();
 		}

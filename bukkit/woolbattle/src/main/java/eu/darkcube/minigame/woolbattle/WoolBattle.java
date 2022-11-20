@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -27,7 +26,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
 import eu.darkcube.minigame.woolbattle.command.CommandDisableStats;
 import eu.darkcube.minigame.woolbattle.command.CommandFix;
 import eu.darkcube.minigame.woolbattle.command.CommandIsStats;
@@ -44,6 +42,7 @@ import eu.darkcube.minigame.woolbattle.command.CommandWoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
+import eu.darkcube.minigame.woolbattle.listener.ListenerAntiMonster;
 import eu.darkcube.minigame.woolbattle.listener.ListenerChat;
 import eu.darkcube.minigame.woolbattle.listener.ListenerFoodLevelChange;
 import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClick;
@@ -94,7 +93,7 @@ import net.minecraft.server.v1_8_R3.IChunkProvider;
 import net.minecraft.server.v1_8_R3.IDataManager;
 import net.minecraft.server.v1_8_R3.IScoreboardCriteria;
 
-public class Main extends Plugin {
+public class WoolBattle extends Plugin {
 
 	public String name;
 
@@ -138,6 +137,8 @@ public class Main extends Plugin {
 
 	private ListenerLaunchable listenerLaunchable;
 
+	private ListenerAntiMonster listenerAntiMonster;
+
 	public Integer baseLifes;
 
 	public Map baseMap;
@@ -150,14 +151,16 @@ public class Main extends Plugin {
 
 	private boolean epGlitch = true;
 
-	private static Main instance;
+	private int currentTick;
+
+	private static WoolBattle instance;
 
 	public static String tab_header;
 
 	public static String tab_footer;
 
-	public Main() {
-		Main.instance = this;
+	public WoolBattle() {
+		WoolBattle.instance = this;
 		System.setProperty("file.encoding", "UTF-8");
 	}
 
@@ -168,20 +171,19 @@ public class Main extends Plugin {
 
 		// Load all messages
 		try {
-			Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties", Message.KEY_MODFIIER);
-			Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties", Message.KEY_MODFIIER);
+			Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties",
+					Message.KEY_MODFIIER);
+			Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties",
+					Message.KEY_MODFIIER);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 		List<String> languageEntries = new ArrayList<>();
-		languageEntries
-				.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey).collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values())
-				.stream()
-				.map(i -> Message.ITEM_PREFIX + i.getKey())
+		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey)
 				.collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values())
-				.stream()
+		languageEntries.addAll(Arrays.asList(Item.values()).stream()
+				.map(i -> Message.ITEM_PREFIX + i.getKey()).collect(Collectors.toList()));
+		languageEntries.addAll(Arrays.asList(Item.values()).stream()
 				.filter(i -> i.getBuilder().getLores().size() > 0)
 				.map(i -> Message.ITEM_PREFIX + Message.LORE_PREFIX + i.getKey())
 				.collect(Collectors.toList()));
@@ -201,8 +203,8 @@ public class Main extends Plugin {
 
 		this.saveDefaultConfig("config");
 		this.createConfig("config");
-		Main.tab_header = this.getConfig("config").getString(Config.TAB_HEADER);
-		Main.tab_footer = this.getConfig("config").getString(Config.TAB_FOOTER);
+		WoolBattle.tab_header = this.getConfig("config").getString(Config.TAB_HEADER);
+		WoolBattle.tab_footer = this.getConfig("config").getString(Config.TAB_FOOTER);
 
 		this.saveDefaultConfig("mysql");
 		this.createConfig("mysql");
@@ -223,6 +225,7 @@ public class Main extends Plugin {
 		this.listenerWeatherChange = new ListenerWeatherChange();
 		this.listenerLaunchable = new ListenerLaunchable();
 		this.listenerChat = new ListenerChat();
+		this.listenerAntiMonster = new ListenerAntiMonster();
 
 		// Load and connect mysql
 		this.mysql = new MySQL();
@@ -236,7 +239,8 @@ public class Main extends Plugin {
 
 		// Load teamtypes and teams
 		List<String> teams = this.getConfig("teams").getStringList("teams");
-		List<TeamType> types = teams.stream().map(json -> TeamType.deserialize(json)).collect(Collectors.toList());
+		List<TeamType> types =
+				teams.stream().map(json -> TeamType.deserialize(json)).collect(Collectors.toList());
 		AtomicReference<TeamType> spec = new AtomicReference<>();
 		new ArrayList<>(types).forEach(type -> {
 			if (type.getDisplayNameKey().equals("SPECTATOR")) {
@@ -273,7 +277,8 @@ public class Main extends Plugin {
 		pm.registerInterface(VoidWorldPluginLoader.class);
 		try {
 			pm.loadPlugin(VoidWorldPluginLoader.file);
-		} catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException ex) {
+		} catch (UnknownDependencyException | InvalidPluginException
+				| InvalidDescriptionException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -305,7 +310,8 @@ public class Main extends Plugin {
 
 			@Override
 			public void run() {
-				for (SchedulerTask s : new ArrayList<>(Main.this.schedulers)) {
+				currentTick++;
+				for (SchedulerTask s : new ArrayList<>(WoolBattle.this.schedulers)) {
 					if (s.canExecute()) {
 						s.run();
 					}
@@ -315,13 +321,14 @@ public class Main extends Plugin {
 		}.runTaskTimer(this, 0, 1);
 
 		// Register default listeners
-		Main.registerListeners(this.listenerInventoryClick);
-		Main.registerListeners(this.listenerInventoryClose);
-		Main.registerListeners(this.listenerPlayerInteract);
-		Main.registerListeners(this.listenerFoodLevelChange);
-		Main.registerListeners(this.listenerWeatherChange);
-		Main.registerListeners(this.listenerLaunchable);
-		Main.registerListeners(this.listenerChat);
+		WoolBattle.registerListeners(this.listenerInventoryClick);
+		WoolBattle.registerListeners(this.listenerInventoryClose);
+		WoolBattle.registerListeners(this.listenerPlayerInteract);
+		WoolBattle.registerListeners(this.listenerFoodLevelChange);
+		WoolBattle.registerListeners(this.listenerWeatherChange);
+		WoolBattle.registerListeners(this.listenerLaunchable);
+		WoolBattle.registerListeners(this.listenerChat);
+		WoolBattle.registerListeners(this.listenerAntiMonster);
 		this.listenerLaunchable.start();
 
 		// Load worlds (At serverstart there are no worlds but if the plugin
@@ -355,12 +362,12 @@ public class Main extends Plugin {
 				CloudNetLink.update();
 			}
 
-		}.runTaskTimerAsynchronously(Main.getInstance(), 10, 10);
+		}.runTaskTimerAsynchronously(WoolBattle.getInstance(), 10, 10);
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				for (User user : Main.this.userWrapper.getUsers()) {
+				for (User user : WoolBattle.this.userWrapper.getUsers()) {
 					MySQL.saveUserData(user);
 				}
 			}
@@ -420,15 +427,18 @@ public class Main extends Plugin {
 
 	public void setEpGlitch(User user) {
 		Scoreboard sb = new Scoreboard(user);
-		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
-		String suffix = this.epGlitch ? Message.EP_GLITCH_ON.getMessage(user) : Message.EP_GLITCH_OFF.getMessage(user);
+		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
+				sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
+		String suffix = this.epGlitch ? Message.EP_GLITCH_ON.getMessage(user)
+				: Message.EP_GLITCH_OFF.getMessage(user);
 		team.setSuffix(suffix);
 	}
 
 	public void setMap(User user) {
 		if (this.getLobby().isEnabled()) {
 			Scoreboard sb = new Scoreboard(user);
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(ObjectiveTeam.MAP.getKey());
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
+					sb.getTeam(ObjectiveTeam.MAP.getKey());
 			Map m = this.getMap();
 			String suffix = m == null ? "§cNo Maps" : m.getName();
 			team.setSuffix(suffix);
@@ -437,17 +447,24 @@ public class Main extends Plugin {
 
 	public void setOnline(User user) {
 		Scoreboard sb = new Scoreboard(user);
-		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.getTeam(ObjectiveTeam.ONLINE.getKey());
+		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
+				sb.getTeam(ObjectiveTeam.ONLINE.getKey());
 		String suffix = Integer.toString(Bukkit.getOnlinePlayers().size());
 		team.setSuffix(suffix);
 	}
 
+	public int getCurrentTick() {
+		return this.currentTick;
+	}
+
 	public static final void initScoreboard(Scoreboard sb, User owner) {
 		// Spectator is not included in "Team"
-		Collection<Team> teams = new HashSet<>(Main.getInstance().getTeamManager().getTeams());
-		teams.add(Main.getInstance().getTeamManager().getSpectator());
+		Collection<Team> teams =
+				new HashSet<>(WoolBattle.getInstance().getTeamManager().getTeams());
+		teams.add(WoolBattle.getInstance().getTeamManager().getSpectator());
 		for (Team t : teams) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team = sb.createTeam(t.getType().getScoreboardTag());
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
+					sb.createTeam(t.getType().getScoreboardTag());
 			team.setPrefix(t.getPrefix());
 		}
 		for (ScoreboardObjective obj : ScoreboardObjective.values()) {
@@ -507,7 +524,8 @@ public class Main extends Plugin {
 		return new ChunkGenerator() {
 
 			@Override
-			public ChunkData generateChunkData(World world, Random random, int x, int z, BiomeGrid biome) {
+			public ChunkData generateChunkData(World world, Random random, int x, int z,
+					BiomeGrid biome) {
 				return this.createChunkData(world);
 			}
 
@@ -552,13 +570,15 @@ public class Main extends Plugin {
 		try {
 			// Setting all chunkgenerator fields for world
 			this.sendConsole("Preparing void world generation for world '" + world.getName() + "'");
-			w.getHandle().generator = this.getDefaultWorldGenerator(world.getName(), world.getName());
+			w.getHandle().generator =
+					this.getDefaultWorldGenerator(world.getName(), world.getName());
 			Field field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("dataManager");
 			field.setAccessible(true);
 			IDataManager manager = (IDataManager) field.get(w.getHandle());
 			IChunkProvider gen = new CustomChunkGenerator(w.getHandle(), w.getHandle().getSeed(),
 					w.getHandle().generator);
-			gen = new ChunkProviderServer(w.getHandle(), manager.createChunkLoader(w.getHandle().worldProvider), gen);
+			gen = new ChunkProviderServer(w.getHandle(),
+					manager.createChunkLoader(w.getHandle().worldProvider), gen);
 			w.getHandle().chunkProviderServer = (ChunkProviderServer) gen;
 			field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("chunkProvider");
 			field.setAccessible(true);
@@ -586,7 +606,8 @@ public class Main extends Plugin {
 		if (Bukkit.getWorld(world) == null) {
 			// && !new File(Bukkit.getWorldContainer(), world).exists()) {
 			try {
-				WorldCreator creator = new WorldCreator(world).generator(this.getDefaultWorldGenerator(world, world));
+				WorldCreator creator = new WorldCreator(world)
+						.generator(this.getDefaultWorldGenerator(world, world));
 				creator.createWorld();
 			} catch (NullPointerException ex) {
 				ex.printStackTrace();
@@ -596,8 +617,8 @@ public class Main extends Plugin {
 		}
 	}
 
-	public static final Main getInstance() {
-		return Main.instance;
+	public static final WoolBattle getInstance() {
+		return WoolBattle.instance;
 	}
 
 	public final void sendMessage(Message msg, Object... replacements) {
@@ -621,7 +642,8 @@ public class Main extends Plugin {
 			if (l instanceof RegisterNotifyListener) {
 				((RegisterNotifyListener) l).registered();
 			}
-			Main.getInstance().getServer().getPluginManager().registerEvents(l, Main.getInstance());
+			WoolBattle.getInstance().getServer().getPluginManager().registerEvents(l,
+					WoolBattle.getInstance());
 		}
 	}
 

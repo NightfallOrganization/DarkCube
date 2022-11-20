@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.perk.PerkEnderPearl;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
@@ -17,7 +17,7 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandSetPerkCost extends Command {
 
 	public CommandSetPerkCost() {
-		super(Main.getInstance(), "setPerkCost", new Command[0], "Setzt die Perk Kosten", CommandArgument.PERK,
+		super(WoolBattle.getInstance(), "setPerkCost", new Command[0], "Setzt die Perk Kosten", CommandArgument.PERK,
 				CommandArgument.COST);
 	}
 
@@ -68,7 +68,7 @@ public class CommandSetPerkCost extends Command {
 					cd = 0;
 				}
 			} catch (Exception ex) {
-				Main.getInstance().sendMessage("§cUngültige Zahl: " + scd, sender);
+				WoolBattle.getInstance().sendMessage("§cUngültige Zahl: " + scd, sender);
 				return true;
 			}
 			final int fcd = cd;
@@ -88,7 +88,7 @@ public class CommandSetPerkCost extends Command {
 
 	private void setCD(Runnable r, int cd, String name, CommandSender sender) {
 		r.run();
-		Main.getInstance().sendMessage("§aDu hast die Kosten für das Perk §6" + name
+		WoolBattle.getInstance().sendMessage("§aDu hast die Kosten für das Perk §6" + name
 				+ " §aauf §6" + cd + "§a gesetzt!", sender);
 	}
 }

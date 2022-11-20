@@ -9,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -25,7 +25,7 @@ public class ListenerTNTEntityDamageByEntity extends Listener<EntityDamageByEnti
 			return;
 		}
 		Player p = (Player) e.getEntity();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (user.getTeam().getType() == TeamType.SPECTATOR) {
 			e.setCancelled(true);
 			return;
@@ -40,7 +40,7 @@ public class ListenerTNTEntityDamageByEntity extends Listener<EntityDamageByEnti
 				}
 				Player a = source.getBukkitEntity();
 				Location loc = p.getLocation().add(0, 0.5, 0);
-				User attacker = Main.getInstance().getUserWrapper().getUser(a.getUniqueId());
+				User attacker = WoolBattle.getInstance().getUserWrapper().getUser(a.getUniqueId());
 				e.setCancelled(true);
 				double x = loc.getX() - tnt.getLocation().getX();
 				double y = loc.getY() - tnt.getLocation().getY();
@@ -73,7 +73,7 @@ public class ListenerTNTEntityDamageByEntity extends Listener<EntityDamageByEnti
 				velocity.setY(1 + (velocity.getY() * strengthY / 5));
 				velocity.setZ(velocity.getZ() * strengthZ);
 				p.setVelocity(velocity);
-				Main.getInstance().getIngame().attack(attacker, user);
+				WoolBattle.getInstance().getIngame().attack(attacker, user);
 			}
 		} else if (e.getDamager().getType() == EntityType.SNOWBALL) {
 			Snowball bomb = (Snowball) e.getDamager();

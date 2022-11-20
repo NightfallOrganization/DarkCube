@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.util.Locations;
 import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
@@ -58,11 +58,11 @@ public class DefaultMap implements Map, Serializable {
 
 	@Override
 	public void delete() {
-		Main.getInstance().getMapManager().deleteMap(this);
+		WoolBattle.getInstance().getMapManager().deleteMap(this);
 	}
 
 	private void save() {
-		Main.getInstance().getMapManager().saveMaps();
+		WoolBattle.getInstance().getMapManager().saveMaps();
 	}
 
 	@Override

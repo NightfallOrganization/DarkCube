@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
@@ -16,7 +16,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandSetNameColor extends SubCommand {
 
 	public CommandSetNameColor() {
-		super(Main.getInstance(), "setNameColor", new Command[0], "Setzt die Namensfarbe", CommandArgument.NAME_COLOR);
+		super(WoolBattle.getInstance(), "setNameColor", new Command[0], "Setzt die Namensfarbe", CommandArgument.NAME_COLOR);
 	}
 
 	@Override

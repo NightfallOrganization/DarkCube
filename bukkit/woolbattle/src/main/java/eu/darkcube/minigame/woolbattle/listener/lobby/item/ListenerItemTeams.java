@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -32,7 +32,7 @@ public class ListenerItemTeams extends Listener<EventInteract> {
 			ItemStack item = e.getItem();
 			if (item != null) {
 				Player p = e.getPlayer();
-				User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+				User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 				if (item.hasItemMeta()) {
 					if (ItemManager.getItemId(item).equals(ItemManager.getItemId(Item.LOBBY_TEAMS))) {
 						e.setCancelled(true);
@@ -43,7 +43,7 @@ public class ListenerItemTeams extends Listener<EventInteract> {
 						if (user.getOpenInventory() == InventoryId.TEAMS) {
 							e.setCancelled(true);
 							Team uteam = user.getTeam();
-							Team team = Main.getInstance().getTeamManager().getTeam(ItemManager.getTeamId(e.getItem()));
+							Team team = WoolBattle.getInstance().getTeamManager().getTeam(ItemManager.getTeamId(e.getItem()));
 							if (team != null) {
 								if (uteam.equals(team)) {
 									p.sendMessage(Message.ALREADY_IN_TEAM.getMessage(user));
@@ -53,7 +53,7 @@ public class ListenerItemTeams extends Listener<EventInteract> {
 									p.sendMessage(Message.TEAM_IS_FULL.getMessage(user, team.getName(user)));
 									return;
 								}
-								Main.getInstance().getTeamManager().setTeam(user, team);
+								WoolBattle.getInstance().getTeamManager().setTeam(user, team);
 								p.sendMessage(Message.CHANGED_TEAM.getMessage(user, team.getName(user)));
 							}
 						}
@@ -61,22 +61,22 @@ public class ListenerItemTeams extends Listener<EventInteract> {
 				}
 			}
 		} catch (NullPointerException ex) {
-			Main.getInstance().sendConsole(
+			WoolBattle.getInstance().sendConsole(
 					"§cThe Item " + e.getItem().getItemMeta().getDisplayName() + " is not correctly set up");
 		}
 	}
 
 	public void reloadInventories() {
-		Main.getInstance().getUserWrapper().getUsers().stream()
+		WoolBattle.getInstance().getUserWrapper().getUsers().stream()
 				.filter(user -> user.getOpenInventory() == InventoryId.TEAMS).forEach(user -> {
 					openInventory(Bukkit.getPlayer(user.getUniqueId()));
 				});
 	}
 
 	public void openInventory(Player p) {
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		InventoryBuilder builder = new InventoryBuilder(Message.INVENTORY_TEAMS.getMessage(user));
-		List<Team> teams = new ArrayList<>(Main.getInstance().getTeamManager().getTeams());
+		List<Team> teams = new ArrayList<>(WoolBattle.getInstance().getTeamManager().getTeams());
 		builder.size(teams.size());
 		teams.sort(new Comparator<Team>() {
 			@Override
@@ -88,7 +88,7 @@ public class ListenerItemTeams extends Listener<EventInteract> {
 			Team team = teams.get(i);
 			ItemBuilder b = new ItemBuilder(Material.WOOL);
 			b.setDisplayName(ChatColor.BOLD + team.getName(user));
-			b.setDurability(team.getType().getWoolColor());
+			b.setDurability(team.getType().getWoolColorByte());
 			if (team.getUsers().contains(user)) {
 				b.glow();
 			}

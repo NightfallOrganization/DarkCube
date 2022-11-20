@@ -1,12 +1,10 @@
 package eu.darkcube.minigame.woolbattle.perk;
 
 import java.util.Collection;
-
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
@@ -26,10 +24,12 @@ public interface Perk {
 	Item getItem();
 
 	default void setItem() {
-		if (Main.getInstance().getIngame().isEnabled() && this.getOwner().getTeam().getType() != TeamType.SPECTATOR
+		if (WoolBattle.getInstance().getIngame().isEnabled()
+				&& this.getOwner().getTeam().getType() != TeamType.SPECTATOR
 				&& this.getOwner().getPerk(this.getPerkNumber()) == this) {
 			if (this.getSlot() == 100) {
-				this.getOwner().getBukkitEntity().getOpenInventory().setCursor(this.calculateItem());
+				this.getOwner().getBukkitEntity().getOpenInventory()
+						.setCursor(this.calculateItem());
 			} else {
 				this.getOwner().getBukkitEntity().getHandle().defaultContainer.getBukkitView()
 						.setItem(this.getSlot(), this.calculateItem());
@@ -41,8 +41,8 @@ public interface Perk {
 	default void updateInventory() {
 		CraftPlayer p = this.getOwner().getBukkitEntity();
 		EntityPlayer ep = p.getHandle();
-		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId, this.getSlot(),
-				CraftItemStack.asNMSCopy(this.calculateItem())));
+		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId,
+				this.getSlot(), CraftItemStack.asNMSCopy(this.calculateItem())));
 	}
 
 	ItemStack calculateItem();

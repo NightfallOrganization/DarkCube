@@ -2,7 +2,7 @@ package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
@@ -10,7 +10,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandDisable extends SubCommand {
 
 	public CommandDisable() {
-		super(Main.getInstance(), "disable", new Command[0], "Deaktiviert das Team");
+		super(WoolBattle.getInstance(), "disable", new Command[0], "Deaktiviert das Team");
 	}
 
 	@Override

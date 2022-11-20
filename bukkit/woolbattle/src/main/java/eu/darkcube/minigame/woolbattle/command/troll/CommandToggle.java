@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 import eu.darkcube.system.commandapi.Command;
@@ -15,7 +15,7 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandToggle extends Command {
 
 	public CommandToggle() {
-		super(Main.getInstance(), "toggle", new Command[0], "Troll Toggle");
+		super(WoolBattle.getInstance(), "toggle", new Command[0], "Troll Toggle");
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class CommandToggle extends Command {
 			}
 		}
 		for (Player p : players) {
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			user.setTrollMode(!user.isTrollMode());
 			StatsLink.enabled = false;
 		}

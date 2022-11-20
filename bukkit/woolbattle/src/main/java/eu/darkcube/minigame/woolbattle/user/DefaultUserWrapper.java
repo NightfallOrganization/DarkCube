@@ -14,7 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.mysql.MySQL;
 
 public class DefaultUserWrapper implements UserWrapper, Listener {
@@ -23,7 +23,7 @@ public class DefaultUserWrapper implements UserWrapper, Listener {
 
 	public DefaultUserWrapper() {
 		users = new HashSet<>();
-		Main.registerListeners(this);
+		WoolBattle.registerListeners(this);
 		Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).forEach(this::load);
 	}
 
@@ -44,7 +44,7 @@ public class DefaultUserWrapper implements UserWrapper, Listener {
 			UserData data = MySQL.loadUserData(uuid);
 			User user = new DefaultUser(uuid, data, (CraftPlayer) Bukkit.getPlayer(uuid));
 			if (user.getData().isParticles()) {
-				Main.getInstance().getIngame().particlePlayers.add(user.getBukkitEntity());
+				WoolBattle.getInstance().getIngame().particlePlayers.add(user.getBukkitEntity());
 			}
 			users.add(user);
 			return user;
@@ -74,7 +74,7 @@ public class DefaultUserWrapper implements UserWrapper, Listener {
 
 	@Override
 	public boolean unload(User user) {
-		Main.getInstance().getIngame().particlePlayers.remove(user.getBukkitEntity());
+		WoolBattle.getInstance().getIngame().particlePlayers.remove(user.getBukkitEntity());
 		return users.remove(user);
 	}
 

@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -23,7 +23,7 @@ public class ListenerItemPickup extends Listener<PlayerPickupItemEvent> {
 			return;
 		}
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (user.getTeam().getType() == TeamType.SPECTATOR) {
 			e.setCancelled(true);
 			return;
@@ -33,7 +33,7 @@ public class ListenerItemPickup extends Listener<PlayerPickupItemEvent> {
 		ItemStack item = entity.getItemStack();
 		short oldColor = item.getDurability();
 		if (item.getType() == Material.WOOL) {
-			item.setDurability(user.getTeam().getType().getWoolColor());
+			item.setDurability(user.getTeam().getType().getWoolColorByte());
 		}
 		int count = ItemManager.countItems(Material.WOOL, inv);
 		int tryadd = item.getAmount();
@@ -48,17 +48,17 @@ public class ListenerItemPickup extends Listener<PlayerPickupItemEvent> {
 			entity.setItemStack(item2);
 			entity.setPickupDelay(4);
 			if (tryadd - remaining > 0) {
-				inv.addItem(new ItemStack(Material.WOOL, tryadd - remaining, user.getTeam().getType().getWoolColor()));
+				inv.addItem(new ItemStack(Material.WOOL, tryadd - remaining, user.getTeam().getType().getWoolColorByte()));
 				playSound(p);
-				Main.getInstance().getIngame().listenerDoubleJump.refresh(p);
+				WoolBattle.getInstance().getIngame().listenerDoubleJump.refresh(p);
 			}
 			return;
 		}
 		if (freeSpace > 0) {
 			entity.remove();
-			inv.addItem(new ItemStack(Material.WOOL, tryadd, user.getTeam().getType().getWoolColor()));
+			inv.addItem(new ItemStack(Material.WOOL, tryadd, user.getTeam().getType().getWoolColorByte()));
 			playSound(p);
-			Main.getInstance().getIngame().listenerDoubleJump.refresh(p);
+			WoolBattle.getInstance().getIngame().listenerDoubleJump.refresh(p);
 		}
 	}
 

@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.user.User;
 
 public class EventInteract extends PlayerEvent implements Cancellable {
@@ -24,7 +24,7 @@ public class EventInteract extends PlayerEvent implements Cancellable {
 
 	public EventInteract(Player who, ItemStack item, Inventory inv, ClickType click) {
 		super(who);
-		user = Main.getInstance().getUserWrapper().getUser(who.getUniqueId());
+		user = WoolBattle.getInstance().getUserWrapper().getUser(who.getUniqueId());
 		this.inventory = inv;
 		this.item = item;
 		this.click = click;
@@ -33,7 +33,7 @@ public class EventInteract extends PlayerEvent implements Cancellable {
 
 	public EventInteract(Player who, ItemStack item, Inventory inv, ClickType click, boolean isInteract) {
 		super(who);
-		user = Main.getInstance().getUserWrapper().getUser(who.getUniqueId());
+		user = WoolBattle.getInstance().getUserWrapper().getUser(who.getUniqueId());
 		this.isInteract = isInteract;
 		this.inventory = inv;
 		this.item = item;

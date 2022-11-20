@@ -14,7 +14,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -39,7 +39,7 @@ public class ListenerMinigunInteract extends Listener<PlayerInteractEvent> {
 			ItemStack item = e.getItem();
 			if (item == null)
 				return;
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			final Perk perk = user.getPerkByItemId(ItemManager.getItemId(item));
 			if (MINIGUN_COOLDOWN.getItemId().equals(ItemManager.getItemId(item))) {
 				Ingame.playSoundNotEnoughWool(user);
@@ -93,10 +93,10 @@ public class ListenerMinigunInteract extends Listener<PlayerInteractEvent> {
 					Snowball s = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
 					s.setShooter(p);
 					s.setVelocity(p.getLocation().getDirection().multiply(2.5));
-					s.setMetadata("type", new FixedMetadataValue(Main.getInstance(), "minigun"));
+					s.setMetadata("type", new FixedMetadataValue(WoolBattle.getInstance(), "minigun"));
 
 					ItemManager.removeItems(user, p.getInventory(),
-							new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()),
+							new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()),
 							PerkType.MINIGUN.getCost());
 				}
 

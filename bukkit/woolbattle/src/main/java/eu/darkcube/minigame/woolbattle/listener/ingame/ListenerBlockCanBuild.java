@@ -9,7 +9,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockCanBuildEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.Block;
@@ -32,7 +32,7 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
 			for (Entity ent : e.getBlock().getWorld().getEntities()) {
 				AxisAlignedBB entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
 				if (box.b(entityBox)) {
-					if (!Main.getInstance().getTeamManager().getSpectator().contains(ent.getUniqueId())
+					if (!WoolBattle.getInstance().getTeamManager().getSpectator().contains(ent.getUniqueId())
 							&& ent.getType() != EntityType.DROPPED_ITEM) {
 						e.setBuildable(false);
 						return;

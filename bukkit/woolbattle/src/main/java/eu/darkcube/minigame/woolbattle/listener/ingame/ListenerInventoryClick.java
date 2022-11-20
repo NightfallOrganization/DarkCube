@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -44,7 +44,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		int slot = e.getRawSlot();
 
 		Player p = (Player) e.getWhoClicked();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (user.getTeam().getType() == TeamType.SPECTATOR) {
 			e.setCancelled(true);
 			if (user.getOpenInventory() != null) {
@@ -149,7 +149,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 					if (tag.equals(tagHotbar)) {
 						tue(tagHotbar, tagItem, tagCursor, tag);
 					} else if (tag.equals(tagCursor)) {
-						Main.getInstance().sendConsole("Player " + p.getName() + " had slot error. Values:");
+						WoolBattle.getInstance().sendConsole("Player " + p.getName() + " had slot error. Values:");
 						System.out.println("Slot: " + slot);
 						System.out.println("Tag: " + tag);
 						System.out.println("HotbarButton: " + hotbarSlot);
@@ -276,7 +276,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		if (tag == null)
 			return;
 		Player p = (Player) e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		Handle[] handles = new Handle[0];
 		handles = Arrays.addAfter(handles,
 				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),

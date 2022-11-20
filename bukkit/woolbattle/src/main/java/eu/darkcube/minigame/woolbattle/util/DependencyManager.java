@@ -8,13 +8,13 @@ import java.nio.file.Path;
 
 import com.google.common.io.ByteStreams;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 
 public class DependencyManager {
 
-	private Main plugin;
+	private WoolBattle plugin;
 
-	public DependencyManager(Main plugin) {
+	public DependencyManager(WoolBattle plugin) {
 		this.plugin = plugin;
 	}
 
@@ -54,7 +54,7 @@ public class DependencyManager {
 		}
 
 		public Path getFile() {
-			Main plugin = Main.getInstance();
+			WoolBattle plugin = WoolBattle.getInstance();
 			File libs = new File(plugin.getDataFolder(), "libs");
 			if (!libs.exists())
 				libs.mkdirs();

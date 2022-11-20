@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.DyeColor;
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
@@ -16,7 +16,7 @@ import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
 public class CommandSetWoolColor extends SubCommand {
 
 	public CommandSetWoolColor() {
-		super(Main.getInstance(), "setWoolColor", new Command[0], "Setzt die Wollfarbe", CommandArgument.WOOL_COLOR);
+		super(WoolBattle.getInstance(), "setWoolColor", new Command[0], "Setzt die Wollfarbe", CommandArgument.WOOL_COLOR);
 	}
 
 	@Override

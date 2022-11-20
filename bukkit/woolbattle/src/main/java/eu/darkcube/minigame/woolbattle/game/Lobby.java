@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.google.common.util.concurrent.AtomicDouble;
 
 import eu.darkcube.minigame.woolbattle.Config;
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerBlockBreak;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerBlockPlace;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerEntityDamage;
@@ -142,7 +142,7 @@ public class Lobby extends GamePhase {
 							p.setExp(0);
 						});
 						Lobby.this.disable();
-						Main.getInstance().getIngame().enable();
+						WoolBattle.getInstance().getIngame().enable();
 						return;
 					}
 					AtomicDouble exp = new AtomicDouble((float) newValue / (Lobby.this.MAX_TIMER_SECONDS * 20F));
@@ -152,7 +152,7 @@ public class Lobby extends GamePhase {
 						p.setLevel(newValue / 20);
 						p.setExp((float) exp.get());
 					});
-					Main.getInstance().getUserWrapper().getUsers().forEach(user -> {
+					WoolBattle.getInstance().getUserWrapper().getUsers().forEach(user -> {
 						new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey())
 								.setSuffix(Integer.toString(newValue / 20));
 					});
@@ -200,7 +200,7 @@ public class Lobby extends GamePhase {
 			public void run() {
 				if (Lobby.this.MAX_PLAYER_COUNT == 0 && !this.announced) {
 					this.announced = true;
-					Main.getInstance().sendConsole("It does not seem that any teams have been set up");
+					WoolBattle.getInstance().sendConsole("It does not seem that any teams have been set up");
 				} else if (Lobby.this.MAX_PLAYER_COUNT != 0) {
 					final int online = Bukkit.getOnlinePlayers().size();
 					if (online >= Lobby.this.MIN_PLAYER_COUNT) {
@@ -234,8 +234,8 @@ public class Lobby extends GamePhase {
 	@Override
 	public void onEnable() {
 		CloudNetLink.update();
-		Main.getInstance().reloadConfig("config");
-		Main.getInstance().baseLifes = null;
+		WoolBattle.getInstance().reloadConfig("config");
+		WoolBattle.getInstance().baseLifes = null;
 //		Main.getInstance().getSchedulers().clear();
 		this.setTimer(60 * 20);
 		this.VOTES_LIFES.clear();
@@ -243,7 +243,7 @@ public class Lobby extends GamePhase {
 		this.VOTES_EP_GLITCH.clear();
 		this.SCOREBOARD_BY_USER.clear();
 		this.SCOREBOARD_MISSING_USERS.clear();
-		Main.getInstance()
+		WoolBattle.getInstance()
 				.getUserWrapper()
 				.getUsers()
 				.forEach(u -> this.SCOREBOARD_MISSING_USERS.put(u, new HashSet<>()));
@@ -253,18 +253,18 @@ public class Lobby extends GamePhase {
 			this.setTimer(this.getTimer() < 300 ? 300 : this.getTimer());
 			p.teleport(this.getSpawn());
 		});
-		Main.getInstance().getUserWrapper().getUsers().forEach(u -> this.reloadUsers(u));
-		this.MIN_PLAYER_COUNT = Main.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
-		this.deathline = Main.getInstance().getConfig("spawns").getInt("lobbydeathline");
+		WoolBattle.getInstance().getUserWrapper().getUsers().forEach(u -> this.reloadUsers(u));
+		this.MIN_PLAYER_COUNT = WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+		this.deathline = WoolBattle.getInstance().getConfig("spawns").getInt("lobbydeathline");
 
 		int i = 0;
-		for (Team team : Main.getInstance().getTeamManager().getTeams()) {
+		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
 			if (team.getType().isEnabled())
 				i += team.getType().getMaxPlayers();
 		}
 		this.MAX_PLAYER_COUNT = i;
 
-		Main.registerListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting,
+		WoolBattle.registerListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting,
 				this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin,
 				this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage,
 				this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings,
@@ -275,7 +275,7 @@ public class Lobby extends GamePhase {
 
 	@Override
 	public void onDisable() {
-		Main.unregisterListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting,
+		WoolBattle.unregisterListeners(this.listenerItemTeams, this.listenerItemPerks, this.listenerItemVoting,
 				this.listenerItemParticles, this.listenerBlockBreak, this.listenerBlockPlace, this.listenerPlayerJoin,
 				this.listenerPlayerQuit, this.listenerPlayerDropItem, this.listenerEntityDamage,
 				this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings,
@@ -287,29 +287,29 @@ public class Lobby extends GamePhase {
 	public void recalculateMap() {
 		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(
 				this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()),
-				Main.getInstance()
+				WoolBattle.getInstance()
 						.getMapManager()
 						.getMaps()
 						.stream()
 						.filter(m -> m.isEnabled())
 						.collect(Collectors.toSet()),
-				Main.getInstance().getMap());
+				WoolBattle.getInstance().getMap());
 		if (map != null)
 			if (!map.isEnabled())
 				map = null;
-		Main.getInstance().setMap(map);
+		WoolBattle.getInstance().setMap(map);
 	}
 
 	public void recalculateEpGlitch() {
 		boolean glitch = Vote.calculateWinner(this.VOTES_EP_GLITCH.values(), Arrays.asList(true, false), false);
-		Main.getInstance().setEpGlitch(glitch);
+		WoolBattle.getInstance().setEpGlitch(glitch);
 	}
 
 	public void loadScoreboard(User user) {
 		Set<User> missing = new HashSet<>();
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			if (!p.getUniqueId().equals(user.getUniqueId())) {
-				missing.add(Main.getInstance().getUserWrapper().getUser(p.getUniqueId()));
+				missing.add(WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId()));
 			}
 		});
 		this.SCOREBOARD_MISSING_USERS.values().forEach(users -> users.add(user));
@@ -340,21 +340,21 @@ public class Lobby extends GamePhase {
 	public void reloadTab(User user) {
 //		Header header = new Header(Main.getInstance().getConfig("config").getString(Config.TAB_HEADER));
 //		Footer footer = new Footer(Main.getInstance().getConfig("config").getString(Config.TAB_FOOTER));
-		Header header = new Header(Main.tab_header);
-		Footer footer = new Footer(Main.tab_footer);
+		Header header = new Header(WoolBattle.tab_header);
+		Footer footer = new Footer(WoolBattle.tab_footer);
 		header.setMessage(header.getMessage()
 				.replace("%map%",
-						Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
+						WoolBattle.getInstance().getMap() == null ? "Unknown Map" : WoolBattle.getInstance().getMap().getName()));
 		footer.setMessage(footer.getMessage()
 				.replace("%map%",
-						Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
-		header.setMessage(header.getMessage().replace("%name%", Main.getInstance().name));
-		footer.setMessage(footer.getMessage().replace("%name%", Main.getInstance().name));
+						WoolBattle.getInstance().getMap() == null ? "Unknown Map" : WoolBattle.getInstance().getMap().getName()));
+		header.setMessage(header.getMessage().replace("%name%", WoolBattle.getInstance().name));
+		footer.setMessage(footer.getMessage().replace("%name%", WoolBattle.getInstance().name));
 		header.setMessage(header.getMessage()
-				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix + " &8"
+				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + WoolBattle.getInstance().tabprefix + " &8"
 						+ Characters.SHIFT_SHIFT_LEFT));
 		footer.setMessage(footer.getMessage()
-				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix + " &8"
+				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + WoolBattle.getInstance().tabprefix + " &8"
 						+ Characters.SHIFT_SHIFT_LEFT));
 		header.setMessage(header.getMessage().replace("%server%", Bukkit.getServerName()));
 		footer.setMessage(footer.getMessage().replace("%server%", Bukkit.getServerName()));
@@ -377,16 +377,16 @@ public class Lobby extends GamePhase {
 
 	public Location getSpawn() {
 		if (this.spawn == null)
-			this.spawn = Locations.deserialize(Main.getInstance().getConfig("spawns").getString("lobby"),
+			this.spawn = Locations.deserialize(WoolBattle.getInstance().getConfig("spawns").getString("lobby"),
 					Locations.DEFAULT_LOCATION);
 		return this.spawn.clone();
 	}
 
 	public void setSpawn(Location spawn) {
 		this.spawn = spawn;
-		YamlConfiguration cfg = Main.getInstance().getConfig("spawns");
+		YamlConfiguration cfg = WoolBattle.getInstance().getConfig("spawns");
 		cfg.set("lobby", Locations.serialize(spawn));
-		Main.getInstance().saveConfig(cfg);
+		WoolBattle.getInstance().saveConfig(cfg);
 	}
 
 	public Map<User, Scoreboard> getScoreboardByUser() {

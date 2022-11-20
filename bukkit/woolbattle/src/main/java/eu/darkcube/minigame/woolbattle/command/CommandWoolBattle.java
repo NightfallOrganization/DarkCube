@@ -2,7 +2,7 @@ package eu.darkcube.minigame.woolbattle.command;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.CommandCreateMap;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.CommandCreateTeam;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.CommandDeleteMap;
@@ -18,7 +18,7 @@ import eu.darkcube.system.commandapi.Command;
 public class CommandWoolBattle extends Command {
 
 	public CommandWoolBattle() {
-		super(Main.getInstance(), "woolbattle", new Command[] {
+		super(WoolBattle.getInstance(), "woolbattle", new Command[] {
 						new CommandTeam(), new CommandCreateTeam(), new CommandDeleteTeam(),
 						new CommandListTeams(), new CommandCreateMap(), new CommandDeleteMap(),
 						new CommandMap(), new CommandListMaps(), new CommandLoadWorld(),

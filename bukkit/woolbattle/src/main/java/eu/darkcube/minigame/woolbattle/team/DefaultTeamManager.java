@@ -14,7 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
@@ -35,7 +35,7 @@ public class DefaultTeamManager implements TeamManager {
 	public void setTeam(User user, Team team) {
 		Team t = getTeam(user);
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			User u = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User u = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			Scoreboard s = new Scoreboard(u);
 			if (t != null)
 				s.getTeam(t.getType().getScoreboardTag()).removePlayer(user.getPlayerName());
@@ -52,10 +52,10 @@ public class DefaultTeamManager implements TeamManager {
 						|| user.getEnderPearl() == null) {
 			user.loadPerks();
 		}
-		Main.getInstance().getLobby().listenerItemTeams.reloadInventories();
-		if (Main.getInstance().getIngame().isEnabled()) {
-			Main.getInstance().getIngame().setPlayerItems(user);
-			Main.getInstance().getIngame().checkGameEnd();
+		WoolBattle.getInstance().getLobby().listenerItemTeams.reloadInventories();
+		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+			WoolBattle.getInstance().getIngame().setPlayerItems(user);
+			WoolBattle.getInstance().getIngame().checkGameEnd();
 		}
 	}
 

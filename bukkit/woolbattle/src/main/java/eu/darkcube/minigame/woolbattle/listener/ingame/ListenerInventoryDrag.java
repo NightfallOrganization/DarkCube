@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerInventoryClick.Handle;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -24,7 +24,7 @@ public class ListenerInventoryDrag extends Listener<InventoryDragEvent> {
 	public void handle(InventoryDragEvent e) {
 		if (e.getOldCursor() != null && e.getWhoClicked() instanceof Player) {
 			Player p = (Player) e.getWhoClicked();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			ItemStack item = e.getOldCursor();
 			boolean var1 = item != null && item.getType() != Material.AIR;
 			String itemTag = var1 ? ItemManager.getItemId(item) : "Unknown Perk";

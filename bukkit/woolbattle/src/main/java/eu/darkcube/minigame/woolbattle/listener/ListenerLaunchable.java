@@ -2,7 +2,6 @@ package eu.darkcube.minigame.woolbattle.listener;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -12,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
@@ -33,7 +31,8 @@ public class ListenerLaunchable implements Listener {
 		if (this.executed.contains(p)) {
 			return;
 		}
-		LaunchableInteractEvent pe = new LaunchableInteractEvent(p, e.getEntity(), p.getItemInHand());
+		LaunchableInteractEvent pe =
+				new LaunchableInteractEvent(p, e.getEntity(), p.getItemInHand());
 		Bukkit.getPluginManager().callEvent(pe);
 		if (pe.isCancelled()) {
 			e.setCancelled(true);
@@ -50,30 +49,31 @@ public class ListenerLaunchable implements Listener {
 		}
 		EntityType type = null;
 		switch (e.getItem().getType()) {
-		case ENDER_PEARL:
-			type = EntityType.ENDER_PEARL;
-			break;
-		case EYE_OF_ENDER:
-			type = EntityType.ENDER_SIGNAL;
-			break;
-		case EGG:
-			type = EntityType.EGG;
-			break;
-		case SNOW_BALL:
-			type = EntityType.SNOWBALL;
-			break;
-		case EXP_BOTTLE:
-			type = EntityType.THROWN_EXP_BOTTLE;
-			break;
-		default:
-			break;
+			case ENDER_PEARL:
+				type = EntityType.ENDER_PEARL;
+				break;
+			case EYE_OF_ENDER:
+				type = EntityType.ENDER_SIGNAL;
+				break;
+			case EGG:
+				type = EntityType.EGG;
+				break;
+			case SNOW_BALL:
+				type = EntityType.SNOWBALL;
+				break;
+			case EXP_BOTTLE:
+				type = EntityType.THROWN_EXP_BOTTLE;
+				break;
+			default:
+				break;
 		}
 		if (this.executed.contains(e.getPlayer())) {
 			e.setCancelled(true);
 			return;
 		}
 		this.executed.add(e.getPlayer());
-		LaunchableInteractEvent pe = new LaunchableInteractEvent(e.getPlayer(), type, e.getItem());
+		LaunchableInteractEvent pe =
+				new LaunchableInteractEvent(e.getPlayer(), type, e.getItem(), e.getAction());
 		Bukkit.getPluginManager().callEvent(pe);
 		if (pe.isCancelled()) {
 			e.setCancelled(true);

@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -47,7 +47,7 @@ public class ListenerWallGeneratorInteract extends Listener<PlayerInteractEvent>
 	public void handle(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Player p = e.getPlayer();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			ItemStack item = e.getItem();
 			if (item == null) {
 				return;
@@ -157,14 +157,14 @@ public class ListenerWallGeneratorInteract extends Listener<PlayerInteractEvent>
 		@SuppressWarnings("deprecation")
 		private void setBlock(Location loc, User user) {
 			if (loc.getBlock().getType() == Material.AIR
-					&& !Main.getInstance().getIngame().breakedWool.containsKey(loc.getBlock())) {
+					&& !WoolBattle.getInstance().getIngame().breakedWool.containsKey(loc.getBlock())) {
 
 				ItemManager.removeItems(perk.getOwner(), perk.getOwner().getBukkitEntity().getInventory(), user.getSingleWoolItem(),
 						PerkType.WALL_GENERATOR.getCost());
 
 				loc.getBlock().setType(Material.WOOL);
-				loc.getBlock().setData(user.getTeam().getType().getWoolColor());
-				Main.getInstance().getIngame().placedBlocks.add(loc.getBlock());
+				loc.getBlock().setData(user.getTeam().getType().getWoolColorByte());
+				WoolBattle.getInstance().getIngame().placedBlocks.add(loc.getBlock());
 			}
 		}
 

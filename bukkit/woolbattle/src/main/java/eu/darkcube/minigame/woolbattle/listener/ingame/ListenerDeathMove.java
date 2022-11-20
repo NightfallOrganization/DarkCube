@@ -3,15 +3,15 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGhost;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.User;
 
 public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 
-	private Main main = Main.getInstance();
+	private WoolBattle main = WoolBattle.getInstance();
 
 	@Override
 	@EventHandler
@@ -20,9 +20,8 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 		User user = this.main.getUserWrapper().getUser(p.getUniqueId());
 		if (user.getTeam().getType() != TeamType.SPECTATOR) {
 			if (p.getLocation().getY() <= this.main.getMap().getDeathHeight()) {
-				if (this.main.getIngame().listenerGhostInteract.ghosts.containsKey(user)) {
-					this.main.getIngame().listenerGhostEntityDamageByEntity.reset(user,
-							this.main.getIngame().listenerGhostInteract.ghosts.get(user));
+				if (ListenerGhost.isGhost(user)) {
+					ListenerGhost.reset(user);
 					return;
 				}
 				if (user.getTicksAfterLastHit() <= 200) {
@@ -36,7 +35,7 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 		}
 		if (e.getTo().getY() < 0) {
 			p.teleport(user.getTeam().getSpawn());
-		}	
+		}
 	}
 
 }

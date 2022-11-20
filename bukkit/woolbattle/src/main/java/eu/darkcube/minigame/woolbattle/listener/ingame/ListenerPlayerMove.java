@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.util.BoundingBox;
 
@@ -26,7 +26,7 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 	@Override
 	@EventHandler
 	public void handle(PlayerMoveEvent e) {
-		Main.getInstance().getIngame().schedulerHeightDisplay.display(e.getPlayer());
+		WoolBattle.getInstance().getIngame().schedulerHeightDisplay.display(e.getPlayer());
 
 		if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
 			return;

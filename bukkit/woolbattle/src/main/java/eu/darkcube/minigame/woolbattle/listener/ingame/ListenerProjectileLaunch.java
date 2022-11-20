@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -28,7 +28,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 	public void handle(ProjectileLaunchEvent e) {
 		if (e.getEntity().getShooter() instanceof Player) {
 			Player p = (Player) e.getEntity().getShooter();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			if (e.getEntityType() == EntityType.ARROW) {
 				Arrow arrow = (Arrow) e.getEntity();
 
@@ -39,9 +39,9 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 					return;
 				}
 
-				Main.getInstance().getIngame().arrows.put(arrow, user);
+				WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
 				ItemManager.removeItems(user, p.getInventory(),
-						new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor()), 1);
+						new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()), 1);
 				arrow.setVelocity(arrow.getVelocity());
 				if (user.getPassivePerk().getPerkName().equals(PerkName.FAST_ARROW)) {
 					Vector vec = arrow.getVelocity().multiply(1.7);
@@ -88,7 +88,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 					}
 
 					int cost = PerkType.ARROW_RAIN.getCost() - arrowCount;
-					ItemStack wool = new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColor());
+					ItemStack wool = new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte());
 
 					if (cost < 0) {
 						wool.setAmount(0 - cost);
@@ -132,7 +132,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 
 									int cost = PerkType.TNT_ARROW.getCost();
 									ItemStack wool = new ItemStack(Material.WOOL, 1,
-											user.getTeam().getType().getWoolColor());
+											user.getTeam().getType().getWoolColorByte());
 									if (cost < 0) {
 										wool.setAmount(0 - cost);
 										p.getInventory().addItem(wool);
@@ -141,8 +141,8 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 									}
 									TNTPrimed tnt = arrow.getWorld().spawn(arrow.getLocation(), TNTPrimed.class);
 
-									tnt.setMetadata("boost", new FixedMetadataValue(Main.getInstance(), 2));
-									tnt.setMetadata("source", new FixedMetadataValue(Main.getInstance(), user));
+									tnt.setMetadata("boost", new FixedMetadataValue(WoolBattle.getInstance(), 2));
+									tnt.setMetadata("source", new FixedMetadataValue(WoolBattle.getInstance(), user));
 									tnt.setIsIncendiary(false);
 									tnt.setFuseTicks(2);
 								}
@@ -167,7 +167,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 			vec = l.getDirection();
 			vec.multiply(original.getVelocity().length());
 			arrow.setVelocity(vec);
-			Main.getInstance().getIngame().arrows.put(arrow, user);
+			WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
 		}
 	}
 

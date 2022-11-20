@@ -1,15 +1,15 @@
 package eu.darkcube.minigame.woolbattle.user;
 
 import java.util.UUID;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.inventory.ItemStack;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.gadget.Gadget;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.nbt.BasicDataStorage;
+import eu.darkcube.minigame.woolbattle.nbt.DataStorage;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkEnderPearl;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -27,6 +27,7 @@ class DefaultUser implements User {
 	private final UserData userData;
 	private final UUID uuid;
 	private final CraftPlayer player;
+	private final DataStorage temporaryDataStorage;
 	private boolean trollmode;
 	private int spawnProtectionTicks;
 	private InventoryId openInventory;
@@ -43,6 +44,7 @@ class DefaultUser implements User {
 		this.player = player;
 		this.userData = new UserUserData(userData);
 		this.uuid = uuid;
+		this.temporaryDataStorage = new BasicDataStorage();
 		spawnProtectionTicks = 0;
 		trollmode = false;
 		kills = 0;
@@ -60,10 +62,18 @@ class DefaultUser implements User {
 	}
 
 	@Override
+	public DataStorage getTemporaryDataStorage() {
+		return this.temporaryDataStorage;
+	}
+
+	@Override
 	public void loadPerks() {
-		activePerk1 = getData().getPerks().getActivePerk1().toType().newPerkTypePerk(this, PerkNumber.ACTIVE_1);
-		activePerk2 = getData().getPerks().getActivePerk2().toType().newPerkTypePerk(this, PerkNumber.ACTIVE_2);
-		passivePerk = getData().getPerks().getPassivePerk().toType().newPerkTypePerk(this, PerkNumber.PASSIVE);
+		activePerk1 = getData().getPerks().getActivePerk1().toType().newPerkTypePerk(this,
+				PerkNumber.ACTIVE_1);
+		activePerk2 = getData().getPerks().getActivePerk2().toType().newPerkTypePerk(this,
+				PerkNumber.ACTIVE_2);
+		passivePerk = getData().getPerks().getPassivePerk().toType().newPerkTypePerk(this,
+				PerkNumber.PASSIVE);
 		enderPearl = new PerkEnderPearl(this);
 	}
 
@@ -72,7 +82,7 @@ class DefaultUser implements User {
 		for (Perk p : Arrays.asList(activePerk1, activePerk2, passivePerk)) {
 			if (p != null) {
 				if (p.getItem().getItemId().equals(itemId)
-								|| p.getCooldownItem().getItemId().equals(itemId)) {
+						|| p.getCooldownItem().getItemId().equals(itemId)) {
 					return p;
 				}
 			}
@@ -93,9 +103,9 @@ class DefaultUser implements User {
 	@Override
 	public void setTicksAfterLastHit(int ticks) {
 		ticksAfterLastHit = ticks;
-//		if (getBukkitEntity().getLocation().getY() < 50 && ticks == 0) {
-//			getBukkitEntity().playSound(getBukkitEntity().getLocation(), Sound.NOTE_PLING, 1, 1);
-//		}
+		// if (getBukkitEntity().getLocation().getY() < 50 && ticks == 0) {
+		// getBukkitEntity().playSound(getBukkitEntity().getLocation(), Sound.NOTE_PLING, 1, 1);
+		// }
 	}
 
 	private final class UserUserData implements UserData {
@@ -144,9 +154,9 @@ class DefaultUser implements User {
 		@Override
 		public void setParticles(boolean particles) {
 			if (particles) {
-				Main.getInstance().getIngame().particlePlayers.add(getBukkitEntity());
+				WoolBattle.getInstance().getIngame().particlePlayers.add(getBukkitEntity());
 			} else {
-				Main.getInstance().getIngame().particlePlayers.remove(getBukkitEntity());
+				WoolBattle.getInstance().getIngame().particlePlayers.remove(getBukkitEntity());
 			}
 			data.setParticles(particles);
 		}
@@ -175,8 +185,8 @@ class DefaultUser implements User {
 
 	private boolean hasPerk(PerkName perk) {
 		return getData().getPerks().getActivePerk1().equals(perk)
-						|| getData().getPerks().getActivePerk2().equals(perk)
-						|| getData().getPerks().getPassivePerk().equals(perk);
+				|| getData().getPerks().getActivePerk2().equals(perk)
+				|| getData().getPerks().getPassivePerk().equals(perk);
 	}
 
 	@Override
@@ -186,7 +196,7 @@ class DefaultUser implements User {
 
 	@Override
 	public Team getTeam() {
-		return Main.getInstance().getTeamManager().getTeam(this);
+		return WoolBattle.getInstance().getTeamManager().getTeam(this);
 	}
 
 	@Override
@@ -205,8 +215,8 @@ class DefaultUser implements User {
 	@Override
 	public void setSpawnProtectionTicks(int ticks) {
 		this.spawnProtectionTicks = ticks;
-		getBukkitEntity().setExp((float) getSpawnProtectionTicks()
-						/ (float) Ingame.SPAWNPROTECTION_TICKS);
+		getBukkitEntity()
+				.setExp((float) getSpawnProtectionTicks() / (float) Ingame.SPAWNPROTECTION_TICKS);
 	}
 
 	@Override
@@ -250,8 +260,7 @@ class DefaultUser implements User {
 
 	@Override
 	public String getTeamPlayerName() {
-		return ChatColor.getByChar(getTeam().getType().getNameColor()).toString()
-						+ getPlayerName();
+		return ChatColor.getByChar(getTeam().getType().getNameColor()).toString() + getPlayerName();
 	}
 
 	@Override
@@ -266,14 +275,14 @@ class DefaultUser implements User {
 
 	@Override
 	public void setTeam(Team team) {
-		Main.getInstance().getTeamManager().setTeam(this, team);
+		WoolBattle.getInstance().getTeamManager().setTeam(this, team);
 	}
 
 	@Override
 	public void setTrollMode(boolean trollmode) {
 		this.trollmode = trollmode;
-		Main.getInstance().sendMessage("§aTrollmode "
-						+ (trollmode ? "§aAn" : "§cAus"), getBukkitEntity());
+		WoolBattle.getInstance().sendMessage("§aTrollmode " + (trollmode ? "§aAn" : "§cAus"),
+				getBukkitEntity());
 	}
 
 	@Override
@@ -331,14 +340,12 @@ class DefaultUser implements User {
 
 	@Override
 	public double getKD() {
-		return getDeaths() != 0 ? (double) getKills() / (double) getDeaths()
-						: getKills();
+		return getDeaths() != 0 ? (double) getKills() / (double) getDeaths() : getKills();
 	}
 
 	@Override
 	public ItemStack getSingleWoolItem() {
-		return new ItemStack(Material.WOOL, 1,
-						getTeam().getType().getWoolColor());
+		return new ItemStack(Material.WOOL, 1, getTeam().getType().getWoolColorByte());
 	}
 
 	@Override
@@ -363,23 +370,22 @@ class DefaultUser implements User {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof User
-						&& getUniqueId().equals(((User) obj).getUniqueId());
+		return obj instanceof User && getUniqueId().equals(((User) obj).getUniqueId());
 	}
 
 	@Override
 	public Perk getPerk(PerkNumber number) {
 		switch (number) {
-		case ACTIVE_1:
-			return getActivePerk1();
-		case ACTIVE_2:
-			return getActivePerk2();
-		case PASSIVE:
-			return getPassivePerk();
-		case ENDER_PEARL:
-			return getEnderPearl();
-		default:
-		break;
+			case ACTIVE_1:
+				return getActivePerk1();
+			case ACTIVE_2:
+				return getActivePerk2();
+			case PASSIVE:
+				return getPassivePerk();
+			case ENDER_PEARL:
+				return getEnderPearl();
+			default:
+				break;
 		}
 		return null;
 	}

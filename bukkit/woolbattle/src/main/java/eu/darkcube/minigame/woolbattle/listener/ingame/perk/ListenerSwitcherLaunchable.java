@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
@@ -33,7 +33,7 @@ public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent
 	public void handle(LaunchableInteractEvent e) {
 		if (e.getEntityType() == EntityType.SNOWBALL) {
 			Player p = e.getPlayer();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 
 			ItemStack item = e.getItem();
 			if (item == null) {
@@ -76,7 +76,7 @@ public class ListenerSwitcherLaunchable extends Listener<LaunchableInteractEvent
 			}
 
 			ItemManager.removeItems(user, p.getInventory(), user.getSingleWoolItem(), PerkType.SWITCHER.getCost());
-			ball.setMetadata("perk", new FixedMetadataValue(Main.getInstance(), perk.getPerkName().getName()));
+			ball.setMetadata("perk", new FixedMetadataValue(WoolBattle.getInstance(), perk.getPerkName().getName()));
 
 			new Scheduler() {
 

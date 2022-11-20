@@ -2,9 +2,9 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.util;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -24,19 +24,55 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 
 	@Override
 	public final void registered() {
-		Main.registerListeners(this.handle);
+		WoolBattle.registerListeners(this.handle);
 	}
 
 	@Override
 	public final void unregistered() {
-		Main.unregisterListeners(this.handle);
+		WoolBattle.unregisterListeners(this.handle);
 	}
 
 	public PerkType getPerkType() {
 		return this.perkType;
 	}
 
-	protected abstract boolean activate(User user, Perk perk);
+	/**
+	 * Called when the perk is activated
+	 * 
+	 * @param user
+	 * @param perk
+	 * @return if the perk was activated and cooldown should start
+	 */
+	protected boolean activate(User user, Perk perk) {
+		return false;
+	}
+
+	/**
+	 * Called when the perk is activated with a right click
+	 * 
+	 * @param user
+	 * @param perk
+	 * @return if the perk was activated and cooldown should start
+	 */
+	protected boolean activateRight(User user, Perk perk) {
+		return false;
+	}
+
+	/**
+	 * Called when the perk is activated with a left click
+	 * 
+	 * @param user
+	 * @param perk
+	 * @return if the perk was activated and cooldown should start
+	 */
+	protected boolean activateLeft(User user, Perk perk) {
+		return false;
+	}
+
+	protected void activated(User user, Perk perk) {
+		payForThePerk(user, perkType);
+		startCooldown(user, perkType);
+	}
 
 	private class Handle implements Listener {
 
@@ -46,10 +82,11 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 			if (item == null) {
 				return;
 			}
-			User user = Main.getInstance().getUserWrapper().getUser(event.getPlayer().getUniqueId());
-			if (!BasicPerkListener.this.checkUsable(user, BasicPerkListener.this.perkType, item, () -> {
+			User user = WoolBattle.getInstance().getUserWrapper()
+					.getUser(event.getPlayer().getUniqueId());
+			if (!checkUsable(user, perkType, item, () -> {
 				if (event.getEntity() != null) {
-					Perk perk = user.getPerkByItemId(BasicPerkListener.this.perkType.getItem().getItemId());
+					Perk perk = user.getPerkByItemId(perkType.getItem().getItemId());
 					perk.setItem();
 					new Scheduler(perk::setItem).runTask();
 				}
@@ -57,11 +94,14 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 			})) {
 				return;
 			}
-			if (!BasicPerkListener.this.activate(user, user.getPerkByItemId(BasicPerkListener.this.perkType.getItem().getItemId()))) {
+			Perk perk = user.getPerkByItemId(perkType.getItem().getItemId());
+			boolean left = event.getAction() == Action.LEFT_CLICK_AIR
+					|| event.getAction() == Action.LEFT_CLICK_BLOCK;
+			if (!activate(user, perk)
+					&& !(left ? activateLeft(user, perk) : activateRight(user, perk))) {
 				return;
 			}
-			BasicPerkListener.this.payForThePerk(user, BasicPerkListener.this.perkType);
-			BasicPerkListener.this.startCooldown(user, BasicPerkListener.this.perkType);
+			activated(user, perk);
 		}
 
 	}

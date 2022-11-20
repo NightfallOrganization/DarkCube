@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.UserSettings;
@@ -22,7 +22,7 @@ public class ListenerItemSettings extends Listener<EventInteract> {
 		if (e.getItem().hasItemMeta()) {
 			if (ItemManager.getItemId(item).equals(Item.SETTINGS.getItemId())) {
 				new Scheduler(
-						() -> UserSettings.openSettings(Main.getInstance().getUserWrapper().getUser(p.getUniqueId())))
+						() -> UserSettings.openSettings(WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId())))
 								.runTask();
 			}
 		}

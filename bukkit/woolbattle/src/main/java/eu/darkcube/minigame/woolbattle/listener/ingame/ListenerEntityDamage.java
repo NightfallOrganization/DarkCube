@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -15,8 +15,8 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
 	public void handle(EntityDamageEvent e) {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
-			User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
-			Ingame ingame = Main.getInstance().getIngame();
+			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			Ingame ingame = WoolBattle.getInstance().getIngame();
 			if (ingame.isGlobalSpawnProtection || user.hasSpawnProtection()) {
 				e.setCancelled(true);
 				return;
@@ -28,7 +28,7 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
 				e.setCancelled(true);
 				break;
 			case SUFFOCATION:
-				if (Main.getInstance().isEpGlitch()) {
+				if (WoolBattle.getInstance().isEpGlitch()) {
 					int ticks = user.getTicksAfterLastHit();
 					if (ticks < 200) {
 						ticks += 60;

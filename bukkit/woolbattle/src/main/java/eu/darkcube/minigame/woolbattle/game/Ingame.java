@@ -10,11 +10,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -28,9 +26,8 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scoreboard.DisplaySlot;
-
 import eu.darkcube.minigame.woolbattle.Config;
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.EventDamageBlock;
 import eu.darkcube.minigame.woolbattle.event.EventDestroyBlock;
 import eu.darkcube.minigame.woolbattle.event.EventPlayerDeath;
@@ -39,6 +36,7 @@ import eu.darkcube.minigame.woolbattle.listener.ingame.*;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.*;
 import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerDoubleJump;
 import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerEnderpearlLaunchable;
+import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -62,13 +60,14 @@ import eu.darkcube.minigame.woolbattle.util.tab.TabManager;
 
 public class Ingame extends GamePhase {
 
-	public static int MAX_BLOCK_ARROW_HITS = Main.getInstance().getConfig("config").getInt("maxblockarrowhits");
+	public static int MAX_BLOCK_ARROW_HITS =
+			WoolBattle.getInstance().getConfig("config").getInt("maxblockarrowhits");
 
-	public static int SPAWNPROTECTION_TICKS = Main.getInstance().getConfig("config").getInt("spawnprotectionticks");
+	public static int SPAWNPROTECTION_TICKS =
+			WoolBattle.getInstance().getConfig("config").getInt("spawnprotectionticks");
 
-	public static int SPAWNPROTECTION_TICKS_GLOBAL = Main.getInstance()
-			.getConfig("config")
-			.getInt("spawnprotectionticksglobal");
+	public static int SPAWNPROTECTION_TICKS_GLOBAL =
+			WoolBattle.getInstance().getConfig("config").getInt("spawnprotectionticksglobal");
 
 	public Set<Block> placedBlocks = new HashSet<>();
 
@@ -134,7 +133,7 @@ public class Ingame extends GamePhase {
 
 	public final ListenerExplode listenerWoolBombExplode;
 
-	public final ListenerLineBuilderInteract listenerLineBuilderInteract;
+	public final ListenerLineBuilder listenerLineBuilderInteract;
 
 	public final ListenerRonjasToiletInteract listenerRonjasToiletInteract;
 
@@ -152,21 +151,19 @@ public class Ingame extends GamePhase {
 
 	public final ListenerBlink listenerBlinkInteract;
 
-	public final ListenerGrandpasClockInteract listenerGrandpasClockInteract;
+	public final ListenerGrandpasClock listenerGrandpasClockInteract;
 
-	public final ListenerGhostInteract listenerGhostInteract;
-
-	public final ListenerGhostEntityDamage listenerGhostEntityDamageByEntity;
+	public final ListenerGhost listenerGhost;
 
 	public final ListenerMinigunInteract listenerMinigunInteract;
 
 	public final ListenerDeathMove listenerDeathMove;
 
-	public final ListenerGrabberInteract listenerGrabberInteract;
+	public final ListenerGrabber listenerGrabberInteract;
 
 	public final ListenerBooster listenerBoosterInteract;
 
-	public final ListenerGrapplingHookFishing listenerGrapplingHookFishing;
+	public final ListenerGrapplingHook listenerGrapplingHookFishing;
 
 	public final ListenerRopeInteract listenerRopeInteract;
 
@@ -188,7 +185,7 @@ public class Ingame extends GamePhase {
 
 	public final Map<User, Team> lastTeam = new HashMap<>();
 
-//	public final Scheduler schedulerDeathTimer;
+	// public final Scheduler schedulerDeathTimer;
 	public boolean isGlobalSpawnProtection = false;
 
 	private boolean startingIngame = false;
@@ -222,23 +219,23 @@ public class Ingame extends GamePhase {
 		this.listenerTNTEntityDamageByEntity = new ListenerTNTEntityDamageByEntity();
 		this.listenerWoolBomb = new ListenerWoolBomb();
 		this.listenerWoolBombExplode = new ListenerExplode();
-		this.listenerLineBuilderInteract = new ListenerLineBuilderInteract();
+		this.listenerLineBuilderInteract = new ListenerLineBuilder();
 		this.listenerRonjasToiletInteract = new ListenerRonjasToiletInteract();
 		this.listenerRonjasToiletLaunch = new ListenerRonjasToiletLaunch();
 		this.listenerRonjasToiletHit = new ListenerRonjasToiletHit();
-		this.listenerRonjasToiletEntityDamageByEntity = new ListenerRonjasToiletEntityDamageByEntity();
+		this.listenerRonjasToiletEntityDamageByEntity =
+				new ListenerRonjasToiletEntityDamageByEntity();
 		this.listenerEnderpearlLaunchable = new ListenerEnderpearlLaunchable();
 		this.listenerSafetyPlatformInteract = new ListenerSafetyPlatformInteract();
 		this.listenerBlinkInteract = new ListenerBlink();
 		this.listenerWallGeneratorInteract = new ListenerWallGeneratorInteract();
-		this.listenerGrandpasClockInteract = new ListenerGrandpasClockInteract();
-		this.listenerGhostInteract = new ListenerGhostInteract();
-		this.listenerGhostEntityDamageByEntity = new ListenerGhostEntityDamage();
+		this.listenerGrandpasClockInteract = new ListenerGrandpasClock();
+		this.listenerGhost = new ListenerGhost();
 		this.listenerMinigunInteract = new ListenerMinigunInteract();
 		this.listenerDeathMove = new ListenerDeathMove();
-		this.listenerGrabberInteract = new ListenerGrabberInteract();
+		this.listenerGrabberInteract = new ListenerGrabber();
 		this.listenerBoosterInteract = new ListenerBooster();
-		this.listenerGrapplingHookFishing = new ListenerGrapplingHookFishing();
+		this.listenerGrapplingHookFishing = new ListenerGrapplingHook();
 		this.listenerRopeInteract = new ListenerRopeInteract();
 		this.listenerSlimeJump = new ListenerSlimePlatform();
 
@@ -264,12 +261,12 @@ public class Ingame extends GamePhase {
 							Ingame.this.arrows.remove(arrow);
 							break;
 						}
-						User user = Main.getInstance()
-								.getUserWrapper()
+						User user = WoolBattle.getInstance().getUserWrapper()
 								.getUser(((Player) arrow.getShooter()).getUniqueId());
 						ParticleEffect.BLOCK_CRACK.display(
-								new ParticleEffect.BlockData(Material.WOOL, user.getTeam().getType().getWoolColor()), 0,
-								0, 0, 1, 8, arrow.getLocation(), Ingame.this.particlePlayers);
+								new ParticleEffect.BlockData(Material.WOOL,
+										user.getTeam().getType().getWoolColorByte()),
+								0, 0, 0, 1, 8, arrow.getLocation(), Ingame.this.particlePlayers);
 					}
 				}
 			}
@@ -288,9 +285,9 @@ public class Ingame extends GamePhase {
 				}
 				Ingame.this.isGlobalSpawnProtection = true;
 				this.protectionTicks--;
-				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
-					user.getBukkitEntity()
-							.setExp((float) this.protectionTicks / (float) Ingame.SPAWNPROTECTION_TICKS_GLOBAL);
+				for (User user : WoolBattle.getInstance().getUserWrapper().getUsers()) {
+					user.getBukkitEntity().setExp((float) this.protectionTicks
+							/ (float) Ingame.SPAWNPROTECTION_TICKS_GLOBAL);
 				}
 			}
 
@@ -308,7 +305,7 @@ public class Ingame extends GamePhase {
 
 			@Override
 			public void run() {
-				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
+				for (User user : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 					if (user.getTeam().getType() != TeamType.SPECTATOR) {
 						if (user.getTicksAfterLastHit() < 1200)
 							user.setTicksAfterLastHit(user.getTicksAfterLastHit() + 1);
@@ -321,7 +318,7 @@ public class Ingame extends GamePhase {
 
 			@Override
 			public void run() {
-				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
+				for (User user : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 					if (Ingame.SPAWNPROTECTION_TICKS != 0) {
 						if (user.getSpawnProtectionTicks() > 0) {
 							user.setSpawnProtectionTicks(user.getSpawnProtectionTicks() - 1);
@@ -349,7 +346,7 @@ public class Ingame extends GamePhase {
 
 			@Override
 			public void run() {
-				for (User user : Main.getInstance().getUserWrapper().getUsers()) {
+				for (User user : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 					if (user.getTeam().getType() != TeamType.SPECTATOR) {
 						user.getActivePerk1().updateInventory();
 						user.getActivePerk2().updateInventory();
@@ -370,10 +367,10 @@ public class Ingame extends GamePhase {
 		this.startingIngame = true;
 		CloudNetLink.update();
 		this.splitPlayersToTeams();
-//		Main.getInstance().getSchedulers().clear();
+		// Main.getInstance().getSchedulers().clear();
 		int lifes = -1;
-		if (!Main.getInstance().getLobby().VOTES_LIFES.isEmpty()) {
-			Collection<Integer> list = Main.getInstance().getLobby().VOTES_LIFES.values();
+		if (!WoolBattle.getInstance().getLobby().VOTES_LIFES.isEmpty()) {
+			Collection<Integer> list = WoolBattle.getInstance().getLobby().VOTES_LIFES.values();
 			double d = 0;
 			for (int i : list) {
 				d += i;
@@ -393,20 +390,14 @@ public class Ingame extends GamePhase {
 			xtra += playersize;
 			lifes = 10 + xtra;
 		}
-		if (Main.getInstance().baseLifes != null)
-			lifes = Main.getInstance().baseLifes;
-		for (Team team : Main.getInstance().getTeamManager().getTeams()) {
+		if (WoolBattle.getInstance().baseLifes != null)
+			lifes = WoolBattle.getInstance().baseLifes;
+		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
 			team.setLifes(lifes);
 		}
 
-		this.listenerLineBuilderInteract.cooldownTasks.clear();
-		this.listenerLineBuilderInteract.lastLine.clear();
-		this.listenerLineBuilderInteract.lines.clear();
-		this.listenerLineBuilderInteract.placeTasks.clear();
 		this.listenerDoubleJump.cooldown.clear();
 		this.listenerPlayerMove.ghostBlockFixCount.clear();
-		this.listenerGhostInteract.ghosts.clear();
-		this.listenerGhostEntityDamageByEntity.attacks.clear();
 
 		if (this.placedBlocks != null)
 			for (Block b : this.placedBlocks) {
@@ -414,23 +405,27 @@ public class Ingame extends GamePhase {
 				Ingame.resetBlockDamage(b);
 			}
 
-		Main.registerListeners(this.listenerBlockBreak, this.listenerBlockPlace, this.listenerItemDrop,
-				this.listenerItemPickup, this.listenerBlockCanBuild, this.listenerPlayerJoin, this.listenerPlayerQuit,
-				this.listenerPlayerLogin, this.listenerEntityDamageByEntity, this.listenerDoubleJump,
+		WoolBattle.registerListeners(this.listenerBlockBreak, this.listenerBlockPlace,
+				this.listenerItemDrop, this.listenerItemPickup, this.listenerBlockCanBuild,
+				this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerLogin,
+				this.listenerEntityDamageByEntity, this.listenerDoubleJump,
 				this.listenerEntityDamage, this.listenerChangeBlock, this.listenerProjectileHit,
-				this.listenerProjectileLaunch, this.listenerInventoryClick, this.listenerInventoryDrag,
-				this.listenerCapsule, this.listenerSwitcherLaunch, this.listenerSwitcherSwitch, this.listenerInteract,
-				this.listenerGameModeChange, this.listenerPlayerMove, this.listenerEntitySpawn,
+				this.listenerProjectileLaunch, this.listenerInventoryClick,
+				this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcherLaunch,
+				this.listenerSwitcherSwitch, this.listenerInteract, this.listenerGameModeChange,
+				this.listenerPlayerMove, this.listenerEntitySpawn,
 				this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract,
-				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerWoolBombExplode,
-				this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit,
+				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb,
+				this.listenerWoolBombExplode, this.listenerLineBuilderInteract,
+				this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit,
 				this.listenerRonjasToiletEntityDamageByEntity, this.listenerRonjasToiletLaunch,
-				this.listenerBlinkInteract, this.listenerWallGeneratorInteract, this.listenerGrandpasClockInteract,
-				this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity, this.listenerMinigunInteract,
-				this.listenerDeathMove, this.listenerGrabberInteract, this.listenerBoosterInteract,
-				this.listenerGrapplingHookFishing, this.listenerRopeInteract, this.listenerSlimeJump);
+				this.listenerBlinkInteract, this.listenerWallGeneratorInteract,
+				this.listenerGrandpasClockInteract, this.listenerGhost,
+				this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract,
+				this.listenerBoosterInteract, this.listenerGrapplingHookFishing,
+				this.listenerRopeInteract, this.listenerSlimeJump);
 
-		Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
+		WoolBattle.getInstance().getUserWrapper().getUsers().forEach(u -> {
 			this.loadScoreboardObjective(u);
 			u.loadPerks();
 			u.getBukkitEntity().closeInventory();
@@ -468,21 +463,25 @@ public class Ingame extends GamePhase {
 		this.schedulerResetWool.cancel();
 		this.schedulerTick.cancel();
 		this.schedulerHeightDisplay.stop();
-		Main.unregisterListeners(this.listenerBlockBreak, this.listenerBlockPlace, this.listenerItemDrop,
-				this.listenerItemPickup, this.listenerBlockCanBuild, this.listenerPlayerJoin, this.listenerPlayerQuit,
-				this.listenerPlayerLogin, this.listenerEntityDamageByEntity, this.listenerDoubleJump,
+		WoolBattle.unregisterListeners(this.listenerBlockBreak, this.listenerBlockPlace,
+				this.listenerItemDrop, this.listenerItemPickup, this.listenerBlockCanBuild,
+				this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerLogin,
+				this.listenerEntityDamageByEntity, this.listenerDoubleJump,
 				this.listenerEntityDamage, this.listenerChangeBlock, this.listenerProjectileHit,
-				this.listenerProjectileLaunch, this.listenerInventoryClick, this.listenerInventoryDrag,
-				this.listenerCapsule, this.listenerSwitcherLaunch, this.listenerSwitcherSwitch, this.listenerInteract,
-				this.listenerGameModeChange, this.listenerPlayerMove, this.listenerEntitySpawn,
+				this.listenerProjectileLaunch, this.listenerInventoryClick,
+				this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcherLaunch,
+				this.listenerSwitcherSwitch, this.listenerInteract, this.listenerGameModeChange,
+				this.listenerPlayerMove, this.listenerEntitySpawn,
 				this.listenerEnderpearlLaunchable, this.listenerSafetyPlatformInteract,
-				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerWoolBombExplode,
-				this.listenerLineBuilderInteract, this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit,
+				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb,
+				this.listenerWoolBombExplode, this.listenerLineBuilderInteract,
+				this.listenerRonjasToiletInteract, this.listenerRonjasToiletHit,
 				this.listenerRonjasToiletEntityDamageByEntity, this.listenerRonjasToiletLaunch,
-				this.listenerBlinkInteract, this.listenerWallGeneratorInteract, this.listenerGrandpasClockInteract,
-				this.listenerGhostInteract, this.listenerGhostEntityDamageByEntity, this.listenerMinigunInteract,
-				this.listenerDeathMove, this.listenerGrabberInteract, this.listenerBoosterInteract,
-				this.listenerGrapplingHookFishing, this.listenerRopeInteract, this.listenerSlimeJump);
+				this.listenerBlinkInteract, this.listenerWallGeneratorInteract,
+				this.listenerGrandpasClockInteract, this.listenerGhost,
+				this.listenerMinigunInteract, this.listenerDeathMove, this.listenerGrabberInteract,
+				this.listenerBoosterInteract, this.listenerGrapplingHookFishing,
+				this.listenerRopeInteract, this.listenerSlimeJump);
 		this.listenerEnderpearlLaunchable.disable();
 		for (Block b : this.placedBlocks) {
 			b.setType(Material.AIR);
@@ -517,9 +516,8 @@ public class Ingame extends GamePhase {
 
 						@Override
 						public void run() {
-							Main.getInstance()
-									.sendMessage(Message.KILLSTREAK, killer.getTeamPlayerName(),
-											Integer.toString(killstreak));
+							WoolBattle.getInstance().sendMessage(Message.KILLSTREAK,
+									killer.getTeamPlayerName(), Integer.toString(killstreak));
 						}
 
 					}.runTask();
@@ -545,17 +543,17 @@ public class Ingame extends GamePhase {
 		}
 		if (killer != null) {
 			if (user.getTicksAfterLastHit() < 201) {
-				Main.getInstance()
-						.sendMessage(Message.PLAYER_WAS_KILLED_BY_PLAYER, user.getTeamPlayerName(),
-								killer.getTeamPlayerName());
+				WoolBattle.getInstance().sendMessage(Message.PLAYER_WAS_KILLED_BY_PLAYER,
+						user.getTeamPlayerName(), killer.getTeamPlayerName());
 			} else if (user.getTicksAfterLastHit() <= 200) {
-				Main.getInstance().sendMessage(Message.PLAYER_DIED, user.getTeamPlayerName());
+				WoolBattle.getInstance().sendMessage(Message.PLAYER_DIED, user.getTeamPlayerName());
 			}
 		}
 
 		Team userTeam = user.getTeam();
 		if (userTeam.getLifes() == 0 || leaving) {
-			Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
+			WoolBattle.getInstance().getTeamManager().setTeam(user,
+					WoolBattle.getInstance().getTeamManager().getSpectator());
 		}
 
 		if (userTeam.getUsers().size() == 0) {
@@ -565,9 +563,8 @@ public class Ingame extends GamePhase {
 				}
 			}
 
-			Main.getInstance().sendMessage(Message.TEAM_WAS_ELIMINATED, u -> new String[] {
-					userTeam.getName(u)
-			});
+			WoolBattle.getInstance().sendMessage(Message.TEAM_WAS_ELIMINATED,
+					u -> new String[] {userTeam.getName(u)});
 			if (leaving) {
 				user.getBukkitEntity().kickPlayer("Disconnected");
 			}
@@ -586,19 +583,15 @@ public class Ingame extends GamePhase {
 	public void checkGameEnd() {
 		if (this.startingIngame)
 			return;
-		List<Team> teams = Main.getInstance()
-				.getTeamManager()
-				.getTeams()
-				.stream()
-				.filter(t -> t.getUsers().size() >= 1)
-				.collect(Collectors.toList());
+		List<Team> teams = WoolBattle.getInstance().getTeamManager().getTeams().stream()
+				.filter(t -> t.getUsers().size() >= 1).collect(Collectors.toList());
 		if (teams.size() == 1) {
 			this.winner = teams.get(0);
 			for (User i : this.winner.getUsers()) {
 				StatsLink.addWin(i);
 			}
 			this.disable();
-			Main.getInstance().getEndgame().enable();
+			WoolBattle.getInstance().getEndgame().enable();
 		}
 	}
 
@@ -606,11 +599,12 @@ public class Ingame extends GamePhase {
 		Scoreboard sb = new Scoreboard(user);
 		Objective obj = sb.getObjective(ScoreboardObjective.INGAME.getKey());
 		int i = 0;
-		for (Team team : Main.getInstance().getTeamManager().getTeams()) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team t = sb
-					.getTeam(team.getType().getIngameScoreboardTag());
+		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team t =
+					sb.getTeam(team.getType().getIngameScoreboardTag());
 			t.addPlayer(team.getType().getInvisibleTag());
-			t.setSuffix(ChatColor.GOLD.toString() + Characters.SHIFT_SHIFT_LEFT + team.getName(user));
+			t.setSuffix(
+					ChatColor.GOLD.toString() + Characters.SHIFT_SHIFT_LEFT + team.getName(user));
 			obj.setScore(team.getType().getInvisibleTag(), i++);
 			this.reloadScoreboardLifes(sb, team);
 		}
@@ -621,17 +615,17 @@ public class Ingame extends GamePhase {
 		if (!this.lastTeam.containsKey(target)) {
 			return false;
 		}
-		Main.getInstance().getTeamManager().setTeam(target, this.lastTeam.remove(target));
+		WoolBattle.getInstance().getTeamManager().setTeam(target, this.lastTeam.remove(target));
 		return true;
 	}
 
 	public synchronized void splitPlayersToTeams() {
-		Collection<? extends Team> teams = Main.getInstance().getTeamManager().getTeams();
+		Collection<? extends Team> teams = WoolBattle.getInstance().getTeamManager().getTeams();
 		int chosenCount = 0;
 		for (Team team : teams) {
 			chosenCount += team.getUsers().size();
 		}
-		if (chosenCount == Main.getInstance().getUserWrapper().getUsers().size()) {
+		if (chosenCount == WoolBattle.getInstance().getUserWrapper().getUsers().size()) {
 			if (chosenCount == 0) {
 				throw new Error("Starting game without players!");
 			}
@@ -645,7 +639,8 @@ public class Ingame extends GamePhase {
 							User user = o.get();
 							users1.add(user);
 						} else {
-							Main.getInstance().sendConsole("§cUser of team was somehow not found");
+							WoolBattle.getInstance()
+									.sendConsole("§cUser of team was somehow not found");
 						}
 					}
 					break;
@@ -666,7 +661,7 @@ public class Ingame extends GamePhase {
 		for (int i = 0; i < max; i++) {
 			for (Team team : teams) {
 				if (team.getUsers().size() == i) {
-					for (User user : Main.getInstance().getUserWrapper().getUsers()) {
+					for (User user : WoolBattle.getInstance().getUserWrapper().getUsers()) {
 						if (user.getTeam().getType() == TeamType.SPECTATOR) {
 							user.setTeam(team);
 							break;
@@ -677,11 +672,15 @@ public class Ingame extends GamePhase {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public void setArmor(User user) {
 		Player p = user.getBukkitEntity();
-		Color color = DyeColor.getByData(user.getTeam().getType().getWoolColor()).getColor();
-		if (this.listenerGhostInteract.ghosts.containsKey(user)) {
+		System.out.println(user.getTeam());
+		System.out.println(user.getTeam().getType());
+		System.out.println(user.getTeam().getType().getWoolColorByte());
+		System.out.println(user.getTeam().getType().getWoolColor());
+		Color color = user.getTeam().getType().getWoolColor().getColor();
+		if (ListenerGhost.isGhost(user)) {
+			System.out.println("ghost");
 			color = Color.WHITE;
 		}
 		ItemStack boots = Item.ARMOR_LEATHER_BOOTS.getItem(user);
@@ -701,9 +700,7 @@ public class Ingame extends GamePhase {
 		ItemStack helmet = Item.ARMOR_LEATHER_HELMET.getItem(user);
 		meta.setDisplayName(helmet.getItemMeta().getDisplayName());
 		helmet.setItemMeta(meta.clone());
-		p.getInventory().setArmorContents(new ItemStack[] {
-				boots, leggings, chest, helmet
-		});
+		p.getInventory().setArmorContents(new ItemStack[] {boots, leggings, chest, helmet});
 	}
 
 	public void setPlayerItems(User user) {
@@ -725,30 +722,35 @@ public class Ingame extends GamePhase {
 		this.setArmor(user);
 
 		PlayerPerks perks = user.getData().getPerks();
+		Set<Integer> slots = new HashSet<>();
+		slots.add(perks.getSlotActivePerk1());
+		slots.add(perks.getSlotActivePerk2());
+		slots.add(perks.getSlotPassivePerk());
+		slots.add(perks.getSlotShears());
+		slots.add(perks.getSlotBow());
+		slots.add(perks.getSlotArrow());
+		if (slots.size() < 6) {
+			PerkName a1 = perks.getActivePerk1();
+			PerkName a2 = perks.getActivePerk2();
+			PerkName p1 = perks.getPassivePerk();
+			perks.reset();
+			perks.setActivePerk1(a1);
+			perks.setActivePerk2(a2);
+			perks.setPassivePerk(p1);
+		}
 
 		this.setPlayerItem(v, perks.getSlotBow(), Item.DEFAULT_BOW.getItem(user));
 		this.setPlayerItem(v, perks.getSlotArrow(), Item.DEFAULT_ARROW.getItem(user));
-//		v.setItem(perks.getSlotBow(), Item.DEFAULT_BOW.getItem(user));
-//		v.setItem(perks.getSlotArrow(), Item.DEFAULT_ARROW.getItem(user));
 		this.setPlayerItem(v, perks.getSlotShears(), Item.DEFAULT_SHEARS.getItem(user));
 		user.getEnderPearl().setItem();
-//		v.setItem(user.getData().getPerks().getSlotPearl(), Item.DEFAULT_PEARL.getItem(user));
-//		v.setItem(perks.getSlotShears(), Item.DEFAULT_SHEARS.getItem(user));
 
 		user.getActivePerk1().setItem();
 		user.getActivePerk2().setItem();
 		user.getPassivePerk().setItem();
 
-//		v.setItem(user.getData().getPerks().getSlotActivePerk1(), user.getData().getPerks().getActivePerk1().toType()
-//				.newPerkTypePerk(user, PerkNumber.ACTIVE_1).getItem().getItem(user));
-//		v.setItem(user.getData().getPerks().getSlotActivePerk2(), user.getData().getPerks().getActivePerk2().toType()
-//				.newPerkTypePerk(user, PerkNumber.ACTIVE_2).getItem().getItem(user));
-//		v.setItem(user.getData().getPerks().getSlotPassivePerk(), user.getData().getPerks().getPassivePerk().toType()
-//				.newPerkTypePerk(user, PerkNumber.PASSIVE).getItem().getItem(user));
 		for (int i = 0; i < woolcount; i++) {
-			p.getInventory()
-					.addItem(new ItemBuilder(Material.WOOL).setDurability(user.getTeam().getType().getWoolColor())
-							.build());
+			p.getInventory().addItem(new ItemBuilder(Material.WOOL)
+					.setDurability(user.getTeam().getType().getWoolColorByte()).build());
 		}
 		p.getHandle().updateInventory(p.getHandle().activeContainer);
 		p.getHandle().collidesWithEntities = true;
@@ -765,11 +767,12 @@ public class Ingame extends GamePhase {
 		if (user.getTeam() != null)
 			this.lastTeam.put(user, user.getTeam());
 		Player p = user.getBukkitEntity();
-//		Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
+		// Main.getInstance().getTeamManager().setTeam(user,
+		// Main.getInstance().getTeamManager().getSpectator());
 		Scoreboard sb = new Scoreboard();
 		p.setScoreboard(sb.getScoreboard());
-		Main.initScoreboard(sb, user);
-		Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
+		WoolBattle.initScoreboard(sb, user);
+		WoolBattle.getInstance().getUserWrapper().getUsers().forEach(u -> {
 			Scoreboard s = new Scoreboard(u);
 			s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
 			if (u.getTeam().getType() != TeamType.SPECTATOR) {
@@ -790,39 +793,40 @@ public class Ingame extends GamePhase {
 		p.getInventory().setItem(0, Item.TELEPORT_COMPASS.getItem(user));
 	}
 
-//	public void setSpectator(User user) {
-//		Player p = user.getBukkitEntity();
-//		if (user.getTeam() != null)
-//			lastTeam.put(user, user.getTeam());
-//		Main.getInstance().getTeamManager().setTeam(user, Main.getInstance().getTeamManager().getSpectator());
-//		Scoreboard sb = new Scoreboard();
-//		p.setScoreboard(sb.getScoreboard());
-//		Main.initScoreboard(sb, user);
-//		Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
-//			Scoreboard s = new Scoreboard(u);
-//			s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
-//			if (u.getTeam().getType() != TeamType.SPECTATOR) {
-//				u.getBukkitEntity().hidePlayer(p);
-//			} else {
-//				p.showPlayer(u.getBukkitEntity());
-//			}
-//			if (u != user) {
-//				sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
-//			}
-//		});
-//		loadScoreboardObjective(user);
-//		reloadTab(user);
-//		p.spigot().setCollidesWithEntities(false);
-//		p.setAllowFlight(true);
-//		p.teleport(Main.getInstance().getMap().getSpawn(TeamType.SPECTATOR.getDisplayNameKey()));
-//		p.getInventory().clear();
-//		p.getInventory().setArmorContents(new ItemStack[4]);
-//		p.getInventory().setItem(0, Item.TELEPORT_COMPASS.getItem(user));
-//	}
+	// public void setSpectator(User user) {
+	// Player p = user.getBukkitEntity();
+	// if (user.getTeam() != null)
+	// lastTeam.put(user, user.getTeam());
+	// Main.getInstance().getTeamManager().setTeam(user,
+	// Main.getInstance().getTeamManager().getSpectator());
+	// Scoreboard sb = new Scoreboard();
+	// p.setScoreboard(sb.getScoreboard());
+	// Main.initScoreboard(sb, user);
+	// Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
+	// Scoreboard s = new Scoreboard(u);
+	// s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
+	// if (u.getTeam().getType() != TeamType.SPECTATOR) {
+	// u.getBukkitEntity().hidePlayer(p);
+	// } else {
+	// p.showPlayer(u.getBukkitEntity());
+	// }
+	// if (u != user) {
+	// sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
+	// }
+	// });
+	// loadScoreboardObjective(user);
+	// reloadTab(user);
+	// p.spigot().setCollidesWithEntities(false);
+	// p.setAllowFlight(true);
+	// p.teleport(Main.getInstance().getMap().getSpawn(TeamType.SPECTATOR.getDisplayNameKey()));
+	// p.getInventory().clear();
+	// p.getInventory().setArmorContents(new ItemStack[4]);
+	// p.getInventory().setItem(0, Item.TELEPORT_COMPASS.getItem(user));
+	// }
 
 	public void reloadScoreboardLifes(User user) {
 		Scoreboard sb = new Scoreboard(user);
-		for (Team team : Main.getInstance().getTeamManager().getTeams()) {
+		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
 			this.reloadScoreboardLifes(sb, team);
 		}
 	}
@@ -833,31 +837,36 @@ public class Ingame extends GamePhase {
 			llifes = llifes.substring(0, 3);
 		}
 		sb.getTeam(team.getType().getIngameScoreboardTag())
-				.setPrefix(ChatColor.translateAlternateColorCodes('&', "&6" + Characters.SHIFT_SHIFT_RIGHT + " &4"
-						+ Characters.HEART + "&r" + llifes + "&4" + Characters.HEART + " "));
+				.setPrefix(ChatColor.translateAlternateColorCodes('&',
+						"&6" + Characters.SHIFT_SHIFT_RIGHT + " &4" + Characters.HEART + "&r"
+								+ llifes + "&4" + Characters.HEART + " "));
 	}
 
 	public void reloadTab(User user) {
-		Header header = new Header(Main.getInstance().getConfig("config").getString(Config.TAB_HEADER));
-		Footer footer = new Footer(Main.getInstance().getConfig("config").getString(Config.TAB_FOOTER));
-		header.setMessage(header.getMessage()
-				.replace("%map%",
-						Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
-		footer.setMessage(footer.getMessage()
-				.replace("%map%",
-						Main.getInstance().getMap() == null ? "Unknown Map" : Main.getInstance().getMap().getName()));
-		header.setMessage(header.getMessage().replace("%name%", Main.getInstance().name));
-		footer.setMessage(footer.getMessage().replace("%name%", Main.getInstance().name));
-		header.setMessage(header.getMessage()
-				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix + " &8"
-						+ Characters.SHIFT_SHIFT_LEFT));
-		footer.setMessage(footer.getMessage()
-				.replace("%prefix%", "&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + Main.getInstance().tabprefix + " &8"
-						+ Characters.SHIFT_SHIFT_LEFT));
+		Header header = new Header(
+				WoolBattle.getInstance().getConfig("config").getString(Config.TAB_HEADER));
+		Footer footer = new Footer(
+				WoolBattle.getInstance().getConfig("config").getString(Config.TAB_FOOTER));
+		header.setMessage(header.getMessage().replace("%map%",
+				WoolBattle.getInstance().getMap() == null ? "Unknown Map"
+						: WoolBattle.getInstance().getMap().getName()));
+		footer.setMessage(footer.getMessage().replace("%map%",
+				WoolBattle.getInstance().getMap() == null ? "Unknown Map"
+						: WoolBattle.getInstance().getMap().getName()));
+		header.setMessage(header.getMessage().replace("%name%", WoolBattle.getInstance().name));
+		footer.setMessage(footer.getMessage().replace("%name%", WoolBattle.getInstance().name));
+		header.setMessage(header.getMessage().replace("%prefix%",
+				"&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + WoolBattle.getInstance().tabprefix
+						+ " &8" + Characters.SHIFT_SHIFT_LEFT));
+		footer.setMessage(footer.getMessage().replace("%prefix%",
+				"&8" + Characters.SHIFT_SHIFT_RIGHT + " &6" + WoolBattle.getInstance().tabprefix
+						+ " &8" + Characters.SHIFT_SHIFT_LEFT));
 		header.setMessage(header.getMessage().replace("%server%", Bukkit.getServerName()));
 		footer.setMessage(footer.getMessage().replace("%server%", Bukkit.getServerName()));
-		header.setMessage(ChatColor.translateAlternateColorCodes('&', header.getMessage()).replace("\\n", "\n"));
-		footer.setMessage(ChatColor.translateAlternateColorCodes('&', footer.getMessage()).replace("\\n", "\n"));
+		header.setMessage(ChatColor.translateAlternateColorCodes('&', header.getMessage())
+				.replace("\\n", "\n"));
+		footer.setMessage(ChatColor.translateAlternateColorCodes('&', footer.getMessage())
+				.replace("\\n", "\n"));
 		TabManager.setHeaderFooter(user, header, footer);
 	}
 
@@ -865,8 +874,9 @@ public class Ingame extends GamePhase {
 		if (user.isTrollMode() && user.getTeam().getType() == TeamType.SPECTATOR) {
 			return true;
 		}
-		if ((!this.isGlobalSpawnProtection && !target.hasSpawnProtection() && target.getTeam() != user.getTeam()
-				&& (!this.listenerGhostInteract.ghosts.containsKey(target) || ignoreGhost)) || user.isTrollMode()) {
+		if ((!this.isGlobalSpawnProtection && !target.hasSpawnProtection()
+				&& target.getTeam() != user.getTeam()
+				&& (!ListenerGhost.isGhost(user) || ignoreGhost)) || user.isTrollMode()) {
 			target.setLastHit(user);
 			target.setTicksAfterLastHit(0);
 			return true;
@@ -879,9 +889,6 @@ public class Ingame extends GamePhase {
 	}
 
 	public static int getBlockDamage(Block block) {
-//		if (block.getMetadata("arrowDamage").size() == 0)
-//			return 0;
-//		return block.getMetadata("arrowDamage").get(0).asInt();
 		MetadataValue v;
 		return ((v = Ingame.getMetaData(block, "arrowDamage")) == null) ? 0 : v.asInt();
 	}
@@ -894,23 +901,25 @@ public class Ingame extends GamePhase {
 	}
 
 	public static void resetBlockDamage(Block block) {
-		block.removeMetadata("arrowDamage", Main.getInstance());
+		block.removeMetadata("arrowDamage", WoolBattle.getInstance());
 	}
 
 	public static void playSoundNotEnoughWool(User user) {
-		user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(), Sound.VILLAGER_NO, 1, 1);
+		user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(), Sound.VILLAGER_NO, 1,
+				1);
 	}
 
 	@SuppressWarnings("deprecation")
 	public static void setBlockDamage(Block block, int damage) {
-		EventDamageBlock damageBlock = new EventDamageBlock(block, Ingame.getBlockDamage(block), damage);
+		EventDamageBlock damageBlock =
+				new EventDamageBlock(block, Ingame.getBlockDamage(block), damage);
 		if (damageBlock.isCancelled()) {
 			return;
 		}
 		if (damage >= Ingame.MAX_BLOCK_ARROW_HITS) {
 			EventDestroyBlock destroyBlock = new EventDestroyBlock(block);
 			if (!destroyBlock.isCancelled()) {
-				Ingame ingame = Main.getInstance().getIngame();
+				Ingame ingame = WoolBattle.getInstance().getIngame();
 				if (ingame.placedBlocks.contains(block)) {
 					ingame.placedBlocks.remove(block);
 				} else {
@@ -921,12 +930,12 @@ public class Ingame extends GamePhase {
 				return;
 			}
 		}
-//		block.setMetadata("arrowDamage", new FixedMetadataValue(Main.getInstance(), damage));
+		// block.setMetadata("arrowDamage", new FixedMetadataValue(Main.getInstance(), damage));
 		Ingame.setMetaData(block, "arrowDamage", damage);
 	}
 
 	public static void setMetaData(Block block, String key, Object value) {
-		block.setMetadata(key, new FixedMetadataValue(Main.getInstance(), value));
+		block.setMetadata(key, new FixedMetadataValue(WoolBattle.getInstance(), value));
 	}
 
 }

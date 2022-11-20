@@ -4,19 +4,19 @@ import java.util.Collection;
 
 import org.bukkit.command.CommandSender;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.commandapi.Command;
 
 public class CommandListMaps extends Command {
 
 	public CommandListMaps() {
-		super(Main.getInstance(), "listMaps", new Command[0], "Listet alle Maps auf");
+		super(WoolBattle.getInstance(), "listMaps", new Command[0], "Listet alle Maps auf");
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		Collection<? extends Map> maps = Main.getInstance().getMapManager().getMaps();
+		Collection<? extends Map> maps = WoolBattle.getInstance().getMapManager().getMaps();
 		if (maps.size() == 0) {
 			sender.sendMessage("§cEs sind keine Teams erstellt!");
 			return true;

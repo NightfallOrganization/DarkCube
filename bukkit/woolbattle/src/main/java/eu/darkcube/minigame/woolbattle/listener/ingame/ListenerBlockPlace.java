@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -16,7 +16,7 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
 	@EventHandler
 	public void handle(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		if (!user.isTrollMode()) {
 			if (user.getTeam().getType() == TeamType.SPECTATOR) {
 				e.setCancelled(true);
@@ -30,7 +30,7 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
 			return;
 		}
 		Block block = e.getBlock();
-		Ingame ingame = Main.getInstance().getIngame();
+		Ingame ingame = WoolBattle.getInstance().getIngame();
 		if (ingame.breakedWool.containsKey(block)) {
 			e.setCancelled(true);
 			return;

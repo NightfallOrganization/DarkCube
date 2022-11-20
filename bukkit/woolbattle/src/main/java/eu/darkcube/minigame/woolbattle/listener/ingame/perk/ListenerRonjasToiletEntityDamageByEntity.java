@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.User;
 
@@ -23,8 +23,8 @@ public class ListenerRonjasToiletEntityDamageByEntity extends Listener<EntityDam
 			return;
 		}
 		Player p = (Player) egg.getShooter();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
-		User target = Main.getInstance().getUserWrapper().getUser(t.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User target = WoolBattle.getInstance().getUserWrapper().getUser(t.getUniqueId());
 		if(user.getTeam() != target.getTeam() || user.isTrollMode()) {
 			target.setLastHit(user);
 			target.setTicksAfterLastHit(0);

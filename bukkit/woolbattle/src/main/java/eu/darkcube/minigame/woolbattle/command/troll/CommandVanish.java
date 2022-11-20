@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.system.commandapi.Command;
@@ -18,8 +18,8 @@ public class CommandVanish extends Command {
 	private Set<Player> vanished = new HashSet<>();
 	
 	public CommandVanish() {
-		super(Main.getInstance(), "vanish", new Command[0], "Vanish", CommandArgument.PLAYER_OPTIONAL);
-		Main.registerListeners(new Listener<PlayerQuitEvent>() {
+		super(WoolBattle.getInstance(), "vanish", new Command[0], "Vanish", CommandArgument.PLAYER_OPTIONAL);
+		WoolBattle.registerListeners(new Listener<PlayerQuitEvent>() {
 			@Override
 			public void handle(PlayerQuitEvent e) {
 				vanished.remove(e.getPlayer());
@@ -38,7 +38,7 @@ public class CommandVanish extends Command {
 			}
 		}
 		if(vanishing == null) {
-			Main.getInstance().sendMessage("§cUngültiger Spieler: " + args[0], sender);
+			WoolBattle.getInstance().sendMessage("§cUngültiger Spieler: " + args[0], sender);
 			return true;
 		}
 		if(vanished.contains(vanishing)) {
@@ -54,9 +54,9 @@ public class CommandVanish extends Command {
 			}
 		}
 		if(vanished.contains(vanishing)) {
-			Main.getInstance().sendMessage("§aVanished " + vanishing.getName(), sender);
+			WoolBattle.getInstance().sendMessage("§aVanished " + vanishing.getName(), sender);
 		} else {
-			Main.getInstance().sendMessage("§cUnvanished " + vanishing.getName(), sender);
+			WoolBattle.getInstance().sendMessage("§cUnvanished " + vanishing.getName(), sender);
 		}
 		return true;
 	}

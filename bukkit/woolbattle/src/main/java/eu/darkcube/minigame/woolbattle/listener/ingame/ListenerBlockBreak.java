@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerDoubleJump;
@@ -23,7 +23,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 	@EventHandler
 	public synchronized void handle(BlockBreakEvent e) {
 		Player p = e.getPlayer();
-		User user = Main.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 		Block block = e.getBlock();
 		e.setExpToDrop(0);
 		if (!user.isTrollMode()) {
@@ -33,14 +33,14 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 			}
 		} else {
 //			if (e.getBlock().getType() != Material.WOOL) {
-			Main.getInstance().getIngame().placedBlocks.remove(e.getBlock());
+			WoolBattle.getInstance().getIngame().placedBlocks.remove(e.getBlock());
 			e.getBlock().setType(Material.AIR);
 			return;
 //			}
 		}
 		Material type = block.getType();
 		if (type == Material.WOOL) {
-			Ingame ingame = Main.getInstance().getIngame();
+			Ingame ingame = WoolBattle.getInstance().getIngame();
 			if (!ingame.placedBlocks.contains(block)) {
 				ingame.breakedWool.put(block, block.getData());
 			} else {
@@ -56,11 +56,11 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 			ItemStack addItem = null;
 			if (remaining > 0) {
 				if (tryadd - remaining > 0) {
-					addItem = new ItemStack(Material.WOOL, tryadd - remaining, user.getTeam().getType().getWoolColor());
+					addItem = new ItemStack(Material.WOOL, tryadd - remaining, user.getTeam().getType().getWoolColorByte());
 					shallAdd = true;
 				}
 			} else if (freeSpace > 0) {
-				addItem = new ItemStack(Material.WOOL, tryadd, user.getTeam().getType().getWoolColor());
+				addItem = new ItemStack(Material.WOOL, tryadd, user.getTeam().getType().getWoolColorByte());
 				shallAdd = true;
 			}
 			if (shallAdd) {
@@ -72,7 +72,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 			e.getBlock().setType(Material.AIR);
 			return;
 		}
-		if (!Main.getInstance().getIngame().placedBlocks.contains(block)) {
+		if (!WoolBattle.getInstance().getIngame().placedBlocks.contains(block)) {
 			e.setCancelled(true);
 		}
 	}

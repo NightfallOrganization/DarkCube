@@ -11,14 +11,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.Main;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 
 public class Locations extends Parser {
 
 	public static final float F360 = 360f;
 	public static final float F180 = 180f;
 	public static final Location DEFAULT_LOCATION = deserialize(
-			Main.getInstance().getConfig("spawns").getString("defaultLocation"), null);
+			WoolBattle.getInstance().getConfig("spawns").getString("defaultLocation"), null);
 
 	public static Set<Block> getBlocksInLine(Location start, Vector direction, int range) {
 		BlockIterator it = new BlockIterator(start.getWorld(), start.toVector(), direction, 1, range);
