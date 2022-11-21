@@ -41,8 +41,8 @@ public class ListenerGrandpasClock extends BasicPerkListener {
 					user.getBukkitEntity().teleport(
 							user.getTemporaryDataStorage().<Location>remove(METADATA_OLDPOS));
 					user.getTemporaryDataStorage().remove(METADATA_TICKER);
-					user.getBukkitEntity().playSound(user.getBukkitEntity().getBedSpawnLocation(),
-							Sound.ENDERMAN_TELEPORT, 100, 1);
+					user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(),
+							Sound.ENDERMAN_TELEPORT, 1, 1);
 					cancel();
 					activated(user, perk);
 					return;

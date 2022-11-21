@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
@@ -37,6 +39,11 @@ public class ListenerLaunchable implements Listener {
 		if (pe.isCancelled()) {
 			e.setCancelled(true);
 		}
+	}
+
+	@EventListener
+	public void handle(PlayerItemHeldEvent e) {
+		executed.remove(e.getPlayer());
 	}
 
 	@EventHandler
@@ -67,11 +74,13 @@ public class ListenerLaunchable implements Listener {
 			default:
 				break;
 		}
-		if (this.executed.contains(e.getPlayer())) {
-			e.setCancelled(true);
-			return;
+		if (e.getItem().getType() != Material.WOOL) {
+			if (this.executed.contains(e.getPlayer())) {
+				e.setCancelled(true);
+				return;
+			}
+			this.executed.add(e.getPlayer());
 		}
-		this.executed.add(e.getPlayer());
 		LaunchableInteractEvent pe =
 				new LaunchableInteractEvent(e.getPlayer(), type, e.getItem(), e.getAction());
 		Bukkit.getPluginManager().callEvent(pe);

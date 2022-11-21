@@ -2,6 +2,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.material.Wool;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -65,6 +66,7 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				}
 			}
 			if (tick - lastLine > 5) {
+				line = null;
 				return;
 			}
 			if (cooldownTicks > TimeUnit.SECOND.toUnit(TimeUnit.TICKS) * perk.getMaxCooldown()) {
@@ -84,9 +86,11 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				line.addBlock(next);
 				if (next.getBlock().getType() == Material.AIR) {
 					next.getBlock().setType(Material.WOOL);
-					Wool wool = (Wool) next.getBlock().getState().getData();
+					BlockState state = next.getBlock().getState();
+					Wool wool = (Wool) state.getData();
 					wool.setColor(user.getTeam().getType().getWoolColor());
-					next.getBlock().getState().setData(wool);
+					state.setData(wool);
+					state.update(true);
 					WoolBattle.getInstance().getIngame().placedBlocks.add(next.getBlock());
 				}
 				user.getBukkitEntity().addPotionEffect(
