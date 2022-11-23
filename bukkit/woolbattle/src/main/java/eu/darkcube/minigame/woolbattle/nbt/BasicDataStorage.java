@@ -2,6 +2,7 @@ package eu.darkcube.minigame.woolbattle.nbt;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class BasicDataStorage implements DataStorage {
 
@@ -27,5 +28,15 @@ public class BasicDataStorage implements DataStorage {
 	@Override
 	public <T> T remove(String key) {
 		return (T) data.remove(key);
+	}
+
+	@Override
+	public <T> T getOr(String key, T orElse) {
+		return has(key) ? get(key) : orElse;
+	}
+
+	@Override
+	public <T> T getOr(String key, Supplier<T> orElse) {
+		return has(key) ? get(key) : orElse.get();
 	}
 }

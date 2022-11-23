@@ -14,7 +14,7 @@ public class ListenerBooster extends BasicPerkListener {
 	}
 
 	@Override
-	protected boolean activate(User user, Perk perk) {
+	protected boolean activateRight(User user, Perk perk) {
 		Player p = user.getBukkitEntity();
 		Vector velo = p.getLocation().getDirection()
 				.setY(p.getLocation().getDirection().getY() + 0.3).multiply(2.7);

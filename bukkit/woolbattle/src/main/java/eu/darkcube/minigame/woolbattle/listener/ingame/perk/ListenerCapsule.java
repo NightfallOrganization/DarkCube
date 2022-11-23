@@ -3,7 +3,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
@@ -18,7 +17,7 @@ public class ListenerCapsule extends BasicPerkListener {
 	}
 
 	@Override
-	protected boolean activate(User user, Perk perk) {
+	protected boolean activateRight(User user, Perk perk) {
 		Player p = user.getBukkitEntity();
 		Location loc = p.getLocation();
 		this.setBlock(loc.subtract(0, 1, 0));
@@ -31,8 +30,8 @@ public class ListenerCapsule extends BasicPerkListener {
 		this.setBlock2(loc.add(0, 1, 0));
 		this.setBlock2(loc.add(0, 0, 2));
 		this.setBlock2(loc.subtract(0, 1, 0));
-		p.teleport(
-				p.getLocation().getBlock().getLocation().add(.5, .25, .5).setDirection(p.getLocation().getDirection()));
+		p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5)
+				.setDirection(p.getLocation().getDirection()));
 		return true;
 	}
 

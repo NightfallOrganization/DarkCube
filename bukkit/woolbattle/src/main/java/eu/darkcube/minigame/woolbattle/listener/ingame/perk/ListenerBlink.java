@@ -18,7 +18,7 @@ public class ListenerBlink extends BasicPerkListener {
 	}
 
 	@Override
-	protected boolean activate(User user, Perk perk) {
+	protected boolean activateRight(User user, Perk perk) {
 		return ListenerBlink.teleport(user);
 	}
 

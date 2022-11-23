@@ -155,7 +155,7 @@ public class Ingame extends GamePhase {
 
 	public final ListenerGhost listenerGhost;
 
-	public final ListenerMinigunInteract listenerMinigunInteract;
+	public final ListenerMinigun listenerMinigunInteract;
 
 	public final ListenerDeathMove listenerDeathMove;
 
@@ -231,7 +231,7 @@ public class Ingame extends GamePhase {
 		this.listenerWallGeneratorInteract = new ListenerWallGeneratorInteract();
 		this.listenerGrandpasClockInteract = new ListenerGrandpasClock();
 		this.listenerGhost = new ListenerGhost();
-		this.listenerMinigunInteract = new ListenerMinigunInteract();
+		this.listenerMinigunInteract = new ListenerMinigun();
 		this.listenerDeathMove = new ListenerDeathMove();
 		this.listenerGrabberInteract = new ListenerGrabber();
 		this.listenerBoosterInteract = new ListenerBooster();

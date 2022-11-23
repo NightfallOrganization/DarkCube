@@ -39,7 +39,7 @@ public class ListenerGhost extends BasicPerkListener {
 	}
 
 	@Override
-	protected boolean activate(User user, Perk perk) {
+	protected boolean activateRight(User user, Perk perk) {
 		if (isGhost(user)) {
 			return false;
 		}
