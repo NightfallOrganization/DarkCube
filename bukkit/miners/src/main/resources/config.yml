@@ -1,0 +1,5 @@
+teams: 4
+teamSize: 1
+minPlayers: 2
+timerDefault: 60
+timerQuick: 10
