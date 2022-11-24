@@ -1,0 +1,3 @@
+main: eu.darkcube.system.miners.Miners
+version: 0.1
+name: Miners
