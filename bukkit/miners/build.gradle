@@ -1,0 +1,5 @@
+dependencies {
+	compileOnlyApi project(':bukkit:darkcubesystem')
+	compileOnlyApi project(':bukkit:commandapi')
+	compileOnlyApi project(':bukkit:inventoryapi')
+}
