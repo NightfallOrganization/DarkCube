@@ -1,4 +1,4 @@
-package eu.darkcube.system.miners.lobbyphase;
+package eu.darkcube.system.miners.gamephase.lobbyphase;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -11,21 +11,7 @@ public class Lobbyphase {
 	private BukkitRunnable lobbyUpdater;
 	private Timer lobbyTimer;
 
-	private int teams;
-	private int teamSize;
-	private int maxPlayers;
-	private int minPlayers;
-	private int timerDefault;
-	private int timerQuick;
-
 	public Lobbyphase() {
-		teams = Miners.getConfigFile().getInt("teams");
-		teamSize = Miners.getConfigFile().getInt("teamSize");
-		maxPlayers = teams * teamSize;
-		minPlayers = Miners.getConfigFile().getInt("minPlayers");
-		timerDefault = Miners.getConfigFile().getInt("timerDefault");
-		timerQuick = Miners.getConfigFile().getInt("timerQuick");
-
 		if (Miners.getGamephase() != 0)
 			return;
 
@@ -40,6 +26,8 @@ public class Lobbyphase {
 			public void onEnd() {
 				// startNextPhase();
 				System.out.println("init gamephase 1");
+				Miners.getTeamManager().distributeRemainingPlayers();
+				Miners.getTeamManager().fixTeams();
 			}
 		};
 
@@ -49,17 +37,18 @@ public class Lobbyphase {
 			public void run() {
 				int playerCount = Bukkit.getOnlinePlayers().size();
 				if (lobbyTimer.isRunning()) { // if timer is running check if it should stop, continue or quick start
-					if (playerCount < minPlayers)
+					if (playerCount < Miners.getMinersConfig().MIN_PLAYERS)
 						lobbyTimer.cancel(false);
-					else if (playerCount == maxPlayers && lobbyTimer.getTimeRemaining() > timerQuick * 1000)
-						lobbyTimer.setEndTime(System.currentTimeMillis() + timerQuick * 1000);
+					else if (playerCount == Miners.getMinersConfig().MAX_PLAYERS
+							&& lobbyTimer.getTimeRemaining() > Miners.getMinersConfig().TIMER_QUICK * 1000)
+						lobbyTimer.setEndTime(System.currentTimeMillis() + Miners.getMinersConfig().TIMER_QUICK * 1000);
 				} else { // if timer is not running check if it should start or quick start
-					if (playerCount >= minPlayers)
-						lobbyTimer.start(timerDefault * 1000);
+					if (playerCount >= Miners.getMinersConfig().MIN_PLAYERS)
+						lobbyTimer.start(Miners.getMinersConfig().TIMER_DEFAULT * 1000);
 					else
 						resetXpBar();
-					if (playerCount == maxPlayers)
-						lobbyTimer.setEndTime(System.currentTimeMillis() + timerQuick * 1000);
+					if (playerCount == Miners.getMinersConfig().MAX_PLAYERS)
+						lobbyTimer.setEndTime(System.currentTimeMillis() + Miners.getMinersConfig().TIMER_QUICK * 1000);
 				}
 			}
 		};
@@ -91,7 +80,7 @@ public class Lobbyphase {
 	public void resetXpBar() {
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			p.setExp(1);
-			p.setLevel(timerDefault);
+			p.setLevel(Miners.getMinersConfig().TIMER_DEFAULT);
 		});
 	}
 

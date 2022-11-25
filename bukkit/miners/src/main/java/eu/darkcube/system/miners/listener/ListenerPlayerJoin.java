@@ -1,4 +1,4 @@
-package eu.darkcube.system.miners.lobbyphase.listener;
+package eu.darkcube.system.miners.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,8 +10,7 @@ public class ListenerPlayerJoin implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		if (Miners.getGamephase() != 0)
-			return;
+		Miners.getPlayerManager().addPlayer(e.getPlayer());
 	}
 
 }
