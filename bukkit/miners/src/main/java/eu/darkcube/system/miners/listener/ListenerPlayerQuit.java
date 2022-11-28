@@ -16,6 +16,8 @@ public class ListenerPlayerQuit implements Listener {
 		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		e.setQuitMessage(null);
 		Miners.getPlayerManager().removePlayer(e.getPlayer());
+		e.setQuitMessage(null);
+		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		switch (Miners.getGamephase()) {
 		case 0:
 			if (Miners.getLobbyPhase().getTimer().isRunning()) {
@@ -34,6 +36,8 @@ public class ListenerPlayerQuit implements Listener {
 		if (Miners.getGamephase() != 3)
 			Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		Miners.getPlayerManager().removePlayer(e.getPlayer());
+		e.setLeaveMessage(null);
+		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		switch (Miners.getGamephase()) {
 		case 0:
 			if (Miners.getLobbyPhase().getTimer().isRunning()) {
