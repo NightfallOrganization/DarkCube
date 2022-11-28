@@ -40,15 +40,17 @@ public class Lobbyphase {
 					if (playerCount < Miners.getMinersConfig().MIN_PLAYERS)
 						lobbyTimer.cancel(false);
 					else if (playerCount == Miners.getMinersConfig().MAX_PLAYERS
-							&& lobbyTimer.getTimeRemaining() > Miners.getMinersConfig().TIMER_QUICK * 1000)
-						lobbyTimer.setEndTime(System.currentTimeMillis() + Miners.getMinersConfig().TIMER_QUICK * 1000);
+							&& lobbyTimer.getTimeRemaining() > Miners.getMinersConfig().LOBBY_TIMER_QUICK * 1000)
+						lobbyTimer.setEndTime(
+								System.currentTimeMillis() + Miners.getMinersConfig().LOBBY_TIMER_QUICK * 1000);
 				} else { // if timer is not running check if it should start or quick start
 					if (playerCount >= Miners.getMinersConfig().MIN_PLAYERS)
-						lobbyTimer.start(Miners.getMinersConfig().TIMER_DEFAULT * 1000);
+						lobbyTimer.start(Miners.getMinersConfig().LOBBY_TIMER_DEFAULT * 1000);
 					else
 						resetXpBar();
 					if (playerCount == Miners.getMinersConfig().MAX_PLAYERS)
-						lobbyTimer.setEndTime(System.currentTimeMillis() + Miners.getMinersConfig().TIMER_QUICK * 1000);
+						lobbyTimer.setEndTime(
+								System.currentTimeMillis() + Miners.getMinersConfig().LOBBY_TIMER_QUICK * 1000);
 				}
 			}
 		};
@@ -80,7 +82,7 @@ public class Lobbyphase {
 	public void resetXpBar() {
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			p.setExp(1);
-			p.setLevel(Miners.getMinersConfig().TIMER_DEFAULT);
+			p.setLevel(Miners.getMinersConfig().LOBBY_TIMER_DEFAULT);
 		});
 	}
 

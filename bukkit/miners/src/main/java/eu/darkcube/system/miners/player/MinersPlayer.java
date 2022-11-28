@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 
+import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.miners.Miners;
 
 public class MinersPlayer {
@@ -45,6 +46,10 @@ public class MinersPlayer {
 
 	public Team getScoreboardTeam() {
 		return scoreboardTeam;
+	}
+
+	public Language getLanguage() {
+		return Language.ENGLISH;
 	}
 
 }

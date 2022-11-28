@@ -7,12 +7,15 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.miners.player.Message;
 
 public class ListenerPlayerQuit implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		Miners.getPlayerManager().removePlayer(e.getPlayer());
+		e.setQuitMessage(null);
+		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		switch (Miners.getGamephase()) {
 		case 0:
 			if (Miners.getLobbyPhase().getTimer().isRunning()) {
@@ -28,6 +31,8 @@ public class ListenerPlayerQuit implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerKickEvent e) {
 		Miners.getPlayerManager().removePlayer(e.getPlayer());
+		e.setLeaveMessage(null);
+		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		switch (Miners.getGamephase()) {
 		case 0:
 			if (Miners.getLobbyPhase().getTimer().isRunning()) {

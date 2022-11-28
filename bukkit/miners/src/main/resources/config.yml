@@ -1,5 +1,9 @@
 teamCount: 4
 teamSize: 1
 minPlayers: 2
-timerDefault: 60
-timerQuick: 10
+
+lobby:
+  timerDefault: 60
+  timerQuick: 10
+mining:
+  duration: 300

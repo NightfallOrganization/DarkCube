@@ -1,5 +1,6 @@
 package eu.darkcube.system.miners;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
@@ -8,12 +9,14 @@ import org.bukkit.event.Listener;
 
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.miners.command.CommandTest;
 import eu.darkcube.system.miners.command.CommandTimer;
 import eu.darkcube.system.miners.gamephase.lobbyphase.Lobbyphase;
 import eu.darkcube.system.miners.listener.ListenerPlayerJoin;
 import eu.darkcube.system.miners.listener.ListenerPlayerLogin;
 import eu.darkcube.system.miners.listener.ListenerPlayerQuit;
+import eu.darkcube.system.miners.player.Message;
 import eu.darkcube.system.miners.player.PlayerManager;
 import eu.darkcube.system.miners.player.TeamManager;
 
@@ -39,6 +42,13 @@ public class Miners extends DarkCubePlugin {
 		this.saveDefaultConfig("config");
 		this.createConfig("config");
 		minersConfig = new MinersConfig();
+
+		try {
+			Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties", Message.KEY_MODFIIER);
+			Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties", Message.KEY_MODFIIER);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
@@ -57,7 +67,8 @@ public class Miners extends DarkCubePlugin {
 
 	@Override
 	public void onDisable() {
-		Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer("§cServer Stoppt"));
+		Bukkit.getOnlinePlayers()
+				.forEach(p -> p.kickPlayer(Message.SERVER_STOP.getMessage(playerManager.getMinersPlayer(p))));
 	}
 
 	public static Miners getInstance() {
@@ -101,4 +112,13 @@ public class Miners extends DarkCubePlugin {
 		return result;
 	}
 
+	public static void sendTranslatedMessage(Player player, Message message, Object... replacements) {
+		player.sendMessage(message.getMessage(player, replacements));
+	}
+
+	public static void sendTranslatedMessageAll(Message message, Object... replacements) {
+		Bukkit.getOnlinePlayers().forEach(p -> sendTranslatedMessage(p, message, replacements));
+		getInstance().sendConsole(message.getServerMessage(replacements));
+	}
+	
 }

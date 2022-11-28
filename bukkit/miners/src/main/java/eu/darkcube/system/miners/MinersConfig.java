@@ -8,8 +8,11 @@ public class MinersConfig {
 	public final int TEAM_SIZE;
 	public final int MAX_PLAYERS;
 	public final int MIN_PLAYERS;
-	public final int TIMER_DEFAULT;
-	public final int TIMER_QUICK;
+
+	public final int LOBBY_TIMER_DEFAULT;
+	public final int LOBBY_TIMER_QUICK;
+
+	public final int MINING_PHASE_DURATION;
 
 	public final YamlConfiguration CONFIG;
 
@@ -19,8 +22,11 @@ public class MinersConfig {
 		TEAM_SIZE = CONFIG.getInt("teamSize");
 		MAX_PLAYERS = TEAM_COUNT * TEAM_SIZE;
 		MIN_PLAYERS = CONFIG.getInt("minPlayers");
-		TIMER_DEFAULT = CONFIG.getInt("timerDefault");
-		TIMER_QUICK = CONFIG.getInt("timerQuick");
+
+		LOBBY_TIMER_DEFAULT = CONFIG.getInt("lobby.timerDefault");
+		LOBBY_TIMER_QUICK = CONFIG.getInt("lobby.timerQuick");
+
+		MINING_PHASE_DURATION = CONFIG.getInt("mining.duration");
 	}
 
 }
