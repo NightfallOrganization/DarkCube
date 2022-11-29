@@ -69,6 +69,13 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 		return false;
 	}
 
+	/**
+	 * Called when any of the activate methods return true. Default implementation is paying wool
+	 * and starting cooldown
+	 * 
+	 * @param user
+	 * @param perk
+	 */
 	protected void activated(User user, Perk perk) {
 		payForThePerk(user, perkType);
 		startCooldown(user, perkType);

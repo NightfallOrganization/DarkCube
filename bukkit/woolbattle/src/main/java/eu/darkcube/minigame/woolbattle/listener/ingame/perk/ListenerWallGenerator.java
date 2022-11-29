@@ -1,85 +1,31 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
-public class ListenerWallGeneratorInteract extends Listener<PlayerInteractEvent> {
+public class ListenerWallGenerator extends BasicPerkListener {
 
-	public static final Item WALL = PerkType.WALL_GENERATOR.getItem();
-	public static final Item WALL_COOLDOWN = PerkType.WALL_GENERATOR.getCooldownItem();
+	public ListenerWallGenerator() {
+		super(PerkType.WALL_GENERATOR);
+	}
 
-	private static final int[][] ids = {
-			{
-					-2, -1, 0, 1, 2
-			}, {
-					-2, -1, 0, 1, 2
-			}, {
-					-2, -1, 0, 1, 2
-			},
-			{
-					-2, -1, 0, 1, 2
-			}
-	};
-
-	public Map<User, WallBlockPlacerScheduler> placeTasks = new HashMap<>();
+	private static final int[][] ids =
+			{{-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}};
 
 	@Override
-	@EventHandler
-	public void handle(PlayerInteractEvent e) {
-		if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Player p = e.getPlayer();
-			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
-			ItemStack item = e.getItem();
-			if (item == null) {
-				return;
-			}
-			String itemid = ItemManager.getItemId(item);
-			Perk perk = user.getPerkByItemId(itemid);
-			if (perk == null) {
-				return;
-			}
-			if (WALL_COOLDOWN.getItemId().equals(itemid)) {
-				deny(user, perk);
-				e.setCancelled(true);
-				return;
-			} else if (!WALL.getItemId().equals(itemid)) {
-				return;
-			}
-			e.setCancelled(true);
-			if (perk.getCooldown() > 0
-					|| !p.getInventory().contains(Material.WOOL, PerkType.WALL_GENERATOR.getCost())) {
-				deny(user, perk);
-				return;
-			}
-
-			if (placeTasks.get(user) != null) {
-				deny(user, perk);
-				return;
-			}
-
-			placeTasks.put(user, new WallBlockPlacerScheduler(perk));
-			placeTasks.get(user).runTaskTimer(1);
-
-		}
+	protected boolean activateRight(User user, Perk perk) {
+		new WallBlockPlacerScheduler(perk).runTaskTimer(1);
+		return true;
 	}
 
 	private class WallBlockPlacerScheduler extends Scheduler {
@@ -129,7 +75,6 @@ public class ListenerWallGeneratorInteract extends Listener<PlayerInteractEvent>
 			Location loc2 = loc.clone();
 			loc2.setDirection(normal.clone()).setYaw(loc2.getYaw() + 90);
 			Vector vec = loc2.getDirection().normalize();
-//			loc.add(vec.multiply(ids[id0][id1]));
 			loc = add(loc, vec.multiply(ids[id0][id1]));
 			loc.add(0, id0 - 1, 0);
 
@@ -137,29 +82,21 @@ public class ListenerWallGeneratorInteract extends Listener<PlayerInteractEvent>
 		}
 
 		private Location add(Location loc, Vector vec) {
-//			for (int i = 0; i < blockCount; i++) {
-//				loc = loc.getBlock().getLocation().add(vec);
-//			}
-//			if(blockCount < 0) {
-//				vec = vec.clone().multiply(-1);
-//			}
-//			for (int i = 0; i > blockCount; i--) {
-//				loc = loc.getBlock().getLocation().add(vec);
-//			}
 			Vector v2 = vec.clone().normalize();
 			for (int i = 0; i < vec.length(); i++) {
 				loc = loc.getBlock().getLocation().add(.5, 0, .5).add(v2);
 			}
-//			System.out.println(vec.length());
 			return loc;
 		}
 
 		@SuppressWarnings("deprecation")
 		private void setBlock(Location loc, User user) {
 			if (loc.getBlock().getType() == Material.AIR
-					&& !WoolBattle.getInstance().getIngame().breakedWool.containsKey(loc.getBlock())) {
+					&& !WoolBattle.getInstance().getIngame().breakedWool
+							.containsKey(loc.getBlock())) {
 
-				ItemManager.removeItems(perk.getOwner(), perk.getOwner().getBukkitEntity().getInventory(), user.getSingleWoolItem(),
+				ItemManager.removeItems(perk.getOwner(),
+						perk.getOwner().getBukkitEntity().getInventory(), user.getSingleWoolItem(),
 						PerkType.WALL_GENERATOR.getCost());
 
 				loc.getBlock().setType(Material.WOOL);
@@ -178,26 +115,6 @@ public class ListenerWallGeneratorInteract extends Listener<PlayerInteractEvent>
 			Location loc = perk.getOwner().getBukkitEntity().getLocation();
 			loc.add(loc.getDirection().setY(0).normalize().multiply(2));
 			return loc;
-		}
-
-		@Override
-		public void cancel() {
-			super.cancel();
-			new Scheduler() {
-				int cd = perk.getMaxCooldown();
-
-				@Override
-				public void run() {
-					if (cd <= 0) {
-						this.cancel();
-						perk.setCooldown(0);
-						return;
-					}
-					perk.setCooldown(cd--);
-				}
-			}.runTaskTimer(20);
-
-			placeTasks.remove(perk.getOwner());
 		}
 	}
 
