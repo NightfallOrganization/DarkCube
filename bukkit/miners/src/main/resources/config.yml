@@ -7,3 +7,20 @@ lobby:
   timerQuick: 10
 mining:
   duration: 300
+  
+generation:
+  veins: '[
+            "{\"count\":\"50\",\"minSize\":\"5\",\"maxSize\":\"14\",\"type\":\"IRON_ORE\"}",
+            "{\"count\":\"25\",\"minSize\":\"3\",\"maxSize\":\"10\",\"type\":\"GOLD_ORE\"}"
+            "{\"count\":\"16\",\"minSize\":\"2\",\"maxSize\":\"5\",\"type\":\"DIAMOND_ORE\"}",
+            
+            "{\"count\":\"25\",\"minSize\":\"2\",\"maxSize\":\"5\",\"type\":\"EMERALD_ORE\"}",
+            "{\"count\":\"16\",\"minSize\":\"1\",\"maxSize\":\"1\",\"type\":\"REDSTONE_ORE\"}"
+            "{\"count\":\"25\",\"minSize\":\"1\",\"maxSize\":\"1\",\"type\":\"TNT\"}"
+            
+            "{\"count\":\"10\",\"minSize\":\"1\",\"maxSize\":\"3\",\"type\":\"IRON_BLOCK\"}",
+            "{\"count\":\"8\",\"minSize\":\"1\",\"maxSize\":\"2\",\"type\":\"GOLD_BLOCK\"}",
+            "{\"count\":\"5\",\"minSize\":\"1\",\"maxSize\":\"1\",\"type\":\"DIAMOND_BLOCK\"}"
+          ]'
+  chests: 
+    count: 25

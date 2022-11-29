@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
 import eu.darkcube.system.miners.util.Timer;
 
 public class Lobbyphase {
@@ -24,10 +25,9 @@ public class Lobbyphase {
 
 			@Override
 			public void onEnd() {
-				// startNextPhase();
-				System.out.println("init gamephase 1");
 				Miners.getTeamManager().distributeRemainingPlayers();
 				Miners.getTeamManager().fixTeams();
+				startNextPhase();
 			}
 		};
 
@@ -64,7 +64,11 @@ public class Lobbyphase {
 	public void startNextPhase() {
 		if (Miners.getGamephase() != 0)
 			return;
+		lobbyTimer.cancel(false);
 		lobbyUpdater.cancel();
+		Bukkit.getOnlinePlayers().forEach(p -> {
+			p.teleport(Miningphase.getSpawn(Miners.getTeamManager().getPlayerTeam(p)));
+		});
 	}
 
 	public void updateXpBar() {

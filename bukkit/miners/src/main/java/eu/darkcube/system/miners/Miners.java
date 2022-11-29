@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -13,6 +14,7 @@ import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.miners.command.CommandTest;
 import eu.darkcube.system.miners.command.CommandTimer;
 import eu.darkcube.system.miners.gamephase.lobbyphase.Lobbyphase;
+import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
 import eu.darkcube.system.miners.listener.ListenerPlayerJoin;
 import eu.darkcube.system.miners.listener.ListenerPlayerLogin;
 import eu.darkcube.system.miners.listener.ListenerPlayerQuit;
@@ -30,8 +32,11 @@ public class Miners extends DarkCubePlugin {
 	private static TeamManager teamManager;
 
 	private static Lobbyphase gamephaseLobby;
+	private static Miningphase gamephaseMining;
 
 	private static MinersConfig minersConfig;
+
+	public static final String MINING_WORLD_NAME = "MinersCubes";
 
 	public Miners() {
 		instance = this;
@@ -56,13 +61,16 @@ public class Miners extends DarkCubePlugin {
 		playerManager = new PlayerManager();
 		teamManager = new TeamManager();
 
-		gamephaseLobby = new Lobbyphase();
-
 		CommandAPI api = CommandAPI.getInstance();
 		api.register(new CommandTest());
 		api.register(new CommandTimer());
 
 		registerListeners(new ListenerPlayerQuit(), new ListenerPlayerLogin(), new ListenerPlayerJoin());
+
+		Bukkit.createWorld(new WorldCreator(MINING_WORLD_NAME));
+
+		gamephaseLobby = new Lobbyphase();
+		gamephaseMining = new Miningphase();
 	}
 
 	@Override
@@ -95,6 +103,10 @@ public class Miners extends DarkCubePlugin {
 		return gamephaseLobby;
 	}
 
+	public static Miningphase getMiningPhase() {
+		return gamephaseMining;
+	}
+
 	public static void initGamephaseMining() {
 		if (gamephase != 0)
 			return;
@@ -120,5 +132,9 @@ public class Miners extends DarkCubePlugin {
 		Bukkit.getOnlinePlayers().forEach(p -> sendTranslatedMessage(p, message, replacements));
 		getInstance().sendConsole(message.getServerMessage(replacements));
 	}
-	
+
+	public static void log(Object o) {
+		System.out.println("[Miners] " + o.toString());
+	}
+
 }

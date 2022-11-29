@@ -13,9 +13,9 @@ public class ListenerPlayerQuit implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
-		Miners.getPlayerManager().removePlayer(e.getPlayer());
-		e.setQuitMessage(null);
 		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
+		e.setQuitMessage(null);
+		Miners.getPlayerManager().removePlayer(e.getPlayer());
 		switch (Miners.getGamephase()) {
 		case 0:
 			if (Miners.getLobbyPhase().getTimer().isRunning()) {
@@ -30,9 +30,9 @@ public class ListenerPlayerQuit implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerKickEvent e) {
-		Miners.getPlayerManager().removePlayer(e.getPlayer());
 		e.setLeaveMessage(null);
 		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
+		Miners.getPlayerManager().removePlayer(e.getPlayer());
 		switch (Miners.getGamephase()) {
 		case 0:
 			if (Miners.getLobbyPhase().getTimer().isRunning()) {
