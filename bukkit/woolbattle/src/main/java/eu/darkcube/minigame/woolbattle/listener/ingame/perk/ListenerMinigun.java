@@ -13,8 +13,6 @@ import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListen
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerMinigun extends BasicPerkListener {
@@ -23,14 +21,14 @@ public class ListenerMinigun extends BasicPerkListener {
 		super(PerkType.MINIGUN);
 	}
 
-	public static final Item MINIGUN = PerkType.MINIGUN.getItem();
-	public static final Item MINIGUN_COOLDOWN = PerkType.MINIGUN.getCooldownItem();
-
-	private static final String METADATA_SCHEDULER = "minigunScheduler";
+	private static final String DATA_SCHEDULER = "minigunScheduler";
 
 	@Override
 	protected boolean activateRight(User user, Perk perk) {
-		user.getTemporaryDataStorage().set(METADATA_SCHEDULER, new Scheduler() {
+		if (user.getTemporaryDataStorage().has(DATA_SCHEDULER)) {
+			return false;
+		}
+		user.getTemporaryDataStorage().set(DATA_SCHEDULER, new Scheduler() {
 			private int count = 0;
 			{
 				runTaskTimer(3);
@@ -40,9 +38,7 @@ public class ListenerMinigun extends BasicPerkListener {
 			public void run() {
 				Player p = user.getBukkitEntity();
 				ItemStack item = p.getItemInHand();
-				if (count >= 20 || item == null
-						|| !MINIGUN.getItemId().equals(ItemManager.getItemId(item))
-						|| !checkUsable(perk)) {
+				if (count >= 20 || item == null || !checkUsable(user, getPerkType(), item)) {
 					stop(user);
 					return;
 				}
@@ -75,8 +71,8 @@ public class ListenerMinigun extends BasicPerkListener {
 	}
 
 	private void stop(User user) {
-		if (user.getTemporaryDataStorage().has(METADATA_SCHEDULER)) {
-			user.getTemporaryDataStorage().<Scheduler>remove(METADATA_SCHEDULER).cancel();
+		if (user.getTemporaryDataStorage().has(DATA_SCHEDULER)) {
+			user.getTemporaryDataStorage().<Scheduler>remove(DATA_SCHEDULER).cancel();
 		}
 	}
 }

@@ -184,9 +184,8 @@ class DefaultUser implements User {
 	}
 
 	private boolean hasPerk(PerkName perk) {
-		return getData().getPerks().getActivePerk1().equals(perk)
-				|| getData().getPerks().getActivePerk2().equals(perk)
-				|| getData().getPerks().getPassivePerk().equals(perk);
+		return activePerk1.getPerkName().equals(perk) || activePerk2.getPerkName().equals(perk)
+				|| passivePerk.getPerkName().equals(perk);
 	}
 
 	@Override

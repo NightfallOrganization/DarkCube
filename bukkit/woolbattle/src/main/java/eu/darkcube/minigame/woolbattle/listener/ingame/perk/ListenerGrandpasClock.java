@@ -14,21 +14,21 @@ public class ListenerGrandpasClock extends BasicPerkListener {
 		super(PerkType.GRANDPAS_CLOCK);
 	}
 
-	private static final String METADATA_OLDPOS = "grandpasClockOldPos";
-	private static final String METADATA_TICKER = "grandpasClockTicker";
+	private static final String DATA_OLDPOS = "grandpasClockOldPos";
+	private static final String DATA_TICKER = "grandpasClockTicker";
 
 	@Override
 	protected boolean activate(User user, Perk perk) {
-		if (user.getTemporaryDataStorage().has(METADATA_OLDPOS)) {
+		if (user.getTemporaryDataStorage().has(DATA_OLDPOS)) {
 			user.getBukkitEntity()
-					.teleport(user.getTemporaryDataStorage().<Location>remove(METADATA_OLDPOS));
-			user.getTemporaryDataStorage().<Scheduler>remove(METADATA_TICKER).cancel();
+					.teleport(user.getTemporaryDataStorage().<Location>remove(DATA_OLDPOS));
+			user.getTemporaryDataStorage().<Scheduler>remove(DATA_TICKER).cancel();
 			user.getBukkitEntity().playSound(user.getBukkitEntity().getBedSpawnLocation(),
 					Sound.ENDERMAN_TELEPORT, 100, 1);
 			return true;
 		}
-		user.getTemporaryDataStorage().set(METADATA_OLDPOS, user.getBukkitEntity().getLocation());
-		user.getTemporaryDataStorage().set(METADATA_TICKER, new Scheduler() {
+		user.getTemporaryDataStorage().set(DATA_OLDPOS, user.getBukkitEntity().getLocation());
+		user.getTemporaryDataStorage().set(DATA_TICKER, new Scheduler() {
 			{
 				runTaskTimer(10);
 			}
@@ -38,9 +38,9 @@ public class ListenerGrandpasClock extends BasicPerkListener {
 			@Override
 			public void run() {
 				if (count++ == 6) {
-					user.getBukkitEntity().teleport(
-							user.getTemporaryDataStorage().<Location>remove(METADATA_OLDPOS));
-					user.getTemporaryDataStorage().remove(METADATA_TICKER);
+					user.getBukkitEntity()
+							.teleport(user.getTemporaryDataStorage().<Location>remove(DATA_OLDPOS));
+					user.getTemporaryDataStorage().remove(DATA_TICKER);
 					user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(),
 							Sound.ENDERMAN_TELEPORT, 1, 1);
 					cancel();

@@ -17,7 +17,7 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerLineBuilder extends BasicPerkListener {
 
-	private static final String METADATA_SCHEDULER = "linebuilderScheduler";
+	private static final String DATA_SCHEDULER = "linebuilderScheduler";
 
 	public ListenerLineBuilder() {
 		super(PerkType.LINE_BUILDER);
@@ -25,17 +25,17 @@ public class ListenerLineBuilder extends BasicPerkListener {
 
 	@Override
 	protected boolean activateRight(User user, Perk perk) {
-		if (!user.getTemporaryDataStorage().has(METADATA_SCHEDULER)) {
-			user.getTemporaryDataStorage().set(METADATA_SCHEDULER, new TheScheduler(perk));
+		if (!user.getTemporaryDataStorage().has(DATA_SCHEDULER)) {
+			user.getTemporaryDataStorage().set(DATA_SCHEDULER, new TheScheduler(perk));
 		}
-		TheScheduler s = user.getTemporaryDataStorage().<TheScheduler>get(METADATA_SCHEDULER);
+		TheScheduler s = user.getTemporaryDataStorage().<TheScheduler>get(DATA_SCHEDULER);
 		s.lastLine = s.tick;
 		return false;
 	}
 
 	@Override
 	protected boolean activateLeft(User user, Perk perk) {
-		user.getTemporaryDataStorage().remove(METADATA_SCHEDULER);
+		user.getTemporaryDataStorage().remove(DATA_SCHEDULER);
 		return false;
 	}
 
@@ -60,7 +60,7 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				cooldownTicks--;
 			} else {
 				if (tick - lastLine > 5) {
-					user.getTemporaryDataStorage().remove(METADATA_SCHEDULER);
+					user.getTemporaryDataStorage().remove(DATA_SCHEDULER);
 					cancel();
 					return;
 				}
@@ -71,7 +71,7 @@ public class ListenerLineBuilder extends BasicPerkListener {
 			}
 			if (cooldownTicks > TimeUnit.SECOND.toUnit(TimeUnit.TICKS) * perk.getMaxCooldown()) {
 				startCooldown(perk);
-				user.getTemporaryDataStorage().remove(METADATA_SCHEDULER);
+				user.getTemporaryDataStorage().remove(DATA_SCHEDULER);
 				cancel();
 				return;
 			}

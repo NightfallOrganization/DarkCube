@@ -20,4 +20,12 @@ public enum TimeUnit {
 	public long toMillis() {
 		return this.millis;
 	}
+
+	public long toTicks() {
+		return millis / TICKS.millis;
+	}
+
+	public long toTicks(double number) {
+		return Math.round((number * (millis / TICKS.millis)));
+	}
 }
