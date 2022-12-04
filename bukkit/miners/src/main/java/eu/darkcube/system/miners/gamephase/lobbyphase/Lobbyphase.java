@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.system.miners.Miners;
-import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
 import eu.darkcube.system.miners.util.Timer;
 
 public class Lobbyphase {
@@ -27,7 +26,7 @@ public class Lobbyphase {
 			public void onEnd() {
 				Miners.getTeamManager().distributeRemainingPlayers();
 				Miners.getTeamManager().fixTeams();
-				startNextPhase();
+				Miners.nextGamephase();
 			}
 		};
 
@@ -40,7 +39,7 @@ public class Lobbyphase {
 					if (playerCount < Miners.getMinersConfig().MIN_PLAYERS)
 						lobbyTimer.cancel(false);
 					else if (playerCount == Miners.getMinersConfig().MAX_PLAYERS
-							&& lobbyTimer.getTimeRemaining() > Miners.getMinersConfig().LOBBY_TIMER_QUICK * 1000)
+							&& lobbyTimer.getTimeRemainingMillis() > Miners.getMinersConfig().LOBBY_TIMER_QUICK * 1000)
 						lobbyTimer.setEndTime(
 								System.currentTimeMillis() + Miners.getMinersConfig().LOBBY_TIMER_QUICK * 1000);
 				} else { // if timer is not running check if it should start or quick start
@@ -57,25 +56,23 @@ public class Lobbyphase {
 		lobbyUpdater.runTaskTimer(Miners.getInstance(), 20, 20);
 	}
 
+	public void disable() {
+		lobbyTimer.cancel(false);
+		if (lobbyUpdater != null) {
+			lobbyUpdater.cancel();
+			lobbyUpdater = null;
+		}
+	}
+
 	public Timer getTimer() {
 		return lobbyTimer;
 	}
 
-	public void startNextPhase() {
-		if (Miners.getGamephase() != 0)
-			return;
-		lobbyTimer.cancel(false);
-		lobbyUpdater.cancel();
-		Bukkit.getOnlinePlayers().forEach(p -> {
-			p.teleport(Miningphase.getSpawn(Miners.getTeamManager().getPlayerTeam(p)));
-		});
-	}
-
 	public void updateXpBar() {
 		float totalTime = lobbyTimer.getOriginalEndTime() - lobbyTimer.getStartTime();
-		float div = lobbyTimer.getTimeRemaining() / totalTime;
+		float div = lobbyTimer.getTimeRemainingMillis() / totalTime;
 
-		int remainingSeconds = (int) Math.ceil(lobbyTimer.getTimeRemaining() / 1000);
+		int remainingSeconds = (int) Math.ceil(lobbyTimer.getTimeRemainingMillis() / 1000);
 
 		Bukkit.getOnlinePlayers().forEach(p -> {
 			p.setExp(div);

@@ -13,6 +13,7 @@ public class MinersConfig {
 	public final int LOBBY_TIMER_QUICK;
 
 	public final int MINING_PHASE_DURATION;
+	public final int PVP_PHASE_DURATION;
 
 	public final YamlConfiguration CONFIG;
 
@@ -27,6 +28,7 @@ public class MinersConfig {
 		LOBBY_TIMER_QUICK = CONFIG.getInt("lobby.timerQuick");
 
 		MINING_PHASE_DURATION = CONFIG.getInt("mining.duration");
+		PVP_PHASE_DURATION = CONFIG.getInt("pvp.duration");
 	}
 
 }

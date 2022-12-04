@@ -9,12 +9,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.miners.items.Item;
+import eu.darkcube.system.miners.player.Message;
 import eu.darkcube.system.miners.util.Timer;
 
 public class Miningphase {
@@ -30,7 +34,7 @@ public class Miningphase {
 
 	public Miningphase() {
 		MINING_WORLD = Bukkit.getWorld(Miners.MINING_WORLD_NAME);
-		
+
 		for (Map<String, String> map : readVeinConfig()) {
 			if (map.containsKey("type") && map.containsKey("count")) {
 				generateVeinsFromMap(map);
@@ -38,19 +42,56 @@ public class Miningphase {
 		}
 
 		miningTimer = new Timer() {
+			private int[] notifications = { 240, 180, 120, 60, 30, 10, 5, 4, 3, 2, 1 };
+			private int nextNotification = 0;
 
 			@Override
 			public void onIncrement() {
+				int remainingSeconds = (int) Math.ceil(getTimeRemainingMillis() / 1000);
+				if (nextNotification < notifications.length && remainingSeconds == notifications[nextNotification]) {
+					sendTimeRemaining(notifications[nextNotification]);
+					nextNotification++;
+				}
 			}
 
 			@Override
 			public void onEnd() {
-				// startNextPhase();
-				System.out.println("init gamephase 2");
+				Miners.nextGamephase();
+			}
+
+			private void sendTimeRemaining(int secs) {
+				if (secs > 60) {
+					int mins = secs / 60;
+					Bukkit.getOnlinePlayers().forEach(
+							p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, mins, Message.TIME_MINUTES));
+				} else {
+					Bukkit.getOnlinePlayers().forEach(
+							p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, secs, Message.TIME_SECONDS));
+				}
 			}
 		};
+	}
+
+	public void enable() {
 		miningTimer.start(Miners.getMinersConfig().MINING_PHASE_DURATION * 1000);
 
+		Bukkit.getOnlinePlayers().forEach(p -> {
+			p.getInventory().addItem(Item.PICKAXE_DEFAULT.getItem(p));
+			p.getInventory().addItem(Item.COBBLESTONE.getItem(p));
+			p.getInventory().addItem(Item.CRAFTING_TABLE.getItem(p));
+			p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 0, false, false));
+			p.teleport(Miningphase.getSpawn(Miners.getTeamManager().getPlayerTeam(p)));
+		});
+
+		Miners.getTeamManager().getPlayersWithoutTeam().forEach(p -> p.setAllowFlight(true));
+	}
+
+	public void disable() {
+		miningTimer.cancel(false);
+	}
+
+	public Timer getTimer() {
+		return miningTimer;
 	}
 
 	/**

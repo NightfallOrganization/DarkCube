@@ -16,7 +16,7 @@ public abstract class Timer {
 
 	public abstract void onEnd();
 
-	public boolean start(long millis) {
+	public final boolean start(long millis) {
 		if (runnable != null)
 			return false;
 		this.startTime = System.currentTimeMillis();
@@ -38,7 +38,7 @@ public abstract class Timer {
 		return true;
 	}
 
-	public boolean setEndTime(long time) {
+	public final boolean setEndTime(long time) {
 		if (runnable == null)
 			return false;
 		endTime = time;
@@ -47,7 +47,7 @@ public abstract class Timer {
 		return true;
 	}
 
-	public boolean cancel(boolean end) {
+	public final boolean cancel(boolean end) {
 		if (runnable == null)
 			return false;
 		runnable.cancel();
@@ -57,23 +57,23 @@ public abstract class Timer {
 		return true;
 	}
 
-	public long getStartTime() {
+	public final long getStartTime() {
 		return startTime;
 	}
 
-	public long getEndTime() {
+	public final long getEndTime() {
 		return endTime;
 	}
 
-	public long getOriginalEndTime() {
+	public final long getOriginalEndTime() {
 		return originalEndTime;
 	}
 
-	public boolean isRunning() {
+	public final boolean isRunning() {
 		return runnable != null;
 	}
 
-	public long getTimeRemaining() {
+	public final long getTimeRemainingMillis() {
 		return endTime - System.currentTimeMillis();
 	}
 

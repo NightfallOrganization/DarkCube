@@ -27,10 +27,9 @@ import eu.darkcube.system.inventory.api.util.ItemBuilder;
 public class CommandSpawner extends Command implements Listener {
 
 	public CommandSpawner() {
-		super(Main.getInstance(), "spawner", new Command[0], "Gibt dir einen Monsterspawner", new Argument[] {
-				new Argument("Entity", "Das zu Spawnende Entity"),
-				new Argument("Spieler", "Der Spieler, der den Spawner bekommen soll.", false)
-		});
+		super(Main.getInstance(), "spawner", new Command[0], "Gibt dir einen Monsterspawner",
+				new Argument[] { new Argument("Entity", "Das zu Spawnende Entity"),
+						new Argument("Spieler", "Der Spieler, der den Spawner bekommen soll.", false) });
 		this.setAliases("d_spawner");
 		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
 	}
@@ -115,11 +114,8 @@ public class CommandSpawner extends Command implements Listener {
 			}
 		}
 		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
-		ItemStack item = new ItemBuilder(Material.MOB_SPAWNER).unsafe()
-				.setString("spawnertype", entity.name())
-				.builder()
-				.displayname(ChatColor.GOLD + entity.name() + ChatColor.GRAY + " Spawner")
-				.build();
+		ItemStack item = new ItemBuilder(Material.MOB_SPAWNER).unsafe().setString("spawnertype", entity.name())
+				.builder().displayname(ChatColor.GOLD + entity.name() + ChatColor.GRAY + " Spawner").build();
 //		ItemStack nmsSpawner = CraftItemStack.asNMSCopy(bukkitSpawner);
 //		NBTTagCompound tag = nmsSpawner.getTag();
 //		if (tag == null)
@@ -133,14 +129,13 @@ public class CommandSpawner extends Command implements Listener {
 		int count = 0;
 		for (Player current : players) {
 			current.getInventory().addItem(item);
-			Main.getInstance()
-					.sendMessage(Main.cConfirm() + "Du hast einen " + Main.cValue() + entity.name() + Main.cConfirm()
-							+ "-Spawner erhalten.", sender);
+			Main.getInstance().sendMessage(Main.cConfirm() + "Du hast einen " + Main.cValue() + entity.name()
+					+ Main.cConfirm() + "-Spawner erhalten.", sender);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
-			Main.getInstance()
-					.sendMessage(Main.cValue() + count + Main.cConfirm() + " Spielern einen Spawner gegeben.", sender);
+			Main.getInstance().sendMessage(Main.cValue() + count + Main.cConfirm() + " Spielern einen Spawner gegeben.",
+					sender);
 		}
 		return true;
 	}
@@ -158,25 +153,27 @@ public class CommandSpawner extends Command implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handle(BlockPlaceEvent e) {
-		if (!e.isCancelled()) {
-			ItemStack itemStack = e.getItemInHand();
-			ItemBuilder b = new ItemBuilder(itemStack);
-			if (b.getMeta() == null) {
-				return;
-			}
-			String type = b.unsafe().getString("spawnertype");
-			if (type == null || type.isEmpty()) {
-				return;
-			}
-			EntityType entity = this.find(type);
-			if (entity == null) {
-				return;
-			}
-			CreatureSpawner spawner = (CreatureSpawner) e.getBlock().getState();
-			spawner.setSpawnedType(entity);
-			spawner.update();
-			spawner.update(true);
+		if (e.isCancelled())
+			return;
+		if (!e.getItemInHand().getType().equals(Material.MOB_SPAWNER))
+			return;
+		ItemStack itemStack = e.getItemInHand();
+		ItemBuilder b = new ItemBuilder(itemStack);
+		if (b.getMeta() == null) {
+			return;
 		}
+		String type = b.unsafe().getString("spawnertype");
+		if (type == null || type.isEmpty()) {
+			return;
+		}
+		EntityType entity = this.find(type);
+		if (entity == null) {
+			return;
+		}
+		CreatureSpawner spawner = (CreatureSpawner) e.getBlock().getState();
+		spawner.setSpawnedType(entity);
+		spawner.update();
+		spawner.update(true);
 	}
 
 	private EntityType find(String type) {

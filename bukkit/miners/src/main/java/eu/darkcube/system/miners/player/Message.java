@@ -11,14 +11,24 @@ import eu.darkcube.system.miners.Miners;
 // copied from woolbattle
 public enum Message {
 
-	SERVER_STOP, TIME_REMAINING, TIME_SECONDS, TIME_MINUTES, PLAYER_JOINED, PLAYER_LEFT, COMMAND_TIMER_CHANGED
+	SERVER_STOP,
+	TIME_REMAINING,
+	TIME_SECONDS,
+	TIME_MINUTES,
+	PLAYER_JOINED,
+	PLAYER_LEFT,
+	PLAYER_DIED,
+	PLAYER_WAS_KILLED,
+	COMMAND_TIMER_CHANGED,
+	FAIL_PLACE_BLOCK,
+	FAIL_PLACE_BLOCK_AT_SPAWN,
+	FAIL_TEAM_FULL,
+	FAIL_GAME_RUNNING
 
 	;
 
 	public static final String KEY_PREFIX = "MINERS_";
 	public static final Function<String, String> KEY_MODFIIER = s -> KEY_PREFIX + s;
-	public static final String ITEM_PREFIX = "ITEM_";
-	public static final String LORE_PREFIX = "LORE_";
 
 	private final String key;
 
@@ -31,6 +41,10 @@ public enum Message {
 	}
 
 	public static final String getMessage(String messageKey, Language language, Object... replacements) {
+		if (replacements.length > 0)
+			for (int i = 0; i < replacements.length; i++)
+				if (replacements[i] instanceof Message)
+					replacements[i] = ((Message) replacements[i]).getMessage(language);
 		return ChatColor.translateAlternateColorCodes('&', language.getMessage(KEY_PREFIX + messageKey, replacements));
 	}
 

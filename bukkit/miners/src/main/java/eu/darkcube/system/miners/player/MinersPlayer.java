@@ -34,14 +34,26 @@ public class MinersPlayer {
 		return player;
 	}
 
-	public void updatePlayerName() {
-		String prefix = Miners.getTeamManager().getPlayerTeam(player) == 0 ? ""
+	public void updatePlayer() {
+		String prefix = Miners.getTeamManager().getPlayerTeam(player) == 0 ? ChatColor.GRAY.toString()
 				: ChatColor.DARK_GRAY + "[" + ChatColor.AQUA + Miners.getTeamManager().getPlayerTeam(player)
 						+ ChatColor.DARK_GRAY + "] " + ChatColor.GRAY;
 
 		scoreboardTeam.setPrefix(prefix);
 		player.setPlayerListName(prefix + player.getName());
 		player.setCustomName(prefix + player.getName());
+
+		if (Miners.getTeamManager().getPlayerTeam(player) == 0) { // hide spectators from non-specs
+			Bukkit.getOnlinePlayers().forEach(p -> {
+				if (Miners.getTeamManager().getPlayerTeam(p) != 0)
+					p.hidePlayer(player);
+			});
+			if (Miners.getGamephase() != 0)
+				player.setAllowFlight(true);
+		} else { // show non-spectators to everyone
+			Bukkit.getOnlinePlayers().forEach(p -> p.showPlayer(player));
+			player.setAllowFlight(false);
+		}
 	}
 
 	public Team getScoreboardTeam() {

@@ -18,15 +18,15 @@ public class TeamManager {
 		TEAMS = new HashMap<>();
 	}
 
-	public void updatePlayerName(Player p) {
-		Miners.getPlayerManager().getMinersPlayer(p).updatePlayerName();
+	public void updatePlayer(Player p) {
+		Miners.getPlayerManager().getMinersPlayer(p).updatePlayer();
 	}
 
 	public boolean setPlayerTeam(Player p, int team, boolean allowOverTeamSize) {
-		if (!isTeamFull(team) || allowOverTeamSize) {
+		if (!isTeamFull(team) || allowOverTeamSize || team == 0) {
 			System.out.println("added player " + p.getName());
 			TEAMS.put(p, team);
-			updatePlayerName(p);
+			updatePlayer(p);
 			return true;
 		}
 		return false;
@@ -34,7 +34,7 @@ public class TeamManager {
 
 	public void removePlayerFromTeam(Player p) {
 		TEAMS.remove(p);
-		updatePlayerName(p);
+		updatePlayer(p);
 	}
 
 	/**
@@ -98,6 +98,8 @@ public class TeamManager {
 	}
 
 	public int getPlayerTeam(Player p) {
+		if (p == null)
+			return 0;
 		if (TEAMS.containsKey(p))
 			return TEAMS.get(p);
 		return 0;
