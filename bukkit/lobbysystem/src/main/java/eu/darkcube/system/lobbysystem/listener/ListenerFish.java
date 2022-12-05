@@ -3,7 +3,6 @@ package eu.darkcube.system.lobbysystem.listener;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -16,16 +15,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
-
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class ListenerFish extends BaseListener {
 	private Collection<UUID> ids = new HashSet<>();
 
 	@EventHandler
 	public void handle(PlayerArmorStandManipulateEvent e) {
-		if (!UserWrapper.getUser(e.getPlayer().getUniqueId()).isBuildMode())
+		if (!UserWrapper.fromUser(UserAPI.getInstance().getUser(e.getPlayer())).isBuildMode())
 			e.setCancelled(true);
 	}
 
@@ -46,6 +45,7 @@ public class ListenerFish extends BaseListener {
 				stand.setRightArmPose(new EulerAngle(0, 0.5, 0));
 				stand.setVisible(false);
 				stand.setSmall(true);
+				stand.setMarker(true);
 				stand.setItemInHand(new ItemStack(Material.RAW_FISH));
 				ids.add(stand.getUniqueId());
 				new BukkitRunnable() {
@@ -55,15 +55,23 @@ public class ListenerFish extends BaseListener {
 
 					@Override
 					public void run() {
+						if (!e.getPlayer().isOnline()) {
+							super.cancel();
+							stand.remove();
+							ids.remove(stand.getUniqueId());
+							return;
+						}
 						p = e.getPlayer().getLocation();
 						s = stand.getEyeLocation();
 						if (stand.getEyeLocation().distance(e.getPlayer().getLocation()) < 2) {
 							cancel();
 							return;
 						}
-//						e.getPlayer().playSound(e.getHook().getLocation(), Sound.ANVIL_LAND, 100, 4);
-						Vector v = new Vector(p.getX() - s.getX(), p.getY() - stand.getLocation().getY(),
-								p.getZ() - s.getZ()).normalize();
+						// e.getPlayer().playSound(e.getHook().getLocation(), Sound.ANVIL_LAND, 100,
+						// 4);
+						Vector v = new Vector(p.getX() - s.getX(),
+								p.getY() - stand.getLocation().getY(), p.getZ() - s.getZ())
+										.normalize();
 						stand.teleport(new Location(s.getWorld(), s.getX() + v.getX() / 100,
 								stand.getLocation().getY() + v.getY(), s.getZ() + v.getZ() / 100));
 						stand.setVelocity(v.multiply(0.3));
@@ -75,7 +83,7 @@ public class ListenerFish extends BaseListener {
 						stand.remove();
 						ids.remove(stand.getUniqueId());
 						super.cancel();
-					};
+					}
 
 				}.runTaskTimer(Lobby.getInstance(), 5, 1);
 			}

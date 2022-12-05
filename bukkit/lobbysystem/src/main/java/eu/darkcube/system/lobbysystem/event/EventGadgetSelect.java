@@ -5,7 +5,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 
 public class EventGadgetSelect extends Event implements Cancellable {
 
@@ -13,9 +13,9 @@ public class EventGadgetSelect extends Event implements Cancellable {
 
 	private Gadget gadget;
 	private boolean cancel;
-	private User user;
+	private LobbyUser user;
 
-	public EventGadgetSelect(User user, Gadget gadget) {
+	public EventGadgetSelect(LobbyUser user, Gadget gadget) {
 		this.user = user;
 		cancel = false;
 		this.gadget = gadget;
@@ -29,7 +29,7 @@ public class EventGadgetSelect extends Event implements Cancellable {
 		this.gadget = gadget;
 	}
 
-	public User getUser() {
+	public LobbyUser getUser() {
 		return user;
 	}
 

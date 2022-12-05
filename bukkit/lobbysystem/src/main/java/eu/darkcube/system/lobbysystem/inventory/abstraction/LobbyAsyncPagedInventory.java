@@ -1,28 +1,38 @@
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
 import java.util.Collection;
-
 import eu.darkcube.system.inventory.api.v1.DefaultAsyncPagedInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
+import eu.darkcube.system.lobbysystem.user.UserWrapper;
+import eu.darkcube.system.userapi.User;
 
 public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventory {
 
-	protected final User user;
+	protected final LobbyUser user;
 
 	private boolean done = false;
 
-	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, User user) {
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, LobbyUser user) {
 		super(inventoryType, title, () -> !user.isAnimations());
 		this.user = user;
 		this.complete();
 	}
 
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, User user) {
+		this(inventoryType, title, UserWrapper.fromUser(user));
+	}
+
 	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
-					User user) {
+			LobbyUser user) {
 		super(inventoryType, title, size, box, () -> !user.isAnimations());
 		this.user = user;
 		this.complete();
+	}
+
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
+			User user) {
+		this(inventoryType, title, size, box, UserWrapper.fromUser(user));
 	}
 
 	@Override
@@ -42,7 +52,7 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
 		this.offerAnimations(this.informations);
 	}
 
-	public User getUser() {
+	public LobbyUser getUser() {
 		return this.user;
 	}
 

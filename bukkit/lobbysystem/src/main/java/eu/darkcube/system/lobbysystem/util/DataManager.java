@@ -3,14 +3,11 @@ package eu.darkcube.system.lobbysystem.util;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
+import com.google.common.reflect.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.reflect.TypeToken;
-
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
@@ -20,20 +17,24 @@ import eu.darkcube.system.lobbysystem.util.Border.Shape;
 
 public class DataManager {
 
-	private volatile Database database;
-	private volatile Database databaseUserpos;
+	private final Database database;
 	private volatile Border border;
 	private volatile Set<String> woolbattleTasks;
+	private Location jarPlate;
 
 	public DataManager() {
-		database = CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("lobbysystem_data");
-		databaseUserpos = CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("lobbysystem_userpos");
+		database =
+				CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("lobbysystem_data");
 		setDefault("spawn", Locations.toDocument(Locations.DEFAULT, false));
-		setDefault("border", new Border(Shape.CIRCLE, 100, Locations.DEFAULT,
-						null).serializeToDocument());
+		setDefault("border",
+				new Border(Shape.CIRCLE, 100, Locations.DEFAULT, null).serializeToDocument());
 		setDefault("woolbattleNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
 		setDefault("dailyrewardNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
 		setDefault("woolbattleSpawn", Locations.toDocument(Locations.DEFAULT, false));
+		setDefault("jumpAndRunSpawn", Locations.toDocument(Locations.DEFAULT, false));
+		setDefault("jumpAndRunPlate", Locations.toDocument(Locations.DEFAULT, false));
+		jarPlate = Locations.fromDocument(database.get("jumpAndRunPlate"), null);
+
 		setDefault("woolbattleTasks", new JsonDocument().append("tasks", new HashSet<String>()));
 		try {
 			border = Border.GSON.fromJson(database.get("border").toJson(), Border.class);
@@ -51,8 +52,7 @@ public class DataManager {
 				border = Border.GSON.fromJson(doc.toJson(), Border.class);
 				fetchWoolBattleTasks();
 			}
-		}.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60
-						* 2);
+		}.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60 * 2);
 	}
 
 	private void setDefault(String key, JsonDocument val) {
@@ -66,35 +66,11 @@ public class DataManager {
 		return this;
 	}
 
-	public Database getDatabaseUserpos() {
-		return databaseUserpos;
-	}
-
-	public void setUserPos(UUID uuid, Location loc) {
-		if (!databaseUserpos.contains(uuid.toString())) {
-			databaseUserpos.insert(uuid.toString(), toDocument(loc));
-		} else {
-			databaseUserpos.update(uuid.toString(), toDocument(loc));
-		}
-	}
-
-	public Location getUserPos(UUID uuid) {
-		Location p;
-		try {
-			p = toLocation(databaseUserpos.get(uuid.toString()));
-		} catch (Exception ex) {
-			p = null;
-		}
-		if (p == null || p.getWorld() == null) {
-			p = getSpawn();
-		}
-		return p;
-	}
-
 	public void fetchWoolBattleTasks() {
-		woolbattleTasks = database.get("woolbattleTasks").get("tasks", new TypeToken<Set<String>>() {
-			private static final long serialVersionUID = 1461778882147270573L;
-		}.getType());
+		woolbattleTasks =
+				database.get("woolbattleTasks").get("tasks", new TypeToken<Set<String>>() {
+					private static final long serialVersionUID = 1461778882147270573L;
+				}.getType());
 	}
 
 	public Set<String> getWoolBattleTasks() {
@@ -108,6 +84,25 @@ public class DataManager {
 
 	public Location getWoolBattleSpawn() {
 		return Locations.fromDocument(database.get("woolbattleSpawn"), null);
+	}
+
+	public Location getJumpAndRunSpawn() {
+		return Locations.fromDocument(database.get("jumpAndRunSpawn"), null);
+	}
+
+	public DataManager setJumpAndRunSpawn(Location loc) {
+		database.update("jumpAndRunSpawn", Locations.toDocument(loc, false));
+		return this;
+	}
+
+	public Location getJumpAndRunPlate() {
+		return jarPlate;
+	}
+
+	public DataManager setJumpAndRunPlate(Location loc) {
+		jarPlate = loc;
+		database.update("jumpAndRunPlate", Locations.toDocument(loc, false));
+		return this;
 	}
 
 	public DataManager setWoolBattleSpawn(Location loc) {
@@ -148,9 +143,8 @@ public class DataManager {
 
 	public JsonDocument toDocument(Location loc) {
 		JsonDocument doc = new JsonDocument();
-		doc.append("p", loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":"
-						+ loc.getYaw() + ":" + loc.getPitch() + ":"
-						+ loc.getWorld().getUID());
+		doc.append("p", loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":"
+				+ loc.getPitch() + ":" + loc.getWorld().getUID());
 		return doc;
 	}
 

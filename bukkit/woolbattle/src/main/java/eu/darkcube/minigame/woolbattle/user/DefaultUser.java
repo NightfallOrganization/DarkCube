@@ -20,6 +20,7 @@ import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.InventoryId;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
 import eu.darkcube.system.language.core.Language;
+import eu.darkcube.system.userapi.UserAPI;
 import net.minecraft.server.v1_8_R3.Packet;
 
 class DefaultUser implements User {
@@ -234,7 +235,7 @@ class DefaultUser implements User {
 	@Override
 	public void setLanguage(Language language) {
 		getData().setLanguage(language);
-		Language.setLanguage(uuid, language);
+		UserAPI.getInstance().getUser(uuid).setLanguage(language);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package eu.darkcube.system.pserver.plugin.user;
 
 import java.util.Set;
 import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -11,10 +10,10 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.language.core.Language;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class OfflineUser extends UserWithExtraData {
 
@@ -24,7 +23,11 @@ public class OfflineUser extends UserWithExtraData {
 
 	public OfflineUser(UUID uuid) {
 		super(uuid);
-		this.language = Language.getLanguage(uuid);
+		boolean loaded = UserAPI.getInstance().isUserLoaded(uuid);
+		eu.darkcube.system.userapi.User user = UserAPI.getInstance().getUser(uuid);
+		this.language = user.getLanguage();
+		if (loaded)
+			UserAPI.getInstance().unloadUser(user);
 		final UserCache.Entry entry = UserCache.cache().getEntry(uuid);
 		this.name = entry.name;
 		this.executor = new BukkitCommandExecutor(new OfflineSender());
@@ -63,12 +66,10 @@ public class OfflineUser extends UserWithExtraData {
 		}
 
 		@Override
-		public void sendMessage(String var1) {
-		}
+		public void sendMessage(String var1) {}
 
 		@Override
-		public void sendMessage(String[] var1) {
-		}
+		public void sendMessage(String[] var1) {}
 
 		@Override
 		public PermissionAttachment addAttachment(Plugin var1) {
@@ -81,14 +82,13 @@ public class OfflineUser extends UserWithExtraData {
 		}
 
 		@Override
-		public PermissionAttachment addAttachment(Plugin var1, String var2,
-						boolean var3) {
+		public PermissionAttachment addAttachment(Plugin var1, String var2, boolean var3) {
 			return null;
 		}
 
 		@Override
-		public PermissionAttachment addAttachment(Plugin var1, String var2,
-						boolean var3, int var4) {
+		public PermissionAttachment addAttachment(Plugin var1, String var2, boolean var3,
+				int var4) {
 			return null;
 		}
 

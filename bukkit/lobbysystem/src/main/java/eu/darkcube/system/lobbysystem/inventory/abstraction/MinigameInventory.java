@@ -9,14 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
@@ -26,8 +23,8 @@ import eu.darkcube.system.GameState;
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
-import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.userapi.User;
 
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 
@@ -56,7 +53,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 
 	@Override
 	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user));
+		this.fallbackItems.put(IInventory.slot(1, 5),
+				this.minigameItem.getItem(this.user.getUser()));
 		super.insertFallbackItems();
 	}
 
@@ -67,8 +65,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		super.destroy();
 	}
 
-	protected void destroy0() {
-	}
+	protected void destroy0() {}
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -76,15 +73,14 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		super.fillItems(items);
 
 		Collection<ServiceInfoSnapshot> servers = new HashSet<>();
-		this.getCloudTasks()
-				.stream()
-				.forEach(task -> servers
-						.addAll(CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(task)));
+		this.getCloudTasks().stream().forEach(task -> servers.addAll(
+				CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(task)));
 
 		Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
 		for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
 			try {
-				GameState state = GameState.fromString(server.getProperty(BridgeServiceProperty.STATE).orElse(null));
+				GameState state = GameState
+						.fromString(server.getProperty(BridgeServiceProperty.STATE).orElse(null));
 				if (state == null || state == GameState.UNKNOWN)
 					throw new NullPointerException();
 				if (state == GameState.STOPPING) {
@@ -138,8 +134,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 			ItemStack item = builder.build();
 			item = new ItemBuilder(item).getUnsafe()
 					.setString("minigameServer", server.getServiceId().getUniqueId().toString())
-					.builder()
-					.build();
+					.builder().build();
 			ItemSortingInfo info = new ItemSortingInfo(item, online, maxPlayers, state);
 			itemSortingInfos.add(info);
 		}
@@ -182,23 +177,23 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		public int compareTo(ItemSortingInfo other) {
 			int amt = 0;
 			switch (this.state) {
-			case LOBBY:
-				if (other.state != GameState.LOBBY)
-					return -1;
-				amt = Integer.compare(other.onPlayers, this.onPlayers);
-				break;
-			case INGAME:
-				if (other.state == GameState.LOBBY)
-					return 1;
-				if (other.state != GameState.LOBBY && other.state != GameState.INGAME)
-					return -1;
-				amt = Integer.compare(other.onPlayers, this.onPlayers);
-				break;
-			default:
-				if (other.state != GameState.UNKNOWN)
-					return 1;
-				amt = Integer.compare(other.onPlayers, this.onPlayers);
-				break;
+				case LOBBY:
+					if (other.state != GameState.LOBBY)
+						return -1;
+					amt = Integer.compare(other.onPlayers, this.onPlayers);
+					break;
+				case INGAME:
+					if (other.state == GameState.LOBBY)
+						return 1;
+					if (other.state != GameState.LOBBY && other.state != GameState.INGAME)
+						return -1;
+					amt = Integer.compare(other.onPlayers, this.onPlayers);
+					break;
+				default:
+					if (other.state != GameState.UNKNOWN)
+						return 1;
+					amt = Integer.compare(other.onPlayers, this.onPlayers);
+					break;
 			}
 			if (amt == 0) {
 				amt = Integer.compare(other.onPlayers, this.onPlayers);

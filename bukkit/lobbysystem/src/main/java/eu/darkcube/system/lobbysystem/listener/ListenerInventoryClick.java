@@ -3,9 +3,7 @@ package eu.darkcube.system.lobbysystem.listener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.language.core.Language;
@@ -15,16 +13,17 @@ import eu.darkcube.system.lobbysystem.inventory.InventorySettings;
 import eu.darkcube.system.lobbysystem.inventory.InventoryWoolBattle;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerOwn;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class ListenerInventoryClick extends BaseListener {
 
 	@EventHandler
 	public void handle(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
-		User user = UserWrapper.getUser(p.getUniqueId());
+		LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
 		if (user.isBuildMode()) {
 			return;
 		}
@@ -48,12 +47,12 @@ public class ListenerInventoryClick extends BaseListener {
 			}
 			i %= Language.values().length;
 			language = Language.values()[i];
-			user.setLanguage(language);
+			user.getUser().setLanguage(language);
 			boolean oldS = user.isSounds();
 			user.setSounds(false);
-			ListenerSettingsJoin.instance.handle(new PlayerJoinEvent(p, "NoSpawnTeleport"));
+			Lobby.getInstance().setItems(user);
 			user.setGadget(user.getGadget());
-			user.setOpenInventory(new InventorySettings(user));
+			user.setOpenInventory(new InventorySettings(user.getUser()));
 			p.setFlying(true);
 			user.setSounds(oldS);
 		}
@@ -68,38 +67,26 @@ public class ListenerInventoryClick extends BaseListener {
 				&& !(user.getOpenInventory() instanceof InventoryWoolBattle)) {
 			user.teleport(Lobby.getInstance().getDataManager().getWoolBattleSpawn());
 			close = true;
+		} else if (itemid.equals(Item.INVENTORY_COMPASS_JUMPANDRUN.getItemId())) {
+			user.teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn());
+			close = true;
 		} else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItemId())) {
 			user.setAnimations(false);
-			user.setOpenInventory(new InventorySettings(user));
+			user.setOpenInventory(new InventorySettings(user.getUser()));
 		} else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_OFF.getItemId())) {
 			user.setAnimations(true);
-			user.setOpenInventory(new InventorySettings(user));
+			user.setOpenInventory(new InventorySettings(user.getUser()));
 		} else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_ON.getItemId())) {
 			user.setSounds(false);
-			user.setOpenInventory(new InventorySettings(user));
+			user.setOpenInventory(new InventorySettings(user.getUser()));
 		} else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_OFF.getItemId())) {
 			user.setSounds(true);
-			user.setOpenInventory(new InventorySettings(user));
+			user.setOpenInventory(new InventorySettings(user.getUser()));
 		}
 
 		// PagedInventories
 		IInventory inv = user.getOpenInventory();
-//		if (inv instanceof PagedInventoryOld) {
-//			PagedInventoryOld pinv = (PagedInventoryOld) inv;
-//			if (itemid.equals(Item.NEXT.getItemId())) {
-//				pinv.setPage(user, pinv.getPage(user) + 1);
-//			} else if (itemid.equals(Item.PREV.getItemId())) {
-//				pinv.setPage(user, pinv.getPage(user) - 1);
-//			}
-//		} else if (inv instanceof PagedInventory) {
-//			PagedInventory pinv = (PagedInventory) inv;
-//			if (itemid.equals(Item.NEXT.getItemId())) {
-//				pinv.setPage(user, pinv.getPage(user) + 1);
-//			} else if (itemid.equals(Item.PREV.getItemId())) {
-//				pinv.setPage(user, pinv.getPage(user) - 1);
-//			}
-//		}
-		
+
 		if (inv instanceof InventoryConfirm) {
 			InventoryConfirm cinv = (InventoryConfirm) inv;
 			if (itemid.equals(Item.CONFIRM.getItemId())) {
@@ -111,29 +98,13 @@ public class ListenerInventoryClick extends BaseListener {
 
 		if (inv instanceof InventoryPServer) {
 			if (itemid.equals(Item.INVENTORY_PSERVER_PRIVATE.getItemId())) {
-				user.setOpenInventory(new InventoryPServerOwn(user));
+				user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
 			}
 		} else if (inv instanceof InventoryPServerOwn) {
 			if (itemid.equals(Item.INVENTORY_PSERVER_PUBLIC.getItemId())) {
 				user.setOpenInventory(new InventoryPServer(user));
 			}
 		}
-
-//		boolean pserverOperated = false;
-//		if (itemid.equals(Item.NEXT.getItemId())) {
-//			InventoryPServer.PAGE.put(user, InventoryPServer.PAGE.getOrDefault(user, 0) + 1);
-//			pserverOperated = true;
-//		} else if (itemid.equals(Item.PREV.getItemId())) {
-//			InventoryPServer.PAGE.put(user, InventoryPServer.PAGE.getOrDefault(user, 0) - 1);
-//			pserverOperated = true;
-//		}
-//		if (pserverOperated) {
-//			Runnable runnable = InventoryPServer.RUNNABLES.get(user);
-//			if (runnable != null) {
-//				runnable.update();
-//			}
-//		}
-
 		if (close) {
 			p.closeInventory();
 		}

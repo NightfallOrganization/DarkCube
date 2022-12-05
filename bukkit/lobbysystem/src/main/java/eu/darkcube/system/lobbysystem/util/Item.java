@@ -1,10 +1,8 @@
 package eu.darkcube.system.lobbysystem.util;
 
 import static org.bukkit.Material.*;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -14,10 +12,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.userapi.User;
 
 public enum Item {
 
@@ -35,18 +32,15 @@ public enum Item {
 	INVENTORY_SETTINGS_SOUNDS_ON(ItemBuilder.item(GOLD_RECORD)),
 	INVENTORY_SETTINGS_SOUNDS_OFF(ItemBuilder.item(GOLD_RECORD)),
 
+
+	INVENTORY_COMPASS_JUMPANDRUN(ItemBuilder.item(DIAMOND_BOOTS)),
 	INVENTORY_COMPASS_SPAWN(ItemBuilder.item(NETHER_STAR)),
 	INVENTORY_COMPASS_SMASH(ItemBuilder.item(FIREBALL)),
 	INVENTORY_COMPASS_WOOLBATTLE(ItemBuilder.item(BOW)),
-	INVENTORY_COMPASS_MINERS(
-			ItemBuilder.item(DIAMOND_PICKAXE).flag(ItemFlag.HIDE_ATTRIBUTES)),
+	INVENTORY_COMPASS_MINERS(ItemBuilder.item(DIAMOND_PICKAXE).flag(ItemFlag.HIDE_ATTRIBUTES)),
 
-	GADGET_HOOK_ARROW(
-			ItemBuilder.item(BOW)
-					.unbreakable(true)
-					.flag(ItemFlag.HIDE_UNBREAKABLE)
-					.enchant(Enchantment.ARROW_INFINITE, 1)
-					.flag(ItemFlag.HIDE_ENCHANTS)),
+	GADGET_HOOK_ARROW(ItemBuilder.item(BOW).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE)
+			.enchant(Enchantment.ARROW_INFINITE, 1).flag(ItemFlag.HIDE_ENCHANTS)),
 	GADGET_HOOK_ARROW_ARROW(ItemBuilder.item(ARROW)),
 
 	GADGET_GRAPPLING_HOOK(
@@ -80,7 +74,8 @@ public enum Item {
 	START_PSERVER(ItemBuilder.item(INK_SACK).durability(2)),
 	STOP_PSERVER(ItemBuilder.item(INK_SACK).durability(1)),
 	PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE)
-			.fireworkEffect(FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())
+			.fireworkEffect(
+					FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())
 			.flag(ItemFlag.HIDE_POTION_EFFECTS)),
 	PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE)
 			.fireworkEffect(FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build())
@@ -183,8 +178,10 @@ public enum Item {
 		return Item.getItem(item, user, replacements, new Object[0]);
 	}
 
-	public static ItemStack getItem(Item item, User user, Object[] replacements, Object... loreReplacements) {
-		ItemBuilder builder = item.getBuilder().getUnsafe().setString("itemId", Item.getItemId(item)).builder();
+	public static ItemStack getItem(Item item, User user, Object[] replacements,
+			Object... loreReplacements) {
+		ItemBuilder builder =
+				item.getBuilder().getUnsafe().setString("itemId", Item.getItemId(item)).builder();
 		String name = Item.getDisplayName(item, user, replacements);
 		builder.displayname(name);
 		if (builder.getLores().size() != 0) {
@@ -227,15 +224,14 @@ public enum Item {
 	}
 
 	public static String[] getLore(Item item, User user, Object... loreReplacements) {
-		return Message
-				.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(), user.getLanguage(),
-						loreReplacements)
-				.split("\\%n");
+		return Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(),
+				user.getLanguage(), loreReplacements).split("\\%n");
 	}
 
 	public static Item byGadget(Gadget gadget) {
 		for (Item item : Item.values()) {
-			if (item.getKey().startsWith("GADGET_") && item.getKey().substring(7).equals(gadget.name())) {
+			if (item.getKey().startsWith("GADGET_")
+					&& item.getKey().substring(7).equals(gadget.name())) {
 				return item;
 			}
 		}

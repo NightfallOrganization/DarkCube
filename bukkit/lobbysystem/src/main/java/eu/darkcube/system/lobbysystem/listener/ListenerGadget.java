@@ -4,12 +4,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.inventory.InventoryGadget;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class ListenerGadget extends BaseListener {
 
@@ -22,7 +22,7 @@ public class ListenerGadget extends BaseListener {
 	@EventHandler
 	public void handle(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
-		User user = UserWrapper.getUser(p.getUniqueId());
+		LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
 		if (user.getOpenInventory().getType() != InventoryGadget.type_gadget) {
 			return;
 		}

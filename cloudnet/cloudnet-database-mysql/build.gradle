@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':bukkit:statsapi')
+    implementation cloudnet
+    implementation 'com.zaxxer:HikariCP:2.7.9'
+    implementation "mysql:mysql-connector-java:5.1.47"
+}

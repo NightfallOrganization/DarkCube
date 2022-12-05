@@ -2,11 +2,11 @@ package eu.darkcube.system.lobbysystem.pserver;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class PServerSupport {
 
@@ -18,7 +18,7 @@ public class PServerSupport {
 
 	static {
 		try {
-//			eu.darkcube.system.pserver.server.PServer.class.getClass();
+			// eu.darkcube.system.pserver.server.PServer.class.getClass();
 			Class.forName(PServer.class.getName());
 			supported = true;
 			Register.register();
@@ -33,12 +33,13 @@ public class PServerSupport {
 
 	private static class Register {
 		private static void register() {
-			eu.darkcube.system.pserver.wrapper.PServerWrapper
-					.setPServerCommand(new eu.darkcube.system.pserver.wrapper.command.PServerCommand() {
+			eu.darkcube.system.pserver.wrapper.PServerWrapper.setPServerCommand(
+					new eu.darkcube.system.pserver.wrapper.command.PServerCommand() {
 						@Override
 						public boolean execute(CommandSender sender, String[] args) {
 							if (sender instanceof Player) {
-								User user = UserWrapper.getUser(((Player) sender).getUniqueId());
+								LobbyUser user = UserWrapper
+										.fromUser(UserAPI.getInstance().getUser((Player) sender));
 								user.setOpenInventory(new InventoryPServer(user));
 							}
 							return true;

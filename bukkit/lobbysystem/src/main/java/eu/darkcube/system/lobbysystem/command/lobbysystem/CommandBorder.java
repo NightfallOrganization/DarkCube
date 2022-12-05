@@ -1,27 +1,18 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetPos1;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetPos2;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetRadius;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetShape;
 
-public class CommandBorder extends Command {
+public class CommandBorder extends LobbyCommandExecutor {
 
 	public CommandBorder() {
-		super(Lobby.getInstance(), "border", new Command[] {
-				new CommandSetPos1(),
-				new CommandSetPos2(),
-				new CommandSetShape(),
-				new CommandSetRadius()
-		}, "Border Hauptcommand");
+		super("border", b -> {
+			b.then(new CommandSetPos1().builder()).then(new CommandSetPos2().builder())
+					.then(new CommandSetRadius().builder()).then(new CommandSetShape().builder());
+		});
 	}
 
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		return false;
-	}
 }

@@ -1,9 +1,10 @@
 package eu.darkcube.system.pserver.plugin.user;
 
-import org.bukkit.entity.*;
-
-import eu.darkcube.system.commandapi.v3.*;
-import eu.darkcube.system.language.core.*;
+import org.bukkit.entity.Player;
+import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
+import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.language.core.Language;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class OnlineUser extends UserWithExtraData {
 
@@ -15,7 +16,7 @@ public class OnlineUser extends UserWithExtraData {
 		super(player.getUniqueId());
 		this.player = player;
 		this.executor = new BukkitCommandExecutor(player);
-		this.language = Language.getLanguage(player.getUniqueId());
+		this.language = UserAPI.getInstance().getUser(player).getLanguage();
 	}
 
 	@Override

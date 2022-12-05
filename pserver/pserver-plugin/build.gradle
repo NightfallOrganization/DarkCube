@@ -1,11 +1,12 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 dependencies {
-    implementation project(':pserver:pserver-common')
-    implementation project(':bukkit:darkcubesystem')
-    implementation project(':bukkit:commandapi')
-    implementation project(':bukkit:languageapi')
-    implementation project(':bukkit:inventoryapi')
-    implementation project(':bukkit:woolbattle')
-    implementation luckperms
+    api project(':pserver:pserver-common')
+    api project(':bukkit:darkcubesystem')
+    api project(':bukkit:commandapi')
+    api project(':bukkit:languageapi')
+    api project(':bukkit:inventoryapi')
+    api project(':bukkit:woolbattle')
+    api project(':bukkit:userapi')
+    api luckperms
 }

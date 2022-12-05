@@ -4,7 +4,7 @@ dependencies {
     implementation project(':bukkit:inventoryapi')
     implementation project(':pserver:pserver-common')
     implementation project(':pserver')
-	implementation project(':bukkit:cubesapi')
+    implementation project(':bukkit:userapi')
     embedApi project(':common:labymod-emotes')
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation cloudnetDriver

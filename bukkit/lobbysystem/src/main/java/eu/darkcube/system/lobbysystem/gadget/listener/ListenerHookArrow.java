@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -26,16 +25,15 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.listener.BaseListener;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Border;
 import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.lobbysystem.util.UUIDManager;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class ListenerHookArrow extends BaseListener {
 
@@ -49,10 +47,11 @@ public class ListenerHookArrow extends BaseListener {
 		ProjectileSource source = projectile.getShooter();
 		if (source instanceof Player) {
 			Player p = (Player) source;
-			User user = UserWrapper.getUser(p.getUniqueId());
+			LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
 			if (user.getGadget() == Gadget.HOOK_ARROW) {
 				if (this.cooldownPlayers.contains(p.getUniqueId())) {
-					p.getInventory().setItem(35, Item.GADGET_HOOK_ARROW_ARROW.getItem(user));
+					p.getInventory().setItem(35,
+							Item.GADGET_HOOK_ARROW_ARROW.getItem(user.getUser()));
 					this.cooldownPlayers.remove(p.getUniqueId());
 					this.pullEntityToLocation(p, projectile);
 					p.playSound(p.getLocation(), Sound.MAGMACUBE_JUMP, 10.0F, 1.0F);
@@ -68,20 +67,17 @@ public class ListenerHookArrow extends BaseListener {
 		final ProjectileSource source = projectile.getShooter();
 		if (source instanceof Player) {
 			Player p = (Player) source;
-			User user = UserWrapper.getUser(p.getUniqueId());
+			LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
 			if (user.getGadget() == Gadget.HOOK_ARROW) {
-				projectile.setMetadata("hookarrow", new FixedMetadataValue(Lobby.getInstance(), true));
+				projectile.setMetadata("hookarrow",
+						new FixedMetadataValue(Lobby.getInstance(), true));
 				p.getInventory().setItem(35, null);
 				this.cooldownPlayers.add(p.getUniqueId());
 				p.setLeashHolder(projectile);
 				new BukkitRunnable() {
 
-					private int[] xs = new int[] {
-							-1, 0, 1
-					};
-					private int[] zs = new int[] {
-							-1, 0, 1
-					};
+					private int[] xs = new int[] {-1, 0, 1};
+					private int[] zs = new int[] {-1, 0, 1};
 
 					@Override
 					public void run() {
@@ -104,10 +100,11 @@ public class ListenerHookArrow extends BaseListener {
 					public void run() {
 						final Bat bat = p.getWorld().spawn(p.getEyeLocation(), Bat.class);
 						// TODO: Removed, idk what it does anymore
-//						((CraftBat) bat).getHandle().b(true);
-						bat.addPotionEffect(
-								new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 100000, true, false));
-						bat.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100000, 100000, true, false));
+						// ((CraftBat) bat).getHandle().b(true);
+						bat.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000,
+								100000, true, false));
+						bat.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100000, 100000,
+								true, false));
 
 						bat.setLeashHolder(projectile);
 						if (!ListenerHookArrow.this.bats.containsKey(p.getUniqueId())) {
@@ -123,7 +120,8 @@ public class ListenerHookArrow extends BaseListener {
 										&& bat.isLeashed()) {
 									if (this.border.isOutside(projectile)) {
 										projectile.remove();
-										p.getInventory().setItem(35, Item.GADGET_HOOK_ARROW_ARROW.getItem(user));
+										p.getInventory().setItem(35, Item.GADGET_HOOK_ARROW_ARROW
+												.getItem(user.getUser()));
 										p.setAllowFlight(true);
 										this.cancel();
 										return;
@@ -179,15 +177,16 @@ public class ListenerHookArrow extends BaseListener {
 
 	@EventHandler
 	public void handle(EventGadgetSelect e) {
-		User user = e.getUser();
-		Player p = UUIDManager.getPlayerByUUID(user.getUniqueId());
+		LobbyUser user = e.getUser();
+		Player p = user.getUser().asPlayer();
 		Gadget g = user.getGadget();
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (p != null) {
 					if (e.getGadget() == Gadget.HOOK_ARROW) {
-						p.getInventory().setItem(35, Item.GADGET_HOOK_ARROW_ARROW.getItem(user));
+						p.getInventory().setItem(35,
+								Item.GADGET_HOOK_ARROW_ARROW.getItem(user.getUser()));
 					} else {
 						if (g == Gadget.HOOK_ARROW) {
 							p.getInventory().setItem(35, new ItemStack(Material.AIR));

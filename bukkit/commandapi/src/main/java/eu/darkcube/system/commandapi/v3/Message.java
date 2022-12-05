@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import com.google.common.base.Objects;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-
 import net.md_5.bungee.api.chat.TextComponent;
 
 public enum Message {
@@ -48,9 +46,11 @@ public enum Message {
 	POS_MIXED_TYPES("pos_mixed_types"),
 	ROTATION_INCOMPLETE("rotation_incomplete"),
 	ANCHOR_INVALID("anchor_invalid"),
-	INVALID_ENUM("invalid_enum"), 
-	INVALID_WORLD("invalid_world"), 
+	INVALID_ENUM("invalid_enum"),
+	INVALID_WORLD("invalid_world"),
+	INVALID_UUID("invalid_uuid"),
 	BOOLEAN_INVALID("boolean_invalid"),
+	SERVICE_TASK_NOT_PRESENT("service_task_not_present"),
 
 	;
 
@@ -69,9 +69,7 @@ public enum Message {
 	public DynamicCommandExceptionType newDynamicCommandExceptionType() {
 		return new DynamicCommandExceptionType(o -> {
 			if (!(o instanceof Object[])) {
-				o = new Object[] {
-						o
-				};
+				o = new Object[] {o};
 			}
 			Object[] components = (Object[]) o;
 			return new DynamicMessageWrapper(this, components);
@@ -95,8 +93,8 @@ public enum Message {
 		CustomComponentBuilder b = new CustomComponentBuilder("");
 		CustomComponentBuilder
 				.applyPrefixModifier(prefixModifier,
-						CustomComponentBuilder.cast(
-								TextComponent.fromLegacyText(String.format(toStringFunction.apply(this), components))))
+						CustomComponentBuilder.cast(TextComponent.fromLegacyText(
+								String.format(toStringFunction.apply(this), components))))
 				.accept(b);
 		TextComponent[] text = b.create();
 		return text;
@@ -143,7 +141,8 @@ public enum Message {
 
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof DynamicMessageWrapper && Objects.equal(((DynamicMessageWrapper) obj).message, message)
+			return obj instanceof DynamicMessageWrapper
+					&& Objects.equal(((DynamicMessageWrapper) obj).message, message)
 					&& Arrays.equals(components, ((DynamicMessageWrapper) obj).components);
 		}
 

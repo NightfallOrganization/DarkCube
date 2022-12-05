@@ -4,19 +4,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.github.juliarn.npc.NPC;
 import com.github.juliarn.npc.NPCPool;
-
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.WeatherType;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
@@ -24,27 +23,28 @@ import de.dytanic.cloudnet.driver.service.ServiceTask;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import eu.darkcube.system.GameState;
 import eu.darkcube.system.Plugin;
-import eu.darkcube.system.commandapi.CommandAPI;
+import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.loader.ReflectionClassLoader;
 import eu.darkcube.system.lobbysystem.command.CommandLobbysystem;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.CommandBuild;
 import eu.darkcube.system.lobbysystem.gadget.listener.ListenerGrapplingHook;
 import eu.darkcube.system.lobbysystem.gadget.listener.ListenerHookArrow;
+import eu.darkcube.system.lobbysystem.jumpandrun.JaRManager;
 import eu.darkcube.system.lobbysystem.listener.*;
 import eu.darkcube.system.lobbysystem.npc.DailyRewardNPC;
 import eu.darkcube.system.lobbysystem.npc.WoolBattleNPC;
 import eu.darkcube.system.lobbysystem.pserver.PServerJoinOnStart;
 import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
-import eu.darkcube.system.lobbysystem.util.AsyncExecutor;
 import eu.darkcube.system.lobbysystem.util.DataManager;
 import eu.darkcube.system.lobbysystem.util.DependencyManager;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
-import eu.darkcube.system.lobbysystem.util.UUIDManager;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class Lobby extends Plugin {
 
@@ -54,6 +54,7 @@ public class Lobby extends Plugin {
 	private NPC woolbattleNpc;
 	private NPC dailyRewardNpc;
 	private PServerJoinOnStart pServerJoinOnStart;
+	private JaRManager jaRManager;
 
 	public Lobby() {
 		Lobby.instance = this;
@@ -66,9 +67,12 @@ public class Lobby extends Plugin {
 
 	@Override
 	public void onEnable() {
-		this.npcPool = NPCPool.builder(this).spawnDistance(50).actionDistance(45).tabListRemoveTicks(40L).build();
+		this.npcPool = NPCPool.builder(this).spawnDistance(50).actionDistance(45)
+				.tabListRemoveTicks(40L).build();
 
-		AsyncExecutor.start();
+		UserWrapper userWrapper = new UserWrapper();
+		UserAPI.getInstance().addModifier(userWrapper);
+		userWrapper.beginMigration();
 
 		PServerSupport.init();
 		// Load all messages
@@ -82,23 +86,26 @@ public class Lobby extends Plugin {
 			ex.printStackTrace();
 		}
 		List<String> languageEntries = new ArrayList<>();
-		languageEntries
-				.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey).collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values()).stream().map(i -> Message.PREFIX_ITEM + i.getKey())
+		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey)
 				.collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values()).stream().filter(i -> i.getBuilder().getLores().size() > 0)
-				.map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey()).collect(Collectors.toList()));
+		languageEntries.addAll(Arrays.asList(Item.values()).stream()
+				.map(i -> Message.PREFIX_ITEM + i.getKey()).collect(Collectors.toList()));
+		languageEntries.addAll(Arrays.asList(Item.values()).stream()
+				.filter(i -> i.getBuilder().getLores().size() > 0)
+				.map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey())
+				.collect(Collectors.toList()));
 		Language.validateEntries(languageEntries.toArray(new String[languageEntries.size()]),
 				s -> Message.KEY_PREFIX + s);
 
-		UserWrapper.init();
-
 		this.dataManager = new DataManager();
+		this.jaRManager = new JaRManager();
 		this.woolbattleNpc = WoolBattleNPC.create();
 		this.dailyRewardNpc = DailyRewardNPC.create();
 
-		CommandAPI.enable(this, new CommandLobbysystem());
-		CommandAPI.enable(this, new CommandBuild());
+		// CommandAPI.enable(this, new CommandLobbysystemOld());
+		// CommandAPI.enable(this, new CommandBuildOld());
+		CommandAPI.getInstance().register(new CommandBuild());
+		CommandAPI.getInstance().register(new CommandLobbysystem());
 
 		for (World world : Bukkit.getWorlds()) {
 			world.setGameRuleValue("randomTickSpeed", "0");
@@ -107,28 +114,30 @@ public class Lobby extends Plugin {
 		}
 
 		new BukkitRunnable() {
-			private final Collection<String> woolbattleTasks = Lobby.this.getDataManager().getWoolBattleTasks();
+			private final Collection<String> woolbattleTasks =
+					Lobby.this.getDataManager().getWoolBattleTasks();
 
 			@Override
 			public void run() {
 				for (String task : this.woolbattleTasks) {
-					if (CloudNetDriver.getInstance().getServiceTaskProvider().isServiceTaskPresent(task)) {
-						ServiceTask serviceTask = CloudNetDriver.getInstance().getServiceTaskProvider()
-								.getServiceTask(task);
+					if (CloudNetDriver.getInstance().getServiceTaskProvider()
+							.isServiceTaskPresent(task)) {
+						ServiceTask serviceTask = CloudNetDriver.getInstance()
+								.getServiceTaskProvider().getServiceTask(task);
 						Collection<ServiceInfoSnapshot> services = CloudNetDriver.getInstance()
 								.getCloudServiceProvider().getCloudServices(serviceTask.getName());
 
 						int freeServices = 0;
 						for (ServiceInfoSnapshot service : services) {
-							GameState state = GameState
-									.fromString(service.getProperty(BridgeServiceProperty.STATE).orElse(null));
+							GameState state = GameState.fromString(
+									service.getProperty(BridgeServiceProperty.STATE).orElse(null));
 							if (state == GameState.LOBBY || state == GameState.UNKNOWN) {
 								freeServices++;
 							}
 						}
 						if (freeServices < serviceTask.getMinServiceCount()) {
-							ServiceInfoSnapshot snap = CloudNetDriver.getInstance().getCloudServiceFactory()
-									.createCloudService(serviceTask);
+							ServiceInfoSnapshot snap = CloudNetDriver.getInstance()
+									.getCloudServiceFactory().createCloudService(serviceTask);
 							CloudNetDriver.getInstance().getCloudServiceProvider(snap)
 									.setCloudServiceLifeCycle(ServiceLifeCycle.RUNNING);
 						}
@@ -139,11 +148,7 @@ public class Lobby extends Plugin {
 			}
 		}.runTaskTimerAsynchronously(this, 30 * 20, 30 * 20);
 
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			UserWrapper.loadUser(p.getUniqueId());
-		}
-
-		new ListenerSettingsJoin();
+		new ListenerJoin();
 		new ListenerScoreboard();
 		new ListenerQuit();
 		new ListenerBlock();
@@ -169,13 +174,6 @@ public class Lobby extends Plugin {
 			this.pServerJoinOnStart = new PServerJoinOnStart();
 		}
 		new ListenerPhysics();
-
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			ListenerSettingsJoin.instance.handle(new PlayerJoinEvent(p, "Custom"));
-			ListenerScoreboard.instance.handle(new PlayerJoinEvent(p, "Custom"));
-			User user = UserWrapper.getUser(p.getUniqueId());
-			user.setGadget(user.getGadget());
-		}
 		new ListenerBorder();
 
 		if (PServerSupport.isSupported()) {
@@ -191,13 +189,62 @@ public class Lobby extends Plugin {
 			SkullCache.unregister();
 			this.pServerJoinOnStart.unregister();
 		}
-		for (User user : new HashSet<>(UserWrapper.users.values())) {
-			this.getDataManager().setUserPos(user.getUniqueId(),
-					UUIDManager.getPlayerByUUID(user.getUniqueId()).getLocation());
-			UserWrapper.unloadUser(user);
+	}
+
+	public void savePlayer(LobbyUser user) {
+		Player p = user.getUser().asPlayer();
+		user.setLastPosition(p.getLocation());
+		user.setSelectedSlot(p.getInventory().getHeldItemSlot());
+	}
+
+	public void setupPlayer(LobbyUser user) {
+		Player p = user.getUser().asPlayer();
+		setItems(user);
+
+		DataManager dataManager = getDataManager();
+		Location spawn = dataManager.getSpawn();
+		p.setGameMode(GameMode.SURVIVAL);
+		if (!p.getAllowFlight())
+			p.setAllowFlight(true);
+		p.setCompassTarget(spawn.getBlock().getLocation());
+		p.setExhaustion(0);
+		p.setSaturation(0);
+		p.setFireTicks(0);
+		p.setMaxHealth(20);
+		p.setHealth(20);
+		p.setLevel(0);
+		p.setPlayerWeather(WeatherType.CLEAR);
+		p.setFoodLevel(20);
+		p.setExp(1);
+		PlayerInventory inv = p.getInventory();
+		inv.setHeldItemSlot(user.getSelectedSlot());
+
+		Location l = user.getLastPosition();
+		if (!dataManager.getBorder().isInside(l)) {
+			l = dataManager.getSpawn();
+		} else if (l.add(0, 1, 0).getBlock().getType().isSolid()) {
+			l = dataManager.getSpawn();
+		}
+		p.teleport(l);
+	}
+
+	public void setItems(LobbyUser user) {
+		Player p = user.getUser().asPlayer();
+		User u = user.getUser();
+		PlayerInventory inv = p.getInventory();
+		inv.clear();
+		inv.setItem(0, Item.INVENTORY_COMPASS.getItem(u));
+		inv.setItem(1, Item.INVENTORY_SETTINGS.getItem(u));
+		inv.setItem(4, Item.byGadget(user.getGadget()).getItem(u));
+		try {
+			if (PServerSupport.isSupported()) {
+				inv.setItem(6, Item.PSERVER_MAIN_ITEM.getItem(u));
+			}
+		} catch (Exception ex) {
 		}
 
-		AsyncExecutor.shutdown();
+		inv.setItem(7, Item.INVENTORY_GADGET.getItem(u));
+		inv.setItem(8, Item.INVENTORY_LOBBY_SWITCHER.getItem(u));
 	}
 
 	public PServerJoinOnStart getPServerJoinOnStart() {
@@ -214,6 +261,10 @@ public class Lobby extends Plugin {
 
 	public DataManager getDataManager() {
 		return this.dataManager;
+	}
+
+	public JaRManager getJaRManager() {
+		return this.jaRManager;
 	}
 
 	public NPCPool getNpcPool() {

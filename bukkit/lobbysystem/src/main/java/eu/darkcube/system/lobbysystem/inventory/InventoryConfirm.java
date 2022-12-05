@@ -1,15 +1,13 @@
 package eu.darkcube.system.lobbysystem.inventory;
 
 import java.util.Map;
-
 import org.bukkit.inventory.ItemStack;
-
 import eu.darkcube.system.inventory.api.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
-import eu.darkcube.system.lobbysystem.user.User;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.userapi.User;
 
 public class InventoryConfirm extends LobbyAsyncPagedInventory {
 
@@ -20,8 +18,9 @@ public class InventoryConfirm extends LobbyAsyncPagedInventory {
 	public final Runnable onCancel;
 
 	public InventoryConfirm(String title, User user, Runnable onConfirm, Runnable onCancel) {
-		super(InventoryConfirm.type_confirm, title, 3 * 9, AsyncPagedInventory.box(1, 1, 3, 9), user);
-//		super(title, null, 3 * 9, InventoryConfirm.type_confirm, box(1, 1, 3, 9));
+		super(InventoryConfirm.type_confirm, title, 3 * 9, AsyncPagedInventory.box(1, 1, 3, 9),
+				user);
+		// super(title, null, 3 * 9, InventoryConfirm.type_confirm, box(1, 1, 3, 9));
 		this.onConfirm = onConfirm;
 		this.onCancel = onCancel;
 	}
@@ -29,13 +28,13 @@ public class InventoryConfirm extends LobbyAsyncPagedInventory {
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		super.fillItems(items);
-		items.put(IInventory.slot(2, 3), Item.CANCEL.getItem(this.user));
-		items.put(IInventory.slot(2, 7), Item.CONFIRM.getItem(this.user));
+		items.put(IInventory.slot(2, 3), Item.CANCEL.getItem(this.user.getUser()));
+		items.put(IInventory.slot(2, 7), Item.CONFIRM.getItem(this.user.getUser()));
 	}
 
 	@Override
 	protected void insertFallbackItems() {
-		ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user);
+		ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user.getUser());
 		for (int i = 0; i < this.SLOTS.length; i++) {
 			int slot = this.SLOTS[i];
 			this.fallbackItems.put(slot, l);

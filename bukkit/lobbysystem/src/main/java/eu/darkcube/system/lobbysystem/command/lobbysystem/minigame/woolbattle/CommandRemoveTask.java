@@ -1,45 +1,33 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-
-import org.bukkit.command.CommandSender;
-
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import eu.darkcube.system.commandapi.Command;
+import java.util.stream.Stream;
+import de.dytanic.cloudnet.driver.service.ServiceTask;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.CommandArgument;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.arguments.ServiceTaskArgument;
+import net.md_5.bungee.api.ChatColor;
 
-public class CommandRemoveTask extends Command {
+public class CommandRemoveTask extends LobbyCommandExecutor {
+
 	public CommandRemoveTask() {
-		super(Lobby.getInstance(), "removeTask", new Command[0], "Entfernt eine Task", CommandArgument.CLOUD_TASK);
-	}
-
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return new ArrayList<>(Lobby.getInstance().getDataManager().getWoolBattleTasks());
-		}
-		return super.onTabComplete(args);
-	}
-
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length == 1) {
-			CloudNetDriver w = CloudNetDriver.getInstance();
-			Set<String> tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
-			if (!w.getServiceTaskProvider().isServiceTaskPresent(args[0]) && !tasks.contains(args[0])) {
-				sender.sendMessage("§cEs gibt keine CloudTask mit dem Namen " + args[0]);
-				return true;
+		super("removeTask", b -> b.then(Commands.argument("task", new ServiceTaskArgument() {
+			@Override
+			protected Stream<String> tasksStream() {
+				return super.tasksStream().filter(
+						t -> Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(t));
 			}
-			String task = tasks.contains(args[0]) ? args[0]
-					: w.getServiceTaskProvider().getServiceTask(args[0]).getName();
-			tasks.remove(task);
+		}).executes(ctx -> {
+			ServiceTask task = ServiceTaskArgument.getServiceTask(ctx, "task");
+			Set<String> tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
+			tasks.remove(task.getName());
 			Lobby.getInstance().getDataManager().setWoolBattleTasks(tasks);
-			sender.sendMessage("§aTask erfolgreich entfernt!");
-			return true;
-		}
-		return false;
+			ctx.getSource().sendFeedback(new CustomComponentBuilder("Task erfolgreich entfernt!")
+					.color(ChatColor.GREEN).create(), true);
+			return 0;
+		})));
 	}
+
 }

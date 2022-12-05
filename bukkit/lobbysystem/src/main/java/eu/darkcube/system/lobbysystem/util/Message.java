@@ -1,9 +1,8 @@
 package eu.darkcube.system.lobbysystem.util;
 
 import org.bukkit.ChatColor;
-
 import eu.darkcube.system.language.core.Language;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.userapi.User;
 
 public enum Message {
 
@@ -34,9 +33,9 @@ public enum Message {
 	}
 
 	public String getMessage(Language language, Object... replacements) {
-//		return language.getMessage(KEY_PREFIX + key, replacements);
+		// return language.getMessage(KEY_PREFIX + key, replacements);
 		return getMessage(key, language, replacements);
-//		return getMessage(key, language, replacements);
+		// return getMessage(key, language, replacements);
 	}
 
 	public String getServerMessage(Object... replacements) {
@@ -47,35 +46,34 @@ public enum Message {
 		return getMessage(user.getLanguage(), replacements);
 	}
 
-	public static String getMessage(String key, Language language,
-					Object... replacements) {
-		return ChatColor.translateAlternateColorCodes('&', language.getMessage(KEY_PREFIX
-						+ key, replacements));
+	public static String getMessage(String key, Language language, Object... replacements) {
+		return ChatColor.translateAlternateColorCodes('&',
+				language.getMessage(KEY_PREFIX + key, replacements));
 	}
 
-//	public static final String getMessage(String key, Language language,
-//					String... replacements) {
-//		try {
-//			String msg = language.getBundle().getString(key);
-//			if (msg.equals("[]")) {
-//				return " ";
-//			}
-//			for (int i = 0; msg.contains("{}")
-//							&& i < replacements.length; i++) {
-//				msg = msg.replaceFirst("\\{\\}", replacements[i]);
-//			}
-//			return ChatColor.translateAlternateColorCodes('&', msg);
-//		} catch (Exception ex) {
-//			StringBuilder builder = new StringBuilder();
-//			builder.append(key);
-//			if (replacements.length > 0) {
-//				for (int i = 0; i + 1 < replacements.length; i++) {
-//					builder.append(replacements[i]).append(',');
-//				}
-//				builder.append(replacements[replacements.length
-//								- 1]).append(']');
-//			}
-//			return builder.toString();
-//		}
-//	}
+	// public static final String getMessage(String key, Language language,
+	// String... replacements) {
+	// try {
+	// String msg = language.getBundle().getString(key);
+	// if (msg.equals("[]")) {
+	// return " ";
+	// }
+	// for (int i = 0; msg.contains("{}")
+	// && i < replacements.length; i++) {
+	// msg = msg.replaceFirst("\\{\\}", replacements[i]);
+	// }
+	// return ChatColor.translateAlternateColorCodes('&', msg);
+	// } catch (Exception ex) {
+	// StringBuilder builder = new StringBuilder();
+	// builder.append(key);
+	// if (replacements.length > 0) {
+	// for (int i = 0; i + 1 < replacements.length; i++) {
+	// builder.append(replacements[i]).append(',');
+	// }
+	// builder.append(replacements[replacements.length
+	// - 1]).append(']');
+	// }
+	// return builder.toString();
+	// }
+	// }
 }

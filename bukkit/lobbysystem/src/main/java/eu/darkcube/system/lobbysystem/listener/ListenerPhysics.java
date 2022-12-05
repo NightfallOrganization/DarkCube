@@ -10,6 +10,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import eu.darkcube.system.lobbysystem.Lobby;
 
 public class ListenerPhysics extends BaseListener {
 
@@ -17,6 +18,10 @@ public class ListenerPhysics extends BaseListener {
 	public void handle(PlayerInteractEvent e) {
 		if (e.getAction() == Action.PHYSICAL) {
 			e.setCancelled(true);
+			if (e.getClickedBlock()
+					.equals(Lobby.getInstance().getDataManager().getJumpAndRunPlate().getBlock())) {
+				Lobby.getInstance().getJaRManager().startJaR(e.getPlayer());
+			}
 		}
 	}
 
