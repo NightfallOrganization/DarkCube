@@ -1,0 +1,6 @@
+dependencies {
+    api cloudnet
+    api cloudnetBridge
+    api project(':pserver:pserver-api')
+    api project(':pserver:pserver-bukkit')
+}

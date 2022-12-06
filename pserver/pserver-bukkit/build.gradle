@@ -1,0 +1,5 @@
+dependencies {
+    api project(':pserver:pserver-api')
+    api project(':bukkit:commandapi')
+    api cloudnetWrapper
+}

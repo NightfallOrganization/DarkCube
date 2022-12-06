@@ -5,7 +5,6 @@ import org.bukkit.inventory.ItemStack;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
-import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
 
@@ -13,15 +12,12 @@ public class InventoryNewPServerSlot extends LobbyAsyncPagedInventory {
 
 	private static final InventoryType type_pserver_slot = InventoryType.of("pserver_slot");
 
-	public final PServerUserSlot psslot;
+	public final int psslot;
 
-	public final int slot;
-
-	public InventoryNewPServerSlot(User user, PServerUserSlot psslot, int slot) {
+	public InventoryNewPServerSlot(User user, int psslot) {
 		super(InventoryNewPServerSlot.type_pserver_slot,
-				Item.PSERVER_NEW_SLOT.getDisplayName(user, Integer.toString(slot)), user);
+				Item.PSERVER_NEW_SLOT.getDisplayName(user, Integer.toString(psslot + 1)), user);
 		this.psslot = psslot;
-		this.slot = slot;
 	}
 
 	@Override

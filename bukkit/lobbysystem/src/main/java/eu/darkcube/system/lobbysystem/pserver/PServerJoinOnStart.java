@@ -19,11 +19,11 @@ import eu.darkcube.system.commons.AsyncExecutor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.wrapper.event.PServerRemoveEvent;
-import eu.darkcube.system.pserver.wrapper.event.PServerUpdateEvent;
 import eu.darkcube.system.userapi.UserAPI;
 
 public class PServerJoinOnStart implements Listener {

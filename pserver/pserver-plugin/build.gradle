@@ -1,7 +1,5 @@
-apply plugin: 'java-library'
-
 dependencies {
-    api project(':pserver:pserver-common')
+    api project(':pserver:pserver-api')
     api project(':bukkit:darkcubesystem')
     api project(':bukkit:commandapi')
     api project(':bukkit:languageapi')

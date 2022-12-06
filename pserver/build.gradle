@@ -1,9 +1,3 @@
-apply plugin: 'java-library'
-
-dependencies {
-    api cloudnet
-    api cloudnetWrapper
-    api cloudnetBridge
-    embedApi project('pserver-common')
-    api project(':bukkit:commandapi')
+subprojects {
+    apply plugin: 'java-library'
 }

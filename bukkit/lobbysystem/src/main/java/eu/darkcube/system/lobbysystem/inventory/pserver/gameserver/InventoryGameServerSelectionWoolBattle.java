@@ -11,7 +11,6 @@ import de.dytanic.cloudnet.driver.service.ServiceTask;
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
 
@@ -20,10 +19,10 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
 	private static final InventoryType type_gameserver_selection_woolbattle =
 			InventoryType.of("gameserver_selection_woolbattle");
 
-	public InventoryGameServerSelectionWoolBattle(User user, PServerUserSlot psslot, int slot) {
+	public InventoryGameServerSelectionWoolBattle(User user, int psslot) {
 		super(user, Item.GAMESERVER_SELECTION_WOOLBATTLE,
 				InventoryGameServerSelectionWoolBattle.type_gameserver_selection_woolbattle,
-				new Sup(), new Func(), psslot, slot);
+				new Sup(), new Func(), psslot);
 	}
 
 	public static class Func implements BiFunction<User, ServiceTask, ItemBuilder> {

@@ -9,7 +9,6 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.world.WorldLoadEvent;
-
 import eu.darkcube.system.bauserver.Main;
 
 public class WorldEventListener implements Listener {
@@ -21,6 +20,9 @@ public class WorldEventListener implements Listener {
 
 	@EventHandler
 	public void handle(WeatherChangeEvent event) {
+		if (event.getWorld().hasMetadata("mayrain")) {
+			return;
+		}
 		if (event.toWeatherState()) {
 			event.setCancelled(true);
 			event.getWorld().setWeatherDuration(Integer.MAX_VALUE);

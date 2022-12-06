@@ -19,10 +19,10 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
+import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.wrapper.event.PServerUpdateEvent;
 
 public class InventoryPServer extends LobbyAsyncPagedInventory {
 

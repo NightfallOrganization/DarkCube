@@ -4,14 +4,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import eu.darkcube.system.Plugin;
+import eu.darkcube.system.bauserver.command.CommandBauserver;
 import eu.darkcube.system.bauserver.listener.WorldEventListener;
+import eu.darkcube.system.commandapi.v3.CommandAPI;
 
 public class Main extends Plugin {
 
 	@Override
 	public void onEnable() {
+		CommandAPI.getInstance().register(new CommandBauserver());
 		Bukkit.getPluginManager().registerEvents(new WorldEventListener(), this);
 		new BukkitRunnable() {
 			@Override
@@ -22,7 +24,7 @@ public class Main extends Plugin {
 			}
 		}.runTask(this);
 	}
-	
+
 	public void setupWorld(World world) {
 		world.setFullTime(6000);
 		world.setDifficulty(Difficulty.PEACEFUL);

@@ -23,12 +23,12 @@ import de.dytanic.cloudnet.ext.bridge.player.ICloudOfflinePlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import eu.darkcube.system.commons.AsyncExecutor;
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerAddOwnerEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerRemoveOwnerEvent;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.wrapper.event.PServerAddEvent;
-import eu.darkcube.system.pserver.wrapper.event.PServerAddOwnerEvent;
-import eu.darkcube.system.pserver.wrapper.event.PServerRemoveEvent;
-import eu.darkcube.system.pserver.wrapper.event.PServerRemoveOwnerEvent;
 
 public class SkullCache implements Listener {
 

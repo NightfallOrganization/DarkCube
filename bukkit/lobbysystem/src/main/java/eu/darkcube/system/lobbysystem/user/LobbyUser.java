@@ -28,12 +28,9 @@ public class LobbyUser {
 			PersistentDataTypes.set(PersistentDataTypes.INTEGER);
 	private static final PersistentDataType<Gadget> TGADGET =
 			PersistentDataTypes.enumType(Gadget.class);
-	private static final PersistentDataType<PServerUserSlots> PSERVER_SLOTS =
-			PersistentDataTypes.map(PersistentDataTypes.JSONDOCUMENT, slots -> {
-				return slots.createDocument();
-			}, doc -> {
-				return new PServerUserSlots(doc);
-			});
+	private static final PersistentDataType<PServerUserSlots> TPSERVER_SLOTS =
+			PersistentDataTypes.map(PersistentDataTypes.JSONDOCUMENT,
+					PServerUserSlots::createDocument, PServerUserSlots::fromDocument);
 	private static final Key ANIMATIONS = new Key(Lobby.getInstance(), "animations");
 	private static final Key SOUNDS = new Key(Lobby.getInstance(), "sounds");
 	private static final Key LASTDAILYREWARD = new Key(Lobby.getInstance(), "lastDailyReward");
@@ -41,9 +38,9 @@ public class LobbyUser {
 	private static final Key GADGET = new Key(Lobby.getInstance(), "gadget");
 	private static final Key POSITION = new Key(Lobby.getInstance(), "position");
 	private static final Key SELECTEDSLOT = new Key(Lobby.getInstance(), "selectedSlot");
+	private static final Key PSERVER_SLOTS = new Key(Lobby.getInstance(), "pserverSlots");
 	volatile IInventory openInventory;
 	boolean buildMode = false;
-	PServerUserSlots slots;
 	final User user;
 
 	public LobbyUser(User user) {
@@ -61,9 +58,10 @@ public class LobbyUser {
 				Gadget.GRAPPLING_HOOK);
 		this.user.getPersistentDataStorage().setIfNotPresent(SELECTEDSLOT,
 				PersistentDataTypes.INTEGER, 0);
+		this.user.getPersistentDataStorage().setIfNotPresent(PSERVER_SLOTS, TPSERVER_SLOTS,
+				new PServerUserSlots());
 		long time2 = System.currentTimeMillis();
 		this.openInventory = new InventoryPlayer();
-		this.slots = new PServerUserSlots(user);
 		if (System.currentTimeMillis() - time1 > 1000) {
 			Lobby.getInstance().getLogger()
 					.info("Loading LobbyUser took very long: "
@@ -73,18 +71,12 @@ public class LobbyUser {
 	}
 
 	void unload() {
-		this.slots.save();
-		this.slots = null;
 		this.openInventory = null;
 		this.buildMode = false;
 	}
 
 	public User getUser() {
 		return this.user;
-	}
-
-	public PServerUserSlots getSlots() {
-		return this.slots;
 	}
 
 	public IInventory getOpenInventory() {
@@ -123,6 +115,14 @@ public class LobbyUser {
 		}
 		this.setAnimations(oldAnimations);
 		return this;
+	}
+
+	public PServerUserSlots getPServerUserSlots() {
+		return user.getPersistentDataStorage().get(PSERVER_SLOTS, TPSERVER_SLOTS);
+	}
+
+	public void setPServerUserSlots(PServerUserSlots slots) {
+		user.getPersistentDataStorage().set(PSERVER_SLOTS, TPSERVER_SLOTS, slots);
 	}
 
 	public int getSelectedSlot() {

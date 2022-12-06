@@ -1,0 +1,5 @@
+main: eu.darkcube.system.pserver.bukkit.PServerWrapper
+version: 1.0
+name: PServer
+author: DasBabyPixel
+softdepend: [System]

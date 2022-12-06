@@ -11,8 +11,8 @@ import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.inventory.api.v1.PageArrow;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
+import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots;
-import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
 
@@ -52,10 +52,10 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 		}
 		final int pagesize = this.getPageSize();
 
-		PServerUserSlots slots = this.user.getSlots();
+		PServerUserSlots slots = this.user.getPServerUserSlots();
 
 		for (int slot = 0; slot < pservercount; slot++) {
-			PServerUserSlot pslot = slots.getSlot(slot);
+			PServerUserSlot pslot = slots.getUserSlot(slot);
 			ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pslot);
 
 			if (item == null) {

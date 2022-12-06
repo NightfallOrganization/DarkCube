@@ -12,7 +12,6 @@ import eu.darkcube.system.inventory.api.util.ItemBuilder;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
-import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots.PServerUserSlot;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
@@ -37,9 +36,7 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
 	protected final int[] itemSort;
 
-	public final PServerUserSlot psslot;
-
-	public final int slot;
+	public final int psslot;
 
 	private boolean done = false;
 
@@ -47,15 +44,13 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
 	public InventoryGameServerSelection(User user, Item item, InventoryType type,
 			Supplier<Collection<ServiceTask>> supplier,
-			BiFunction<User, ServiceTask, ItemBuilder> toItemFunction, PServerUserSlot psslot,
-			int slot) {
+			BiFunction<User, ServiceTask, ItemBuilder> toItemFunction, int psslot) {
 		super(type, item.getDisplayName(user), UserWrapper.fromUser(user));
 		auser = user;
 		this.supplier = supplier;
 		this.toItemFunction = toItemFunction;
 		this.item = item;
 		this.psslot = psslot;
-		this.slot = slot;
 
 		this.itemSort = new int[] {
 				//@formatter:off
