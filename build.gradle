@@ -50,7 +50,6 @@ allprojects {
         configurations {
             embedApi
             embedImplementation
-            eclipseFix
         }
         
         dependencies {
@@ -72,13 +71,6 @@ allprojects {
                 }
             }
         }
-        
-    
-    	pluginManager.withPlugin('eclipse') {
-        	eclipse.classpath {
-            	plusConfigurations += [ configurations.eclipseFix ]
-        	}
-    	}
     }
 }
 
