@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem;
 
 import java.io.IOException;
@@ -8,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.github.juliarn.npc.NPC;
 import com.github.juliarn.npc.NPCPool;
+import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -73,6 +81,7 @@ public class Lobby extends Plugin {
 		UserWrapper userWrapper = new UserWrapper();
 		UserAPI.getInstance().addModifier(userWrapper);
 		userWrapper.beginMigration();
+		PServerDataManager.beginMigration();
 
 		PServerSupport.init();
 		// Load all messages

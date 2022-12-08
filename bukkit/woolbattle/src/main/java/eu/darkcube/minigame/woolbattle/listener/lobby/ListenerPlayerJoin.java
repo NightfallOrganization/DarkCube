@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.listener.lobby;
 
 import org.bukkit.GameMode;
@@ -41,7 +48,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		p.setScoreboard(sb.getScoreboard());
 
 		Objective obj = sb.getObjective(ScoreboardObjective.LOBBY.getKey());
-		int minplayercount = WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+		int minPlayerCount = WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
 		Team needed = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
 		for (int i = 0; i < ObjectiveTeam.values().length; i++) {
 			ObjectiveTeam ot = ObjectiveTeam.values()[i];
@@ -53,7 +60,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 			p.removePotionEffect(effect.getType());
 		}
 
-		needed.setSuffix(Integer.toString(minplayercount));
+		needed.setSuffix(Integer.toString(minPlayerCount));
 		WoolBattle.getInstance().setMap(user);
 		WoolBattle.getInstance().setOnline(user);
 		WoolBattle.getInstance().setEpGlitch(user);

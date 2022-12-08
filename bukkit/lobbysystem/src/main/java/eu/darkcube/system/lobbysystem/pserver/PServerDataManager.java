@@ -1,9 +1,18 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.pserver;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.Material;
@@ -32,18 +41,19 @@ public class PServerDataManager {
 				.containsDatabase("pserver_userslots")) {
 			Database database = CloudNetDriver.getInstance().getDatabaseProvider()
 					.getDatabase("pserver_userslots");
-			Type type = new TypeToken<Map<Integer, PServerUserSlotOld>>() {}.getType();
+			Type type = new TypeToken<Map<Integer, PServerUserSlotOld>>() {
+			}.getType();
 			for (String key : database.keys()) {
 				UUID uuid = UUID.fromString(key);
 				User user = UserAPI.getInstance().getUser(uuid);
 				LobbyUser u = UserWrapper.fromUser(user);
-				Map<Integer, PServerUserSlotOld> oslots =
+				Map<Integer, PServerUserSlotOld> oldSlots =
 						GsonSerializer.gson.fromJson(database.get(key).toJson(), type);
 				Map<Integer, PServerUserSlot> slots = new HashMap<>();
-				for (Map.Entry<Integer, PServerUserSlotOld> entry : oslots.entrySet()) {
+				for (Map.Entry<Integer, PServerUserSlotOld> entry : oldSlots.entrySet()) {
 					PServerUserSlot slot =
 							new PServerUserSlot(entry.getValue().pserverId, new JsonDocument());
-					JsonObject o = entry.getValue().data;
+					JsonObject o = entry.getValue().data();
 					if (o.has("private"))
 						slot.data.append("private", o.get("private").getAsBoolean());
 					if (o.has("task"))
@@ -51,7 +61,7 @@ public class PServerDataManager {
 					slots.put(entry.getKey(), slot);
 				}
 				PServerUserSlots s = new PServerUserSlots();
-				s.slots = slots;
+				s.slots.putAll(slots);
 				u.setPServerUserSlots(s);
 			}
 		}
@@ -77,13 +87,14 @@ public class PServerDataManager {
 		}
 		if (Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(task)) {
 			return new InventoryGameServerSelectionWoolBattle.Func().apply(user,
-					CloudNetDriver.getInstance().getServiceTaskProvider().getServiceTask(task));
+					Objects.requireNonNull(CloudNetDriver.getInstance().getServiceTaskProvider()
+							.getServiceTask(task)));
 		}
 		return null;
 	}
 
 	public static class PServerUserSlots {
-		private Map<Integer, PServerUserSlot> slots;
+		private final Map<Integer, PServerUserSlot> slots = new HashMap<>();
 
 		public synchronized PServerUserSlot getUserSlot(int slot) {
 			if (!slots.containsKey(slot)) {
@@ -116,9 +127,10 @@ public class PServerDataManager {
 		}
 	}
 
+
 	public static class PServerUserSlot {
 		public UniqueId pserverId = null;
-		public JsonDocument data = null;
+		public JsonDocument data;
 
 		public PServerUserSlot() {
 			this.data = new JsonDocument();
@@ -127,10 +139,6 @@ public class PServerDataManager {
 		public PServerUserSlot(UniqueId pserverId, JsonDocument data) {
 			this.pserverId = pserverId;
 			this.data = data;
-		}
-
-		public boolean isInUse() {
-			return pserverId != null;
 		}
 
 		public JsonDocument createDocument() {
@@ -148,6 +156,7 @@ public class PServerDataManager {
 			return new PServerUserSlot(pserverId, data);
 		}
 	}
+
 
 	public static class PServerUserSlotsOld {
 
@@ -222,16 +231,16 @@ public class PServerDataManager {
 		// }
 		// }
 
-		public class PServerUserSlotOld {
+
+		public static class PServerUserSlotOld {
 
 			// @DontSerialize
 			// private boolean changed = false;
-			private UniqueId pserverId = null;
-			private JsonObject data = null;
+			public UniqueId pserverId = null;
+			public JsonObject data = null;
 
-			public void load(UniqueId pserverId) {
-				this.pserverId = pserverId;
-				// this.changed = true;
+			private JsonObject data() {
+				return data;
 			}
 
 			// public void delete(User owner) {
@@ -298,9 +307,4 @@ public class PServerDataManager {
 			// }
 		}
 	}
-
-	public static class InvalidConfigurationException extends RuntimeException {
-		private static final long serialVersionUID = 9158875635797975221L;
-	}
-
 }

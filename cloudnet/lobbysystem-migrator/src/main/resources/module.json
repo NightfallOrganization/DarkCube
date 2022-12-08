@@ -1,0 +1,10 @@
+{
+  "runtimeModule": true,
+  "group": "eu.darkcube.cloudnet.modules",
+  "name": "DarkCube-LobbySystem-Migrator",
+  "version": "1.0",
+  "author": "DasBabyPixel",
+  "description": "Migrates data from the lobbysystem from the old format into the new one",
+  "main": "de.dytanic.cloudnet.ext.database.mysql.CloudNetMySQLDatabaseModule",
+  "storesSensitiveData": true
+}

@@ -5,6 +5,6 @@
 	"version": "1.0",
 	"author": "DasBabyPixel",
 	"description": "Cloud-PServer",
-	"main": "eu.darkcube.system.pserver.node.PServerModule",
+	"main": "eu.darkcube.system.pserver.cloudnet.PServerModule",
 	"storesSensitiveData": true
 }
