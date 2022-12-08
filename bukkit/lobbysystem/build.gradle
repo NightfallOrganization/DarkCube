@@ -1,14 +1,15 @@
 dependencies {
-    api project(':bukkit:darkcubesystem')
-    api project(':bukkit:languageapi')
-    api project(':bukkit:inventoryapi')
-    api project(':pserver:pserver-api')
-    api project(':pserver:pserver-bukkit')
-    api project(':bukkit:userapi')
+    implementation project(':bukkit:darkcubesystem')
+    implementation project(':bukkit:commons')
+    implementation project(':bukkit:languageapi')
+    implementation project(':bukkit:inventoryapi')
+    implementation project(':pserver:pserver-bukkit')
+    implementation project(':pserver:pserver-api')
+    implementation project(':bukkit:userapi')
     embedApi project(':common:labymod-emotes')
     implementation 'org.jetbrains:annotations:23.0.0'
-    api cloudnetDriver
-    api cloudnetWrapper
-    api cloudnetBridge
-    api luckperms
+    implementation cloudnetDriver
+    implementation cloudnetWrapper
+    implementation cloudnetBridge
+    implementation luckperms
 }

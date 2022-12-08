@@ -1,5 +1,5 @@
 dependencies {
     embedApi 'com.mojang:brigadier:1.0.17'
-    api 'com.viaversion:viaversion-api:4.4.2'
-    api project(':bukkit:commons')
+    implementation 'com.viaversion:viaversion-api:4.4.2'
+    implementation project(':bukkit:commons')
 }
