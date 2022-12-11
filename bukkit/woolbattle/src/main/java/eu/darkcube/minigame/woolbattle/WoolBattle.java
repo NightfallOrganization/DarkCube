@@ -18,6 +18,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -188,8 +189,9 @@ public class WoolBattle extends Plugin {
 		List<String> languageEntries = new ArrayList<>();
 		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey)
 				.collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values()).stream()
-				.map(i -> Message.ITEM_PREFIX + i.getKey()).collect(Collectors.toList()));
+		languageEntries.addAll(
+				Arrays.asList(Item.values()).stream().map(i -> Message.ITEM_PREFIX + i.getKey())
+						.collect(Collectors.toList()));
 		languageEntries.addAll(Arrays.asList(Item.values()).stream()
 				.filter(i -> i.getBuilder().getLores().size() > 0)
 				.map(i -> Message.ITEM_PREFIX + Message.LORE_PREFIX + i.getKey())
@@ -284,8 +286,8 @@ public class WoolBattle extends Plugin {
 		pm.registerInterface(VoidWorldPluginLoader.class);
 		try {
 			pm.loadPlugin(VoidWorldPluginLoader.file);
-		} catch (UnknownDependencyException | InvalidPluginException
-				| InvalidDescriptionException ex) {
+		} catch (UnknownDependencyException | InvalidPluginException |
+				InvalidDescriptionException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -336,7 +338,6 @@ public class WoolBattle extends Plugin {
 		WoolBattle.registerListeners(this.listenerLaunchable);
 		WoolBattle.registerListeners(this.listenerChat);
 		WoolBattle.registerListeners(this.listenerAntiMonster);
-		this.listenerLaunchable.start();
 
 		// Load worlds (At serverstart there are no worlds but if the plugin
 		// gets
@@ -436,7 +437,8 @@ public class WoolBattle extends Plugin {
 		Scoreboard sb = new Scoreboard(user);
 		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
 				sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
-		String suffix = this.epGlitch ? Message.EP_GLITCH_ON.getMessage(user)
+		String suffix = this.epGlitch
+				? Message.EP_GLITCH_ON.getMessage(user)
 				: Message.EP_GLITCH_OFF.getMessage(user);
 		team.setSuffix(suffix);
 	}
@@ -605,16 +607,16 @@ public class WoolBattle extends Plugin {
 	}
 
 	public final void loadWorld(String world) {
-		if (!new File(this.getServer().getWorldContainer(), world).exists()
-				&& !new File(this.getServer().getWorldContainer().getParent(), world).exists()) {
+		if (!new File(this.getServer().getWorldContainer(), world).exists() && !new File(
+				this.getServer().getWorldContainer().getParent(), world).exists()) {
 			System.out.println("World " + world + " not found");
 			return;
 		}
 		if (Bukkit.getWorld(world) == null) {
 			// && !new File(Bukkit.getWorldContainer(), world).exists()) {
 			try {
-				WorldCreator creator = new WorldCreator(world)
-						.generator(this.getDefaultWorldGenerator(world, world));
+				WorldCreator creator = new WorldCreator(world).generator(
+						this.getDefaultWorldGenerator(world, world));
 				creator.createWorld();
 			} catch (NullPointerException ex) {
 				ex.printStackTrace();
@@ -649,8 +651,8 @@ public class WoolBattle extends Plugin {
 			if (l instanceof RegisterNotifyListener) {
 				((RegisterNotifyListener) l).registered();
 			}
-			WoolBattle.getInstance().getServer().getPluginManager().registerEvents(l,
-					WoolBattle.getInstance());
+			WoolBattle.getInstance().getServer().getPluginManager()
+					.registerEvents(l, WoolBattle.getInstance());
 		}
 	}
 

@@ -10,6 +10,7 @@ package eu.darkcube.system.pserver.cloudnet;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceConfiguration;
@@ -45,13 +46,13 @@ public class NodePServer implements PServer {
 
 	private volatile boolean stopping = false;
 
-	public NodePServer(UniqueId id, boolean temporary, Collection<UUID> owners, String serverName,
-			String taskName, ServiceConfiguration conf, JsonDocument data) {
+	public NodePServer(UniqueId id, boolean temporary, String serverName, String taskName,
+			ServiceConfiguration conf, JsonDocument data) {
 		this.taskName = taskName;
 		this.id = id;
 		this.data = data;
 		this.temporary = temporary;
-		setOwners(owners);
+		setOwners(null);
 		this.serverName = serverName;
 		this.conf = conf;
 		this.createSerializable();
@@ -124,8 +125,9 @@ public class NodePServer implements PServer {
 	// }
 
 	public void createSerializable() {
-		this.serializable = new PServerSerializable(id, getOnlinePlayers(), state, temporary,
-				startedAt, owners, taskName, serverName);
+		this.serializable =
+				new PServerSerializable(id, getOnlinePlayers(), temporary, startedAt, taskName,
+						serverName, state);
 	}
 
 	public void rebuildSerializable() {

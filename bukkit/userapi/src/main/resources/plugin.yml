@@ -2,3 +2,4 @@ name: UserAPI
 author: DasBabyPixel
 version: 1.0
 main: eu.darkcube.system.userapi.PluginUserAPI
+softdepend: [System]

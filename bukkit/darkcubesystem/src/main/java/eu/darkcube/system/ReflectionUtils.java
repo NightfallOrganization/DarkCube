@@ -137,22 +137,22 @@ public final class ReflectionUtils {
 	 * @param arguments   Arguments which are used to construct an object of the
 	 *                    desired target class
 	 * @return The instance of the desired target class with the specified arguments
-	 * @throws InstantiationException    If you cannot create an instance of the
+	 * @throws ReflectionException    If you cannot create an instance of the
 	 *                                   desired target class due to certain
-	 *                                   circumstances
-	 * @throws IllegalAccessException    If the desired constructor cannot be
-	 *                                   accessed due to certain circumstances
-	 * @throws IllegalArgumentException  If the types of the arguments do not match
+	 *                                   circumstances<br>
+	 * 									If the desired constructor cannot be
+	 *                                   accessed due to certain circumstances<br>
+	 * 									If the types of the arguments do not match
 	 *                                   the parameter types of the constructor
 	 *                                   (this should not occur since it searches
 	 *                                   for a constructor with the types of the
-	 *                                   arguments)
-	 * @throws InvocationTargetException If the desired constructor cannot be
-	 *                                   invoked
-	 * @throws NoSuchMethodException     If the desired constructor with the
-	 *                                   specified arguments cannot be found
-	 * @throws ClassNotFoundException    If the desired target class with the
-	 *                                   specified name and package cannot be found
+	 *                                   arguments)<br>
+	 * 									If the desired constructor cannot be
+	 *                                   invoked<br>
+	 * 									If the desired constructor with the
+	 *                                   specified arguments cannot be found<br>
+	 * 									If the desired target class with the
+	 *                                   specified name and package cannot be found<br>
 	 * @see #getClass(String, PackageType)
 	 * @see #instantiateObject(Class, Object...)
 	 */
@@ -168,7 +168,7 @@ public final class ReflectionUtils {
 	 * @param parameterTypes Parameter types of the desired method
 	 * @return The method of the target class with the specified name and parameter
 	 *         types
-	 * @throws NoSuchMethodException If the desired method of the target class with
+	 * @throws ReflectionException If the desired method of the target class with
 	 *                               the specified name and parameter types cannot
 	 *                               be found
 	 * @see DataType#getPrimitive(Class[])
@@ -779,7 +779,7 @@ public final class ReflectionUtils {
 		/**
 		 * Returns the primitive class array of the given object array
 		 * 
-		 * @param object Given object array
+		 * @param objects Given object array
 		 * @return The primitive class array
 		 */
 		public static Class<?>[] getPrimitive(Object[] objects) {
@@ -796,7 +796,7 @@ public final class ReflectionUtils {
 		/**
 		 * Returns the reference class array of the given object array
 		 * 
-		 * @param object Given object array
+		 * @param objects Given object array
 		 * @return The reference class array
 		 */
 		public static Class<?>[] getReference(Object[] objects) {

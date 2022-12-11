@@ -85,12 +85,7 @@ public class CommandSource implements ISuggestionProvider {
 
 	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name, String displayName,
 			Entity entity, Vector2f rotation, Map<String, Object> extra) {
-		this(source, pos, world, name, displayName, false, entity, new ResultConsumer<CommandSource>() {
-
-			@Override
-			public void onCommandComplete(CommandContext<CommandSource> context, boolean success, int result) {
-			}
-
+		this(source, pos, world, name, displayName, false, entity, (context, success, result) -> {
 		}, Type.FEET, rotation, extra);
 	}
 

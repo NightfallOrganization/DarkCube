@@ -7,28 +7,13 @@
 
 package eu.darkcube.system.pserver.cloudnet;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import de.dytanic.cloudnet.CloudNet;
+import de.dytanic.cloudnet.common.concurrent.CompletableTask;
+import de.dytanic.cloudnet.common.concurrent.ITask;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
-import de.dytanic.cloudnet.driver.service.ProcessConfiguration;
-import de.dytanic.cloudnet.driver.service.ServiceConfiguration;
-import de.dytanic.cloudnet.driver.service.ServiceDeployment;
-import de.dytanic.cloudnet.driver.service.ServiceEnvironmentType;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.driver.service.ServiceRemoteInclusion;
-import de.dytanic.cloudnet.driver.service.ServiceTask;
-import de.dytanic.cloudnet.driver.service.ServiceTemplate;
+import de.dytanic.cloudnet.driver.service.*;
 import de.dytanic.cloudnet.driver.template.TemplateStorage;
 import de.dytanic.cloudnet.service.EmptyGroupConfiguration;
 import de.dytanic.cloudnet.template.LocalTemplateStorage;
@@ -38,11 +23,15 @@ import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperAddOwner;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperAddPServer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperRemoveOwner;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperRemovePServer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperUpdateInfo;
+import eu.darkcube.system.pserver.common.packet.packets.*;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class NodePServerProvider extends PServerProvider {
 
@@ -78,8 +67,9 @@ public class NodePServerProvider extends PServerProvider {
 				Collection<String> associatedNodes = new ArrayList<>();
 				Collection<String> groups = new ArrayList<>();
 				Collection<String> deletedFilesAfterStop = new ArrayList<>();
-				ProcessConfiguration processConfiguration = new ProcessConfiguration(
-						ServiceEnvironmentType.MINECRAFT_SERVER, 312, new ArrayList<String>());
+				ProcessConfiguration processConfiguration =
+						new ProcessConfiguration(ServiceEnvironmentType.MINECRAFT_SERVER, 312,
+								new ArrayList<>());
 				int startPort = 20000;
 				int minServiceCount = 0;
 
@@ -114,7 +104,7 @@ public class NodePServerProvider extends PServerProvider {
 				CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("pserver_data");
 	}
 
-	private Map<UniqueId, NodePServer> pservers = new HashMap<>();
+	public ConcurrentMap<UniqueId, NodePServer> pservers = new ConcurrentHashMap<>();
 
 	@Override
 	public String newName() {
@@ -138,19 +128,25 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public void setPServerData(UniqueId pserver, JsonDocument data) {
+	public ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
+		CompletableTask<Void> task = new CompletableTask<>();
 		pserverData.containsAsync(pserver.toString()).fireExceptionOnFailure().onComplete(con -> {
 			if (con) {
 				pserverData.update(pserver.toString(), data);
 			} else {
 				pserverData.insert(pserver.toString(), data);
 			}
+			task.complete(null);
 		});
+		return task;
 	}
 
 	@Override
-	public void clearOwners(UniqueId id) {
+	public ITask<Void> clearOwners(UniqueId id) {
 		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id);
+		CompletableTask<Void> task = new CompletableTask<>();
+		task.complete(null);
+		return task;
 	}
 
 	@Override
@@ -177,23 +173,29 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public void addOwner(UniqueId id, UUID owner) {
+	public ITask<Void> addOwner(UniqueId id, UUID owner) {
 		DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, owner);
 		this.getPServerOptional(id).ifPresent(ps -> {
 			ps.getOwners().add(owner);
 			ps.rebuildSerializable();
 		});
 		new PacketNodeWrapperAddOwner(id, owner).sendAsync();
+		CompletableTask<Void> task = new CompletableTask<>();
+		task.complete(null);
+		return task;
 	}
 
 	@Override
-	public void removeOwner(UniqueId id, UUID owner) {
+	public ITask<Void> removeOwner(UniqueId id, UUID owner) {
 		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, owner);
 		this.getPServerOptional(id).ifPresent(ps -> {
 			ps.getOwners().remove(owner);
 			ps.rebuildSerializable();
 		});
 		new PacketNodeWrapperRemoveOwner(id, owner).sendAsync();
+		CompletableTask<Void> task = new CompletableTask<>();
+		task.complete(null);
+		return task;
 	}
 
 	@Override
@@ -222,27 +224,15 @@ public class NodePServerProvider extends PServerProvider {
 
 	@Override
 	public NodePServer createPServer(PServerSerializable configuration) {
-		return this.createPServer(configuration, null);
-	}
-
-	@Override
-	public NodePServer createPServer(PServerSerializable configuration, ServiceTask task) {
 		if (this.isPServer(configuration.id)) {
 			return this.getPServer(configuration.id);
 		}
-		if (task == null) {
-			task = this.pserverTask;
+		if (configuration.taskName == null) {
+			configuration.taskName = this.pserverTask.getName();
 		}
-		NodePServer pserver =
-				this.newPServer(configuration, getPServerData(configuration.id), task);
+		NodePServer pserver = this.newPServer(configuration, getPServerData(configuration.id));
 		this.addOrUpdate(pserver);
 		return pserver;
-	}
-
-	public Collection<ServiceTemplate> getAllTemplates() {
-		return this.storage.getTemplates().stream()
-				.filter(s -> s.getPrefix().equals(PServerProvider.getTemplatePrefix()))
-				.collect(Collectors.toList());
 	}
 
 	public Collection<String> getAllTemplateIDs() {
@@ -254,24 +244,26 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public void delete(UniqueId pserver) {
+	public ITask<Void> delete(UniqueId pserver) {
+		CompletableTask<Void> task = new CompletableTask<>();
 		NodePServerProvider.executor.submit(() -> {
 			this.getPServerOptional(pserver).ifPresent(ps -> {
 				ServiceInfoSnapshot snap = ps.getSnapshot();
 				ps.stop();
 				if (snap != null) {
-					if (snap.provider() != null)
-						snap.provider().kill();
+					snap.provider().kill();
 				}
 			});
 			ServiceTemplate template = PServerProvider.getTemplate(pserver);
 			if (this.storage.has(template)) {
 				this.storage.delete(template);
 			}
+			task.complete(null);
 		});
+		return task;
 	}
 
-	public NodePServer newPServer(PServerSerializable s, JsonDocument data, ServiceTask task) {
+	private NodePServer newPServer(PServerSerializable s, JsonDocument data) {
 		String groupGlobalName = "pserver-global";
 		if (!CloudNet.getInstance().getGroupConfigurationProvider()
 				.isGroupConfigurationPresent(groupGlobalName)) {
@@ -279,8 +271,8 @@ public class NodePServerProvider extends PServerProvider {
 					.addGroupConfiguration(new EmptyGroupConfiguration(groupGlobalName));
 		}
 		ServiceConfiguration.Builder confb = ServiceConfiguration.builder()
-				.task(CloudNet.getInstance().getServiceTaskProvider()
-						.getServiceTask(task.getName()))
+				.task(Objects.requireNonNull(
+						CloudNet.getInstance().getServiceTaskProvider().getServiceTask(s.taskName)))
 				.task(NodePServerProvider.pserverTaskName).staticService(false)
 				.addTemplates(this.globalTemplate).addGroups("pserver-global");
 		if (!s.temporary) {
@@ -301,10 +293,7 @@ public class NodePServerProvider extends PServerProvider {
 		}
 		confb.node(CloudNet.getInstance().getConfig().getIdentity().getUniqueId());
 		ServiceConfiguration conf = confb.build();
-
-		NodePServer ps = new NodePServer(s.id, s.temporary, s.owners, s.serverName, task.getName(),
-				conf, data);
-		return ps;
+		return new NodePServer(s.id, s.temporary, s.serverName, s.taskName, conf, data);
 	}
 
 	public static void init() {
@@ -312,6 +301,8 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	public boolean isPServer(UniqueId uniqueId) {
+		if (uniqueId == null)
+			return false;
 		return this.pservers.containsKey(uniqueId);
 	}
 

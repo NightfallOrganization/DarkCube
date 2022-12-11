@@ -18,7 +18,7 @@ public class HandlerDataUpdate implements PacketHandler<PacketNodeWrapperDataUpd
 	public Packet handle(PacketNodeWrapperDataUpdate packet) {
 		WrapperPServerProvider.getInstance().getPServerOptional(packet.getPServerId())
 				.ifPresent(ps -> {
-					ps.update(ps.getSerializable(), ps.getData());
+					ps.update(packet.getData());
 				});
 		return null;
 	}

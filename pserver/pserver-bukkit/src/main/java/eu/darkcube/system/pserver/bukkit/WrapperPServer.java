@@ -10,8 +10,11 @@ package eu.darkcube.system.pserver.bukkit;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 import eu.darkcube.system.pserver.common.packet.Packet;
@@ -36,22 +39,25 @@ public class WrapperPServer implements PServer {
 	private PServerSerializable serializable;
 	private JsonDocument data;
 
-	WrapperPServer(PServerSerializable info, JsonDocument data) {
-		this.update(info, data);
+	WrapperPServer(PServerSerializable info, JsonDocument data, Collection<UUID> owners) {
+		this.owners = owners;
+		this.update(info);
+		this.update(data);
 	}
 
-	public synchronized void update(PServerSerializable info, JsonDocument data) {
+	public synchronized void update(PServerSerializable info) {
 		this.serializable = info;
-		this.data = data;
-
 		this.id = info.id;
 		this.state = info.state;
 		this.online = info.online;
 		this.temporary = info.temporary;
 		this.startedAt = info.startedAt;
-		this.owners = new HashSet<>(info.owners);
 		this.taskName = info.taskName;
 		this.serverName = info.serverName;
+	}
+
+	public synchronized void update(JsonDocument data) {
+		this.data = data;
 	}
 
 	@Override

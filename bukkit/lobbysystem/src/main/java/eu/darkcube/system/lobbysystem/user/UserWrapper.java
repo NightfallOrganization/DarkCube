@@ -7,8 +7,6 @@
 
 package eu.darkcube.system.lobbysystem.user;
 
-import java.util.UUID;
-import org.bukkit.Bukkit;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.system.lobbysystem.Lobby;
@@ -17,6 +15,10 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.data.Key;
 import eu.darkcube.system.userapi.data.UserModifier;
+import org.bukkit.Bukkit;
+
+import java.util.Collection;
+import java.util.UUID;
 
 public class UserWrapper implements UserModifier {
 	public static final Key key = new Key(Lobby.getInstance(), "user");
@@ -27,7 +29,8 @@ public class UserWrapper implements UserModifier {
 			Lobby.getInstance().getLogger().info("Starting migration of lobbysystem_userdata");
 			Database db = CloudNetDriver.getInstance().getDatabaseProvider()
 					.getDatabase("lobbysystem_userdata");
-			for (String key : db.keys()) {
+			Collection<String> keys = db.keys();
+			for (String key : keys) {
 				long time1 = System.currentTimeMillis();
 				UUID uuid = UUID.fromString(key);
 				User user = UserAPI.getInstance().getUser(uuid);

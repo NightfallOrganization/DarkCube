@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.packet.Packet;
 import eu.darkcube.system.pserver.common.packet.PacketHandler;

@@ -7,12 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import eu.darkcube.system.ReflectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -39,27 +42,35 @@ import eu.darkcube.system.pserver.common.PServerProvider;
 
 public class SkullCache implements Listener {
 
-	public static Map<UUID, ItemStack> cache = new HashMap<>();
+	public static Map<UUID, Object> cache = new HashMap<>();
+	private static final Method asNMSCopy = ReflectionUtils.getMethod(
+			ReflectionUtils.getClass("CraftItemStack",
+					ReflectionUtils.PackageType.CRAFTBUKKIT_INVENTORY), "asNMSCopy",
+			ItemStack.class);
+	private static final Method asBukkitCopy = ReflectionUtils.getMethod(
+			ReflectionUtils.getClass("CraftItemStack",
+					ReflectionUtils.PackageType.CRAFTBUKKIT_INVENTORY), "asBukkitCopy",
+			asNMSCopy.getReturnType());
 
 	public static void loadToCache(UUID ownerUUID, String ownerName) {
 		if (SkullCache.cache.containsKey(ownerUUID)) {
 			return;
 		}
-		org.bukkit.inventory.ItemStack i = new org.bukkit.inventory.ItemStack(Material.SKULL_ITEM,
-				1, (short) SkullType.PLAYER.ordinal());
+		ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
 		SkullMeta meta = (SkullMeta) i.getItemMeta();
 		meta.setOwner(ownerName);
 		meta.setDisplayName(ownerName);
 		i.setItemMeta(meta);
-		SkullCache.cache.put(ownerUUID, i);
+		SkullCache.cache.put(ownerUUID, ReflectionUtils.invokeMethod(null, asNMSCopy, i));
 	}
 
 	public static void unloadFromCache(UUID ownerUUID) {
 		SkullCache.cache.remove(ownerUUID);
 	}
 
-	public static org.bukkit.inventory.ItemStack getCachedItem(UUID ownerUUID) {
-		return (SkullCache.cache.get(ownerUUID));
+	public static ItemStack getCachedItem(UUID ownerUUID) {
+		return (ItemStack) ReflectionUtils.invokeMethod(null, asBukkitCopy,
+				SkullCache.cache.get(ownerUUID));
 	}
 
 	private static SkullCache sc = new SkullCache();

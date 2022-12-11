@@ -13,18 +13,13 @@ import eu.darkcube.system.pserver.common.packet.Packet;
 public class PacketWrapperNodeCreatePServer extends Packet {
 
 	private PServerSerializable pserver;
-	private String taskname;
 
-	public PacketWrapperNodeCreatePServer(PServerSerializable pserver, String task) {
+	public PacketWrapperNodeCreatePServer(PServerSerializable pserver) {
 		this.pserver = pserver;
-		this.taskname = task;
 	}
 
 	public PServerSerializable getInfo() {
 		return pserver;
 	}
 
-	public String getTask() {
-		return taskname;
-	}
 }

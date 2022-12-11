@@ -18,10 +18,12 @@ public class HandlerCreatePServer implements PacketHandler<PacketWrapperNodeCrea
 
 	@Override
 	public Packet handle(PacketWrapperNodeCreatePServer packet) {
-		Packet ps = new PacketNodeWrapperPServer(NodePServerProvider.getInstance()
-				.createPServer(packet.getInfo(), packet.getTask() == null ? null
-						: CloudNetDriver.getInstance().getServiceTaskProvider().getServiceTask(packet.getTask()))
-				.getSerializable());
-		return ps;
+		//		Packet ps = new PacketNodeWrapperPServer(NodePServerProvider.getInstance()
+		//				.createPServer(packet.getInfo(), packet.getTask() == null ? null
+		//						: CloudNetDriver.getInstance().getServiceTaskProvider().getServiceTask(packet.getTask()))
+		//				.getSerializable());
+		return new PacketNodeWrapperPServer(
+				NodePServerProvider.getInstance().createPServer(packet.getInfo())
+						.getSerializable());
 	}
 }

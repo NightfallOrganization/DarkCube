@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,8 +60,9 @@ public class UserAPI {
 				UUID uuid = UUID.fromString(key);
 				User user = getUser(uuid);
 				user.setLanguage(db.get(key).get("language", Language.class));
-				PluginUserAPI.getInstance().getLogger().info(
-						"Migrating language: " + user.getName() + "(" + user.getUniqueId() + ")");
+				PluginUserAPI.getInstance().getLogger()
+						.info("Migrating language: " + user.getName() + "(" + user.getUniqueId()
+								+ ")");
 				unloadUser(user, true);
 			}
 			CloudNetDriver.getInstance().getDatabaseProvider().deleteDatabase("user_languages");
@@ -73,8 +75,9 @@ public class UserAPI {
 				BigInteger cubes = doc.getBigInteger("cubes");
 				User user = getUser(UUID.fromString(key));
 				user.setCubes(cubes);
-				PluginUserAPI.getInstance().getLogger().info(
-						"Migrating cubes: " + user.getName() + "(" + user.getUniqueId() + ")");
+				PluginUserAPI.getInstance().getLogger()
+						.info("Migrating cubes: " + user.getName() + "(" + user.getUniqueId()
+								+ ")");
 				unloadUser(user, true);
 			}
 			CloudNetDriver.getInstance().getDatabaseProvider().deleteDatabase("cubesapi_cubes");
@@ -84,9 +87,7 @@ public class UserAPI {
 				User user = getUser(packet.getUniqueId());
 				if (user instanceof BukkitUser) {
 					BukkitUser bu = (BukkitUser) user;
-					synchronized (UserAPI.this) {
-						bu.getPersistentDataStorage().getData().append(packet.getData());
-					}
+					bu.getPersistentDataStorage().getData().append(packet.getData());
 				}
 			}
 			return null;
@@ -96,9 +97,7 @@ public class UserAPI {
 				User user = getUser(packet.getUniqueId());
 				if (user instanceof BukkitUser) {
 					BukkitUser bu = (BukkitUser) user;
-					synchronized (UserAPI.this) {
-						bu.getPersistentDataStorage().getData().remove(packet.getKey().toString());
-					}
+					bu.getPersistentDataStorage().getData().remove(packet.getKey().toString());
 				}
 			}
 			return null;
@@ -107,8 +106,8 @@ public class UserAPI {
 			@Override
 			public void run() {
 				for (BukkitUser user : users.values()) {
-					if (user.lastAccess() + UNLOAD_USERS_AFTER_MILLIS < System
-							.currentTimeMillis()) {
+					if (user.lastAccess() + UNLOAD_USERS_AFTER_MILLIS
+							< System.currentTimeMillis()) {
 						unloadUser(user);
 					}
 				}
@@ -181,8 +180,8 @@ public class UserAPI {
 		if (System.currentTimeMillis() - time1 > 1000) {
 			PluginUserAPI.getInstance().getLogger()
 					.info("Loading user took very long: " + (System.currentTimeMillis() - time1)
-							+ " | " + (System.currentTimeMillis() - time2) + " | "
-							+ (System.currentTimeMillis() - time3));
+							+ " | " + (System.currentTimeMillis() - time2) + " | " + (
+							System.currentTimeMillis() - time3));
 		}
 		return user;
 	}
@@ -240,14 +239,14 @@ public class UserAPI {
 		ITaskListener<Boolean> failureListener = new ITaskListener<Boolean>() {
 			@Override
 			public void onCancelled(ITask<Boolean> task) {
-				new IllegalStateException("CANT CANCEL THIS TASK!!! THINGS MAY BREAK!!!")
-						.printStackTrace();
+				new IllegalStateException(
+						"CANT CANCEL THIS TASK!!! THINGS MAY BREAK!!!").printStackTrace();
 			}
 
 			@Override
 			public void onFailure(ITask<Boolean> task, Throwable th) {
-				new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!", th)
-						.printStackTrace();
+				new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!",
+						th).printStackTrace();
 			}
 		};
 		if (!sync) {
@@ -267,14 +266,13 @@ public class UserAPI {
 						@Override
 						public void onCancelled(ITask<Boolean> task) {
 							new IllegalStateException(
-									"CANT CANCEL THIS TASK!!! THINGS MAY BREAK!!!")
-											.printStackTrace();
+									"CANT CANCEL THIS TASK!!! THINGS MAY BREAK!!!").printStackTrace();
 						}
 
 						@Override
 						public void onFailure(ITask<Boolean> task, Throwable th) {
-							new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!", th)
-									.printStackTrace();
+							new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!",
+									th).printStackTrace();
 						}
 					});
 		} else {

@@ -99,8 +99,8 @@ public class PServerPlugin extends DarkCubePlugin {
 
 		PServerProvider.getInstance().setPServerCommand(new PServerCommand());
 
-		this.linkManager.addLink(() -> new LuckPermsLink());
-		this.linkManager.addLink(() -> new WoolBattleLink());
+		this.linkManager.addLink(LuckPermsLink::new);
+		this.linkManager.addLink(WoolBattleLink::new);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ public class WoolBattleLink extends Link {
 	protected void link() throws Throwable {
 		eu.darkcube.minigame.woolbattle.util.StatsLink.enabled = false;
 		eu.darkcube.minigame.woolbattle.util.CloudNetLink.shouldDisplay = false;
+		CommandAPI.getInstance().unregisterPrefixlessByPrefix("woolbattle");
 		CommandAPI.getInstance().register(new ForceMapCommand());
 		CommandAPI.getInstance().register(new SetLifesCommand());
 		CommandAPI.getInstance().register(new SetTeamCommand());

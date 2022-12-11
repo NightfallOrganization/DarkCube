@@ -27,7 +27,8 @@ public class ListenerPhysics extends BaseListener {
 			e.setCancelled(true);
 			if (e.getClickedBlock()
 					.equals(Lobby.getInstance().getDataManager().getJumpAndRunPlate().getBlock())) {
-				Lobby.getInstance().getJaRManager().startJaR(e.getPlayer());
+				if (Lobby.getInstance().getDataManager().isJumpAndRunEnabled())
+					Lobby.getInstance().getJaRManager().startJaR(e.getPlayer());
 			}
 		}
 	}

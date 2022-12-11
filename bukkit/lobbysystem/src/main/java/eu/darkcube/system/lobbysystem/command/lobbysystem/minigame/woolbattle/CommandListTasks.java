@@ -29,6 +29,7 @@ public class CommandListTasks extends LobbyCommandExecutor {
 				ccb.append("\n- ").color(ChatColor.YELLOW).append(task).color(ChatColor.AQUA);
 				// sb.append("\n§e- §b").append(task);
 			}
+			ctx.getSource().sendFeedback(ccb.create(),true);
 			return 0;
 		}));
 	}

@@ -8,6 +8,7 @@
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import java.util.Map;
+
 import org.bukkit.inventory.ItemStack;
 import eu.darkcube.system.inventory.api.v1.IInventory;
 import eu.darkcube.system.inventory.api.v1.InventoryType;
@@ -15,22 +16,19 @@ import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInven
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
 
-public class InventoryNewPServerSlot extends LobbyAsyncPagedInventory {
+public class InventoryNewPServer extends LobbyAsyncPagedInventory {
 
-	private static final InventoryType type_pserver_slot = InventoryType.of("pserver_slot");
+	private static final InventoryType type_new_pserver = InventoryType.of("new_pserver");
 
-	public final int psslot;
-
-	public InventoryNewPServerSlot(User user, int psslot) {
-		super(InventoryNewPServerSlot.type_pserver_slot,
-				Item.PSERVER_NEW_SLOT.getDisplayName(user, Integer.toString(psslot + 1)), user);
-		this.psslot = psslot;
+	public InventoryNewPServer(User user) {
+		super(InventoryNewPServer.type_new_pserver, Item.INVENTORY_NEW_PSERVER.getDisplayName(user),
+				user);
 	}
 
 	@Override
 	protected void insertFallbackItems() {
 		this.fallbackItems.put(IInventory.slot(1, 5),
-				Item.PSERVER_NEW_SLOT.getItem(this.user.getUser()));
+				Item.INVENTORY_NEW_PSERVER.getItem(this.user.getUser()));
 		super.insertFallbackItems();
 	}
 

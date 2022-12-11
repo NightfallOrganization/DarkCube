@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.google.common.reflect.TypeToken;
 import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.driver.module.ModuleLifeCycle;
@@ -21,54 +22,20 @@ import de.dytanic.cloudnet.driver.module.driver.DriverModule;
 import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerAddOwner;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerClearOwners;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerConnectPlayer;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerCreatePServer;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerDelete;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerGetData;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerGetOwners;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerGetPServer;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerGetPServersOfPlayer;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerGetUniqueId;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerNewName;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerNewUniqueId;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerRemove;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerRemoveOwner;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerRetrievePServers;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerSetRunning;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerStart;
-import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerStop;
+import eu.darkcube.system.pserver.cloudnet.packethandler.*;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PacketManager;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeAddOwner;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeClearOwners;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeConnectPlayer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeCreatePServer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeDelete;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeGetData;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeGetOwners;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeGetPServer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeGetPServersOfPlayer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeGetUniqueId;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeNewName;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeNewUniqueId;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeRemove;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeRemoveOwner;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeRetrievePServers;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeSetRunning;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeStart;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeStop;
+import eu.darkcube.system.pserver.common.packet.packets.*;
 
 public class PServerModule extends DriverModule {
 
 	private static PServerModule instance;
 
 	public static final String PLUGIN_NAME = new File(
-			PServerModule.class.getProtectionDomain().getCodeSource().getLocation().getPath())
-					.getName();
+			PServerModule.class.getProtectionDomain().getCodeSource().getLocation()
+					.getPath()).getName();
 
 	public Listener listener;
 
@@ -120,6 +87,7 @@ public class PServerModule extends DriverModule {
 		pm.registerHandler(PacketWrapperNodeStart.class, new HandlerStart());
 		pm.registerHandler(PacketWrapperNodeStop.class, new HandlerStop());
 		pm.registerHandler(PacketWrapperNodeGetData.class, new HandlerGetData());
+		pm.registerHandler(PacketWrapperNodeSetData.class, new HandlerSetData());
 
 		this.getLogger().info("PServer initializing!");
 		AsyncExecutor.start();

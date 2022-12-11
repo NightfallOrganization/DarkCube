@@ -31,8 +31,6 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
 	private final BiFunction<User, ServiceTask, ItemBuilder> toItemFunction;
 
-	protected final Map<User, Map<Integer, ItemStack>> contents = new HashMap<>();
-
 	public static final String ITEMID = "pserver_gameserver";
 
 	public static final String GAMESERVER_META_KEY = "pserver.gameserver";
@@ -43,22 +41,18 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
 	protected final int[] itemSort;
 
-	public final int psslot;
-
 	private boolean done = false;
 
 	private final User auser;
 
 	public InventoryGameServerSelection(User user, Item item, InventoryType type,
 			Supplier<Collection<ServiceTask>> supplier,
-			BiFunction<User, ServiceTask, ItemBuilder> toItemFunction, int psslot) {
+			BiFunction<User, ServiceTask, ItemBuilder> toItemFunction) {
 		super(type, item.getDisplayName(user), UserWrapper.fromUser(user));
 		auser = user;
 		this.supplier = supplier;
 		this.toItemFunction = toItemFunction;
 		this.item = item;
-		this.psslot = psslot;
-
 		this.itemSort = new int[] {
 				//@formatter:off
 				10, 9, 11, 8, 12, 3, 17, 
@@ -98,40 +92,4 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 			slot++;
 		}
 	}
-
-	// @Override
-	// protected void onOpen(User user) {
-	// new BukkitRunnable() {
-	// @Override
-	// public void run() {
-	// int slot = 0;
-	// Collection<ServiceTask> serviceTasks = supplier.get();
-	// for (ServiceTask serviceTask : serviceTasks) {
-	// ItemBuilder b = toItemFunction.apply(serviceTask);
-	// JsonObject data = new JsonObject();
-	// data.addProperty(SLOT, slot);
-	// data.addProperty(GAMESERVER_META_KEY, serviceTask.getName());
-	// b.getUnsafe().setString(GAMESERVER_META_KEY, data.toString());
-	// slot++;
-	// }
-	// }
-	// }.runTaskAsynchronously(Lobby.getInstance());
-	// }
-	//
-	// @Override
-	// protected void onClose(User user) {
-	// contents.remove(user);
-	// }
-	//
-	// @Override
-	// protected Map<Integer, ItemStack> getContents(User user) {
-	// if (contents.containsKey(user)) {
-	// return contents.get(user);
-	// }
-	// Map<Integer, ItemStack> m = new HashMap<>();
-	// for (int i = 0; i < getPageSize(); i++) {
-	// m.put(i, Item.LOADING.getItem(user));
-	// }
-	// return m;
-	// }
 }

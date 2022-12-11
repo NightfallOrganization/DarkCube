@@ -3,3 +3,4 @@ version: 1.0
 name: PServer
 author: DasBabyPixel
 softdepend: [System]
+api-version: 1.13

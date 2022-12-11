@@ -9,6 +9,7 @@ package eu.darkcube.system.userapi;
 
 import java.math.BigInteger;
 import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import eu.darkcube.system.language.core.Language;
@@ -50,20 +51,23 @@ public class BukkitUser implements User {
 
 	@Override
 	public BigInteger getCubes() {
-		return this.getPersistentDataStorage().get(new Key(PluginUserAPI.getInstance(), "cubes"),
-				PersistentDataTypes.BIGINTEGER, () -> BigInteger.valueOf(1000L));
+		return this.getPersistentDataStorage()
+				.get(new Key(PluginUserAPI.getInstance(), "cubes"), PersistentDataTypes.BIGINTEGER,
+						() -> BigInteger.valueOf(1000L));
 	}
 
 	@Override
 	public void setCubes(BigInteger cubes) {
-		this.getPersistentDataStorage().set(new Key(PluginUserAPI.getInstance(), "cubes"),
-				PersistentDataTypes.BIGINTEGER, cubes);
+		this.getPersistentDataStorage()
+				.set(new Key(PluginUserAPI.getInstance(), "cubes"), PersistentDataTypes.BIGINTEGER,
+						cubes);
 	}
 
 	@Override
 	public Language getLanguage() {
-		return this.getPersistentDataStorage().get(new Key(PluginUserAPI.getInstance(), "language"),
-				LANGUAGE, () -> Language.DEFAULT);
+		return this.getPersistentDataStorage()
+				.get(new Key(PluginUserAPI.getInstance(), "language"), LANGUAGE,
+						() -> Language.DEFAULT);
 	}
 
 	@Override

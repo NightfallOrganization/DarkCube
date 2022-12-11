@@ -7,8 +7,17 @@
 
 package eu.darkcube.system.lobbysystem.user;
 
-import java.util.HashSet;
-import java.util.Set;
+import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
+import eu.darkcube.system.lobbysystem.gadget.Gadget;
+import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
+import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.ParticleEffect;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.data.Key;
+import eu.darkcube.system.userapi.data.PersistentDataType;
+import eu.darkcube.system.userapi.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,27 +26,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
-import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
-import eu.darkcube.system.lobbysystem.pserver.PServerDataManager.PServerUserSlots;
-import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.lobbysystem.util.ParticleEffect;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.data.Key;
-import eu.darkcube.system.userapi.data.PersistentDataType;
-import eu.darkcube.system.userapi.data.PersistentDataTypes;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class LobbyUser {
 	private static final PersistentDataType<Set<Integer>> INTEGERS =
 			PersistentDataTypes.set(PersistentDataTypes.INTEGER);
 	private static final PersistentDataType<Gadget> TGADGET =
 			PersistentDataTypes.enumType(Gadget.class);
-	private static final PersistentDataType<PServerUserSlots> TPSERVER_SLOTS =
-			PersistentDataTypes.map(PersistentDataTypes.JSONDOCUMENT,
-					PServerUserSlots::createDocument, PServerUserSlots::fromDocument);
 	private static final Key ANIMATIONS = new Key(Lobby.getInstance(), "animations");
 	private static final Key SOUNDS = new Key(Lobby.getInstance(), "sounds");
 	private static final Key LASTDAILYREWARD = new Key(Lobby.getInstance(), "lastDailyReward");
@@ -45,7 +42,6 @@ public class LobbyUser {
 	private static final Key GADGET = new Key(Lobby.getInstance(), "gadget");
 	private static final Key POSITION = new Key(Lobby.getInstance(), "position");
 	private static final Key SELECTEDSLOT = new Key(Lobby.getInstance(), "selectedSlot");
-	private static final Key PSERVER_SLOTS = new Key(Lobby.getInstance(), "pserverSlots");
 	volatile IInventory openInventory;
 	boolean buildMode = false;
 	final User user;
@@ -53,33 +49,25 @@ public class LobbyUser {
 	public LobbyUser(User user) {
 		this.user = user;
 		long time1 = System.currentTimeMillis();
-		this.user.getPersistentDataStorage().setIfNotPresent(ANIMATIONS,
-				PersistentDataTypes.BOOLEAN, true);
-		this.user.getPersistentDataStorage().setIfNotPresent(SOUNDS, PersistentDataTypes.BOOLEAN,
-				true);
-		this.user.getPersistentDataStorage().setIfNotPresent(LASTDAILYREWARD,
-				PersistentDataTypes.LONG, 0L);
-		this.user.getPersistentDataStorage().setIfNotPresent(REWARDSLOTSUSED, INTEGERS,
-				new HashSet<>());
-		this.user.getPersistentDataStorage().setIfNotPresent(GADGET, TGADGET,
-				Gadget.GRAPPLING_HOOK);
-		this.user.getPersistentDataStorage().setIfNotPresent(SELECTEDSLOT,
-				PersistentDataTypes.INTEGER, 0);
-		this.user.getPersistentDataStorage().setIfNotPresent(PSERVER_SLOTS, TPSERVER_SLOTS,
-				new PServerUserSlots());
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(ANIMATIONS, PersistentDataTypes.BOOLEAN, true);
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(SOUNDS, PersistentDataTypes.BOOLEAN, true);
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(LASTDAILYREWARD, PersistentDataTypes.LONG, 0L);
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(REWARDSLOTSUSED, INTEGERS, new HashSet<>());
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(GADGET, TGADGET, Gadget.GRAPPLING_HOOK);
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(SELECTEDSLOT, PersistentDataTypes.INTEGER, 0);
 		long time2 = System.currentTimeMillis();
 		this.openInventory = new InventoryPlayer();
 		if (System.currentTimeMillis() - time1 > 1000) {
 			Lobby.getInstance().getLogger()
-					.info("Loading LobbyUser took very long: "
-							+ (System.currentTimeMillis() - time1) + " | "
-							+ (System.currentTimeMillis() - time2));
+					.info("Loading LobbyUser took very long: " + (System.currentTimeMillis()
+							- time1) + " | " + (System.currentTimeMillis() - time2));
 		}
-	}
-
-	void unload() {
-		this.openInventory = null;
-		this.buildMode = false;
 	}
 
 	public User getUser() {
@@ -92,25 +80,21 @@ public class LobbyUser {
 
 	public LobbyUser setOpenInventory(IInventory openInventory) {
 		boolean oldAnimations = this.isAnimations();
-		if (this.openInventory != null
-				&& openInventory.getClass().equals(this.openInventory.getClass())) {
+		if (this.openInventory != null && openInventory.getClass()
+				.equals(this.openInventory.getClass())) {
 			this.setAnimations(false);
 		}
 
 		Player p = user.asPlayer();
 		if (p != null) {
-			Runnable r = new Runnable() {
-
-				@Override
-				public void run() {
-					if (openInventory.getHandle() != null) {
-						openInventory.open(p);
-						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 100,
-								false, false), true);
-						LobbyUser.this.openInventory = openInventory;
-					}
+			Runnable r = () -> {
+				if (openInventory.getHandle() != null) {
+					openInventory.open(p);
+					p.addPotionEffect(
+							new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 100, false,
+									false), true);
+					LobbyUser.this.openInventory = openInventory;
 				}
-
 			};
 			if (!Bukkit.isPrimaryThread()) {
 				Bukkit.getScheduler().runTask(Lobby.getInstance(), r);
@@ -122,14 +106,6 @@ public class LobbyUser {
 		}
 		this.setAnimations(oldAnimations);
 		return this;
-	}
-
-	public PServerUserSlots getPServerUserSlots() {
-		return user.getPersistentDataStorage().get(PSERVER_SLOTS, TPSERVER_SLOTS);
-	}
-
-	public void setPServerUserSlots(PServerUserSlots slots) {
-		user.getPersistentDataStorage().set(PSERVER_SLOTS, TPSERVER_SLOTS, slots);
 	}
 
 	public int getSelectedSlot() {
@@ -178,8 +154,8 @@ public class LobbyUser {
 	}
 
 	public void setLastDailyReward(long lastDailyReward) {
-		user.getPersistentDataStorage().set(LASTDAILYREWARD, PersistentDataTypes.LONG,
-				lastDailyReward);
+		user.getPersistentDataStorage()
+				.set(LASTDAILYREWARD, PersistentDataTypes.LONG, lastDailyReward);
 	}
 
 	public void playSound(Sound sound, float volume, float pitch) {
@@ -203,8 +179,6 @@ public class LobbyUser {
 	public void teleport(Location loc) {
 		Player p = user.asPlayer();
 		if (p != null) {
-			p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 100, false, false),
-					true);
 			this.playSound(Sound.NOTE_PLING, 10, 1);
 			p.teleport(loc);
 			p.setGameMode(GameMode.SURVIVAL);
@@ -244,11 +218,6 @@ public class LobbyUser {
 	public void setAnimations(boolean animations) {
 		user.getPersistentDataStorage().set(ANIMATIONS, PersistentDataTypes.BOOLEAN, animations);
 	}
-
-	// public UserData newUserData() {
-	// return new UserData(this.language, this.gadget, this.sounds, this.animations,
-	// this.lastDailyReward, this.rewardSlotsUsed);
-	// }
 
 	public LobbyUser setGadget(Gadget gadget) {
 		EventGadgetSelect e = new EventGadgetSelect(this, gadget);

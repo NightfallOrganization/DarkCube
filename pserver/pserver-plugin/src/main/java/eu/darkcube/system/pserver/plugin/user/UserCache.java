@@ -75,9 +75,8 @@ public class UserCache {
 						}
 						update(entry, false);
 					} catch (Exception ex) {
-						Bukkit.getConsoleSender().sendMessage(ChatColor.RED
-										+ "Failed to deserialize user: "
-										+ line);
+						Bukkit.getConsoleSender()
+								.sendMessage(ChatColor.RED + "Failed to deserialize user: " + line);
 					}
 				}
 				this.save();
@@ -92,7 +91,9 @@ public class UserCache {
 			Collection<Entry> entries = byUUID.values();
 			Iterator<Entry> it = entries.iterator();
 			try {
-				BufferedWriter writer = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+				BufferedWriter writer = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8,
+						StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+						StandardOpenOption.TRUNCATE_EXISTING);
 				while (it.hasNext()) {
 					Entry entry = it.next();
 					if (!isEntryValid(entry)) {
@@ -203,8 +204,7 @@ public class UserCache {
 			return entry;
 		}
 		return new Entry(player.getName(), player.getUniqueId(),
-						Instant.now().plus(30, ChronoUnit.DAYS),
-						new JsonObject());
+				Instant.now().plus(30, ChronoUnit.DAYS), new JsonObject());
 	}
 
 	private String formatName(String name) {
@@ -218,7 +218,9 @@ public class UserCache {
 
 		private void save() {
 			try {
-				BufferedWriter writer = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+				BufferedWriter writer = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8,
+						StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+						StandardOpenOption.TRUNCATE_EXISTING);
 				for (Entry entry : byUUID.values()) {
 					writer.write(entry.toString());
 					writer.newLine();
@@ -234,7 +236,8 @@ public class UserCache {
 			this.cacheFile = cacheFile;
 			if (Files.exists(cacheFile)) {
 				try {
-					BufferedReader reader = Files.newBufferedReader(cacheFile, StandardCharsets.UTF_8);
+					BufferedReader reader =
+							Files.newBufferedReader(cacheFile, StandardCharsets.UTF_8);
 					String line;
 					while ((line = reader.readLine()) != null) {
 						if (line.isEmpty()) {
@@ -244,9 +247,8 @@ public class UserCache {
 							Entry entry = deserialize(line);
 							byUUID.put(entry.uuid, entry);
 						} catch (Exception ex) {
-							Bukkit.getConsoleSender().sendMessage(ChatColor.RED
-											+ "Failed to deserialize user: "
-											+ line);
+							Bukkit.getConsoleSender().sendMessage(
+									ChatColor.RED + "Failed to deserialize user: " + line);
 						}
 					}
 				} catch (Exception ex) {
@@ -263,6 +265,7 @@ public class UserCache {
 
 	}
 
+
 	public class Entry {
 
 		public final String name;
@@ -270,8 +273,7 @@ public class UserCache {
 		public Instant expiresAt;
 		public final JsonObject extra;
 
-		public Entry(String name, UUID uuid, Instant expiresAt,
-						JsonObject extra) {
+		public Entry(String name, UUID uuid, Instant expiresAt, JsonObject extra) {
 			this.name = name;
 			this.uuid = uuid;
 			this.expiresAt = expiresAt;
@@ -280,16 +282,14 @@ public class UserCache {
 
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof Entry && (name.equals(((Entry) obj).name)
-							&& uuid.equals(((Entry) obj).uuid)
-							&& expiresAt.equals(((Entry) obj).expiresAt))
-							&& extra.equals(((Entry) obj).extra);
+			return obj instanceof Entry && (name.equals(((Entry) obj).name) && uuid.equals(
+					((Entry) obj).uuid) && expiresAt.equals(((Entry) obj).expiresAt))
+					&& extra.equals(((Entry) obj).extra);
 		}
 
 		@Override
 		public int hashCode() {
-			return name.hashCode() + uuid.hashCode() + expiresAt.hashCode()
-							+ extra.hashCode();
+			return name.hashCode() + uuid.hashCode() + expiresAt.hashCode() + extra.hashCode();
 		}
 
 		public boolean isExpired() {
@@ -312,15 +312,17 @@ public class UserCache {
 		JsonObject object = gson.get().fromJson(serialized, JsonObject.class);
 		String name = object.get("name").getAsJsonPrimitive().getAsString();
 		UUID uuid = UUID.fromString(object.get("uuid").getAsJsonPrimitive().getAsString());
-		Instant expiresAt = Instant.ofEpochSecond(object.get("expiresAtEpochSecond").getAsJsonPrimitive().getAsLong(), object.get("expiresAtNano").getAsJsonPrimitive().getAsInt());
+		Instant expiresAt = Instant.ofEpochSecond(
+				object.get("expiresAtEpochSecond").getAsJsonPrimitive().getAsLong(),
+				object.get("expiresAtNano").getAsJsonPrimitive().getAsInt());
 		JsonObject extra = object.get("extra").getAsJsonObject();
 		return new Entry(name, uuid, expiresAt, extra);
 	}
 
 	public static void load() {
 		cache = new UserCache(
-						PServerPlugin.getInstance().getWorkingDirectory().resolve("usercache"),
-						PServerPlugin.getInstance().getWorkingDirectory().resolve("usercache_expired"));
+				PServerPlugin.getInstance().getWorkingDirectory().resolve("usercache"),
+				PServerPlugin.getInstance().getWorkingDirectory().resolve("usercache_expired"));
 	}
 
 	public static void unload() {

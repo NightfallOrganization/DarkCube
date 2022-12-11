@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+
+import eu.darkcube.system.pserver.bukkit.PServerWrapper;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
@@ -84,8 +86,9 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 						ps.getTaskName());
 			}
 			if (b == null) {
-				b = new ItemBuilder(owner == null ? Material.BARRIER : Material.SKULL_ITEM)
-						.durability((short) SkullType.PLAYER.ordinal());
+				b = new ItemBuilder(
+						owner == null ? Material.BARRIER : Material.SKULL_ITEM).durability(
+						(short) SkullType.PLAYER.ordinal());
 				skull = b.getMaterial() == Material.SKULL_ITEM;
 			}
 			if (skull) {
@@ -94,11 +97,11 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 			b.unsafeStackSize(true).amount(online);
 			b.displayname(
 					Message.PSERVER_ITEM_TITLE.getMessage(this.user.getUser(), ps.getServerName()));
-			b.lore(publicServer ? Message.CLICK_TO_JOIN.getMessage(this.user.getUser())
+			b.lore(publicServer
+					? Message.CLICK_TO_JOIN.getMessage(this.user.getUser())
 					: Message.PSERVER_NOT_PUBLIC.getMessage(this.user.getUser()));
 			Item.setItemId(b, InventoryPServer.ITEMID);
 			b.getUnsafe().setString(InventoryPServer.META_KEY_PSERVER, ps.getId().toString());
-
 			sitems.put(ontime, b.build());
 		}
 

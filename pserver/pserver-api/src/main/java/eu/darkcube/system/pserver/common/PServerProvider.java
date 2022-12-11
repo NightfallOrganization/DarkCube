@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
+
+import de.dytanic.cloudnet.common.concurrent.ITask;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
 import de.dytanic.cloudnet.driver.service.ServiceTemplate;
@@ -43,11 +45,11 @@ public abstract class PServerProvider {
 
 	public abstract JsonDocument getPServerData(UniqueId pserver);
 
-	public abstract void setPServerData(UniqueId pserver, JsonDocument data);
+	public abstract ITask<Void> setPServerData(UniqueId pserver, JsonDocument data);
 
 	public abstract PServer createPServer(PServerSerializable configuration);
 
-	public abstract PServer createPServer(PServerSerializable configuration, ServiceTask task);
+	//public abstract PServer createPServer(PServerSerializable configuration, ServiceTask task);
 
 	public Optional<? extends PServer> getPServerOptional(UniqueId pserver) {
 		return Optional.ofNullable(getPServer(pserver));
@@ -59,13 +61,13 @@ public abstract class PServerProvider {
 
 	public abstract Collection<UUID> getOwners(UniqueId pserver);
 
-	public abstract void delete(UniqueId pserver);
+	public abstract ITask<Void> delete(UniqueId pserver);
 
-	public abstract void clearOwners(UniqueId id);
+	public abstract ITask<Void> clearOwners(UniqueId id);
 
-	public abstract void addOwner(UniqueId id, UUID owner);
+	public abstract ITask<Void> addOwner(UniqueId id, UUID owner);
 
-	public abstract void removeOwner(UniqueId id, UUID owner);
+	public abstract ITask<Void> removeOwner(UniqueId id, UUID owner);
 
 	public abstract String newName();
 

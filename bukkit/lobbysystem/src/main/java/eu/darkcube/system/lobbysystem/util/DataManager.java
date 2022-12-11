@@ -10,6 +10,7 @@ package eu.darkcube.system.lobbysystem.util;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
 import com.google.common.reflect.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,6 +29,8 @@ public class DataManager {
 	private volatile Border border;
 	private volatile Set<String> woolbattleTasks;
 	private Location jarPlate;
+	private boolean jarEnabled;
+	private boolean winter;
 
 	public DataManager() {
 		database =
@@ -38,6 +41,10 @@ public class DataManager {
 		setDefault("woolbattleNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
 		setDefault("dailyrewardNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
 		setDefault("woolbattleSpawn", Locations.toDocument(Locations.DEFAULT, false));
+		setDefault("winter", new JsonDocument().append("value", true));
+		winter = database.get("winter").getBoolean("value");
+		setDefault("jumpAndRunEnabled", new JsonDocument().append("value", true));
+		jarEnabled = database.get("jumpAndRunEnabled").getBoolean("value");
 		setDefault("jumpAndRunSpawn", Locations.toDocument(Locations.DEFAULT, false));
 		setDefault("jumpAndRunPlate", Locations.toDocument(Locations.DEFAULT, false));
 		jarPlate = Locations.fromDocument(database.get("jumpAndRunPlate"), null);
@@ -60,6 +67,24 @@ public class DataManager {
 				fetchWoolBattleTasks();
 			}
 		}.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60 * 2);
+	}
+
+	public void setJumpAndRunEnabled(boolean enabled) {
+		jarEnabled = enabled;
+		database.update("jumpAndRunEnabled", new JsonDocument("value", enabled));
+	}
+
+	public boolean isJumpAndRunEnabled() {
+		return jarEnabled;
+	}
+
+	public void setWinter(boolean winter) {
+		this.winter = winter;
+		database.update("winter", new JsonDocument().append("value", winter));
+	}
+
+	public boolean isWinter() {
+		return winter;
 	}
 
 	private void setDefault(String key, JsonDocument val) {

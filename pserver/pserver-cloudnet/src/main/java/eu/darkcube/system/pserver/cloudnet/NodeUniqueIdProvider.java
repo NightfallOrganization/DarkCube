@@ -7,11 +7,12 @@
 
 package eu.darkcube.system.pserver.cloudnet;
 
-import java.util.UUID;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.UniqueIdProvider;
+
+import java.util.UUID;
 
 public class NodeUniqueIdProvider extends UniqueIdProvider {
 
@@ -27,13 +28,14 @@ public class NodeUniqueIdProvider extends UniqueIdProvider {
 
 	@Override
 	public boolean isAvailable(UniqueId id) {
-		return !DatabaseProvider.get("pserver").cast(PServerDatabase.class).contains(id);
+		return !DatabaseProvider.get("pserver").cast(PServerDatabase.class).contains(id)
+				&& !NodePServerProvider.getInstance().pservers.containsKey(id);
 	}
 
 	public static void init() {
-		
+
 	}
-	
+
 	static {
 		new NodeUniqueIdProvider();
 	}

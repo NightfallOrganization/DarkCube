@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+
+import de.dytanic.cloudnet.common.concurrent.ITask;
 import org.bukkit.command.CommandSender;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -60,11 +62,11 @@ public class WrapperPServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public synchronized void setPServerData(UniqueId pserver, JsonDocument data) {
+	public synchronized ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
 		if (pservers.containsKey(pserver)) {
-			pservers.get(pserver).update(pservers.get(pserver).getSerializable(), data);
+			pservers.get(pserver).update(data);
 		}
-		new PacketWrapperNodeSetData(pserver, data).sendAsync();
+		return new PacketWrapperNodeSetData(pserver, data).sendQueryAsync().map(p -> null);
 	}
 
 	@Override
@@ -77,20 +79,20 @@ public class WrapperPServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public boolean isPServer() {
+	public synchronized boolean isPServer() {
 		return pserver != null;
 	}
 
 	@Override
-	public WrapperPServer getCurrentPServer() throws IllegalStateException {
+	public synchronized WrapperPServer getCurrentPServer() throws IllegalStateException {
 		if (pserver == null)
 			throw new IllegalStateException();
 		return pserver;
 	}
 
 	@Override
-	public void clearOwners(UniqueId id) {
-		new PacketWrapperNodeClearOwners(id).sendAsync();
+	public ITask<Void> clearOwners(UniqueId id) {
+		return new PacketWrapperNodeClearOwners(id).sendQueryAsync().map(p -> null);
 	}
 
 	@Override
@@ -100,8 +102,8 @@ public class WrapperPServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public void delete(UniqueId pserver) {
-		new PacketWrapperNodeDelete(pserver).sendAsync();
+	public ITask<Void> delete(UniqueId pserver) {
+		return new PacketWrapperNodeDelete(pserver).sendQueryAsync().map(p -> null);
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public class WrapperPServerProvider extends PServerProvider {
 
 	public void update(PServerSerializable pserver) {
 		getPServerOptional(pserver.id).ifPresent(ps -> {
-			ps.update(pserver, ps.getData());
+			ps.update(pserver);
 			publishUpdate(getPServer(pserver.id));
 		});
 	}
@@ -136,12 +138,14 @@ public class WrapperPServerProvider extends PServerProvider {
 		UniqueId uuid = pserver.id;
 		Optional<WrapperPServer> pso = getPServerOptional(uuid);
 		if (!pso.isPresent()) {
+			Collection<UUID> owners = getOwners(uuid);
 			WrapperPServer ps =
-					new WrapperPServer(pserver, PServerProvider.getInstance().getPServerData(uuid));
+					new WrapperPServer(pserver, PServerProvider.getInstance().getPServerData(uuid),
+							owners);
 			pservers.put(uuid, ps);
 			publishAdd(ps);
 		} else {
-			pso.get().update(pserver, pso.get().getData());
+			pso.get().update(pserver);
 		}
 		publishUpdate(getPServer(uuid));
 		return getPServer(uuid);
@@ -155,15 +159,17 @@ public class WrapperPServerProvider extends PServerProvider {
 
 	@Override
 	public WrapperPServer createPServer(PServerSerializable configuration) {
-		return createPServer(configuration, null);
-	}
-
-	@Override
-	public WrapperPServer createPServer(PServerSerializable configuration, ServiceTask task) {
-		return updateAndInsertIfNecessary(new PacketWrapperNodeCreatePServer(configuration,
-				task == null ? null : task.getName()).sendQuery()
+		return updateAndInsertIfNecessary(
+				new PacketWrapperNodeCreatePServer(configuration).sendQuery()
 						.cast(PacketNodeWrapperPServer.class).getInfo());
 	}
+
+	//	@Override
+	//	public WrapperPServer createPServer(PServerSerializable configuration, ServiceTask task) {
+	//		return updateAndInsertIfNecessary(new PacketWrapperNodeCreatePServer(configuration,
+	//				task == null ? null : task.getName()).sendQuery()
+	//				.cast(PacketNodeWrapperPServer.class).getInfo());
+	//	}
 
 	@Override
 	public synchronized WrapperPServer getPServer(UniqueId uuid) {
@@ -179,19 +185,16 @@ public class WrapperPServerProvider extends PServerProvider {
 		CloudNetDriver.getInstance().getEventManager().callEvent(event);
 	}
 
-	private WrapperPServer publishAdd(WrapperPServer ps) {
+	private void publishAdd(WrapperPServer ps) {
 		publishEvent(new PServerAddEvent(ps));
-		return ps;
 	}
 
-	private WrapperPServer publishUpdate(WrapperPServer ps) {
+	private void publishUpdate(WrapperPServer ps) {
 		publishEvent(new PServerUpdateEvent(ps));
-		return ps;
 	}
 
-	private WrapperPServer publishRemove(WrapperPServer ps) {
+	private void publishRemove(WrapperPServer ps) {
 		publishEvent(new PServerRemoveEvent(ps));
-		return ps;
 	}
 
 	@Override
@@ -200,19 +203,19 @@ public class WrapperPServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public void addOwner(UniqueId id, UUID owner) {
-		new PacketWrapperNodeAddOwner(id, owner).sendAsync();
+	public ITask<Void> addOwner(UniqueId id, UUID owner) {
 		getPServerOptional(id).ifPresent(ps -> {
 			ps.getOwners().add(owner);
 		});
+		return new PacketWrapperNodeAddOwner(id, owner).sendQueryAsync().map(p -> null);
 	}
 
 	@Override
-	public void removeOwner(UniqueId id, UUID owner) {
-		new PacketWrapperNodeRemoveOwner(id, owner).sendAsync();
+	public ITask<Void> removeOwner(UniqueId id, UUID owner) {
 		getPServerOptional(id).ifPresent(ps -> {
 			ps.getOwners().remove(owner);
 		});
+		return new PacketWrapperNodeRemoveOwner(id, owner).sendQueryAsync().map(p -> null);
 	}
 
 	public static WrapperPServerProvider getInstance() {

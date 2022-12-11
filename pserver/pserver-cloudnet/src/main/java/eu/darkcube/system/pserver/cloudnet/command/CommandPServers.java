@@ -8,11 +8,13 @@
 package eu.darkcube.system.pserver.cloudnet.command;
 
 import static de.dytanic.cloudnet.command.sub.SubCommandArgumentTypes.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.command.ICommandSender;
 import de.dytanic.cloudnet.command.sub.SubCommandBuilder;
@@ -35,8 +37,9 @@ import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 
 public class CommandPServers extends SubCommandHandler {
 
-	private static final IPlayerManager playerManager = CloudNetDriver.getInstance()
-			.getServicesRegistry().getFirstService(IPlayerManager.class);
+	private static final IPlayerManager playerManager =
+			CloudNetDriver.getInstance().getServicesRegistry()
+					.getFirstService(IPlayerManager.class);
 
 	public CommandPServers() {
 		super( // @formatter:off
@@ -76,8 +79,8 @@ public class CommandPServers extends SubCommandHandler {
 					long startedAt = System.currentTimeMillis();
 					Collection<UUID> owners = PServerProvider.getInstance().getOwners(uid);
 					String serverName = PServerProvider.getInstance().newName();
-					PServerSerializable ser = new PServerSerializable(uid, online, state, temporary, 
-							startedAt, owners, null, serverName);
+					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
+							startedAt, null, serverName, State.OFFLINE);
 					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer loaded! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
 				}, s-> s.async(), exactStringIgnoreCase("load"), dynamicString("id", "PServer does not exist", s ->
@@ -91,10 +94,9 @@ public class CommandPServers extends SubCommandHandler {
 					PServer.State state = State.OFFLINE;
 					boolean temporary = false;
 					long startedAt = System.currentTimeMillis();
-					Collection<UUID> owners = new ArrayList<>();
 					String serverName = PServerProvider.getInstance().newName();
-					PServerSerializable ser = new PServerSerializable(uid, online, state, temporary, 
-							startedAt, owners, null, serverName);
+					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
+							startedAt,  null, serverName,State.OFFLINE);
 					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer created! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
 				}, s -> s.async(), exactStringIgnoreCase("new"))
@@ -104,17 +106,15 @@ public class CommandPServers extends SubCommandHandler {
 						sender.sendMessage("Task nicht gefunden!");
 						return;
 					}
-					ServiceTask task = CloudNet.getInstance().getServiceTaskProvider().getServiceTask(taskn);
 					UniqueId uid = UniqueIdProvider.getInstance().newUniqueId();
 					int online = 0;
 					PServer.State state = State.OFFLINE;
 					boolean temporary = true;
 					long startedAt = System.currentTimeMillis();
-					Collection<UUID> owners = new ArrayList<>();
 					String serverName = PServerProvider.getInstance().newName();
-					PServerSerializable ser = new PServerSerializable(uid, online, state, temporary, 
-							startedAt, owners, null, serverName);
-					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser, task);
+					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
+							startedAt,  taskn, serverName,state);
+					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer created! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
 				}, s -> s.async(), exactStringIgnoreCase("by"), dynamicString("task", "Task nicht gefunden", 
 						s -> CloudNet.getInstance().getServiceTaskProvider().isServiceTaskPresent(s), 

@@ -13,9 +13,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.github.juliarn.npc.NPC;
 import com.github.juliarn.npc.NPCPool;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
+import eu.darkcube.system.lobbysystem.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -46,11 +48,6 @@ import eu.darkcube.system.lobbysystem.pserver.PServerJoinOnStart;
 import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
-import eu.darkcube.system.lobbysystem.util.DataManager;
-import eu.darkcube.system.lobbysystem.util.DependencyManager;
-import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.lobbysystem.util.SkullCache;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 
@@ -75,13 +72,13 @@ public class Lobby extends Plugin {
 
 	@Override
 	public void onEnable() {
-		this.npcPool = NPCPool.builder(this).spawnDistance(50).actionDistance(45)
-				.tabListRemoveTicks(40L).build();
+		this.npcPool =
+				NPCPool.builder(this).spawnDistance(50).actionDistance(45).tabListRemoveTicks(40L)
+						.build();
 
 		UserWrapper userWrapper = new UserWrapper();
 		UserAPI.getInstance().addModifier(userWrapper);
 		userWrapper.beginMigration();
-		PServerDataManager.beginMigration();
 
 		PServerSupport.init();
 		// Load all messages
@@ -97,8 +94,9 @@ public class Lobby extends Plugin {
 		List<String> languageEntries = new ArrayList<>();
 		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey)
 				.collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values()).stream()
-				.map(i -> Message.PREFIX_ITEM + i.getKey()).collect(Collectors.toList()));
+		languageEntries.addAll(
+				Arrays.asList(Item.values()).stream().map(i -> Message.PREFIX_ITEM + i.getKey())
+						.collect(Collectors.toList()));
 		languageEntries.addAll(Arrays.asList(Item.values()).stream()
 				.filter(i -> i.getBuilder().getLores().size() > 0)
 				.map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey())
@@ -123,18 +121,18 @@ public class Lobby extends Plugin {
 		}
 
 		new BukkitRunnable() {
-			private final Collection<String> woolbattleTasks =
-					Lobby.this.getDataManager().getWoolBattleTasks();
 
 			@Override
 			public void run() {
-				for (String task : this.woolbattleTasks) {
+				for (String task : getDataManager().getWoolBattleTasks()) {
 					if (CloudNetDriver.getInstance().getServiceTaskProvider()
 							.isServiceTaskPresent(task)) {
-						ServiceTask serviceTask = CloudNetDriver.getInstance()
-								.getServiceTaskProvider().getServiceTask(task);
-						Collection<ServiceInfoSnapshot> services = CloudNetDriver.getInstance()
-								.getCloudServiceProvider().getCloudServices(serviceTask.getName());
+						ServiceTask serviceTask =
+								CloudNetDriver.getInstance().getServiceTaskProvider()
+										.getServiceTask(task);
+						Collection<ServiceInfoSnapshot> services =
+								CloudNetDriver.getInstance().getCloudServiceProvider()
+										.getCloudServices(serviceTask.getName());
 
 						int freeServices = 0;
 						for (ServiceInfoSnapshot service : services) {
@@ -145,8 +143,9 @@ public class Lobby extends Plugin {
 							}
 						}
 						if (freeServices < serviceTask.getMinServiceCount()) {
-							ServiceInfoSnapshot snap = CloudNetDriver.getInstance()
-									.getCloudServiceFactory().createCloudService(serviceTask);
+							ServiceInfoSnapshot snap =
+									CloudNetDriver.getInstance().getCloudServiceFactory()
+											.createCloudService(serviceTask);
 							CloudNetDriver.getInstance().getCloudServiceProvider(snap)
 									.setCloudServiceLifeCycle(ServiceLifeCycle.RUNNING);
 						}
@@ -168,7 +167,6 @@ public class Lobby extends Plugin {
 		new ListenerInteract();
 		new ListenerLobbySwitcher();
 		new ListenerWoolBattleNPC();
-		new ListenerDailyRewardNPC();
 		new ListenerMinigameServer();
 		new ListenerItemDropPickup();
 		new ListenerFish();
@@ -188,7 +186,22 @@ public class Lobby extends Plugin {
 		if (PServerSupport.isSupported()) {
 			SkullCache.register();
 		}
-
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (!dataManager.isWinter()) {
+					return;
+				}
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					ParticleEffect.FIREWORKS_SPARK.display(20, 20, 20, 0F, 200, p.getLocation(), p);
+					ParticleEffect.SNOW_SHOVEL.display(20, 20, 20, 0F, 100, p.getLocation(), p);
+				}
+			}
+		}.runTaskTimer(this, 1, 1);
+		for (World world : Bukkit.getWorlds()) {
+			world.setStorm(getDataManager().isWinter());
+			world.setThundering(false);
+		}
 	}
 
 	@Override

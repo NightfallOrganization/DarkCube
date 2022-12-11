@@ -20,12 +20,9 @@ public class InventoryGameServersSelection extends LobbyAsyncPagedInventory {
 	private static final InventoryType type_gameserver_selection =
 			InventoryType.of("gameserver_selection");
 
-	public final int psslot;
-
-	public InventoryGameServersSelection(User user, int psslot) {
+	public InventoryGameServersSelection(User user) {
 		super(InventoryGameServersSelection.type_gameserver_selection,
 				Item.GAME_PSERVER.getDisplayName(user), user);
-		this.psslot = psslot;
 	}
 
 	@Override
