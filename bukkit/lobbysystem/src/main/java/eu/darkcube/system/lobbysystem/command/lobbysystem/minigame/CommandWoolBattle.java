@@ -1,24 +1,25 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame;
 
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandAddTask;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandListTasks;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandRemoveTask;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandSetSpawn;
 
-public class CommandWoolBattle extends Command {
+public class CommandWoolBattle extends LobbyCommandExecutor {
 
 	public CommandWoolBattle() {
-		super(Lobby.getInstance(), "woolbattle", new Command[] { new CommandSetSpawn(), new CommandListTasks(),
-				new CommandAddTask(), new CommandRemoveTask() }, "WoolBattle Hauptcommand");
-	}
-
-	@Override
-	public boolean execute(CommandSender arg0, String[] arg1) {
-		return false;
+		super("woolbattle", b -> {
+			b.then(new CommandAddTask().builder()).then(new CommandListTasks().builder())
+					.then(new CommandRemoveTask().builder()).then(new CommandSetSpawn().builder());
+		});
 	}
 
 }

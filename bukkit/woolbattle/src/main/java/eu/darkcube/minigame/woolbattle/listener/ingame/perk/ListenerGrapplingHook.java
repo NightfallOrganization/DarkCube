@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk;
 
 import org.bukkit.Location;
@@ -7,7 +14,6 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -15,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.PerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkType;
 import eu.darkcube.minigame.woolbattle.user.User;
@@ -22,7 +29,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
-public class ListenerGrapplingHook implements Listener {
+public class ListenerGrapplingHook extends PerkListener {
 
 	public static final Item HOOK = PerkType.GRAPPLING_HOOK.getItem();
 	public static final Item HOOK_COOLDOWN = PerkType.GRAPPLING_HOOK.getCooldownItem();
@@ -121,19 +128,7 @@ public class ListenerGrapplingHook implements Listener {
 
 			p.setVelocity(v);
 
-			new Scheduler() {
-				int cd = PerkType.GRAPPLING_HOOK.getCooldown() + 1;
-
-				@Override
-				public void run() {
-					if (cd <= 1) {
-						this.cancel();
-						perk.setCooldown(0);
-						return;
-					}
-					perk.setCooldown(--cd);
-				}
-			}.runTaskTimer(20);
+			startCooldown(perk);
 		}
 	}
 }

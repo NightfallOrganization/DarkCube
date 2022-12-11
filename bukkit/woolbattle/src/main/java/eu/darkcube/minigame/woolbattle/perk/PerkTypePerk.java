@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.perk;
 
 import org.bukkit.Bukkit;
@@ -6,8 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGrabber;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
@@ -38,23 +44,26 @@ public class PerkTypePerk implements Perk {
 		this.cooldown = new SimpleObservableInteger(0) {
 
 			@Override
-			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
+					Integer newValue) {
 				if (newValue == 0)
 					PerkTypePerk.this.setHardCooldown(false);
-				if (!PerkTypePerk.this.isHardCooldown() && newValue == PerkTypePerk.this.getMaxCooldown())
+				if (!PerkTypePerk.this.isHardCooldown()
+						&& newValue == PerkTypePerk.this.getMaxCooldown())
 					PerkTypePerk.this.setHardCooldown(true);
 				PerkTypePerk.this.setItem();
 			}
 
 			@Override
-			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
-			}
+			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
+					Integer newValue) {}
 
 		};
 		this.slot = new SimpleObservableInteger() {
 
 			@Override
-			public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
+					Integer newValue) {
 				if (oldValue != null) {
 					if (oldValue == 100)
 						PerkTypePerk.this.player.getOpenInventory().setCursor(null);
@@ -66,7 +75,8 @@ public class PerkTypePerk implements Perk {
 			}
 
 			@Override
-			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
+			public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
+					Integer newValue) {
 				perkNumber.setRawSlot(owner, newValue);
 			}
 
@@ -122,12 +132,10 @@ public class PerkTypePerk implements Perk {
 		if (this.getCooldown() == 0 || ((this.type == PerkType.LINE_BUILDER)
 				&& this.getCooldown() != this.getMaxCooldown() && !this.isHardCooldown())) {
 			ItemStack item = this.getItem().getItem(this.owner);
-			if (this.type == PerkType.GRABBER
-					&& WoolBattle.getInstance().getIngame().listenerGrabberInteract.grabbed.containsKey(this.owner)) {
+			if (this.type == PerkType.GRABBER && ListenerGrabber.hasTarget(owner)) {
 				item = Item.PERK_GRABBER_GRABBED.getItem(this.owner);
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName(WoolBattle.getInstance().getIngame().listenerGrabberInteract.grabbed.get(this.owner)
-						.getTeamPlayerName());
+				meta.setDisplayName(ListenerGrabber.getTarget(owner).getTeamPlayerName());
 				item.setItemMeta(meta);
 			} else if (this.type == PerkType.ARROW_RAIN) {
 				ItemMeta meta = item.getItemMeta();

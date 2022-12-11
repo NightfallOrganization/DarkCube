@@ -1,23 +1,24 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.util;
 
 import static org.bukkit.Material.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-
 import eu.darkcube.system.inventory.api.util.ItemBuilder;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.userapi.User;
 
 public enum Item {
 
@@ -35,18 +36,15 @@ public enum Item {
 	INVENTORY_SETTINGS_SOUNDS_ON(ItemBuilder.item(GOLD_RECORD)),
 	INVENTORY_SETTINGS_SOUNDS_OFF(ItemBuilder.item(GOLD_RECORD)),
 
+
+	INVENTORY_COMPASS_JUMPANDRUN(ItemBuilder.item(DIAMOND_BOOTS)),
 	INVENTORY_COMPASS_SPAWN(ItemBuilder.item(NETHER_STAR)),
 	INVENTORY_COMPASS_SMASH(ItemBuilder.item(FIREBALL)),
 	INVENTORY_COMPASS_WOOLBATTLE(ItemBuilder.item(BOW)),
-	INVENTORY_COMPASS_MINERS(
-			ItemBuilder.item(DIAMOND_PICKAXE).flag(ItemFlag.HIDE_ATTRIBUTES)),
+	INVENTORY_COMPASS_MINERS(ItemBuilder.item(DIAMOND_PICKAXE).flag(ItemFlag.HIDE_ATTRIBUTES)),
 
-	GADGET_HOOK_ARROW(
-			ItemBuilder.item(BOW)
-					.unbreakable(true)
-					.flag(ItemFlag.HIDE_UNBREAKABLE)
-					.enchant(Enchantment.ARROW_INFINITE, 1)
-					.flag(ItemFlag.HIDE_ENCHANTS)),
+	GADGET_HOOK_ARROW(ItemBuilder.item(BOW).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE)
+			.enchant(Enchantment.ARROW_INFINITE, 1).flag(ItemFlag.HIDE_ENCHANTS)),
 	GADGET_HOOK_ARROW_ARROW(ItemBuilder.item(ARROW)),
 
 	GADGET_GRAPPLING_HOOK(
@@ -69,7 +67,7 @@ public enum Item {
 	PSERVER_OWN_MENU(ItemBuilder.item(COMMAND)),
 	INVENTORY_PSERVER(ItemBuilder.item(COMMAND)),
 	GAMESERVER_SELECTION_WOOLBATTLE(ItemBuilder.item(BOW)),
-	PSERVER_NEW_SLOT(ItemBuilder.item(COMMAND)),
+	INVENTORY_NEW_PSERVER(ItemBuilder.item(COMMAND)),
 	PSERVER_SLOT(ItemBuilder.item(STAINED_GLASS_PANE).durability(5)),
 	WORLD_PSERVER(ItemBuilder.item(GRASS)),
 	GAME_PSERVER(ItemBuilder.item(DIAMOND_SWORD)),
@@ -80,12 +78,17 @@ public enum Item {
 	START_PSERVER(ItemBuilder.item(INK_SACK).durability(2)),
 	STOP_PSERVER(ItemBuilder.item(INK_SACK).durability(1)),
 	PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE)
-			.fireworkEffect(FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())
+			.fireworkEffect(
+					FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())
 			.flag(ItemFlag.HIDE_POTION_EFFECTS)),
 	PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE)
 			.fireworkEffect(FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build())
 			.flag(ItemFlag.HIDE_POTION_EFFECTS)),
 
+	ARROW_NEXT(ItemBuilder.item(ARROW)),
+	ARROW_PREVIOUS(ItemBuilder.item(ARROW)),
+
+	GAME_NOT_FOUND(ItemBuilder.item(BARRIER)),
 	LOADING(ItemBuilder.item(BARRIER)),
 
 	;
@@ -131,60 +134,14 @@ public enum Item {
 		return Item.getItemId(this);
 	}
 
-	public static int countItems(ItemStack item, Inventory inv) {
-		int i = 1;
-		for (; inv.contains(item, i); i++) {
-		}
-		if (inv instanceof PlayerInventory) {
-			PlayerInventory t = (PlayerInventory) inv;
-			List<ItemStack> items = new ArrayList<>();
-			items.add(t.getHolder().getItemOnCursor());
-			items.add(t.getBoots());
-			items.add(t.getChestplate());
-			items.add(t.getLeggings());
-			items.add(t.getHelmet());
-			for (ItemStack s : items) {
-				if (item.equals(s)) {
-					i += s.getAmount();
-				}
-			}
-		}
-		return i - 1;
-	}
-
-	public static void removeItems(Inventory invToRemoveFrom, ItemStack itemToRemove, int count) {
-		for (int i = 0; i < count; i++)
-			invToRemoveFrom.removeItem(itemToRemove);
-	}
-
-	public static int countItems(Material item, Inventory inv) {
-		int i = 1;
-		for (; inv.contains(item, i); i++) {
-		}
-		if (inv instanceof PlayerInventory) {
-			PlayerInventory t = (PlayerInventory) inv;
-			List<ItemStack> items = new ArrayList<>();
-			items.add(t.getHolder().getItemOnCursor());
-			items.add(t.getBoots());
-			items.add(t.getChestplate());
-			items.add(t.getLeggings());
-			items.add(t.getHelmet());
-			for (ItemStack s : items) {
-				if (s != null)
-					if (s.getType() == item) {
-						i += s.getAmount();
-					}
-			}
-		}
-		return i - 1;
-	}
-
 	public static ItemStack getItem(Item item, User user, Object... replacements) {
 		return Item.getItem(item, user, replacements, new Object[0]);
 	}
 
-	public static ItemStack getItem(Item item, User user, Object[] replacements, Object... loreReplacements) {
-		ItemBuilder builder = item.getBuilder().getUnsafe().setString("itemId", Item.getItemId(item)).builder();
+	public static ItemStack getItem(Item item, User user, Object[] replacements,
+			Object... loreReplacements) {
+		ItemBuilder builder =
+				item.getBuilder().getUnsafe().setString("itemId", Item.getItemId(item)).builder();
 		String name = Item.getDisplayName(item, user, replacements);
 		builder.displayname(name);
 		if (builder.getLores().size() != 0) {
@@ -206,10 +163,6 @@ public enum Item {
 		return Message.PREFIX_ITEM + item.getKey();
 	}
 
-	public static String getLanguageId(ItemStack item) {
-		return Item.getNBTValue(new ItemBuilder(item), "language");
-	}
-
 	public static String getItemId(ItemStack item) {
 		return Item.getNBTValue(new ItemBuilder(item), "itemId");
 	}
@@ -227,19 +180,17 @@ public enum Item {
 	}
 
 	public static String[] getLore(Item item, User user, Object... loreReplacements) {
-		return Message
-				.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(), user.getLanguage(),
-						loreReplacements)
-				.split("\\%n");
+		return Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(),
+				user.getLanguage(), loreReplacements).split("\\%n");
 	}
 
 	public static Item byGadget(Gadget gadget) {
 		for (Item item : Item.values()) {
-			if (item.getKey().startsWith("GADGET_") && item.getKey().substring(7).equals(gadget.name())) {
+			if (item.getKey().startsWith("GADGET_")
+					&& item.getKey().substring(7).equals(gadget.name())) {
 				return item;
 			}
 		}
-		return null;
+		throw new IllegalArgumentException();
 	}
-
 }

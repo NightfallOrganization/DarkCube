@@ -1,7 +1,7 @@
 dependencies {
-	compileOnlyApi project(':bukkit:darkcubesystem')
-	compileOnlyApi project(':bukkit:commandapi')
-	compileOnlyApi project(':bukkit:inventoryapi')
-	compileOnlyApi project(':bukkit:languageapi')
-	compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
+	implementation project(':bukkit:darkcubesystem')
+	implementation project(':bukkit:commandapi')
+	implementation project(':bukkit:inventoryapi')
+	implementation project(':bukkit:languageapi')
+	implementation 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
 }

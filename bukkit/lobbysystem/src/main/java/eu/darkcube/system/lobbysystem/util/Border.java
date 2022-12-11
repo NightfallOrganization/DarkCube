@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.util;
 
 import java.lang.reflect.Type;
-
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -15,30 +17,31 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 import eu.darkcube.system.lobbysystem.parser.Locations;
 
 public class Border implements Serializable {
 
-	public static final Gson GSON = new GsonBuilder()
-			.registerTypeAdapter(Location.class, new JsonSerializer<Location>() {
+	public static final Gson GSON =
+			new GsonBuilder().registerTypeAdapter(Location.class, new JsonSerializer<Location>() {
 
 				@Override
-				public JsonElement serialize(Location loc, Type type, JsonSerializationContext con) {
+				public JsonElement serialize(Location loc, Type type,
+						JsonSerializationContext con) {
 					return new JsonPrimitive(Locations.serialize(loc));
 				}
 
-			})
-			.registerTypeAdapter(Location.class, new JsonDeserializer<Location>() {
+			}).registerTypeAdapter(Location.class, new JsonDeserializer<Location>() {
 
 				@Override
-				public Location deserialize(JsonElement json, Type type, JsonDeserializationContext con)
-						throws JsonParseException {
+				public Location deserialize(JsonElement json, Type type,
+						JsonDeserializationContext con) throws JsonParseException {
 					return Locations.deserialize(json.getAsString(), null);
 				}
 
-			})
-			.create();
+			}).create();
 
 	private Shape shape;
 
@@ -56,30 +59,33 @@ public class Border implements Serializable {
 	}
 
 	public boolean isInside(Entity ent) {
+		return isInside(ent.getLocation());
+	}
+
+	public boolean isInside(Location o) {
 		boolean inside = false;
-		if (this.loc.getWorld() != ent.getWorld())
+		if (this.loc.getWorld() != o.getWorld())
 			return true;
-		Location o = ent.getLocation();
 		switch (this.shape) {
-		case CIRCLE:
-			inside = this.loc.distance(o) < this.radius;
-			break;
-		case RECTANGLE:
-			if (this.loc2 == null)
-				return true;
-			double sx = Math.min(this.loc.getX(), this.loc2.getX());
-			double sy = Math.min(this.loc.getY(), this.loc2.getY());
-			double sz = Math.min(this.loc.getZ(), this.loc2.getZ());
-			double bx = Math.max(this.loc.getX(), this.loc2.getX());
-			double by = Math.max(this.loc.getY(), this.loc2.getY());
-			double bz = Math.max(this.loc.getZ(), this.loc2.getZ());
-			double x = o.getX();
-			double y = o.getY();
-			double z = o.getZ();
-//			return (sx < o.getX() && o.getX() > bx) && (sy < o.getY() && o.getY() > by)
-//					&& (sz < o.getZ() && o.getZ() > bz);
-			inside = sx < x && bx > x && sz < z && bz > z && sy < y && by > y;
-			break;
+			case CIRCLE:
+				inside = this.loc.distance(o) < this.radius;
+				break;
+			case RECTANGLE:
+				if (this.loc2 == null)
+					return true;
+				double sx = Math.min(this.loc.getX(), this.loc2.getX());
+				double sy = Math.min(this.loc.getY(), this.loc2.getY());
+				double sz = Math.min(this.loc.getZ(), this.loc2.getZ());
+				double bx = Math.max(this.loc.getX(), this.loc2.getX());
+				double by = Math.max(this.loc.getY(), this.loc2.getY());
+				double bz = Math.max(this.loc.getZ(), this.loc2.getZ());
+				double x = o.getX();
+				double y = o.getY();
+				double z = o.getZ();
+				// return (sx < o.getX() && o.getX() > bx) && (sy < o.getY() && o.getY() > by)
+				// && (sz < o.getZ() && o.getZ() > bz);
+				inside = sx < x && bx > x && sz < z && bz > z && sy < y && by > y;
+				break;
 		}
 		return inside;
 	}
@@ -112,18 +118,19 @@ public class Border implements Serializable {
 	public void boost(Entity ent) {
 		Location mid = this.getMid();
 		double x = mid.getX() - ent.getLocation().getX();
-//		double y = ent.getLocation().getY() > Math.max(this.loc.getY(), this.loc2.getY()) ? mid.getY() - ent.getLocation().getY()
-//				: 2;
+		// double y = ent.getLocation().getY() > Math.max(this.loc.getY(), this.loc2.getY()) ?
+		// mid.getY() - ent.getLocation().getY()
+		// : 2;
 		double ymax;
 		switch (this.shape) {
-		case CIRCLE:
-			ymax = this.loc.getY() + this.radius;
-			break;
-		case RECTANGLE:
-			ymax = Math.max(this.loc.getY(), this.loc2.getY());
-			break;
-		default:
-			throw new UnsupportedOperationException();
+			case CIRCLE:
+				ymax = this.loc.getY() + this.radius;
+				break;
+			case RECTANGLE:
+				ymax = Math.max(this.loc.getY(), this.loc2.getY());
+				break;
+			default:
+				throw new UnsupportedOperationException();
 		}
 		double y = ent.getLocation().getY() > ymax ? mid.getY() - ent.getLocation().getY() : 2;
 		double z = mid.getZ() - ent.getLocation().getZ();
@@ -132,10 +139,10 @@ public class Border implements Serializable {
 
 	public Location getMid() {
 		switch (this.shape) {
-		case CIRCLE:
-			return this.loc;
-		case RECTANGLE:
-			return this.loc.clone().add(this.loc2).multiply(.5);
+			case CIRCLE:
+				return this.loc;
+			case RECTANGLE:
+				return this.loc.clone().add(this.loc2).multiply(.5);
 		}
 		return this.loc;
 	}

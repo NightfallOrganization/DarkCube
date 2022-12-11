@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.listener;
 
 import org.bukkit.Bukkit;
@@ -10,9 +17,9 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
+import eu.darkcube.system.userapi.UserAPI;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -110,14 +117,15 @@ public class ListenerScoreboard extends BaseListener {
 		obj.getScore(TEAM_SOCIALS).setScore(1);
 		obj.getScore("§4§d").setScore(0);
 
-		new BukkitRunnable() {
 
-			private eu.darkcube.system.lobbysystem.user.User u = UserWrapper.getUser(p.getUniqueId());
+		eu.darkcube.system.userapi.User u = UserAPI.getInstance().getUser(p);
+		eu.darkcube.system.lobbysystem.user.LobbyUser user = UserWrapper.fromUser(u);
+		new BukkitRunnable() {
 
 			@Override
 			public void run() {
 
-				if (!p.isOnline()) {
+				if (!u.isLoaded()) {
 					this.cancel();
 					return;
 				}
@@ -133,7 +141,8 @@ public class ListenerScoreboard extends BaseListener {
 					prefix = "";
 				String suffix = prefix.split(" ")[0];
 
-				setSuffix(rank, ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', suffix)));
+				setSuffix(rank,
+						ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', suffix)));
 
 			}
 		}.runTaskTimer(Lobby.getInstance(), 20, 20);
@@ -141,10 +150,13 @@ public class ListenerScoreboard extends BaseListener {
 
 		new BukkitRunnable() {
 			int count = 0;
-			eu.darkcube.system.lobbysystem.user.User user = UserWrapper.getUser(p.getUniqueId());
 
 			@Override
 			public void run() {
+				if (!u.isLoaded() || !p.isOnline()) {
+					cancel();
+					return;
+				}
 				if (!user.isAnimations()) {
 					obj2.setDisplayName("§8" + ssl + " §5Dark§dCube§8.§5eu §8" + ssr);
 					return;
@@ -155,30 +167,39 @@ public class ListenerScoreboard extends BaseListener {
 		}.runTaskTimer(Lobby.getInstance(), 2, 2);
 	}
 
-	private static final String[] ANIMATION = new String[] {
-			"§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ",
-			"§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ",
-			"§8« §5Dark§dCube§8.§5eu §8»    ", "§8 « §5Dark§dCube§8.§5eu §8»   ", "§8  « §5Dark§dCube§8.§5eu §8»  ",
-			"§8   « §5Dark§dCube§8.§5eu §8» ", "§8    « §5Dark§dCube§8.§5eu §8»", "§8    « §5Dark§dCube§8.§5eu §8»",
-			"§8    « §5Dark§dCube§8.§5eu §8»", "§8    « §5Dark§dCube§8.§5eu §8»", "§8    « §5Dark§dCube§8.§5eu §8»",
-			"§8   « §5D ark§dCube§8.§5eu §8»", "§8   « §5Da rk§dCube§8.§5eu §8»", "§8   « §5Dar k§dCube§8.§5eu §8»",
-			"§8   « §5Dark §dCube§8.§5eu §8»", "§8   « §5Dark§dC ube§8.§5eu §8»", "§8   « §5Dark§dCu be§8.§5eu §8»",
-			"§8   « §5Dark§dCub e§8.§5eu §8»", "§8   « §5Dark§dCube §8.§5eu §8»", "§8   « §5Dark§dCube§8. §5eu §8»",
-			"§8   « §5Dark§dCube§8.§5e u §8»", "§8   « §5Dark§dCube§8.§5eu  §8»", "§8  « §5Dark§dCube§8.§5eu §8»  ",
-			"§8  « §5D ark§dCube§8.§5eu §8» ", "§8  « §5Da rk§dCube§8.§5eu §8» ", "§8  « §5Dar k§dCube§8.§5eu §8» ",
-			"§8  « §5Dark §dCube§8.§5eu §8» ", "§8  « §5Dark§dC ube§8.§5eu §8» ", "§8  « §5Dark§dCu be§8.§5eu §8» ",
-			"§8  « §5Dark§dCub e§8.§5eu §8» ", "§8  « §5Dark§dCube §8.§5eu §8» ", "§8  « §5Dark§dCube§8. §5eu §8» ",
-			"§8  « §5Dark§dCube§8.§5e u §8» ", "§8  « §5Dark§dCube§8.§5eu  §8» ", "§8  « §5Dark§dCube§8.§5eu §8»  ",
-			"§8 « §5Dark§dCube§8.§5eu §8»   ", "§8 « §5D ark§dCube§8.§5eu §8»  ", "§8 « §5Da rk§dCube§8.§5eu §8»  ",
-			"§8 « §5Dar k§dCube§8.§5eu §8»  ", "§8 « §5Dark §dCube§8.§5eu §8»  ", "§8 « §5Dark§dC ube§8.§5eu §8»  ",
-			"§8 « §5Dark§dCu be§8.§5eu §8»  ", "§8 « §5Dark§dCub e§8.§5eu §8»  ", "§8 « §5Dark§dCube §8.§5eu §8»  ",
-			"§8 « §5Dark§dCube§8. §5eu §8»  ", "§8 « §5Dark§dCube§8.§5e u §8»  ", "§8 « §5Dark§dCube§8.§5eu  §8»  ",
-			"§8 « §5Dark§dCube§8.§5eu §8»   ", "§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5D ark§dCube§8.§5eu §8»   ",
-			"§8« §5Da rk§dCube§8.§5eu §8»   ", "§8« §5Dar k§dCube§8.§5eu §8»   ", "§8« §5Dark §dCube§8.§5eu §8»   ",
-			"§8« §5Dark§dC ube§8.§5eu §8»   ", "§8« §5Dark§dCu be§8.§5eu §8»   ", "§8« §5Dark§dCub e§8.§5eu §8»   ",
-			"§8« §5Dark§dCube §8.§5eu §8»   ", "§8« §5Dark§dCube§8. §5eu §8»   ", "§8« §5Dark§dCube§8.§5e u §8»   ",
-			"§8« §5Dark§dCube§8.§5eu  §8»   ", "§8« §5Dark§dCube§8.§5eu §8»    ",
-	};
+	private static final String[] ANIMATION = new String[] {"§8« §5Dark§dCube§8.§5eu §8»    ",
+			"§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ",
+			"§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ",
+			"§8« §5Dark§dCube§8.§5eu §8»    ", "§8« §5Dark§dCube§8.§5eu §8»    ",
+			"§8 « §5Dark§dCube§8.§5eu §8»   ", "§8  « §5Dark§dCube§8.§5eu §8»  ",
+			"§8   « §5Dark§dCube§8.§5eu §8» ", "§8    « §5Dark§dCube§8.§5eu §8»",
+			"§8    « §5Dark§dCube§8.§5eu §8»", "§8    « §5Dark§dCube§8.§5eu §8»",
+			"§8    « §5Dark§dCube§8.§5eu §8»", "§8    « §5Dark§dCube§8.§5eu §8»",
+			"§8   « §5D ark§dCube§8.§5eu §8»", "§8   « §5Da rk§dCube§8.§5eu §8»",
+			"§8   « §5Dar k§dCube§8.§5eu §8»", "§8   « §5Dark §dCube§8.§5eu §8»",
+			"§8   « §5Dark§dC ube§8.§5eu §8»", "§8   « §5Dark§dCu be§8.§5eu §8»",
+			"§8   « §5Dark§dCub e§8.§5eu §8»", "§8   « §5Dark§dCube §8.§5eu §8»",
+			"§8   « §5Dark§dCube§8. §5eu §8»", "§8   « §5Dark§dCube§8.§5e u §8»",
+			"§8   « §5Dark§dCube§8.§5eu  §8»", "§8  « §5Dark§dCube§8.§5eu §8»  ",
+			"§8  « §5D ark§dCube§8.§5eu §8» ", "§8  « §5Da rk§dCube§8.§5eu §8» ",
+			"§8  « §5Dar k§dCube§8.§5eu §8» ", "§8  « §5Dark §dCube§8.§5eu §8» ",
+			"§8  « §5Dark§dC ube§8.§5eu §8» ", "§8  « §5Dark§dCu be§8.§5eu §8» ",
+			"§8  « §5Dark§dCub e§8.§5eu §8» ", "§8  « §5Dark§dCube §8.§5eu §8» ",
+			"§8  « §5Dark§dCube§8. §5eu §8» ", "§8  « §5Dark§dCube§8.§5e u §8» ",
+			"§8  « §5Dark§dCube§8.§5eu  §8» ", "§8  « §5Dark§dCube§8.§5eu §8»  ",
+			"§8 « §5Dark§dCube§8.§5eu §8»   ", "§8 « §5D ark§dCube§8.§5eu §8»  ",
+			"§8 « §5Da rk§dCube§8.§5eu §8»  ", "§8 « §5Dar k§dCube§8.§5eu §8»  ",
+			"§8 « §5Dark §dCube§8.§5eu §8»  ", "§8 « §5Dark§dC ube§8.§5eu §8»  ",
+			"§8 « §5Dark§dCu be§8.§5eu §8»  ", "§8 « §5Dark§dCub e§8.§5eu §8»  ",
+			"§8 « §5Dark§dCube §8.§5eu §8»  ", "§8 « §5Dark§dCube§8. §5eu §8»  ",
+			"§8 « §5Dark§dCube§8.§5e u §8»  ", "§8 « §5Dark§dCube§8.§5eu  §8»  ",
+			"§8 « §5Dark§dCube§8.§5eu §8»   ", "§8« §5Dark§dCube§8.§5eu §8»    ",
+			"§8« §5D ark§dCube§8.§5eu §8»   ", "§8« §5Da rk§dCube§8.§5eu §8»   ",
+			"§8« §5Dar k§dCube§8.§5eu §8»   ", "§8« §5Dark §dCube§8.§5eu §8»   ",
+			"§8« §5Dark§dC ube§8.§5eu §8»   ", "§8« §5Dark§dCu be§8.§5eu §8»   ",
+			"§8« §5Dark§dCub e§8.§5eu §8»   ", "§8« §5Dark§dCube §8.§5eu §8»   ",
+			"§8« §5Dark§dCube§8. §5eu §8»   ", "§8« §5Dark§dCube§8.§5e u §8»   ",
+			"§8« §5Dark§dCube§8.§5eu  §8»   ", "§8« §5Dark§dCube§8.§5eu §8»    ",};
 
 	private void setSuffix(Team team, String suffix) {
 		if (suffix.length() > 16) {

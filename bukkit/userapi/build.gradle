@@ -1,0 +1,6 @@
+dependencies {
+    api project(':bukkit:darkcubesystem')
+    api project(':bukkit:languageapi')
+    api project(':bukkit:commandapi')
+    api project(':bukkit:packetapi')
+}
