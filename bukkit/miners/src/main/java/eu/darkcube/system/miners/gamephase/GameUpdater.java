@@ -3,6 +3,7 @@ package eu.darkcube.system.miners.gamephase;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.system.miners.Miners;
@@ -21,6 +22,11 @@ public class GameUpdater {
 						teamsAlive.add(i);
 				if (teamsAlive.size() < 2)
 					Miners.endGame();
+				if (Miners.getGamephase() == 1)
+					Bukkit.getOnlinePlayers().forEach(p -> {
+						p.setSaturation(20);
+						p.setFoodLevel(20);
+					});
 			}
 		};
 	}

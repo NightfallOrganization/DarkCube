@@ -31,7 +31,8 @@ public class ListenerPlayerQuit implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerKickEvent e) {
 		e.setLeaveMessage(null);
-		Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
+		if (Miners.getGamephase() != 3)
+			Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
 		Miners.getPlayerManager().removePlayer(e.getPlayer());
 		switch (Miners.getGamephase()) {
 		case 0:

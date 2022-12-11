@@ -44,12 +44,13 @@ public class MinersPlayer {
 		player.setCustomName(prefix + player.getName());
 
 		if (Miners.getTeamManager().getPlayerTeam(player) == 0) { // hide spectators from non-specs
-			Bukkit.getOnlinePlayers().forEach(p -> {
-				if (Miners.getTeamManager().getPlayerTeam(p) != 0)
-					p.hidePlayer(player);
-			});
-			if (Miners.getGamephase() != 0)
+			if (Miners.getGamephase() != 0 && Miners.getGamephase() != 3) {
 				player.setAllowFlight(true);
+				Bukkit.getOnlinePlayers().forEach(p -> {
+					if (Miners.getTeamManager().getPlayerTeam(p) != 0)
+						p.hidePlayer(player);
+				});
+			}
 		} else { // show non-spectators to everyone
 			Bukkit.getOnlinePlayers().forEach(p -> p.showPlayer(player));
 			player.setAllowFlight(false);

@@ -1,11 +1,14 @@
 package eu.darkcube.system.miners.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
@@ -17,6 +20,8 @@ public class ListenerPlayerDeath implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		if (Miners.getGamephase() == 2)
 			Miners.getTeamManager().setPlayerTeam(e.getEntity(), 0, true);
+		if (Miners.getGamephase() == 1)
+			e.setKeepInventory(true);
 		Player p = getKiller(e.getDeathMessage(), e.getEntity());
 		if (p == null)
 			Miners.sendTranslatedMessageAll(Message.PLAYER_DIED, e.getEntity().getCustomName());
@@ -36,9 +41,13 @@ public class ListenerPlayerDeath implements Listener {
 
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent e) {
-		if (Miners.getGamephase() == 1)
+		e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 0, false, false));
+		if (Miners.getGamephase() == 1) {
 			e.setRespawnLocation(Miningphase.getSpawn(Miners.getTeamManager().getPlayerTeam(e.getPlayer())));
-		else if (Miners.getGamephase() == 2)
+			e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 4, false, false));
+			e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 5, 0, false, false));
+			e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.GHAST_CHARGE, 1, 1);
+		} else if (Miners.getGamephase() == 2)
 			e.setRespawnLocation(e.getPlayer().getLocation());
 	}
 

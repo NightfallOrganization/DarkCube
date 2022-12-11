@@ -21,6 +21,7 @@ import eu.darkcube.system.miners.gamephase.lobbyphase.Lobbyphase;
 import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
 import eu.darkcube.system.miners.gamephase.pvpphase.PVPPhase;
 import eu.darkcube.system.miners.listener.ListenerBlockBreak;
+import eu.darkcube.system.miners.listener.ListenerChatMessage;
 import eu.darkcube.system.miners.listener.ListenerItemInteract;
 import eu.darkcube.system.miners.listener.ListenerPlaceBlock;
 import eu.darkcube.system.miners.listener.ListenerPlayerDamage;
@@ -85,7 +86,7 @@ public class Miners extends DarkCubePlugin {
 
 		registerListeners(new ListenerPlayerQuit(), new ListenerPlayerLogin(), new ListenerPlayerJoin(),
 				new ListenerBlockBreak(), new ListenerPlaceBlock(), new ListenerItemInteract(),
-				new ListenerPlayerDeath(), new ListenerPlayerDamage());
+				new ListenerPlayerDeath(), new ListenerPlayerDamage(), new ListenerChatMessage());
 		registerListeners(new TNTManager());
 
 		Bukkit.createWorld(new WorldCreator(MINING_WORLD_NAME));
@@ -107,8 +108,7 @@ public class Miners extends DarkCubePlugin {
 
 	@Override
 	public void onDisable() {
-		Bukkit.getOnlinePlayers()
-				.forEach(p -> p.kickPlayer(Message.SERVER_STOP.getMessage(playerManager.getMinersPlayer(p))));
+		Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(""));
 	}
 
 	public static Miners getInstance() {
