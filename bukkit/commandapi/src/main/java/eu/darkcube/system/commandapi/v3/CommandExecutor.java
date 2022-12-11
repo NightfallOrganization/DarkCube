@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.commandapi.v3;
 
 import java.util.Locale;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -16,32 +22,15 @@ public class CommandExecutor {
 	private String permission;
 	private String[] aliases;
 	private String[] names;
-	private TriConsumer<CommandDispatcher<CommandSource>, LiteralCommandNode<CommandSource>, LiteralArgumentBuilder<CommandSource>> argumentBuilder;
+	private Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder;
 
 	public CommandExecutor(String prefix, String name, String[] aliases,
-					Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
+			Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
 		this(prefix, name, prefix + "." + name, aliases, argumentBuilder);
 	}
 
-	public CommandExecutor(String prefix, String name, String permission,
-					String[] aliases,
-					Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
-		this(prefix, name, permission, aliases, (node, builder) -> {
-			argumentBuilder.accept(builder);
-		});
-	}
-
-	public CommandExecutor(String prefix, String name, String permission,
-					String[] aliases,
-					BiConsumer<LiteralCommandNode<CommandSource>, LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
-		this(prefix, name, permission, aliases, (dispatcher, node, builder) -> {
-			argumentBuilder.accept(node, builder);
-		});
-	}
-
-	public CommandExecutor(String prefix, String name, String permission,
-					String[] aliases,
-					TriConsumer<CommandDispatcher<CommandSource>, LiteralCommandNode<CommandSource>, LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
+	public CommandExecutor(String prefix, String name, String permission, String[] aliases,
+			Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
 		this.prefix = prefix;
 		this.name = name;
 		this.permission = permission;
@@ -54,32 +43,10 @@ public class CommandExecutor {
 		}
 	}
 
-	public void register(CommandDispatcher<CommandSource> dispatcher) {
-		LiteralArgumentBuilder<CommandSource> builder = Commands.literal(this.name);
-		LiteralCommandNode<CommandSource> node = dispatcher.register(builder);
-		builder = Commands.literal(this.name);
-		this.argumentBuilder.accept(dispatcher, node, builder);
-		node = dispatcher.register(builder);
-
-		for (String name : getNames()) {
-			dispatcher.register(buildRedirect(name, node));
-		}
-	}
-
-	protected LiteralArgumentBuilder<CommandSource> buildRedirect(
-					final String alias,
-					final LiteralCommandNode<CommandSource> destination) {
-		// Redirects only work for nodes with children, but break the top
-		// argument-less command.
-		// Manually adding the root command after setting the redirect doesn't
-		// fix it.
-		// See https://github.com/Mojang/brigadier/issues/46). Manually clone
-		// the node instead.
-		LiteralArgumentBuilder<CommandSource> builder = Commands.literal(alias.toLowerCase(Locale.ENGLISH)).requires(destination.getRequirement()).forward(destination.getRedirect(), destination.getRedirectModifier(), destination.isFork()).executes(destination.getCommand());
-		for (CommandNode<CommandSource> child : destination.getChildren()) {
-			builder.then(child);
-		}
-		return builder;
+	public final LiteralArgumentBuilder<CommandSource> builder() {
+		LiteralArgumentBuilder<CommandSource> b = Commands.literal(name);
+		argumentBuilder.accept(b);
+		return b;
 	}
 
 	public String[] getAliases() {

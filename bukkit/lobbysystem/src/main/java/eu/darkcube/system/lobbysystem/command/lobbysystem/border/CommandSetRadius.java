@@ -1,46 +1,33 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.system.commandapi.Command;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.CommandArgument;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.util.Border;
+import net.md_5.bungee.api.ChatColor;
 
-public class CommandSetRadius extends Command {
+public class CommandSetRadius extends LobbyCommandExecutor {
+
 	public CommandSetRadius() {
-		super(Lobby.getInstance(), "setRadius", new Command[0], "Setzt den Radius der Border",
-				CommandArgument.RADIUS);
+		super("setRadius", b -> b.then(
+				Commands.argument("radius", DoubleArgumentType.doubleArg(10)).executes(ctx -> {
+					double d = DoubleArgumentType.getDouble(ctx, "radius");
+					Border border = Lobby.getInstance().getDataManager().getBorder();
+					border = new Border(border.getShape(), d, border.getLoc1(), border.getLoc2());
+					Lobby.getInstance().getDataManager().setBorder(border);
+					ctx.getSource().sendFeedback(new CustomComponentBuilder("Radius neugesetzt!")
+							.color(ChatColor.GREEN).create(), true);
+					return 0;
+				})));
 	}
 
-	@Override
-	public List<String> onTabComplete(String[] args) {
-//		if (args.length == 1) {
-//			return Arrays.asList(Shape.values()).stream().map(Shape::name)
-//					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
-//		}
-		return super.onTabComplete(args);
-	}
-
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length != 1)
-			return false;
-		double r = -1;
-		try {
-			r = Double.parseDouble(args[0]);
-		} catch (Exception ex) {
-		}
-		if (r < 0) {
-			sender.sendMessage("§cUngültiger Radius!");
-			return true;
-		}
-		Border border = Lobby.getInstance().getDataManager().getBorder();
-		border = new Border(border.getShape(), r, border.getLoc1(), border.getLoc2());
-		Lobby.getInstance().getDataManager().setBorder(border);
-		sender.sendMessage("§aRadius neugesetzt!");
-		return true;
-	}
 }

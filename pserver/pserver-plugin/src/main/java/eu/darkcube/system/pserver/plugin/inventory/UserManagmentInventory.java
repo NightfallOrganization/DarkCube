@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.pserver.plugin.inventory;
 
 import java.util.Map;
@@ -30,7 +37,6 @@ public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 		this.listener.register();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		int index = 0;
@@ -42,11 +48,10 @@ public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 			}
 			ItemBuilder builder = new ItemBuilder(Material.SKULL_ITEM).durability(3);
 			builder.owner(entry.name).displayname(ChatColor.GRAY + entry.name);
-			builder.build();
-			builder.meta(null).getUnsafe().setString(KEY, KEY_VALUE).setString(USER_UUID_KEY, entry.uuid.toString())
+			builder.getUnsafe().setString(KEY, KEY_VALUE).setString(USER_UUID_KEY, entry.uuid.toString())
 					.setString(USER_NAME_KEY, entry.name);
 			builder.lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessageString(user, entry.name, entry.uuid)
-					.split("\n"));
+					.split("(\r\n|\r|\n)"));
 			items.put(index++, builder.build());
 		}
 	}

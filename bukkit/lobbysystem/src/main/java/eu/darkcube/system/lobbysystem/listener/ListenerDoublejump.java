@@ -1,20 +1,26 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.listener;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.user.User;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
+import eu.darkcube.system.userapi.UserAPI;
 
 public class ListenerDoublejump extends BaseListener {
 
@@ -24,11 +30,11 @@ public class ListenerDoublejump extends BaseListener {
 	@EventHandler
 	public void handle(PlayerToggleFlightEvent e) {
 		Player p = e.getPlayer();
-		User user = UserWrapper.getUser(p.getUniqueId());
+		LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
 		if (user.isBuildMode()) {
 			return;
 		}
-		if(!e.isFlying())
+		if (!e.isFlying())
 			return;
 		e.setCancelled(true);
 		if (!this.cooldown.containsKey(p)) {
@@ -46,9 +52,10 @@ public class ListenerDoublejump extends BaseListener {
 						this.cancel();
 						return;
 					}
-					if(p.isFlying())
+					if (p.isFlying())
 						return;
-					ListenerDoublejump.this.cooldown.put(p, ListenerDoublejump.this.cooldown.get(p) - 1);
+					ListenerDoublejump.this.cooldown.put(p,
+							ListenerDoublejump.this.cooldown.get(p) - 1);
 					p.setExp(1 - (ListenerDoublejump.this.cooldown.get(p) / 80F));
 					if (ListenerDoublejump.this.cooldown.get(p) <= 0) {
 						ListenerDoublejump.this.cooldown.remove(p);

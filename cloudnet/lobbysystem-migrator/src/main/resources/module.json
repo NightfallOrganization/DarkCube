@@ -1,0 +1,18 @@
+{
+  "runtimeModule": true,
+  "group": "eu.darkcube.cloudnet.modules",
+  "name": "DarkCube-LobbySystem-Migrator",
+  "version": "1.0",
+  "author": "DasBabyPixel",
+  "description": "Migrates data from the lobbysystem from the old format into the new one",
+  "main": "eu.darkcube.system.lobbysystem.migrator.Migrator",
+  "storesSensitiveData": true,
+  "dependencies": [
+    {
+      "group": "com.google.code.gson",
+      "name": "gson",
+      "version": "2.10",
+      "repo": "maven"
+    }
+  ]
+}

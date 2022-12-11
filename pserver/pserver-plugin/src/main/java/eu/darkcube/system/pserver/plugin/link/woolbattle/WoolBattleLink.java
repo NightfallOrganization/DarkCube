@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.pserver.plugin.link.woolbattle;
 
 import eu.darkcube.system.commandapi.v3.CommandAPI;
@@ -19,6 +26,7 @@ public class WoolBattleLink extends Link {
 	protected void link() throws Throwable {
 		eu.darkcube.minigame.woolbattle.util.StatsLink.enabled = false;
 		eu.darkcube.minigame.woolbattle.util.CloudNetLink.shouldDisplay = false;
+		CommandAPI.getInstance().unregisterPrefixlessByPrefix("woolbattle");
 		CommandAPI.getInstance().register(new ForceMapCommand());
 		CommandAPI.getInstance().register(new SetLifesCommand());
 		CommandAPI.getInstance().register(new SetTeamCommand());

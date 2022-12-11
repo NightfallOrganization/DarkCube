@@ -1,50 +1,34 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
+import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.CommandArgument;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.util.Border;
 import eu.darkcube.system.lobbysystem.util.Border.Shape;
+import net.md_5.bungee.api.ChatColor;
 
-public class CommandSetShape extends Command {
+public class CommandSetShape extends LobbyCommandExecutor {
+
 	public CommandSetShape() {
-		super(Lobby.getInstance(), "setShape", new Command[0], "Setzt die Form der Border",
-				CommandArgument.SHAPE);
+		super("setShape", b -> b.then(Commands
+				.argument("shape", EnumArgument.enumArgument(Shape.values())).executes(ctx -> {
+					Shape s = EnumArgument.getEnumArgument(ctx, "shape", Shape.class);
+					Border border = Lobby.getInstance().getDataManager().getBorder();
+					border = new Border(s, border.getRadius(), border.getLoc1(), border.getLoc2());
+					Lobby.getInstance().getDataManager().setBorder(border);
+					ctx.getSource().sendFeedback(new CustomComponentBuilder("Form neugesetzt!")
+							.color(ChatColor.GREEN).create(), true);
+					return 0;
+				})));
 	}
 
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return Arrays.asList(Shape.values()).stream().map(Shape::name)
-					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
-		}
-		return super.onTabComplete(args);
-	}
-
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length != 1)
-			return false;
-		Shape s = null;
-		for (Shape shape : Shape.values()) {
-			if (shape.name().equalsIgnoreCase(args[0])) {
-				s = shape;
-			}
-		}
-		if (s == null) {
-			sender.sendMessage("§cUnbekannte Form!");
-			return true;
-		}
-		Border border = Lobby.getInstance().getDataManager().getBorder();
-		border = new Border(s, border.getRadius(), border.getLoc1(), border.getLoc2());
-		Lobby.getInstance().getDataManager().setBorder(border);
-		sender.sendMessage("§aForm neugesetzt!");
-		return true;
-	}
 }
