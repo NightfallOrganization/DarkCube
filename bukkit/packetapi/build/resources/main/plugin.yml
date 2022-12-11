@@ -1,0 +1,5 @@
+name: PacketAPI
+author: DasBabyPixel
+version: 1.0
+main: eu.darkcube.system.packetapi.PluginPacketAPI
+depend: [System]
