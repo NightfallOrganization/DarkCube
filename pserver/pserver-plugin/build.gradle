@@ -1,6 +1,7 @@
 apply plugin: 'java-library'
 
 dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     implementation project(':pserver:pserver-api')
     implementation project(':bukkit:darkcubesystem')
     implementation project(':bukkit:commons')
