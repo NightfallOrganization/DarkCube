@@ -7,15 +7,6 @@
 
 package eu.darkcube.system.miners;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.language.core.Language;
@@ -27,19 +18,19 @@ import eu.darkcube.system.miners.gamephase.end.EndPhase;
 import eu.darkcube.system.miners.gamephase.lobbyphase.Lobbyphase;
 import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
 import eu.darkcube.system.miners.gamephase.pvpphase.PVPPhase;
-import eu.darkcube.system.miners.listener.ListenerBlockBreak;
-import eu.darkcube.system.miners.listener.ListenerChatMessage;
-import eu.darkcube.system.miners.listener.ListenerItemInteract;
-import eu.darkcube.system.miners.listener.ListenerPlaceBlock;
-import eu.darkcube.system.miners.listener.ListenerPlayerDamage;
-import eu.darkcube.system.miners.listener.ListenerPlayerDeath;
-import eu.darkcube.system.miners.listener.ListenerPlayerJoin;
-import eu.darkcube.system.miners.listener.ListenerPlayerLogin;
-import eu.darkcube.system.miners.listener.ListenerPlayerQuit;
+import eu.darkcube.system.miners.listener.*;
 import eu.darkcube.system.miners.player.Message;
 import eu.darkcube.system.miners.player.PlayerManager;
 import eu.darkcube.system.miners.player.TNTManager;
 import eu.darkcube.system.miners.player.TeamManager;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Miners extends DarkCubePlugin {
 
