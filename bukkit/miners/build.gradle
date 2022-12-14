@@ -1,5 +1,7 @@
 dependencies {
-	api project(':bukkit:darkcubesystem')
-	api project(':bukkit:commandapi')
-	api project(':bukkit:inventoryapi')
+	implementation project(':bukkit:darkcubesystem')
+	implementation project(':bukkit:commandapi')
+	implementation project(':bukkit:inventoryapi')
+	implementation project(':bukkit:languageapi')
+	implementation 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
 }
