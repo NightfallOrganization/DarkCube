@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.pserver.plugin;
 
 import java.io.IOException;
@@ -92,8 +99,8 @@ public class PServerPlugin extends DarkCubePlugin {
 
 		PServerProvider.getInstance().setPServerCommand(new PServerCommand());
 
-		this.linkManager.addLink(() -> new LuckPermsLink());
-		this.linkManager.addLink(() -> new WoolBattleLink());
+		this.linkManager.addLink(LuckPermsLink::new);
+		this.linkManager.addLink(WoolBattleLink::new);
 	}
 
 	@Override

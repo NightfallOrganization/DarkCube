@@ -1,10 +1,12 @@
 dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     implementation project(':bukkit:darkcubesystem')
+    implementation project(':bukkit:commons')
     implementation project(':bukkit:languageapi')
     implementation project(':bukkit:inventoryapi')
-    implementation project(':pserver:pserver-common')
-    implementation project(':pserver')
-	implementation project(':bukkit:cubesapi')
+    implementation project(':pserver:pserver-bukkit')
+    implementation project(':pserver:pserver-api')
+    implementation project(':bukkit:userapi')
     embedApi project(':common:labymod-emotes')
     implementation 'org.jetbrains:annotations:23.0.0'
     implementation cloudnetDriver

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.listener;
 
 import org.bukkit.event.EventHandler;
@@ -10,6 +17,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import eu.darkcube.system.lobbysystem.Lobby;
 
 public class ListenerPhysics extends BaseListener {
 
@@ -17,6 +25,11 @@ public class ListenerPhysics extends BaseListener {
 	public void handle(PlayerInteractEvent e) {
 		if (e.getAction() == Action.PHYSICAL) {
 			e.setCancelled(true);
+			if (e.getClickedBlock()
+					.equals(Lobby.getInstance().getDataManager().getJumpAndRunPlate().getBlock())) {
+				if (Lobby.getInstance().getDataManager().isJumpAndRunEnabled())
+					Lobby.getInstance().getJaRManager().startJaR(e.getPlayer());
+			}
 		}
 	}
 

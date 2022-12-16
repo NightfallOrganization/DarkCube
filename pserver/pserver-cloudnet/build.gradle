@@ -1,0 +1,16 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation cloudnet
+    implementation cloudnetBridge
+    embedApi project(':pserver:pserver-api')
+    embedApi project(':pserver:pserver-bukkit')
+}
+
+jar {
+	dependsOn ':pserver:pserver-bukkit:jar'
+
+	from (project(':pserver:pserver-bukkit').getBuildDir()) {
+		include 'pserver-bukkit.jar'
+	}
+}

@@ -1,3 +1,5 @@
 main: eu.darkcube.system.miners.Miners
-version: 0.1
+version: ALPHA-1.0
 name: Miners
+author: Kes
+depend: [System, CommandAPI, LanguageAPICore]

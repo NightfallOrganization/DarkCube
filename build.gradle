@@ -49,16 +49,26 @@ allprojects {
     pluginManager.withPlugin('java-library') {
         configurations {
             embedApi
+            embedImplementation
         }
         
         dependencies {
             configurations.api.extendsFrom(configurations.embedApi)
+            configurations.implementation.extendsFrom(configurations.embedImplementation)
         }
         
         jar {
         	dependsOn configurations.embedApi
+        	dependsOn configurations.embedImplementation
             from {
-                configurations.embedApi.collect { it.isDirectory() ? it : zipTree(it) }
+                configurations.embedApi.collect { 
+                	it.isDirectory() ? it : zipTree(it)
+                }
+            }
+            from {
+                configurations.embedImplementation.collect {
+	                it.isDirectory() ? it : zipTree(it)
+                }
             }
         }
     }

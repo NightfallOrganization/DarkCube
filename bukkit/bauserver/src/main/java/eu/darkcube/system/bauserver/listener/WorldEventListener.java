@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.bauserver.listener;
 
 import org.bukkit.event.EventHandler;
@@ -9,7 +16,6 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.world.WorldLoadEvent;
-
 import eu.darkcube.system.bauserver.Main;
 
 public class WorldEventListener implements Listener {
@@ -21,6 +27,9 @@ public class WorldEventListener implements Listener {
 
 	@EventHandler
 	public void handle(WeatherChangeEvent event) {
+		if (event.getWorld().hasMetadata("mayrain")) {
+			return;
+		}
 		if (event.toWeatherState()) {
 			event.setCancelled(true);
 			event.getWorld().setWeatherDuration(Integer.MAX_VALUE);

@@ -1,6 +1,6 @@
 {
 	"runtimeModule": true,
-	"group": "de.pixel.cloudnet.modules",
+	"group": "eu.darkcube.cloudnet.modules",
 	"name": "CloudNet-StatsReset",
 	"version": "1.0",
 	"author": "DasBabyPixel",

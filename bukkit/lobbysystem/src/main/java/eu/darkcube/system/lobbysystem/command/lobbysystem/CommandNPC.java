@@ -1,22 +1,23 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetDailyReward;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetWoolBattle;
 
-public class CommandNPC extends Command {
+public class CommandNPC extends LobbyCommandExecutor {
 
 	public CommandNPC() {
-		super(Lobby.getInstance(), "npc", new Command[] {
-				new CommandSetWoolBattle(), new CommandSetDailyReward()
-		}, "NPC Hauptcommand");
+		super("npc", b -> {
+			b.then(new CommandSetWoolBattle().builder())
+					.then(new CommandSetDailyReward().builder());
+		});
 	}
 
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		return false;
-	}
 }

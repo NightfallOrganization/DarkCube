@@ -1,7 +1,15 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.listener;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -18,11 +26,7 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerLaunchable implements Listener {
 
-	private Set<Player> executed = new HashSet<>();
-
-	public void start() {
-		new Scheduler(this.executed::clear).runTaskTimer(1, 1);
-	}
+	private Set<Player> executing = new HashSet<>();
 
 	@EventHandler
 	public void handle(ProjectileLaunchEvent e) {
@@ -30,20 +34,17 @@ public class ListenerLaunchable implements Listener {
 			return;
 		}
 		Player p = (Player) e.getEntity().getShooter();
-		if (this.executed.contains(p)) {
+		if (this.executing.contains(p)) {
 			return;
 		}
+		executing.add(p);
 		LaunchableInteractEvent pe =
 				new LaunchableInteractEvent(p, e.getEntity(), p.getItemInHand());
 		Bukkit.getPluginManager().callEvent(pe);
 		if (pe.isCancelled()) {
 			e.setCancelled(true);
 		}
-	}
-
-	@EventListener
-	public void handle(PlayerItemHeldEvent e) {
-		executed.remove(e.getPlayer());
+		executing.remove(p);
 	}
 
 	@EventHandler
@@ -74,19 +75,17 @@ public class ListenerLaunchable implements Listener {
 			default:
 				break;
 		}
-		if (e.getItem().getType() != Material.WOOL) {
-			if (this.executed.contains(e.getPlayer())) {
-				e.setCancelled(true);
-				return;
-			}
-			this.executed.add(e.getPlayer());
+		if (this.executing.contains(e.getPlayer())) {
+			return;
 		}
+		this.executing.add(e.getPlayer());
 		LaunchableInteractEvent pe =
 				new LaunchableInteractEvent(e.getPlayer(), type, e.getItem(), e.getAction());
 		Bukkit.getPluginManager().callEvent(pe);
 		if (pe.isCancelled()) {
 			e.setCancelled(true);
 		}
+		executing.remove(e.getPlayer());
 	}
 
 }

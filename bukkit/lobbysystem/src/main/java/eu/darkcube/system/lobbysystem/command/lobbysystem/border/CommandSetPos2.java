@@ -1,53 +1,47 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.mojang.brigadier.context.CommandContext;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
+import eu.darkcube.system.commandapi.v3.arguments.BooleanArgument;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.CommandArgument;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.parser.Locations;
 import eu.darkcube.system.lobbysystem.util.Border;
 import eu.darkcube.system.lobbysystem.util.DataManager;
+import net.md_5.bungee.api.ChatColor;
 
-public class CommandSetPos2 extends Command {
+public class CommandSetPos2 extends LobbyCommandExecutor {
+
 	public CommandSetPos2() {
-		super(Lobby.getInstance(), "setPos2", new Command[0], "Setzt die 2. Position der Border",
-				CommandArgument.MAKE_NICE_LOCATION);
+		super("setPos2",
+				b -> b.executes(ctx -> cmd(ctx, ctx.getSource().asPlayer().getLocation()))
+						.then(Commands.argument("makenice", BooleanArgument.booleanArgument())
+								.executes(ctx -> cmd(ctx,
+										BooleanArgument.getBoolean(ctx, "makenice")
+												? Locations.getNiceLocation(
+														ctx.getSource().asPlayer().getLocation())
+												: ctx.getSource().asPlayer().getLocation()))));
 	}
 
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return Arrays.asList("true", "false").stream()
-					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
-		}
-		return super.onTabComplete(args);
+	private static int cmd(CommandContext<CommandSource> ctx, Location loc) {
+		DataManager data = Lobby.getInstance().getDataManager();
+		Border border = data.getBorder();
+		border = new Border(border.getShape(), border.getRadius(), border.getLoc1(), loc);
+		data.setBorder(border);
+		ctx.getSource().sendFeedback(
+				new CustomComponentBuilder("Position 2 gesetzt!").color(ChatColor.GREEN).create(),
+				true);
+		return 0;
 	}
 
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			Location loc = p.getLocation();
-			if (args.length == 1) {
-				if (args[0].equalsIgnoreCase("true")) {
-					loc = Locations.getNiceLocation(loc);
-					p.teleport(loc);
-				}
-			}
-			DataManager data = Lobby.getInstance().getDataManager();
-			Border border = data.getBorder();
-			border = new Border(border.getShape(), border.getRadius(), border.getLoc1(), loc);
-			data.setBorder(border);
-			p.sendMessage("§aPosition 2 neugesetzt!");
-			return true;
-		}
-		return false;
-	}
 }

@@ -1,45 +1,66 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
-import org.bukkit.command.CommandSender;
-
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import eu.darkcube.system.commandapi.Command;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import de.dytanic.cloudnet.driver.service.ServiceTask;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
+import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.commandapi.v3.Message;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.CommandArgument;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.arguments.ServiceTaskArgument;
+import net.md_5.bungee.api.ChatColor;
 
-public class CommandRemoveTask extends Command {
+public class CommandRemoveTask extends LobbyCommandExecutor {
+
+	private static final DynamicCommandExceptionType TASK_NOT_PRESENT =
+			Message.SERVICE_TASK_NOT_PRESENT.newDynamicCommandExceptionType();
+
 	public CommandRemoveTask() {
-		super(Lobby.getInstance(), "removeTask", new Command[0], "Entfernt eine Task", CommandArgument.CLOUD_TASK);
-	}
-
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return new ArrayList<>(Lobby.getInstance().getDataManager().getWoolBattleTasks());
-		}
-		return super.onTabComplete(args);
-	}
-
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length == 1) {
-			CloudNetDriver w = CloudNetDriver.getInstance();
-			Set<String> tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
-			if (!w.getServiceTaskProvider().isServiceTaskPresent(args[0]) && !tasks.contains(args[0])) {
-				sender.sendMessage("§cEs gibt keine CloudTask mit dem Namen " + args[0]);
-				return true;
+		super("removeTask", b -> b.then(Commands.argument("task", new ArgumentType<String>() {
+			@Override
+			public String parse(StringReader reader) throws CommandSyntaxException {
+				String task = reader.readString();
+				if (!Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(task)) {
+					throw TASK_NOT_PRESENT.createWithContext(reader,task);
+				}
+				return task;
 			}
-			String task = tasks.contains(args[0]) ? args[0]
-					: w.getServiceTaskProvider().getServiceTask(args[0]).getName();
+
+			@Override
+			public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+					SuggestionsBuilder builder) {
+				return ISuggestionProvider.suggest(
+						Lobby.getInstance().getDataManager().getWoolBattleTasks(), builder);
+			}
+		}).executes(ctx -> {
+			String task = ctx.getArgument("task", String.class);
+			Set<String> tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
 			tasks.remove(task);
 			Lobby.getInstance().getDataManager().setWoolBattleTasks(tasks);
-			sender.sendMessage("§aTask erfolgreich entfernt!");
-			return true;
-		}
-		return false;
+			ctx.getSource().sendFeedback(
+					new CustomComponentBuilder("Task erfolgreich entfernt!").color(ChatColor.GREEN)
+							.create(), true);
+			return 0;
+		})));
 	}
+
 }
