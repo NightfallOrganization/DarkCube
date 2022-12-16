@@ -29,5 +29,4 @@ public class ListenerPlaceBlock implements Listener {
 			e.getPlayer().getInventory().setItemInHand(Item.COBBLESTONE.getItem(e.getPlayer()));
 		}
 	}
-
 }

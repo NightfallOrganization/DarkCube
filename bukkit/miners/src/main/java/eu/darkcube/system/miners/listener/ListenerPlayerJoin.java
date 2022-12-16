@@ -12,14 +12,15 @@ import eu.darkcube.system.miners.player.Message;
 
 public class ListenerPlayerJoin implements Listener {
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 0, false, false));
-		Miners.getPlayerManager().addPlayer(e.getPlayer());
-		Miners.getPlayerManager().getMinersPlayer(e.getPlayer()).updatePlayer();
-		e.getPlayer().setGameMode(GameMode.SURVIVAL);
-		e.setJoinMessage(null);
-		Miners.sendTranslatedMessageAll(Message.PLAYER_JOINED, e.getPlayer().getCustomName());
-	}
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 0, false, false));
+        Miners.getPlayerManager().addPlayer(e.getPlayer());
+        Miners.getPlayerManager().getMinersPlayer(e.getPlayer()).updatePlayer();
+        e.getPlayer().setGameMode(GameMode.SURVIVAL);
+        e.setJoinMessage(null);
+        if (Miners.getTeamManager().getPlayerTeam(e.getPlayer()) != 0)
+            Miners.sendTranslatedMessageAll(Message.PLAYER_JOINED, e.getPlayer().getCustomName());
+    }
 
 }
