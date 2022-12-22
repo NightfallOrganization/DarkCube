@@ -4,7 +4,7 @@ dependencies {
     implementation project(':pserver:pserver-bukkit')
     implementation project(':pserver:pserver-api')
     embedApi project(':common:labymod-emotes')
-    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'org.jetbrains:annotations:23.1.0'
     implementation cloudnetDriver
     implementation cloudnetWrapper
     implementation cloudnetBridge
