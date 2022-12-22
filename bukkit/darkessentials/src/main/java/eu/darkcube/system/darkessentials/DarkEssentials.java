@@ -175,7 +175,6 @@ public class DarkEssentials extends Plugin {
 		CommandAPI.enable(this, new CommandHat());
 		CommandAPI.enable(this, new CommandNear());
 		CommandAPI.enable(this, new CommandSkull());
-		CommandAPI.enable(this, new CommandOnlineplayers());
 		CommandAPI.enable(this, new CommandItemclear());
 		CommandAPI.enable(this, new CommandCraft());
 		CommandAPI.enable(this, new CommandGms());
