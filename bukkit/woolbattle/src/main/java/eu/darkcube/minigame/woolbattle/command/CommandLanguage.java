@@ -7,19 +7,18 @@
 
 package eu.darkcube.minigame.woolbattle.command;
 
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerJoinEvent;
-
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.User;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.language.core.Language;
+import eu.darkcube.system.util.Language;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
+
+import java.util.List;
 
 public class CommandLanguage extends Command {
 

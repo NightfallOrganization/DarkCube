@@ -20,12 +20,12 @@ import org.bukkit.potion.PotionEffect;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandHeal extends Command {
 
 	public CommandHeal() {
-		super(Main.getInstance(), "heal", new Command[0], "Heilt den angegebenen Spieler vollständig.",
+		super(DarkEssentials.getInstance(), "heal", new Command[0], "Heilt den angegebenen Spieler vollständig.",
 				new Argument("Spieler", "Der zu heilende Spieler", false));
 		setAliases("d_heal");
 	}
@@ -48,17 +48,18 @@ public class CommandHeal extends Command {
 				}
 			}
 		} else {
-			Main.sendMessagePlayernameRequired(sender);
+			DarkEssentials.sendMessagePlayernameRequired(sender);
 			return true;
 		}
 		for (Player current : players) {
 			removeAllNegativePotions(current);
 			current.setHealth(current.getMaxHealth());
-			Main.getInstance().sendMessage(Main.cConfirm() + "Du wurdest geheilt!", current);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du wurdest geheilt!", current);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
-			Main.getInstance().sendMessage(Main.cValue() + count + Main.cConfirm() + " Spieler geheilt!", sender);
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Spieler geheilt!", sender);
 		}
 		return true;
 	}
@@ -75,7 +76,7 @@ public class CommandHeal extends Command {
 				list.add("all");
 			}
 			if (!argsList.contains("all")) {
-				list.addAll(Main.getPlayersStartWith(args));
+				list.addAll(DarkEssentials.getPlayersStartWith(args));
 			}
 		}
 		return list;

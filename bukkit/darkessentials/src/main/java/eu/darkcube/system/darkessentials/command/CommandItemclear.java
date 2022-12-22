@@ -22,14 +22,14 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 import eu.darkcube.system.darkessentials.util.NumbzUtils;
 
 public class CommandItemclear extends Command {
 
 	public CommandItemclear() {
-		super(Main.getInstance(), "itemclear", new Command[0], "Löscht gedroppte Items.",
+		super(DarkEssentials.getInstance(), "itemclear", new Command[0], "Löscht gedroppte Items.",
 				new Argument[] { new Argument("Radius", "Der Radius, in dem Items gelöscht werden sollten.", false),
 						new Argument("Spieler", "Der Spieler, um den herum Items gelöscht werden sollen.", false),
 						new Argument("Welt", "Die Welt, in der Items gelöscht werden sollen.", false) });
@@ -60,23 +60,23 @@ public class CommandItemclear extends Command {
 				}
 			}
 			if (!players.isEmpty() && !worlds.isEmpty()) {
-				Main.getInstance()
-						.sendMessage(Main.cFail() + "Du kannst nicht gleichzeitig Welten und Spieler angeben!", sender);
+				DarkEssentials.getInstance()
+						.sendMessage(DarkEssentials.cFail() + "Du kannst nicht gleichzeitig Welten und Spieler angeben!", sender);
 				return true;
 			}
 			if (radius == Integer.MAX_VALUE && !players.isEmpty()) {
-				Main.getInstance().sendMessage(
-						Main.cFail() + "Du musst einen Radius angeben, wenn du einen Spieler angibst!", sender);
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cFail() + "Du musst einen Radius angeben, wenn du einen Spieler angibst!", sender);
 				return true;
 			}
 			if (radius != Integer.MAX_VALUE && players.isEmpty()) {
-				Main.getInstance().sendMessage(
-						Main.cFail() + "Du musst einen Spieler angeben, wenn du einen Radius angibst!", sender);
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cFail() + "Du musst einen Spieler angeben, wenn du einen Radius angibst!", sender);
 				return true;
 			}
 			if (radius != Integer.MAX_VALUE && !worlds.isEmpty()) {
-				Main.getInstance().sendMessage(
-						Main.cFail() + "Du kannst nicht gleichzeitig eine Welt und einen Radius angeben!", sender);
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cFail() + "Du kannst nicht gleichzeitig eine Welt und einen Radius angeben!", sender);
 				return true;
 			}
 		}
@@ -84,18 +84,18 @@ public class CommandItemclear extends Command {
 		if (unresolvedNames.size() != 0) {
 			StringBuilder sb = new StringBuilder();
 			if (unresolvedNames.size() > 1) {
-				sb.append(Main.cFail() + "Die Spieler oder Welten " + ChatColor.GRAY + "\"");
+				sb.append(DarkEssentials.cFail() + "Die Spieler oder Welten " + ChatColor.GRAY + "\"");
 			} else {
-				sb.append(Main.cFail() + "Der Spieler oder die Welt " + ChatColor.GRAY + "\"");
+				sb.append(DarkEssentials.cFail() + "Der Spieler oder die Welt " + ChatColor.GRAY + "\"");
 			}
 			for (String name : unresolvedNames) {
-				sb.append(Main.cValue() + name + ChatColor.GRAY + "\", \"");
+				sb.append(DarkEssentials.cValue() + name + ChatColor.GRAY + "\", \"");
 			}
 			if (unresolvedNames.size() > 1) {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " konnten nicht gefunden werden!", sender);
 			} else {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " konnte nicht gefunden werden!", sender);
 			}
 		}
@@ -125,7 +125,8 @@ public class CommandItemclear extends Command {
 			}
 		}
 
-		Main.getInstance().sendMessage(new StringBuilder(Main.cValue()).append(count).append(Main.cConfirm())
+		DarkEssentials.getInstance().sendMessage(new StringBuilder(DarkEssentials.cValue()).append(count).append(
+						DarkEssentials.cConfirm())
 				.append(" Items wurden gelöscht!").toString(), Bukkit.getOnlinePlayers());
 
 		return true;
@@ -140,7 +141,7 @@ public class CommandItemclear extends Command {
 		if (args.length > 1) {
 			try {
 				Integer.parseInt(args[0]);
-				return Main.getPlayersStartWith(args);
+				return DarkEssentials.getPlayersStartWith(args);
 			} catch (Exception e) {
 				return EssentialCollections.toSortedStringList(Bukkit.getWorlds(), EssentialCollections.asList(args),
 						args[args.length - 1]);

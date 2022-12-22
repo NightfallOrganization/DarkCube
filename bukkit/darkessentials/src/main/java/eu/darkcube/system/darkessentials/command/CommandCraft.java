@@ -11,12 +11,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandCraft extends Command {
 
 	public CommandCraft() {
-		super(Main.getInstance(), "craft", new Command[0], "Öffnet ein Craftingfenster.");
+		super(DarkEssentials.getInstance(), "craft", new Command[0], "Öffnet ein Craftingfenster.");
 		setAliases("d_craft");
 	}
 
@@ -26,7 +26,7 @@ public class CommandCraft extends Command {
 			return false;
 		}
 		if (!(sender instanceof Player)) {
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst ein Spieler sein, um diesen Command auszuführen!",
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst ein Spieler sein, um diesen Command auszuführen!",
 					sender);
 		}
 		((Player) sender).openWorkbench(((Player) sender).getLocation(), true);

@@ -7,15 +7,8 @@
 
 package eu.darkcube.system.darkessentials.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.util.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,12 +19,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import eu.darkcube.system.ChatUtils;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class NumbzUtils {
-	public static boolean containsStringIgnoreCase(String string,
-					Collection<String> list) {
+	public static boolean containsStringIgnoreCase(String string, Collection<String> list) {
 		for (String s : list) {
 			if (s.equalsIgnoreCase(string))
 				return true;
@@ -39,8 +31,7 @@ public class NumbzUtils {
 		return false;
 	}
 
-	public static boolean containsStringIgnoreCase(String string,
-					String... list) {
+	public static boolean containsStringIgnoreCase(String string, String... list) {
 		return containsStringIgnoreCase(string, Arrays.asList(list));
 	}
 
@@ -74,15 +65,13 @@ public class NumbzUtils {
 		return list.get(new Random().nextInt(list.size()));
 	}
 
-	public static Set<WeightedObject>
-					toWeightedObjectList(Collection<? extends Object> list) {
+	public static Set<WeightedObject> toWeightedObjectList(Collection<? extends Object> list) {
 		Set<WeightedObject> weightedList = new HashSet<>();
 		list.forEach(t -> weightedList.add(new WeightedObject(t, 1)));
 		return weightedList;
 	}
 
-	public static ItemStack getNamedItemStack(ItemStack itemStack, String name,
-					String... lore) {
+	public static ItemStack getNamedItemStack(ItemStack itemStack, String name, String... lore) {
 		if (itemStack == null || name == null)
 			return null;
 		ItemMeta meta = itemStack.getItemMeta();
@@ -92,43 +81,39 @@ public class NumbzUtils {
 		return itemStack;
 	}
 
-	public static ItemStack getNamedItemStack(Material material, int amount,
-					short damage, String name, String... lore) {
+	public static ItemStack getNamedItemStack(Material material, int amount, short damage,
+			String name, String... lore) {
 		if (material == null || name == null)
 			return null;
-		return getNamedItemStack(new ItemStack(material, amount,
-						damage), name, lore);
+		return getNamedItemStack(new ItemStack(material, amount, damage), name, lore);
 	}
 
-	public static ItemStack getNamedItemStack(Material material, int amount,
-					String name, String... lore) {
+	public static ItemStack getNamedItemStack(Material material, int amount, String name,
+			String... lore) {
 		if (material == null || name == null)
 			return null;
 		return getNamedItemStack(new ItemStack(material, amount), name, lore);
 	}
 
-	public static ItemStack getNamedItemStack(Material material, String name,
-					String... lore) {
+	public static ItemStack getNamedItemStack(Material material, String name, String... lore) {
 		if (material == null || name == null)
 			return null;
 		return getNamedItemStack(new ItemStack(material), name, lore);
 	}
 
-	public static ItemStack setNBT(ItemStack itemStack, String key,
-					String value) {
+	public static ItemStack setNBT(ItemStack itemStack, String key, String value) {
 		if (itemStack == null)
 			return null;
 		if (key == null || value == null)
 			return itemStack;
-		return new ItemBuilder(
-						itemStack).unsafe().setString(key, value).builder().build();
-//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
-//		NBTTagCompound tag = nmsItemStack.getTag();
-//		if (tag == null)
-//			tag = new NBTTagCompound();
-//		tag.set(key, new NBTTagString(value));
-//		nmsItemStack.setTag(tag);
-//		return CraftItemStack.asBukkitCopy(nmsItemStack);
+		return new ItemBuilder(itemStack).unsafe().setString(key, value).builder().build();
+		//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
+		//		NBTTagCompound tag = nmsItemStack.getTag();
+		//		if (tag == null)
+		//			tag = new NBTTagCompound();
+		//		tag.set(key, new NBTTagString(value));
+		//		nmsItemStack.setTag(tag);
+		//		return CraftItemStack.asBukkitCopy(nmsItemStack);
 	}
 
 	public static String getTagValue(ItemStack itemStack, String key) {
@@ -136,11 +121,11 @@ public class NumbzUtils {
 			return "";
 		String tag = new ItemBuilder(itemStack).unsafe().getString(key);
 		return tag == null ? "" : tag;
-//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
-//		NBTTagCompound tag = nmsItemStack.getTag();
-//		if (tag == null || tag.getString(key) == null)
-//			return "";
-//		return tag.getString(key);
+		//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
+		//		NBTTagCompound tag = nmsItemStack.getTag();
+		//		if (tag == null || tag.getString(key) == null)
+		//			return "";
+		//		return tag.getString(key);
 	}
 
 	public static ItemStack addEnchGlow(ItemStack itemStack) {
@@ -169,21 +154,21 @@ public class NumbzUtils {
 	public static void sendActionbar(String message, Player... players) {
 		if (message == null)
 			return;
-		ChatUtils.ChatEntry.buildActionbar(new ChatUtils.ChatEntry.Builder().text(message).build()).sendPlayer(players);
+		ChatUtils.ChatEntry.buildActionbar(new ChatUtils.ChatEntry.Builder().text(message).build())
+				.send(players);
 	}
 
 	public static void sendActionbarToAll(String message, Player... exclude) {
 		if (message == null)
 			return;
-//		PacketPlayOutChat packet = new PacketPlayOutChat(
-//						ChatSerializer.a("{\"text\":\"" + message + "\"}"),
-//						(byte) 2);
 		List<Player> excludeList = Arrays.asList(exclude);
-		ChatUtils.ChatEntry.buildActionbar(new ChatUtils.ChatEntry.Builder().text(message).build()).sendPlayer(Bukkit.getOnlinePlayers().stream().filter(p -> !excludeList.contains(p)).collect(Collectors.toList()).toArray(new Player[0]));
+		ChatUtils.ChatEntry.buildActionbar(new ChatUtils.ChatEntry.Builder().text(message).build())
+				.send(Bukkit.getOnlinePlayers().stream().filter(p -> !excludeList.contains(p))
+						.collect(Collectors.toList()).toArray(new Player[0]));
 	}
 
-	public static String secondsToTime(int seconds, boolean showZeroHours,
-					boolean showZeroMins, String color1, String color2) {
+	public static String secondsToTime(int seconds, boolean showZeroHours, boolean showZeroMins,
+			String color1, String color2) {
 		if (color1 == null || color2 == null)
 			return "Color null";
 		if (seconds < 0)
@@ -222,8 +207,7 @@ public class NumbzUtils {
 		return returnString.toString();
 	}
 
-	public static String secondsToTime(int seconds, boolean showZeroHours,
-					boolean showZeroMins) {
+	public static String secondsToTime(int seconds, boolean showZeroHours, boolean showZeroMins) {
 		return secondsToTime(seconds, showZeroHours, showZeroMins, "", "");
 	}
 

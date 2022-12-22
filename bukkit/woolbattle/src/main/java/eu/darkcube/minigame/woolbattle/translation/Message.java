@@ -7,12 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.translation;
 
-import java.util.function.Function;
-
+import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.system.util.Language;
 import org.bukkit.ChatColor;
 
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.system.language.core.Language;
+import java.util.function.Function;
 
 public enum Message {
 

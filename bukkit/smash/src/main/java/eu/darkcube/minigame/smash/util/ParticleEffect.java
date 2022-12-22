@@ -24,9 +24,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.smash.util.ParticleEffect.ParticleData;
-import eu.darkcube.system.ReflectionUtils;
-import eu.darkcube.system.ReflectionUtils.PackageType;
+import eu.darkcube.system.util.ReflectionUtils;
+import eu.darkcube.system.util.ReflectionUtils.PackageType;
 
 /**
  * <b>ParticleEffect Library</b>

@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import java.util.Set;
-import java.util.UUID;
+import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
+import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -17,10 +19,9 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.language.core.Language;
-import eu.darkcube.system.userapi.UserAPI;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class OfflineUser extends UserWithExtraData {
 

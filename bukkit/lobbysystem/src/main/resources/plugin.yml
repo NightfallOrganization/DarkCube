@@ -2,7 +2,7 @@ main: eu.darkcube.system.lobbysystem.Lobby
 version: 1.0
 author: DasBabyPixel
 name: LobbySystem
-depend: [System, InventoryAPI, LanguageAPICore]
+depend: [System]
 softdepend: [PServer]
 permissions: 
   system.npc.knockback.ignore:

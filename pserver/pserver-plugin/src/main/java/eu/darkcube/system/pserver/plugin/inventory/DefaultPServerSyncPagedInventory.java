@@ -7,10 +7,10 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import java.util.Collection;
-
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.pserver.plugin.user.User;
+
+import java.util.Collection;
 
 public class DefaultPServerSyncPagedInventory
 				extends DefaultPServerAsyncPagedInventory {

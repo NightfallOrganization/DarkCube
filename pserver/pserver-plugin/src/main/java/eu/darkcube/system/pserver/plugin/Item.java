@@ -7,16 +7,16 @@
 
 package eu.darkcube.system.pserver.plugin;
 
-import static eu.darkcube.system.inventory.api.util.ItemBuilder.*;
-import static org.bukkit.Material.*;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.pserver.plugin.user.User;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.bukkit.inventory.ItemStack;
-
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.pserver.plugin.user.User;
+import static eu.darkcube.system.inventoryapi.ItemBuilder.item;
+import static org.bukkit.Material.ARROW;
+import static org.bukkit.Material.BOOK;
 
 public enum Item {
 

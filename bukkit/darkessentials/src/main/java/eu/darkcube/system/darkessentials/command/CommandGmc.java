@@ -15,13 +15,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.GamemodeChanger;
 
 public class CommandGmc extends Command {
 
 	public CommandGmc() {
-		super(Main.getInstance(), "gmc", new Command[0], "Setzt Spieler in den Creative-Mode.",
+		super(DarkEssentials.getInstance(), "gmc", new Command[0], "Setzt Spieler in den Creative-Mode.",
 				new Argument("Spieler", "Der Spieler, dessen Gamemode geändert werden soll.", false));
 		setAliases("d_gmc", "gm1");
 	}
@@ -29,7 +29,7 @@ public class CommandGmc extends Command {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (args.length == 0 && !(sender instanceof Player)) {
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst ein Spieler sein, um diesen Command auszuführen!",
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst ein Spieler sein, um diesen Command auszuführen!",
 					sender);
 			return true;
 		}
@@ -40,7 +40,7 @@ public class CommandGmc extends Command {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length != 0) {
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		}
 		return new ArrayList<>();
 	}

@@ -7,11 +7,8 @@
 
 package de.pixel.bedwars.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import de.pixel.bedwars.shop.ShopItem;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
@@ -21,8 +18,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import de.pixel.bedwars.shop.ShopItem;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ItemManager {
 

@@ -20,13 +20,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandEnchant extends Command {
 
 	public CommandEnchant() {
-		super(Main.getInstance(), "enchant", new Command[0], "Verzaubert ein Item.",
+		super(DarkEssentials.getInstance(), "enchant", new Command[0], "Verzaubert ein Item.",
 				new Argument("Verzauberung", "Dier Verzauberung, die dem Item hinzugefügt werden soll"),
 				new Argument("Level", "Das Level der Verzauberung (Keine Angabe: Level 1", false),
 				new Argument("Spieler", "Der Spieler, für den verzaubert werden soll.", false));
@@ -119,7 +119,7 @@ public class CommandEnchant extends Command {
 			ench = Enchantment.DURABILITY;
 			break;
 		default:
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst eine Verzauberung angeben!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst eine Verzauberung angeben!", sender);
 			return true;
 		}
 		args[0] = "%processed%";
@@ -143,27 +143,27 @@ public class CommandEnchant extends Command {
 			}
 		}
 		if (value < 1) {
-			Main.getInstance().sendMessage(Main.cFail() + "Die angegebene Zal muss positiv sein!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Die angegebene Zal muss positiv sein!", sender);
 			return true;
 		}
 		if (players.isEmpty() && unresolvedNames.isEmpty()) {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		int count = 0;
 		for (Player current : players) {
 			current.getItemInHand().addUnsafeEnchantment(ench, value);
-			Main.getInstance().sendMessage(Main.cConfirm() + "Das Item in deiner Hand wurde verzaubert!", current);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Das Item in deiner Hand wurde verzaubert!", current);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender)))
-			Main.getInstance().sendMessage(
-					Main.cValue() + String.valueOf(count) + Main.cConfirm() + " Items verzaubert!", sender);
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.cValue() + String.valueOf(count) + DarkEssentials.cConfirm() + " Items verzaubert!", sender);
 
 		return true;
 	}
@@ -180,7 +180,7 @@ public class CommandEnchant extends Command {
 			return EssentialCollections.toSortedStringList(enchantmentsAsStrings, args[0]);
 		}
 		if (args.length > 1) {
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		}
 		return Collections.emptyList();
 	}

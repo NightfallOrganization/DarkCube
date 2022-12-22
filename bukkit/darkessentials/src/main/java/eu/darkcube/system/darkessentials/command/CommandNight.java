@@ -20,13 +20,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandNight extends Command {
 
 	public CommandNight() {
-		super(Main.getInstance(), "night", new Command[0], "Setzt die Zeit auf Nacht",
+		super(DarkEssentials.getInstance(), "night", new Command[0], "Setzt die Zeit auf Nacht",
 				new Argument("World", "Die Welt in der man Nacht setzen will", false));
 		setAliases("d_night");
 	}
@@ -48,21 +48,22 @@ public class CommandNight extends Command {
 			if (sender instanceof Player) {
 				worlds.add(((Player) sender).getWorld());
 			} else {
-				Main.getPlugin(Main.class)
+				DarkEssentials.getPlugin(DarkEssentials.class)
 						.sendMessage("§cDu bist kein Spieler, deshalb musst du einen Weltnamen angeben!", sender);
 				return true;
 			}
 		}
 		if (unresolvedNames.size() != 0) {
-			StringBuilder sb = new StringBuilder().append(Main.cFail() + "Die Welt " + ChatColor.GRAY + "\"");
+			StringBuilder sb = new StringBuilder().append(
+					DarkEssentials.cFail() + "Die Welt " + ChatColor.GRAY + "\"");
 			for (String name : unresolvedNames) {
-				sb.append(Main.cValue() + name + ChatColor.GRAY + "\", \"");
+				sb.append(DarkEssentials.cValue() + name + ChatColor.GRAY + "\", \"");
 			}
 			if (unresolvedNames.size() > 1) {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " wurden nicht gefunden!", sender);
 			} else {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " wurde nicht gefunden!", sender);
 			}
 		}
@@ -71,8 +72,8 @@ public class CommandNight extends Command {
 			current.setTime(18000);
 			for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 				if (currentPlayer.getWorld().equals(current)) {
-					Main.getInstance().sendMessage(
-							Main.cConfirm() + "Die Welt, in der du dich befindest, wurde auf Nacht gesetzt.",
+					DarkEssentials.getInstance().sendMessage(
+							DarkEssentials.cConfirm() + "Die Welt, in der du dich befindest, wurde auf Nacht gesetzt.",
 							currentPlayer);
 				}
 			}
@@ -81,12 +82,12 @@ public class CommandNight extends Command {
 		Player playerSender = (Player) sender;
 		if (!(worlds.size() == 1 && worlds.contains(playerSender.getWorld()) && unresolvedNames.isEmpty())) {
 			if (worlds.size() > 1) {
-				Main.getInstance().sendMessage(
-						Main.cValue() + count + Main.cConfirm() + " Welten wurden auf Nacht gesetzt.",
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Welten wurden auf Nacht gesetzt.",
 						sender);
 			} else {
-				Main.getInstance().sendMessage(
-						Main.cValue() + count + Main.cConfirm() + " Welt wurde auf Nacht gesetzt.",
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Welt wurde auf Nacht gesetzt.",
 						sender);
 			}
 		}

@@ -1,12 +1,11 @@
 package eu.darkcube.system.miners.player;
 
+import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
-
-import eu.darkcube.system.language.core.Language;
-import eu.darkcube.system.miners.Miners;
 
 public class MinersPlayer {
 

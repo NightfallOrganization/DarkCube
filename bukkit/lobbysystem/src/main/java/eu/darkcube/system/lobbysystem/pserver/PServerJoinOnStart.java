@@ -7,22 +7,8 @@
 
 package eu.darkcube.system.lobbysystem.pserver;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
-import eu.darkcube.system.ChatUtils.ChatEntry;
-import eu.darkcube.system.commons.AsyncExecutor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Message;
@@ -32,6 +18,17 @@ import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.AsyncExecutor;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.*;
 
 public class PServerJoinOnStart implements Listener {
 
@@ -56,16 +53,9 @@ public class PServerJoinOnStart implements Listener {
 				if (p == null) {
 					continue;
 				}
-				ChatEntry
-						.buildActionbar(
-								new ChatEntry.Builder()
-										.text(Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE
-												.getMessage(UserAPI.getInstance().getUser(p)))
-										.build())
-						.sendPlayer(p);
-				// PacketPlayOutChat packet = new PacketPlayOutChat(new ChatComponentText(), (byte)
-				// 2);
-				// ((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet);
+				ChatEntry.buildActionbar(new ChatEntry.Builder().text(
+						Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE.getMessage(
+								UserAPI.getInstance().getUser(p))).build()).send(p);
 			}
 		}
 

@@ -7,21 +7,21 @@
 
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 import com.google.gson.JsonObject;
-import org.bukkit.inventory.ItemStack;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInventory {
 

@@ -7,11 +7,10 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
-
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
 
 public class InventoryPlayer implements IInventory {
 

@@ -14,7 +14,7 @@ import de.dytanic.cloudnet.ext.bridge.server.BridgeServerHelper;
 import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.system.GameState;
+import eu.darkcube.system.util.GameState;
 
 public class CloudNetLink {
 

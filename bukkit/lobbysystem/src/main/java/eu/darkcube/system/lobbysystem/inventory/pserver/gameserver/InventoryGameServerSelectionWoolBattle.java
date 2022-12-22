@@ -7,20 +7,20 @@
 
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.service.ServiceTask;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.userapi.User;
+
 import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.userapi.User;
 
 public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerSelection {
 

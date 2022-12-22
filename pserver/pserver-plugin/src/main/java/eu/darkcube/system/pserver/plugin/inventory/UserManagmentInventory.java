@@ -7,19 +7,18 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.listener.UserManagmentInventoryListener;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserCache;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 

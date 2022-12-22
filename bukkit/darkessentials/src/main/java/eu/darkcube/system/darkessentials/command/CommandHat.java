@@ -19,12 +19,12 @@ import org.bukkit.inventory.ItemStack;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandHat extends Command {
 
 	public CommandHat() {
-		super(Main.getInstance(), "hat", new Command[0], "Setzt dir ein Item auf den Kopf.",
+		super(DarkEssentials.getInstance(), "hat", new Command[0], "Setzt dir ein Item auf den Kopf.",
 				new Argument[] { new Argument("Spieler", "Der Spieler, dem das Item aufgesetzt wird.", false) });
 		setAliases("d_hat");
 	}
@@ -32,7 +32,7 @@ public class CommandHat extends Command {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (args.length == 0 && !(sender instanceof Player)) {
-			Main.sendMessagePlayernameRequired(sender);
+			DarkEssentials.sendMessagePlayernameRequired(sender);
 			return true;
 		}
 		Set<String> unresolvedNames = new HashSet<>();
@@ -47,24 +47,25 @@ public class CommandHat extends Command {
 					if (current.equals(sender)) {
 						count++;
 					}
-					Main.getInstance().sendMessage(Main.cConfirm() + "Du hast einen Hut bekommen!", current);
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du hast einen Hut bekommen!", current);
 				} else if (current.equals(sender)) {
-					Main.getInstance().sendMessage(new StringBuilder().append(Main.cFail())
+					DarkEssentials.getInstance().sendMessage(new StringBuilder().append(
+									DarkEssentials.cFail())
 							.append("Du musst ein Item in der Hand halten!").toString(), sender);
 				}
 			} else {
 				unresolvedNames.add(playerName);
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		if (count == 0 && unresolvedNames.isEmpty()) {
 			ItemStack itemStack = ((Player) sender).getItemInHand();
 			((Player) sender).setItemInHand(((Player) sender).getInventory().getHelmet());
 			((Player) sender).getInventory().setHelmet(itemStack);
-			Main.getInstance().sendMessage(Main.cConfirm() + "Du hast einen Hut bekommen!", (sender));
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du hast einen Hut bekommen!", (sender));
 		} else {
-			Main.getInstance().sendMessage(new StringBuilder().append(Main.cValue()).append(count)
-					.append(Main.cConfirm()).append(" Spieler haben einen Hut bekommen!").toString(), sender);
+			DarkEssentials.getInstance().sendMessage(new StringBuilder().append(DarkEssentials.cValue()).append(count)
+					.append(DarkEssentials.cConfirm()).append(" Spieler haben einen Hut bekommen!").toString(), sender);
 		}
 		return true;
 	}
@@ -72,7 +73,7 @@ public class CommandHat extends Command {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length != 0)
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		return new ArrayList<>();
 	}
 }

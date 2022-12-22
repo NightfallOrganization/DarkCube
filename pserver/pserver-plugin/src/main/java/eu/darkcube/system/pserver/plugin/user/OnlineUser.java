@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import org.bukkit.entity.Player;
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.Language;
+import org.bukkit.entity.Player;
 
 public class OnlineUser extends UserWithExtraData {
 

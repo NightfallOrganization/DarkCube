@@ -7,10 +7,9 @@
 
 package eu.darkcube.system.pserver.cloudnet;
 
-import java.io.File;
-
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
+import de.dytanic.cloudnet.driver.service.ServiceEnvironmentType;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.driver.util.DefaultModuleHelper;
 import de.dytanic.cloudnet.event.service.CloudServicePreStartEvent;
@@ -19,29 +18,24 @@ import de.dytanic.cloudnet.service.ICloudService;
 import eu.darkcube.system.pserver.common.ServiceInfoUtil;
 import eu.darkcube.system.pserver.common.UniqueId;
 
+import java.io.File;
+
 public class Listener {
-//
-//	@EventListener
-//	public void handle(ChannelMessageReceiveEvent event) {
-//		if (event.getChannel().equals("connecttt")) {
-//			System.out.println("receive");
-//			new HandlerConnect().handle(new PacketWrapperNodeConnect(new UniqueId(event.getBuffer().readString())));
-//		}
-//	}
 
 	@EventListener
 	public void handle(CloudServicePreStartEvent e) {
-//		File file = getFile(e.getCloudService());
-//		if (file.exists()) {
-		this.copy(e.getCloudService());
-//		}
+		if (e.getCloudService().getServiceInfoSnapshot().getServiceId().getEnvironment()
+				== ServiceEnvironmentType.MINECRAFT_SERVER) {
+			this.copy(e.getCloudService());
+		}
 	}
-	
-	
+
+
 
 	@EventListener
 	public void handle(CloudServicePreStopEvent e) {
-		UniqueId id = ServiceInfoUtil.getInstance().getUniqueId(e.getCloudService().getServiceInfoSnapshot());
+		UniqueId id = ServiceInfoUtil.getInstance()
+				.getUniqueId(e.getCloudService().getServiceInfoSnapshot());
 		if (NodePServerProvider.getInstance().isPServer(id)) {
 			NodePServer ps = NodePServerProvider.getInstance().getPServer(id);
 			e.getCloudService().deployResources(false);

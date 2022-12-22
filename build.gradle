@@ -1,6 +1,6 @@
 ext {
     cloudnetVersion = '3.4.0-SNAPSHOT'
-    
+
     cloudnetDriver = "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
     cloudnet = "de.dytanic.cloudnet:cloudnet:$cloudnetVersion"
     cloudnetBridge = "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
@@ -13,61 +13,76 @@ ext {
 
 allprojects {
     repositories {
-		mavenCentral()
-		mavenLocal()
-	    maven {
-        	url = uri('https://repo.papermc.io/repository/maven-public/')
-    	}
-    	maven {
-    	    url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-    	    content {
-				includeGroup 'org.bukkit'
-				includeGroup 'org.spigotmc'    	        
-    	    }
-    	}  
-    	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-		maven { url = 'https://oss.sonatype.org/content/repositories/central' }
-		maven { url = 'https://libraries.minecraft.net'}
-		maven { url = 'https://repo.dmulloy2.net/repository/public/' }
-		maven { url = 'https://repo.cloudnetservice.eu/repository/releases/' }
-		maven { url = 'https://repo.cloudnetservice.eu/repository/snapshots/' }
-		maven { url = 'https://jitpack.io'}
-		maven { url = 'https://repo.viaversion.com' }
-
-
+        mavenCentral()
+        mavenLocal()
+        maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+        maven {
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+            content {
+                includeGroup 'org.bukkit'
+                includeGroup 'org.spigotmc'
+            }
+        }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+        maven { url = 'https://libraries.minecraft.net' }
+        maven { url = 'https://repo.dmulloy2.net/repository/public/' }
+        maven { url = 'https://repo.cloudnetservice.eu/repository/releases/' }
+        maven { url = 'https://repo.cloudnetservice.eu/repository/snapshots/' }
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://repo.viaversion.com' }
     }
-    
+
     pluginManager.withPlugin('java') {
-		java {
-    		toolchain.languageVersion.set(JavaLanguageVersion.of(8))
-		}
-	
-		compileJava.options.encoding = 'UTF-8'
-		compileTestJava.options.encoding = 'UTF-8'
+        java {
+            toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+        }
+
+        compileJava.options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.deprecation = true
     }
 
     pluginManager.withPlugin('java-library') {
         configurations {
             embedApi
             embedImplementation
+            embedCompileOnly
+            embedRuntimeOnly
         }
-        
+
         dependencies {
             configurations.api.extendsFrom(configurations.embedApi)
             configurations.implementation.extendsFrom(configurations.embedImplementation)
+            configurations.compileOnly.extendsFrom(configurations.embedCompileOnly)
+            configurations.runtimeOnly.extendsFrom(configurations.embedRuntimeOnly)
         }
-        
+
         jar {
-        	dependsOn configurations.embedApi
-        	dependsOn configurations.embedImplementation
+            dependsOn configurations.embedApi
+            dependsOn configurations.embedImplementation
+            dependsOn configurations.embedCompileOnly
+            dependsOn configurations.embedRuntimeOnly
             from {
-                configurations.embedApi.collect { 
-                	it.isDirectory() ? it : zipTree(it)
+                configurations.embedApi.collect {
+                    it.isDirectory() ? it : zipTree(it)
                 }
             }
             from {
                 configurations.embedImplementation.collect {
-	                it.isDirectory() ? it : zipTree(it)
+                    it.isDirectory() ? it : zipTree(it)
+                }
+            }
+            from {
+                configurations.embedCompileOnly.collect {
+                    it.isDirectory() ? it : zipTree(it)
+                }
+            }
+            from {
+                configurations.embedRuntimeOnly.collect {
+                    it.isDirectory() ? it : zipTree(it)
                 }
             }
         }

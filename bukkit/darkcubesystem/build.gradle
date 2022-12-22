@@ -1,4 +1,12 @@
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    embedApi npclib
+    embedApi project('core')
+    embedRuntimeOnly project(path: '1.8.8', configuration: 'default')
+    //println project(path: '1.19.2').getMetaPropertyValues()
+    embedRuntimeOnly project(path: '1.19.2', configuration: 'reobf')
+}
+
+tasks {
+    jar {
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
 }

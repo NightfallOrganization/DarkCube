@@ -7,31 +7,40 @@
 
 package eu.darkcube.system.cloudban.bukkit;
 
-import java.util.*;
-import java.util.Arrays;
-
-import org.bukkit.*;
-import org.bukkit.entity.*;
-import org.bukkit.event.*;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.*;
-import org.bukkit.plugin.java.*;
-
-import com.google.gson.*;
-
-import de.dytanic.cloudnet.common.document.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.event.EventListener;
-import de.dytanic.cloudnet.driver.event.events.channel.*;
-import de.dytanic.cloudnet.wrapper.*;
-import eu.darkcube.system.*;
-import eu.darkcube.system.ChatUtils.*;
-import eu.darkcube.system.ChatUtils.ChatEntry.*;
+import de.dytanic.cloudnet.driver.event.events.channel.ChannelMessageReceiveEvent;
+import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.system.cloudban.bukkit.command.*;
-import eu.darkcube.system.cloudban.util.*;
-import eu.darkcube.system.cloudban.util.ban.*;
+import eu.darkcube.system.cloudban.util.Punisher;
+import eu.darkcube.system.cloudban.util.Report;
+import eu.darkcube.system.cloudban.util.UUIDManager;
+import eu.darkcube.system.cloudban.util.ban.Ban;
 import eu.darkcube.system.cloudban.util.ban.Server;
-import eu.darkcube.system.cloudban.util.communication.*;
-import eu.darkcube.system.commandapi.*;
+import eu.darkcube.system.cloudban.util.communication.EnumChannelMessage;
+import eu.darkcube.system.cloudban.util.communication.Messenger;
+import eu.darkcube.system.commandapi.CommandAPI;
+import eu.darkcube.system.util.ChatUtils;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.util.ChatUtils.ChatEntry.Builder;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -73,9 +82,10 @@ public class Main extends JavaPlugin implements Listener {
 			return;
 		}
 		if (e.getMessage().equals(EnumChannelMessage.REPORT_SEND_USER_DETAILS.getMessage())) {
-//			Report report = Report.fromDocument(e.getData());
+			//			Report report = Report.fromDocument(e.getData());
 
-			JsonArray array = gson.fromJson(e.getData().toJson(), JsonObject.class).getAsJsonArray("data");
+			JsonArray array =
+					gson.fromJson(e.getData().toJson(), JsonObject.class).getAsJsonArray("data");
 			for (JsonElement element : array) {
 				JsonDocument doc = new JsonDocument();
 				doc.read(element.toString());
@@ -94,29 +104,36 @@ public class Main extends JavaPlugin implements Listener {
 				for (Player p : players) {
 					if (p.hasPermission(reactCommand.getPermission())) {
 
-						ChatEntry[] headerFooter = new Builder().text("§6=====================================").build();
-						ChatEntry[] reportMsg1 = new Builder().text("§6Report von §5" + report.getCreator().getName()).build();
-						ChatEntry[] reportMsg2 = new Builder().text("§4Verbrecher: §c" + report.getPlayer().getName()).build();
-						ChatEntry[] reason = new Builder().text("§eGrund: §b" + report.getReason().getDisplay()).build();
+						ChatEntry[] headerFooter =
+								new Builder().text("§6=====================================")
+										.build();
+						ChatEntry[] reportMsg1 = new Builder().text(
+								"§6Report von §5" + report.getCreator().getName()).build();
+						ChatEntry[] reportMsg2 = new Builder().text(
+								"§4Verbrecher: §c" + report.getPlayer().getName()).build();
+						ChatEntry[] reason =
+								new Builder().text("§eGrund: §b" + report.getReason().getDisplay())
+										.build();
 						List<ChatEntry> entries = new ArrayList<>();
 						entries.addAll(Arrays.asList(headerFooter));
 						entries.addAll(Arrays.asList(reportMsg1));
 						entries.addAll(Arrays.asList(reportMsg2));
 						entries.addAll(Arrays.asList(reason));
-						entries.addAll(Arrays.asList(new Builder().text("§7[§6Bearbeiten§7] ").hover("§6Bearbeiten!")
-								.click("/reactreport " + report.getId()).build()));
-						entries.addAll(Arrays.asList(new Builder().text(" §7[§aAnnehmen§7] ").hover("§aAnnehmen!")
-								.click("/acceptreport " + report.getId()).build()));
-						entries.addAll(Arrays.asList(new Builder().text(" §7[§cAblehnen§7] ").hover("§cAblehnen!")
-								.click("/declinereport " + report.getId()).build()));
-						entries.addAll(Arrays.asList(new Builder().text("§7[§4Entfernen§7] ").hover("§4Entfernen")
-								.click("/removereport " + report.getId()).build()));
+						entries.addAll(Arrays.asList(
+								new Builder().text("§7[§6Bearbeiten§7] ").hover("§6Bearbeiten!")
+										.click("/reactreport " + report.getId()).build()));
+						entries.addAll(Arrays.asList(
+								new Builder().text(" §7[§aAnnehmen§7] ").hover("§aAnnehmen!")
+										.click("/acceptreport " + report.getId()).build()));
+						entries.addAll(Arrays.asList(
+								new Builder().text(" §7[§cAblehnen§7] ").hover("§cAblehnen!")
+										.click("/declinereport " + report.getId()).build()));
+						entries.addAll(Arrays.asList(
+								new Builder().text("§7[§4Entfernen§7] ").hover("§4Entfernen")
+										.click("/removereport " + report.getId()).build()));
 						entries.addAll(Arrays.asList(headerFooter));
-						
-						ChatBaseComponent c = ChatUtils.chat(entries.toArray(new ChatEntry[0]));
-						c.sendPlayer(p);
-//						p.getHandle().sendMessage(new IChatBaseComponent[] { headerFooter, reportMsg1, reportMsg2,
-//								reason, reportMsg3, headerFooter });
+
+						ChatUtils.chat(entries.toArray(new ChatEntry[0])).send(p);
 					}
 				}
 			}
@@ -144,7 +161,8 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handle(PlayerLoginEvent e) {
 		if (!e.getPlayer().hasPermission(Punisher.PERMISSION_IGNORE_BAN)) {
-			Punisher.isAllowedToBeOnline(e.getPlayer().getUniqueId(), Server.GLOBAL, new BukkitBanConsumer(e));
+			Punisher.isAllowedToBeOnline(e.getPlayer().getUniqueId(), Server.GLOBAL,
+					new BukkitBanConsumer(e));
 		}
 	}
 

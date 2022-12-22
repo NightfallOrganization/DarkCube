@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
+import eu.darkcube.system.inventoryapi.v1.DefaultAsyncPagedInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.pserver.plugin.Item;
+import eu.darkcube.system.pserver.plugin.user.User;
+
 import java.util.Collection;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
-
-import eu.darkcube.system.inventory.api.v1.DefaultAsyncPagedInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
-import eu.darkcube.system.inventory.api.v1.PageArrow;
-import eu.darkcube.system.pserver.plugin.Item;
-import eu.darkcube.system.pserver.plugin.user.User;
 
 public class DefaultPServerAsyncPagedInventory extends DefaultAsyncPagedInventory {
 

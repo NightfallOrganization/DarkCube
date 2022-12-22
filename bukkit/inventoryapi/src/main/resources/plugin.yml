@@ -1,5 +1,0 @@
-main: eu.darkcube.system.inventory.api.InventoryAPI
-name: InventoryAPI
-author: DasBabyPixel
-version: 1.0
-depend: [APICommons, System]

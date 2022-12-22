@@ -7,24 +7,25 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.AsyncPagedInventory;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.PositionedIterator;
 import eu.darkcube.system.userapi.User;
+import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class InventoryLoading extends LobbyAsyncPagedInventory {
 
