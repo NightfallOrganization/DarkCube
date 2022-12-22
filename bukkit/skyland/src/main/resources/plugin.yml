@@ -4,4 +4,18 @@ author: EliteDarkness
 version: 1.0
 api-version: 1.13
 commands:
-  - GM:
+  gm:
+  heal:
+  day:
+  night:
+  fly:
+  feed:
+  max:
+  spawntrainingstand:
+  god:
+  trash:
+  world:
+  loadworld:
+  unloadworld:
+  createworld:
+  getitem:
