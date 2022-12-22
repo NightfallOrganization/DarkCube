@@ -7,15 +7,16 @@
 
 package eu.darkcube.system.lobbysystem.user;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 import com.google.common.reflect.TypeToken;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.util.Serializable;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.Language;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class UserData implements Serializable {
 

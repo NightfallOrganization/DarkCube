@@ -18,13 +18,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandFeed extends Command {
 
 	public CommandFeed() {
-		super(Main.getInstance(), "feed", new Command[0], "Sättigt den angegebenen Spieler",
+		super(DarkEssentials.getInstance(), "feed", new Command[0], "Sättigt den angegebenen Spieler",
 				new Argument("hunger | saturation",
 						"Ob Hungerleiste oder Sättigung gefüllt werden soll. Keine Angabe: beides", false),
 				new Argument("Spieler", "Der zu sättigende Spieler.", false));
@@ -58,11 +58,11 @@ public class CommandFeed extends Command {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		for (Player current : players) {
 			if (hunger) {
 				current.setFoodLevel(20);
@@ -70,11 +70,12 @@ public class CommandFeed extends Command {
 			if (saturation) {
 				current.setSaturation(20);
 			}
-			Main.getInstance().sendMessage(Main.cConfirm() + "Du wurdest gesättigt!", current);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du wurdest gesättigt!", current);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
-			Main.getInstance().sendMessage(Main.cValue() + count + Main.cConfirm() + " Spieler gesättigt!", sender);
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Spieler gesättigt!", sender);
 		}
 		return true;
 	}
@@ -87,7 +88,7 @@ public class CommandFeed extends Command {
 				list.addAll(EssentialCollections.toSortedStringList(EssentialCollections.asList("saturation", "hunger"),
 						args[0]));
 			}
-			list.addAll(Main.getPlayersStartWith(args));
+			list.addAll(DarkEssentials.getPlayersStartWith(args));
 		}
 		return list;
 	}

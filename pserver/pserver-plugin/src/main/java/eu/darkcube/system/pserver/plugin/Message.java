@@ -7,19 +7,18 @@
 
 package eu.darkcube.system.pserver.plugin;
 
-import java.util.function.Function;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
+import eu.darkcube.system.util.Language;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.function.Function;
 
 public enum Message {
 

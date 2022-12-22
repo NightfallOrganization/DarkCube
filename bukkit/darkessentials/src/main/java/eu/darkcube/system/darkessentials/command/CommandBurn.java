@@ -7,7 +7,6 @@
 
 package eu.darkcube.system.darkessentials.command;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -19,12 +18,12 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandBurn extends Command {
 
 	public CommandBurn() {
-		super(Main.getInstance(), "burn", new Command[0], "Lässt Spieler brennen.",
+		super(DarkEssentials.getInstance(), "burn", new Command[0], "Lässt Spieler brennen.",
 				new Argument("Spieler", "Der Spieler, der brennen soll.", false),
 				new Argument("Dauer", "Die Dauer des Brennens in Sekunden. (Keine Angabe: Für immer)", false));
 		setAliases("d_burn");
@@ -56,32 +55,35 @@ public class CommandBurn extends Command {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		for (Player current : players) {
 			current.setFireTicks(ticks);
 			if (ticks == Integer.MAX_VALUE) {
-				Main.getInstance().sendMessage(Main.cConfirm() + "Du wurdest angezündet!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du wurdest angezündet!", sender);
 			} else {
-				Main.getInstance().sendMessage(
-						new StringBuilder().append(Main.cConfirm()).append("Du wurdest für ").append(Main.cValue())
-								.append(ticks / 20).append(Main.cConfirm()).append(" Sekunden angezündet!").toString(),
+				DarkEssentials.getInstance().sendMessage(
+						new StringBuilder().append(DarkEssentials.cConfirm()).append("Du wurdest für ").append(
+										DarkEssentials.cValue())
+								.append(ticks / 20).append(DarkEssentials.cConfirm()).append(" Sekunden angezündet!").toString(),
 						sender);
 			}
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
 			if (ticks == Integer.MAX_VALUE) {
-				Main.getInstance().sendMessage(Main.cValue() + count + Main.cConfirm() + " Spieler angezündet!",
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Spieler angezündet!",
 						sender);
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cValue()).append(count).append(Main.cConfirm())
-								.append(" Spieler für ").append(Main.cValue()).append(ticks / 20)
-								.append(Main.cConfirm()).append(" Sekunden angezündet!").toString(), sender);
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cValue()).append(count).append(
+										DarkEssentials.cConfirm())
+								.append(" Spieler für ").append(DarkEssentials.cValue()).append(ticks / 20)
+								.append(DarkEssentials.cConfirm()).append(" Sekunden angezündet!").toString(), sender);
 			}
 		}
 		return true;
@@ -90,7 +92,7 @@ public class CommandBurn extends Command {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length != 0)
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		return Collections.emptyList();
 	}
 }

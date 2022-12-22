@@ -20,13 +20,13 @@ import org.bukkit.inventory.PlayerInventory;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandRepair extends Command {
 
 	public CommandRepair() {
-		super(Main.getInstance(), "repair", new Command[0],
+		super(DarkEssentials.getInstance(), "repair", new Command[0],
 						"Repariert ein Item.", new Argument[] {
 										new Argument("hand|helmet|chest|leggings|boots|armor|inventory|all",
 														"Die Items, die repariert werden sollen. (Default: hand)",
@@ -123,17 +123,17 @@ public class CommandRepair extends Command {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
 		if (value == 0) {
-			Main.getInstance().sendMessage(Main.cFail()
-							+ "Die angegebene Zahl darf nicht " + Main.cValue()
-							+ "0 " + Main.cFail() + "sein!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail()
+							+ "Die angegebene Zahl darf nicht " + DarkEssentials.cValue()
+							+ "0 " + DarkEssentials.cFail() + "sein!", sender);
 			return true;
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		int itemCount = 0;
 		int playerCount = 0;
 		for (Player current : players) {
@@ -180,14 +180,14 @@ public class CommandRepair extends Command {
 				}
 			}
 			if (value > 0) {
-				Main.getInstance().sendMessage(Main.cValue()
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cValue()
 								+ String.valueOf(tempItemCount)
-								+ Main.cConfirm()
+								+ DarkEssentials.cConfirm()
 								+ " Items wurden repariert.", sender);
 			} else {
-				Main.getInstance().sendMessage(Main.cValue()
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cValue()
 								+ String.valueOf(tempItemCount)
-								+ Main.cConfirm()
+								+ DarkEssentials.cConfirm()
 								+ " Items wurden beschädigt.", sender);
 			}
 			playerCount++;
@@ -196,13 +196,14 @@ public class CommandRepair extends Command {
 
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append(Main.cValue()).append(itemCount).append(Main.cConfirm()).append(" Items für ").append(Main.cValue()).append(playerCount).append(Main.cConfirm()).append(" Spieler");
+			stringBuilder.append(DarkEssentials.cValue()).append(itemCount).append(DarkEssentials.cConfirm()).append(" Items für ").append(
+					DarkEssentials.cValue()).append(playerCount).append(DarkEssentials.cConfirm()).append(" Spieler");
 			if (value > 0) {
 				stringBuilder.append(" repariert.");
 			} else {
 				stringBuilder.append(" beschädigt.");
 			}
-			Main.getInstance().sendMessage(stringBuilder.toString(), sender);
+			DarkEssentials.getInstance().sendMessage(stringBuilder.toString(), sender);
 		}
 		return true;
 	}
@@ -238,7 +239,7 @@ public class CommandRepair extends Command {
 			}), args[0]));
 		}
 		if (args.length != 0) {
-			list.addAll(Main.getPlayersStartWith(args));
+			list.addAll(DarkEssentials.getPlayersStartWith(args));
 		}
 		return list;
 	}

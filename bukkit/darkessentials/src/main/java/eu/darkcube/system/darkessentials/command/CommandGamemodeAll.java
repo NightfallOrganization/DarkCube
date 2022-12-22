@@ -10,17 +10,16 @@ package eu.darkcube.system.darkessentials.command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.GamemodeChanger;
 
 public class CommandGamemodeAll extends Command {
 
 	public CommandGamemodeAll() {
-		super(Main.getInstance(), "gamemodeall", new Command[0], "Setzt den Gamemode aller Spieler",
+		super(DarkEssentials.getInstance(), "gamemodeall", new Command[0], "Setzt den Gamemode aller Spieler",
 				new Argument("gamemode", "Der  Gamemode, der gesetzt werden soll."));
 	}
 
@@ -51,7 +50,7 @@ public class CommandGamemodeAll extends Command {
 			gamemode = 3;
 			break;
 		default:
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst einen Gamemode angeben!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst einen Gamemode angeben!", sender);
 			return true;
 		}
 		for (Player p : Bukkit.getOnlinePlayers())

@@ -7,26 +7,29 @@
 
 package de.pixel.bedwars.shop;
 
-import static de.pixel.bedwars.shop.Cost.*;
-import static de.pixel.bedwars.shop.ShopEnchant.*;
-import static eu.darkcube.system.inventory.api.util.ItemBuilder.*;
-import static org.bukkit.Material.*;
-
-import java.text.*;
-import java.util.*;
-import java.util.Map.*;
-
-import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
+import com.google.common.collect.Multimap;
+import de.pixel.bedwars.util.I18n;
+import de.pixel.bedwars.util.ItemManager;
+import de.pixel.bedwars.util.Message;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import net.minecraft.server.v1_8_R3.AttributeModifier;
+import net.minecraft.server.v1_8_R3.GenericAttributes;
+import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.collect.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map.Entry;
 
-import de.pixel.bedwars.util.*;
-import eu.darkcube.system.inventory.api.util.*;
-import net.minecraft.server.v1_8_R3.*;
+import static de.pixel.bedwars.shop.Cost.*;
+import static de.pixel.bedwars.shop.ShopEnchant.*;
+import static org.bukkit.Material.*;
+import static eu.darkcube.system.inventoryapi.ItemBuilder.*;
 
 public enum ShopItem {
 

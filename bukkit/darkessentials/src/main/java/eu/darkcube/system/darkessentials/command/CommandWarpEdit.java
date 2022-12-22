@@ -26,7 +26,7 @@ import com.google.gson.Gson;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 import eu.darkcube.system.darkessentials.util.WarpPoint;
 import net.md_5.bungee.api.ChatColor;
@@ -37,14 +37,14 @@ public class CommandWarpEdit extends Command {
 	Map<CommandSender, String> warpDeleteComfirmation = new HashMap<>();
 
 	public CommandWarpEdit() {
-		super(Main.getInstance(), "warpedit", new Command[0], "Bearbeitet Warp-Punkte.",
+		super(DarkEssentials.getInstance(), "warpedit", new Command[0], "Bearbeitet Warp-Punkte.",
 				new Argument("create|delete|edit|info", "Was gemacht werden soll."),
 				new Argument("Name", "Der Name des Warp-Punktes, der bearbeitet werden soll."),
 				new Argument("setIcon|setPosition|setName|setEnabled", "Nur bei Edit: Was abgeändert werden soll.",
 						false),
 				new Argument("Wert", "Nur bei Edit: Wie es abgeändert werden soll.", false));
 		setAliases("d_warpedit");
-		warps = Main.updateWarps();
+		warps = DarkEssentials.updateWarps();
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class CommandWarpEdit extends Command {
 				|| (args.length < 4 && args[0].equalsIgnoreCase("edit") && !args[2].equalsIgnoreCase("setPosition")))
 			return false;
 
-		warps = Main.updateWarps();
+		warps = DarkEssentials.updateWarps();
 
 		switch (args[0].toLowerCase()) {
 		case "create":
@@ -63,39 +63,43 @@ public class CommandWarpEdit extends Command {
 				if (!(sender instanceof Player)) {
 					// warps.add(new WarpPoint(args[1], null, null, false));
 					warps.add(new WarpPoint(args[1]));
-					Main.getInstance().sendMessage("Warp-Punkt erstellt. Folgende Parameter sind noch undefiniert:",
+					DarkEssentials.getInstance().sendMessage("Warp-Punkt erstellt. Folgende Parameter sind noch undefiniert:",
 							sender);
-					Main.getInstance().sendMessage("- Position", sender);
-					Main.getInstance().sendMessage("- Icon", sender);
+					DarkEssentials.getInstance().sendMessage("- Position", sender);
+					DarkEssentials.getInstance().sendMessage("- Icon", sender);
 				} else {
 					warps.add(new WarpPoint(args[1], ((Player) sender).getLocation(), null, false));
-					Main.getInstance().sendMessage(
-							Main.colorConfirm + "Warp-Punkt erstellt. Folgende Parameter sind noch undefiniert:",
+					DarkEssentials.getInstance().sendMessage(
+							DarkEssentials.colorConfirm + "Warp-Punkt erstellt. Folgende Parameter sind noch undefiniert:",
 							sender);
-					Main.getInstance().sendMessage(ChatColor.GRAY + "-" + Main.colorValue + " Icon", sender);
+					DarkEssentials.getInstance().sendMessage(ChatColor.GRAY + "-" + DarkEssentials.colorValue + " Icon", sender);
 				}
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ").append(Main.colorValue)
-								.append(args[1]).append(Main.colorFail).append(" existiert bereits!").toString(),
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ").append(
+												DarkEssentials.colorValue)
+								.append(args[1]).append(DarkEssentials.colorFail).append(" existiert bereits!").toString(),
 								sender);
 			}
 			break;
 		case "delete":
 			if (getWarp(args[1]) != null) {
 				warpDeleteComfirmation.put(sender, args[1]);
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorConfirm).append("Der Warp-Punkt ")
-								.append(Main.colorValue).append(getWarp(args[1]).getName()).append(Main.colorConfirm)
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Der Warp-Punkt ")
+								.append(DarkEssentials.colorValue).append(getWarp(args[1]).getName()).append(
+										DarkEssentials.colorConfirm)
 								.append(" wird gelöscht!").toString(), sender);
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorConfirm).append("Verwende ").append(Main.colorValue)
-								.append("/warpedit confirm").append(Main.colorConfirm).append(" zum Bestätigen.")
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Verwende ").append(
+										DarkEssentials.colorValue)
+								.append("/warpedit confirm").append(DarkEssentials.colorConfirm).append(" zum Bestätigen.")
 								.toString(), sender);
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ").append(Main.colorValue)
-								.append(args[1]).append(Main.colorFail).append(" wurde nicht gefunden!").toString(),
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ").append(
+												DarkEssentials.colorValue)
+								.append(args[1]).append(DarkEssentials.colorFail).append(" wurde nicht gefunden!").toString(),
 								sender);
 			}
 			break;
@@ -107,21 +111,23 @@ public class CommandWarpEdit extends Command {
 					short damage = 0;
 					if (args[3].equalsIgnoreCase("hand") || args[3].equalsIgnoreCase("this")) {
 						if (!(sender instanceof Player))
-							return Main.sendMessageAndReturnTrue(Main.colorFail
+							return DarkEssentials.sendMessageAndReturnTrue(DarkEssentials.colorFail
 									+ "Du bist kein Spieler, deshalb kannst du dieses Argument nicht verwenden!",
 									sender);
 						if (((Player) sender).getItemInHand() == null
 								|| ((Player) sender).getItemInHand() == new ItemStack(Material.AIR))
-							return Main.sendMessageAndReturnTrue(Main.colorFail + "Deine Hand ist leer!", sender);
+							return DarkEssentials.sendMessageAndReturnTrue(
+									DarkEssentials.colorFail + "Deine Hand ist leer!", sender);
 						material = ((Player) sender).getItemInHand().getType();
 						damage = ((Player) sender).getItemInHand().getDurability();
 					} else {
 						try {
 							material = Material.valueOf(args[3].toUpperCase(Locale.ENGLISH));
 						} catch (Exception e) {
-							Main.getInstance()
-									.sendMessage(new StringBuilder(Main.colorFail).append("Das Item ")
-											.append(Main.colorValue).append(args[3]).append(Main.colorFail)
+							DarkEssentials.getInstance()
+									.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Das Item ")
+											.append(DarkEssentials.colorValue).append(args[3]).append(
+													DarkEssentials.colorFail)
 											.append(" wurde nicht gefunden!").toString(), sender);
 							return true;
 						}
@@ -129,13 +135,16 @@ public class CommandWarpEdit extends Command {
 							try {
 								damage = Short.parseShort(args[4]);
 							} catch (Exception e) {
-								return Main.sendMessageAndReturnTrue(Main.colorFail + "Ungültige Zahl!", sender);
+								return DarkEssentials.sendMessageAndReturnTrue(
+										DarkEssentials.colorFail + "Ungültige Zahl!", sender);
 							}
 						} else if (args.length > 5)
-							return Main.sendMessageAndReturnTrue(Main.colorFail + "Ungültige Zahl!", sender);
+							return DarkEssentials.sendMessageAndReturnTrue(
+									DarkEssentials.colorFail + "Ungültige Zahl!", sender);
 					}
-					Main.getInstance().sendMessage(new StringBuilder(Main.colorConfirm).append("Icon für Warp-Punkt ")
-							.append(Main.colorValue).append(getWarp(args[1]).getName()).append(Main.colorConfirm)
+					DarkEssentials.getInstance().sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Icon für Warp-Punkt ")
+							.append(DarkEssentials.colorValue).append(getWarp(args[1]).getName()).append(
+									DarkEssentials.colorConfirm)
 							.append(" erfolgreich geändert.").toString(), sender);
 					getWarp(args[1]).setIcon(material.toString() + ":" + damage);
 					break;
@@ -147,7 +156,7 @@ public class CommandWarpEdit extends Command {
 							y = Integer.parseInt(args[4]);
 							z = Integer.parseInt(args[5]);
 						} catch (Exception e) {
-							Main.getInstance().sendMessage(Main.colorFail + "Ungültige Zahl!", sender);
+							DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Ungültige Zahl!", sender);
 							return true;
 						}
 					Location loc = new Location(null, x, y, z);
@@ -156,7 +165,7 @@ public class CommandWarpEdit extends Command {
 						if (sender instanceof Player) {
 							loc = ((Player) sender).getLocation();
 						} else {
-							Main.getInstance().sendMessage(Main.colorFail
+							DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail
 									+ "Du bist kein Spieler, deshalb musst du Koordianten und eine Welt angeben!",
 									sender);
 							return true;
@@ -175,15 +184,16 @@ public class CommandWarpEdit extends Command {
 							} else if (args[3].equalsIgnoreCase("false"))
 								loc = ((Player) sender).getLocation();
 							else {
-								Main.getInstance()
-										.sendMessage(new StringBuilder(Main.colorFail).append("Du kannst nur ")
-												.append(Main.colorValue).append("true").append(Main.colorFail)
-												.append(" oder ").append(Main.colorValue).append("false")
-												.append(Main.colorFail).append(" angeben!").toString(), sender);
+								DarkEssentials.getInstance()
+										.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Du kannst nur ")
+												.append(DarkEssentials.colorValue).append("true").append(
+														DarkEssentials.colorFail)
+												.append(" oder ").append(DarkEssentials.colorValue).append("false")
+												.append(DarkEssentials.colorFail).append(" angeben!").toString(), sender);
 								return true;
 							}
 						} else {
-							Main.getInstance().sendMessage(Main.colorFail
+							DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail
 									+ "Du bist kein Spieler, deshalb musst du Koordianten und eine Welt angeben!",
 									sender);
 							return true;
@@ -196,16 +206,17 @@ public class CommandWarpEdit extends Command {
 						} else if (getWarp(args[1]).getLocation() != null) {
 							loc.setWorld(getWarp(args[1]).getLocation().getWorld());
 						} else {
-							Main.getInstance().sendMessage(Main.colorFail + "Du musst eine Welt angeben!", sender);
+							DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Du musst eine Welt angeben!", sender);
 							return true;
 						}
 					} else if (args.length == 7) {
 						if (Bukkit.getWorld(args[6]) != null)
 							loc.setWorld(Bukkit.getWorld(args[6]));
 						else {
-							Main.getInstance()
-									.sendMessage(new StringBuilder(Main.colorFail).append("Die Welt ")
-											.append(Main.colorValue).append(args[6]).append(Main.colorFail)
+							DarkEssentials.getInstance()
+									.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Die Welt ")
+											.append(DarkEssentials.colorValue).append(args[6]).append(
+													DarkEssentials.colorFail)
 											.append(" wurde nicht gefunden!").toString(), sender);
 							return true;
 						}
@@ -213,23 +224,25 @@ public class CommandWarpEdit extends Command {
 						return false;
 
 					getWarp(args[1]).setLocation(loc);
-					Main.getInstance()
+					DarkEssentials.getInstance()
 							.sendMessage(
-									new StringBuilder(Main.colorConfirm).append("Position für Warp-Punkt ")
-											.append(Main.colorValue).append(getWarp(args[1]).getName())
-											.append(Main.colorConfirm).append(" erfolgreich geändert.").toString(),
+									new StringBuilder(DarkEssentials.colorConfirm).append("Position für Warp-Punkt ")
+											.append(DarkEssentials.colorValue).append(getWarp(args[1]).getName())
+											.append(DarkEssentials.colorConfirm).append(" erfolgreich geändert.").toString(),
 									sender);
 					break;
 				case "setname":
 					if (getWarp(args[3]) == null) {
-						Main.getInstance().sendMessage(new StringBuilder(Main.colorConfirm).append("Warp-Punkt ")
-								.append(Main.colorValue).append(getWarp(args[1]).getName()).append(Main.colorConfirm)
+						DarkEssentials.getInstance().sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Warp-Punkt ")
+								.append(DarkEssentials.colorValue).append(getWarp(args[1]).getName()).append(
+										DarkEssentials.colorConfirm)
 								.append(" erfolgreich umbenannt.").toString(), sender);
 						getWarp(args[1]).setName(args[3]);
 					} else {
-						Main.getInstance()
-								.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ")
-										.append(Main.colorValue).append(args[3]).append(Main.colorFail)
+						DarkEssentials.getInstance()
+								.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ")
+										.append(DarkEssentials.colorValue).append(args[3]).append(
+												DarkEssentials.colorFail)
 										.append(" existiert bereits!").toString(), sender);
 					}
 					break;
@@ -237,28 +250,30 @@ public class CommandWarpEdit extends Command {
 					if (args[3].equalsIgnoreCase("true")) {
 						WarpPoint warp = getWarp(args[1]);
 						if (warp.isValid()) {
-							Main.getInstance()
-									.sendMessage(new StringBuilder(Main.colorConfirm).append("Warp-Punkt ")
-											.append(Main.colorValue).append(getWarp(args[1]).getName())
-											.append(Main.colorConfirm).append(" erfolgreich aktiviert.").toString(),
+							DarkEssentials.getInstance()
+									.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Warp-Punkt ")
+											.append(DarkEssentials.colorValue).append(getWarp(args[1]).getName())
+											.append(DarkEssentials.colorConfirm).append(" erfolgreich aktiviert.").toString(),
 											sender);
 							warp.setEnabled(true);
 						} else {
-							Main.getInstance().sendMessage(
-									Main.colorFail + "Alle Parameter des Warp-Punktes müssen definiert sein!", sender);
+							DarkEssentials.getInstance().sendMessage(
+									DarkEssentials.colorFail + "Alle Parameter des Warp-Punktes müssen definiert sein!", sender);
 						}
 					} else if (args[3].equalsIgnoreCase("false")) {
-						Main.getInstance()
-								.sendMessage(new StringBuilder(Main.colorConfirm).append("Warp-Punkt ")
-										.append(Main.colorValue).append(getWarp(args[1]).getName())
-										.append(Main.colorConfirm).append(" erfolgreich deaktiviert.").toString(),
+						DarkEssentials.getInstance()
+								.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Warp-Punkt ")
+										.append(DarkEssentials.colorValue).append(getWarp(args[1]).getName())
+										.append(DarkEssentials.colorConfirm).append(" erfolgreich deaktiviert.").toString(),
 										sender);
 						getWarp(args[1]).setEnabled(false);
 					} else {
-						Main.getInstance()
-								.sendMessage(new StringBuilder(Main.colorFail).append("Du musst ")
-										.append(Main.colorValue).append("true").append(Main.colorFail).append(" oder ")
-										.append(Main.colorValue).append("false").append(Main.colorFail)
+						DarkEssentials.getInstance()
+								.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Du musst ")
+										.append(DarkEssentials.colorValue).append("true").append(
+												DarkEssentials.colorFail).append(" oder ")
+										.append(DarkEssentials.colorValue).append("false").append(
+												DarkEssentials.colorFail)
 										.append(" angeben!").toString(), sender);
 					}
 					break;
@@ -266,9 +281,10 @@ public class CommandWarpEdit extends Command {
 					return false;
 				}
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ").append(Main.colorValue)
-								.append(args[1]).append(Main.colorFail).append(" wurde nicht gefunden!").toString(),
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ").append(
+												DarkEssentials.colorValue)
+								.append(args[1]).append(DarkEssentials.colorFail).append(" wurde nicht gefunden!").toString(),
 								sender);
 			}
 			break;
@@ -276,57 +292,59 @@ public class CommandWarpEdit extends Command {
 			if (getWarp(args[1]) != null) {
 				WarpPoint warp = getWarp(args[1]);
 				warp.isValid();
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorConfirm).append("Informationen zum Warp-Punkt ")
-								.append(Main.colorValue).append(warp.getName()).append(Main.colorConfirm).append(":")
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Informationen zum Warp-Punkt ")
+								.append(DarkEssentials.colorValue).append(warp.getName()).append(
+										DarkEssentials.colorConfirm).append(":")
 								.toString(), sender);
 				if (warp.getLocation() != null) {
 					Location loc = warp.getLocation();
-					Main.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Position: ")
-							.append(Main.colorValue).append(loc.getBlockX()).append(ChatColor.DARK_GRAY).append(", ")
-							.append(Main.colorValue).append(loc.getBlockY()).append(ChatColor.DARK_GRAY).append(", ")
-							.append(Main.colorValue).append(loc.getBlockZ()).append(ChatColor.DARK_GRAY).append(", ")
-							.append(Main.colorValue).append(loc.getWorld().getName()).toString(), sender);
+					DarkEssentials.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Position: ")
+							.append(DarkEssentials.colorValue).append(loc.getBlockX()).append(ChatColor.DARK_GRAY).append(", ")
+							.append(DarkEssentials.colorValue).append(loc.getBlockY()).append(ChatColor.DARK_GRAY).append(", ")
+							.append(DarkEssentials.colorValue).append(loc.getBlockZ()).append(ChatColor.DARK_GRAY).append(", ")
+							.append(DarkEssentials.colorValue).append(loc.getWorld().getName()).toString(), sender);
 				} else {
-					Main.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Position: ")
-							.append(Main.colorValue).append("undefiniert").toString(), sender);
+					DarkEssentials.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Position: ")
+							.append(DarkEssentials.colorValue).append("undefiniert").toString(), sender);
 				}
 				if (warp.getIcon() != null) {
-					Main.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Icon: ")
-							.append(Main.colorValue).append(warp.getIcon()).toString(), sender);
+					DarkEssentials.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Icon: ")
+							.append(DarkEssentials.colorValue).append(warp.getIcon()).toString(), sender);
 				} else {
-					Main.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Icon: ")
-							.append(Main.colorValue).append("undefiniert").toString(), sender);
+					DarkEssentials.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Icon: ")
+							.append(DarkEssentials.colorValue).append("undefiniert").toString(), sender);
 				}
-				Main.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Aktiviert: ")
-						.append(Main.colorValue).append(warp.getEnabled()).toString(), sender);
+				DarkEssentials.getInstance().sendMessage(new StringBuilder(ChatColor.GRAY.toString()).append("- Aktiviert: ")
+						.append(DarkEssentials.colorValue).append(warp.getEnabled()).toString(), sender);
 			} else
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ").append(Main.colorValue)
-								.append(args[1]).append(Main.colorFail).append(" wurde nicht gefunden!").toString(),
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ").append(
+												DarkEssentials.colorValue)
+								.append(args[1]).append(DarkEssentials.colorFail).append(" wurde nicht gefunden!").toString(),
 								sender);
 			break;
 		case "confirm":
 			if (warpDeleteComfirmation.containsKey(sender)) {
 				if (warps.contains(getWarp(warpDeleteComfirmation.get(sender)))) {
 					warps.remove(getWarp(warpDeleteComfirmation.get(sender)));
-					Main.getInstance()
-							.sendMessage(new StringBuilder(Main.colorConfirm).append("Der Warp-Punkt ")
-									.append(Main.colorValue).append(warpDeleteComfirmation.get(sender))
-									.append(Main.colorConfirm).append(" wurde gelöscht!").toString(), sender);
+					DarkEssentials.getInstance()
+							.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Der Warp-Punkt ")
+									.append(DarkEssentials.colorValue).append(warpDeleteComfirmation.get(sender))
+									.append(DarkEssentials.colorConfirm).append(" wurde gelöscht!").toString(), sender);
 				} else
-					Main.getInstance()
-							.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ")
-									.append(Main.colorValue).append(warpDeleteComfirmation.get(sender))
-									.append(Main.colorFail).append(" wurde bereits gelöscht!").toString(), sender);
+					DarkEssentials.getInstance()
+							.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ")
+									.append(DarkEssentials.colorValue).append(warpDeleteComfirmation.get(sender))
+									.append(DarkEssentials.colorFail).append(" wurde bereits gelöscht!").toString(), sender);
 				warpDeleteComfirmation.remove(sender);
 			} else
-				Main.getInstance().sendMessage(Main.colorFail + "Nichts zum Bestätigen!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Nichts zum Bestätigen!", sender);
 			break;
 		default:
 			return false;
 		}
-		Main.config.set("warps", new Gson().toJson(warps));
+		DarkEssentials.config.set("warps", new Gson().toJson(warps));
 		return true;
 	}
 
@@ -349,7 +367,7 @@ public class CommandWarpEdit extends Command {
 			case "edit":
 			case "info":
 				Set<String> enabledWarps = new HashSet<>();
-				for (WarpPoint w : Main.updateWarps())
+				for (WarpPoint w : DarkEssentials.updateWarps())
 					enabledWarps.add(w.getName());
 				return EssentialCollections.toSortedStringList(enabledWarps, args[1]);
 			}

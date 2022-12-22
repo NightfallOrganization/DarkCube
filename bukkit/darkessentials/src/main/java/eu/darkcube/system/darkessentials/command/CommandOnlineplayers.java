@@ -26,14 +26,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandOnlineplayers extends Command implements Listener {
 
 	public CommandOnlineplayers() {
-		super(Main.getInstance(), "onlineplayers", new Command[0], "Zeit dir alle Spieler auf dem Server.");
+		super(DarkEssentials.getInstance(), "onlineplayers", new Command[0], "Zeit dir alle Spieler auf dem Server.");
 		setAliases("d_onlineplayers", "players");
-		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
+		Bukkit.getPluginManager().registerEvents(this, DarkEssentials.getInstance());
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class CommandOnlineplayers extends Command implements Listener {
 		for (Player current : Bukkit.getOnlinePlayers()) {
 			sb.append(current.getName()).append(", ");
 		}
-		Main.getInstance().sendMessage(Main.cConfirm() + "Online sind:", sender);
-		Main.getInstance().sendMessageWithoutPrefix(sb.toString().substring(0, sb.toString().length() - 2), sender);
+		DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Online sind:", sender);
+		DarkEssentials.getInstance().sendMessageWithoutPrefix(sb.toString().substring(0, sb.toString().length() - 2), sender);
 	}
 
 	private Inventory getPlayersInInv(int page) {

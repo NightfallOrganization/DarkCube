@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.darkessentials.command;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
+import eu.darkcube.system.commandapi.Argument;
+import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.darkessentials.DarkEssentials;
+import eu.darkcube.system.darkessentials.util.EssentialCollections;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,20 +25,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.commandapi.Argument;
-import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
-import eu.darkcube.system.darkessentials.util.EssentialCollections;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class CommandSpawner extends Command implements Listener {
 
 	public CommandSpawner() {
-		super(Main.getInstance(), "spawner", new Command[0], "Gibt dir einen Monsterspawner",
+		super(DarkEssentials.getInstance(), "spawner", new Command[0], "Gibt dir einen Monsterspawner",
 				new Argument[] { new Argument("Entity", "Das zu Spawnende Entity"),
 						new Argument("Spieler", "Der Spieler, der den Spawner bekommen soll.", false) });
 		this.setAliases("d_spawner");
-		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
+		Bukkit.getPluginManager().registerEvents(this, DarkEssentials.getInstance());
 	}
 
 	@Override
@@ -98,7 +97,7 @@ public class CommandSpawner extends Command implements Listener {
 				}
 			}
 		} catch (Exception e) {
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst ein Mob angeben!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst ein Mob angeben!", sender);
 			return true;
 		}
 		args[0] = "%processed%";
@@ -116,11 +115,11 @@ public class CommandSpawner extends Command implements Listener {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		ItemStack item = new ItemBuilder(Material.MOB_SPAWNER).unsafe().setString("spawnertype", entity.name())
 				.builder().displayname(ChatColor.GOLD + entity.name() + ChatColor.GRAY + " Spawner").build();
 //		ItemStack nmsSpawner = CraftItemStack.asNMSCopy(bukkitSpawner);
@@ -136,12 +135,14 @@ public class CommandSpawner extends Command implements Listener {
 		int count = 0;
 		for (Player current : players) {
 			current.getInventory().addItem(item);
-			Main.getInstance().sendMessage(Main.cConfirm() + "Du hast einen " + Main.cValue() + entity.name()
-					+ Main.cConfirm() + "-Spawner erhalten.", sender);
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.cConfirm() + "Du hast einen " + DarkEssentials.cValue() + entity.name()
+					+ DarkEssentials.cConfirm() + "-Spawner erhalten.", sender);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
-			Main.getInstance().sendMessage(Main.cValue() + count + Main.cConfirm() + " Spielern einen Spawner gegeben.",
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Spielern einen Spawner gegeben.",
 					sender);
 		}
 		return true;
@@ -153,7 +154,7 @@ public class CommandSpawner extends Command implements Listener {
 			return EssentialCollections.toSortedStringList(EntityType.values(), args[0]);
 		}
 		if (args.length > 1) {
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		}
 		return super.onTabComplete(args);
 	}

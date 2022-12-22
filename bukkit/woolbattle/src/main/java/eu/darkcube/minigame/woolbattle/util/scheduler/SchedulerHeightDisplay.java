@@ -15,7 +15,7 @@ import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.system.ChatUtils.ChatEntry;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
 
 public class SchedulerHeightDisplay extends Scheduler {
 
@@ -44,10 +44,9 @@ public class SchedulerHeightDisplay extends Scheduler {
 				Team team = user.getTeam();
 				if (team != null) {
 					if (team.getType() != TeamType.SPECTATOR) {
-						ChatEntry
-								.buildActionbar(new ChatEntry.Builder()
-										.text("§8» " + display.getColor().toString() + diff + " §8«").build())
-								.sendPlayer(p);
+						ChatEntry.buildActionbar(new ChatEntry.Builder().text(
+										"§8» " + display.getColor().toString() + diff + " §8«").build())
+								.send(p);
 					}
 				}
 			}

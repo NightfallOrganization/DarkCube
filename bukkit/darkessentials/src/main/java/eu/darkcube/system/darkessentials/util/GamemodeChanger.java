@@ -16,7 +16,7 @@ import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class GamemodeChanger {
 	
@@ -36,7 +36,7 @@ public class GamemodeChanger {
 			gmString = "Spectator";
 		break;
 		default:
-			Main.getInstance().sendMessage(Main.cFail()
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail()
 							+ "Du musst einen Gamemode angeben!", sender);
 			return;
 		}
@@ -45,14 +45,14 @@ public class GamemodeChanger {
 			if (sender instanceof Player) {
 				targetNames.add(((Player) sender).getName());
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return;
 			}
 		}
 		Set<String> unresolvedNames = new HashSet<>();
 		if (targetNames.contains(((Player) sender).getName())) {
 			if (((Player) sender).getGameMode().equals(GameMode.valueOf(gmString.toUpperCase())))
-				Main.getInstance().sendMessage(Main.cFail()
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail()
 								+ "Du bist bereits in diesem Gamemode!", sender);
 		}
 		for (String playerName : targetNames) {
@@ -63,10 +63,12 @@ public class GamemodeChanger {
 				unresolvedNames.add(playerName);
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		if (targetNames.size() == 1 && targetNames.contains(((Player) sender).getName())
 						&& unresolvedNames.isEmpty()) {
-			Main.getInstance().sendMessage(new StringBuilder().append(Main.cConfirm()).append("Gamemode von ").append(Main.cValue()).append(count).append(Main.cConfirm()).append(" Spielern auf ").append(gmString).append(Main.cConfirm()).append(" gesetzt").toString(), sender);
+			DarkEssentials.getInstance().sendMessage(new StringBuilder().append(DarkEssentials.cConfirm()).append("Gamemode von ").append(
+					DarkEssentials.cValue()).append(count).append(DarkEssentials.cConfirm()).append(" Spielern auf ").append(gmString).append(
+					DarkEssentials.cConfirm()).append(" gesetzt").toString(), sender);
 		}
 	}
 

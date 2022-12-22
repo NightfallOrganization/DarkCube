@@ -11,7 +11,7 @@ import eu.darkcube.minigame.woolbattle.gadget.Gadget;
 import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
-import eu.darkcube.system.language.core.Language;
+import eu.darkcube.system.util.Language;
 
 public interface UserData extends Serializable {
 

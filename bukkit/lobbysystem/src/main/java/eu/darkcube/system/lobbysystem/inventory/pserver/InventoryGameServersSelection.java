@@ -7,13 +7,14 @@
 
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
-import java.util.Map;
-import org.bukkit.inventory.ItemStack;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
 
 public class InventoryGameServersSelection extends LobbyAsyncPagedInventory {
 

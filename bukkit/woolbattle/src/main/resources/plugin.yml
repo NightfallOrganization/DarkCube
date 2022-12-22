@@ -2,4 +2,4 @@ main: eu.darkcube.minigame.woolbattle.WoolBattle
 version: 1.0
 author: DasBabyPixel
 name: WoolBattle
-depend: [System, CommandAPI]
+depend: [System]

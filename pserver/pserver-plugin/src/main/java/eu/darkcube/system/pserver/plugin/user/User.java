@@ -7,18 +7,16 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import java.util.UUID;
-import java.util.function.Consumer;
-
-import org.bukkit.entity.Player;
-
 import com.google.gson.JsonObject;
-
 import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.pserver.plugin.Message;
+import eu.darkcube.system.util.Language;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface User {
 

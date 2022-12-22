@@ -7,25 +7,18 @@
 
 package eu.darkcube.minigame.woolbattle.team;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.translation.Message;
+import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
-import eu.darkcube.system.language.core.Language;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DefaultTeamManager implements TeamManager {
 

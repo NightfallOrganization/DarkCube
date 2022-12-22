@@ -7,18 +7,17 @@
 
 package eu.darkcube.system.pserver.plugin.listener;
 
-import java.util.UUID;
-
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
+import eu.darkcube.system.pserver.plugin.inventory.UserManagmentUserInventory;
+import eu.darkcube.system.pserver.plugin.user.User;
+import eu.darkcube.system.pserver.plugin.user.UserManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
-import eu.darkcube.system.pserver.plugin.inventory.UserManagmentUserInventory;
-import eu.darkcube.system.pserver.plugin.user.User;
-import eu.darkcube.system.pserver.plugin.user.UserManager;
+import java.util.UUID;
 
 public class UserManagmentInventoryListener implements BaseListener {
 

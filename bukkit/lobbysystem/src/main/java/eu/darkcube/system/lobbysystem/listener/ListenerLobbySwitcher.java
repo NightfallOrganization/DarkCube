@@ -7,20 +7,20 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.wrapper.Wrapper;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import eu.darkcube.system.lobbysystem.inventory.InventoryLobbySwitcher;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.UUIDManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class ListenerLobbySwitcher extends BaseListener {
 

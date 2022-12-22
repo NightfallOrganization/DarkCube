@@ -10,7 +10,7 @@ package eu.darkcube.system.lobbysystem.pserver;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelectionWoolBattle;
 import eu.darkcube.system.lobbysystem.util.Item;

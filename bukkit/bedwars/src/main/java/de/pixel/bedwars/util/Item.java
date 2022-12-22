@@ -7,12 +7,11 @@
 
 package de.pixel.bedwars.util;
 
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-
-import static eu.darkcube.system.inventory.api.util.ItemBuilder.*;
+import static eu.darkcube.system.inventoryapi.ItemBuilder.item;
 import static org.bukkit.Material.*;
 
 public enum Item {

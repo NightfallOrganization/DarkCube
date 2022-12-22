@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.user;
 
-import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;

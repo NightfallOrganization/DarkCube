@@ -7,17 +7,11 @@
 
 package eu.darkcube.system.cloudban.bukkit.command;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import eu.darkcube.system.cloudban.bukkit.Main;
+import eu.darkcube.system.cloudban.command.Command;
+import eu.darkcube.system.cloudban.command.wrapper.CommandWrapper;
+import eu.darkcube.system.util.ReflectionUtils;
+import eu.darkcube.system.util.ReflectionUtils.PackageType;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
@@ -26,11 +20,11 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import eu.darkcube.system.ReflectionUtils;
-import eu.darkcube.system.ReflectionUtils.PackageType;
-import eu.darkcube.system.cloudban.bukkit.Main;
-import eu.darkcube.system.cloudban.command.Command;
-import eu.darkcube.system.cloudban.command.wrapper.CommandWrapper;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class BukkitCommandWrapper implements TabExecutor {
 
@@ -81,7 +75,7 @@ public class BukkitCommandWrapper implements TabExecutor {
 				Object server = Bukkit.getServer();
 				Method methodGETCOMMANDMAP = server.getClass().getMethod("getCommandMap");
 				CommandMap commandMap = (CommandMap) methodGETCOMMANDMAP.invoke(server);
-				commandMap.register("system", plugincommand);
+				commandMap.register("eu/darkcube/system", plugincommand);
 				Field f = commandMap.getClass().getDeclaredField("knownCommands");
 				f.setAccessible(true);
 				Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) f

@@ -13,12 +13,12 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandPWeather extends Command {
 
 	public CommandPWeather() {
-		super(Main.getInstance(), "pweather", new Command[0], "Setzt das Wetter nur für dich selbst.",
+		super(DarkEssentials.getInstance(), "pweather", new Command[0], "Setzt das Wetter nur für dich selbst.",
 				new Argument("Wetter", "Das Wetter, welches für dich gesetzt wird."));
 		setAliases("d_pweather");
 	}
@@ -26,7 +26,7 @@ public class CommandPWeather extends Command {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (!(sender instanceof Player)) {
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst ein Spieler sein, um diesen Command auszuführen!",
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst ein Spieler sein, um diesen Command auszuführen!",
 					sender);
 			return true;
 		}
@@ -43,22 +43,22 @@ public class CommandPWeather extends Command {
 					break;
 				case "reset":
 					((Player) sender).resetPlayerWeather();
-					Main.getInstance().sendMessage(Main.cConfirm() + "Wetter zurückgesetzt!", sender);
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Wetter zurückgesetzt!", sender);
 					return true;
 				default:
 					throw new IllegalArgumentException();
 				}
 			} catch (Exception ex) {
-				Main.getInstance().sendMessage(Main.cFail() + "Du musst ein Wetter angeben!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst ein Wetter angeben!", sender);
 				return true;
 			}
 			((Player) sender).setPlayerWeather(weather);
 			switch (weather) {
 			case CLEAR:
-				Main.getInstance().sendMessage(Main.cConfirm() + "Die Sonne scheint (angeblich)", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Die Sonne scheint (angeblich)", sender);
 				break;
 			case DOWNFALL:
-				Main.getInstance().sendMessage(Main.cConfirm() + "Der Regen fällt (angeblich)", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Der Regen fällt (angeblich)", sender);
 				break;
 			}
 			return true;

@@ -29,7 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 import eu.darkcube.system.darkessentials.util.NumbzUtils;
 import eu.darkcube.system.darkessentials.util.WarpPoint;
@@ -43,31 +43,31 @@ public class CommandWarp extends Command implements Listener {
 			"NETHER_STAR:0", false);
 
 	public CommandWarp() {
-		super(Main.getInstance(), "warp", new Command[0], "Teleportpunkte",
+		super(DarkEssentials.getInstance(), "warp", new Command[0], "Teleportpunkte",
 				new Argument("name", "Der Warp-Punkt, zu dem du dich teleportieren willst.", false));
 		setAliases("warps", "d_warp");
-		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
+		Bukkit.getPluginManager().registerEvents(this, DarkEssentials.getInstance());
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (!(sender instanceof Player)) {
-			Main.getInstance().sendMessage(Main.colorFail + "Du musst ein Spieler sein, um diesen Command auszuführen!",
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Du musst ein Spieler sein, um diesen Command auszuführen!",
 					sender);
 			return true;
 		}
 
 		if (teleportingPlayers.contains(sender)) {
-			Main.getInstance().sendMessage(Main.colorFail + "Es läuft bereits ein Teleportvorgang!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Es läuft bereits ein Teleportvorgang!", sender);
 			return true;
 		}
 
 		enabledWarps = new HashSet<>();
-		for (WarpPoint w : Main.updateWarps())
+		for (WarpPoint w : DarkEssentials.updateWarps())
 			if (w.getEnabled())
 				enabledWarps.add(w);
 		if (enabledWarps.isEmpty()) {
-			Main.getInstance().sendMessage(Main.colorFail + "Es sind noch keine Warppunkte vorhanden.", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Es sind noch keine Warppunkte vorhanden.", sender);
 			return true;
 		}
 
@@ -77,9 +77,10 @@ public class CommandWarp extends Command implements Listener {
 			if (getWarp(args[0]) != null && getWarp(args[0]).isValid() && getWarp(args[0]).getEnabled()) {
 				startTeleport((Player) sender, getWarp(args[0]));
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder(Main.colorFail).append("Der Warp-Punkt ").append(Main.colorValue)
-								.append(args[0]).append(Main.colorFail).append(" wurde nicht gefunden!").toString(),
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder(DarkEssentials.colorFail).append("Der Warp-Punkt ").append(
+												DarkEssentials.colorValue)
+								.append(args[0]).append(DarkEssentials.colorFail).append(" wurde nicht gefunden!").toString(),
 								sender);
 			}
 		} else {
@@ -105,22 +106,24 @@ public class CommandWarp extends Command implements Listener {
 		if (target == null || sender == null)
 			return;
 
-		if (Main.config.getInt("command.warp.teleportDelay") == 0) {
+		if (DarkEssentials.config.getInt("command.warp.teleportDelay") == 0) {
 			sender.teleport(target.getLocation());
-			Main.getInstance().sendMessage(
-					new StringBuilder(Main.colorConfirm).append("Du wurdest zum Warp-Punkt ").append(Main.colorValue)
-							.append(target.getName()).append(Main.colorConfirm).append(" teleportiert.").toString(),
+			DarkEssentials.getInstance().sendMessage(
+					new StringBuilder(DarkEssentials.colorConfirm).append("Du wurdest zum Warp-Punkt ").append(
+									DarkEssentials.colorValue)
+							.append(target.getName()).append(DarkEssentials.colorConfirm).append(" teleportiert.").toString(),
 					sender);
 		} else {
 			teleportingPlayers.add(sender);
 			Location startPosition = sender.getLocation();
 			long startTime = System.currentTimeMillis();
-			boolean disallowMove = Main.config.getBoolean("command.warp.disallowMove");
-			int teleportDelay = Main.config.getInt("command.warp.teleportDelay");
+			boolean disallowMove = DarkEssentials.config.getBoolean("command.warp.disallowMove");
+			int teleportDelay = DarkEssentials.config.getInt("command.warp.teleportDelay");
 
-			Main.getInstance().sendMessage(new StringBuilder(Main.colorConfirm).append("Der Teleport zum Warp-Punkt ")
-					.append(Main.colorValue).append(target.getName()).append(Main.colorConfirm).append(" startet in ")
-					.append(Main.colorValue).append(teleportDelay).append(Main.colorConfirm)
+			DarkEssentials.getInstance().sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Der Teleport zum Warp-Punkt ")
+					.append(DarkEssentials.colorValue).append(target.getName()).append(
+							DarkEssentials.colorConfirm).append(" startet in ")
+					.append(DarkEssentials.colorValue).append(teleportDelay).append(DarkEssentials.colorConfirm)
 					.append(" Sekunden. Bewege dich nicht!").toString(), sender);
 
 			BukkitRunnable teleporter = new BukkitRunnable() {
@@ -130,24 +133,25 @@ public class CommandWarp extends Command implements Listener {
 						Location currentPosition = sender.getLocation();
 						if (!(startPosition.getWorld().equals(currentPosition.getWorld())
 								&& startPosition.getBlock().equals(currentPosition.getBlock()))) {
-							Main.getInstance().sendMessage(
-									Main.colorFail + "Teleportvorgang abgebrochen! Du hast dich bewegt.", sender);
+							DarkEssentials.getInstance().sendMessage(
+									DarkEssentials.colorFail + "Teleportvorgang abgebrochen! Du hast dich bewegt.", sender);
 							teleportingPlayers.remove(sender);
 							this.cancel();
 						}
 					}
 					if (System.currentTimeMillis() >= startTime + teleportDelay * 1000) {
 						sender.teleport(target.getLocation());
-						Main.getInstance()
-								.sendMessage(new StringBuilder(Main.colorConfirm).append("Du wurdest zum Warp-Punkt ")
-										.append(Main.colorValue).append(target.getName()).append(Main.colorConfirm)
+						DarkEssentials.getInstance()
+								.sendMessage(new StringBuilder(DarkEssentials.colorConfirm).append("Du wurdest zum Warp-Punkt ")
+										.append(DarkEssentials.colorValue).append(target.getName()).append(
+												DarkEssentials.colorConfirm)
 										.append(" teleportiert.").toString(), sender);
 						teleportingPlayers.remove(sender);
 						this.cancel();
 					}
 				}
 			};
-			teleporter.runTaskTimer(Main.getInstance(), 0, 20);
+			teleporter.runTaskTimer(DarkEssentials.getInstance(), 0, 20);
 		}
 	}
 
@@ -180,7 +184,7 @@ public class CommandWarp extends Command implements Listener {
 	public List<String> onTabComplete(String[] args) {
 		if (args.length == 1) {
 			Set<String> result = new HashSet<>();
-			for (WarpPoint w : Main.updateWarps())
+			for (WarpPoint w : DarkEssentials.updateWarps())
 				if (w.getEnabled())
 					result.add(w.getName());
 			return EssentialCollections.toSortedStringList(enabledWarps, args[0]);

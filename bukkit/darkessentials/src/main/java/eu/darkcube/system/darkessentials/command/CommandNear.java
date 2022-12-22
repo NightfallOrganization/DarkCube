@@ -18,13 +18,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.NumbzUtils;
 
 public class CommandNear extends Command {
 
 	public CommandNear() {
-		super(Main.getInstance(), "near", new Command[0], "Gibt den nächsten Spieler wieder.", new Argument[] {
+		super(DarkEssentials.getInstance(), "near", new Command[0], "Gibt den nächsten Spieler wieder.", new Argument[] {
 				new Argument("Spieler", "Der Spieler, dessen nächster Spieler angezeit wird.", false) });
 		setAliases("d_near");
 	}
@@ -33,21 +33,22 @@ public class CommandNear extends Command {
 	public boolean execute(CommandSender sender, String[] args) {
 		if (args.length == 0) {
 			if (!(sender instanceof Player)) {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 			if (getClosestPlayer((Player) sender) != null) {
 				Player closest = getClosestPlayer((Player) sender);
-				Main.getInstance().sendMessage(
-						new StringBuilder().append(Main.cConfirm()).append("Der nächste Spieler ist ")
-								.append(Main.cValue()).append(closest.getName()).append(Main.cConfirm()).append(" (")
-								.append(Main.cValue())
+				DarkEssentials.getInstance().sendMessage(
+						new StringBuilder().append(DarkEssentials.cConfirm()).append("Der nächste Spieler ist ")
+								.append(DarkEssentials.cValue()).append(closest.getName()).append(
+										DarkEssentials.cConfirm()).append(" (")
+								.append(DarkEssentials.cValue())
 								.append((int) NumbzUtils.getDistance(((Player) sender).getLocation(),
 										closest.getLocation()))
-								.append(Main.cConfirm()).append(" Blöcke).").toString(),
+								.append(DarkEssentials.cConfirm()).append(" Blöcke).").toString(),
 						sender);
 			} else {
-				Main.getInstance().sendMessage(Main.cFail() + "Es befindet sich kein Spieler in deiner Nähe!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Es befindet sich kein Spieler in deiner Nähe!", sender);
 			}
 			return true;
 		}
@@ -57,16 +58,17 @@ public class CommandNear extends Command {
 				Player current = Bukkit.getPlayer(playerName);
 				if (getClosestPlayer(current) != null) {
 					Player closest = getClosestPlayer(current);
-					Main.getInstance()
-							.sendMessage(new StringBuilder().append(Main.cConfirm()).append("Der nächste Spieler von ")
-									.append(current.getName()).append(" ist ").append(Main.cValue())
-									.append(closest.getName()).append(Main.cConfirm()).append(" (")
-									.append(Main.cValue())
+					DarkEssentials.getInstance()
+							.sendMessage(new StringBuilder().append(DarkEssentials.cConfirm()).append("Der nächste Spieler von ")
+									.append(current.getName()).append(" ist ").append(
+											DarkEssentials.cValue())
+									.append(closest.getName()).append(DarkEssentials.cConfirm()).append(" (")
+									.append(DarkEssentials.cValue())
 									.append((int) NumbzUtils.getDistance(current.getLocation(), closest.getLocation()))
-									.append(Main.cConfirm()).append(" Blöcke).").toString(), sender);
+									.append(DarkEssentials.cConfirm()).append(" Blöcke).").toString(), sender);
 				} else {
-					Main.getInstance().sendMessage(
-							Main.cFail() + "Es befindet sich kein Spieler in der Nähe von " + current.getName() + "!",
+					DarkEssentials.getInstance().sendMessage(
+							DarkEssentials.cFail() + "Es befindet sich kein Spieler in der Nähe von " + current.getName() + "!",
 							sender);
 				}
 			} else {
@@ -91,7 +93,7 @@ public class CommandNear extends Command {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length != 0)
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		return new ArrayList<>();
 	}
 }

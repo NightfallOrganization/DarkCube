@@ -18,13 +18,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandSpeed extends Command {
 
 	public CommandSpeed() {
-		super(Main.getInstance(), "speed", new Command[0], "Stellt deine Geschwindigkeit um.",
+		super(DarkEssentials.getInstance(), "speed", new Command[0], "Stellt deine Geschwindigkeit um.",
 				new Argument[] {
 						new Argument("walk|fly", "Ob deine Lauf- oder Fluggeschwindigkeit geändert wird.", false),
 						new Argument("Wert", "Der Wert auf den deine Geschwindigkeit gesetzt wird."),
@@ -57,9 +57,10 @@ public class CommandSpeed extends Command {
 				value = Float.parseFloat(args[valuePos]);
 				args[valuePos] = "%processed%";
 			} catch (NumberFormatException e) {
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cFail()).append("Du musst eine Zahl zwischen")
-								.append(Main.cValue()).append("0 und 10").append(Main.cFail()).append(" angeben!")
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cFail()).append("Du musst eine Zahl zwischen")
+								.append(DarkEssentials.cValue()).append("0 und 10").append(
+										DarkEssentials.cFail()).append(" angeben!")
 								.toString(), sender);
 				return true;
 			}
@@ -77,26 +78,27 @@ public class CommandSpeed extends Command {
 		if (players.isEmpty() && sender instanceof Player) {
 			players.add((Player) sender);
 		} else {
-			Main.sendMessagePlayernameRequired(sender);
+			DarkEssentials.sendMessagePlayernameRequired(sender);
 			return true;
 		}
 		if (players.isEmpty() && unresolvedNames.isEmpty()) {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		for (Player current : players) {
 			float newValue;
 			if (value <= 10 && value >= 0) {
 				newValue = value / 10;
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cFail()).append("Du musst eine Zahl zwischen")
-								.append(Main.cValue()).append("0 und 10").append(Main.cFail()).append(" angeben!")
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cFail()).append("Du musst eine Zahl zwischen")
+								.append(DarkEssentials.cValue()).append("0 und 10").append(
+										DarkEssentials.cFail()).append(" angeben!")
 								.toString(), sender);
 				return true;
 			}
@@ -113,18 +115,18 @@ public class CommandSpeed extends Command {
 				} else {
 					current.setWalkSpeed(0);
 				}
-				Main.getInstance().sendMessage("§aDeine Laufgeschwindigkeit wurde auf §5" + value + " geändert!",
+				DarkEssentials.getInstance().sendMessage("§aDeine Laufgeschwindigkeit wurde auf §5" + value + " geändert!",
 						current);
 			}
 			if (fly) {
 				current.setFlySpeed(newValue);
-				Main.getInstance().sendMessage("§aDeine Fluggeschwindigkeit wurde auf §5" + value + " geändert!",
+				DarkEssentials.getInstance().sendMessage("§aDeine Fluggeschwindigkeit wurde auf §5" + value + " geändert!",
 						current);
 			}
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
-			Main.getInstance().sendMessage(
+			DarkEssentials.getInstance().sendMessage(
 					"§aGeschwindigkeit von §5" + count + " §aSpielern auf §5" + value + " geändert!", sender);
 		}
 		return true;
@@ -136,7 +138,7 @@ public class CommandSpeed extends Command {
 			return EssentialCollections.toSortedStringList(EssentialCollections.asList("walk", "fly"), args[0]);
 		}
 		if (args.length > 1) {
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		}
 		return new ArrayList<>();
 	}

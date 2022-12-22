@@ -7,8 +7,9 @@
 
 package eu.darkcube.system.voidworldplugin;
 
-import java.util.Random;
-
+import eu.darkcube.system.DarkCubePlugin;
+import eu.darkcube.system.util.ReflectionUtils;
+import eu.darkcube.system.util.ReflectionUtils.PackageType;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -17,9 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.generator.ChunkGenerator;
 
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.ReflectionUtils;
-import eu.darkcube.system.ReflectionUtils.PackageType;
+import java.util.Random;
 
 public class Main extends DarkCubePlugin implements Listener {
 
@@ -50,12 +49,9 @@ public class Main extends DarkCubePlugin implements Listener {
 		// Setting gamerules
 		ReflectionUtils.invokeMethod(w, "getHandle");
 		Object handle = ReflectionUtils.invokeMethod(w, ReflectionUtils.getMethod(w.getClass(), "getHandle"));
-//		Class<?> EntityTracker = Reflection.getVersionClass(Reflection.MINECRAFT_PREFIX, "EntityTracker");
-//		Object tracker = Reflection.newInstance(Reflection.getConstructor(EntityTracker, handle.getClass()), handle);
 		Object tracker = ReflectionUtils
 				.instantiateObject(ReflectionUtils.getClass("EntityTracker", PackageType.MINECRAFT_SERVER), handle);
 		ReflectionUtils.setValue(handle, handle.getClass(), false, "tracker", tracker);
-//		w.getHandle().tracker = new EntityTracker(w.getHandle());
 		w.setDifficulty(Difficulty.PEACEFUL);
 		w.setKeepSpawnInMemory(false);
 		w.setFullTime(0);
@@ -78,10 +74,6 @@ public class Main extends DarkCubePlugin implements Listener {
 		// Setting all chunkgenerator fields for world
 		Bukkit.getConsoleSender().sendMessage("§cPreparing void world generation for world '" + w.getName() + "'");
 		ReflectionUtils.setValue(handle, false, "generator", this.getDefaultWorldGenerator(w.getName(), w.getName()));
-//			w.getHandle().generator = this.getDefaultWorldGenerator(world.getName(), world.getName());
-//			Field field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("dataManager");
-//			field.setAccessible(true);
-//			IDataManager manager = (IDataManager) field.get(w.getHandle());
 		Object manager = ReflectionUtils.getValue(handle, "World", PackageType.MINECRAFT_SERVER, true, "dataManager");
 		Object gen = ReflectionUtils.instantiateObject(
 				ReflectionUtils.getConstructor("CustomChunkGenerator", PackageType.CRAFTBUKKIT_GENERATOR,
@@ -89,12 +81,6 @@ public class Main extends DarkCubePlugin implements Listener {
 						ChunkGenerator.class),
 				handle, ReflectionUtils.invokeMethod(handle, "getSeed"),
 				ReflectionUtils.getValue(handle, false, "generator"));
-//					ReflectionUtils.getClass("CustomChunkGenerator", PackageType.CRAFTBUKKIT_GENERATOR), null);
-
-//			IChunkProvider gen = new CustomChunkGenerator(w.getHandle(), w.getHandle().getSeed(),
-//					w.getHandle().generator) {
-//
-//			};
 		gen = ReflectionUtils.instantiateObject(
 				ReflectionUtils.getConstructor("ChunkProviderServer", PackageType.MINECRAFT_SERVER,
 						ReflectionUtils.getClass("WorldServer", PackageType.MINECRAFT_SERVER),
@@ -106,19 +92,10 @@ public class Main extends DarkCubePlugin implements Listener {
 								ReflectionUtils.getClass("IDataManager", PackageType.MINECRAFT_SERVER)),
 						ReflectionUtils.getValue(handle, false, "worldProvider")),
 				gen);
-//			gen = new ChunkProviderServer(w.getHandle(), manager.createChunkLoader(w.getHandle().worldProvider), gen) {
-//			};
-//			w.getHandle().chunkProviderServer = (ChunkProviderServer) gen;
 		ReflectionUtils.setValue(handle, false, "chunkProviderServer", gen);
 		ReflectionUtils.setValue(handle, "World", PackageType.MINECRAFT_SERVER, true, "chunkProvider", gen);
 		ReflectionUtils.setValue(w, ReflectionUtils.getClass("CraftWorld", PackageType.CRAFTBUKKIT), true, "generator",
 				ReflectionUtils.getValue(handle, false, "generator"));
-//			field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("chunkProvider");
-//			field.setAccessible(true);
-//			field.set(w.getHandle(), gen);
-//			field = w.getClass().getDeclaredField("generator");
-//			field.setAccessible(true);
-//			field.set(w, w.getHandle().generator);
 	}
 
 }

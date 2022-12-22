@@ -1,6 +1,0 @@
-dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    embedApi 'com.mojang:brigadier:1.0.17'
-    implementation 'com.viaversion:viaversion-api:4.4.2'
-    implementation project(':bukkit:commons')
-}

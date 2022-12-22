@@ -7,31 +7,24 @@
 
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
-import eu.darkcube.system.GameState;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.GameState;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.*;
 
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 

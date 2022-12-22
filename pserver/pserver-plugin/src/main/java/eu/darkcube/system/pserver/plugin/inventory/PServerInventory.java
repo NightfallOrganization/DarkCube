@@ -7,14 +7,13 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import java.util.Map;
-
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.pserver.plugin.Message;
+import eu.darkcube.system.pserver.plugin.user.User;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.inventory.api.v1.InventoryType;
-import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.user.User;
+import java.util.Map;
 
 public class PServerInventory extends DefaultPServerSyncPagedInventory {
 

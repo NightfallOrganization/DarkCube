@@ -24,13 +24,13 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandSkull extends Command {
 
 	public CommandSkull() {
-		super(Main.getInstance(), "skull", new Command[0], "Gibt dir den Kopf eines Spielers.",
+		super(DarkEssentials.getInstance(), "skull", new Command[0], "Gibt dir den Kopf eines Spielers.",
 				new Argument[] { new Argument("Spieler|Mob|me", "Der Spieler oder Mob, dessen Kopf du haben möchtest."),
 						new Argument("Spieler", "Der Spieler, der den Kopf bekommen soll.") });
 		setAliases("d_head", "head");
@@ -39,11 +39,11 @@ public class CommandSkull extends Command {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (args.length == 0) {
-			Main.getInstance().sendMessage(Main.cFail() + "Du musst einen Spielernamen angeben!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst einen Spielernamen angeben!", sender);
 			return true;
 		}
 		if (args.length == 1 && !(sender instanceof Player)) {
-			Main.sendMessagePlayernameRequired(sender);
+			DarkEssentials.sendMessagePlayernameRequired(sender);
 			return true;
 		}
 		boolean playerHead = false;
@@ -76,8 +76,8 @@ public class CommandSkull extends Command {
 				playerHead = true;
 				break;
 			}
-			Main.getInstance().sendMessage(
-					Main.cFail() + "Du bist kein Spieler, deshalb musst du einen weiteren Spielernamen angeben!",
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.cFail() + "Du bist kein Spieler, deshalb musst du einen weiteren Spielernamen angeben!",
 					sender);
 			return true;
 		default:
@@ -137,15 +137,16 @@ public class CommandSkull extends Command {
 			((Player) sender).playSound(((Player) sender).getLocation(), Sound.CAT_MEOW, 20, 1);
 		}
 		skullItem.setItemMeta(meta);
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		int count = 0;
 		for (Player current : players) {
 			current.getInventory().addItem(skullItem);
-			Main.getInstance().sendMessage(Main.cConfirm() + "Du hast einen Kopf erhalten!", current);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du hast einen Kopf erhalten!", current);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender)))
-			Main.getInstance().sendMessage(new StringBuilder(Main.cValue()).append(count).append(Main.cConfirm())
+			DarkEssentials.getInstance().sendMessage(new StringBuilder(DarkEssentials.cValue()).append(count).append(
+							DarkEssentials.cConfirm())
 					.append(" Spielern einen Kopf gegeben.").toString(), sender);
 
 		return true;
@@ -156,14 +157,14 @@ public class CommandSkull extends Command {
 		List<String> list = new ArrayList<>();
 		if (args.length != 0) {
 			if (args.length == 1) {
-				list.addAll(Main.getPlayersStartWith(args));
+				list.addAll(DarkEssentials.getPlayersStartWith(args));
 				for (String s : EssentialCollections.asList("creeper", "zombie", "skeleton", "witherskeleton")) {
 					if (s.startsWith(args[0]))
 						list.add(s);
 				}
 			} else {
 				args[0] = "%processed%";
-				list.addAll(Main.getPlayersStartWith(args));
+				list.addAll(DarkEssentials.getPlayersStartWith(args));
 			}
 		}
 		return list;

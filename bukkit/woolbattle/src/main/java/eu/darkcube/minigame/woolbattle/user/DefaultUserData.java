@@ -12,7 +12,7 @@ import eu.darkcube.minigame.woolbattle.perk.DefaultPlayerPerks;
 import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer.DontSerialize;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
-import eu.darkcube.system.language.core.Language;
+import eu.darkcube.system.util.Language;
 
 public class DefaultUserData implements UserData {
 

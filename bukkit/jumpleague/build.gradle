@@ -1,10 +1,4 @@
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     compileOnly project(':bukkit:darkcubesystem')
-    compileOnly project(':bukkit:inventoryapi')
-    compileOnly project(':bukkit:commons')
-    compileOnly project(':bukkit:commandapi')
-    compileOnly project(':bukkit:languageapi')
-    compileOnly project(':bukkit:packetapi')
-    compileOnly project(':bukkit:userapi')
 }
