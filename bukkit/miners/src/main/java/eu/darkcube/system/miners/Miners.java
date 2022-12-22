@@ -29,6 +29,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -84,7 +85,7 @@ public class Miners extends DarkCubePlugin {
         api.register(new CommandTeam());
 
         registerListeners(new ListenerPlayerQuit(), new ListenerPlayerLogin(), new ListenerPlayerJoin(), new ListenerBlockBreak(), new ListenerPlaceBlock(),
-                new ListenerItemInteract(), new ListenerPlayerDamage(), new ListenerChatMessage());
+                new ListenerItemInteract(), new ListenerPlayerDamage(), new ListenerChatMessage(), new ListenerCrafting(), new ListenerItemPickup());
         registerListeners(new TNTManager());
 
         Bukkit.createWorld(new WorldCreator(MINING_WORLD_NAME));
