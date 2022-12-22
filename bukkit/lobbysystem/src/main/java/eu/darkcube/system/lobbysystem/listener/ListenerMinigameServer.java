@@ -7,16 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import java.util.UUID;
-
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.lobbysystem.util.UUIDManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.lobbysystem.util.UUIDManager;
+import java.util.UUID;
 
 public class ListenerMinigameServer extends BaseListener {
 

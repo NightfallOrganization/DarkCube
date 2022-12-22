@@ -1,15 +1,14 @@
 package eu.darkcube.system.miners.items;
 
-import java.util.Arrays;
-
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.miners.player.Message;
+import eu.darkcube.system.util.Language;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.language.core.Language;
-import eu.darkcube.system.miners.Miners;
-import eu.darkcube.system.miners.player.Message;
+import java.util.Arrays;
 
 public enum Item {
 

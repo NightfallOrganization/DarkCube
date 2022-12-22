@@ -7,10 +7,7 @@
 
 package eu.darkcube.system.stats.api.gamemode;
 
-import java.util.List;
-
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.ChatUtils.ChatEntry;
 import eu.darkcube.system.stats.api.Duration;
 import eu.darkcube.system.stats.api.mysql.MySQL;
 import eu.darkcube.system.stats.api.stats.Stats;
@@ -18,6 +15,9 @@ import eu.darkcube.system.stats.api.stats.StatsElo;
 import eu.darkcube.system.stats.api.stats.StatsKillDeath;
 import eu.darkcube.system.stats.api.stats.StatsWinLoss;
 import eu.darkcube.system.stats.api.user.User;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
+
+import java.util.List;
 
 public class StatsWoolBattle extends Stats implements StatsWinLoss, StatsKillDeath, StatsElo {
 

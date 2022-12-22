@@ -7,11 +7,10 @@
 
 package de.pixel.bedwars.shop;
 
+import de.pixel.bedwars.util.Message;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import de.pixel.bedwars.util.Message;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
 
 public class Cost {
 

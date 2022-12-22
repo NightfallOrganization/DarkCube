@@ -7,24 +7,25 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceId;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.wrapper.Wrapper;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 

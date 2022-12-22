@@ -9,7 +9,6 @@ package eu.darkcube.system.miners;
 
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
-import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.miners.command.CommandTeam;
 import eu.darkcube.system.miners.command.CommandTest;
 import eu.darkcube.system.miners.command.CommandTimer;
@@ -23,6 +22,7 @@ import eu.darkcube.system.miners.player.Message;
 import eu.darkcube.system.miners.player.PlayerManager;
 import eu.darkcube.system.miners.player.TNTManager;
 import eu.darkcube.system.miners.player.TeamManager;
+import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.WorldCreator;

@@ -12,19 +12,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandTrash extends Command {
 
 	public CommandTrash() {
-		super(Main.getInstance(), "trash", new Command[0], "Öffnet einen Mülleimer.");
+		super(DarkEssentials.getInstance(), "trash", new Command[0], "Öffnet einen Mülleimer.");
 		setAliases("d_trash");
 	}
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		if (!(sender instanceof Player)) {
-			Main.getInstance().sendMessage(Main.cFail()+"Du musst ein Spieler sein um diesen Command auszuführen!", sender);
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail()+"Du musst ein Spieler sein um diesen Command auszuführen!", sender);
 			return true;
 		}
 		if (args.length == 0) {

@@ -1,12 +1,11 @@
 package eu.darkcube.system.miners.player;
 
-import java.util.function.Function;
-
+import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.util.Language;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.system.language.core.Language;
-import eu.darkcube.system.miners.Miners;
+import java.util.function.Function;
 
 // copied from woolbattle
 public enum Message {

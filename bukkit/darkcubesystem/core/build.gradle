@@ -1,0 +1,7 @@
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnlyApi 'com.viaversion:viaversion-api:4.4.2'
+    compileOnly cloudnetDriver
+    embedApi npclib
+    embedApi 'com.mojang:brigadier:1.0.17'
+}

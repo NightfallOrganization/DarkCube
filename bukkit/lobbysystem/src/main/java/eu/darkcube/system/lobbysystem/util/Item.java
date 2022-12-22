@@ -7,8 +7,9 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import static org.bukkit.Material.*;
-
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.lobbysystem.gadget.Gadget;
+import eu.darkcube.system.userapi.User;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -16,9 +17,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.userapi.User;
+
+import static org.bukkit.Material.*;
 
 public enum Item {
 

@@ -7,12 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import java.util.Set;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
+
+import java.util.Set;
 
 public class InventoryWoolBattle extends MinigameInventory {
 

@@ -21,13 +21,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandTimefreeze extends Command {
 
 	public CommandTimefreeze() {
-		super(Main.getInstance(), "timefreeze", new Command[0],
+		super(DarkEssentials.getInstance(), "timefreeze", new Command[0],
 				"Setzt die Zeit auf einen bestimmten Wert und stoppt den Tagesverlauf.",
 				new Argument("day|noon|night|Wert|disable",
 						"Die Zeit, die gesetzt werden soll (Disable: Zeit normal weiter laufen lassen)."),
@@ -55,8 +55,8 @@ public class CommandTimefreeze extends Command {
 			try {
 				timeToSet = Integer.parseInt(args[0]);
 			} catch (Exception e) {
-				Main.getInstance().sendMessage(
-						new StringBuilder(Main.cFail()).append("Du musst eine Zeit angeben!").toString(), sender);
+				DarkEssentials.getInstance().sendMessage(
+						new StringBuilder(DarkEssentials.cFail()).append("Du musst eine Zeit angeben!").toString(), sender);
 			}
 		}
 		args[0] = "%processed%";
@@ -75,26 +75,26 @@ public class CommandTimefreeze extends Command {
 			if (sender instanceof Player) {
 				worlds.add(((Player) sender).getWorld());
 			} else {
-				Main.getInstance().sendMessage(
-						Main.cFail() + "Du bist kein Spieler, deshalb musst du eine Welt angeben!", sender);
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cFail() + "Du bist kein Spieler, deshalb musst du eine Welt angeben!", sender);
 				return true;
 			}
 		}
 		if (!unresolvedNames.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
 			if (unresolvedNames.size() > 1) {
-				sb.append(Main.cFail() + "Die Welten " + ChatColor.GRAY + "\"");
+				sb.append(DarkEssentials.cFail() + "Die Welten " + ChatColor.GRAY + "\"");
 			} else {
-				sb.append(Main.cFail() + "Die Welt " + ChatColor.GRAY + "\"");
+				sb.append(DarkEssentials.cFail() + "Die Welt " + ChatColor.GRAY + "\"");
 			}
 			for (String name : unresolvedNames) {
-				sb.append(Main.cValue() + name + ChatColor.GRAY + "\", \"");
+				sb.append(DarkEssentials.cValue() + name + ChatColor.GRAY + "\", \"");
 			}
 			if (unresolvedNames.size() > 1) {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " wurden nicht gefunden!", sender);
 			} else {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " wurde nicht gefunden!", sender);
 			}
 		}
@@ -102,12 +102,12 @@ public class CommandTimefreeze extends Command {
 		for (World current : worlds) {
 			current.setTime(timeToSet);
 			current.setGameRuleValue("doDaylightCycle", "false");
-			StringBuilder sb = new StringBuilder(Main.cConfirm())
-					.append("Die Welt, in der du dich befindest, wurde auf ").append(Main.cValue()).append(timeToSet)
-					.append(Main.cConfirm()).append(" gesetzt.");
+			StringBuilder sb = new StringBuilder(DarkEssentials.cConfirm())
+					.append("Die Welt, in der du dich befindest, wurde auf ").append(DarkEssentials.cValue()).append(timeToSet)
+					.append(DarkEssentials.cConfirm()).append(" gesetzt.");
 			for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 				if (currentPlayer.getWorld().equals(current)) {
-					Main.getInstance().sendMessage(sb.toString(), currentPlayer);
+					DarkEssentials.getInstance().sendMessage(sb.toString(), currentPlayer);
 
 				}
 			}
@@ -117,14 +117,18 @@ public class CommandTimefreeze extends Command {
 		if (!(worlds.size() == 1 && worlds.contains(((Player) sender).getWorld()) && unresolvedNames.isEmpty())) {
 			if (worlds.size() > 1) {
 
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cValue()).append(count).append(Main.cConfirm())
-								.append(" Welten auf ").append(Main.cValue()).append(timeToSet).append(Main.cConfirm())
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cValue()).append(count).append(
+										DarkEssentials.cConfirm())
+								.append(" Welten auf ").append(DarkEssentials.cValue()).append(timeToSet).append(
+										DarkEssentials.cConfirm())
 								.append(" gesetzt.").toString(), sender);
 			} else {
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cValue()).append(count).append(Main.cConfirm())
-								.append(" Welt auf ").append(Main.cValue()).append(timeToSet).append(Main.cConfirm())
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cValue()).append(count).append(
+										DarkEssentials.cConfirm())
+								.append(" Welt auf ").append(DarkEssentials.cValue()).append(timeToSet).append(
+										DarkEssentials.cConfirm())
 								.append(" gesetzt.").toString(), sender);
 			}
 		}

@@ -1,25 +1,28 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    }
+}
+
 rootProject.name = 'DarkCube'
 include 'bukkit'
 include 'bukkit:autovoidworld'
 include 'bukkit:bauserver'
 include 'bukkit:bedwars'
 include 'bukkit:changepermissionmessage'
-include 'bukkit:commandapi'
-include 'bukkit:commons'
-include 'bukkit:darkcubesystem'
+includeSubProjects('bukkit:darkcubesystem', '1.8.8', '1.19.2', 'core')
+include 'bukkit:darkcubesystem:'
 include 'bukkit:darkessentials'
 include 'bukkit:holograms'
-include 'bukkit:inventoryapi'
+include 'bukkit:jumpleague'
 include 'bukkit:knockout'
-include 'bukkit:languageapi'
 include 'bukkit:lobbysystem'
 include 'bukkit:luckperms-prefixplugin'
 include 'bukkit:miners'
-include 'bukkit:packetapi'
 include 'bukkit:skyland'
 include 'bukkit:smash'
 include 'bukkit:statsapi'
-include 'bukkit:userapi'
 include 'bukkit:woolbattle'
 include 'bungee'
 include 'bungee:cmd-bauserver'
@@ -42,3 +45,10 @@ include 'pserver:pserver-api'
 include 'pserver:pserver-bukkit'
 include 'pserver:pserver-cloudnet'
 include 'pserver:pserver-plugin'
+
+def includeSubProjects(String rootProject, String... subProjects) {
+    include(rootProject);
+    for(String subProject : subProjects) {
+        include "$rootProject:$subProject"
+    }
+}

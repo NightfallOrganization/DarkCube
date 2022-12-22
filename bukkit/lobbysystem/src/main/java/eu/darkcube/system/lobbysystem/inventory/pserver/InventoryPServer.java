@@ -7,20 +7,11 @@
 
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
-
-import eu.darkcube.system.pserver.bukkit.PServerWrapper;
-import org.bukkit.Material;
-import org.bukkit.SkullType;
-import org.bukkit.inventory.ItemStack;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.IInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.listener.ListenerPServer;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
@@ -32,6 +23,14 @@ import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
+import org.bukkit.Material;
+import org.bukkit.SkullType;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.UUID;
 
 public class InventoryPServer extends LobbyAsyncPagedInventory {
 

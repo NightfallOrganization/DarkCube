@@ -17,13 +17,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 import eu.darkcube.system.darkessentials.util.GamemodeChanger;
 
 public class CommandGM extends Command {
 	public CommandGM() {
-		super(Main.getInstance(), "gamemode", new Command[0], "Setzt den Gamemode eines Spielers.",
+		super(DarkEssentials.getInstance(), "gamemode", new Command[0], "Setzt den Gamemode eines Spielers.",
 				new Argument[] {
 						new Argument("0-3|survival|creative|adventure|spectator",
 								"Der Gamemode, in den der Spieler gesetzt werden soll."),
@@ -39,7 +39,7 @@ public class CommandGM extends Command {
 		int gamemode = 0;
 		if (args.length >= 1) {
 			if (args.length == 1 && !(sender instanceof Player)) {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 			switch (args[0].toLowerCase()) {
@@ -64,7 +64,7 @@ public class CommandGM extends Command {
 				gamemode = 3;
 				break;
 			default:
-				Main.getInstance().sendMessage(Main.cFail() + "Du musst einen Gamemode angeben!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst einen Gamemode angeben!", sender);
 				return true;
 			}
 			args[0] = "%processed%";
@@ -85,7 +85,7 @@ public class CommandGM extends Command {
 					EssentialCollections.asList(new String[] { "survival", "creative", "adventure", "spectator" }),
 					args[0]);
 		} else if (args.length > 1) {
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		}
 		return new ArrayList<>();
 	}

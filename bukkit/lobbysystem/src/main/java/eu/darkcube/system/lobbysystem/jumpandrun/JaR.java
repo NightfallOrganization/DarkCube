@@ -16,8 +16,6 @@ public class JaR {
 
 	final JaRManager manager;
 	final Player player;
-	JaRModule currentModule;
-	JaRModule nextModule;
 	int index = 0;
 	final Random r = new Random();
 
@@ -27,58 +25,60 @@ public class JaR {
 	}
 
 	public Block getCurrentBlock() {
-		if (currentModule == null) {
-			expand();
-			index = 0;
-			currentModule = nextModule;
-			nextModule = null;
-			if (currentModule != null)
-				currentModule.build();
-		}
-		return currentModule.blocks[index];
+//		if (currentModule == null) {
+//			expand();
+//			index = 0;
+//			currentModule = nextModule;
+//			nextModule = null;
+//			if (currentModule != null)
+//				currentModule.build();
+//		}
+//		return currentModule.blocks[index];
+		return null;
 	}
 
 	public Block getNextBlock() {
-		index++;
-		if (currentModule == null || index == currentModule.blocks.length) {
-			expand();
-			index = 0;
-			if (currentModule != null)
-				currentModule.destroy();
-			currentModule = nextModule;
-			currentModule.build();
-			nextModule = null;
-		}
-		return currentModule.blocks[index];
+//		index++;
+//		if (currentModule == null || index == currentModule.blocks.length) {
+//			expand();
+//			index = 0;
+//			if (currentModule != null)
+//				currentModule.destroy();
+//			currentModule = nextModule;
+//			currentModule.build();
+//			nextModule = null;
+//		}
+//		return currentModule.blocks[index];
+		return null;
 	}
 
-	private void expand() {
-		if (currentModule == null) {
-			nextModule = new JaRModule();
-			nextModule.create(this);
-		} else if (nextModule == null) {
-			nextModule = new JaRModule();
-			nextModule.region = currentModule.region;
-			nextModule.blocks[0] = currentModule.blocks[5];
-		}
-		if (nextModule.blocks[0] != null) {
-			whl: while (true) {
-				Vector dir;
-				do {
-					dir = new Vector(10 - r.nextInt(21), 0, 10 - r.nextInt(21));
-				} while (dir.lengthSquared() == 0);
-				dir.normalize();
-
-				for (int i = 1; i < nextModule.blocks.length; i++) {
-					nextModule.blocks[i] = getJump(nextModule.blocks[i - 1], dir);
-					if (!nextModule.region.contains(nextModule.blocks[i])) {
-						continue whl;
-					}
-				}
-				break;
-			}
-		}
-	}
+//	private void expand() {
+//		if (currentModule == null) {
+//			nextModule = new JaRModule();
+//			nextModule.create(this);
+//		} else if (nextModule == null) {
+//			nextModule = new JaRModule();
+//			nextModule.region = currentModule.region;
+//			nextModule.blocks[0] = currentModule.blocks[5];
+//		}
+//		if (nextModule.blocks[0] != null) {
+//			whl: while (true) {
+//				Vector dir;
+//				do {
+//					dir = new Vector(10 - r.nextInt(21), 0, 10 - r.nextInt(21));
+//				} while (dir.lengthSquared() == 0);
+//				dir.normalize();
+//
+//				for (int i = 1; i < nextModule.blocks.length; i++) {
+//					nextModule.blocks[i] = getJump(nextModule.blocks[i - 1], dir);
+//					if (!nextModule.region.contains(nextModule.blocks[i])) {
+//						continue whl;
+//					}
+//				}
+//				break;
+//			}
+//		}
+//	}
 
 	private Block getJump(Block start, Vector dirIn) {
 		Vector dir = dirIn.clone();

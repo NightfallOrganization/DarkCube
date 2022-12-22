@@ -17,20 +17,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.Duration;
 import eu.darkcube.system.darkessentials.util.DurationDeserializer;
 
 public class CommandStop extends Command {
 
 	private long stopAt = Long.MAX_VALUE;
-	private static final String TITLE = Main.cValue() + " " + Main.cConfirm();
-	private static final String SUBTITLE = Main.cConfirm() + "Der Server stoppt"
-					+ Main.cValue() + " %s";
+	private static final String TITLE = DarkEssentials.cValue() + " " + DarkEssentials.cConfirm();
+	private static final String SUBTITLE = DarkEssentials.cConfirm() + "Der Server stoppt"
+					+ DarkEssentials.cValue() + " %s";
 	private BukkitRunnable runnable;
 
 	public CommandStop() {
-		super(Main.getInstance(), "stop", new Command[0],
+		super(DarkEssentials.getInstance(), "stop", new Command[0],
 						"Stoppt den Server nach einer bestimmten Zeit",
 						new Argument("Zeit",
 										"Zeit, nach der der Server gestoppt wird",
@@ -45,9 +45,9 @@ public class CommandStop extends Command {
 										&& runnable != null))) {
 			if (args.length == 0) {
 				runnable.cancel();
-				Main.getInstance().sendMessage(Main.cConfirm()
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm()
 								+ "Der Stopvorgang wurde abgebrochen", sender);
-				Main.sendTitle(TITLE, Main.cConfirm()
+				DarkEssentials.sendTitle(TITLE, DarkEssentials.cConfirm()
 								+ "Der Stopvorgang wurde abgebrochen!", 20, 100, 20);
 				return true;
 			}
@@ -57,12 +57,12 @@ public class CommandStop extends Command {
 				if (runnable != null) {
 					runnable.cancel();
 					runnable = null;
-					Main.getInstance().sendMessage(Main.cConfirm()
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm()
 									+ "Der Stopvorgang wurde abgebrochen", sender);
-					Main.sendTitle(TITLE, Main.cConfirm()
+					DarkEssentials.sendTitle(TITLE, DarkEssentials.cConfirm()
 									+ "Der Stopvorgang wurde abgebrochen!", 20, 100, 20);
 				} else {
-					Main.getInstance().sendMessage(Main.cFail()
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail()
 									+ "Bitte gib eine gültige Zeitspanne an", sender);
 				}
 				stopAt = Long.MAX_VALUE;
@@ -72,7 +72,7 @@ public class CommandStop extends Command {
 							+ duration.getDurationInSeconds().longValueExact();
 			if (runnable != null) {
 				runnable.cancel();
-				Main.getInstance().sendMessage(Main.cConfirm()
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm()
 								+ "Der vorherige Stopvorgang wurde abgebrochen!", sender);
 			}
 			runnable = new BukkitRunnable() {
@@ -88,24 +88,24 @@ public class CommandStop extends Command {
 						}
 						if (remaining == 60) {
 							System.out.println("Der Server stoppt in einer Minute.");
-							Main.sendTitle(TITLE, String.format(SUBTITLE, "in einer Minute"), 10, 100, 10);
+							DarkEssentials.sendTitle(TITLE, String.format(SUBTITLE, "in einer Minute"), 10, 100, 10);
 						} else if (remaining == 30) {
 							System.out.println("Der Server stoppt in 30 Sekunden.");
-							Main.sendTitle(TITLE, String.format(SUBTITLE, "in 30 Sekunden"), 10, 100, 10);
+							DarkEssentials.sendTitle(TITLE, String.format(SUBTITLE, "in 30 Sekunden"), 10, 100, 10);
 						} else if (remaining == 1) {
 							System.out.println("Der Server stoppt jetzt.");
-							Main.sendTitle(TITLE, String.format(SUBTITLE, "Jetzt"), 0, 100, 0);
+							DarkEssentials.sendTitle(TITLE, String.format(SUBTITLE, "Jetzt"), 0, 100, 0);
 						} else if (remaining <= 10) {
 							System.out.println("Der Server stoppt in "
 											+ remaining + " Sekunden.");
-							Main.sendTitle(TITLE, String.format(SUBTITLE, "in "
+							DarkEssentials.sendTitle(TITLE, String.format(SUBTITLE, "in "
 											+ remaining
 											+ " Sekunden"), 0, 20, 0);
 						}
 					}
 				}
 			};
-			runnable.runTaskTimer(Main.getInstance(), 0, 20);
+			runnable.runTaskTimer(DarkEssentials.getInstance(), 0, 20);
 			return true;
 		} else if ((sender instanceof Player
 						|| sender instanceof ConsoleCommandSender)

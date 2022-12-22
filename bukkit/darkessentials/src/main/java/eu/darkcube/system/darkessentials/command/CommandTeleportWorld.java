@@ -17,13 +17,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandTeleportWorld extends Command {
 
 	public CommandTeleportWorld() {
-		super(Main.getInstance(), "teleportworld", new Command[0], "Teleportiert dich in eine bestimmte Welt.",
+		super(DarkEssentials.getInstance(), "teleportworld", new Command[0], "Teleportiert dich in eine bestimmte Welt.",
 				new Argument("Welt", "Die Welt, in die du dich teleportierst."),
 				new Argument("x", "Die X-Koordinate", false), new Argument("y", "Die Y-Koordinate", false),
 				new Argument("z", "Die Z-Koordinate", false));
@@ -35,7 +35,7 @@ public class CommandTeleportWorld extends Command {
 		if (args.length == 0 || args.length > 4 || (args.length < 4 && args.length != 1))
 			return false;
 		if (!(sender instanceof Player)) {
-			Main.getInstance().sendMessage(Main.colorFail + "Du musst ein Spieler sein, um diesen Command auszuführen!",
+			DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Du musst ein Spieler sein, um diesen Command auszuführen!",
 					sender);
 		} else if (Bukkit.getWorld(args[0]) != null) {
 			Location loc = Bukkit.getWorld(args[0]).getSpawnLocation().clone();
@@ -45,15 +45,17 @@ public class CommandTeleportWorld extends Command {
 					loc.setY(Double.parseDouble(args[2]));
 					loc.setZ(Double.parseDouble(args[3]));
 				} catch (NumberFormatException ex) {
-					Main.getInstance().sendMessage(Main.colorFail + "Du musst eine Zahl angeben!", sender);
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.colorFail + "Du musst eine Zahl angeben!", sender);
 					return true;
 				}
 			}
 			((Player) sender).teleport(loc);
-			Main.getInstance().sendMessage(Main.colorConfirm + "Du wurdest in die Welt " + Main.colorValue
-					+ Bukkit.getWorld(args[0]).getName() + Main.colorConfirm + " teleportiert!", sender);
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.colorConfirm + "Du wurdest in die Welt " + DarkEssentials.colorValue
+					+ Bukkit.getWorld(args[0]).getName() + DarkEssentials.colorConfirm + " teleportiert!", sender);
 		} else {
-			Main.getInstance().sendMessage(Main.colorFail + "Die Welt " + Main.colorValue + args[0] + Main.colorFail
+			DarkEssentials.getInstance().sendMessage(
+					DarkEssentials.colorFail + "Die Welt " + DarkEssentials.colorValue + args[0] + DarkEssentials.colorFail
 					+ " wurde nicht gefunden!", sender);
 		}
 		return true;

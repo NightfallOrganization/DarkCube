@@ -7,19 +7,18 @@
 
 package eu.darkcube.system.stats.api.stats;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.ChatBaseComponent;
-import eu.darkcube.system.ChatUtils.ChatEntry;
-import eu.darkcube.system.ChatUtils.ChatEntry.Builder;
 import eu.darkcube.system.stats.api.Arrays;
 import eu.darkcube.system.stats.api.Duration;
 import eu.darkcube.system.stats.api.gamemode.GameMode;
 import eu.darkcube.system.stats.api.user.User;
+import eu.darkcube.system.util.ChatBaseComponent;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.util.ChatUtils.ChatEntry.Builder;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Stats {
 
@@ -49,11 +48,8 @@ public abstract class Stats {
 
 	public final List<ChatEntry> format() {
 		List<ChatEntry> list = new ArrayList<>();
-//		StringBuilder builder = new StringBuilder();
 		list.addAll(Arrays.asList(
 				new Builder().text("§7» §5Wool§dBattle\n §7Statistiken von §a" + this.owner.getName() + "\n").build()));
-//		builder.append("&7» &5Wool&dBattle &7Statistiken von \n&a").append(getOwner().getName()).append("&7 (")
-//				.append(getDuration().format()).append("&7)\n");
 		this.insertBreakLine(list);
 		this.insertFormats(list);
 		this.insertBreakLine(list);
@@ -62,7 +58,7 @@ public abstract class Stats {
 	}
 
 	public final ChatBaseComponent formatComponent() {
-		return ChatEntry.buildArray(this.format().toArray(new ChatEntry[0]));
+		return ChatEntry.build(this.format().toArray(new ChatEntry[0]));
 	}
 
 	protected abstract void insertFormats(List<ChatEntry> list);

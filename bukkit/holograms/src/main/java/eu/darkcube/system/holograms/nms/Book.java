@@ -16,8 +16,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import eu.darkcube.system.ReflectionUtils;
-import eu.darkcube.system.ReflectionUtils.PackageType;
+import eu.darkcube.system.util.ReflectionUtils;
+import eu.darkcube.system.util.ReflectionUtils.PackageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 

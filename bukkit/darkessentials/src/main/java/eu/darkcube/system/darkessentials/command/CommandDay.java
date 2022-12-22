@@ -21,7 +21,7 @@ import eu.darkcube.system.darkessentials.util.EssentialCollections;
 public class CommandDay extends Command {
 
 	public CommandDay() {
-		super(Main.getInstance(), "day", new Command[0], "Setzt die Zeit auf Tag",
+		super(DarkEssentials.getInstance(), "day", new Command[0], "Setzt die Zeit auf Tag",
 				new Argument("World", "Die Welt in der man Tag setzen will", false));
 		setAliases("d_day");
 	}
@@ -43,26 +43,26 @@ public class CommandDay extends Command {
 			if (sender instanceof Player) {
 				worlds.add(((Player) sender).getWorld());
 			} else {
-				Main.getInstance().sendMessage(
-						Main.cFail() + "Du bist kein Spieler, deshalb musst du einen Weltnamen angeben!", sender);
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cFail() + "Du bist kein Spieler, deshalb musst du einen Weltnamen angeben!", sender);
 				return true;
 			}
 		}
 		if (!unresolvedNames.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
 			if (unresolvedNames.size() > 1) {
-				sb.append(Main.cFail() + "Die Welten " + ChatColor.GRAY + "\"");
+				sb.append(DarkEssentials.cFail() + "Die Welten " + ChatColor.GRAY + "\"");
 			} else {
-				sb.append(Main.cFail() + "Die Welt " + ChatColor.GRAY + "\"");
+				sb.append(DarkEssentials.cFail() + "Die Welt " + ChatColor.GRAY + "\"");
 			}
 			for (String name : unresolvedNames) {
-				sb.append(Main.cValue() + name + ChatColor.GRAY + "\", \"");
+				sb.append(DarkEssentials.cValue() + name + ChatColor.GRAY + "\", \"");
 			}
 			if (unresolvedNames.size() > 1) {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " wurden nicht gefunden!", sender);
 			} else {
-				Main.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + Main.cFail()
+				DarkEssentials.getInstance().sendMessage(sb.toString().substring(0, sb.toString().length() - 3) + DarkEssentials.cFail()
 						+ " wurde nicht gefunden!", sender);
 			}
 		}
@@ -71,8 +71,8 @@ public class CommandDay extends Command {
 			current.setTime(6000);
 			for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
 				if (currentPlayer.getWorld().equals(current)) {
-					Main.getInstance().sendMessage(
-							Main.cConfirm() + "Die Welt, in der du dich befindest, wurde auf Tag gesetzt.",
+					DarkEssentials.getInstance().sendMessage(
+							DarkEssentials.cConfirm() + "Die Welt, in der du dich befindest, wurde auf Tag gesetzt.",
 							currentPlayer);
 				}
 			}
@@ -81,11 +81,12 @@ public class CommandDay extends Command {
 		Player playerSender = (Player) sender;
 		if (!(worlds.size() == 1 && worlds.contains(playerSender.getWorld()) && unresolvedNames.isEmpty())) {
 			if (worlds.size() > 1) {
-				Main.getInstance().sendMessage(
-						Main.cValue() + String.valueOf(count) + Main.cConfirm() + " Welten wurden auf Tag gesetzt.",
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cValue() + String.valueOf(count) + DarkEssentials.cConfirm() + " Welten wurden auf Tag gesetzt.",
 						sender);
 			} else {
-				Main.getInstance().sendMessage(Main.cValue() + count + Main.cConfirm() + " Welt wurde auf Tag gesetzt.",
+				DarkEssentials.getInstance().sendMessage(
+						DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Welt wurde auf Tag gesetzt.",
 						sender);
 			}
 		}

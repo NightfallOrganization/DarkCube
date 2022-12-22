@@ -18,12 +18,12 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 
 public class CommandPing extends Command {
 
 	public CommandPing() {
-		super(Main.getInstance(), "ping", new Command[0], "Zeigt den Ping eines Spielers.",
+		super(DarkEssentials.getInstance(), "ping", new Command[0], "Zeigt den Ping eines Spielers.",
 				new Argument[] { new Argument("Spieler", "Der Spieler, dessen Ping gezeit werden soll.", false) });
 		setAliases("d_ping");
 	}
@@ -43,18 +43,19 @@ public class CommandPing extends Command {
 		} else if (sender instanceof Player) {
 			players.add((Player) sender);
 		} else {
-			Main.sendMessagePlayernameRequired(sender);
+			DarkEssentials.sendMessagePlayernameRequired(sender);
 			return true;
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		for (Player current : players) {
 			try {
 				Object player = current.getClass().getMethod("getHandle").invoke(current);
 				int ping = (int) player.getClass().getField("ping").get(player);
 				StringBuilder stringBuilder = new StringBuilder();
-				stringBuilder.append(Main.cConfirm()).append(current.getName()).append("'s Ping beträgt ").append(Main.cValue()).append(ping)
+				stringBuilder.append(DarkEssentials.cConfirm()).append(current.getName()).append("'s Ping beträgt ").append(
+								DarkEssentials.cValue()).append(ping)
 						.append("ms");
-				Main.getInstance().sendMessage(stringBuilder.toString(), sender);
+				DarkEssentials.getInstance().sendMessage(stringBuilder.toString(), sender);
 			} catch (Exception e) {
 
 			}
@@ -65,7 +66,7 @@ public class CommandPing extends Command {
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if(args.length!=0) 
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		return new ArrayList<>();
 	}
 }

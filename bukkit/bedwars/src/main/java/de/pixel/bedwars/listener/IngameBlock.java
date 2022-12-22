@@ -7,24 +7,31 @@
 
 package de.pixel.bedwars.listener;
 
-import java.util.*;
-import java.util.stream.*;
-
+import de.pixel.bedwars.Main;
+import de.pixel.bedwars.shop.ShopItem;
+import de.pixel.bedwars.state.Ingame;
+import de.pixel.bedwars.team.Team;
+import de.pixel.bedwars.util.BedBreakAgent;
+import de.pixel.bedwars.util.ItemManager;
+import de.pixel.bedwars.util.Message;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import org.bukkit.*;
-import org.bukkit.block.*;
-import org.bukkit.entity.*;
-import org.bukkit.event.*;
-import org.bukkit.event.block.*;
-import org.bukkit.inventory.*;
-import org.bukkit.metadata.*;
-import org.bukkit.scheduler.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import de.pixel.bedwars.*;
-import de.pixel.bedwars.shop.*;
-import de.pixel.bedwars.state.*;
-import de.pixel.bedwars.team.*;
-import de.pixel.bedwars.util.*;
-import eu.darkcube.system.inventory.api.util.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class IngameBlock implements Listener {
 

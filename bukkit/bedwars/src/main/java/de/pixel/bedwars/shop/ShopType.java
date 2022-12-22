@@ -7,15 +7,16 @@
 
 package de.pixel.bedwars.shop;
 
+import de.pixel.bedwars.shop.site.ShopSite;
+import de.pixel.bedwars.util.Message;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import static de.pixel.bedwars.shop.site.ShopSite.*;
-
-import org.bukkit.*;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.*;
-
-import de.pixel.bedwars.shop.site.*;
-import de.pixel.bedwars.util.*;
-import eu.darkcube.system.inventory.api.util.*;
 
 public enum ShopType {
 

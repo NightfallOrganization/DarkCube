@@ -9,7 +9,7 @@ package eu.darkcube.system.stats.api.stats;
 
 import java.util.List;
 
-import eu.darkcube.system.ChatUtils.ChatEntry;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
 import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsWinLoss {

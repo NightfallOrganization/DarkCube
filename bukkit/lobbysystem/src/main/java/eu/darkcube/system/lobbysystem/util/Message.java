@@ -7,9 +7,9 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import org.bukkit.ChatColor;
-import eu.darkcube.system.language.core.Language;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.Language;
+import org.bukkit.ChatColor;
 
 public enum Message {
 

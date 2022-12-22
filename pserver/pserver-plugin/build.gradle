@@ -4,11 +4,6 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     implementation project(':pserver:pserver-api')
     implementation project(':bukkit:darkcubesystem')
-    implementation project(':bukkit:commons')
-    implementation project(':bukkit:commandapi')
-    implementation project(':bukkit:languageapi')
-    implementation project(':bukkit:inventoryapi')
     implementation project(':bukkit:woolbattle')
-    implementation project(':bukkit:userapi')
     implementation luckperms
 }

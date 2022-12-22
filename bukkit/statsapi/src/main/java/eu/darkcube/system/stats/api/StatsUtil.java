@@ -9,8 +9,8 @@ package eu.darkcube.system.stats.api;
 
 import java.util.List;
 
-import eu.darkcube.system.ChatUtils;
-import eu.darkcube.system.ChatUtils.ChatEntry;
+import eu.darkcube.system.util.ChatUtils;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
 import eu.darkcube.system.stats.api.command.CommandStatsTop;
 import eu.darkcube.system.stats.api.stats.Stats;
 

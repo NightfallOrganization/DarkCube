@@ -18,13 +18,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandFly extends Command {
 
 	public CommandFly() {
-		super(Main.getInstance(), "fly", new Command[0], "Lässt einen Spieler fliegen.",
+		super(DarkEssentials.getInstance(), "fly", new Command[0], "Lässt einen Spieler fliegen.",
 				new Argument("enable|disable|toggle",
 						"Ob fliegen aktiviert, deaktiviert oder umgeschaltet werden soll. (Default: toggle", false),
 				new Argument("Wert", "Die Geschwindigkleit, mit der der Spieler fliegen kann.", false),
@@ -85,21 +85,21 @@ public class CommandFly extends Command {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		for (Player current : players) {
 			switch (action) {
 			case "enable":
 				current.setAllowFlight(true);
-				Main.getInstance().sendMessage(Main.cConfirm() + "Du kannst nun fliegen!", current);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du kannst nun fliegen!", current);
 				countEnable++;
 				break;
 			case "disable":
 				current.setAllowFlight(false);
-				Main.getInstance().sendMessage(Main.cConfirm() + "Du kannst nun nicht mehr fliegen!", current);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du kannst nun nicht mehr fliegen!", current);
 				countDisable++;
 				break;
 			case TOGGLE:
@@ -108,12 +108,12 @@ public class CommandFly extends Command {
 				}
 				if (!current.getAllowFlight()) {
 					current.setAllowFlight(true);
-					Main.getInstance().sendMessage(Main.cConfirm() + "Du kannst nun fliegen!", current);
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du kannst nun fliegen!", current);
 					countEnable++;
 				} else {
 					current.setAllowFlight(false);
 					countDisable++;
-					Main.getInstance().sendMessage(Main.cConfirm() + "Du kannst nun nicht mehr fliegen!", current);
+					DarkEssentials.getInstance().sendMessage(DarkEssentials.cConfirm() + "Du kannst nun nicht mehr fliegen!", current);
 				}
 				break;
 			default:
@@ -122,38 +122,41 @@ public class CommandFly extends Command {
 			if (valueSet) {
 				if (value <= 10 && value >= 0) {
 					current.setFlySpeed(value / 10);
-					Main.getInstance()
-							.sendMessage(new StringBuilder().append(Main.cConfirm())
-									.append("Deine Fluggeschwindigkeit wurde auf ").append(Main.cValue())
-									.append((int) value).append(Main.cConfirm()).append(" geändert!").toString(),
+					DarkEssentials.getInstance()
+							.sendMessage(new StringBuilder().append(DarkEssentials.cConfirm())
+									.append("Deine Fluggeschwindigkeit wurde auf ").append(
+													DarkEssentials.cValue())
+									.append((int) value).append(DarkEssentials.cConfirm()).append(" geändert!").toString(),
 									sender);
 					countSpeed++;
 				}
 			}
 		}
 		if (valueSet && (value > 10 || value < 0)) {
-			Main.getInstance()
-					.sendMessage(new StringBuilder().append(Main.cFail()).append("Die angegebene Zahl muss zwischen")
-							.append(Main.cValue()).append("0 und 10").append(Main.cFail()).append(" liegen!")
+			DarkEssentials.getInstance()
+					.sendMessage(new StringBuilder().append(DarkEssentials.cFail()).append("Die angegebene Zahl muss zwischen")
+							.append(DarkEssentials.cValue()).append("0 und 10").append(
+									DarkEssentials.cFail()).append(" liegen!")
 							.toString(), sender);
 		}
 		if (!(players.size() == 1 && players.contains(sender))) {
 			if (countDisable != 0) {
-				Main.getInstance().sendMessage(new StringBuilder().append(Main.cValue()).append(countDisable)
-						.append(Main.cConfirm()).append(" Spieler können nun fliegen!").toString(), sender);
+				DarkEssentials.getInstance().sendMessage(new StringBuilder().append(DarkEssentials.cValue()).append(countDisable)
+						.append(DarkEssentials.cConfirm()).append(" Spieler können nun fliegen!").toString(), sender);
 			}
 			if (countEnable != 0) {
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cValue()).append(countDisable)
-								.append(Main.cConfirm()).append(" Spieler können nun nicht mehr fliegen!").toString(),
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cValue()).append(countDisable)
+								.append(DarkEssentials.cConfirm()).append(" Spieler können nun nicht mehr fliegen!").toString(),
 								sender);
 			}
 			if (countSpeed != 0) {
-				Main.getInstance()
-						.sendMessage(new StringBuilder().append(Main.cConfirm()).append("Geschwindigkeit von ")
-								.append(Main.cValue()).append(countSpeed).append(Main.cConfirm())
-								.append(" Spielern auf ").append(Main.cValue()).append((int) value)
-								.append(Main.cConfirm()).append(" geändert!").toString(), sender);
+				DarkEssentials.getInstance()
+						.sendMessage(new StringBuilder().append(DarkEssentials.cConfirm()).append("Geschwindigkeit von ")
+								.append(DarkEssentials.cValue()).append(countSpeed).append(
+										DarkEssentials.cConfirm())
+								.append(" Spielern auf ").append(DarkEssentials.cValue()).append((int) value)
+								.append(DarkEssentials.cConfirm()).append(" geändert!").toString(), sender);
 			}
 		}
 		return true;
@@ -166,7 +169,7 @@ public class CommandFly extends Command {
 					args[0]);
 		}
 		if (args.length != 0) {
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		}
 		return Collections.emptyList();
 	}

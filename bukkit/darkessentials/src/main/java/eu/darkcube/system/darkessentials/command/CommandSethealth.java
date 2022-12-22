@@ -18,13 +18,13 @@ import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.darkessentials.Main;
+import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
 
 public class CommandSethealth extends Command {
 
 	public CommandSethealth() {
-		super(Main.getInstance(), "sethealth", new Command[0], "Legt die maximalen Leben eines Spielers fest.",
+		super(DarkEssentials.getInstance(), "sethealth", new Command[0], "Legt die maximalen Leben eines Spielers fest.",
 				new Argument("Wert", "Anzahl der Leben, die ein Spieler haben soll (in halben Herzen)"),
 				new Argument("Spieler", "Der Spieler, dessen Leben gesetzt werden sollen.", false));
 	}
@@ -41,11 +41,11 @@ public class CommandSethealth extends Command {
 				value = Integer.parseInt(args[0]);
 				args[0] = "%processed%";
 			} catch (Exception e) {
-				Main.getInstance().sendMessage(Main.cFail() + "Du musst eine Zahl angeben!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst eine Zahl angeben!", sender);
 				return true;
 			}
 			if (value <= 0) {
-				Main.getInstance().sendMessage(Main.cFail() + "Die angegebene Zahl muss positiv sein!", sender);
+				DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Die angegebene Zahl muss positiv sein!", sender);
 				return true;
 			}
 		}
@@ -64,21 +64,23 @@ public class CommandSethealth extends Command {
 			if (sender instanceof Player) {
 				players.add((Player) sender);
 			} else {
-				Main.sendMessagePlayernameRequired(sender);
+				DarkEssentials.sendMessagePlayernameRequired(sender);
 				return true;
 			}
 		}
-		Main.sendMessagePlayerNotFound(unresolvedNames, sender);
+		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
 		int count = 0;
 		for (Player current : players) {
 			current.setMaxHealth(value);
 			count++;
 		}
 		if (!(players.size() == 1 && players.contains(sender) && unresolvedNames.isEmpty())) {
-			Main.getInstance()
-					.sendMessage(new StringBuilder(Main.cConfirm()).append("Leben von ").append(Main.cValue())
-							.append(count).append(Main.cConfirm()).append(" Spielern auf ").append(Main.cValue())
-							.append(value).append(Main.cConfirm()).append(" gesetzt!").toString(), sender);
+			DarkEssentials.getInstance()
+					.sendMessage(new StringBuilder(DarkEssentials.cConfirm()).append("Leben von ").append(
+									DarkEssentials.cValue())
+							.append(count).append(DarkEssentials.cConfirm()).append(" Spielern auf ").append(
+									DarkEssentials.cValue())
+							.append(value).append(DarkEssentials.cConfirm()).append(" gesetzt!").toString(), sender);
 		}
 		return true;
 	}
@@ -88,7 +90,7 @@ public class CommandSethealth extends Command {
 		if (args.length == 1)
 			return EssentialCollections.asList("reset");
 		if (args.length > 1)
-			return Main.getPlayersStartWith(args);
+			return DarkEssentials.getPlayersStartWith(args);
 		return new ArrayList<>();
 	}
 

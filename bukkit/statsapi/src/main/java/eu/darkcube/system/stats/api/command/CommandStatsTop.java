@@ -7,21 +7,6 @@
 
 package eu.darkcube.system.stats.api.command;
 
-import java.lang.reflect.Method;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import eu.darkcube.system.ChatBaseComponent;
-import eu.darkcube.system.ChatUtils.ChatEntry;
-import eu.darkcube.system.ChatUtils.ChatEntry.Builder;
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.stats.api.Arrays;
@@ -32,17 +17,25 @@ import eu.darkcube.system.stats.api.mysql.MySQL;
 import eu.darkcube.system.stats.api.mysql.Result;
 import eu.darkcube.system.stats.api.stats.Stats;
 import eu.darkcube.system.stats.api.user.StatsUserManager;
+import eu.darkcube.system.util.ChatBaseComponent;
+import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.util.ChatUtils.ChatEntry.Builder;
+import org.bukkit.command.CommandSender;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class CommandStatsTop extends Command {
 
 	public static final CommandStatsTop INSTANCE = new CommandStatsTop();
 
-	private static final String[] availableCategoriesWoolbattle = {
-			"elo", "kills", "deaths", "wins", "losses", "kd", "wl"
-	};
+	private static final String[] availableCategoriesWoolbattle =
+			{"elo", "kills", "deaths", "wins", "losses", "kd", "wl"};
 	private static final Map<String, String> converts = new HashMap<>();
 
 	public static final Map<GameMode, String[]> availableCategories = new HashMap<>();
+
 	static {
 		availableCategories.put(GameMode.WOOLBATTLE, availableCategoriesWoolbattle);
 
@@ -52,19 +45,19 @@ public class CommandStatsTop extends Command {
 
 	private CommandStatsTop() {
 		super(StatsPlugin.getInstance(), "statstop", new Command[0], "Ruft die Top-Stats ab",
-				new Argument("Spielmodus", "Der Spielmodus"), new Argument("Kategorie", "Die Kategorie"),
+				new Argument("Spielmodus", "Der Spielmodus"),
+				new Argument("Kategorie", "Die Kategorie"),
 				new Argument("Duration", "Die Duration", false));
 	}
 
 	@Override
 	public List<String> onTabComplete(String[] args) {
 		if (args.length == 1) {
-			return Arrays.toSortedStringList(new String[] {
-					"woolbattle"
-			}, args[0].toLowerCase());
+			return Arrays.toSortedStringList(new String[] {"woolbattle"}, args[0].toLowerCase());
 		} else if (args.length == 2) {
 			if (args[0].equalsIgnoreCase("woolbattle")) {
-				return Arrays.toSortedStringList(availableCategoriesWoolbattle, args[1].toLowerCase());
+				return Arrays.toSortedStringList(availableCategoriesWoolbattle,
+						args[1].toLowerCase());
 			}
 		} else if (args.length == 3) {
 			return Arrays.toSortedStringList(Duration.values(), args[2].toUpperCase());
@@ -103,18 +96,8 @@ public class CommandStatsTop extends Command {
 				}
 			}
 
-			ChatBaseComponent chat = getTopPlayers(MySQL.WOOLBATTLE_BASE_NAME, convertCategoryToMysql(category), 10,
-					"/stats %name% " + duration.toString(), duration);
-			if (sender instanceof Player) {
-				chat.sendPlayer((Player) sender);
-			} else {
-				try {
-					Method m = chat.getComponent().getClass().getMethod("getText");
-					sender.sendMessage(m.invoke(chat.getComponent()).toString());
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
+			getTopPlayers(MySQL.WOOLBATTLE_BASE_NAME, convertCategoryToMysql(category), 10,
+					"/stats %name% " + duration, duration).send(sender);
 			return true;
 		}
 		sender.sendMessage(getSimpleLongUsage());
@@ -150,10 +133,11 @@ public class CommandStatsTop extends Command {
 		return null;
 	}
 
-	public static ChatBaseComponent getTopPlayers(String tableBaseName, String category, int playerCount,
-			String command, Duration duration) {
-		Result result = MySQL.mysql.getResult("SELECT uuid, " + category + " FROM "
-				+ MySQL.getTableName(tableBaseName, duration) + " ORDER BY " + category + " DESC LIMIT " + playerCount);
+	public static ChatBaseComponent getTopPlayers(String tableBaseName, String category,
+			int playerCount, String command, Duration duration) {
+		Result result = MySQL.mysql.getResult(
+				"SELECT uuid, " + category + " FROM " + MySQL.getTableName(tableBaseName, duration)
+						+ " ORDER BY " + category + " DESC LIMIT " + playerCount);
 		result.goToColumn(1);
 		ResultSet res = result.raw();
 
@@ -195,13 +179,13 @@ public class CommandStatsTop extends Command {
 					value = String.format("%.2f", Double.valueOf(value));
 				} catch (Exception e) {
 				}
-//				String[] split = value.split("\\.");
-//				if (split.length >= 2) {
-//					if (split[1].length() > 2) {
-//						split[1] = split[1].substring(0, 2);
-//					}
-//					value = split[0] + "." + split[1];
-//				}
+				//				String[] split = value.split("\\.");
+				//				if (split.length >= 2) {
+				//					if (split[1].length() > 2) {
+				//						split[1] = split[1].substring(0, 2);
+				//					}
+				//					value = split[0] + "." + split[1];
+				//				}
 			}
 
 			String username = StatsUserManager.getOfflineUser(uuid).getName();
@@ -212,7 +196,7 @@ public class CommandStatsTop extends Command {
 			builder.hover("§7Klicke um die Statistiken von §6" + username + " §7anzuzeigen");
 			entries.addAll(Arrays.asList(builder.build()));
 		}
-		ChatBaseComponent component = ChatEntry.buildArray(entries.toArray(new ChatEntry[0]));
+		ChatBaseComponent component = ChatEntry.build(entries.toArray(new ChatEntry[0]));
 		return component;
 	}
 }

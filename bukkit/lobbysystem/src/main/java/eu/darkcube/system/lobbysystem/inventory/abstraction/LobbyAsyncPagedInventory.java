@@ -7,12 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
-import java.util.Collection;
-import eu.darkcube.system.inventory.api.v1.DefaultAsyncPagedInventory;
-import eu.darkcube.system.inventory.api.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.v1.DefaultAsyncPagedInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.userapi.User;
+
+import java.util.Collection;
 
 public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventory {
 

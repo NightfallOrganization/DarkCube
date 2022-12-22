@@ -12,10 +12,8 @@ import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.ChatUtils;
-import eu.darkcube.system.commons.AsyncExecutor;
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
-import eu.darkcube.system.inventory.api.v1.IInventory;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventPServerMayJoin;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
@@ -33,6 +31,8 @@ import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.UniqueIdProvider;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.AsyncExecutor;
+import eu.darkcube.system.util.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -179,11 +179,11 @@ public class ListenerPServer extends BaseListener {
 								new BukkitRunnable() {
 									@Override
 									public void run() {
-										ChatUtils.ChatEntry.buildArray(
+										ChatUtils.ChatEntry.build(
 														new ChatUtils.ChatEntry.Builder().text(
 																Message.STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER.getMessage(
 																		user.getUser())).build())
-												.sendPlayer(user.getUser().asPlayer());
+												.send(user.getUser().asPlayer());
 									}
 								}.runTask(Lobby.getInstance());
 								return;
