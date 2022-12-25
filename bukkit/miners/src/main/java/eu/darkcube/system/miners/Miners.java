@@ -29,7 +29,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 

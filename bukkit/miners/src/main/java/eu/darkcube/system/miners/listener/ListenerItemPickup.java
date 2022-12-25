@@ -1,6 +1,6 @@
 package eu.darkcube.system.miners.listener;
 
-import eu.darkcube.system.inventory.api.util.ItemBuilder;
+import eu.darkcube.system.inventoryapi.ItemBuilder;
 import eu.darkcube.system.miners.items.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -42,7 +42,19 @@ public class Miningphase {
         }
 
         miningTimer = new Timer() {
-            private int[] notifications = {240, 180, 120, 60, 30, 10, 5, 4, 3, 2, 1};
+            private final int[] notifications = {
+                    240,
+                    180,
+                    120,
+                    60,
+                    30,
+                    10,
+                    5,
+                    4,
+                    3,
+                    2,
+                    1
+            };
             private int nextNotification = 0;
 
             @Override
@@ -110,7 +122,7 @@ public class Miningphase {
     /**
      * read json with ore vein generation from the config
      */
-    private static final List<Map<String, String>> readVeinConfig() {
+    private static List<Map<String, String>> readVeinConfig() {
         Gson gson = new Gson();
         String json = Miners.getMinersConfig().CONFIG.getString("generation.veins");
         List<String> list1 = gson.fromJson(json, new TypeToken<List<String>>() {
@@ -122,7 +134,7 @@ public class Miningphase {
         return list2;
     }
 
-    private static final void generateVeinsFromMap(Map<String, String> map) {
+    private static void generateVeinsFromMap(Map<String, String> map) {
         try {
             Material material = Material.valueOf(map.get("type"));
             int count = Integer.parseInt(map.get("count"));
