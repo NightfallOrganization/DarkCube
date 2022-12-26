@@ -1,5 +1,7 @@
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.inventoryapi.ItemBuilder;
+import net.kyori.adventure.text.JoinConfiguration;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -508,23 +510,19 @@ public final class CustomArmor {
     }
 
     public static ItemStack getEsdeathBootsItem() {
-        ItemStack item = new ItemStack(Material.LEATHER_BOOTS);
-        ItemMeta meta = item.getItemMeta();
-        LeatherArmorMeta leatherarmormeta = (LeatherArmorMeta) meta;
-        leatherarmormeta.setColor(Color.fromBGR(255, 202, 66));
-        meta.addEnchant(Enchantment.MENDING, 1, true);
-        meta.addEnchant(Enchantment.DURABILITY, 100, true);
-        meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 10, true);
-        meta.setUnbreakable(true);
-        meta.addEnchant(Enchantment.FROST_WALKER, 30, true);
-
+        ItemBuilder item = ItemBuilder.item(Material.LEATHER_BOOTS);
+        item.enchant(Enchantment.FROST_WALKER, 30).
+                enchant(Enchantment.MENDING, 1).
+                enchant(Enchantment.DURABILITY, 100).
+                enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
+        //item.displayname("Esdeath Boots");
+        item.build();
+        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) item.getMeta();
         ComponentLike esdeath = Component.text().content("Esdeath").color(TextColor.color(86, 207, 255));
         ComponentLike boots = Component.text().content("Boots").color(TextColor.color(73, 177, 218));
-
-        meta.displayName(Component.join(Component.space(), esdeath, boots));
-
-        item.setItemMeta(meta);
-        return item;
+        leatherArmorMeta.displayName(Component.join(JoinConfiguration.separator(Component.space()), esdeath, boots));
+        item.unbreakable(true);
+        return item.build();
     }
 
 }
