@@ -17,6 +17,10 @@ import java.util.UUID;
 
 public interface User {
 
+	void lock();
+
+	void unlock();
+
 	/**
 	 * @return this user's minecraft {@link UUID}
 	 */
@@ -39,7 +43,7 @@ public interface User {
 
 	/**
 	 * Sets the user's language
-	 * 
+	 *
 	 * @param language
 	 */
 	void setLanguage(Language language);
@@ -51,14 +55,14 @@ public interface User {
 
 	/**
 	 * Sets the user's cubes
-	 * 
+	 *
 	 * @param cubes
 	 */
 	void setCubes(BigInteger cubes);
 
 	/**
 	 * @return the user's {@link MetaDataStorage}. This only stores data until the user is unloaded,
-	 *         then all data is forgotten. This will NOT synchronize over all servers
+	 * then all data is forgotten. This will NOT synchronize over all servers
 	 */
 	MetaDataStorage getMetaDataStorage();
 

@@ -30,35 +30,33 @@ public class BasicPersistentDataStorage implements PersistentDataStorage {
 	public <T> void set(Key key, PersistentDataType<T> type, T data) {
 		JsonDocument d = new JsonDocument();
 		type.serialize(d, key.toString(), data);
-		synchronized (this.data) {
-			this.data.append(d);
-			caches.put(key, data);
-		}
+		user.lock();
+		this.data.append(d);
+		caches.put(key, data);
+		user.unlock();
 		new PacketUserPersistentDataSet(user.getUniqueId(), d).sendAsync();
 	}
 
 	@Override
 	public <T> void setIfNotPresent(Key key, PersistentDataType<T> type, T data) {
-		synchronized (this.data) {
-			if (!this.data.contains(key.toString())) {
-				set(key, type, data);
-			}
+		user.lock();
+		if (!this.data.contains(key.toString())) {
+			set(key, type, data);
 		}
+		user.unlock();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T remove(Key key, PersistentDataType<T> type) {
-		T t;
-		boolean contains;
-		synchronized (data) {
-			contains = data.contains(key.toString());
-			t = (T) caches.remove(key);
-			if (t == null) {
-				t = type.deserialize(this.data, key.toString());
-			}
-			data.remove(key.toString());
+		user.lock();
+		boolean contains = data.contains(key.toString());
+		T t = (T) caches.remove(key);
+		if (t == null) {
+			t = type.deserialize(this.data, key.toString());
 		}
+		data.remove(key.toString());
+		user.unlock();
 		if (!contains)
 			return null;
 		new PacketUserPersistentDataRemove(user.getUniqueId(), key).sendAsync();
@@ -67,51 +65,53 @@ public class BasicPersistentDataStorage implements PersistentDataStorage {
 
 	@Override
 	public <T> T get(Key key, PersistentDataType<T> type, Supplier<T> defaultValue) {
-		synchronized (data) {
-			T t = get(key, type);
-			if (t == null) {
-				t = defaultValue.get();
-				set(key, type, t);
-			}
-			return t;
+		user.lock();
+		T t = get(key, type);
+		if (t == null) {
+			t = defaultValue.get();
+			set(key, type, t);
 		}
+		user.unlock();
+		return t;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Key key, PersistentDataType<T> type) {
-		T t = null;
-		synchronized (data) {
-			t = (T) caches.get(key);
+		user.lock();
+		try {
+			T t = (T) caches.get(key);
 			if (t != null)
 				return t;
 			if (!data.contains(key.toString()))
 				return null;
 			t = type.deserialize(data, key.toString());
-		}
-		synchronized (caches) {
 			caches.put(key, t);
+			return t;
+		} finally {
+			user.unlock();
 		}
-		return t;
 	}
 
 	@Override
 	public boolean has(Key key) {
-		synchronized (data) {
-			return data.contains(key.toString());
-		}
+		user.lock();
+		boolean con = data.contains(key.toString());
+		user.unlock();
+		return con;
 	}
 
 	public JsonDocument getData() {
-		synchronized (data) {
-			return this.data;
-		}
+		user.lock();
+		JsonDocument data = this.data;
+		user.unlock();
+		return data;
 	}
 
 	public void clear() {
-		synchronized (data) {
-			data.clear();
-			caches.clear();
-		}
+		user.lock();
+		data.clear();
+		caches.clear();
+		user.unlock();
 	}
 }

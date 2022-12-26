@@ -1,5 +1,5 @@
 ext {
-    cloudnetVersion = '3.4.0-SNAPSHOT'
+    cloudnetVersion = '3.4.5-RELEASE'
 
     cloudnetDriver = "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
     cloudnet = "de.dytanic.cloudnet:cloudnet:$cloudnetVersion"
@@ -13,8 +13,8 @@ ext {
 
 allprojects {
     repositories {
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
         maven { url = 'https://repo.papermc.io/repository/maven-public/' }
         maven {
             url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'

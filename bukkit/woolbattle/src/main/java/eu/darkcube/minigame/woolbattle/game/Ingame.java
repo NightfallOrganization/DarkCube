@@ -7,22 +7,31 @@
 
 package eu.darkcube.minigame.woolbattle.game;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import eu.darkcube.minigame.woolbattle.Config;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.event.EventDamageBlock;
+import eu.darkcube.minigame.woolbattle.event.EventDestroyBlock;
+import eu.darkcube.minigame.woolbattle.event.EventPlayerDeath;
+import eu.darkcube.minigame.woolbattle.event.EventPlayerKill;
+import eu.darkcube.minigame.woolbattle.listener.ingame.*;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.*;
+import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerDoubleJump;
+import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerEnderpearlLaunchable;
+import eu.darkcube.minigame.woolbattle.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
+import eu.darkcube.minigame.woolbattle.team.Team;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.translation.Message;
+import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.util.*;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerHeightDisplay;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.minigame.woolbattle.util.tab.Footer;
+import eu.darkcube.minigame.woolbattle.util.tab.Header;
+import eu.darkcube.minigame.woolbattle.util.tab.TabManager;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
@@ -33,53 +42,10 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scoreboard.DisplaySlot;
-import eu.darkcube.minigame.woolbattle.Config;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.event.EventDamageBlock;
-import eu.darkcube.minigame.woolbattle.event.EventDestroyBlock;
-import eu.darkcube.minigame.woolbattle.event.EventPlayerDeath;
-import eu.darkcube.minigame.woolbattle.event.EventPlayerKill;
-import eu.darkcube.minigame.woolbattle.listener.ingame.*;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerBlink;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerBooster;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerCapsule;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGhost;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGrabber;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGrandpasClock;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGrapplingHook;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerLineBuilder;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerMinigun;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerRonjasToiletSplash;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerRope;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerSafetyPlatform;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerSlimePlatform;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerSwitcher;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerWallGenerator;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerWoolBomb;
-import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerDoubleJump;
-import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerEnderpearlLaunchable;
-import eu.darkcube.minigame.woolbattle.perk.PerkName;
-import eu.darkcube.minigame.woolbattle.perk.PlayerPerks;
-import eu.darkcube.minigame.woolbattle.team.Team;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.Characters;
-import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
-import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.minigame.woolbattle.util.ItemBuilder;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
-import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
-import eu.darkcube.minigame.woolbattle.util.ScoreboardObjective;
-import eu.darkcube.minigame.woolbattle.util.StatsLink;
-import eu.darkcube.minigame.woolbattle.util.TimeUnit;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerHeightDisplay;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
-import eu.darkcube.minigame.woolbattle.util.tab.Footer;
-import eu.darkcube.minigame.woolbattle.util.tab.Header;
-import eu.darkcube.minigame.woolbattle.util.tab.TabManager;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
 
@@ -392,7 +358,7 @@ public class Ingame extends GamePhase {
 			int xtra = 0;
 			int playersize = Bukkit.getOnlinePlayers().size();
 			if (playersize < 3) {
-				xtra = new Random().nextInt(playersize / 2);
+				xtra = 0;
 			} else {
 				playersize = 3;
 				xtra = new Random().nextInt(4);
@@ -503,7 +469,7 @@ public class Ingame extends GamePhase {
 		final User killer = user.getLastHit();
 		EventPlayerDeath pe1 = new EventPlayerDeath(user);
 		Bukkit.getPluginManager().callEvent(pe1);
-		final boolean countAsDeath = killer != null ? user.getTicksAfterLastHit() <= 200 : false;
+		final boolean countAsDeath = killer != null && user.getTicksAfterLastHit() <= 200;
 		if (countAsDeath) {
 			this.killstreak.remove(user);
 			EventPlayerKill pe2 = new EventPlayerKill(user, killer);
@@ -564,6 +530,8 @@ public class Ingame extends GamePhase {
 				user.getBukkitEntity().kickPlayer("Disconnected");
 			}
 			this.checkGameEnd();
+			CloudNetLink.update();
+			return;
 		}
 		if (countAsDeath) {
 			if (user.getTeam().getLifes() > 0) {

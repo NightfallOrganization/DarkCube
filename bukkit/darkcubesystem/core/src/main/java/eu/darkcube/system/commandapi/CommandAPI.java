@@ -44,7 +44,7 @@ public class CommandAPI {
 
 	/**
 	 * @param plugin - The Plugin that executes the Command
-	 * @param owner  - MUST be a Command with the name of the Bukkit-Command
+	 * @param owner - MUST be a Command with the name of the Bukkit-Command
 	 * @return CommandAPI - The CommandAPI instance
 	 */
 	public static synchronized CommandAPI enable(JavaPlugin plugin, Command owner) {
@@ -56,8 +56,7 @@ public class CommandAPI {
 		}
 		api.getMainCommand().instance = api;
 		api.getMainCommand().loadSimpleLongUsage();
-		CommandAPI.registerCommands(plugin, owner);
-		PluginCommand cmd = plugin.getCommand(owner.getName());
+		PluginCommand cmd = CommandAPI.registerCommands(plugin, owner);
 
 		CommandHandler handler = new CommandHandler(api);
 		cmd.setAliases(Arrays.asList(owner.getAliases()));
@@ -73,8 +72,8 @@ public class CommandAPI {
 		return api;
 	}
 
-	private static synchronized void registerCommands(JavaPlugin plugin, Command owner) {
-		VersionSupport.getVersion().commandApi().registerLegacy(plugin,owner);
+	private static synchronized PluginCommand registerCommands(JavaPlugin plugin, Command owner) {
+		return VersionSupport.getVersion().commandApi().registerLegacy(plugin, owner);
 	}
 
 	private void loadPermissions(Command cmd) {

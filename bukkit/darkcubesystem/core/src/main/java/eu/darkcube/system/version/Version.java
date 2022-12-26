@@ -11,6 +11,7 @@ import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.util.ChatBaseComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
@@ -28,7 +29,7 @@ public interface Version {
 	String getSpigotUnknownCommandMessage();
 
 	interface CommandAPI {
-		void registerLegacy(Plugin plugin, Command command);
+		PluginCommand registerLegacy(Plugin plugin, Command command);
 
 		void register(CommandExecutor command);
 

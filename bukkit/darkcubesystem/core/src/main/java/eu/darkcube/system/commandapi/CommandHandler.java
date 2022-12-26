@@ -28,7 +28,6 @@ public class CommandHandler implements TabExecutor {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command cmd,
 			String label, String[] args) {
-
 		Command CMD = instance.main_command;
 		if (!CMD.hasPermission(sender))
 			return Collections.emptyList();

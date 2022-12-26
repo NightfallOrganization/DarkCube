@@ -106,16 +106,16 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
-
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(this.user.getLastDailyReward());
 		Calendar c2 = Calendar.getInstance();
-		if (c.get(Calendar.DAY_OF_YEAR) != c2.get(Calendar.DAY_OF_YEAR)) {
-			this.user.setRewardSlotsUsed(new HashSet<>());;
+		if (c.get(Calendar.DAY_OF_YEAR) != c2.get(Calendar.DAY_OF_YEAR)
+				|| c.get(Calendar.YEAR) != c2.get(Calendar.YEAR)) {
+			this.user.setRewardSlotsUsed(new HashSet<>());
 		}
 
-		ItemStack used = new ItemBuilder(Material.SULPHUR)
-				.displayname(Message.REWARD_ALREADY_USED.getMessage(this.user.getUser())).build();
+		ItemStack used = new ItemBuilder(Material.SULPHUR).displayname(
+				Message.REWARD_ALREADY_USED.getMessage(this.user.getUser())).build();
 		ItemStack unused = new ItemBuilder(Material.GLOWSTONE_DUST).displayname("§e???").build();
 		Set<Integer> usedSlots = this.user.getRewardSlotsUsed();
 		if (usedSlots.contains(1)) {

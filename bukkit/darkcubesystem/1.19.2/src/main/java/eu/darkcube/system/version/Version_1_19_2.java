@@ -21,10 +21,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.title.TitlePart;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R1.command.CraftCommandMap;
 import org.bukkit.craftbukkit.v1_19_R1.command.VanillaCommandWrapper;
@@ -63,11 +60,11 @@ public class Version_1_19_2 implements Version {
 	@Override
 	public void sendMessage(ChatBaseComponent component, CommandSender... senders) {
 		ChatUtils.ChatEntry[] entries = component.getEntries();
-		JsonArray a = new JsonArray();
+		JsonArray array = new JsonArray();
 		for (ChatUtils.ChatEntry entry : entries) {
-			a.add(entry.getJson());
+			array.add(entry.getJson());
 		}
-		Component c = GsonComponentSerializer.gson().deserialize(a.toString());
+		Component c = GsonComponentSerializer.gson().deserialize(array.toString());
 		for (CommandSender s : senders) {
 			switch (component.getDisplay()) {
 				case ACTIONBAR -> s.sendActionBar(c);
@@ -166,39 +163,75 @@ public class Version_1_19_2 implements Version {
 
 
 		@Override
-		public void registerLegacy(Plugin plugin, Command owner) {
-			Set<Command> commandSet = new HashSet<>();
-			commandSet.add(owner);
-			for (Command command : commandSet) {
-				try {
-					Constructor<PluginCommand> constructor =
-							PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-					constructor.setAccessible(true);
-					PluginCommand plugincommand =
-							constructor.newInstance(command.getName(), plugin);
-					plugincommand.setAliases(Arrays.asList(owner.getAliases()));
-					plugincommand.setUsage(command.getSimpleLongUsage());
-					plugincommand.setPermission(command.getPermission());
-					CraftServer server = (CraftServer) Bukkit.getServer();
-					CraftCommandMap commandMap = (CraftCommandMap) server.getCommandMap();
-					commandMap.register("system", plugincommand);
+		public PluginCommand registerLegacy(Plugin plugin, Command command) {
+			try {
+				Constructor<PluginCommand> constructor =
+						PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+				constructor.setAccessible(true);
+				PluginCommand plugincommand = constructor.newInstance(command.getName(), plugin);
+				plugincommand.setAliases(Arrays.asList(command.getAliases()));
+				plugincommand.setUsage(command.getSimpleLongUsage());
+				plugincommand.setPermission(command.getPermission());
+				CraftServer server = (CraftServer) Bukkit.getServer();
+				CraftCommandMap commandMap = (CraftCommandMap) server.getCommandMap();
+				register(commandMap, commandMap.getKnownCommands(), plugin, plugincommand);
+				return plugincommand;
+			} catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException |
+					InstantiationException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
-					Map<String, org.bukkit.command.Command> knownCommands =
-							commandMap.getKnownCommands();
-					if (knownCommands.get(
-							owner.getName().toLowerCase()) instanceof VanillaCommandWrapper) {
-						knownCommands.put(owner.getName().toLowerCase(), plugincommand);
-					}
-					for (String alias : owner.getAliases()) {
-						if (knownCommands.get(
-								alias.toLowerCase()) instanceof VanillaCommandWrapper) {
-							knownCommands.put(alias.toLowerCase(), plugincommand);
-						}
-					}
-				} catch (IllegalAccessException | NoSuchMethodException |
-						InvocationTargetException | InstantiationException e) {
-					throw new RuntimeException(e);
+		private void register(CommandMap commandMap, Map<String, org.bukkit.command.Command> known,
+				Plugin plugin, PluginCommand command) {
+			String name = command.getName().toLowerCase(Locale.ENGLISH);
+			String prefix = plugin.getName().toLowerCase(Locale.ENGLISH);
+			List<String> successfulNames = new ArrayList<>();
+			register(known, name, prefix, false, command, successfulNames);
+			for (String alias : command.getAliases()) {
+				register(known, alias, prefix, true, command, successfulNames);
+			}
+		}
+
+
+		private void register(Map<String, org.bukkit.command.Command> known, String name,
+				String prefix, boolean alias, org.bukkit.command.Command command,
+				List<String> successfulNames) {
+			String key = prefix + ":" + name;
+			boolean work = false;
+			if (known.containsKey(key)) {
+				org.bukkit.command.Command ex = known.get(key);
+				DarkCubeSystem.getInstance().getLogger().warning(
+						"[CommandAPI] Failed to register command: Command with that name already exists");
+				DarkCubeSystem.getInstance().getLogger()
+						.warning("[CommandAPI] Command: " + key + " - " + ex);
+				if (!alias) {
+					command.setLabel(key);
 				}
+			} else {
+				work = true;
+			}
+			if (work) {
+				known.put(key, command);
+				successfulNames.add(key);
+			}
+			work = false;
+			if (known.containsKey(name)) {
+				org.bukkit.command.Command ex = known.get(name);
+				if (ex instanceof VanillaCommandWrapper) {
+					work = true;
+				} else {
+					DarkCubeSystem.getInstance().getLogger().warning(
+							"[CommandAPI] Failed to register command: Command with that name already exists");
+					DarkCubeSystem.getInstance().getLogger()
+							.warning("[CommandAPI] Command: " + name + " - " + ex);
+				}
+			} else {
+				work = true;
+			}
+			if (work) {
+				known.put(name, command);
+				successfulNames.add(name);
 			}
 		}
 

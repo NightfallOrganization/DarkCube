@@ -7,8 +7,6 @@
 
 package eu.darkcube.system.lobbysystem.command.arguments;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -22,6 +20,9 @@ import de.dytanic.cloudnet.driver.service.ServiceTask;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
 import eu.darkcube.system.commandapi.v3.Message;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
 
@@ -54,10 +55,8 @@ public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
 
 	protected Stream<String> tasksStream() {
 		return CloudNetDriver.getInstance().getServiceTaskProvider().getPermanentServiceTasks()
-				.stream()
-				.filter(t -> t.getProcessConfiguration()
-						.getEnvironment() == ServiceEnvironmentType.MINECRAFT_SERVER)
-				.map(t -> t.getName());
+				.stream().filter(t -> t.getProcessConfiguration().getEnvironment()
+						== ServiceEnvironmentType.MINECRAFT_SERVER).map(t -> t.getName());
 
 	}
 }

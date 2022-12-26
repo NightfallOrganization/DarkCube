@@ -7,13 +7,11 @@
 
 package eu.darkcube.system.userapi.data;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BasicMetaDataStorage implements MetaDataStorage {
 
-	public final Map<Key, Object> data = new HashMap<>();
+	public final ConcurrentHashMap<Key, Object> data = new ConcurrentHashMap<>();
 
 	@Override
 	public void set(Key key, Object value) {
@@ -37,13 +35,10 @@ public class BasicMetaDataStorage implements MetaDataStorage {
 		return (T) data.remove(key);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getOr(Key key, T orElse) {
-		return has(key) ? get(key) : orElse;
+		return (T) data.getOrDefault(key, orElse);
 	}
 
-	@Override
-	public <T> T getOr(Key key, Supplier<T> orElse) {
-		return has(key) ? get(key) : orElse.get();
-	}
 }
