@@ -218,7 +218,7 @@ public final class CustomArmor {
         ComponentLike netherblock = Component.text().content("Netherblock").color(TextColor.color(120, 0, 0));
         ComponentLike helmet = Component.text().content("Helmet").color(TextColor.color(80, 0, 0));
 
-        meta.displayName(Component.join(Component.space(), netherblock, helmet));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), netherblock, helmet));
 
         item.setItemMeta(meta);
         return item;
@@ -234,7 +234,7 @@ public final class CustomArmor {
         ComponentLike netherblock = Component.text().content("Netherblock").color(TextColor.color(120, 0, 0));
         ComponentLike chestplate = Component.text().content("Chestplate").color(TextColor.color(80, 0, 0));
 
-        meta.displayName(Component.join(Component.space(), netherblock, chestplate));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), netherblock, chestplate));
 
         item.setItemMeta(meta);
         return item;
@@ -250,7 +250,7 @@ public final class CustomArmor {
         ComponentLike netherblock = Component.text().content("Netherblock").color(TextColor.color(120, 0, 0));
         ComponentLike leggings = Component.text().content("Leggings").color(TextColor.color(80, 0, 0));
 
-        metaLeggings.displayName(Component.join(Component.space(), netherblock, leggings));
+        metaLeggings.displayName(Component.join(JoinConfiguration.separator(Component.space()), netherblock, leggings));
 
         itemLeggings.setItemMeta(metaLeggings);
         return itemLeggings;
@@ -266,7 +266,7 @@ public final class CustomArmor {
         ComponentLike netherblock = Component.text().content("Netherblock").color(TextColor.color(120, 0, 0));
         ComponentLike boots = Component.text().content("Boots").color(TextColor.color(80, 0, 0));
 
-        meta.displayName(Component.join(Component.space(), netherblock, boots));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), netherblock, boots));
 
         item.setItemMeta(meta);
         return item;
@@ -282,7 +282,7 @@ public final class CustomArmor {
         ComponentLike netherblock = Component.text().content("Netherblock").color(TextColor.color(120, 0, 0));
         ComponentLike pickaxe = Component.text().content("Pickaxe").color(TextColor.color(80, 0, 0));
 
-        meta.displayName(Component.join(Component.space(), netherblock, pickaxe));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), netherblock, pickaxe));
 
         item.setItemMeta(meta);
         return item;
@@ -323,7 +323,7 @@ public final class CustomArmor {
         ComponentLike starter = Component.text().content("§7« §fStarter");
         ComponentLike sword = Component.text().content("§7Sword §7»");
 
-        meta.displayName(Component.join(Component.space(), starter, sword));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
 
         item.setItemMeta(meta);
         return item;
@@ -346,7 +346,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Mining").color(TextColor.color(117, 131, 134));
         ComponentLike helmet = Component.text().content("Helmet").color(TextColor.color(77, 91, 94));
 
-        meta.displayName(Component.join(Component.space(), mining, helmet));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, helmet));
 
         item.setItemMeta(meta);
         return item;
@@ -369,7 +369,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Mining").color(TextColor.color(117, 131, 134));
         ComponentLike chestplate = Component.text().content("Chestplate").color(TextColor.color(77, 91, 94));
 
-        meta.displayName(Component.join(Component.space(), mining, chestplate));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, chestplate));
 
         item.setItemMeta(meta);
         return item;
@@ -392,7 +392,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Mining").color(TextColor.color(117, 131, 134));
         ComponentLike chestplate = Component.text().content("Leggings").color(TextColor.color(77, 91, 94));
 
-        meta.displayName(Component.join(Component.space(), mining, chestplate));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, chestplate));
 
         item.setItemMeta(meta);
         return item;
@@ -411,7 +411,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Mining").color(TextColor.color(117, 131, 134));
         ComponentLike chestplate = Component.text().content("Boots").color(TextColor.color(77, 91, 94));
 
-        meta.displayName(Component.join(Component.space(), mining, chestplate));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, chestplate));
 
         item.setItemMeta(meta);
         return item;
@@ -434,7 +434,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Speed").color(TextColor.color(255, 202, 66));
         ComponentLike helmet = Component.text().content("Helmet").color(TextColor.color(222, 171, 40));
 
-        meta.displayName(Component.join(Component.space(), mining, helmet));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, helmet));
 
         item.setItemMeta(meta);
         return item;
@@ -457,7 +457,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Speed").color(TextColor.color(255, 202, 66));
         ComponentLike chestplate = Component.text().content("Chestplate").color(TextColor.color(222, 171, 40));
 
-        meta.displayName(Component.join(Component.space(), mining, chestplate));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, chestplate));
 
         item.setItemMeta(meta);
         return item;
@@ -480,7 +480,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Speed").color(TextColor.color(255, 202, 66));
         ComponentLike leggings = Component.text().content("Leggings").color(TextColor.color(222, 171, 40));
 
-        meta.displayName(Component.join(Component.space(), mining, leggings));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, leggings));
 
         item.setItemMeta(meta);
         return item;
@@ -503,7 +503,7 @@ public final class CustomArmor {
         ComponentLike mining = Component.text().content("Speed").color(TextColor.color(255, 202, 66));
         ComponentLike boots = Component.text().content("Boots").color(TextColor.color(222, 171, 40));
 
-        meta.displayName(Component.join(Component.space(), mining, boots));
+        meta.displayName(Component.join(JoinConfiguration.separator(Component.space()), mining, boots));
 
         item.setItemMeta(meta);
         return item;
