@@ -30,8 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ItemBuilder - API Class to create a {@link ItemStack} with just one line of
- * Code
+ * ItemBuilder - API Class to create a {@link ItemStack} with just one line of Code
  *
  * @author Acquized
  * @version 1.8
@@ -41,27 +40,17 @@ import java.util.Map;
 
 public class ItemBuilder {
 
+	private final List<String> lore = new ArrayList<>();
+	private final List<ItemFlag> flags = new ArrayList<>();
 	private String skullOwner;
 	private ItemStack item;
-
 	private ItemMeta meta;
-
 	private Material material;
-
 	private int amount = 1;
-
 	private MaterialData data;
-
 	private short damage = 0;
-
 	private Map<Enchantment, Integer> enchantments = new HashMap<>();
-
 	private String displayname;
-
-	private final List<String> lore = new ArrayList<>();
-
-	private final List<ItemFlag> flags = new ArrayList<>();
-
 	private FireworkEffect fireworkEffect = null;
 
 	private boolean andSymbol = true;
@@ -142,18 +131,7 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * Same as {@link #ItemBuilder(Material)}
-	 *
-	 * @param material The Material
-	 * @return {@link #ItemBuilder(Material)}
-	 */
-	public static ItemBuilder item(Material material) {
-		return new ItemBuilder(material);
-	}
-
-	/**
-	 * Initalizes the ItemBuilder with a {@link FileConfiguration}
-	 * ItemStack in Path
+	 * Initalizes the ItemBuilder with a {@link FileConfiguration} ItemStack in Path
 	 */
 	public ItemBuilder(FileConfiguration cfg, String path) {
 		this(cfg.getItemStack(path));
@@ -185,6 +163,48 @@ public class ItemBuilder {
 	}
 
 	/**
+	 * Same as {@link #ItemBuilder(Material)}
+	 *
+	 * @param material The Material
+	 *
+	 * @return {@link #ItemBuilder(Material)}
+	 */
+	public static ItemBuilder item(Material material) {
+		return new ItemBuilder(material);
+	}
+
+	/**
+	 * Converts the Item to a ConfigStack and writes it to path
+	 *
+	 * @param cfg     Configuration File to which it should be writed
+	 * @param path    Path to which the ConfigStack should be writed
+	 * @param builder Which ItemBuilder should be writed
+	 */
+	public static void toConfig(FileConfiguration cfg, String path, ItemBuilder builder) {
+		cfg.set(path, builder.build());
+	}
+
+	/**
+	 * Converts the ItemBuilder to a JsonItemBuilder
+	 *
+	 * @param builder Which ItemBuilder should be converted
+	 *
+	 * @return The ItemBuilder as JSON String
+	 */
+	public static String toJson(ItemBuilder builder) {
+		return new Gson().toJson(builder);
+	}
+
+	/**
+	 * Converts the JsonItemBuilder back to a ItemBuilder
+	 *
+	 * @param json Which JsonItemBuilder should be converted
+	 */
+	public static ItemBuilder fromJson(String json) {
+		return new Gson().fromJson(json, ItemBuilder.class);
+	}
+
+	/**
 	 * Sets the Amount of the ItemStack
 	 *
 	 * @param amount Amount for the ItemStack
@@ -212,6 +232,7 @@ public class ItemBuilder {
 	 * Sets the Damage of the ItemStack
 	 *
 	 * @param damage Damage for the ItemStack
+	 *
 	 * @deprecated Use {@code ItemBuilder#durability}
 	 */
 	@Deprecated
@@ -258,7 +279,7 @@ public class ItemBuilder {
 	 * Adds a {@link Enchantment} to the ItemStack
 	 *
 	 * @param enchant Enchantment for the ItemStack
-	 * @param level Level of the Enchantment
+	 * @param level   Level of the Enchantment
 	 */
 	public ItemBuilder enchant(Enchantment enchant, int level) {
 		Validate.notNull(enchant, "The Enchantment is null.");
@@ -317,6 +338,7 @@ public class ItemBuilder {
 	 * Adds one or more Lines to the Lore of the ItemStack
 	 *
 	 * @param lines One or more Strings for the ItemStack Lore
+	 *
 	 * @deprecated Use {@code ItemBuilder#lore}
 	 */
 	@Deprecated
@@ -344,7 +366,7 @@ public class ItemBuilder {
 	/**
 	 * Adds a String at a specified position in the Lore of the ItemStack
 	 *
-	 * @param line Line of the Lore for the ItemStack
+	 * @param line  Line of the Lore for the ItemStack
 	 * @param index Position in the Lore for the ItemStack
 	 */
 	public ItemBuilder lore(String line, int index) {
@@ -561,7 +583,7 @@ public class ItemBuilder {
 	/**
 	 * Converts the Item to a ConfigStack and writes it to path
 	 *
-	 * @param cfg Configuration File to which it should be writed
+	 * @param cfg  Configuration File to which it should be writed
 	 * @param path Path to which the ConfigStack should be writed
 	 */
 	public ItemBuilder toConfig(FileConfiguration cfg, String path) {
@@ -572,22 +594,11 @@ public class ItemBuilder {
 	/**
 	 * Converts back the ConfigStack to a ItemBuilder
 	 *
-	 * @param cfg Configuration File from which it should be read
+	 * @param cfg  Configuration File from which it should be read
 	 * @param path Path from which the ConfigStack should be read
 	 */
 	public ItemBuilder fromConfig(FileConfiguration cfg, String path) {
 		return new ItemBuilder(cfg, path);
-	}
-
-	/**
-	 * Converts the Item to a ConfigStack and writes it to path
-	 *
-	 * @param cfg Configuration File to which it should be writed
-	 * @param path Path to which the ConfigStack should be writed
-	 * @param builder Which ItemBuilder should be writed
-	 */
-	public static void toConfig(FileConfiguration cfg, String path, ItemBuilder builder) {
-		cfg.set(path, builder.build());
 	}
 
 	/**
@@ -600,28 +611,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * Converts the ItemBuilder to a JsonItemBuilder
-	 *
-	 * @param builder Which ItemBuilder should be converted
-	 * @return The ItemBuilder as JSON String
-	 */
-	public static String toJson(ItemBuilder builder) {
-		return new Gson().toJson(builder);
-	}
-
-	/**
-	 * Converts the JsonItemBuilder back to a ItemBuilder
-	 *
-	 * @param json Which JsonItemBuilder should be converted
-	 */
-	public static ItemBuilder fromJson(String json) {
-		return new Gson().fromJson(json, ItemBuilder.class);
-	}
-
-	/**
 	 * Applies the currently ItemBuilder to the JSONItemBuilder
 	 *
-	 * @param json Already existing JsonItemBuilder
+	 * @param json      Already existing JsonItemBuilder
 	 * @param overwrite Should the JsonItemBuilder used now
 	 */
 	public ItemBuilder applyJson(String json, boolean overwrite) {
@@ -669,7 +661,8 @@ public class ItemBuilder {
 		if (this.lore.size() > 0) {
 			this.meta.setLore(this.lore);
 		}
-		this.meta.spigot().setUnbreakable(this.unbreakable);
+		//TODO
+		//this.meta.spigot().setUnbreakable(this.unbreakable);
 		if (this.flags.size() > 0) {
 			for (ItemFlag f : this.flags) {
 				this.meta.addItemFlags(f);
@@ -702,7 +695,7 @@ public class ItemBuilder {
 		/**
 		 * Sets a NBT Tag {@code String} into the NBT Tag Compound of the Item
 		 *
-		 * @param key The Name on which the NBT Tag should be saved
+		 * @param key   The Name on which the NBT Tag should be saved
 		 * @param value The Value that should be saved
 		 */
 		public Unsafe setString(String key, String value) {
@@ -719,7 +712,7 @@ public class ItemBuilder {
 		/**
 		 * Sets a NBT Tag {@code Integer} into the NBT Tag Compound of the Item
 		 *
-		 * @param key The Name on which the NBT Tag should be savbed
+		 * @param key   The Name on which the NBT Tag should be savbed
 		 * @param value The Value that should be saved
 		 */
 		public Unsafe setInt(String key, int value) {
@@ -736,7 +729,7 @@ public class ItemBuilder {
 		/**
 		 * Sets a NBT Tag {@code Double} into the NBT Tag Compound of the Item
 		 *
-		 * @param key The Name on which the NBT Tag should be savbed
+		 * @param key   The Name on which the NBT Tag should be savbed
 		 * @param value The Value that should be saved
 		 */
 		public Unsafe setDouble(String key, double value) {
@@ -753,7 +746,7 @@ public class ItemBuilder {
 		/**
 		 * Sets a NBT Tag {@code Boolean} into the NBT Tag Compound of the Item
 		 *
-		 * @param key The Name on which the NBT Tag should be savbed
+		 * @param key   The Name on which the NBT Tag should be savbed
 		 * @param value The Value that should be saved
 		 */
 		public Unsafe setBoolean(String key, boolean value) {
