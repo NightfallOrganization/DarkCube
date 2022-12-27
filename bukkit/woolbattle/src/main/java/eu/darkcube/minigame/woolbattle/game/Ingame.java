@@ -894,7 +894,12 @@ public class Ingame extends GamePhase {
 	}
 
 	public static void setMetaData(Block block, String key, Object value) {
-		block.setMetadata(key, new FixedMetadataValue(WoolBattle.getInstance(), value));
+		if (value == null){
+			block.removeMetadata(key, WoolBattle.getInstance());
+		}else {
+			block.setMetadata(key, new FixedMetadataValue(WoolBattle.getInstance(), value));
+		}
+
 	}
 
 }
