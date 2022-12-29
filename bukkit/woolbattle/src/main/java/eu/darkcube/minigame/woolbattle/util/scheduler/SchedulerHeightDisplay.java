@@ -7,20 +7,20 @@
 
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.util.AdventureSupport;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class SchedulerHeightDisplay extends Scheduler {
 
 	public void start() {
-		this.runTaskTimer(1 * 20);
+		this.runTaskTimer(20);
 	}
 
 	public void stop() {
@@ -44,9 +44,9 @@ public class SchedulerHeightDisplay extends Scheduler {
 				Team team = user.getTeam();
 				if (team != null) {
 					if (team.getType() != TeamType.SPECTATOR) {
-						ChatEntry.buildActionbar(new ChatEntry.Builder().text(
-										"§8» " + display.getColor().toString() + diff + " §8«").build())
-								.send(p);
+						AdventureSupport.audienceProvider().player(p).sendActionBar(
+								LegacyComponentSerializer.legacySection().deserialize(
+										"§8» " + display.getColor().toString() + diff + " §8«"));
 					}
 				}
 			}

@@ -7,26 +7,26 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
+import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class MapArgument implements ArgumentType<Map> {
-	private static final DynamicCommandExceptionType INVALID_ENUM = Message.INVALID_ENUM.newDynamicCommandExceptionType();
+	private static final DynamicCommandExceptionType INVALID_ENUM =
+			Messages.INVALID_ENUM.newDynamicCommandExceptionType();
 
 	private MapArgument() {
 	}
@@ -35,8 +35,7 @@ public class MapArgument implements ArgumentType<Map> {
 		return new MapArgument();
 	}
 
-	public static Map getMap(CommandContext<CommandSource> context,
-					String name) {
+	public static Map getMap(CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, Map.class);
 	}
 
@@ -53,8 +52,8 @@ public class MapArgument implements ArgumentType<Map> {
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(
-					CommandContext<S> context, SuggestionsBuilder builder) {
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
 		List<String> suggestions = new ArrayList<>();
 		for (Map map : maps()) {
 			suggestions.add(map.getName());

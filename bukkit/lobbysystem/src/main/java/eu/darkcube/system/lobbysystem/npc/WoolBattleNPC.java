@@ -7,40 +7,26 @@
 
 package eu.darkcube.system.lobbysystem.npc;
 
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
+import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.MetadataModifier;
+import eu.darkcube.system.libs.com.github.juliarn.npc.profile.Profile;
+import eu.darkcube.system.lobbysystem.Lobby;
+
 import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
-
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
-import com.github.juliarn.npc.NPC;
-import com.github.juliarn.npc.SpawnCustomizer;
-import com.github.juliarn.npc.modifier.MetadataModifier;
-import com.github.juliarn.npc.profile.Profile;
-
-import eu.darkcube.system.lobbysystem.Lobby;
 
 public class WoolBattleNPC {
 
 	public static NPC create() {
 		Profile profile = new Profile(new UUID(new Random().nextLong(), 0), "§5Wool§dBattle",
 				Collections.singleton(new WoolBattleSkin()));
-		NPC npc = NPC.builder()
-				.profile(profile)
+		NPC npc = NPC.builder().profile(profile)
 				.location(Lobby.getInstance().getDataManager().getWoolBattleNPCLocation())
-				.imitatePlayer(false)
-				.lookAtPlayer(true)
-				.spawnCustomizer(new SpawnCustomizer() {
-
-					@Override
-					public void handleSpawn(@NotNull NPC npc, @NotNull Player player) {
-						npc.metadata().queue(MetadataModifier.EntityMetadata.SKIN_LAYERS, true).send();
-					}
-
-				})
-				.usePlayerProfiles(false)
-				.build(Lobby.getInstance().getNpcPool());
+				.imitatePlayer(false).lookAtPlayer(true).spawnCustomizer(
+						(npc1, player) -> npc1.metadata()
+								.queue(MetadataModifier.EntityMetadata.SKIN_LAYERS, true).send())
+				.usePlayerProfiles(false).build(Lobby.getInstance().getNpcPool());
 		new NPCKnockbackThread(npc).start();
 		return npc;
 	}
@@ -54,7 +40,5 @@ public class WoolBattleNPC {
 		}
 
 	}
-
-	
 
 }

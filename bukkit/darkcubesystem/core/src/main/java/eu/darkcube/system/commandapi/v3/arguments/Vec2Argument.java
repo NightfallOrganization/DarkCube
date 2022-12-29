@@ -22,9 +22,10 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public class Vec2Argument implements ArgumentType<ILocationArgument> {
-	private static final Collection<String> EXAMPLES = Arrays.asList("0 0", "~ ~", "0.1 -0.5", "~1 ~-2");
-	public static final SimpleCommandExceptionType VEC2_INCOMPLETE = Message.VEC2_INCOMPLETE
-			.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType VEC2_INCOMPLETE =
+			Messages.VEC2_INCOMPLETE.newSimpleCommandExceptionType();
+	private static final Collection<String> EXAMPLES =
+			Arrays.asList("0 0", "~ ~", "0.1 -0.5", "~1 ~-2");
 	private final boolean centerIntegers;
 
 	public Vec2Argument(boolean centerIntegersIn) {
@@ -36,7 +37,8 @@ public class Vec2Argument implements ArgumentType<ILocationArgument> {
 	}
 
 	public static Vector2f getVec2f(CommandContext<CommandSource> context, String name) {
-		Vector3d vector3d = context.getArgument(name, ILocationArgument.class).getPosition(context.getSource());
+		Vector3d vector3d =
+				context.getArgument(name, ILocationArgument.class).getPosition(context.getSource());
 		return new Vector2f((float) vector3d.x, (float) vector3d.z);
 	}
 

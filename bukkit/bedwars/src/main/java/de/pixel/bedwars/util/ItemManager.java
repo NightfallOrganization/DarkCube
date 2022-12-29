@@ -7,8 +7,11 @@
 
 package de.pixel.bedwars.util;
 
+import de.pixel.bedwars.Main;
 import de.pixel.bedwars.shop.ShopItem;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
@@ -24,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemManager {
+
+	public static final Key keyTeam = new Key(Main.getInstance(), "team");
+	public static final Key keyMap = new Key(Main.getInstance(), "map");
+	public static final Key keyItemId = new Key(Main.getInstance(), "itemId");
+	public static final Key keyLifes = new Key(Main.getInstance(), "lifes");
 
 	public static boolean contains(Inventory inv, ItemStack item, int amount) {
 		return countItems(item, inv) >= amount;
@@ -57,8 +65,8 @@ public class ItemManager {
 		return i;
 	}
 
-	public static Map<Integer, ItemStack> removeItems(Inventory invToRemoveFrom, ItemStack itemToRemove,
-			int count) {
+	public static Map<Integer, ItemStack> removeItems(Inventory invToRemoveFrom,
+			ItemStack itemToRemove, int count) {
 		Map<Integer, ItemStack> ret = new HashMap<>();
 		for (int i = 0; i < count; i++) {
 			Map<Integer, ItemStack> m = invToRemoveFrom.removeItem(itemToRemove);
@@ -84,8 +92,8 @@ public class ItemManager {
 		}
 		for (int i = 0; i < inventory.length; i++) {
 			ItemStack cItem = inventory[i];
-			if (cItem != null && cItem.getAmount() < cItem.getMaxStackSize()
-					&& cItem.isSimilar(filteredItem)) {
+			if (cItem != null && cItem.getAmount() < cItem.getMaxStackSize() && cItem.isSimilar(
+					filteredItem)) {
 				return i;
 			}
 		}
@@ -113,26 +121,26 @@ public class ItemManager {
 						CraftItemStack stack = CraftItemStack.asCraftCopy(item);
 						stack.setAmount(cinv.getInventory().getMaxStackSize());
 						toSet.put(firstFree, stack);
-//						inv.setItem(firstFree, stack);
+						//						inv.setItem(firstFree, stack);
 						item.setAmount(item.getAmount() - cinv.getInventory().getMaxStackSize());
 						continue;
 					}
 					toSet.put(firstFree, item);
-//					inv.setItem(firstFree, item);
+					//					inv.setItem(firstFree, item);
 					break;
 				}
-				ItemStack partialItem =
-						toSet.getOrDefault(firstPartial, inv.getItem(firstPartial));
+				ItemStack partialItem = toSet.getOrDefault(firstPartial, inv.getItem(firstPartial));
 				int amount = item.getAmount();
-				if (amount + (partialAmount = partialItem.getAmount()) <= (maxAmount = partialItem.getMaxStackSize())) {
+				if (amount + (partialAmount = partialItem.getAmount()) <= (maxAmount =
+						partialItem.getMaxStackSize())) {
 					partialItem.setAmount(amount + partialAmount);
 					toSet.put(firstPartial, partialItem);
-//					inv.setItem(firstPartial, partialItem);
+					//					inv.setItem(firstPartial, partialItem);
 					break;
 				}
 				partialItem.setAmount(maxAmount);
 				toSet.put(firstPartial, partialItem);
-//				inv.setItem(firstPartial, partialItem);
+				//				inv.setItem(firstPartial, partialItem);
 				item.setAmount(amount + partialAmount - maxAmount);
 			} while (true);
 			++i;
@@ -193,15 +201,17 @@ public class ItemManager {
 		return getItem(item, user, replacements, new String[0]);
 	}
 
-	public static ItemStack getItem(Item item, Player user, String[] replacements, String... loreReplacements) {
-//		ItemBuilder builder = item.getBuilder().getUnsafe().setString("itemId", getItemId(item)).builder();
+	public static ItemStack getItem(Item item, Player user, String[] replacements,
+			String... loreReplacements) {
+		//		ItemBuilder builder = item.getBuilder().getUnsafe().setString("itemId", getItemId(item)).builder();
 		ItemBuilder builder = setItemId(item.getBuilder(), getItemId(item));
 		String name = getDisplayName(item, user, replacements);
 		builder.displayname(name);
-		if (builder.getLores().size() != 0) {
-			builder.getLores().clear();
+		if (builder.lore().size() != 0) {
+			builder.setLore(new ArrayList<>());
 			String last = null;
-			for (String lore : Message.getMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(),
+			for (String lore : Message.getMessage(
+					Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(),
 					I18n.getPlayerLanguage(user), loreReplacements).split("\\%n")) {
 				if (last != null) {
 					lore = ChatColor.getLastColors(last) + lore;
@@ -222,28 +232,28 @@ public class ItemManager {
 	}
 
 	public static String getMapId(ItemStack item) {
-		return getNBTValue(new ItemBuilder(item), "map");
+		return getNBTValue(ItemBuilder.item(item), keyMap);
 	}
 
 	public static int getLifes(ItemStack item) {
-		return Integer.parseInt(getNBTValue(new ItemBuilder(item), "lifes"));
+		return Integer.parseInt(getNBTValue(ItemBuilder.item(item), keyLifes));
 	}
 
 	public static ItemBuilder setItemId(ItemBuilder b, String id) {
-		b.getUnsafe().setString("itemId", id);
+		b.persistentDataStorage().set(keyItemId, PersistentDataTypes.STRING, id);
 		return b;
 	}
 
 	public static String getItemId(ItemStack item) {
-		return getNBTValue(new ItemBuilder(item), "itemId");
+		return getNBTValue(ItemBuilder.item(item), keyItemId);
 	}
 
 	public static String getTeamId(ItemStack item) {
-		return getNBTValue(new ItemBuilder(item), "team");
+		return getNBTValue(ItemBuilder.item(item), keyTeam);
 	}
 
-	private static String getNBTValue(ItemBuilder builder, String key) {
-		return builder.getUnsafe().getString(key);
+	private static String getNBTValue(ItemBuilder builder, Key key) {
+		return builder.persistentDataStorage().get(key, PersistentDataTypes.STRING);
 	}
 
 	public static String getDisplayName(Item item, Player user, String... replacements) {

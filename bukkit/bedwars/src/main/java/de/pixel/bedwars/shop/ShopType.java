@@ -9,7 +9,7 @@ package de.pixel.bedwars.shop;
 
 import de.pixel.bedwars.shop.site.ShopSite;
 import de.pixel.bedwars.util.Message;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,18 +20,20 @@ import static de.pixel.bedwars.shop.site.ShopSite.*;
 
 public enum ShopType {
 
-	DEFAULT(Message.SHOP_INVENTORY_TITLE, BUILDING_BLOCKS, SWORDS, PICKAXES)
-
-	;
+	DEFAULT(Message.SHOP_INVENTORY_TITLE, BUILDING_BLOCKS, SWORDS, PICKAXES);
 
 	private final Message title;
 	private final ShopSite<?>[] sites;
 	private final int sitesSlots;
 
-	private ShopType(Message title, ShopSite<?>... sites) {
+	ShopType(Message title, ShopSite<?>... sites) {
 		this.title = title;
 		this.sites = sites;
 		this.sitesSlots = ShopItem.getSlots(this.sites.length);
+	}
+
+	public static ShopType getType(Player p) {
+		return ShopType.DEFAULT;
 	}
 
 	public final ShopSite<?>[] getSites() {
@@ -42,7 +44,7 @@ public enum ShopType {
 		final int slots = sitesSlots + 9 + site.getSize();
 		final Inventory inv = Bukkit.createInventory(p, slots, title.getMessage(p));
 		final ItemStack glassPane =
-				new ItemBuilder(Material.STAINED_GLASS_PANE).durability((short) 7).displayname(" ").build();
+				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(7).displayname(" ").build();
 		for (int i = 0; i < sites.length; i++) {
 			inv.setItem(i, sites[i].getRepresentation().getItem(p));
 		}
@@ -56,9 +58,5 @@ public enum ShopType {
 			}
 		}
 		return inv;
-	}
-	
-	public static ShopType getType(Player p) {
-		return ShopType.DEFAULT;
 	}
 }

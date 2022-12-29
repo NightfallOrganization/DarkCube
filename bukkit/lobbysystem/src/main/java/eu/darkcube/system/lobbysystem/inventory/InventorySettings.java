@@ -7,19 +7,22 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.SkullUtils;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class InventorySettings extends LobbyAsyncPagedInventory {
-
+	public static final Key language = new Key(Lobby.getInstance(), "language");
 	private static final InventoryType type_settings = InventoryType.of("settings");
 
 	public InventorySettings(User user) {
@@ -57,8 +60,9 @@ public class InventorySettings extends LobbyAsyncPagedInventory {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName("§e" + name);
 		item.setItemMeta(meta);
-		item = new ItemBuilder(item).getUnsafe()
-				.setString("language", this.user.getUser().getLanguage().name()).builder().build();
+		item = ItemBuilder.item(item).persistentDataStorage()
+				.iset(language, PersistentDataTypes.STRING,
+						this.user.getUser().getLanguage().name()).builder().build();
 		SkullUtils.setSkullTextureId(item, textureId);
 		this.fallbackItems.put(IInventory.slot(4, 5), item);
 		this.fallbackItems.put(IInventory.slot(4, 7),

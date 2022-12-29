@@ -7,20 +7,11 @@
 
 package eu.darkcube.system.pserver.plugin;
 
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.pserver.plugin.user.User;
-import eu.darkcube.system.pserver.plugin.user.UserManager;
-import eu.darkcube.system.util.Language;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import eu.darkcube.system.BaseMessage;
 
 import java.util.function.Function;
 
-public enum Message {
+public enum Message implements BaseMessage {
 
 	INVALID_GAMEMODE("INVALID_GAMEMODE"),
 	NOT_A_PLAYER("NOT_A_PLAYER"),
@@ -82,44 +73,17 @@ public enum Message {
 
 	private final String key;
 
-	private Message(final String key) {
+	Message(final String key) {
 		this.key = key;
+	}
+
+	@Override
+	public String getPrefixModifier() {
+		return PREFIX;
 	}
 
 	public String getKey() {
 		return key;
 	}
 
-	public TextComponent[] getMessage(CommandSource source, Object... args) {
-		return getMessage(source.getSource(), args);
-	}
-
-	public TextComponent[] getMessage(ICommandExecutor executor, Object... args) {
-		return CustomComponentBuilder.cast(
-				TextComponent.fromLegacyText(getMessageString(executor, args)));
-	}
-
-	public static String getMessageString(String messageKey, Language language, Object... args) {
-		return getMessageString(messageKey, new String[0], language, args);
-	}
-
-	public static String getMessageString(String messageKey, String[] prefixes, Language language,
-			Object... args) {
-		return language.getMessage(PREFIX + String.join("", prefixes) + messageKey, args);
-	}
-
-	public String getMessageString(User user, Object... args) {
-		return this.getMessageString(user.getCommandExecutor(), args);
-	}
-
-	public String getMessageString(ICommandExecutor executor, Object... args) {
-		Language language = Language.DEFAULT;
-		if (executor instanceof BukkitCommandExecutor) {
-			CommandSender sender = ((BukkitCommandExecutor) executor).getSender();
-			if (sender instanceof Player) {
-				language = UserManager.getInstance().getUser((Player) sender).getLanguage();
-			}
-		}
-		return getMessageString(key, language, args);
-	}
 }

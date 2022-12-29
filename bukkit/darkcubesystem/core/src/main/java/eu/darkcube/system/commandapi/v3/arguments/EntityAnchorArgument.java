@@ -17,7 +17,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 import eu.darkcube.system.commandapi.v3.Vector3d;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -28,13 +28,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-public class EntityAnchorArgument
-				implements ArgumentType<EntityAnchorArgument.Type> {
+public class EntityAnchorArgument implements ArgumentType<EntityAnchorArgument.Type> {
 	private static final Collection<String> EXMAPLES = Arrays.asList("eyes", "feet");
-	private static final DynamicCommandExceptionType ANCHOR_INVALID = Message.ANCHOR_INVALID.newDynamicCommandExceptionType();
+	private static final DynamicCommandExceptionType ANCHOR_INVALID =
+			Messages.ANCHOR_INVALID.newDynamicCommandExceptionType();
 
-	public static Type getEntityAnchor(
-					CommandContext<CommandSource> context, String name) {
+	public static Type getEntityAnchor(CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, Type.class);
 	}
 
@@ -43,8 +42,7 @@ public class EntityAnchorArgument
 	}
 
 	@Override
-	public Type parse(StringReader reader)
-					throws CommandSyntaxException {
+	public Type parse(StringReader reader) throws CommandSyntaxException {
 		int i = reader.getCursor();
 		String s = reader.readUnquotedString();
 		Type entityanchorargument$type = Type.getByName(s);
@@ -56,8 +54,8 @@ public class EntityAnchorArgument
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(
-					CommandContext<S> context, SuggestionsBuilder builder) {
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
 		return ISuggestionProvider.suggest(Type.BY_NAME.keySet(), builder);
 	}
 
@@ -69,24 +67,24 @@ public class EntityAnchorArgument
 	public static enum Type {
 		FEET("feet", (pos, entity) -> {
 			return pos;
-		}),
-		EYES("eyes", (pos, entity) -> {
+		}), EYES("eyes", (pos, entity) -> {
 			return new Vector3d(pos.x, pos.y + (entity instanceof LivingEntity
-							? ((LivingEntity) entity).getEyeHeight()
-							: 0), pos.z);
+					? ((LivingEntity) entity).getEyeHeight()
+					: 0), pos.z);
 		});
 
 		private static final Map<String, Type> BY_NAME = Maps.newHashMap();
+
 		static {
 			for (Type type : Type.values()) {
 				Type.BY_NAME.put(type.name, type);
 			}
 		}
+
 		private final String name;
 		private final BiFunction<Vector3d, Entity, Vector3d> offsetFunc;
 
-		private Type(String nameIn,
-						BiFunction<Vector3d, Entity, Vector3d> offsetFuncIn) {
+		private Type(String nameIn, BiFunction<Vector3d, Entity, Vector3d> offsetFuncIn) {
 			this.name = nameIn;
 			this.offsetFunc = offsetFuncIn;
 		}
@@ -101,8 +99,9 @@ public class EntityAnchorArgument
 
 		public Vector3d apply(CommandSource sourceIn) {
 			Entity entity = sourceIn.getEntity();
-			return entity == null ? sourceIn.getPos()
-							: this.offsetFunc.apply(sourceIn.getPos(), entity);
+			return entity == null
+					? sourceIn.getPos()
+					: this.offsetFunc.apply(sourceIn.getPos(), entity);
 		}
 	}
 }

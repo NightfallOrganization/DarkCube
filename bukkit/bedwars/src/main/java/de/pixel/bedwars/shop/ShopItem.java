@@ -8,10 +8,13 @@
 package de.pixel.bedwars.shop;
 
 import com.google.common.collect.Multimap;
+import de.pixel.bedwars.Main;
 import de.pixel.bedwars.util.I18n;
 import de.pixel.bedwars.util.ItemManager;
 import de.pixel.bedwars.util.Message;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import net.minecraft.server.v1_8_R3.AttributeModifier;
 import net.minecraft.server.v1_8_R3.GenericAttributes;
 import org.bukkit.ChatColor;
@@ -28,26 +31,33 @@ import java.util.Map.Entry;
 
 import static de.pixel.bedwars.shop.Cost.*;
 import static de.pixel.bedwars.shop.ShopEnchant.*;
+import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
 import static org.bukkit.Material.*;
-import static eu.darkcube.system.inventoryapi.ItemBuilder.*;
 
 public enum ShopItem {
 
 	S_SANDSTONE_2("S_SANDSTONE_2", item(SANDSTONE).amount(2), BRONZE.of(1)),
-	S_GLASS("S_GLASS", item(GLASS), BRONZE.of(1)), S_IRONBLOCK("S_IRONBLOCK", item(IRON_BLOCK), IRON.of(2)),
-	S_CHEST("S_CHEST", item(CHEST), IRON.of(1)), S_OBSIDIAN("S_OBSIDIAN", item(OBSIDIAN), GOLD.of(6)),
-	S_KNOCKBACK_STICK("S_KNOCKBACK_STICK", item(STICK).enchant(S_KNOCKBACK.getEnchant(), 1), BRONZE.of(12)),
-	S_SWORD_1("S_SWORD_1", item(GOLD_SWORD).unbreakable(true).enchant(S_SHARPNESS.getEnchant(), 1), IRON.of(1)),
-	S_SWORD_2("S_SWORD_2", item(GOLD_SWORD).unbreakable(true).enchant(S_SHARPNESS.getEnchant(), 2), IRON.of(3)),
-	S_SWORD_3("S_SWORD_3",
-			item(IRON_SWORD).unbreakable(true).enchant(S_SHARPNESS.getEnchant(), 2).enchant(S_KNOCKBACK.getEnchant(),
-					1),
-			GOLD.of(3)),
-	S_PICKAXE_1("S_PICKAXE_1", item(WOOD_PICKAXE).enchant(S_EFFICIENCY.getEnchant(), 1).unbreakable(true),
+	S_GLASS("S_GLASS", item(GLASS), BRONZE.of(1)),
+	S_IRONBLOCK("S_IRONBLOCK", item(IRON_BLOCK), IRON.of(2)),
+	S_CHEST("S_CHEST", item(CHEST), IRON.of(1)),
+	S_OBSIDIAN("S_OBSIDIAN", item(OBSIDIAN), GOLD.of(6)),
+	S_KNOCKBACK_STICK("S_KNOCKBACK_STICK", item(STICK).enchant(S_KNOCKBACK.getEnchant(), 1),
+			BRONZE.of(12)),
+	S_SWORD_1("S_SWORD_1", item(GOLD_SWORD).unbreakable(true).enchant(S_SHARPNESS.getEnchant(), 1),
+			IRON.of(1)),
+	S_SWORD_2("S_SWORD_2", item(GOLD_SWORD).unbreakable(true).enchant(S_SHARPNESS.getEnchant(), 2),
+			IRON.of(3)),
+	S_SWORD_3("S_SWORD_3", item(IRON_SWORD).unbreakable(true).enchant(S_SHARPNESS.getEnchant(), 2)
+			.enchant(S_KNOCKBACK.getEnchant(), 1), GOLD.of(3)),
+	S_PICKAXE_1("S_PICKAXE_1",
+			item(WOOD_PICKAXE).enchant(S_EFFICIENCY.getEnchant(), 1).unbreakable(true),
 			BRONZE.of(4)),
-	S_PICKAXE_2("S_PICKAXE_2", item(STONE_PICKAXE).enchant(S_EFFICIENCY.getEnchant(), 1).unbreakable(true), IRON.of(2)),
-	S_PICKAXE_3("S_PICKAXE_3", item(IRON_PICKAXE).enchant(S_EFFICIENCY.getEnchant(), 2).unbreakable(true), GOLD.of(1)),
-	S_GLASSBREAKER("S_GLASSBREAKER", item(DIAMOND_HOE).glow().unbreakable(true), IRON.of(3)),
+	S_PICKAXE_2("S_PICKAXE_2",
+			item(STONE_PICKAXE).enchant(S_EFFICIENCY.getEnchant(), 1).unbreakable(true),
+			IRON.of(2)),
+	S_PICKAXE_3("S_PICKAXE_3",
+			item(IRON_PICKAXE).enchant(S_EFFICIENCY.getEnchant(), 2).unbreakable(true), GOLD.of(1)),
+	S_GLASSBREAKER("S_GLASSBREAKER", item(DIAMOND_HOE).glow(true).unbreakable(true), IRON.of(3)),
 
 	S_SWORDS("S_SWORDS", item(GOLD_SWORD), NONE.of(1), false),
 	S_BUILDING_BLOCKS("S_BUILDING_BLOCKS", item(SANDSTONE), NONE.of(1), false),
@@ -55,26 +65,26 @@ public enum ShopItem {
 
 	;
 
-	private static final DecimalFormat format = new DecimalFormat("#.##",
-			DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+	private static final DecimalFormat format =
+			new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
 	private final boolean buyable;
 	private final Cost cost;
 	private final ItemBuilder builder;
 	private final String itemId;
 
-	private ShopItem(String itemId, final ItemBuilder builder, final Cost cost) {
+	ShopItem(String itemId, final ItemBuilder builder, final Cost cost) {
 		this(itemId, builder, cost, true);
 	}
 
-	private ShopItem(String itemId, final ItemBuilder builder, final Cost cost, final boolean buyable) {
+	ShopItem(String itemId, final ItemBuilder builder, final Cost cost, final boolean buyable) {
 		this.itemId = itemId;
 		this.builder = builder;
 		this.cost = cost;
 		this.buyable = buyable;
 	}
 
-	public static final ShopItem getItem(String itemid) {
+	public static ShopItem getItem(String itemid) {
 		for (ShopItem item : ShopItem.values()) {
 			if (item.itemId.equals(itemid)) {
 				return item;
@@ -83,14 +93,26 @@ public enum ShopItem {
 		return null;
 	}
 
+	public static String getItemId(ShopItem item) {
+		return ItemManager.getItemId(item);
+	}
+
+	public static final int getSlots(int slots) {
+		return slots == 0 ? 9 : (slots % 9 == 0 ? slots : (9 * (slots / 9 + 1)));
+	}
+
+	public static String getItemId(ItemStack item) {
+		return ItemManager.getItemId(item);
+	}
+
 	public final ItemStack getItem(final Player p) {
 		Locale locale = I18n.getPlayerLanguage(p);
 		String msg = I18n.translate(locale, itemId);
-		@SuppressWarnings("deprecation")
-		ItemBuilder b = new ItemBuilder(builder);
+		ItemBuilder b = builder.clone();
 		b.displayname(msg);
 		ItemManager.setItemId(b, getItemId());
-		b.getUnsafe().setBoolean("shopitem", true);
+		b.persistentDataStorage()
+				.set(new Key(Main.getInstance(), "shopitem"), PersistentDataTypes.BOOLEAN, true);
 		// TODO
 		// ItemStack item = b.s_build(p);
 		ItemStack item = b.build();
@@ -101,9 +123,10 @@ public enum ShopItem {
 				b.lore(Message.ATTACK_DAMAGE.getMessage(p, format.format(damage)));
 			}
 			b.lore("");
-			b.lore(ChatColor.AQUA + Integer.toString(cost.getCount()) + ' ' + cost.getTranslation().getMessage(p));
+			b.lore(ChatColor.AQUA + Integer.toString(cost.getCount()) + ' ' + cost.getTranslation()
+					.getMessage(p));
 		}
-//		return b.s_build(p);
+		//		return b.s_build(p);
 		return b.build();
 	}
 
@@ -111,7 +134,8 @@ public enum ShopItem {
 		double attackDamage = 0.0;
 		net.minecraft.server.v1_8_R3.ItemStack craftItemStack = CraftItemStack.asNMSCopy(itemStack);
 		Multimap<String, AttributeModifier> map = craftItemStack.B();
-		Collection<AttributeModifier> attributes = map.get(GenericAttributes.ATTACK_DAMAGE.getName());
+		Collection<AttributeModifier> attributes =
+				map.get(GenericAttributes.ATTACK_DAMAGE.getName());
 		if (!attributes.isEmpty()) {
 
 			for (AttributeModifier am : attributes) {
@@ -141,10 +165,6 @@ public enum ShopItem {
 		return getItemId(this);
 	}
 
-	public static String getItemId(ShopItem item) {
-		return ItemManager.getItemId(item);
-	}
-
 	public String getId() {
 		return itemId;
 	}
@@ -155,13 +175,5 @@ public enum ShopItem {
 
 	public final boolean isBuyable() {
 		return buyable;
-	}
-
-	public static final int getSlots(int slots) {
-		return slots == 0 ? 9 : (slots % 9 == 0 ? slots : (9 * (slots / 9 + 1)));
-	}
-
-	public static String getItemId(ItemStack item) {
-		return ItemManager.getItemId(item);
 	}
 }

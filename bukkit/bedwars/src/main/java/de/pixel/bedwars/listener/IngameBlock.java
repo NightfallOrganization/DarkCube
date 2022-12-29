@@ -14,7 +14,9 @@ import de.pixel.bedwars.team.Team;
 import de.pixel.bedwars.util.BedBreakAgent;
 import de.pixel.bedwars.util.ItemManager;
 import de.pixel.bedwars.util.Message;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -34,8 +36,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class IngameBlock implements Listener {
-
+	public static final Key key_shopitem = new Key(Main.getInstance(), "shopitem");
 	public static Map<Block, BlockState> placed = new HashMap<>();
+
+	public static void reset() {
+		for (Block b : placed.keySet()) {
+			BlockState state = placed.get(b);
+			state.update(true, false);
+		}
+		placed.clear();
+	}
 
 	@EventHandler
 	public void handle(BlockPhysicsEvent e) {
@@ -44,7 +54,8 @@ public class IngameBlock implements Listener {
 			@Override
 			public void run() {
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					p.sendBlockChange(e.getBlock().getLocation(), e.getBlock().getType(), e.getBlock().getData());
+					p.sendBlockChange(e.getBlock().getLocation(), e.getBlock().getType(),
+							e.getBlock().getData());
 				}
 			}
 		}.runTask(Main.getInstance());
@@ -65,22 +76,22 @@ public class IngameBlock implements Listener {
 		if (!placed.containsKey(e.getBlock())) {
 			placed.put(e.getBlock(), e.getBlockReplacedState());
 			ItemStack item = e.getItemInHand();
-			ItemBuilder b = new ItemBuilder(item);
-			if (b.getUnsafe().getBoolean("shopitem")) {
+			ItemBuilder b = ItemBuilder.item(item);
+			if (b.persistentDataStorage().get(key_shopitem, PersistentDataTypes.BOOLEAN)) {
 				e.getBlock().setMetadata("shopitem",
 						new FixedMetadataValue(Main.getInstance(), ItemManager.getItemId(item)));
 			}
 		}
 	}
 
-	@SuppressWarnings({
-			"deprecation", "unused"
-	})
-	private void appendBlocks(Block origin, Block block, Set<Block> blocks, Set<Block> checked, BlockFace[] faces) {
+	@SuppressWarnings({"deprecation", "unused"})
+	private void appendBlocks(Block origin, Block block, Set<Block> blocks, Set<Block> checked,
+			BlockFace[] faces) {
 		if (checked.contains(block)) {
 			return;
 		}
-		if (origin.getType() != block.getType() || origin.getData() != block.getData() || blocks.contains(block)) {
+		if (origin.getType() != block.getType() || origin.getData() != block.getData()
+				|| blocks.contains(block)) {
 			checked.add(block);
 			return;
 		}
@@ -103,7 +114,8 @@ public class IngameBlock implements Listener {
 				e.getBlock().setType(Material.AIR);
 				ItemStack item = sitem.getItem(e.getPlayer());
 				item.setAmount(1);
-				e.getBlock().getWorld().dropItem(e.getBlock().getLocation().add(0.5, 0.75, 0.5), item);
+				e.getBlock().getWorld()
+						.dropItem(e.getBlock().getLocation().add(0.5, 0.75, 0.5), item);
 				return;
 			}
 			return;
@@ -111,13 +123,13 @@ public class IngameBlock implements Listener {
 		if (e.getPlayer().getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
-//		BlockAgent agent = new BlockAgent(e.getBlock());
-//		agent.scheduledAction(Limit.NO_LIMIT, Limit.of(500), new Consumer<Block>() {
-//			@Override
-//			public void accept(Block t) {
-//				t.setType(Material.WOOL);
-//			}
-//		});
+		//		BlockAgent agent = new BlockAgent(e.getBlock());
+		//		agent.scheduledAction(Limit.NO_LIMIT, Limit.of(500), new Consumer<Block>() {
+		//			@Override
+		//			public void accept(Block t) {
+		//				t.setType(Material.WOOL);
+		//			}
+		//		});
 		Block b = e.getBlock();
 		Material m = b.getType();
 
@@ -151,11 +163,12 @@ public class IngameBlock implements Listener {
 
 				disconnecteduuids.forEach(u -> ingame.checkPlayerOffline(other, u));
 
-				List<OfflinePlayer> off =
-						disconnecteduuids.stream().map(Bukkit::getOfflinePlayer).collect(Collectors.toList());
+				List<OfflinePlayer> off = disconnecteduuids.stream().map(Bukkit::getOfflinePlayer)
+						.collect(Collectors.toList());
 
 				off.forEach(o -> {
-					Main.sendMessage(Message.PLAYER_WAS_FINAL_KILLED, "§" + other.getNamecolor() + o.getName());
+					Main.sendMessage(Message.PLAYER_WAS_FINAL_KILLED,
+							"§" + other.getNamecolor() + o.getName());
 				});
 
 				p.sendMessage(Message.YOU_HAVE_BROKEN_BED.getMessage(p, other.toString(p)));
@@ -178,13 +191,5 @@ public class IngameBlock implements Listener {
 			placed.put(b, b.getState());
 			b.setType(Material.AIR);
 		}
-	}
-
-	public static void reset() {
-		for (Block b : placed.keySet()) {
-			BlockState state = placed.get(b);
-			state.update(true, false);
-		}
-		placed.clear();
 	}
 }

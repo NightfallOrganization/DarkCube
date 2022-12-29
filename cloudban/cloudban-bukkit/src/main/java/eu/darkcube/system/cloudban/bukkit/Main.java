@@ -24,9 +24,6 @@ import eu.darkcube.system.cloudban.util.ban.Server;
 import eu.darkcube.system.cloudban.util.communication.EnumChannelMessage;
 import eu.darkcube.system.cloudban.util.communication.Messenger;
 import eu.darkcube.system.commandapi.CommandAPI;
-import eu.darkcube.system.util.ChatUtils;
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
-import eu.darkcube.system.util.ChatUtils.ChatEntry.Builder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -45,9 +42,16 @@ import java.util.UUID;
 public class Main extends JavaPlugin implements Listener {
 
 	private static Main instance;
+	private static Gson gson = new Gson();
 	private CommandReactReport reactCommand;
 
-	private static Gson gson = new Gson();
+	public static final Main getInstance() {
+		return instance;
+	}
+
+	public static final Wrapper getCloudNet() {
+		return Wrapper.getInstance();
+	}
 
 	@Override
 	public void onEnable() {
@@ -168,13 +172,5 @@ public class Main extends JavaPlugin implements Listener {
 
 	public CommandReactReport getReactCommand() {
 		return reactCommand;
-	}
-
-	public static final Main getInstance() {
-		return instance;
-	}
-
-	public static final Wrapper getCloudNet() {
-		return Wrapper.getInstance();
 	}
 }

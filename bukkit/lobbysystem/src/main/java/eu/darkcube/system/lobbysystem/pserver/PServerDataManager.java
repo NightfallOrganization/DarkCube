@@ -10,7 +10,7 @@ package eu.darkcube.system.lobbysystem.pserver;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelectionWoolBattle;
 import eu.darkcube.system.lobbysystem.util.Item;
@@ -19,7 +19,6 @@ import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
 
 public class PServerDataManager {
 
@@ -32,10 +31,8 @@ public class PServerDataManager {
 				b.lore("§7ID: " + pserverId);
 				return b;
 			}
-			ItemBuilder b =
-					new ItemBuilder(Material.SKULL_ITEM).durability(SkullType.PLAYER.ordinal());
-			b.meta(SkullCache.getCachedItem(user.getUniqueId()).getItemMeta());
-			b.unsafeStackSize(true).displayname(Item.WORLD_PSERVER.getDisplayName(user));
+			ItemBuilder b = ItemBuilder.item(SkullCache.getCachedItem(user.getUniqueId()));
+			b.displayname(Item.WORLD_PSERVER.getDisplayName(user));
 			b.lore("§7ID: " + pserverId);
 			return b;
 		}
@@ -53,7 +50,7 @@ public class PServerDataManager {
 				return new InventoryGameServerSelectionWoolBattle.Func().apply(user, stask);
 			}
 		}
-		ItemBuilder b = new ItemBuilder(Material.BARRIER);
+		ItemBuilder b = ItemBuilder.item(Material.BARRIER);
 		b.displayname("§cTask not found: " + task);
 		return b;
 	}

@@ -10,6 +10,7 @@ package eu.darkcube.system.pserver.plugin.inventory;
 import eu.darkcube.system.inventoryapi.v1.DefaultAsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.Item;
 import eu.darkcube.system.pserver.plugin.user.User;
 
@@ -25,7 +26,8 @@ public class DefaultPServerAsyncPagedInventory extends DefaultAsyncPagedInventor
 
 	private boolean apply = false;
 
-	public DefaultPServerAsyncPagedInventory(User user, InventoryType inventoryType, String title) {
+	public DefaultPServerAsyncPagedInventory(User user, InventoryType inventoryType,
+			Component title) {
 		// TODO: Instant to animations
 		super(inventoryType, title, () -> true);
 		this.user = user;
@@ -90,7 +92,7 @@ public class DefaultPServerAsyncPagedInventory extends DefaultAsyncPagedInventor
 		this.open(this.user.getOnlinePlayer());
 	}
 
-	public static interface Condition {
+	public interface Condition {
 
 		boolean applies();
 

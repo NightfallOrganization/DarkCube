@@ -7,20 +7,17 @@
 
 package eu.darkcube.system.darkessentials.util;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
-import eu.darkcube.system.util.ChatUtils;
-import org.bukkit.Bukkit;
+import eu.darkcube.system.darkessentials.DarkEssentials;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class NumbzUtils {
 	public static boolean containsStringIgnoreCase(String string, Collection<String> list) {
@@ -106,7 +103,9 @@ public class NumbzUtils {
 			return null;
 		if (key == null || value == null)
 			return itemStack;
-		return new ItemBuilder(itemStack).unsafe().setString(key, value).builder().build();
+		return ItemBuilder.item(itemStack).persistentDataStorage()
+				.iset(new Key(DarkEssentials.getInstance(), key), PersistentDataTypes.STRING, value)
+				.builder().build();
 		//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
 		//		NBTTagCompound tag = nmsItemStack.getTag();
 		//		if (tag == null)
@@ -119,52 +118,14 @@ public class NumbzUtils {
 	public static String getTagValue(ItemStack itemStack, String key) {
 		if (itemStack == null || key == null)
 			return "";
-		String tag = new ItemBuilder(itemStack).unsafe().getString(key);
+		String tag = ItemBuilder.item(itemStack).persistentDataStorage()
+				.get(new Key(DarkEssentials.getInstance(), key), PersistentDataTypes.STRING);
 		return tag == null ? "" : tag;
 		//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
 		//		NBTTagCompound tag = nmsItemStack.getTag();
 		//		if (tag == null || tag.getString(key) == null)
 		//			return "";
 		//		return tag.getString(key);
-	}
-
-	public static ItemStack addEnchGlow(ItemStack itemStack) {
-		if (itemStack == null)
-			return null;
-		ItemMeta meta = itemStack.getItemMeta();
-		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		itemStack.setItemMeta(meta);
-		if (itemStack.getType().equals(Material.BOW)) {
-			itemStack.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
-		} else {
-			itemStack.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-		}
-		return itemStack;
-	}
-
-	public static ItemStack removeAllEnchantments(ItemStack itemStack) {
-		if (itemStack == null)
-			return null;
-		for (Enchantment e : Enchantment.values()) {
-			itemStack.removeEnchantment(e);
-		}
-		return itemStack;
-	}
-
-	public static void sendActionbar(String message, Player... players) {
-		if (message == null)
-			return;
-		ChatUtils.ChatEntry.buildActionbar(new ChatUtils.ChatEntry.Builder().text(message).build())
-				.send(players);
-	}
-
-	public static void sendActionbarToAll(String message, Player... exclude) {
-		if (message == null)
-			return;
-		List<Player> excludeList = Arrays.asList(exclude);
-		ChatUtils.ChatEntry.buildActionbar(new ChatUtils.ChatEntry.Builder().text(message).build())
-				.send(Bukkit.getOnlinePlayers().stream().filter(p -> !excludeList.contains(p))
-						.collect(Collectors.toList()).toArray(new Player[0]));
 	}
 
 	public static String secondsToTime(int seconds, boolean showZeroHours, boolean showZeroMins,

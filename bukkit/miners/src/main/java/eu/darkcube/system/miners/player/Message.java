@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.miners.player;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.util.Language;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.function.Function;
@@ -22,9 +29,7 @@ public enum Message {
 	FAIL_PLACE_BLOCK,
 	FAIL_PLACE_BLOCK_AT_SPAWN,
 	FAIL_TEAM_FULL,
-	FAIL_GAME_RUNNING
-
-	;
+	FAIL_GAME_RUNNING;
 
 	public static final String KEY_PREFIX = "MINERS_";
 	public static final Function<String, String> KEY_MODFIIER = s -> KEY_PREFIX + s;
@@ -35,34 +40,34 @@ public enum Message {
 		this.key = this.name();
 	}
 
-	public String getKey() {
-		return key;
-	}
-
-	public static final String getMessage(String messageKey, Language language, Object... replacements) {
+	public static Component getMessage(String messageKey, Language language,
+			Object... replacements) {
 		if (replacements.length > 0)
 			for (int i = 0; i < replacements.length; i++)
 				if (replacements[i] instanceof Message)
 					replacements[i] = ((Message) replacements[i]).getMessage(language);
-		return ChatColor.translateAlternateColorCodes('&', language.getMessage(KEY_PREFIX + messageKey, replacements));
+		return language.getMessage(KEY_PREFIX + messageKey, replacements);
 	}
 
-	public final String getMessage(Language language, Object... replacements) {
-		return getMessage(key, language, replacements);
+	public String getKey() {
+		return key;
 	}
 
-	public final String getServerMessage(Object... replacements) {
-//		return getMessage(Main.getInstance().getServerLanguage(), replacements);
-//		return Language.ENGLISH.getMessage(key, replacements);
+	public final Component getMessage(Language language, Object... replacements) {
+		return getMessage(getKey(), language, replacements);
+	}
+
+	public final Component getServerMessage(Object... replacements) {
 		return getMessage(key, Language.ENGLISH, replacements);
 	}
 
-	public final String getMessage(MinersPlayer user, Object... replacements) {
+	public final Component getMessage(MinersPlayer user, Object... replacements) {
 		return getMessage(user.getLanguage(), replacements);
 	}
 
-	public final String getMessage(Player user, Object... replacements) {
-		return getMessage(Miners.getPlayerManager().getMinersPlayer(user).getLanguage(), replacements);
+	public final Component getMessage(Player user, Object... replacements) {
+		return getMessage(Miners.getPlayerManager().getMinersPlayer(user).getLanguage(),
+				replacements);
 	}
 
 }

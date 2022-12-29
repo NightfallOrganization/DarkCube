@@ -7,9 +7,9 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.Language;
-import org.bukkit.ChatColor;
 
 public enum Message {
 
@@ -37,31 +37,30 @@ public enum Message {
 
 	private final String key;
 
-	private Message() {
+	Message() {
 		key = name();
+	}
+
+	public static Component getMessage(String key, Language language, Object... replacements) {
+		return language.getMessage(KEY_PREFIX + key, replacements);
 	}
 
 	public String getKey() {
 		return key;
 	}
 
-	public String getMessage(Language language, Object... replacements) {
+	public Component getMessage(Language language, Object... replacements) {
 		// return language.getMessage(KEY_PREFIX + key, replacements);
 		return getMessage(key, language, replacements);
 		// return getMessage(key, language, replacements);
 	}
 
-	public String getServerMessage(Object... replacements) {
+	public Component getServerMessage(Object... replacements) {
 		return getMessage(Language.ENGLISH, replacements);
 	}
 
-	public String getMessage(User user, Object... replacements) {
+	public Component getMessage(User user, Object... replacements) {
 		return getMessage(user.getLanguage(), replacements);
-	}
-
-	public static String getMessage(String key, Language language, Object... replacements) {
-		return ChatColor.translateAlternateColorCodes('&',
-				language.getMessage(KEY_PREFIX + key, replacements));
 	}
 
 	// public static final String getMessage(String key, Language language,

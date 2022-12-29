@@ -8,8 +8,8 @@
 package eu.darkcube.minigame.woolbattle.translation;
 
 import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.util.Language;
-import org.bukkit.ChatColor;
 
 import java.util.function.Function;
 
@@ -63,13 +63,10 @@ public enum Message {
 	COOLDOWN,
 	CLICK_TO_SELECT,
 	KILLSTREAK,
-	WOOL_DIRECTION_SETTINGS_TITLE
-
-	;
+	WOOL_DIRECTION_SETTINGS_TITLE;
 
 	public static final String KEY_PREFIX = "WOOLBATTLE_";
-	public static final Function<String, String> KEY_MODFIIER = s -> KEY_PREFIX
-					+ s;
+	public static final Function<String, String> KEY_MODFIIER = s -> KEY_PREFIX + s;
 	public static final String ITEM_PREFIX = "ITEM_";
 	public static final String LORE_PREFIX = "LORE_";
 	public static final String TEAM_PREFIX = "TEAM_";
@@ -80,34 +77,33 @@ public enum Message {
 		this.key = this.name();
 	}
 
-	public String getKey() {
-		return key;
+	public static String getMessage(String messageKey, Language language, Object... replacements) {
+		return LegacyComponentSerializer.legacySection()
+				.serialize(language.getMessage(KEY_PREFIX + messageKey, replacements));
+		//		try {
+		//			String msg = language.getBundle().getString(messageKey);
+		//			for (int i = 0; msg.contains("{}")
+		//							&& i < replacements.length; i++) {
+		//				msg = msg.replaceFirst("\\{\\}", replacements[i]);
+		//			}
+		//			return ChatColor.translateAlternateColorCodes('&', msg);
+		//		} catch (Exception ex) {
+		//			StringBuilder builder = new StringBuilder();
+		//			builder.append(messageKey);
+		//			if (replacements.length > 0) {
+		//				builder.append('[');
+		//				for (int i = 0; i + 1 < replacements.length; i++) {
+		//					builder.append(replacements[i]).append(',');
+		//				}
+		//				builder.append(replacements[replacements.length
+		//								- 1]).append(']');
+		//			}
+		//			return builder.toString();
+		//		}
 	}
 
-	public static final String getMessage(String messageKey, Language language,
-					Object... replacements) {
-		return ChatColor.translateAlternateColorCodes('&', language.getMessage(KEY_PREFIX
-						+ messageKey, replacements));
-//		try {
-//			String msg = language.getBundle().getString(messageKey);
-//			for (int i = 0; msg.contains("{}")
-//							&& i < replacements.length; i++) {
-//				msg = msg.replaceFirst("\\{\\}", replacements[i]);
-//			}
-//			return ChatColor.translateAlternateColorCodes('&', msg);
-//		} catch (Exception ex) {
-//			StringBuilder builder = new StringBuilder();
-//			builder.append(messageKey);
-//			if (replacements.length > 0) {
-//				builder.append('[');
-//				for (int i = 0; i + 1 < replacements.length; i++) {
-//					builder.append(replacements[i]).append(',');
-//				}
-//				builder.append(replacements[replacements.length
-//								- 1]).append(']');
-//			}
-//			return builder.toString();
-//		}
+	public String getKey() {
+		return key;
 	}
 
 	public final String getMessage(Language language, Object... replacements) {
@@ -115,8 +111,8 @@ public enum Message {
 	}
 
 	public final String getServerMessage(Object... replacements) {
-//		return getMessage(Main.getInstance().getServerLanguage(), replacements);
-//		return Language.ENGLISH.getMessage(key, replacements);
+		//		return getMessage(Main.getInstance().getServerLanguage(), replacements);
+		//		return Language.ENGLISH.getMessage(key, replacements);
 		return getMessage(key, Language.ENGLISH, replacements);
 	}
 

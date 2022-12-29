@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.userapi.data;
+package eu.darkcube.system.util.data;
 
 import java.util.function.Supplier;
 
@@ -16,46 +16,52 @@ public interface PersistentDataStorage {
 
 	/**
 	 * Saves some data
-	 * 
-	 * @param <T>
-	 * @param key
-	 * @param type
-	 * @param data
+	 *
+	 * @param key  the key
+	 * @param type the type
+	 * @param data the data
 	 */
 	<T> void set(Key key, PersistentDataType<T> type, T data);
 
 	/**
 	 * Removes some data
-	 * 
-	 * @param <T>
-	 * @param key
-	 * @param type
+	 *
+	 * @param key  the key
+	 * @param type the type
+	 *
 	 * @return the removed data
 	 */
 	<T> T remove(Key key, PersistentDataType<T> type);
 
 	/**
-	 * @param <T>
-	 * @param key
-	 * @param type
+	 * @param key  the key
+	 * @param type the type
+	 *
 	 * @return saved data, null if not present
 	 */
 	<T> T get(Key key, PersistentDataType<T> type);
 
 	/**
-	 * @param <T>
-	 * @param key
-	 * @param type
-	 * @param defaultValue
+	 * @param key          the key
+	 * @param type         the type
+	 * @param defaultValue the default value
+	 *
 	 * @return the saved data, defaultValue if not present
 	 */
 	<T> T get(Key key, PersistentDataType<T> type, Supplier<T> defaultValue);
 
+	/**
+	 * @param key  the key
+	 * @param type the type
+	 * @param data the data
+	 * @param <T>  the data type
+	 */
 	<T> void setIfNotPresent(Key key, PersistentDataType<T> type, T data);
 
 	/**
-	 * @param key
-	 * @return whether or not data is present for the given key
+	 * @param key the key
+	 *
+	 * @return whether data is present for the given key
 	 */
 	boolean has(Key key);
 

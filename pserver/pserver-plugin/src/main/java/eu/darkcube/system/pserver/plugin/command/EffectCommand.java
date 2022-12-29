@@ -7,27 +7,22 @@
 
 package eu.darkcube.system.pserver.plugin.command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.tree.CommandNode;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.arguments.BooleanArgument;
 import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
 import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.ArgumentBuilder;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 import eu.darkcube.system.pserver.plugin.effect.PotionEffect;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+
+import java.util.*;
 
 public class EffectCommand extends PServerExecutor {
 
@@ -42,12 +37,10 @@ public class EffectCommand extends PServerExecutor {
 										.redirect(give, context -> {
 											return context.getSource().with("targets",
 													EntityArgument.getEntities(context, "targets"));
-										}))
-								.build();
+										})).build();
 						give.addChild(giveTargets);
 						CommandNode<CommandSource> giveEffect = Commands.literal("effect")
-								.then(Commands
-										.argument("effect",
+								.then(Commands.argument("effect",
 												EnumArgument.enumArgument(PotionEffect.values(),
 														effect -> new String[] {effect.getKey()}))
 										.executes(context -> {
@@ -57,48 +50,45 @@ public class EffectCommand extends PServerExecutor {
 											boolean particles = source.get("particles", true);
 											boolean ambient = source.get("ambient", false);
 											boolean force = source.get("force", false);
-											Collection<? extends Entity> targets = source.get(
-													"targets",
-													Collections.singleton(source.asPlayer()));
-											PotionEffect type = EnumArgument.getEnumArgument(
-													context, "effect", PotionEffect.class);
+											Collection<? extends Entity> targets =
+													source.get("targets", Collections.singleton(
+															source.asPlayer()));
+											PotionEffect type =
+													EnumArgument.getEnumArgument(context, "effect",
+															PotionEffect.class);
 											return EffectCommand.giveEffect(context, targets, type,
 													level, duration, ambient, particles, force);
-										}))
-								.build();
+										})).build();
 						give.addChild(giveEffect);
 
 						CommandNode<CommandSource> giveLevel = Commands.literal("level")
-								.then(Commands
-										.argument("level", IntegerArgumentType.integer(1, 256))
+								.then(Commands.argument("level",
+												IntegerArgumentType.integer(1, 256))
 										.redirect(give, context -> {
 											return context.getSource().with("level",
 													IntegerArgumentType.getInteger(context,
 															"level"));
-										}))
-								.build();
+										})).build();
 						give.addChild(giveLevel);
 
 						CommandNode<CommandSource> giveDuration = Commands.literal("duration")
-								.then(Commands
-										.argument("duration", IntegerArgumentType.integer(1, 99999))
+								.then(Commands.argument("duration",
+												IntegerArgumentType.integer(1, 99999))
 										.redirect(give, context -> {
 											return context.getSource().with("duration",
 													IntegerArgumentType.getInteger(context,
 															"duration"));
-										}))
-								.build();
+										})).build();
 						give.addChild(giveDuration);
 
 						CommandNode<CommandSource> giveParticles = Commands.literal("particles")
-								.then(Commands
-										.argument("particles", BooleanArgument.booleanArgument())
+								.then(Commands.argument("particles",
+												BooleanArgument.booleanArgument())
 										.redirect(give, context -> {
 											return context.getSource().with("particles",
 													BooleanArgument.getBoolean(context,
 															"particles"));
-										}))
-								.build();
+										})).build();
 						give.addChild(giveParticles);
 						// ArgumentBuilder<CommandSource, ?> b_giveTargetsEffect =
 						// Commands.argument("effect",
@@ -174,28 +164,27 @@ public class EffectCommand extends PServerExecutor {
 		Collection<LivingEntity> added = new HashSet<>();
 		for (Entity target : targets) {
 			if (!(target instanceof LivingEntity)) {
-				source.sendErrorMessage(
-						Message.INVALID_ENTITY.getMessage(source, target.getName()));
+				source.sendMessage(Message.INVALID_ENTITY, target.getName());
 				continue;
 			}
 			LivingEntity living = (LivingEntity) target;
-			if (living.addPotionEffect(new org.bukkit.potion.PotionEffect(effect.getType(),
-					duration * 20, level - 1, ambient, particles), force)) {
+			if (living.addPotionEffect(
+					new org.bukkit.potion.PotionEffect(effect.getType(), duration * 20, level - 1,
+							ambient, particles), force)) {
 				added.add(living);
 			} else {
 				failed.add(living);
 			}
 		}
 		if (added.size() == 1) {
-			source.sendFeedback(Message.ADDED_EFFECT_SINGLE.getMessage(source, effect.getKey(),
-					added.stream().findAny().get().getName(), level, duration), true);
+			source.sendMessage(Message.ADDED_EFFECT_SINGLE, effect.getKey(),
+					added.stream().findAny().get().getName(), level, duration);
 		} else if (failed.size() == 0 || added.size() != 0) {
-			source.sendFeedback(Message.ADDED_EFFECT_MULTIPLE.getMessage(source, effect.getKey(),
-					added.size(), level, duration), true);
+			source.sendMessage(Message.ADDED_EFFECT_MULTIPLE, effect.getKey(), added.size(), level,
+					duration);
 		}
 		for (LivingEntity living : failed) {
-			source.sendErrorMessage(Message.COULD_NOT_ADD_EFFECT.getMessage(source, effect.getKey(),
-					living.getName()));
+			source.sendMessage(Message.COULD_NOT_ADD_EFFECT, effect.getKey(), living.getName());
 		}
 		return 0;
 	}
@@ -206,8 +195,7 @@ public class EffectCommand extends PServerExecutor {
 		Map<LivingEntity, Collection<PotionEffect>> removed = new HashMap<>();
 		for (Entity target : targets) {
 			if (!(target instanceof LivingEntity)) {
-				source.sendErrorMessage(
-						Message.INVALID_ENTITY.getMessage(source, target.getName()));
+				source.sendMessage(Message.INVALID_ENTITY, target.getName());
 				continue;
 			}
 			LivingEntity living = (LivingEntity) target;
@@ -226,24 +214,21 @@ public class EffectCommand extends PServerExecutor {
 			totalRemovedEffects.addAll(effects);
 			if (single) {
 				if (effects.size() == 1) {
-					source.sendFeedback(
-							Message.CLEARED_EFFECT_SINGLE.getMessage(source,
-									effects.stream().findAny().get().getKey(), living.getName()),
-							true);
+					source.sendMessage(Message.CLEARED_EFFECT_SINGLE,
+							effects.stream().findAny().get().getKey(), living.getName());
 				} else {
-					source.sendFeedback(Message.CLEARED_MULTIPLE_EFFECTS_SINGLE.getMessage(source,
-							effects.size(), living.getName()), true);
+					source.sendMessage(Message.CLEARED_MULTIPLE_EFFECTS_SINGLE, effects.size(),
+							living.getName());
 				}
 			}
 		}
 		if (!single) {
 			if (totalRemovedEffects.size() == 1) {
-				source.sendFeedback(Message.CLEARED_EFFECT_MULTIPLE.getMessage(source,
-						totalRemovedEffects.stream().findAny().get().getKey(), removed.size()),
-						true);
+				source.sendMessage(Message.CLEARED_EFFECT_MULTIPLE,
+						totalRemovedEffects.stream().findAny().get().getKey(), removed.size());
 			} else {
-				source.sendFeedback(Message.CLEARED_MULTIPLE_EFFECTS_MULTIPLE.getMessage(source,
-						totalRemovedEffects.size(), removed.size()), true);
+				source.sendMessage(Message.CLEARED_MULTIPLE_EFFECTS_MULTIPLE,
+						totalRemovedEffects.size(), removed.size());
 			}
 		}
 		return 0;

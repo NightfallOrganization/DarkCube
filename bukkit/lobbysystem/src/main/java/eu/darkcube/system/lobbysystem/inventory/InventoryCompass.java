@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
@@ -30,14 +30,14 @@ public class InventoryCompass extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void insertFallbackItems() {
-		ItemStack m = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(2).displayname("§6")
-				.build();
-		ItemStack p = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(10).displayname("§6")
-				.build();
-		ItemStack l = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(7).displayname("§6")
-				.build();
-		ItemStack d = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(15).displayname("§6")
-				.build();
+		ItemStack m =
+				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(2).displayname("§6").build();
+		ItemStack p =
+				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(10).displayname("§6").build();
+		ItemStack l =
+				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(7).displayname("§6").build();
+		ItemStack d =
+				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(15).displayname("§6").build();
 		this.fallbackItems.put(IInventory.slot(1, 1), p);
 		this.fallbackItems.put(IInventory.slot(1, 2), m);
 		this.fallbackItems.put(IInventory.slot(1, 3), p);

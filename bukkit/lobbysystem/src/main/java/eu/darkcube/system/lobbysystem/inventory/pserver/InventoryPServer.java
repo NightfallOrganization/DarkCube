@@ -9,9 +9,10 @@ package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.listener.ListenerPServer;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
@@ -23,6 +24,8 @@ import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +39,8 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 
 	public static final String ITEMID = "lobbysystem.pserver.publiclist";
 
-	public static final String META_KEY_PSERVER = "lobbysystem.pserver.id";
+	public static final Key META_KEY_PSERVER =
+			new Key(Lobby.getInstance(), "lobbysystem.pserver.id");
 
 	private static final InventoryType type_pserver = InventoryType.of("pserver");
 
@@ -48,19 +52,6 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 		// super(Item.PSERVER_MAIN_ITEM.getDisplayName(user), InventoryPServer.type_pserver);
 		this.listener = new Listener();
 		this.listener.register();
-	}
-
-	@Override
-	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 3),
-				Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
-		this.fallbackItems.put(IInventory.slot(1, 4),
-				Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.getUser()));
-		this.fallbackItems.put(IInventory.slot(1, 5),
-				Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
-		this.fallbackItems.put(IInventory.slot(1, 6),
-				Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user.getUser()));
-		super.insertFallbackItems();
 	}
 
 	@Override
@@ -78,29 +69,31 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 			UUID owner = ps.getOwners().stream().findAny().orElse(null);
 
 			ItemBuilder b = null;
-			boolean skull = false;
 
 			if (ps.isGamemode()) {
 				b = PServerDataManager.getDisplayItemGamemode(this.user.getUser(),
 						ps.getTaskName());
 			}
 			if (b == null) {
-				b = new ItemBuilder(
-						owner == null ? Material.BARRIER : Material.SKULL_ITEM).durability(
-						(short) SkullType.PLAYER.ordinal());
-				skull = b.getMaterial() == Material.SKULL_ITEM;
+				if (owner == null) {
+					b = ItemBuilder.item(Material.BARRIER);
+				} else {
+					b = ItemBuilder.item(Material.SKULL_ITEM).damage(SkullType.PLAYER.ordinal());
+					ItemStack item = b.build();
+					item.setItemMeta(SkullCache.getCachedItem(owner).getItemMeta());
+					b = ItemBuilder.item(item);
+				}
 			}
-			if (skull) {
-				b.meta(SkullCache.getCachedItem(owner).getItemMeta());
-			}
-			b.unsafeStackSize(true).amount(online);
+			b.amount(online);
 			b.displayname(
 					Message.PSERVER_ITEM_TITLE.getMessage(this.user.getUser(), ps.getServerName()));
 			b.lore(publicServer
 					? Message.CLICK_TO_JOIN.getMessage(this.user.getUser())
 					: Message.PSERVER_NOT_PUBLIC.getMessage(this.user.getUser()));
 			Item.setItemId(b, InventoryPServer.ITEMID);
-			b.getUnsafe().setString(InventoryPServer.META_KEY_PSERVER, ps.getId().toString());
+			b.persistentDataStorage()
+					.set(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING,
+							ps.getId().toString());
 			sitems.put(ontime, b.build());
 		}
 
@@ -109,6 +102,19 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 			items.put(slot, sitems.get(ontime));
 			slot++;
 		}
+	}
+
+	@Override
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 3),
+				Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
+		this.fallbackItems.put(IInventory.slot(1, 4),
+				Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.getUser()));
+		this.fallbackItems.put(IInventory.slot(1, 5),
+				Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
+		this.fallbackItems.put(IInventory.slot(1, 6),
+				Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user.getUser()));
+		super.insertFallbackItems();
 	}
 
 	@Override

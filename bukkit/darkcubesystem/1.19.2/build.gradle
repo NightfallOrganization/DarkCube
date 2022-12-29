@@ -6,11 +6,13 @@ plugins {
 
 dependencies {
     paperweightDevelopmentBundle('io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT')
-    implementation project(':bukkit:darkcubesystem:core')
+    implementation project(path: ':bukkit:darkcubesystem:core', configuration: 'shadow')
+    compileOnly cloudnetDriver
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    withSourcesJar()
 }
 
 tasks {

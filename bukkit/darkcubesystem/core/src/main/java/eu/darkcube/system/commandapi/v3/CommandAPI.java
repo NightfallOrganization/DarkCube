@@ -12,11 +12,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CommandAPI {
 
-	private final JavaPlugin plugin;
-
-	private Commands commands;
-
 	private static CommandAPI instance;
+	private final JavaPlugin plugin;
+	private Commands commands;
 
 	private CommandAPI(JavaPlugin plugin) {
 		if (CommandAPI.instance != null) {
@@ -48,7 +46,6 @@ public class CommandAPI {
 		commands.unregisterPrefixlessByPrefix(prefix);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void pluginRegisterCommand(final CommandExecutor command) {
 		VersionSupport.getVersion().commandApi().register(command);
 	}
@@ -64,6 +61,5 @@ public class CommandAPI {
 	public JavaPlugin getPlugin() {
 		return this.plugin;
 	}
-
 
 }

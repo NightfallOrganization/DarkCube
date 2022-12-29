@@ -10,9 +10,10 @@ package eu.darkcube.system.lobbysystem.inventory.pserver;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
@@ -43,9 +44,9 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 		this.complete();
 	}
 
-	private static String getDisplayName(User user, UniqueId pserverId) {
+	private static Component getDisplayName(User user, UniqueId pserverId) {
 		ItemBuilder item = PServerDataManager.getDisplayItem(user, pserverId);
-		return item == null ? null : item.getDisplayname();
+		return item == null ? null : item.displayname();
 	}
 
 	@Override
@@ -73,15 +74,15 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void destroy() {
-		CloudNetDriver.getInstance().getEventManager().unregisterListener(this);
-	}
-
-	@Override
 	protected void insertFallbackItems() {
 		this.fallbackItems.put(IInventory.slot(1, 5),
 				PServerDataManager.getDisplayItem(this.user.getUser(), pserverId).build());
 		super.insertFallbackItems();
+	}
+
+	@Override
+	protected void destroy() {
+		CloudNetDriver.getInstance().getEventManager().unregisterListener(this);
 	}
 
 	@EventListener

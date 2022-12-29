@@ -8,6 +8,7 @@
 package eu.darkcube.system.stats.api.gamemode;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.stats.api.Duration;
 import eu.darkcube.system.stats.api.mysql.MySQL;
 import eu.darkcube.system.stats.api.stats.Stats;
@@ -15,9 +16,6 @@ import eu.darkcube.system.stats.api.stats.StatsElo;
 import eu.darkcube.system.stats.api.stats.StatsKillDeath;
 import eu.darkcube.system.stats.api.stats.StatsWinLoss;
 import eu.darkcube.system.stats.api.user.User;
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
-
-import java.util.List;
 
 public class StatsWoolBattle extends Stats implements StatsWinLoss, StatsKillDeath, StatsElo {
 
@@ -42,9 +40,10 @@ public class StatsWoolBattle extends Stats implements StatsWinLoss, StatsKillDea
 	private double elo;
 	private long placementElo;
 
-	public StatsWoolBattle(User owner, Duration duration, GameMode gamemode, long kills, long deaths,
-			long placementKills, long placementDeaths, long placementKillDeathRatio, long wins, long losses,
-			long placementWins, long placementLosses, long placementWinLossRatio, double elo2, long placementElo) {
+	public StatsWoolBattle(User owner, Duration duration, GameMode gamemode, long kills,
+			long deaths, long placementKills, long placementDeaths, long placementKillDeathRatio,
+			long wins, long losses, long placementWins, long placementLosses,
+			long placementWinLossRatio, double elo2, long placementElo) {
 		super(owner, duration, gamemode);
 		this.kills = kills;
 		this.deaths = deaths;
@@ -70,20 +69,37 @@ public class StatsWoolBattle extends Stats implements StatsWinLoss, StatsKillDea
 
 	@Override
 	public String toString() {
-		return "StatsWoolBattle [kills=" + kills + ", placementKills=" + placementKills + ", deaths=" + deaths
-				+ ", placementDeaths=" + placementDeaths + ", killDeathRatio=" + killDeathRatio
-				+ ", placementKillDeathRatio=" + placementKillDeathRatio + ", wins=" + wins + ", placementWins="
-				+ placementWins + ", losses=" + losses + ", placementLosses=" + placementLosses + ", winLossRatio="
-				+ winLossRatio + ", placementWinLossRatio=" + placementWinLossRatio + ", elo=" + elo + ", placementElo="
-				+ placementElo + "]";
+		return "StatsWoolBattle [kills=" + kills + ", placementKills=" + placementKills
+				+ ", deaths=" + deaths + ", placementDeaths=" + placementDeaths
+				+ ", killDeathRatio=" + killDeathRatio + ", placementKillDeathRatio="
+				+ placementKillDeathRatio + ", wins=" + wins + ", placementWins=" + placementWins
+				+ ", losses=" + losses + ", placementLosses=" + placementLosses + ", winLossRatio="
+				+ winLossRatio + ", placementWinLossRatio=" + placementWinLossRatio + ", elo=" + elo
+				+ ", placementElo=" + placementElo + "]";
 	}
 
 	@Override
-	protected void insertFormats(List<ChatEntry> builder) {
-		insertElo(this, builder, elo, placementElo);
-		insertKillDeath(this, builder, kills, deaths, killDeathRatio, placementKills, placementDeaths,
-				placementKillDeathRatio);
-		insertWinLoss(this, builder, wins, losses, winLossRatio, placementWins, placementLosses, placementWinLossRatio);
+	protected Component create() {
+		return insertElo(this, elo, placementElo).append(
+						insertKillDeath(this, kills, deaths, killDeathRatio, placementKills,
+								placementDeaths, placementKillDeathRatio))
+				.append(insertWinLoss(this, wins, losses, winLossRatio, placementWins,
+						placementLosses, placementWinLossRatio));
+	}
+
+	@Override
+	public JsonDocument serializeData() {
+		return new JsonDocument().append("kills", kills).append("deaths", deaths)
+				.append("wins", wins).append("losses", losses).append("elo", elo);
+	}
+
+	@Override
+	public void loadData(JsonDocument document) {
+		kills = document.getLong("kills");
+		deaths = document.getLong("deaths");
+		wins = document.getLong("wins");
+		losses = document.getLong("losses");
+		elo = document.getLong("elo");
 	}
 
 	public long getPlacementKills() {
@@ -140,20 +156,5 @@ public class StatsWoolBattle extends Stats implements StatsWinLoss, StatsKillDea
 
 	public long getKills() {
 		return kills;
-	}
-
-	@Override
-	public JsonDocument serializeData() {
-		return new JsonDocument().append("kills", kills).append("deaths", deaths).append("wins", wins)
-				.append("losses", losses).append("elo", elo);
-	}
-
-	@Override
-	public void loadData(JsonDocument document) {
-		kills = document.getLong("kills");
-		deaths = document.getLong("deaths");
-		wins = document.getLong("wins");
-		losses = document.getLong("losses");
-		elo = document.getLong("elo");
 	}
 }

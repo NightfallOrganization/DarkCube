@@ -11,10 +11,8 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.commandapi.v3.BoundingBox;
 import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.commandapi.v3.MinMaxBounds.FloatBound;
 import eu.darkcube.system.commandapi.v3.Vector3d;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -55,10 +53,11 @@ public class EntitySelector {
 
 	private final EntityType type;
 
-	public EntitySelector(int limit, boolean includeNonPlayers, boolean currentWordOnly, Predicate<Entity> filter,
-			FloatBound distance, Function<Vector3d, Vector3d> positionGetter, BoundingBox bb,
-			BiConsumer<Vector3d, List<? extends Entity>> sorter, boolean self, String username, UUID uuid,
-			EntityType type) {
+	public EntitySelector(int limit, boolean includeNonPlayers, boolean currentWordOnly,
+			Predicate<Entity> filter, FloatBound distance,
+			Function<Vector3d, Vector3d> positionGetter, BoundingBox bb,
+			BiConsumer<Vector3d, List<? extends Entity>> sorter, boolean self, String username,
+			UUID uuid, EntityType type) {
 		this.limit = limit;
 		this.includeNonPlayers = includeNonPlayers;
 		this.currentWordOnly = currentWordOnly;
@@ -104,7 +103,6 @@ public class EntitySelector {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<? extends Entity> select(CommandSource source) {
 		this.checkPermission(source);
 		if (!this.includeNonPlayers) {
@@ -125,9 +123,9 @@ public class EntitySelector {
 			Vector3d vector3d = this.positionGetter.apply(source.getPos());
 			Predicate<Entity> predicate = this.updateFilter(vector3d);
 			if (this.self) {
-				return (List<? extends Entity>) (source.getEntity() != null && predicate.test(source.getEntity())
+				return source.getEntity() != null && predicate.test(source.getEntity())
 						? Lists.newArrayList(source.getEntity())
-						: Collections.emptyList());
+						: Collections.emptyList();
 			}
 			List<Entity> list = Lists.newArrayList();
 			if (this.isWorldLimited()) {
@@ -142,9 +140,10 @@ public class EntitySelector {
 		}
 	}
 
-	private void getEntities(List<Entity> result, World worldIn, Vector3d offset, Predicate<Entity> predicate) {
+	private void getEntities(List<Entity> result, World worldIn, Vector3d offset,
+			Predicate<Entity> predicate) {
 		if (this.bb != null) {
-//	         result.addAll(worldIn.getEntitiesWithinAABB(this.type, this.bb.offset(pos), predicate));
+			//	         result.addAll(worldIn.getEntitiesWithinAABB(this.type, this.bb.offset(pos), predicate));
 			result.addAll(this.bb.offset(offset).getEntitiesWithin(worldIn, this.type, predicate));
 		} else {
 			for (Entity ent : worldIn.getEntities()) {
@@ -154,7 +153,7 @@ public class EntitySelector {
 					}
 				}
 			}
-//			result.addAll(worldIn.getEntities(this.type, predicate));
+			//			result.addAll(worldIn.getEntities(this.type, predicate));
 		}
 	}
 
@@ -190,7 +189,8 @@ public class EntitySelector {
 			}
 			List<Player> list;
 			if (this.isWorldLimited()) {
-				list = source.getWorld().getPlayers().stream().filter(predicate).collect(Collectors.toList());
+				list = source.getWorld().getPlayers().stream().filter(predicate)
+						.collect(Collectors.toList());
 			} else {
 				list = Lists.newArrayList();
 
@@ -216,7 +216,8 @@ public class EntitySelector {
 
 		if (!this.distance.isUnbounded()) {
 			predicate = predicate.and((entity) -> {
-				return this.distance.testSquared(Vector3d.position(entity.getLocation()).squareDistanceTo(pos));
+				return this.distance.testSquared(
+						Vector3d.position(entity.getLocation()).squareDistanceTo(pos));
 			});
 		}
 
@@ -229,23 +230,6 @@ public class EntitySelector {
 		}
 
 		return entities.subList(0, Math.min(this.limit, entities.size()));
-	}
-
-	public static TextComponent[] joinNames(List<? extends Entity> entities) {
-//		return TextComponentUtils.func_240649_b_(entities, Entity::getDisplayName);
-		CustomComponentBuilder builder = new CustomComponentBuilder("");
-		boolean first = true;
-		for (Entity entity : entities) {
-			if (first) {
-				first = false;
-			} else {
-				builder.append(", ");
-			}
-			TextComponent[] text = CustomComponentBuilder.cast(TextComponent
-					.fromLegacyText(entity.getCustomName() == null ? entity.getName() : entity.getCustomName()));
-			builder.append(text);
-		}
-		return builder.create();
 	}
 
 }

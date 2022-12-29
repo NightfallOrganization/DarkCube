@@ -22,12 +22,12 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public class Vec3Argument implements ArgumentType<ILocationArgument> {
-	private static final Collection<String> EXAMPLES = Arrays.asList("0 0 0", "~ ~ ~", "^ ^ ^", "^1 ^ ^-5",
-			"0.1 -0.5 .9", "~0.5 ~1 ~-5");
-	public static final SimpleCommandExceptionType POS_INCOMPLETE = Message.POS_INCOMPLETE
-			.newSimpleCommandExceptionType();
-	public static final SimpleCommandExceptionType POS_MIXED_TYPES = Message.POS_MIXED_TYPES
-			.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType POS_INCOMPLETE =
+			Messages.POS_INCOMPLETE.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType POS_MIXED_TYPES =
+			Messages.POS_MIXED_TYPES.newSimpleCommandExceptionType();
+	private static final Collection<String> EXAMPLES =
+			Arrays.asList("0 0 0", "~ ~ ~", "^ ^ ^", "^1 ^ ^-5", "0.1 -0.5 .9", "~0.5 ~1 ~-5");
 	private final boolean centerIntegers;
 
 	public Vec3Argument(boolean centerIntegersIn) {
@@ -46,13 +46,15 @@ public class Vec3Argument implements ArgumentType<ILocationArgument> {
 		return context.getArgument(name, ILocationArgument.class).getPosition(context.getSource());
 	}
 
-	public static ILocationArgument getLocation(CommandContext<CommandSource> context, String name) {
+	public static ILocationArgument getLocation(CommandContext<CommandSource> context,
+			String name) {
 		return context.getArgument(name, ILocationArgument.class);
 	}
 
 	@Override
 	public ILocationArgument parse(StringReader reader) throws CommandSyntaxException {
-		return reader.canRead() && reader.peek() == '^' ? LocalLocationArgument.parse(reader)
+		return reader.canRead() && reader.peek() == '^'
+				? LocalLocationArgument.parse(reader)
 				: LocationInput.parseDouble(reader, this.centerIntegers);
 	}
 
@@ -69,7 +71,8 @@ public class Vec3Argument implements ArgumentType<ILocationArgument> {
 		} else {
 			collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
 		}
-		return ISuggestionProvider.suggestVec3(s, collection, builder, Commands.predicate(this::parse));
+		return ISuggestionProvider.suggestVec3(s, collection, builder,
+				Commands.predicate(this::parse));
 	}
 
 	@Override
