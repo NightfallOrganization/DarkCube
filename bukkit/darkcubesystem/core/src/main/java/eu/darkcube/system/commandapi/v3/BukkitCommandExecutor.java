@@ -52,10 +52,6 @@ public class BukkitCommandExecutor implements ILanguagedCommandExecutor, Forward
 		DarkCubeSystem.getInstance().getLogger().warning("Can't set language of the console!");
 	}
 
-	public CommandSender getSender() {
-		return sender;
-	}
-
 	@Override
 	public String getCommandPrefix() {
 		return sender instanceof Player ? "/" : ILanguagedCommandExecutor.super.getCommandPrefix();
