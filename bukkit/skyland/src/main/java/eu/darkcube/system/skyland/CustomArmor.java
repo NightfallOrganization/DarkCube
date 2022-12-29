@@ -7,7 +7,8 @@
 
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.meta.LeatherArmorBuilderMeta;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -540,19 +541,25 @@ public final class CustomArmor {
 	}
 
 	public static ItemStack getEsdeathBootsItem() {
-		ItemBuilder item = ItemBuilder.item(Material.LEATHER_BOOTS);
-		item.enchant(Enchantment.FROST_WALKER, 30).enchant(Enchantment.MENDING, 1)
-				.enchant(Enchantment.DURABILITY, 100)
-				.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
-		//item.displayname("Esdeath Boots");
-		item.build();
-		LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) item.getMeta();
-		ComponentLike esdeath =
-				Component.text().content("Esdeath").color(TextColor.color(86, 207, 255));
-		ComponentLike boots =
-				Component.text().content("Boots").color(TextColor.color(73, 177, 218));
-		leatherArmorMeta.displayName(
-				Component.join(JoinConfiguration.separator(Component.space()), esdeath, boots));
+		ItemBuilder item =
+				ItemBuilder.item(Material.LEATHER_BOOTS).enchant(Enchantment.FROST_WALKER, 30)
+						.enchant(Enchantment.MENDING, 1).enchant(Enchantment.DURABILITY, 100)
+						.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 10)
+						.meta(new LeatherArmorBuilderMeta(Color.fromRGB(100, 100, 0)));
+
+		eu.darkcube.system.libs.net.kyori.adventure.text.Component esdeath =
+				eu.darkcube.system.libs.net.kyori.adventure.text.Component.text().content("Esdeath")
+						.color(eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor.color(
+								86, 207, 255)).build();
+		eu.darkcube.system.libs.net.kyori.adventure.text.Component boots =
+				eu.darkcube.system.libs.net.kyori.adventure.text.Component.text().content("Boots")
+						.color(eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor.color(
+								73, 177, 218)).build();
+		item.displayname(eu.darkcube.system.libs.net.kyori.adventure.text.Component.join(
+				eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration.separator(
+						eu.darkcube.system.libs.net.kyori.adventure.text.Component.space()),
+				esdeath, boots));
+
 		item.unbreakable(true);
 		return item.build();
 	}

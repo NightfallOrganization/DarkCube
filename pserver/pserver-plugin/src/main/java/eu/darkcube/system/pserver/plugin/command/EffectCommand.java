@@ -12,13 +12,17 @@ import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.arguments.BooleanArgument;
 import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
 import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.builder.ArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 import eu.darkcube.system.pserver.plugin.effect.PotionEffect;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -34,10 +38,9 @@ public class EffectCommand extends PServerExecutor {
 					{
 						CommandNode<CommandSource> giveTargets = Commands.literal("targets")
 								.then(Commands.argument("targets", EntityArgument.entities())
-										.redirect(give, context -> {
-											return context.getSource().with("targets",
-													EntityArgument.getEntities(context, "targets"));
-										})).build();
+										.redirect(give, context -> context.getSource()
+												.with("targets", EntityArgument.getEntities(context,
+														"targets")))).build();
 						give.addChild(giveTargets);
 						CommandNode<CommandSource> giveEffect = Commands.literal("effect")
 								.then(Commands.argument("effect",
@@ -63,33 +66,34 @@ public class EffectCommand extends PServerExecutor {
 
 						CommandNode<CommandSource> giveLevel = Commands.literal("level")
 								.then(Commands.argument("level",
-												IntegerArgumentType.integer(1, 256))
-										.redirect(give, context -> {
-											return context.getSource().with("level",
-													IntegerArgumentType.getInteger(context,
-															"level"));
-										})).build();
+										IntegerArgumentType.integer(1, 256)).redirect(give,
+										context -> context.getSource().with("level",
+												IntegerArgumentType.getInteger(context, "level"))))
+								.build();
 						give.addChild(giveLevel);
 
 						CommandNode<CommandSource> giveDuration = Commands.literal("duration")
 								.then(Commands.argument("duration",
-												IntegerArgumentType.integer(1, 99999))
-										.redirect(give, context -> {
-											return context.getSource().with("duration",
-													IntegerArgumentType.getInteger(context,
-															"duration"));
-										})).build();
+										IntegerArgumentType.integer(1, 99999)).redirect(give,
+										context -> context.getSource().with("duration",
+												IntegerArgumentType.getInteger(context,
+														"duration")))).build();
 						give.addChild(giveDuration);
 
 						CommandNode<CommandSource> giveParticles = Commands.literal("particles")
 								.then(Commands.argument("particles",
-												BooleanArgument.booleanArgument())
-										.redirect(give, context -> {
-											return context.getSource().with("particles",
-													BooleanArgument.getBoolean(context,
-															"particles"));
-										})).build();
+										BooleanArgument.booleanArgument()).redirect(give,
+										context -> context.getSource().with("particles",
+												BooleanArgument.getBoolean(context, "particles"))))
+								.build();
 						give.addChild(giveParticles);
+
+						ItemBuilder item =
+								ItemBuilder.item().material(Material.LEATHER_CHESTPLATE).amount(5)
+										.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
+										.unbreakable(true)
+										.displayname(Component.text("Duckness stinkkt"));
+
 						// ArgumentBuilder<CommandSource, ?> b_giveTargetsEffect =
 						// Commands.argument("effect",
 						// EnumArgument.enumArgument(PotionEffect.values(), effect -> new String[] {

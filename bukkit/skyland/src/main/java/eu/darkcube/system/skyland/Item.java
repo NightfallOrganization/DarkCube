@@ -7,11 +7,12 @@
 
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.inventory.ItemStack;
 
-import static eu.darkcube.system.inventoryapi.ItemBuilder.*;
+import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
 import static org.bukkit.Material.*;
 import static org.bukkit.enchantments.Enchantment.*;
 
@@ -39,13 +40,12 @@ public enum Item {
 		this.key = name();
 	}
 
-	@SuppressWarnings("deprecation")
 	public ItemStack getItem(User user) {
-		String itemTitle = Message.getMessage(key, user);
-		ItemBuilder clone = new ItemBuilder(builder);
+		Component itemTitle = Message.getMessage(key, user);
+		ItemBuilder clone = builder.clone();
 		clone.displayname(itemTitle);
 		if (damage != -1) {
-			clone.lore(Message.getMessage("ITEM_ATTRIBUTE_DAMAGE", user, damage));
+			clone.lore(Message.ITEM_ATTRIBUTE_DAMAGE.getMessage(user, damage));
 		}
 		return clone.build();
 	}

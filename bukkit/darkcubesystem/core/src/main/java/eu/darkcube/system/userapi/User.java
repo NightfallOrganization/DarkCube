@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.userapi;
 
+import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.MetaDataStorage;
@@ -16,7 +17,7 @@ import org.bukkit.entity.Player;
 import java.math.BigInteger;
 import java.util.UUID;
 
-public interface User extends ForwardingAudience {
+public interface User extends ForwardingAudience, ICommandExecutor {
 
 	void lock();
 

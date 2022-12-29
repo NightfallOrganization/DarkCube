@@ -23,14 +23,13 @@ public class DifficultyCommand extends PServerExecutor {
 	public DifficultyCommand() {
 		super("difficulty", new String[0], b -> b.then(Commands.argument("difficulty",
 				EnumArgument.enumArgument(Difficulty.values(),
-						s -> new String[] {s.name().toLowerCase()})).executes(context -> {
-			return difficulty(context,
-					EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class), null);
-		}).then(Commands.argument("world", WorldArgument.world()).executes(context -> {
-			return difficulty(context,
-					EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class),
-					WorldArgument.getWorld(context, "world"));
-		}))));
+						s -> new String[] {s.name().toLowerCase()})).executes(
+				context -> difficulty(context,
+						EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class),
+						null)).then(Commands.argument("world", WorldArgument.world()).executes(
+				context -> difficulty(context,
+						EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class),
+						WorldArgument.getWorld(context, "world"))))));
 	}
 
 	private static int difficulty(CommandContext<CommandSource> context, Difficulty difficulty,

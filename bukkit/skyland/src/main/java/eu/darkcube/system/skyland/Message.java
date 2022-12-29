@@ -7,16 +7,31 @@
 
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.userapi.User;
 
-public enum Message {
-
-	;
+public enum Message implements BaseMessage {
+	ITEM_ATTRIBUTE_DAMAGE;
 
 	public static final String PREFIX = "SKYLAND_";
+	private final String key;
 
-	public static String getMessage(String key, User user, Object... replacements) {
+	Message() {
+		key = name();
+	}
+
+	public static Component getMessage(String key, User user, Object... replacements) {
 		return user.getLanguage().getMessage(PREFIX + key, replacements);
 	}
 
+	@Override
+	public String getPrefixModifier() {
+		return PREFIX;
+	}
+
+	@Override
+	public String getKey() {
+		return key;
+	}
 }
