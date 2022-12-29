@@ -17,15 +17,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Deprecated
 public class CustomComponentBuilder {
-	private TextComponent current;
 	private final List<TextComponent> parts = new ArrayList<>();
+	private TextComponent current;
 
 	public CustomComponentBuilder(CustomComponentBuilder original) {
 		this.current = new TextComponent(original.current);
 		for (TextComponent baseComponent : original.parts) {
 			this.parts.add((TextComponent) baseComponent.duplicate());
 		}
+	}
+
+	public CustomComponentBuilder(TextComponent... components) {
+		this.append(components);
+	}
+
+	public CustomComponentBuilder(String text) {
+		this.current = new TextComponent(text);
 	}
 
 	public static TextComponent[] cast(BaseComponent[] components) {
@@ -36,8 +45,8 @@ public class CustomComponentBuilder {
 		return arr;
 	}
 
-	public static Consumer<CustomComponentBuilder> applyPrefixModifier(Consumer<CustomComponentBuilder> prefixModifier,
-			TextComponent[] components) {
+	public static Consumer<CustomComponentBuilder> applyPrefixModifier(
+			Consumer<CustomComponentBuilder> prefixModifier, TextComponent[] components) {
 		return b -> {
 			prefixModifier.accept(b);
 			ChatColor color = null;
@@ -48,8 +57,8 @@ public class CustomComponentBuilder {
 			Boolean obfuscated = null;
 			String insertion = null;
 			for (int i = b.getParts().size() - 1; i >= 0; i--) {
-				if (color != null && bold != null && italic != null && underlined != null && strikethrough != null
-						&& obfuscated != null && insertion != null) {
+				if (color != null && bold != null && italic != null && underlined != null
+						&& strikethrough != null && obfuscated != null && insertion != null) {
 					break;
 				}
 				TextComponent component = b.getParts().get(i);
@@ -76,8 +85,9 @@ public class CustomComponentBuilder {
 				}
 			}
 			int i = 0;
-			while ((color != null || bold != null || italic != null || underlined != null || strikethrough != null
-					|| obfuscated != null || insertion != null) && i < components.length) {
+			while ((color != null || bold != null || italic != null || underlined != null
+					|| strikethrough != null || obfuscated != null || insertion != null)
+					&& i < components.length) {
 				TextComponent component = components[i++];
 				if (color != null) {
 					if (component.getColorRaw() != null)
@@ -126,10 +136,6 @@ public class CustomComponentBuilder {
 		};
 	}
 
-	public CustomComponentBuilder(TextComponent... components) {
-		this.append(components);
-	}
-
 	public CustomComponentBuilder append(TextComponent... components) {
 		for (TextComponent component : components) {
 			component = (TextComponent) component.duplicate();
@@ -147,19 +153,15 @@ public class CustomComponentBuilder {
 		return current;
 	}
 
+	public void setCurrent(TextComponent current) {
+		this.current = current;
+	}
+
 	public List<TextComponent> getParts() {
 		List<TextComponent> l = new ArrayList<>(parts);
 		if (current != null)
 			l.add(current);
 		return l;
-	}
-
-	public void setCurrent(TextComponent current) {
-		this.current = current;
-	}
-
-	public CustomComponentBuilder(String text) {
-		this.current = new TextComponent(text);
 	}
 
 	public CustomComponentBuilder append(String text) {
@@ -228,24 +230,24 @@ public class CustomComponentBuilder {
 	public CustomComponentBuilder retain(FormatRetention retention) {
 		BaseComponent previous = this.current;
 		switch (retention) {
-		case NONE: {
-			this.current = new TextComponent(this.current.getText());
-			break;
-		}
-		case ALL: {
-			break;
-		}
-		case EVENTS: {
-			this.current = new TextComponent(this.current.getText());
-			this.current.setInsertion(previous.getInsertion());
-			this.current.setClickEvent(previous.getClickEvent());
-			this.current.setHoverEvent(previous.getHoverEvent());
-			break;
-		}
-		case FORMATTING: {
-			this.current.setClickEvent(null);
-			this.current.setHoverEvent(null);
-		}
+			case NONE: {
+				this.current = new TextComponent(this.current.getText());
+				break;
+			}
+			case ALL: {
+				break;
+			}
+			case EVENTS: {
+				this.current = new TextComponent(this.current.getText());
+				this.current.setInsertion(previous.getInsertion());
+				this.current.setClickEvent(previous.getClickEvent());
+				this.current.setHoverEvent(previous.getHoverEvent());
+				break;
+			}
+			case FORMATTING: {
+				this.current.setClickEvent(null);
+				this.current.setHoverEvent(null);
+			}
 		}
 		return this;
 	}
@@ -256,13 +258,10 @@ public class CustomComponentBuilder {
 		return this.parts.toArray(new TextComponent[this.parts.size()]);
 	}
 
-	public static enum FormatRetention {
-		NONE,
-		FORMATTING,
-		EVENTS,
-		ALL;
+	public enum FormatRetention {
+		NONE, FORMATTING, EVENTS, ALL;
 
-		private FormatRetention() {
+		FormatRetention() {
 		}
 	}
 }

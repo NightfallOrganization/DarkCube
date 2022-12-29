@@ -8,17 +8,14 @@
 package eu.darkcube.system.stats.api.stats;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.stats.api.Arrays;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.stats.api.Duration;
 import eu.darkcube.system.stats.api.gamemode.GameMode;
 import eu.darkcube.system.stats.api.user.User;
-import eu.darkcube.system.util.ChatBaseComponent;
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
-import eu.darkcube.system.util.ChatUtils.ChatEntry.Builder;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Stats {
 
@@ -34,6 +31,16 @@ public abstract class Stats {
 		this.owner = owner;
 	}
 
+	public static Component format(String key, String user, long placement) {
+		return LegacyComponentSerializer.legacySection()
+				.deserialize("§7" + key + "§7: §6" + user + " §f» §7(Platz " + placement + ")");
+	}
+
+	public static Component formatToplist(String user, long placement, String value) {
+		return LegacyComponentSerializer.legacySection()
+				.deserialize("§a" + placement + "§7: §5" + user + " §7(§6" + value + "§7)");
+	}
+
 	public GameMode getGamemode() {
 		return this.gamemode;
 	}
@@ -46,33 +53,25 @@ public abstract class Stats {
 		return this.owner;
 	}
 
-	public final List<ChatEntry> format() {
-		List<ChatEntry> list = new ArrayList<>();
-		list.addAll(Arrays.asList(
-				new Builder().text("§7» §5Wool§dBattle\n §7Statistiken von §a" + this.owner.getName() + "\n").build()));
-		this.insertBreakLine(list);
-		this.insertFormats(list);
-		this.insertBreakLine(list);
-
-		return list;
+	public final Component format() {
+		Component component = Component.text("»").color(NamedTextColor.GRAY).appendSpace()
+				.append(Component.text("Wool").color(NamedTextColor.DARK_PURPLE)
+						.append(Component.text("Battle").color(NamedTextColor.LIGHT_PURPLE)))
+				.appendNewline().appendSpace()
+				.append(Component.text("Statistiken von ").color(NamedTextColor.GRAY))
+				.append(Component.text(owner.getName()).color(NamedTextColor.GREEN))
+				.appendNewline();
+		component = component.append(breakLine()).append(create()).append(breakLine());
+		return component;
 	}
 
-	public final ChatBaseComponent formatComponent() {
-		return ChatEntry.build(this.format().toArray(new ChatEntry[0]));
-	}
+	protected abstract Component create();
 
-	protected abstract void insertFormats(List<ChatEntry> list);
-
-	protected final void insertBreakLine(List<ChatEntry> list) {
-		list.addAll(Arrays.asList(new ChatEntry.Builder().text("§8------------------------\n").build()));
-	}
-
-	public static final String format(String key, String user, long placement) {
-		return "§7" + key + "§7: §6" + user + " §f» §7(Platz " + placement + ")";
-	}
-
-	public static final String formatToplist(String user, long placement, String value) {
-		return "§a" + placement + "§7: §5" + user + " §7(§6" + value + "§7)";
+	protected final Component breakLine() {
+		return Component.text("------------------------").color(NamedTextColor.DARK_GRAY)
+				.appendNewline();
+		//		list.addAll(Arrays.asList(
+		//				new ChatEntry.Builder().text("§8------------------------\n").build()));
 	}
 
 	public abstract JsonDocument serializeData();

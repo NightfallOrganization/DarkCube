@@ -7,17 +7,15 @@
 
 package eu.darkcube.system.stats.api.stats;
 
-import java.util.List;
-
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsKillDeath {
 
-	public default void insertKillDeath(Stats stats, List<ChatEntry> builder, long kills, long deaths, double ratio,
+	default Component insertKillDeath(Stats stats, long kills, long deaths, double ratio,
 			long placementKills, long placementDeaths, long placementRatio) {
-		StatsUtil.insertKills(stats, builder, kills, placementKills);
-		StatsUtil.insertDeaths(stats, builder, deaths, placementDeaths);
-		StatsUtil.insertKillDeathRatio(stats, builder, ratio, placementRatio);
+		return StatsUtil.insertKills(stats, kills, placementKills)
+				.append(StatsUtil.insertDeaths(stats, deaths, placementDeaths))
+				.append(StatsUtil.insertKillDeathRatio(stats, ratio, placementRatio));
 	}
 }

@@ -7,9 +7,6 @@
 
 package eu.darkcube.system;
 
-import com.google.gson.JsonElement;
-import eu.darkcube.system.util.ChatUtils;
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -28,10 +25,10 @@ public abstract class Plugin extends JavaPlugin {
 
 	private static HashMap<String, YamlConfiguration> configFromName = new HashMap<>();
 
-	public abstract String getCommandPrefix();
-
 	public Plugin() {
 	}
+
+	public abstract String getCommandPrefix();
 
 	public Plugin saveDefaultConfig(String path) {
 		path += ".yml";
@@ -96,47 +93,6 @@ public abstract class Plugin extends JavaPlugin {
 		this.sendMessageBridgePrefix(msg);
 	}
 
-	public final void sendMessage(ChatEntry... entries) {
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			this.sendMessage(entries, p);
-		}
-		this.sendMessage(entries, Bukkit.getConsoleSender());
-	}
-
-	public final void sendMessage(ChatEntry[] entries, CommandSender sender) {
-		if (sender instanceof Player) {
-			ChatEntry[] insertion =
-					new ChatEntry.Builder().text("§7» §8[§6" + this.getCommandPrefix() + "§8] §7┃ ")
-							.build();
-			ChatEntry[] newEntries = new ChatEntry[entries.length + insertion.length];
-			System.arraycopy(insertion, 0, newEntries, 0, insertion.length);
-			System.arraycopy(entries, 0, newEntries, insertion.length,
-					entries.length + insertion.length - insertion.length);
-
-			this.sendMessageWithoutPrefix(newEntries, sender);
-		} else {
-			this.sendMessageWithoutPrefix(entries, sender);
-		}
-	}
-
-	public final void sendMessageWithoutPrefix(ChatEntry[] entries, CommandSender sender) {
-		if (sender instanceof Player) {
-			Player p = (Player) sender;
-			ChatUtils.chat(entries).send(p);
-		} else {
-			StringBuilder totalmsg = new StringBuilder();
-			for (ChatEntry entry : entries) {
-				JsonElement element = entry.getJson().get("text");
-				String msg = element.getAsString();
-				msg = ("§7" + msg).replace("§r", "§r§7").replace("§f", "§7");
-				totalmsg.append(msg);
-			}
-			totalmsg = new StringBuilder(
-					Plugin.translateAlternateColorCodesForCloudNet('§', totalmsg.toString()));
-			sender.sendMessage(totalmsg.toString());
-		}
-	}
-
 	public final void sendMessageWithoutPrefix(String msg,
 			Collection<? extends CommandSender> receivers) {
 		receivers.forEach(r -> this.sendMessageBridge(msg, r));
@@ -177,19 +133,6 @@ public abstract class Plugin extends JavaPlugin {
 
 	private void sendMessageBridge(String msg, CommandSender sender) {
 		this.sendMessageWithoutPrefix(msg, sender);
-	}
-
-	public static String translateAlternateColorCodesForCloudNet(char altColorChar,
-			String textToTranslate) {
-		char[] b = textToTranslate.toCharArray();
-		for (int i = 0; i < b.length - 1; i++) {
-			if (b[i] == altColorChar
-					&& "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
-				b[i] = '§';
-				b[i + 1] = Character.toLowerCase(b[i + 1]);
-			}
-		}
-		return new String(b);
 	}
 
 }

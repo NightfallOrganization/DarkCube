@@ -8,9 +8,11 @@
 package eu.darkcube.system.userapi;
 
 import eu.darkcube.system.DarkCubeSystem;
-import eu.darkcube.system.userapi.data.BasicMetaDataStorage;
-import eu.darkcube.system.userapi.data.BasicPersistentDataStorage;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.userapi.data.UserPersistentDataStorage;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -26,6 +28,11 @@ class AsyncWrapperUser implements User {
 	AsyncWrapperUser(BukkitUser user) {
 		this.uuid = user.getUniqueId();
 		this.reference.set(user);
+	}
+
+	@Override
+	public @NotNull Iterable<? extends Audience> audiences() {
+		return user(BukkitUser::audiences);
 	}
 
 	private void user(Consumer<BukkitUser> consumer) {
@@ -113,7 +120,7 @@ class AsyncWrapperUser implements User {
 	}
 
 	@Override
-	public BasicPersistentDataStorage getPersistentDataStorage() {
+	public UserPersistentDataStorage getPersistentDataStorage() {
 		return user(BukkitUser::getPersistentDataStorage);
 	}
 

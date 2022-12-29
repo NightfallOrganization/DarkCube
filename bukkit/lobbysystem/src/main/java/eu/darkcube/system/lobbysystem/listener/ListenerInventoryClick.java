@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
@@ -20,6 +20,7 @@ import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -40,8 +41,10 @@ public class ListenerInventoryClick extends BaseListener {
 			return;
 		}
 		String itemid = Item.getItemId(item);
-		language: {
-			String languageId = new ItemBuilder(item).getUnsafe().getString("language");
+		language:
+		{
+			String languageId = ItemBuilder.item(item).persistentDataStorage()
+					.get(InventorySettings.language, PersistentDataTypes.STRING);
 			if (languageId == null || languageId.isEmpty())
 				break language;
 			Language language = Language.fromString(languageId);

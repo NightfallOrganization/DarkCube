@@ -20,8 +20,7 @@ public class PServerInventory extends DefaultPServerSyncPagedInventory {
 	public static final InventoryType TYPE = InventoryType.of("pserver");
 
 	public PServerInventory(User user) {
-		super(user, TYPE,
-						Message.PSERVER_INVENTORY_TITLE.getMessageString(user));
+		super(user, TYPE, Message.PSERVER_INVENTORY_TITLE.getMessage(user.getCommandExecutor()));
 	}
 
 	@Override

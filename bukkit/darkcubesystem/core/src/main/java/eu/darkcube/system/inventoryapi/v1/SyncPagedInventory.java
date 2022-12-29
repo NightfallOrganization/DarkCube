@@ -7,13 +7,15 @@
 
 package eu.darkcube.system.inventoryapi.v1;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
 
 public abstract class SyncPagedInventory extends AsyncPagedInventory {
 
-	public SyncPagedInventory(InventoryType inventoryType, String title, int size, BooleanSupplier instant,
-			int[] pageSlots, int startSlot) {
+	public SyncPagedInventory(InventoryType inventoryType, Component title, int size,
+			BooleanSupplier instant, int[] pageSlots, int startSlot) {
 		super(inventoryType, title, size, instant, pageSlots, startSlot);
 	}
 

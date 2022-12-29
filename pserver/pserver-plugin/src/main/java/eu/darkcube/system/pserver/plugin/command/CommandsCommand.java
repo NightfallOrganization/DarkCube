@@ -14,13 +14,11 @@ import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 public class CommandsCommand extends PServerExecutor {
 
 	public CommandsCommand() {
-		super("commands", new String[] {
-						"befehle", "help"
-		}, b -> b.executes(context -> {
+		super("commands", new String[] {"befehle", "help"}, b -> b.executes(context -> {
 			CommandSource source = context.getSource();
-			source.sendFeedback(Message.COMMANDS_PREFIX.getMessage(source, PServerExecutor.COMMAND_NAMES.size()), true);
+			source.sendMessage(Message.COMMANDS_PREFIX, PServerExecutor.COMMAND_NAMES.size());
 			for (String name : PServerExecutor.COMMAND_NAMES) {
-				source.sendFeedback(Message.COMMANDS_COMMANDINFO.getMessage(source, name), true);
+				source.sendMessage(Message.COMMANDS_COMMANDINFO, name);
 			}
 			return 0;
 		}));

@@ -1,16 +1,23 @@
-apply plugin: 'java-library'
-
-dependencies {
-    implementation cloudnet
-    implementation cloudnetBridge
-    embedApi project(':pserver:pserver-api')
-    embedApi project(':pserver:pserver-bukkit')
+plugins {
+    id("java-library")
+    id("com.github.johnrengelman.shadow")
 }
 
-jar {
-	dependsOn ':pserver:pserver-bukkit:jar'
+tasks {
+    jar {
+        archiveClassifier.set("pure")
+    }
+    shadowJar {
+        archiveClassifier.set("")
+    }
+    build {
+        dependsOn(shadowJar)
+    }
+}
 
-	from (project(':pserver:pserver-bukkit').getBuildDir()) {
-		include 'pserver-bukkit.jar'
-	}
+dependencies {
+    compileOnlyApi cloudnet
+    compileOnlyApi cloudnetBridge
+    api project(':pserver:pserver-api')
+    runtimeOnly project(':pserver:pserver-bukkit')
 }

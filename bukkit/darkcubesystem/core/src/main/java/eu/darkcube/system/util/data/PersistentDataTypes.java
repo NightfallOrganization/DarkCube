@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.userapi.data;
+package eu.darkcube.system.util.data;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import org.bukkit.Bukkit;
@@ -32,13 +32,13 @@ public class PersistentDataTypes {
 	public static final PersistentDataType<JsonDocument> JSONDOCUMENT =
 			new PersistentDataType<JsonDocument>() {
 				@Override
-				public void serialize(JsonDocument doc, String key, JsonDocument data) {
-					doc.append(key, data);
+				public JsonDocument deserialize(JsonDocument doc, String key) {
+					return doc.getDocument(key);
 				}
 
 				@Override
-				public JsonDocument deserialize(JsonDocument doc, String key) {
-					return doc.getDocument(key);
+				public void serialize(JsonDocument doc, String key, JsonDocument data) {
+					doc.append(key, data);
 				}
 			};
 	public static final PersistentDataType<String> STRING = new PersistentDataType<String>() {
@@ -111,18 +111,6 @@ public class PersistentDataTypes {
 	public static final PersistentDataType<Location> LOCATION = new PersistentDataType<Location>() {
 
 		@Override
-		public void serialize(JsonDocument doc, String key, Location data) {
-			JsonDocument d = new JsonDocument();
-			d.append("x", data.getX());
-			d.append("y", data.getY());
-			d.append("z", data.getZ());
-			d.append("yaw", data.getYaw());
-			d.append("pitch", data.getPitch());
-			d.append("world", data.getWorld().getUID().toString());
-			doc.append(key, d);
-		}
-
-		@Override
 		public Location deserialize(JsonDocument doc, String key) {
 			JsonDocument d = doc.getDocument(key);
 			double x = d.getDouble("x");
@@ -132,6 +120,18 @@ public class PersistentDataTypes {
 			float pitch = d.getFloat("pitch");
 			World world = Bukkit.getWorld(UUID.fromString(d.getString("world")));
 			return new Location(world, x, y, z, yaw, pitch);
+		}
+
+		@Override
+		public void serialize(JsonDocument doc, String key, Location data) {
+			JsonDocument d = new JsonDocument();
+			d.append("x", data.getX());
+			d.append("y", data.getY());
+			d.append("z", data.getZ());
+			d.append("yaw", data.getYaw());
+			d.append("pitch", data.getPitch());
+			d.append("world", data.getWorld().getUID().toString());
+			doc.append(key, d);
 		}
 	};
 

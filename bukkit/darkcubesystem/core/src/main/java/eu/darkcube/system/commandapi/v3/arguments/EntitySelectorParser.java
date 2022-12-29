@@ -27,20 +27,21 @@ import java.util.function.*;
 
 public class EntitySelectorParser {
 
-	public static final DynamicCommandExceptionType UNKNOWN_SELECTOR_TYPE = Message.UNKNOWN_COMMAND_EXCEPTION_TYPE
-			.newDynamicCommandExceptionType();
-	public static final SimpleCommandExceptionType INVALID_ENTITY_NAME_OR_UUID = Message.INVALID_ENTITY_NAME_OR_UUID
-			.newSimpleCommandExceptionType();
-	public static final SimpleCommandExceptionType SELECTOR_NOT_ALLOWED = Message.SELECTOR_NOT_ALLOWED
-			.newSimpleCommandExceptionType();
-	public static final SimpleCommandExceptionType SELECTOR_TYPE_MISSING = Message.SELECTOR_TYPE_MISSING
-			.newSimpleCommandExceptionType();
-	public static final SimpleCommandExceptionType EXPECTED_END_OF_OPTIONS = Message.EXPECTED_END_OF_OPTIONS
-			.newSimpleCommandExceptionType();
-	public static final DynamicCommandExceptionType EXPECTED_VALUE_FOR_OPTION = Message.EXPECTED_VALUE_FOR_OPTION
-			.newDynamicCommandExceptionType();
-	public static final BiConsumer<Vector3d, List<? extends Entity>> ARBITRARY = (vec, entities) -> {
-	};
+	public static final DynamicCommandExceptionType UNKNOWN_SELECTOR_TYPE =
+			Messages.UNKNOWN_COMMAND_EXCEPTION_TYPE.newDynamicCommandExceptionType();
+	public static final SimpleCommandExceptionType INVALID_ENTITY_NAME_OR_UUID =
+			Messages.INVALID_ENTITY_NAME_OR_UUID.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType SELECTOR_NOT_ALLOWED =
+			Messages.SELECTOR_NOT_ALLOWED.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType SELECTOR_TYPE_MISSING =
+			Messages.SELECTOR_TYPE_MISSING.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType EXPECTED_END_OF_OPTIONS =
+			Messages.EXPECTED_END_OF_OPTIONS.newSimpleCommandExceptionType();
+	public static final DynamicCommandExceptionType EXPECTED_VALUE_FOR_OPTION =
+			Messages.EXPECTED_VALUE_FOR_OPTION.newDynamicCommandExceptionType();
+	public static final BiConsumer<Vector3d, List<? extends Entity>> ARBITRARY =
+			(vec, entities) -> {
+			};
 	public static final BiConsumer<Vector3d, List<? extends Entity>> NEAREST = (vec, entities) -> {
 		entities.sort((e1, e2) -> {
 			return Doubles.compare(Vector3d.position(e1.getLocation()).squareDistanceTo(vec),
@@ -56,8 +57,8 @@ public class EntitySelectorParser {
 	public static final BiConsumer<Vector3d, List<? extends Entity>> RANDOM = (vec, entities) -> {
 		Collections.shuffle(entities);
 	};
-	public static final BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> SUGGEST_NONE = (
-			p_201342_0_, p_201342_1_) -> {
+	public static final BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>>
+			SUGGEST_NONE = (p_201342_0_, p_201342_1_) -> {
 		return p_201342_0_.buildFuture();
 	};
 
@@ -77,7 +78,8 @@ public class EntitySelectorParser {
 	private String username;
 	private int cursorStart;
 	private UUID uuid;
-	private BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionHandler = EntitySelectorParser.SUGGEST_NONE;
+	private BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>>
+			suggestionHandler = EntitySelectorParser.SUGGEST_NONE;
 	private boolean hasNameEquals;
 	private boolean hasNameNotEquals;
 	private boolean isLimited;
@@ -99,6 +101,14 @@ public class EntitySelectorParser {
 		this.hasPermission = hasPermissionIn;
 	}
 
+	private static void fillSelectorSuggestions(SuggestionsBuilder suggestionBuilder) {
+		suggestionBuilder.suggest("@p", Messages.SELECTOR_NEAREST_PLAYER.newWrapper());
+		suggestionBuilder.suggest("@a", Messages.SELECTOR_ALL_PLAYERS.newWrapper());
+		suggestionBuilder.suggest("@r", Messages.SELECTOR_RANDOM_PLAYER.newWrapper());
+		suggestionBuilder.suggest("@s", Messages.SELECTOR_SELF.newWrapper());
+		suggestionBuilder.suggest("@e", Messages.SELECTOR_ALL_ENTITIES.newWrapper());
+	}
+
 	public EntitySelector build() {
 		BoundingBox bb;
 		if (this.dx == null && this.dy == null && this.dz == null) {
@@ -116,11 +126,12 @@ public class EntitySelectorParser {
 		if (this.x == null && this.y == null && this.z == null) {
 			function = vec -> vec;
 		} else {
-			function = (vec) -> new Vector3d(this.x == null ? vec.x : this.x, this.y == null ? vec.y : this.y,
-					this.z == null ? vec.z : this.z);
+			function = (vec) -> new Vector3d(this.x == null ? vec.x : this.x,
+					this.y == null ? vec.y : this.y, this.z == null ? vec.z : this.z);
 		}
-		return new EntitySelector(this.limit, this.includeNonPlayers, this.currentWorldOnly, this.filter, this.distance,
-				function, bb, this.sorter, this.self, this.username, this.uuid, this.type);
+		return new EntitySelector(this.limit, this.includeNonPlayers, this.currentWorldOnly,
+				this.filter, this.distance, function, bb, this.sorter, this.self, this.username,
+				this.uuid, this.type);
 	}
 
 	private BoundingBox createAABB(double sizeX, double sizeY, double sizeZ) {
@@ -139,19 +150,19 @@ public class EntitySelectorParser {
 	private void updateFilter() {
 		if (this.xRotation != MinMaxBoundsWrapped.UNBOUNDED) {
 			this.filter = this.filter.and(this.createRotationPredicate(this.xRotation, (entity) -> {
-				return (double) entity.getLocation().getYaw();
+				return entity.getLocation().getYaw();
 			}));
 		}
 
 		if (this.yRotation != MinMaxBoundsWrapped.UNBOUNDED) {
 			this.filter = this.filter.and(this.createRotationPredicate(this.yRotation, (entity) -> {
-				return (double) entity.getLocation().getPitch();
+				return entity.getLocation().getPitch();
 			}));
 		}
 
 		if (!this.level.isUnbounded()) {
 			this.filter = this.filter.and((entity) -> {
-				return !(entity instanceof Player) ? false : this.level.test(((Player) entity).getLevel());
+				return entity instanceof Player && this.level.test(((Player) entity).getLevel());
 			});
 		}
 
@@ -159,8 +170,10 @@ public class EntitySelectorParser {
 
 	private Predicate<Entity> createRotationPredicate(MinMaxBoundsWrapped angleBounds,
 			ToDoubleFunction<Entity> angleFunc) {
-		double d0 = MathHelper.wrapDegrees(angleBounds.getMin() == null ? 0.0F : angleBounds.getMin());
-		double d1 = MathHelper.wrapDegrees(angleBounds.getMax() == null ? 359.0F : angleBounds.getMax());
+		double d0 =
+				MathHelper.wrapDegrees(angleBounds.getMin() == null ? 0.0F : angleBounds.getMin());
+		double d1 = MathHelper.wrapDegrees(
+				angleBounds.getMax() == null ? 359.0F : angleBounds.getMax());
 		return (p_197374_5_) -> {
 			double d2 = MathHelper.wrapDegrees(angleFunc.applyAsDouble(p_197374_5_));
 			if (d0 > d1) {
@@ -199,7 +212,8 @@ public class EntitySelectorParser {
 		} else {
 			if (c0 != 'e') {
 				this.reader.setCursor(i);
-				throw EntitySelectorParser.UNKNOWN_SELECTOR_TYPE.createWithContext(this.reader, '@' + String.valueOf(c0));
+				throw EntitySelectorParser.UNKNOWN_SELECTOR_TYPE.createWithContext(this.reader,
+						'@' + String.valueOf(c0));
 			}
 
 			this.limit = Integer.MAX_VALUE;
@@ -230,7 +244,8 @@ public class EntitySelectorParser {
 		} catch (IllegalArgumentException illegalargumentexception) {
 			if (s.isEmpty() || s.length() > 16) {
 				this.reader.setCursor(i);
-				throw EntitySelectorParser.INVALID_ENTITY_NAME_OR_UUID.createWithContext(this.reader);
+				throw EntitySelectorParser.INVALID_ENTITY_NAME_OR_UUID.createWithContext(
+						this.reader);
 			}
 
 			this.includeNonPlayers = false;
@@ -253,7 +268,8 @@ public class EntitySelectorParser {
 				this.reader.skipWhitespace();
 				if (!this.reader.canRead() || this.reader.peek() != '=') {
 					this.reader.setCursor(i);
-					throw EntitySelectorParser.EXPECTED_VALUE_FOR_OPTION.createWithContext(this.reader, s);
+					throw EntitySelectorParser.EXPECTED_VALUE_FOR_OPTION.createWithContext(
+							this.reader, s);
 				}
 
 				this.reader.skip();
@@ -273,7 +289,8 @@ public class EntitySelectorParser {
 				}
 
 				if (this.reader.peek() != ']') {
-					throw EntitySelectorParser.EXPECTED_END_OF_OPTIONS.createWithContext(this.reader);
+					throw EntitySelectorParser.EXPECTED_END_OF_OPTIONS.createWithContext(
+							this.reader);
 				}
 			}
 
@@ -290,16 +307,6 @@ public class EntitySelectorParser {
 	public boolean shouldInvertValue() {
 		this.reader.skipWhitespace();
 		if (this.reader.canRead() && this.reader.peek() == '!') {
-			this.reader.skip();
-			this.reader.skipWhitespace();
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isOfType() {
-		this.reader.skipWhitespace();
-		if (this.reader.canRead() && this.reader.peek() == '#') {
 			this.reader.skip();
 			this.reader.skipWhitespace();
 			return true;
@@ -355,48 +362,48 @@ public class EntitySelectorParser {
 		return this.x;
 	}
 
-	public Double getY() {
-		return this.y;
-	}
-
-	public Double getZ() {
-		return this.z;
-	}
-
 	public void setX(double xIn) {
 		this.x = xIn;
+	}
+
+	public Double getY() {
+		return this.y;
 	}
 
 	public void setY(double yIn) {
 		this.y = yIn;
 	}
 
+	public Double getZ() {
+		return this.z;
+	}
+
 	public void setZ(double zIn) {
 		this.z = zIn;
-	}
-
-	public void setDx(double dxIn) {
-		this.dx = dxIn;
-	}
-
-	public void setDy(double dyIn) {
-		this.dy = dyIn;
-	}
-
-	public void setDz(double dzIn) {
-		this.dz = dzIn;
 	}
 
 	public Double getDx() {
 		return this.dx;
 	}
 
+	public void setDx(double dxIn) {
+		this.dx = dxIn;
+	}
+
 	public Double getDy() {
 		return this.dy;
 	}
 
+	public void setDy(double dyIn) {
+		this.dy = dyIn;
+	}
+
 	public Double getDz() {
 		return this.dz;
+	}
+
+	public void setDz(double dzIn) {
+		this.dz = dzIn;
 	}
 
 	public void setLimit(int limitIn) {
@@ -429,16 +436,8 @@ public class EntitySelectorParser {
 		return this.build();
 	}
 
-	private static void fillSelectorSuggestions(SuggestionsBuilder suggestionBuilder) {
-		suggestionBuilder.suggest("@p", Message.SELECTOR_NEAREST_PLAYER.newSimpleWrapper());
-		suggestionBuilder.suggest("@a", Message.SELECTOR_ALL_PLAYERS.newSimpleWrapper());
-		suggestionBuilder.suggest("@r", Message.SELECTOR_RANDOM_PLAYER.newSimpleWrapper());
-		suggestionBuilder.suggest("@s", Message.SELECTOR_SELF.newSimpleWrapper());
-		suggestionBuilder.suggest("@e", Message.SELECTOR_ALL_ENTITIES.newSimpleWrapper());
-	}
-
-	private CompletableFuture<Suggestions> suggestNameOrSelector(SuggestionsBuilder suggestionBuilder,
-			Consumer<SuggestionsBuilder> consumer) {
+	private CompletableFuture<Suggestions> suggestNameOrSelector(
+			SuggestionsBuilder suggestionBuilder, Consumer<SuggestionsBuilder> consumer) {
 		consumer.accept(suggestionBuilder);
 		if (this.hasPermission) {
 			EntitySelectorParser.fillSelectorSuggestions(suggestionBuilder);
@@ -499,7 +498,8 @@ public class EntitySelectorParser {
 
 	public CompletableFuture<Suggestions> fillSuggestions(SuggestionsBuilder builder,
 			Consumer<SuggestionsBuilder> consumer) {
-		return this.suggestionHandler.apply(builder.createOffset(this.reader.getCursor()), consumer);
+		return this.suggestionHandler.apply(builder.createOffset(this.reader.getCursor()),
+				consumer);
 	}
 
 	public boolean hasNameEquals() {

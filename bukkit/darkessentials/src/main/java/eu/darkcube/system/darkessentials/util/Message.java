@@ -19,7 +19,10 @@ public enum Message implements BaseMessage {
 	XP_REMOVED_FROM_PLAYERS,
 	XP_OF_PLAYER,
 	XP_OF_PLAYER_SET,
-	XP_OF_PLAYERS_SET;
+	XP_OF_PLAYERS_SET,
+	SPAWNER_GIVEN_TO_SELF,
+	SPAWNER_GIVEN_TO_PLAYER,
+	SPAWNER_GIVEN_TO_PLAYERS;
 
 	private final String key;
 
@@ -27,13 +30,13 @@ public enum Message implements BaseMessage {
 		this.key = name();
 	}
 
+	public static String getPrefix() {
+		return "DarkEssentials_";
+	}
+
 	@Override
 	public String getPrefixModifier() {
 		return getPrefix();
-	}
-
-	public static String getPrefix() {
-		return "DarkEssentials_";
 	}
 
 	@Override

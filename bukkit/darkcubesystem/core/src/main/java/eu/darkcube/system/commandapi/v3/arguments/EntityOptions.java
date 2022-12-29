@@ -31,31 +31,23 @@ import java.util.stream.Collectors;
 
 public class EntityOptions {
 
+	public static final DynamicCommandExceptionType UNKNOWN_ENTITY_OPTION =
+			Messages.UNKNOWN_ENTITY_OPTION.newDynamicCommandExceptionType();
+	public static final DynamicCommandExceptionType INAPPLICABLE_ENTITY_OPTION =
+			Messages.INAPPLICABLE_ENTITY_OPTION.newDynamicCommandExceptionType();
+	public static final SimpleCommandExceptionType NEGATIVE_DISTANCE =
+			Messages.NEGATIVE_DISTANCE.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType NEGATIVE_LEVEL =
+			Messages.NEGATIVE_LEVEL.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType NONPOSITIVE_LIMIT =
+			Messages.NONPOSITIVE_LIMIT.newSimpleCommandExceptionType();
+	public static final DynamicCommandExceptionType INVALID_SORT =
+			Messages.INVALID_SORT.newDynamicCommandExceptionType();
+	public static final DynamicCommandExceptionType INVALID_GAME_MODE =
+			Messages.INVALID_GAME_MODE.newDynamicCommandExceptionType();
+	public static final DynamicCommandExceptionType INVALID_ENTITY_TYPE =
+			Messages.INVALID_ENTITY_TYPE.newDynamicCommandExceptionType();
 	private static final Map<String, OptionHandler> REGISTRY = Maps.newHashMap();
-
-	public static final DynamicCommandExceptionType UNKNOWN_ENTITY_OPTION = Message.UNKNOWN_ENTITY_OPTION
-			.newDynamicCommandExceptionType();
-
-	public static final DynamicCommandExceptionType INAPPLICABLE_ENTITY_OPTION = Message.INAPPLICABLE_ENTITY_OPTION
-			.newDynamicCommandExceptionType();
-
-	public static final SimpleCommandExceptionType NEGATIVE_DISTANCE = Message.NEGATIVE_DISTANCE
-			.newSimpleCommandExceptionType();
-
-	public static final SimpleCommandExceptionType NEGATIVE_LEVEL = Message.NEGATIVE_LEVEL
-			.newSimpleCommandExceptionType();
-
-	public static final SimpleCommandExceptionType NONPOSITIVE_LIMIT = Message.NONPOSITIVE_LIMIT
-			.newSimpleCommandExceptionType();
-
-	public static final DynamicCommandExceptionType INVALID_SORT = Message.INVALID_SORT
-			.newDynamicCommandExceptionType();
-
-	public static final DynamicCommandExceptionType INVALID_GAME_MODE = Message.INVALID_GAME_MODE
-			.newDynamicCommandExceptionType();
-
-	public static final DynamicCommandExceptionType INVALID_ENTITY_TYPE = Message.INVALID_ENTITY_TYPE
-			.newDynamicCommandExceptionType();
 
 	public static void register(String id, IFilter handler, Predicate<EntitySelectorParser> filter,
 			com.mojang.brigadier.Message tooltip) {
@@ -70,7 +62,8 @@ public class EntityOptions {
 				String s = parser.getReader().readString();
 				if (parser.hasNameNotEquals() && !flag) {
 					parser.getReader().setCursor(i);
-					throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(parser.getReader(), "name");
+					throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(
+							parser.getReader(), "name");
 				}
 				if (flag) {
 					parser.setHasNameNotEquals(true);
@@ -79,18 +72,20 @@ public class EntityOptions {
 				}
 
 				parser.addFilter((entity) -> {
-					return (entity.getCustomName() == null ? entity.getName() : entity.getCustomName())
-							.equals(s) != flag;
+					return (entity.getCustomName() == null
+							? entity.getName()
+							: entity.getCustomName()).equals(s) != flag;
 				});
 			}, (parser) -> {
 				return !parser.hasNameEquals();
 			}, null);
 			EntityOptions.register("distance", (parser) -> {
 				int i = parser.getReader().getCursor();
-				MinMaxBounds.FloatBound minmaxbounds$floatbound = MinMaxBounds.FloatBound
-						.fromReader(parser.getReader());
-				if ((minmaxbounds$floatbound.getMin() == null || !(minmaxbounds$floatbound.getMin() < 0.0F))
-						&& (minmaxbounds$floatbound.getMax() == null || !(minmaxbounds$floatbound.getMax() < 0.0F))) {
+				MinMaxBounds.FloatBound minmaxbounds$floatbound =
+						MinMaxBounds.FloatBound.fromReader(parser.getReader());
+				if ((minmaxbounds$floatbound.getMin() == null || !(minmaxbounds$floatbound.getMin()
+						< 0.0F)) && (minmaxbounds$floatbound.getMax() == null || !(
+						minmaxbounds$floatbound.getMax() < 0.0F))) {
 					parser.setDistance(minmaxbounds$floatbound);
 					parser.setCurrentWorldOnly();
 				} else {
@@ -102,9 +97,11 @@ public class EntityOptions {
 			}, null);
 			EntityOptions.register("level", (parser) -> {
 				int i = parser.getReader().getCursor();
-				MinMaxBounds.IntBound minmaxbounds$intbound = MinMaxBounds.IntBound.fromReader(parser.getReader());
+				MinMaxBounds.IntBound minmaxbounds$intbound =
+						MinMaxBounds.IntBound.fromReader(parser.getReader());
 				if ((minmaxbounds$intbound.getMin() == null || minmaxbounds$intbound.getMin() >= 0)
-						&& (minmaxbounds$intbound.getMax() == null || minmaxbounds$intbound.getMax() >= 0)) {
+						&& (minmaxbounds$intbound.getMax() == null
+						|| minmaxbounds$intbound.getMax() >= 0)) {
 					parser.setLevel(minmaxbounds$intbound);
 					parser.setIncludeNonPlayers(false);
 				} else {
@@ -151,13 +148,14 @@ public class EntityOptions {
 				return parser.getDz() == null;
 			}, null);
 			EntityOptions.register("x_rotation", (parser) -> {
-				parser.setXRotation(
-						MinMaxBoundsWrapped.fromReader(parser.getReader(), true, MathHelper::wrapDegrees));
+				parser.setXRotation(MinMaxBoundsWrapped.fromReader(parser.getReader(), true,
+						MathHelper::wrapDegrees));
 			}, (parser) -> {
 				return parser.getXRotation() == MinMaxBoundsWrapped.UNBOUNDED;
 			}, null);
 			EntityOptions.register("y_rotation", (parser) -> {
-				parser.setYRotation(MinMaxBoundsWrapped.fromReader(parser.getReader(), true, MathHelper::wrapDegrees));
+				parser.setYRotation(MinMaxBoundsWrapped.fromReader(parser.getReader(), true,
+						MathHelper::wrapDegrees));
 			}, (parser) -> {
 				return parser.getYRotation() == MinMaxBoundsWrapped.UNBOUNDED;
 			}, null);
@@ -177,26 +175,26 @@ public class EntityOptions {
 				int i = parser.getReader().getCursor();
 				String s = parser.getReader().readUnquotedString();
 				parser.setSuggestionHandler((builder, p_202056_1_) -> {
-					return ISuggestionProvider.suggest(Arrays.asList("nearest", "furthest", "random", "arbitrary"),
-							builder);
+					return ISuggestionProvider.suggest(
+							Arrays.asList("nearest", "furthest", "random", "arbitrary"), builder);
 				});
 				BiConsumer<Vector3d, List<? extends Entity>> biconsumer;
 				switch (s) {
-				case "nearest":
-					biconsumer = EntitySelectorParser.NEAREST;
-					break;
-				case "furthest":
-					biconsumer = EntitySelectorParser.FURTHEST;
-					break;
-				case "random":
-					biconsumer = EntitySelectorParser.RANDOM;
-					break;
-				case "arbitrary":
-					biconsumer = EntitySelectorParser.ARBITRARY;
-					break;
-				default:
-					parser.getReader().setCursor(i);
-					throw EntityOptions.INVALID_SORT.createWithContext(parser.getReader(), s);
+					case "nearest":
+						biconsumer = EntitySelectorParser.NEAREST;
+						break;
+					case "furthest":
+						biconsumer = EntitySelectorParser.FURTHEST;
+						break;
+					case "random":
+						biconsumer = EntitySelectorParser.RANDOM;
+						break;
+					case "arbitrary":
+						biconsumer = EntitySelectorParser.ARBITRARY;
+						break;
+					default:
+						parser.getReader().setCursor(i);
+						throw EntityOptions.INVALID_SORT.createWithContext(parser.getReader(), s);
 				}
 
 				parser.setSorter(biconsumer);
@@ -221,7 +219,8 @@ public class EntityOptions {
 					for (GameMode gamemode : GameMode.values()) {
 						if (gamemode.name().toLowerCase(Locale.ROOT).startsWith(s1)) {
 							if (flag2) {
-								suggestionBuilder.suggest('!' + gamemode.name().toLowerCase(Locale.ROOT));
+								suggestionBuilder.suggest(
+										'!' + gamemode.name().toLowerCase(Locale.ROOT));
 							}
 
 							if (flag1) {
@@ -236,7 +235,8 @@ public class EntityOptions {
 				boolean flag = parser.shouldInvertValue();
 				if (parser.hasGamemodeNotEquals() && !flag) {
 					parser.getReader().setCursor(i);
-					throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(parser.getReader(), "gamemode");
+					throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(
+							parser.getReader(), "gamemode");
 				}
 				String s = parser.getReader().readUnquotedString();
 				GameMode gametype = null;
@@ -274,18 +274,16 @@ public class EntityOptions {
 			 * String s1 = team == null ? "" : team.getName(); return s1.equals(s) != flag;
 			 * } }); if (flag) { parser.setHasTeamNotEquals(true); } else {
 			 * parser.setHasTeamEquals(true); }
-			 * 
+			 *
 			 * }, (p_202038_0_) -> { return !p_202038_0_.hasTeamEquals(); }, null);
 			 */
 			EntityOptions.register("type", (parser) -> {
 				parser.setSuggestionHandler((suggestionBuilder, unused) -> {
-					ISuggestionProvider.suggest(Arrays.asList(EntityType.values())
-							.stream()
+					ISuggestionProvider.suggest(Arrays.asList(EntityType.values()).stream()
 							.map(e -> e.name().toLowerCase(Locale.ROOT))
 							.collect(Collectors.toList()), suggestionBuilder, String.valueOf('!'));
 					if (!parser.isTypeLimitedInversely()) {
-						ISuggestionProvider.suggest(Arrays.asList(EntityType.values())
-								.stream()
+						ISuggestionProvider.suggest(Arrays.asList(EntityType.values()).stream()
 								.map(e -> e.name().toLowerCase(Locale.ROOT))
 								.collect(Collectors.toList()), suggestionBuilder);
 					}
@@ -295,7 +293,8 @@ public class EntityOptions {
 				boolean inverted = parser.shouldInvertValue();
 				if (parser.isTypeLimitedInversely() && !inverted) {
 					parser.getReader().setCursor(i);
-					throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(parser.getReader(), "type");
+					throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(
+							parser.getReader(), "type");
 				}
 				if (inverted) {
 					parser.setTypeLimitedInversely();
@@ -303,16 +302,18 @@ public class EntityOptions {
 
 				String resourcelocation1 = EntityOptions.ResourceLocation_read(parser.getReader());
 				EntityType entitytype = Arrays.asList(EntityType.values()).stream().filter(e -> {
-					return e.name().toLowerCase(Locale.ROOT).equals(resourcelocation1.toLowerCase(Locale.ROOT));
+					return e.name().toLowerCase(Locale.ROOT)
+							.equals(resourcelocation1.toLowerCase(Locale.ROOT));
 				}).findAny().orElseThrow(() -> {
 					parser.getReader().setCursor(i);
-					return EntityOptions.INVALID_ENTITY_TYPE.createWithContext(parser.getReader(), resourcelocation1);
+					return EntityOptions.INVALID_ENTITY_TYPE.createWithContext(parser.getReader(),
+							resourcelocation1);
 				});
-//					EntityType entitytype = Registry.ENTITY_TYPE.getOptional(resourcelocation1).orElseThrow(() -> {
-//						p_197447_0_.getReader().setCursor(i);
-//						return INVALID_ENTITY_TYPE.createWithContext(p_197447_0_.getReader(),
-//								resourcelocation1.toString());
-//					});
+				//					EntityType entitytype = Registry.ENTITY_TYPE.getOptional(resourcelocation1).orElseThrow(() -> {
+				//						p_197447_0_.getReader().setCursor(i);
+				//						return INVALID_ENTITY_TYPE.createWithContext(p_197447_0_.getReader(),
+				//								resourcelocation1.toString());
+				//					});
 				if (Objects.equal(EntityType.PLAYER, entitytype) && !inverted) {
 					parser.setIncludeNonPlayers(false);
 				}
@@ -342,7 +343,7 @@ public class EntityOptions {
 			 * ServerPlayerEntity) { ItemStack itemstack = ((ServerPlayerEntity)
 			 * p_197443_2_).inventory.getCurrentItem(); if (!itemstack.isEmpty()) {
 			 * compoundnbt1.put("SelectedItem", itemstack.write(new CompoundNBT())); } }
-			 * 
+			 *
 			 * return NBTUtil.areNBTEquals(compoundnbt, compoundnbt1, true) != flag; }); },
 			 * (p_202046_0_) -> { return true; }, null);
 			 */
@@ -350,7 +351,7 @@ public class EntityOptions {
 			 * register("scores", (parser) -> { StringReader stringreader =
 			 * parser.getReader(); Map<String, MinMaxBounds.IntBound> map =
 			 * Maps.newHashMap(); stringreader.expect('{'); stringreader.skipWhitespace();
-			 * 
+			 *
 			 * while (stringreader.canRead() && stringreader.peek() != '}') {
 			 * stringreader.skipWhitespace(); String s = stringreader.readUnquotedString();
 			 * stringreader.skipWhitespace(); stringreader.expect('=');
@@ -359,23 +360,23 @@ public class EntityOptions {
 			 * minmaxbounds$intbound); stringreader.skipWhitespace(); if
 			 * (stringreader.canRead() && stringreader.peek() == ',') { stringreader.skip();
 			 * } }
-			 * 
+			 *
 			 * stringreader.expect('}'); if (!map.isEmpty()) {
 			 * parser.addFilter((p_197465_1_) -> { Scoreboard scoreboard =
 			 * p_197465_1_.getServer().getScoreboard(); String s1 =
 			 * p_197465_1_.getScoreboardName();
-			 * 
+			 *
 			 * for (Entry<String, MinMaxBounds.IntBound> entry : map.entrySet()) {
 			 * ScoreObjective scoreobjective = scoreboard.getObjective(entry.getKey()); if
 			 * (scoreobjective == null) { return false; }
-			 * 
+			 *
 			 * if (!scoreboard.entityHasObjective(s1, scoreobjective)) { return false; }
-			 * 
+			 *
 			 * Score score = scoreboard.getOrCreateScore(s1, scoreobjective); int i =
 			 * score.getScorePoints(); if (!entry.getValue().test(i)) { return false; } }
-			 * 
+			 *
 			 * return true; }); }
-			 * 
+			 *
 			 * parser.setHasScores(true); }, (p_202033_0_) -> { return
 			 * !p_202033_0_.hasScores(); }, null);
 			 */
@@ -383,7 +384,7 @@ public class EntityOptions {
 			 * register("advancements", (parser) -> { StringReader stringreader =
 			 * parser.getReader(); Map<ResourceLocation, Predicate<AdvancementProgress>> map
 			 * = Maps.newHashMap(); stringreader.expect('{'); stringreader.skipWhitespace();
-			 * 
+			 *
 			 * while (stringreader.canRead() && stringreader.peek() != '}') {
 			 * stringreader.skipWhitespace(); ResourceLocation resourcelocation =
 			 * ResourceLocation.read(stringreader); stringreader.skipWhitespace();
@@ -392,7 +393,7 @@ public class EntityOptions {
 			 * Predicate<CriterionProgress>> map1 = Maps.newHashMap();
 			 * stringreader.skipWhitespace(); stringreader.expect('{');
 			 * stringreader.skipWhitespace();
-			 * 
+			 *
 			 * while (stringreader.canRead() && stringreader.peek() != '}') {
 			 * stringreader.skipWhitespace(); String s = stringreader.readUnquotedString();
 			 * stringreader.skipWhitespace(); stringreader.expect('=');
@@ -400,35 +401,35 @@ public class EntityOptions {
 			 * map1.put(s, (p_197444_1_) -> { return p_197444_1_.isObtained() == flag1; });
 			 * stringreader.skipWhitespace(); if (stringreader.canRead() &&
 			 * stringreader.peek() == ',') { stringreader.skip(); } }
-			 * 
+			 *
 			 * stringreader.skipWhitespace(); stringreader.expect('}');
 			 * stringreader.skipWhitespace(); map.put(resourcelocation, (p_197435_1_) -> {
 			 * for (Entry<String, Predicate<CriterionProgress>> entry : map1.entrySet()) {
 			 * CriterionProgress criterionprogress =
 			 * p_197435_1_.getCriterionProgress(entry.getKey()); if (criterionprogress ==
 			 * null || !entry.getValue().test(criterionprogress)) { return false; } }
-			 * 
+			 *
 			 * return true; }); } else { boolean flag = stringreader.readBoolean();
 			 * map.put(resourcelocation, (p_197451_1_) -> { return p_197451_1_.isDone() ==
 			 * flag; }); }
-			 * 
+			 *
 			 * stringreader.skipWhitespace(); if (stringreader.canRead() &&
 			 * stringreader.peek() == ',') { stringreader.skip(); } }
-			 * 
+			 *
 			 * stringreader.expect('}'); if (!map.isEmpty()) { parser.addFilter((entity) ->
 			 * { if (!(entity instanceof Player)) { return false; } else { Player
 			 * serverplayerentity = (Player) entity; PlayerAdvancements playeradvancements =
 			 * serverplayerentity.getAdvancements(); AdvancementManager advancementmanager =
 			 * serverplayerentity.getServer() .getAdvancementManager();
-			 * 
+			 *
 			 * for (Entry<ResourceLocation, Predicate<AdvancementProgress>> entry :
 			 * map.entrySet()) { Advancement advancement =
 			 * advancementmanager.getAdvancement(entry.getKey()); if (advancement == null ||
 			 * !entry.getValue().test(playeradvancements.getProgress(advancement))) { return
 			 * false; } }
-			 * 
+			 *
 			 * return true; } }); parser.setIncludeNonPlayers(false); }
-			 * 
+			 *
 			 * parser.setHasAdvancements(true); }, (p_202032_0_) -> { return
 			 * !p_202032_0_.hasAdvancements(); }, null);
 			 */
@@ -453,7 +454,8 @@ public class EntityOptions {
 	public static String ResourceLocation_read(StringReader reader) {
 		int i = reader.getCursor();
 
-		while (reader.canRead() && EntityOptions.ResourceLocation_isValidPathCharacter(reader.peek())) {
+		while (reader.canRead() && EntityOptions.ResourceLocation_isValidPathCharacter(
+				reader.peek())) {
 			reader.skip();
 		}
 
@@ -463,8 +465,8 @@ public class EntityOptions {
 	}
 
 	public static boolean ResourceLocation_isValidPathCharacter(char charIn) {
-		return charIn >= '0' && charIn <= '9' || charIn >= 'a' && charIn <= 'z' || charIn == '_' || charIn == ':'
-				|| charIn == '/' || charIn == '.' || charIn == '-';
+		return charIn >= '0' && charIn <= '9' || charIn >= 'a' && charIn <= 'z' || charIn == '_'
+				|| charIn == ':' || charIn == '/' || charIn == '.' || charIn == '-';
 	}
 
 	public static IFilter get(EntitySelectorParser parser, String id, int cursor)
@@ -474,7 +476,8 @@ public class EntityOptions {
 			if (entityoptions$optionhandler.canHandle.test(parser)) {
 				return entityoptions$optionhandler.handler;
 			}
-			throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(parser.getReader(), id);
+			throw EntityOptions.INAPPLICABLE_ENTITY_OPTION.createWithContext(parser.getReader(),
+					id);
 		}
 		parser.getReader().setCursor(cursor);
 		throw EntityOptions.UNKNOWN_ENTITY_OPTION.createWithContext(parser.getReader(), id);
@@ -484,7 +487,8 @@ public class EntityOptions {
 		String s = builder.getRemaining().toLowerCase(Locale.ROOT);
 
 		for (Entry<String, OptionHandler> entry : EntityOptions.REGISTRY.entrySet()) {
-			if ((entry.getValue()).canHandle.test(parser) && entry.getKey().toLowerCase(Locale.ROOT).startsWith(s)) {
+			if ((entry.getValue()).canHandle.test(parser) && entry.getKey().toLowerCase(Locale.ROOT)
+					.startsWith(s)) {
 				builder.suggest(entry.getKey() + '=', (entry.getValue()).tooltip);
 			}
 		}
@@ -496,6 +500,7 @@ public class EntityOptions {
 		void handle(EntitySelectorParser parser) throws CommandSyntaxException;
 
 	}
+
 
 	public static class OptionHandler {
 

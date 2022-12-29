@@ -12,12 +12,15 @@ import de.dytanic.cloudnet.driver.service.ServiceId;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.wrapper.Wrapper;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,8 +31,24 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
-
+	public static final Key server = new Key(Lobby.getInstance(), "server");
 	private static final InventoryType type_lobby_switcher = InventoryType.of("lobby_switcher");
+	// @formatter:off
+	private static final int[] SLOTS = new int[] {
+			31, 30, 32, 29, 33, 28, 34,
+			22, 21, 23, 20, 24, 19, 25,
+			40, 39, 41, 38, 42, 37, 43
+	};
+
+	// @Override
+	// public void playAnimation(User user) {
+	// this.animate(user, false);
+	// }
+	//
+	// @Override
+	// public void skipAnimation(User user) {
+	// this.animate(user, true);
+	// }
 
 	// private static final int[] SLOTS;
 	// private static final int[] SORT;
@@ -53,27 +72,8 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 	public InventoryLobbySwitcher(User user) {
 		super(InventoryLobbySwitcher.type_lobby_switcher,
 				Item.INVENTORY_LOBBY_SWITCHER.getDisplayName(user), user);
-		for (int i = 0; i < InventoryLobbySwitcher.SLOTS.length; i++) {
-			this.PAGE_SLOTS[i] = InventoryLobbySwitcher.SLOTS[i];
-		}
+		System.arraycopy(InventoryLobbySwitcher.SLOTS,0,this.PAGE_SLOTS,0,InventoryLobbySwitcher.SLOTS.length);
 	}
-
-	// @Override
-	// public void playAnimation(User user) {
-	// this.animate(user, false);
-	// }
-	//
-	// @Override
-	// public void skipAnimation(User user) {
-	// this.animate(user, true);
-	// }
-
-	// @formatter:off
-	private static final int[] SLOTS = new int[] {
-			31, 30, 32, 29, 33, 28, 34, 
-			22, 21, 23, 20, 24, 19, 25, 
-			40, 39, 41, 38, 42, 37, 43
-	};
 
 //	private static final int[] SORT = new int[] {
 //			02, 03, 03, 04, 04, 05, 05, 
@@ -83,34 +83,23 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 	// @formatter:on
 
 	@Override
-	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 5),
-				Item.INVENTORY_LOBBY_SWITCHER.getItem(this.user.getUser()));
-		super.insertFallbackItems();
-	}
-
-	@Override
-	protected void insertArrowItems() {
-		super.insertArrowItems();
-	}
-
-	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		super.fillItems(items);
 		ServiceId service = Wrapper.getInstance().getServiceId();
 		String taskName = service.getTaskName();
-		List<ServiceInfoSnapshot> lobbies = CloudNetDriver.getInstance().getCloudServiceProvider()
-				.getCloudServices(taskName).stream().filter(ServiceInfoSnapshot::isConnected)
-				.filter(s -> s.getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false))
-				.sorted(new Comparator<ServiceInfoSnapshot>() {
+		List<ServiceInfoSnapshot> lobbies =
+				CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(taskName)
+						.stream().filter(ServiceInfoSnapshot::isConnected)
+						.filter(s -> s.getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false))
+						.sorted(new Comparator<ServiceInfoSnapshot>() {
 
-					@Override
-					public int compare(ServiceInfoSnapshot o1, ServiceInfoSnapshot o2) {
-						return Integer.compare(o1.getServiceId().getTaskServiceId(),
-								o2.getServiceId().getTaskServiceId());
-					}
+							@Override
+							public int compare(ServiceInfoSnapshot o1, ServiceInfoSnapshot o2) {
+								return Integer.compare(o1.getServiceId().getTaskServiceId(),
+										o2.getServiceId().getTaskServiceId());
+							}
 
-				}).collect(Collectors.toList());
+						}).collect(Collectors.toList());
 
 		if (lobbies == null || lobbies.isEmpty()) {
 			ItemStack item = new ItemStack(Material.BARRIER);
@@ -128,8 +117,8 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 			ItemMeta meta = item.getItemMeta();
 			String id = s.getServiceId().getName();
 			if (id.length() > 0) {
-				id = Character.toUpperCase(id.charAt(0))
-						+ id.substring(1, id.length()).replace("-", " ");
+				id = Character.toUpperCase(id.charAt(0)) + id.substring(1)
+						.replace("-", " ");
 			}
 			if (s.getServiceId().equals(thisLobby.getServiceId())) {
 				item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user.getUser());
@@ -138,8 +127,9 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 				meta.setDisplayName("§a" + id);
 			}
 			item.setItemMeta(meta);
-			item = new ItemBuilder(item).getUnsafe().setString("server", s.getServiceId().getName())
-					.builder().build();
+			item = ItemBuilder.item(item).persistentDataStorage()
+					.iset(server, PersistentDataTypes.STRING, s.getServiceId().getName()).builder()
+					.build();
 			items.put(i, item);
 		}
 
@@ -162,6 +152,18 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 		// item = new ItemBuilder(
 		// item).getUnsafe().setString("server", s.getServiceId().getName()).builder().build();
 		// items.put(slot, item);
+	}
+
+	@Override
+	protected void insertArrowItems() {
+		super.insertArrowItems();
+	}
+
+	@Override
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 5),
+				Item.INVENTORY_LOBBY_SWITCHER.getItem(this.user.getUser()));
+		super.insertFallbackItems();
 	}
 
 	// private void animate(User user, boolean instant) {

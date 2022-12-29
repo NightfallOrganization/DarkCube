@@ -8,7 +8,7 @@
 package eu.darkcube.system.userapi.packets;
 
 import eu.darkcube.system.packetapi.Packet;
-import eu.darkcube.system.userapi.data.Key;
+import eu.darkcube.system.util.data.Key;
 
 import java.util.UUID;
 

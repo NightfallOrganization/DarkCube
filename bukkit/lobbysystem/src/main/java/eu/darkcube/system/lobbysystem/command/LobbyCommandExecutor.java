@@ -7,10 +7,11 @@
 
 package eu.darkcube.system.lobbysystem.command;
 
-import java.util.function.Consumer;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+import java.util.function.Consumer;
 
 public class LobbyCommandExecutor extends CommandExecutor {
 

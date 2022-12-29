@@ -7,17 +7,19 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import com.github.juliarn.npc.NPC;
-import com.github.juliarn.npc.event.PlayerNPCInteractEvent;
-import com.github.juliarn.npc.modifier.LabyModModifier;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.labymod.emotes.Emotes;
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
+import eu.darkcube.system.libs.com.github.juliarn.npc.event.PlayerNPCInteractEvent;
+import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.LabyModModifier;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryDailyReward;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.AdventureSupport;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -31,6 +33,22 @@ import java.util.*;
 
 public class ListenerDailyReward extends BaseListener {
 
+	private static int randomCubes(Calendar c) {
+		int maxCubes = 200;
+		int minCubes = 80;
+		if (c.get(Calendar.MONTH) == Calendar.DECEMBER) {
+			int day = c.get(Calendar.DAY_OF_MONTH);
+			if (day == 24 || day == 25 || day == 26 || day == 27 || day == 28 || day == 29
+					|| day == 30 || day == 31) {
+				maxCubes *= 10;
+				minCubes *= 10;
+			}
+		}
+
+		int cubes = minCubes + new Random().nextInt(maxCubes - minCubes + 1);
+		return cubes;
+	}
+
 	@EventHandler
 	public void handle(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
@@ -42,7 +60,8 @@ public class ListenerDailyReward extends BaseListener {
 		if (item == null) {
 			return;
 		}
-		int id = new ItemBuilder(item).getUnsafe().getInt("reward");
+		int id = ItemBuilder.item(item).persistentDataStorage()
+				.get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
 		if (id == 0) {
 			return;
 		}
@@ -65,24 +84,9 @@ public class ListenerDailyReward extends BaseListener {
 		item.setItemMeta(meta);
 		user.setLastDailyReward(System.currentTimeMillis());
 		e.setCurrentItem(item);
-		p.sendMessage(Message.REWARD_COINS.getMessage(user.getUser(), Integer.toString(cubes)));
+		AdventureSupport.audienceProvider().player(p).sendMessage(
+				Message.REWARD_COINS.getMessage(user.getUser(), Integer.toString(cubes)));
 		p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
-	}
-
-	private static int randomCubes(Calendar c) {
-		int maxCubes = 200;
-		int minCubes = 80;
-		if (c.get(Calendar.MONTH) == Calendar.DECEMBER) {
-			int day = c.get(Calendar.DAY_OF_MONTH);
-			if (day == 24 || day == 25 || day == 26 || day == 27 || day == 28 || day == 29
-					|| day == 30 || day == 31) {
-				maxCubes *= 10;
-				minCubes *= 10;
-			}
-		}
-
-		int cubes = minCubes + new Random().nextInt(maxCubes - minCubes + 1);
-		return cubes;
 	}
 
 	@EventHandler

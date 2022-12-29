@@ -16,7 +16,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class UUIDArgument implements ArgumentType<UUID> {
 
 	private static final DynamicCommandExceptionType INVALID_UUID =
-			Message.INVALID_UUID.newDynamicCommandExceptionType();
+			Messages.INVALID_UUID.newDynamicCommandExceptionType();
 
 	public static UUIDArgument uuid() {
 		return new UUIDArgument();

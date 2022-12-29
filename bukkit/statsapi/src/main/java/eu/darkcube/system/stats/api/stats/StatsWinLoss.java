@@ -7,17 +7,15 @@
 
 package eu.darkcube.system.stats.api.stats;
 
-import java.util.List;
-
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsWinLoss {
 
-	public default void insertWinLoss(Stats stats, List<ChatEntry> builder, long wins, long losses,
-			double ratio, long placementWins, long placementLosses, long placementRatio) {
-		StatsUtil.insertWins(stats, builder, wins, placementWins);
-		StatsUtil.insertLosses(stats, builder, losses, placementLosses);
-		StatsUtil.insertWinLossRatio(stats, builder, ratio, placementRatio);
+	default Component insertWinLoss(Stats stats, long wins, long losses, double ratio,
+			long placementWins, long placementLosses, long placementRatio) {
+		return StatsUtil.insertWins(stats, wins, placementWins)
+				.append(StatsUtil.insertLosses(stats, losses, placementLosses))
+				.append(StatsUtil.insertWinLossRatio(stats, ratio, placementRatio));
 	}
 }

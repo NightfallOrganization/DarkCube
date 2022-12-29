@@ -16,7 +16,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,7 +25,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class BooleanArgument implements ArgumentType<Boolean> {
 
-	private static final DynamicCommandExceptionType BOOLEAN_INVALID = Message.BOOLEAN_INVALID.newDynamicCommandExceptionType();
+	private static final DynamicCommandExceptionType BOOLEAN_INVALID =
+			Messages.BOOLEAN_INVALID.newDynamicCommandExceptionType();
 
 	private BooleanArgument() {
 	}
@@ -34,8 +35,7 @@ public class BooleanArgument implements ArgumentType<Boolean> {
 		return new BooleanArgument();
 	}
 
-	public static boolean getBoolean(CommandContext<CommandSource> context,
-					String name) {
+	public static boolean getBoolean(CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, Boolean.class);
 	}
 
@@ -50,15 +50,14 @@ public class BooleanArgument implements ArgumentType<Boolean> {
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(
-					CommandContext<S> context, SuggestionsBuilder builder) {
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
 		return ISuggestionProvider.suggest(BooleanType.BY_NAME.keySet(), builder);
 	}
 
 	private static enum BooleanType {
 
-		TRUE("true", true),
-		FALSE("false", false);
+		TRUE("true", true), FALSE("false", false);
 
 		private static final Map<String, BooleanType> BY_NAME = new HashMap<>();
 
@@ -76,12 +75,12 @@ public class BooleanArgument implements ArgumentType<Boolean> {
 			this.value = value;
 		}
 
-		public boolean getValue() {
-			return value;
-		}
-
 		public static BooleanType getByName(String name) {
 			return BY_NAME.get(name.toLowerCase(Locale.ROOT));
+		}
+
+		public boolean getValue() {
+			return value;
 		}
 	}
 }

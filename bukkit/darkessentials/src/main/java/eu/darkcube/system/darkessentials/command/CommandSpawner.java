@@ -7,16 +7,19 @@
 
 package eu.darkcube.system.darkessentials.command;
 
-import eu.darkcube.system.commandapi.Argument;
-import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
+import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
 import eu.darkcube.system.darkessentials.DarkEssentials;
-import eu.darkcube.system.darkessentials.util.EssentialCollections;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.darkessentials.util.Message;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,172 +28,68 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
-public class CommandSpawner extends Command implements Listener {
+public class CommandSpawner extends EssentialsCommand implements Listener {
+	private static final PersistentDataType<EntityType> entityType =
+			PersistentDataTypes.enumType(EntityType.class);
+	private static final Key spawnerType = new Key(DarkEssentials.getInstance(), "spawnerType");
 
 	public CommandSpawner() {
-		super(DarkEssentials.getInstance(), "spawner", new Command[0], "Gibt dir einen Monsterspawner",
-				new Argument[] { new Argument("Entity", "Das zu Spawnende Entity"),
-						new Argument("Spieler", "Der Spieler, der den Spawner bekommen soll.", false) });
-		this.setAliases("d_spawner");
+		super("spawner", b -> b.then(Commands.argument("type",
+						EnumArgument.enumArgument(EntityType.values(),
+								t -> t.getName() != null ? new String[] {t.getName()} : new String[0]))
+				.executes(ctx -> execute(ctx.getSource(),
+						EnumArgument.getEnumArgument(ctx, "type", EntityType.class),
+						Collections.singleton(ctx.getSource().asPlayer())))
+				.then(Commands.argument("players", EntityArgument.players()).executes(
+						ctx -> execute(ctx.getSource(),
+								EnumArgument.getEnumArgument(ctx, "type", EntityType.class),
+								EntityArgument.getPlayers(ctx, "players"))))));
 		Bukkit.getPluginManager().registerEvents(this, DarkEssentials.getInstance());
 	}
 
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length == 0)
-			return false;
-		Set<Player> players = new HashSet<>();
-
-		EntityType entity = null;
-		try {
-			try {
-				entity = EntityType.valueOf(args[0].toUpperCase(Locale.ENGLISH));
-			} catch (Exception ex) {
-			}
-			if (entity == null) {
-				switch (args[0].toLowerCase()) {
-				case "boneman":
-					entity = EntityType.SKELETON;
-					break;
-				case "pigzombie":
-				case "zombie_pigman":
-				case "zombiepigman":
-					entity = EntityType.PIG_ZOMBIE;
-					break;
-				case "cavespider":
-					entity = EntityType.CAVE_SPIDER;
-					break;
-				case "magmacube":
-				case "magma_slime":
-				case "magmaslime":
-					entity = EntityType.MAGMA_CUBE;
-					break;
-				case "enderdragon":
-				case "dragon":
-					entity = EntityType.ENDER_DRAGON;
-					break;
-				case "mushroomcow":
-				case "mooshroom":
-					entity = EntityType.MUSHROOM_COW;
-					break;
-				case "snow_man":
-				case "snowgolem":
-				case "snow_golem":
-					entity = EntityType.SNOWMAN;
-					break;
-				case "cat":
-					entity = EntityType.OCELOT;
-					break;
-				case "irongolem":
-				case "golem":
-				case "villager_golem":
-				case "villagergolem":
-					entity = EntityType.IRON_GOLEM;
-					break;
-				default:
-					throw new IllegalArgumentException();
-				}
-			}
-		} catch (Exception e) {
-			DarkEssentials.getInstance().sendMessage(DarkEssentials.cFail() + "Du musst ein Mob angeben!", sender);
-			return true;
-		}
-		args[0] = "%processed%";
-		Set<String> unresolvedNames = new HashSet<>();
-		for (String playerName : args) {
-			if (!playerName.equals("%processed%")) {
-				if (Bukkit.getPlayer(playerName) != null) {
-					players.add(Bukkit.getPlayer(playerName));
-				} else {
-					unresolvedNames.add(playerName);
-				}
-			}
-		}
-		if (players.isEmpty()) {
-			if (sender instanceof Player) {
-				players.add((Player) sender);
+	private static int execute(CommandSource source, EntityType type, Collection<Player> players) {
+		String name = type.getName();
+		ItemStack item =
+				ItemBuilder.spawner().persistentDataStorage().iset(spawnerType, entityType, type)
+						.builder().displayname(ChatColor.GOLD + name + ChatColor.GRAY + " Spawner")
+						.build();
+		players.forEach(p -> p.getInventory().addItem(item));
+		if (players.size() == 1) {
+			if (players.stream().findFirst().orElse(null) == source.getEntity()) {
+				source.sendMessage(
+						Message.SPAWNER_GIVEN_TO_SELF.getMessage(source.getSource(), name));
 			} else {
-				DarkEssentials.sendMessagePlayernameRequired(sender);
-				return true;
+				source.sendMessage(
+						Message.SPAWNER_GIVEN_TO_PLAYER.getMessage(source.getSource(), name,
+								Objects.requireNonNull(players.stream().findFirst().orElse(null))
+										.getDisplayName()));
 			}
+		} else {
+			source.sendMessage(Message.SPAWNER_GIVEN_TO_PLAYERS.getMessage(source.getSource(), name,
+					players.size()));
 		}
-		DarkEssentials.sendMessagePlayerNotFound(unresolvedNames, sender);
-		ItemStack item = new ItemBuilder(Material.MOB_SPAWNER).unsafe().setString("spawnertype", entity.name())
-				.builder().displayname(ChatColor.GOLD + entity.name() + ChatColor.GRAY + " Spawner").build();
-//		ItemStack nmsSpawner = CraftItemStack.asNMSCopy(bukkitSpawner);
-//		NBTTagCompound tag = nmsSpawner.getTag();
-//		if (tag == null)
-//			tag = new NBTTagCompound();
-//		tag.set("spawnertype", new NBTTagString(entity.name()));
-//		nmsSpawner.setTag(tag);
-//		ItemMeta meta = CraftItemStack.getItemMeta(nmsSpawner);
-//		meta.setDisplayName(ChatColor.GOLD + entity.name() + ChatColor.GRAY
-//						+ " Spawner");
-//		bukkitSpawner.setItemMeta(meta);
-		int count = 0;
-		for (Player current : players) {
-			current.getInventory().addItem(item);
-			DarkEssentials.getInstance().sendMessage(
-					DarkEssentials.cConfirm() + "Du hast einen " + DarkEssentials.cValue() + entity.name()
-					+ DarkEssentials.cConfirm() + "-Spawner erhalten.", sender);
-			count++;
-		}
-		if (!(players.size() == 1 && players.contains(sender))) {
-			DarkEssentials.getInstance().sendMessage(
-					DarkEssentials.cValue() + count + DarkEssentials.cConfirm() + " Spielern einen Spawner gegeben.",
-					sender);
-		}
-		return true;
-	}
-
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return EssentialCollections.toSortedStringList(EntityType.values(), args[0]);
-		}
-		if (args.length > 1) {
-			return DarkEssentials.getPlayersStartWith(args);
-		}
-		return super.onTabComplete(args);
+		return 0;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handle(BlockPlaceEvent e) {
 		if (e.isCancelled())
 			return;
-		if (!e.getItemInHand().getType().equals(Material.MOB_SPAWNER))
-			return;
 		ItemStack itemStack = e.getItemInHand();
-		ItemBuilder b = new ItemBuilder(itemStack);
-		if (b.getMeta() == null) {
+		ItemBuilder b = ItemBuilder.item(itemStack);
+		if (!b.persistentDataStorage().has(spawnerType)) {
 			return;
 		}
-		String type = b.unsafe().getString("spawnertype");
-		if (type == null || type.isEmpty()) {
-			return;
-		}
-		EntityType entity = this.find(type);
+		EntityType entity = b.persistentDataStorage().get(spawnerType, entityType);
 		if (entity == null) {
 			return;
 		}
 		CreatureSpawner spawner = (CreatureSpawner) e.getBlock().getState();
 		spawner.setSpawnedType(entity);
-		spawner.update();
 		spawner.update(true);
 	}
-
-	private EntityType find(String type) {
-		for (EntityType e : EntityType.values()) {
-			if (e.name().equals(type)) {
-				return e;
-			}
-		}
-		return null;
-	}
-
 }

@@ -1,12 +1,23 @@
-dependencies {
-    embedApi project('core')
-    embedRuntimeOnly project(path: '1.8.8', configuration: 'default')
-    //println project(path: '1.19.2').getMetaPropertyValues()
-    embedRuntimeOnly project(path: '1.19.2', configuration: 'reobf')
+plugins {
+    id("com.github.johnrengelman.shadow")
 }
 
 tasks {
-    jar {
-        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    shadowJar {
+        archiveClassifier.set("")
     }
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
+java {
+    withSourcesJar()
+}
+
+dependencies {
+    api(project(path: 'core', configuration: 'shadow'))
+    runtimeOnly project(path: '1.8.8', configuration: 'default')
+    //println project(path: '1.19.2').getMetaPropertyValues()
+    runtimeOnly project(path: '1.19.2', configuration: 'reobf')
 }

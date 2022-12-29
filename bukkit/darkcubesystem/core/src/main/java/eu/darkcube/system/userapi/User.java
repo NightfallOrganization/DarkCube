@@ -7,15 +7,16 @@
 
 package eu.darkcube.system.userapi;
 
-import eu.darkcube.system.userapi.data.MetaDataStorage;
-import eu.darkcube.system.userapi.data.PersistentDataStorage;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.MetaDataStorage;
+import eu.darkcube.system.util.data.PersistentDataStorage;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
 import java.util.UUID;
 
-public interface User {
+public interface User extends ForwardingAudience {
 
 	void lock();
 
@@ -44,7 +45,7 @@ public interface User {
 	/**
 	 * Sets the user's language
 	 *
-	 * @param language
+	 * @param language the language
 	 */
 	void setLanguage(Language language);
 
@@ -56,7 +57,7 @@ public interface User {
 	/**
 	 * Sets the user's cubes
 	 *
-	 * @param cubes
+	 * @param cubes the cubes
 	 */
 	void setCubes(BigInteger cubes);
 
