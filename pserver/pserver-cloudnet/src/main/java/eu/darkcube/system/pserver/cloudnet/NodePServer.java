@@ -7,10 +7,6 @@
 
 package eu.darkcube.system.pserver.cloudnet;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceConfiguration;
@@ -27,6 +23,10 @@ import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperDataUpdate;
 import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperUpdateInfo;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 public class NodePServer implements PServer {
 
@@ -58,72 +58,6 @@ public class NodePServer implements PServer {
 		this.createSerializable();
 	}
 
-	@Override
-	public JsonDocument getData() {
-		return data;
-	}
-
-	@Override
-	public String getTaskName() {
-		return taskName;
-	}
-
-	@Override
-	public void setPrivate(boolean privateServer) {
-		data.append("private", privateServer);
-		new PacketNodeWrapperDataUpdate(id, data);
-	}
-
-	private void setOwners(Collection<UUID> owners) {
-		if (owners == null) {
-			owners = DatabaseProvider.get("pserver").cast(PServerDatabase.class).getOwners(id);
-		}
-		this.owners = owners;
-	}
-
-	@Override
-	public void remove() {
-		stop();
-		NodePServerProvider.getInstance().remove(this);
-	}
-
-	@Override
-	public void connectPlayer(UUID player) {
-		ServiceInfoSnapshot snapshot = this.snapshot;
-		if (snapshot == null) {
-			return;
-		}
-		AsyncExecutor.service().submit(() -> {
-			IPlayerManager pm = CloudNetDriver.getInstance().getServicesRegistry()
-					.getFirstService(IPlayerManager.class);
-			ICloudPlayer cp = pm.getOnlinePlayer(player);
-			if (cp == null) {
-				return;
-			}
-			PlayerExecutor ex = pm.getPlayerExecutor(cp);
-			if (ex == null) {
-				return;
-			}
-			ex.connect(snapshot.getName());
-		});
-	}
-
-	// @Override
-	// public void addOwner(UUID owner) {
-	// DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, owner);
-	// owners.add(owner);
-	// rebuildSerializable();
-	// new PacketNodeWrapperAddOwner(id, owner).sendAsync();
-	// }
-	//
-	// @Override
-	// public void removeOwner(UUID owner) {
-	// DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, owner);
-	// owners.remove(owner);
-	// rebuildSerializable();
-	// new PacketNodeWrapperRemoveOwner(id, owner).sendAsync();
-	// }
-
 	public void createSerializable() {
 		this.serializable =
 				new PServerSerializable(id, getOnlinePlayers(), temporary, startedAt, taskName,
@@ -135,40 +69,14 @@ public class NodePServer implements PServer {
 		new PacketNodeWrapperUpdateInfo(serializable).sendAsync();
 	}
 
-	public void setState(State state) {
-		this.state = state;
-		rebuildSerializable();
-		if (state == State.OFFLINE) {
-			stopping = false;
-		}
-	}
-
 	public ServiceInfoSnapshot getSnapshot() {
 		return snapshot;
 	}
 
-	@Override
-	public int getOnlinePlayers() {
-		if (snapshot == null) {
-			return 0;
-		}
-		Optional<Integer> o = snapshot.getProperty(BridgeServiceProperty.ONLINE_COUNT);
-		return (state == State.RUNNING && o.isPresent()) ? o.get() : 0;
-	}
-
-	@Override
-	public PServerSerializable getSerializable() {
-		return serializable;
-	}
-
-	@Override
-	public Collection<UUID> getOwners() {
-		return owners;
-	}
-
-	@Override
-	public String getServerName() {
-		return serverName;
+	public void setSnapshot(ServiceInfoSnapshot snapshot) {
+		this.snapshot = snapshot;
+		this.serviceId = snapshot == null ? null : snapshot.getServiceId();
+		rebuildSerializable();
 	}
 
 	@Override
@@ -176,18 +84,12 @@ public class NodePServer implements PServer {
 		return state;
 	}
 
-	public void setSnapshot(ServiceInfoSnapshot snapshot) {
-		this.snapshot = snapshot;
-		this.serviceId = snapshot == null ? null : snapshot.getServiceId();
-		// if (snapshot != null) {
-		// this.serviceId = snapshot.getServiceId();
-		// } else {
-		// this.serviceId = null;
-		// }
-	}
-
-	public ServiceId getServiceId() {
-		return serviceId;
+	public void setState(State state) {
+		this.state = state;
+		rebuildSerializable();
+		if (state == State.OFFLINE) {
+			stopping = false;
+		}
 	}
 
 	@Override
@@ -237,6 +139,21 @@ public class NodePServer implements PServer {
 	}
 
 	@Override
+	public void remove() {
+		stop();
+		NodePServerProvider.getInstance().remove(this);
+	}
+
+	@Override
+	public int getOnlinePlayers() {
+		if (snapshot == null) {
+			return 0;
+		}
+		Optional<Integer> o = snapshot.getProperty(BridgeServiceProperty.ONLINE_COUNT);
+		return (state == State.RUNNING && o.isPresent()) ? o.get() : 0;
+	}
+
+	@Override
 	public boolean isGamemode() {
 		return temporary;
 	}
@@ -247,8 +164,14 @@ public class NodePServer implements PServer {
 	}
 
 	@Override
-	public boolean isPublic() {
-		return !isPrivate();
+	public void setPrivate(boolean privateServer) {
+		data.append("private", privateServer);
+		new PacketNodeWrapperDataUpdate(id, data);
+	}
+
+	@Override
+	public UniqueId getId() {
+		return id;
 	}
 
 	@Override
@@ -257,12 +180,69 @@ public class NodePServer implements PServer {
 	}
 
 	@Override
+	public Collection<UUID> getOwners() {
+		return owners;
+	}
+
+	private void setOwners(Collection<UUID> owners) {
+		if (owners == null) {
+			owners = DatabaseProvider.get("pserver").cast(PServerDatabase.class).getOwners(id);
+		}
+		this.owners = owners;
+	}
+
+	@Override
+	public String getServerName() {
+		return serverName;
+	}
+
+	@Override
 	public long getStartedAt() {
 		return startedAt;
 	}
 
 	@Override
-	public UniqueId getId() {
-		return id;
+	public JsonDocument getData() {
+		return data;
+	}
+
+	@Override
+	public PServerSerializable getSerializable() {
+		return serializable;
+	}
+
+	@Override
+	public String getTaskName() {
+		return taskName;
+	}
+
+	@Override
+	public void connectPlayer(UUID player) {
+		ServiceInfoSnapshot snapshot = this.snapshot;
+		if (snapshot == null) {
+			return;
+		}
+		AsyncExecutor.service().submit(() -> {
+			IPlayerManager pm = CloudNetDriver.getInstance().getServicesRegistry()
+					.getFirstService(IPlayerManager.class);
+			ICloudPlayer cp = pm.getOnlinePlayer(player);
+			if (cp == null) {
+				return;
+			}
+			PlayerExecutor ex = pm.getPlayerExecutor(cp);
+			if (ex == null) {
+				return;
+			}
+			ex.connect(snapshot.getName());
+		});
+	}
+
+	@Override
+	public boolean isPublic() {
+		return !isPrivate();
+	}
+
+	public ServiceId getServiceId() {
+		return serviceId;
 	}
 }

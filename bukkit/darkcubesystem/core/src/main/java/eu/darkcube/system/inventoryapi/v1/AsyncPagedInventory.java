@@ -9,7 +9,10 @@ package eu.darkcube.system.inventoryapi.v1;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import eu.darkcube.system.DarkCubeSystem;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
@@ -30,43 +33,28 @@ import java.util.stream.Collectors;
 
 public abstract class AsyncPagedInventory extends AnimatedInventory {
 
+	private static final Key META_KEY_ARROW_TYPE =
+			new Key("InventoryAPI", "PagedInventory_ArrowType");
 	protected final AtomicInteger page = new AtomicInteger(1);
-
 	protected final ConcurrentMap<Integer, ItemStack> items = new ConcurrentHashMap<>();
-
 	protected final ConcurrentMap<Integer, ItemStack> pageItems = new ConcurrentHashMap<>();
-
 	protected final ConcurrentMap<Integer, ItemStack> fallbackItems = new ConcurrentHashMap<>();
-
 	protected final ConcurrentMap<Integer, ItemStack> staticItems = new ConcurrentHashMap<>();
-
 	protected final ConcurrentMap<PageArrow, Integer[]> arrowSlots = new ConcurrentHashMap<>();
-
 	protected final ConcurrentMap<PageArrow, ItemStack> arrowItem = new ConcurrentHashMap<>();
-
 	protected final ConcurrentMap<Integer, Double> updateAtSort = new ConcurrentHashMap<>();
-
 	protected final Set<PageArrow> enabledArrows = Collections.synchronizedSet(new HashSet<>());
-
 	protected final Queue<Integer> updateSlots = new ConcurrentLinkedQueue<>();
-
 	protected final AtomicDouble currentSort = new AtomicDouble();
-
 	protected final PagedListener listener;
 
-	protected final double[] SORT;
-
 	//	protected final double[] PAGE_SORT;
-
+	protected final double[] SORT;
 	protected final int[] SLOTS;
-
 	protected final int[] PAGE_SLOTS;
-
 	protected final int pageSize;
 
-	private static final String META_KEY_ARROW_TYPE = "InventoryAPI_PagedInventory_ArrowType";
-
-	public AsyncPagedInventory(InventoryType inventoryType, String title, int size,
+	public AsyncPagedInventory(InventoryType inventoryType, Component title, int size,
 			BooleanSupplier instant, int[] pageSlots, int startSlot) {
 		super(inventoryType, title, size, instant);
 		this.SLOTS = new int[size];
@@ -91,6 +79,21 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		this.listener = new PagedListener();
 		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubeSystem.getInstance());
 		this.startAnimation();
+	}
+
+	protected static int[] box(int r1, int i1, int r2, int i2) {
+		final int fr1 = Math.min(r1, r2);
+		final int fr2 = Math.max(r1, r2);
+		final int fi1 = Math.min(i1, i2);
+		final int fi2 = Math.max(i1, i2);
+		int[] res = new int[(fr2 - fr1 + 1) * (fi2 - fi1 + 1)];
+		int index = 0;
+		for (int r = fr1; r <= fr2; r++) {
+			for (int i = fi1; i <= fi2; i++, index++) {
+				res[index] = IInventory.slot(r, i);
+			}
+		}
+		return res;
 	}
 
 	protected void updateSorts() {
@@ -119,6 +122,22 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 			this.informations.add(new AnimationInformation(slot, item));
 		}
 		this.postTick(!updateDone.isEmpty());
+	}
+
+	@Override
+	protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
+		Map<Integer, ItemStack> items = new HashMap<>();
+		this.fillItems(items);
+		this.items.putAll(items);
+		this.calculatePageItems();
+	}
+
+	@Override
+	protected void destroy() {
+		super.destroy();
+		HandlerList.unregisterAll(this.listener);
+		this.items.clear();
+		this.updateSlots.clear();
 	}
 
 	protected abstract void postTick(boolean changedInformations);
@@ -172,19 +191,6 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		return this.enabledArrows.contains(arrow);
 	}
 
-	public void setPage(int page) {
-		this.page.set(page);
-		this.calculatePageItems();
-	}
-
-	@Override
-	protected void destroy() {
-		super.destroy();
-		HandlerList.unregisterAll(this.listener);
-		this.items.clear();
-		this.updateSlots.clear();
-	}
-
 	protected abstract void insertDefaultItems();
 
 	public ItemStack getItem(int slot) {
@@ -206,39 +212,32 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 	private ItemStack addArrowMeta(ItemStack arrowItem, PageArrow arrow) {
 		if (arrowItem == null || !arrowItem.hasItemMeta()) {
-			System.out.println("Broken inventory: No arrow item " + this.toString());
+			System.out.println("Broken inventory: No arrow item " + this);
 			return arrowItem;
 		}
-		return new ItemBuilder(arrowItem).getUnsafe()
-				.setString(AsyncPagedInventory.META_KEY_ARROW_TYPE, arrow.name()).builder().build();
+		return ItemBuilder.item(arrowItem).persistentDataStorage()
+				.iset(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING,
+						arrow.name()).builder().build();
 	}
 
 	private PageArrow getArrowType(ItemStack arrowItem) {
 		Map<String, PageArrow> arrowNames = new HashMap<>();
 		Arrays.asList(PageArrow.values()).stream().forEach(a -> arrowNames.put(a.name(), a));
-		return arrowNames.get(new ItemBuilder(arrowItem).getUnsafe()
-				.getString(AsyncPagedInventory.META_KEY_ARROW_TYPE));
+		return arrowNames.get(ItemBuilder.item(arrowItem).persistentDataStorage()
+				.get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
 	}
 
 	private boolean isArrowItem(ItemStack arrowItem) {
 		List<String> arrowNames = Arrays.asList(PageArrow.values()).stream().map(Enum::name)
 				.collect(Collectors.toList());
-		ItemBuilder b = new ItemBuilder(arrowItem);
-		return b.getUnsafe().getString(AsyncPagedInventory.META_KEY_ARROW_TYPE) != null
-				&& arrowNames.contains(
-				b.getUnsafe().getString(AsyncPagedInventory.META_KEY_ARROW_TYPE));
+		ItemBuilder b = ItemBuilder.item(arrowItem);
+		return b.persistentDataStorage().has(AsyncPagedInventory.META_KEY_ARROW_TYPE)
+				&& arrowNames.contains(b.persistentDataStorage()
+				.get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
 	}
 
 	public boolean shouldDisplaySort(double sort) {
 		return this.isInstant() || sort <= this.currentSort.get();
-	}
-
-	@Override
-	protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
-		Map<Integer, ItemStack> items = new HashMap<>();
-		this.fillItems(items);
-		this.items.putAll(items);
-		this.calculatePageItems();
 	}
 
 	protected abstract void fillItems(Map<Integer, ItemStack> items);
@@ -249,6 +248,11 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 	public int getPage() {
 		return this.page.get();
+	}
+
+	public void setPage(int page) {
+		this.page.set(page);
+		this.calculatePageItems();
 	}
 
 	protected void handleClick(InventoryClickEvent event) {
@@ -287,21 +291,6 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 			}
 		}
 
-	}
-
-	protected static int[] box(int r1, int i1, int r2, int i2) {
-		final int fr1 = Math.min(r1, r2);
-		final int fr2 = Math.max(r1, r2);
-		final int fi1 = Math.min(i1, i2);
-		final int fi2 = Math.max(i1, i2);
-		int[] res = new int[(fr2 - fr1 + 1) * (fi2 - fi1 + 1)];
-		int index = 0;
-		for (int r = fr1; r <= fr2; r++) {
-			for (int i = fi1; i <= fi2; i++, index++) {
-				res[index] = IInventory.slot(r, i);
-			}
-		}
-		return res;
 	}
 
 }

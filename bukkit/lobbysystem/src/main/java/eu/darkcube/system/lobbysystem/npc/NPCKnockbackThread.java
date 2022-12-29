@@ -7,15 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.npc;
 
+import eu.darkcube.system.labymod.emotes.Emotes;
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
+import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.AnimationModifier.EntityAnimation;
+import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.LabyModModifier.LabyModAction;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import com.github.juliarn.npc.NPC;
-import com.github.juliarn.npc.modifier.AnimationModifier.EntityAnimation;
-import com.github.juliarn.npc.modifier.LabyModModifier.LabyModAction;
-
-import eu.darkcube.system.labymod.emotes.Emotes;
 
 public class NPCKnockbackThread extends Thread {
 
@@ -29,14 +27,11 @@ public class NPCKnockbackThread extends Thread {
 	public void run() {
 		Consumer cons = new Consumer();
 		while (true) {
-			this.npc.getLocation()
-					.getWorld()
+			this.npc.getLocation().getWorld()
 					.getNearbyEntities(this.npc.getLocation().clone().add(0, 0.6, 0), 0.3, 0.7, 0.3)
-					.stream()
-					.filter(e -> e instanceof Player)
+					.stream().filter(e -> e instanceof Player)
 					.filter(e -> !e.hasPermission("system.npc.knockback.ignore"))
-					.map(e -> (Player) e)
-					.forEach(cons);
+					.map(e -> (Player) e).forEach(cons);
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException ex) {
@@ -56,9 +51,11 @@ public class NPCKnockbackThread extends Thread {
 			double x = loc1.getX() - loc2.getX();
 			double y = loc1.getY() - loc2.getY();
 			double z = loc1.getZ() - loc2.getZ();
-			p.setVelocity(new Vector(x, Math.abs(y) > 1.7 ? 2 : Math.abs(y) + 0.3, z).normalize().multiply(.7));
+			p.setVelocity(new Vector(x, Math.abs(y) > 1.7 ? 2 : Math.abs(y) + 0.3, z).normalize()
+					.multiply(.7));
 			NPCKnockbackThread.this.npc.animation().queue(EntityAnimation.SWING_MAIN_ARM).send(p);
-			NPCKnockbackThread.this.npc.labymod().queue(LabyModAction.EMOTE, Emotes.KARATE.getId()).send(p);
+			NPCKnockbackThread.this.npc.labymod().queue(LabyModAction.EMOTE, Emotes.KARATE.getId())
+					.send(p);
 		}
 
 	}

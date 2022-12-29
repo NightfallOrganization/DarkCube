@@ -19,7 +19,6 @@ import eu.darkcube.system.pserver.common.PServer.State;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,17 +32,6 @@ import java.util.*;
 public class PServerJoinOnStart implements Listener {
 
 	public Map<UUID, UniqueId> waiting = new HashMap<>();
-
-	public void register(LobbyUser user, PServer pserver) {
-		if (pserver.getState() == State.RUNNING) {
-			AsyncExecutor.service().submit(() -> {
-				pserver.connectPlayer(user.getUser().getUniqueId());
-			});
-			return;
-		}
-		this.waiting.put(user.getUser().getUniqueId(), pserver.getId());
-	}
-
 	private BukkitRunnable runnable = new BukkitRunnable() {
 
 		@Override
@@ -53,9 +41,9 @@ public class PServerJoinOnStart implements Listener {
 				if (p == null) {
 					continue;
 				}
-				ChatEntry.buildActionbar(new ChatEntry.Builder().text(
+				UserAPI.getInstance().getUser(p).sendActionBar(
 						Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE.getMessage(
-								UserAPI.getInstance().getUser(p))).build()).send(p);
+								UserAPI.getInstance().getUser(p)));
 			}
 		}
 
@@ -65,6 +53,16 @@ public class PServerJoinOnStart implements Listener {
 		CloudNetDriver.getInstance().getEventManager().registerListener(this);
 		Bukkit.getPluginManager().registerEvents(this, Lobby.getInstance());
 		this.runnable.runTaskTimer(Lobby.getInstance(), 10, 10);
+	}
+
+	public void register(LobbyUser user, PServer pserver) {
+		if (pserver.getState() == State.RUNNING) {
+			AsyncExecutor.service().submit(() -> {
+				pserver.connectPlayer(user.getUser().getUniqueId());
+			});
+			return;
+		}
+		this.waiting.put(user.getUser().getUniqueId(), pserver.getId());
 	}
 
 	@EventListener

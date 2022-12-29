@@ -1,16 +1,17 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.commandapi.v3.arguments.BooleanArgument;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
-import net.md_5.bungee.api.ChatColor;
-
-import java.util.function.Consumer;
 
 public class CommandSetEnabled extends LobbyCommandExecutor {
 	public CommandSetEnabled() {
@@ -18,9 +19,7 @@ public class CommandSetEnabled extends LobbyCommandExecutor {
 				Commands.argument("enabled", BooleanArgument.booleanArgument()).executes(ctx -> {
 					boolean s = BooleanArgument.getBoolean(ctx, "enabled");
 					Lobby.getInstance().getDataManager().setJumpAndRunEnabled(s);
-					ctx.getSource().sendFeedback(
-							new CustomComponentBuilder().append("JumpAndRun Enabled: " + s)
-									.color(ChatColor.GOLD).create(), true);
+					ctx.getSource().sendMessage(Component.text("JumpAndRun Enabled: " + s));
 					return 0;
 				})));
 	}

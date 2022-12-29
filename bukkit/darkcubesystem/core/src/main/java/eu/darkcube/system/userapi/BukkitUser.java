@@ -7,70 +7,61 @@
 
 package eu.darkcube.system.userapi;
 
-import eu.darkcube.system.DarkCubeSystem;
-import eu.darkcube.system.userapi.data.*;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.userapi.data.UserPersistentDataStorage;
+import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.BasicMetaDataStorage;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class BukkitUser implements User {
+class BukkitUser implements User {
 	private static final PersistentDataType<Language> LANGUAGE =
 			PersistentDataTypes.enumType(Language.class);
-	private UUID uuid;
-	private String name;
-	private BasicMetaDataStorage metaDataStorage;
-	private BasicPersistentDataStorage persistentDataStorage;
-	private volatile long lastAccess = 0;
+	final ReentrantLock lock = new ReentrantLock(false);
+	private final UUID uuid;
+	private final BasicMetaDataStorage metaDataStorage;
+	private final UserPersistentDataStorage persistentDataStorage;
+	private volatile String name;
+	private volatile Player player;
 	private volatile boolean loaded = false;
-	private Player player;
-	private volatile BukkitUser user = null;
-	boolean loading = true;
-	final UserAPI userApi;
+	private volatile long lastAccess = System.currentTimeMillis();
 
-	public BukkitUser(UserAPI userApi, UUID uuid, String name) {
-		this.userApi = userApi;
+	public BukkitUser(UUID uuid, String name) {
 		this.player = Bukkit.getPlayer(uuid);
 		this.uuid = uuid;
 		this.name = name;
 		this.metaDataStorage = new BasicMetaDataStorage();
-		this.persistentDataStorage = new BasicPersistentDataStorage(this);
+		this.persistentDataStorage = new UserPersistentDataStorage(this);
 	}
 
 	@Override
-	public boolean isLoaded() {
-		if (user != null && user != this)
-			return user.isLoaded();
-		return loaded;
+	public @NotNull Iterable<? extends Audience> audiences() {
+		Player player = asPlayer();
+		if (player != null) {
+			return Collections.singleton(AdventureSupport.audienceProvider().player(player));
+		}
+		return Collections.emptyList();
 	}
 
-	@Override
-	public BigInteger getCubes() {
-		return this.getPersistentDataStorage()
-				.get(new Key(DarkCubeSystem.getInstance(), "cubes"), PersistentDataTypes.BIGINTEGER,
-						() -> BigInteger.valueOf(1000L));
+	public void lock() {
+		lastAccess = System.currentTimeMillis();
+		lock.lock();
+		lastAccess = System.currentTimeMillis();
 	}
 
-	@Override
-	public void setCubes(BigInteger cubes) {
-		this.getPersistentDataStorage()
-				.set(new Key(DarkCubeSystem.getInstance(), "cubes"), PersistentDataTypes.BIGINTEGER,
-						cubes);
-	}
-
-	@Override
-	public Language getLanguage() {
-		return this.getPersistentDataStorage()
-				.get(new Key(DarkCubeSystem.getInstance(), "language"), LANGUAGE,
-						() -> Language.DEFAULT);
-	}
-
-	@Override
-	public void setLanguage(Language language) {
-		getPersistentDataStorage().set(new Key(DarkCubeSystem.getInstance(), "language"), LANGUAGE,
-				language);
+	public void unlock() {
+		lock.unlock();
+		lastAccess = System.currentTimeMillis();
 	}
 
 	@Override
@@ -82,82 +73,67 @@ public class BukkitUser implements User {
 	public String getName() {
 		Player p = asPlayer();
 		if (p != null) {
-			return user().name = p.getName();
+			return name = p.getName();
 		}
-		return user().name;
+		return name;
 	}
 
 	@Override
 	public Player asPlayer() {
-		BukkitUser u = user();
-		synchronized (u) {
-			if (u.player == null || !u.player.isOnline()) {
-				u.player = Bukkit.getPlayer(u.uuid);
-			}
-			return u.player;
+		if (player == null || !player.isOnline()) {
+			player = Bukkit.getPlayer(uuid);
 		}
+		return player;
+	}
+
+	@Override
+	public Language getLanguage() {
+		return this.getPersistentDataStorage()
+				.get(new Key("UserAPI", "language"), LANGUAGE, () -> Language.DEFAULT);
+	}
+
+	@Override
+	public void setLanguage(Language language) {
+		getPersistentDataStorage().set(new Key("UserAPI", "language"), LANGUAGE, language);
+	}
+
+	@Override
+	public BigInteger getCubes() {
+		return this.getPersistentDataStorage()
+				.get(new Key("UserAPI", "cubes"), PersistentDataTypes.BIGINTEGER,
+						() -> BigInteger.valueOf(1000L));
+	}
+
+	@Override
+	public void setCubes(BigInteger cubes) {
+		this.getPersistentDataStorage()
+				.set(new Key("UserAPI", "cubes"), PersistentDataTypes.BIGINTEGER, cubes);
 	}
 
 	@Override
 	public BasicMetaDataStorage getMetaDataStorage() {
-		return user().metaDataStorage;
+		return metaDataStorage;
 	}
 
 	@Override
-	public BasicPersistentDataStorage getPersistentDataStorage() {
-		return user().persistentDataStorage;
+	public UserPersistentDataStorage getPersistentDataStorage() {
+		return persistentDataStorage;
 	}
 
-	void player(Player player) {
-		BukkitUser u = user();
-		synchronized (u) {
-			u.player = player;
-		}
+	@Override
+	public boolean isLoaded() {
+		return loaded;
 	}
 
 	void loaded(boolean value) {
-		if (user != null && user != this) {
-			user.loaded(value);
-		} else {
-			this.loaded = value;
-		}
-	}
-
-	private BukkitUser user() {
-		if (!loading) {
-			BukkitUser n = (BukkitUser) userApi.existingUser(uuid);
-			if (n != this) {
-				if (n == null) {
-					persistentDataStorage.clear();
-					metaDataStorage.data.clear();
-					userApi.loadUser(this);
-					lastAccess = System.currentTimeMillis();
-					return this;
-				}
-				user = n;
-				if (user != null) {
-					BukkitUser ru = user.user();
-					user = ru != null ? ru : user;
-					user.lastAccess = System.currentTimeMillis();
-					return user;
-				}
-			}
-		}
-		if (user == null)
-			user = this;
-		user.lastAccess = System.currentTimeMillis();
-		return user;
+		this.loaded = value;
 	}
 
 	long lastAccess() {
-		return user().lastAccess;
+		return lastAccess;
 	}
 
-	Player player() {
-		BukkitUser u = user();
-		synchronized (u) {
-			return u.player;
-		}
+	public void lastAccess(long lastAccess) {
+		this.lastAccess = lastAccess;
 	}
-
 }

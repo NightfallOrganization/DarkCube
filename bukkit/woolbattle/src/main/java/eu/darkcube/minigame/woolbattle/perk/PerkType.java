@@ -12,7 +12,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 
 public enum PerkType implements Comparable<PerkType> {
 
-//	SLIME_PLATFORM(Item.PERK_SLIME_PLATFORM, Item.PERK_SLIME_PLATFORM_COOLDOWN, 20, PerkName.SLIME_PLATFORM, false, 18),
+	SLIME_PLATFORM(Item.PERK_SLIME_PLATFORM, Item.PERK_SLIME_PLATFORM_COOLDOWN, 20, PerkName.SLIME_PLATFORM, false, 18),
 
 	CAPSULE(Item.PERK_CAPSULE, Item.PERK_CAPSULE_COOLDOWN, 30, PerkName.CAPSULE, false, 24),
 

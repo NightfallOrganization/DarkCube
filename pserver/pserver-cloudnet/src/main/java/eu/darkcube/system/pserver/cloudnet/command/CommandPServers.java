@@ -7,16 +7,9 @@
 
 package eu.darkcube.system.pserver.cloudnet.command;
 
-import static de.dytanic.cloudnet.command.sub.SubCommandArgumentTypes.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.command.ICommandSender;
+import de.dytanic.cloudnet.command.sub.SubCommand;
 import de.dytanic.cloudnet.command.sub.SubCommandBuilder;
 import de.dytanic.cloudnet.command.sub.SubCommandHandler;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -35,6 +28,14 @@ import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.UniqueIdProvider;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 
+import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static de.dytanic.cloudnet.command.sub.SubCommandArgumentTypes.dynamicString;
+import static de.dytanic.cloudnet.command.sub.SubCommandArgumentTypes.exactStringIgnoreCase;
+
 public class CommandPServers extends SubCommandHandler {
 
 	private static final IPlayerManager playerManager =
@@ -49,13 +50,13 @@ public class CommandPServers extends SubCommandHandler {
 					String exclusion = (String)args.argument("exclusion").orElse(null);
 					PServerModule.getInstance().addDeploymentExclusion(exclusion);
 					sender.sendMessage("Added exclusion " + exclusion);
-				}, s -> s.async(), exactStringIgnoreCase("add"), dynamicString("exclusion", "Exclusion already exists", 
+				}, SubCommand::async, exactStringIgnoreCase("add"), dynamicString("exclusion", "Exclusion already exists",
 						e -> !PServerModule.getInstance().getDeploymentExclusions().contains(e)))
 				.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 					String exclusion = (String)args.argument("exclusion").orElse(null);
 					PServerModule.getInstance().removeDeploymentExclusion(exclusion);
 					sender.sendMessage("Removed exclusion " + exclusion);
-				}, s -> s.async(), exactStringIgnoreCase("remove"), dynamicString("exclusion", "Exclusion does not exist", 
+				}, SubCommand::async, exactStringIgnoreCase("remove"), dynamicString("exclusion", "Exclusion does not exist",
 						e -> PServerModule.getInstance().getDeploymentExclusions().contains(e), 
 						() -> PServerModule.getInstance().getDeploymentExclusions()))
 				.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
@@ -64,7 +65,7 @@ public class CommandPServers extends SubCommandHandler {
 					for(String s : c) {
 						sender.sendMessage(" - " + s);
 					}
-				}, s -> s.async(), exactStringIgnoreCase("list"))
+				}, SubCommand::async, exactStringIgnoreCase("list"))
 				.removeLastPrefix()
 				.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 					String idname = (String)args.argument("id").orElse(null);
@@ -74,16 +75,14 @@ public class CommandPServers extends SubCommandHandler {
 						return;
 					}
 					int online = 0;
-					PServer.State state = State.OFFLINE;
 					boolean temporary = false;
 					long startedAt = System.currentTimeMillis();
-					Collection<UUID> owners = PServerProvider.getInstance().getOwners(uid);
 					String serverName = PServerProvider.getInstance().newName();
 					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
 							startedAt, null, serverName, State.OFFLINE);
 					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer loaded! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
-				}, s-> s.async(), exactStringIgnoreCase("load"), dynamicString("id", "PServer does not exist", s ->
+				}, SubCommand::async, exactStringIgnoreCase("load"), dynamicString("id", "PServer does not exist", s ->
 						NodePServerProvider.getInstance().getAllTemplateIDs().contains(s), 
 						() -> NodePServerProvider.getInstance().getAllTemplateIDs())
 				)
@@ -91,7 +90,6 @@ public class CommandPServers extends SubCommandHandler {
 				.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 					UniqueId uid = UniqueIdProvider.getInstance().newUniqueId();
 					int online = 0;
-					PServer.State state = State.OFFLINE;
 					boolean temporary = false;
 					long startedAt = System.currentTimeMillis();
 					String serverName = PServerProvider.getInstance().newName();
@@ -99,7 +97,7 @@ public class CommandPServers extends SubCommandHandler {
 							startedAt,  null, serverName,State.OFFLINE);
 					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer created! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
-				}, s -> s.async(), exactStringIgnoreCase("new"))
+				}, SubCommand::async, exactStringIgnoreCase("new"))
 				.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 					String taskn = (String) args.argument("task").orElse(null);
 					if(taskn == null || !CloudNet.getInstance().getServiceTaskProvider().isServiceTaskPresent(taskn)) {
@@ -116,7 +114,7 @@ public class CommandPServers extends SubCommandHandler {
 							startedAt,  taskn, serverName,state);
 					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer created! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
-				}, s -> s.async(), exactStringIgnoreCase("by"), dynamicString("task", "Task nicht gefunden", 
+				}, SubCommand::async, exactStringIgnoreCase("by"), dynamicString("task", "Task nicht gefunden",
 						s -> CloudNet.getInstance().getServiceTaskProvider().isServiceTaskPresent(s), 
 						() -> CloudNet.getInstance().getServiceTaskProvider().getPermanentServiceTasks()
 						.stream().map(ServiceTask::getName).collect(Collectors.toList())))
@@ -126,7 +124,7 @@ public class CommandPServers extends SubCommandHandler {
 					PServerProvider.getInstance().getPServers().forEach(ps -> {
 						sender.sendMessage(" - " + ps.getId() + " (" + ps.getServerName() + ")");
 					});
-				}, s -> s.async(), exactStringIgnoreCase("list"))
+				}, SubCommand::async, exactStringIgnoreCase("list"))
 				.prefix(exactStringIgnoreCase("server"))
 				.prefix(
 						dynamicString("id", "Invalid PServer ID", 
@@ -151,7 +149,7 @@ public class CommandPServers extends SubCommandHandler {
 		super.description = "PServer Managing";
 	}
 
-	private static SubCommandBuilder applyCommands(SubCommandBuilder builder) {
+	private static void applyCommands(SubCommandBuilder builder) {
 		// @formatter:off
 		builder.generateCommand(
 				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
@@ -166,7 +164,7 @@ public class CommandPServers extends SubCommandHandler {
 			} else {
 				sender.sendMessage("PServer could not start! (Name: " + ps.getServerName() + ")");
 			}
-		}, s -> s.async(), exactStringIgnoreCase("start"));
+		}, SubCommand::async, exactStringIgnoreCase("start"));
 		builder.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 			PServer ps = (PServer)internalProperties.get("ps");
 			boolean bool = ps.stop();
@@ -227,19 +225,17 @@ public class CommandPServers extends SubCommandHandler {
 			}
 		}, s -> s.async(), exactStringIgnoreCase("listOwners"));
 		// @formatter:on
-		return builder;
 	}
 
 	private static void displayInformation(ICommandSender sender, PServer ps) {
-		sender.sendMessage(new String[] {
-				// @formatter:off
-				"* ID: " + ps.getId().toString(), 
+		sender.sendMessage(// @formatter:off
+				"* ID: " + ps.getId().toString(),
 				"* Online: " + ps.getOnlinePlayers() + "/" + ((NodePServer)ps).getSnapshot().getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1),
 				"* Ontime: " + TimeUnit.MILLISECONDS.toSeconds(ps.getOntime()) + "s",
 				"* ServerName: " + ps.getServerName(),
 				"* Owners: " + ps.getOwners().toString(),
 				"* State: " + ps.getState().toString()
 				// @formatter:on
-		});
+		);
 	}
 }

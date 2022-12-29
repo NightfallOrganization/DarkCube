@@ -12,8 +12,9 @@ import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventPServerMayJoin;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
@@ -32,7 +33,7 @@ import eu.darkcube.system.pserver.common.UniqueIdProvider;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
-import eu.darkcube.system.util.ChatUtils;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,6 +46,16 @@ import java.util.concurrent.ExecutionException;
 
 public class ListenerPServer extends BaseListener {
 
+	public static boolean mayJoin(LobbyUser user, PServer pserver) {
+		boolean mayjoin = !pserver.isPrivate();
+		if (pserver.getOwners().contains(user.getUser().getUniqueId())) {
+			mayjoin = true;
+		}
+		EventPServerMayJoin e = new EventPServerMayJoin(user, pserver, mayjoin);
+		Bukkit.getPluginManager().callEvent(e);
+		return e.mayJoin();
+	}
+
 	@EventHandler
 	public void handle(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player)) {
@@ -54,7 +65,8 @@ public class ListenerPServer extends BaseListener {
 		if (item == null) {
 			return;
 		}
-		ItemBuilder itemb = new ItemBuilder(item);
+		Player p = (Player) e.getWhoClicked();
+		ItemBuilder itemb = ItemBuilder.item(item);
 		String itemid = Item.getItemId(item);
 		LobbyUser user = UserWrapper.fromUser(
 				UserAPI.getInstance().getUser(e.getWhoClicked().getUniqueId()));
@@ -67,14 +79,15 @@ public class ListenerPServer extends BaseListener {
 			if (itemid.equals(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItemId())) {
 				user.setOpenInventory(new InventoryNewPServer(user.getUser()));
 			} else if (itemid.equals(InventoryPServerOwn.ITEMID_EXISTING)) {
-				UniqueId pserverId = new UniqueId(
-						itemb.getUnsafe().getString(InventoryPServerOwn.META_KEY_PSERVERID));
+				UniqueId pserverId = new UniqueId(itemb.persistentDataStorage()
+						.get(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING));
 				user.setOpenInventory(new InventoryPServerConfiguration(user.getUser(), pserverId));
 			}
 		} else if (inv instanceof InventoryPServer) {
 			InventoryPServer cinv = (InventoryPServer) inv;
 			if (itemid.equals(InventoryPServer.ITEMID)) {
-				String psid = itemb.getUnsafe().getString(InventoryPServer.META_KEY_PSERVER);
+				String psid = itemb.persistentDataStorage()
+						.get(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING);
 				PServer ps = PServerProvider.getInstance().getPServer(new UniqueId(psid));
 				if (ps == null) {
 					cinv.recalculate();
@@ -84,7 +97,7 @@ public class ListenerPServer extends BaseListener {
 				if (ListenerPServer.mayJoin(user, ps)) {
 					ps.connectPlayer(user.getUser().getUniqueId());
 				} else {
-					e.getWhoClicked()
+					user.getUser()
 							.sendMessage(Message.PSERVER_NOT_PUBLIC.getMessage(user.getUser()));
 				}
 			}
@@ -93,19 +106,23 @@ public class ListenerPServer extends BaseListener {
 				user.setOpenInventory(new InventoryGameServersSelection(user.getUser()));
 			} else if (itemid.equals(Item.WORLD_PSERVER.getItemId())) {
 				user.setOpenInventory(
-						new InventoryLoading("Creating Server...", user.getUser(), u -> {
-							UniqueId pserverId = UniqueIdProvider.getInstance().newUniqueId();
+						new InventoryLoading(Component.text("Creating Server..."), user.getUser(),
+								u -> {
+									UniqueId pserverId =
+											UniqueIdProvider.getInstance().newUniqueId();
 
-							try {
-								PServerProvider.getInstance()
-										.addOwner(pserverId, user.getUser().getUniqueId()).get();
-								Thread.sleep(1000);
-							} catch (InterruptedException | ExecutionException ex) {
-								throw new RuntimeException(ex);
-							}
+									try {
+										PServerProvider.getInstance()
+												.addOwner(pserverId, user.getUser().getUniqueId())
+												.get();
+										Thread.sleep(1000);
+									} catch (InterruptedException | ExecutionException ex) {
+										throw new RuntimeException(ex);
+									}
 
-							return new InventoryPServerConfiguration(user.getUser(), pserverId);
-						}));
+									return new InventoryPServerConfiguration(user.getUser(),
+											pserverId);
+								}));
 			}
 		} else if (inv instanceof InventoryGameServersSelection) {
 			if (itemid.equals(Item.GAMESERVER_SELECTION_WOOLBATTLE.getItemId())) {
@@ -114,10 +131,11 @@ public class ListenerPServer extends BaseListener {
 		} else if (inv instanceof InventoryGameServerSelection) {
 			if (itemid.equals(InventoryGameServerSelection.ITEMID)) {
 				user.setOpenInventory(
-						new InventoryLoading(inv.getHandle().getTitle(), user.getUser(), u -> {
-							JsonObject extra = new Gson().fromJson(itemb.getUnsafe()
-											.getString(InventoryGameServerSelection.GAMESERVER_META_KEY),
-									JsonObject.class);
+						new InventoryLoading(((InventoryGameServerSelection) inv).getTitle(),
+								user.getUser(), u -> {
+							JsonObject extra = new Gson().fromJson(itemb.persistentDataStorage()
+									.get(InventoryGameServerSelection.GAMESERVER_META_KEY,
+											PersistentDataTypes.STRING), JsonObject.class);
 							ServiceTask task = CloudNetDriver.getInstance().getServiceTaskProvider()
 									.getServiceTask(
 											extra.get(InventoryGameServerSelection.SERVICETASK)
@@ -146,23 +164,20 @@ public class ListenerPServer extends BaseListener {
 		} else if (inv instanceof InventoryPServerConfiguration) {
 			InventoryPServerConfiguration cinv = (InventoryPServerConfiguration) inv;
 			if (itemid.equals(Item.PSERVER_DELETE.getItemId())) {
-				user.setOpenInventory(
-						new InventoryConfirm(cinv.getHandle().getTitle(), user.getUser(), () -> {
-							try {
-								PServerProvider.getInstance()
-										.removeOwner(cinv.pserverId, user.getUser().getUniqueId())
-										.get();
-								if (PServerProvider.getInstance().getOwners(cinv.pserverId)
-										.isEmpty()) {
-									PServerProvider.getInstance().delete(cinv.pserverId).get();
-								}
-							} catch (InterruptedException | ExecutionException ex) {
-								throw new RuntimeException(ex);
-							}
-							user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
-						}, () -> {
-							user.setOpenInventory(cinv);
-						}));
+				user.setOpenInventory(new InventoryConfirm(cinv.getTitle(), user.getUser(), () -> {
+					try {
+						PServerProvider.getInstance()
+								.removeOwner(cinv.pserverId, user.getUser().getUniqueId()).get();
+						if (PServerProvider.getInstance().getOwners(cinv.pserverId).isEmpty()) {
+							PServerProvider.getInstance().delete(cinv.pserverId).get();
+						}
+					} catch (InterruptedException | ExecutionException ex) {
+						throw new RuntimeException(ex);
+					}
+					user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
+				}, () -> {
+					user.setOpenInventory(cinv);
+				}));
 			} else if (itemid.equals(Item.START_PSERVER.getItemId())) {
 				AsyncExecutor.service().submit(() -> {
 					new BukkitRunnable() {
@@ -179,11 +194,9 @@ public class ListenerPServer extends BaseListener {
 								new BukkitRunnable() {
 									@Override
 									public void run() {
-										ChatUtils.ChatEntry.build(
-														new ChatUtils.ChatEntry.Builder().text(
-																Message.STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER.getMessage(
-																		user.getUser())).build())
-												.send(user.getUser().asPlayer());
+										user.getUser().sendMessage(
+												Message.STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER.getMessage(
+														user.getUser()));
 									}
 								}.runTask(Lobby.getInstance());
 								return;
@@ -234,19 +247,6 @@ public class ListenerPServer extends BaseListener {
 				});
 			}
 		}
-	}
-
-	public static boolean mayJoin(LobbyUser user, PServer pserver) {
-		boolean mayjoin = false;
-		if (!pserver.isPrivate()) {
-			mayjoin = true;
-		}
-		if (pserver.getOwners().contains(user.getUser().getUniqueId())) {
-			mayjoin = true;
-		}
-		EventPServerMayJoin e = new EventPServerMayJoin(user, pserver, mayjoin);
-		Bukkit.getPluginManager().callEvent(e);
-		return e.mayJoin();
 	}
 
 }

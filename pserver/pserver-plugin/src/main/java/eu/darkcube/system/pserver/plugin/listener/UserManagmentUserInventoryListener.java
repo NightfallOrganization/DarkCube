@@ -7,11 +7,12 @@
 
 package eu.darkcube.system.pserver.plugin.listener;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentUserInventory;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class UserManagmentUserInventoryListener  implements BaseListener {
+public class UserManagmentUserInventoryListener implements BaseListener {
 
 	private final UserManagmentUserInventory inventory;
 
@@ -41,16 +42,19 @@ public class UserManagmentUserInventoryListener  implements BaseListener {
 		if (item == null) {
 			return;
 		}
-		ItemBuilder builder = new ItemBuilder(item);
-		ItemBuilder.Unsafe unsafe = builder.getUnsafe();
-		if (unsafe.getString(UserManagmentInventory.KEY) == null) {
+		ItemBuilder builder = ItemBuilder.item(item);
+		if (!builder.persistentDataStorage().has(UserManagmentInventory.KEY)) {
 			return;
 		}
-		if (!unsafe.getString(UserManagmentInventory.KEY).equals(UserManagmentInventory.KEY_VALUE)) {
+		if (!builder.persistentDataStorage()
+				.get(UserManagmentInventory.KEY, PersistentDataTypes.STRING)
+				.equals(UserManagmentInventory.KEY_VALUE)) {
 			return;
 		}
-		UUID uuid = UUID.fromString(unsafe.getString(UserManagmentInventory.USER_UUID_KEY));
-		String name = unsafe.getString(UserManagmentInventory.USER_NAME_KEY);
+		UUID uuid = UUID.fromString(builder.persistentDataStorage()
+				.get(UserManagmentInventory.USER_UUID_KEY, PersistentDataTypes.STRING));
+		String name = builder.persistentDataStorage()
+				.get(UserManagmentInventory.USER_NAME_KEY, PersistentDataTypes.STRING);
 		new UserManagmentUserInventory(user, uuid, name).open();
 	}
 

@@ -1,12 +1,25 @@
+plugins {
+    id("com.github.johnrengelman.shadow")
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+    }
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    implementation project(':bukkit:darkcubesystem')
-    implementation project(':pserver:pserver-bukkit')
-    implementation project(':pserver:pserver-api')
-    embedApi project(':common:labymod-emotes')
-    implementation 'org.jetbrains:annotations:23.0.0'
-    implementation cloudnetDriver
-    implementation cloudnetWrapper
-    implementation cloudnetBridge
-    implementation luckperms
+    compileOnly project(':bukkit:darkcubesystem')
+    compileOnly project(':pserver:pserver-bukkit')
+    compileOnly project(':pserver:pserver-api')
+    api project(':common:labymod-emotes')
+    compileOnly 'org.jetbrains:annotations:23.1.0'
+    compileOnly cloudnetDriver
+    compileOnly cloudnetWrapper
+    compileOnly cloudnetBridge
+    compileOnly luckperms
 }

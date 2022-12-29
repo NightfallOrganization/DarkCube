@@ -7,13 +7,16 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -25,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class InventoryDailyReward extends LobbyAsyncPagedInventory {
-
+	public static final Key reward = new Key(Lobby.getInstance(), "reward");
 	public static final InventoryType type_daily_reward = InventoryType.of("daily_reward");
 
 	private boolean displayedRewards = false;
@@ -65,16 +68,40 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void playSound0() {
-		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
-			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
-		});
+	protected void fillItems(Map<Integer, ItemStack> items) {
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(this.user.getLastDailyReward());
+		Calendar c2 = Calendar.getInstance();
+		if (c.get(Calendar.DAY_OF_YEAR) != c2.get(Calendar.DAY_OF_YEAR)
+				|| c.get(Calendar.YEAR) != c2.get(Calendar.YEAR)) {
+			this.user.setRewardSlotsUsed(new HashSet<>());
+		}
+
+		ItemStack used = ItemBuilder.item(Material.SULPHUR)
+				.displayname(Message.REWARD_ALREADY_USED.getMessage(this.user.getUser())).build();
+		ItemStack unused = ItemBuilder.item(Material.GLOWSTONE_DUST).displayname("§e???").build();
+		Set<Integer> usedSlots = this.user.getRewardSlotsUsed();
+		if (usedSlots.contains(1)) {
+			items.put(21, reward(used, 1));
+		} else {
+			items.put(21, reward(unused, 1));
+		}
+		if (usedSlots.contains(2)) {
+			items.put(22, reward(used, 2));
+		} else {
+			items.put(22, reward(unused, 2));
+		}
+		if (usedSlots.contains(3)) {
+			items.put(23, reward(used, 3));
+		} else {
+			items.put(23, reward(unused, 3));
+		}
 	}
 
 	@Override
 	protected void insertFallbackItems() {
-		ItemStack l = new ItemBuilder(Material.STAINED_GLASS_PANE).displayname("§6").durability(7)
-				.build();
+		ItemStack l =
+				ItemBuilder.item(Material.STAINED_GLASS_PANE).displayname("§6").damage(7).build();
 		this.fallbackItems.put(IInventory.slot(1, 1), l);
 		this.fallbackItems.put(IInventory.slot(1, 2), l);
 		this.fallbackItems.put(IInventory.slot(1, 3), l);
@@ -105,40 +132,16 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void fillItems(Map<Integer, ItemStack> items) {
+	protected void playSound0() {
+		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
+			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+		});
+	}
 
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(this.user.getLastDailyReward());
-		Calendar c2 = Calendar.getInstance();
-		if (c.get(Calendar.DAY_OF_YEAR) != c2.get(Calendar.DAY_OF_YEAR)) {
-			this.user.setRewardSlotsUsed(new HashSet<>());;
-		}
-
-		ItemStack used = new ItemBuilder(Material.SULPHUR)
-				.displayname(Message.REWARD_ALREADY_USED.getMessage(this.user.getUser())).build();
-		ItemStack unused = new ItemBuilder(Material.GLOWSTONE_DUST).displayname("§e???").build();
-		Set<Integer> usedSlots = this.user.getRewardSlotsUsed();
-		if (usedSlots.contains(1)) {
-			used = new ItemBuilder(used).getUnsafe().setInt("reward", 1).builder().build();
-			items.put(21, used);
-		} else {
-			unused = new ItemBuilder(unused).getUnsafe().setInt("reward", 1).builder().build();
-			items.put(21, unused);
-		}
-		if (usedSlots.contains(2)) {
-			used = new ItemBuilder(used).getUnsafe().setInt("reward", 2).builder().build();
-			items.put(22, used);
-		} else {
-			unused = new ItemBuilder(unused).getUnsafe().setInt("reward", 2).builder().build();
-			items.put(22, unused);
-		}
-		if (usedSlots.contains(3)) {
-			used = new ItemBuilder(used).getUnsafe().setInt("reward", 3).builder().build();
-			items.put(23, used);
-		} else {
-			unused = new ItemBuilder(unused).getUnsafe().setInt("reward", 3).builder().build();
-			items.put(23, unused);
-		}
+	private ItemStack reward(ItemStack old, int reward) {
+		return ItemBuilder.item(old).persistentDataStorage()
+				.iset(InventoryDailyReward.reward, PersistentDataTypes.INTEGER, reward).builder()
+				.build();
 	}
 
 	// private void animate(User user, boolean instant) {

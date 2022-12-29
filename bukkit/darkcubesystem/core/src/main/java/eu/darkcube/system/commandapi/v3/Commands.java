@@ -18,21 +18,43 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 public class Commands {
 
-	//	private static final Logger LOGGER = LogManager.getLogger();
 	private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
 	private final Collection<CommandEntry> commandEntries = new HashSet<>();
+
+	public static LiteralArgumentBuilder<CommandSource> literal(String s) {
+		return LiteralArgumentBuilder.literal(s);
+	}
+
+	public static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name,
+			ArgumentType<T> type) {
+		return RequiredArgumentBuilder.argument(name, type);
+	}
+
+	public static Predicate<String> predicate(IParser parser) {
+		return bool -> {
+			try {
+				parser.parse(new StringReader(bool));
+				return true;
+			} catch (CommandSyntaxException ex) {
+				return false;
+			}
+		};
+	}
 
 	public List<Suggestion> getTabCompletions(CommandSender sender, String commandLine) {
 		CommandSource source = CommandSource.create(sender);
@@ -125,7 +147,7 @@ public class Commands {
 		try {
 			dispatcher.execute(commandLine, source);
 		} catch (CommandSyntaxException ex) {
-			source.sendErrorMessage(ex.getRawMessage());
+			source.sendMessage(ex.getRawMessage());
 			List<Suggestion> completions = getTabCompletions(sender, commandLine);
 			if (completions.isEmpty()) {
 				commandLine = commandLine + " ";
@@ -135,31 +157,16 @@ public class Commands {
 		} catch (Throwable ex) {
 			StringWriter writer = new StringWriter();
 			ex.printStackTrace(new PrintWriter(writer));
-			String[] msgs = writer.getBuffer().toString().replace("	", "    ")
-					.split(System.lineSeparator());
-			Arrays.asList(msgs).forEach(msg -> source.getSource().sendMessage(b -> b.append("").color(ChatColor.DARK_RED),
-					CustomComponentBuilder.cast(TextComponent.fromLegacyText(msg))));
-		}
-	}
-
-	public static LiteralArgumentBuilder<CommandSource> literal(String s) {
-		return LiteralArgumentBuilder.literal(s);
-	}
-
-	public static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name,
-			ArgumentType<T> type) {
-		return RequiredArgumentBuilder.argument(name, type);
-	}
-
-	public static Predicate<String> predicate(IParser parser) {
-		return bool -> {
-			try {
-				parser.parse(new StringReader(bool));
-				return true;
-			} catch (CommandSyntaxException ex) {
-				return false;
+			String[] msgs = writer.getBuffer().toString().replace(/*tab*/"	", "    ")
+					.split("(\r\n|\r|\n)");
+			Component c = Component.text("");
+			for (int i = 0; i < msgs.length; i++) {
+				if (i != 0)
+					c = c.appendNewline();
+				c = c.append(Component.text(msgs[i]).color(NamedTextColor.DARK_RED));
 			}
-		};
+			source.sendMessage(c);
+		}
 	}
 
 	public CommandDispatcher<CommandSource> getDispatcher() {

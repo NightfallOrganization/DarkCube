@@ -7,19 +7,14 @@
 
 package eu.darkcube.system.lobbysystem.npc;
 
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
+import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.MetadataModifier;
+import eu.darkcube.system.libs.com.github.juliarn.npc.profile.Profile;
+import eu.darkcube.system.lobbysystem.Lobby;
+
 import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
-
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-
-import com.github.juliarn.npc.NPC;
-import com.github.juliarn.npc.SpawnCustomizer;
-import com.github.juliarn.npc.modifier.MetadataModifier;
-import com.github.juliarn.npc.profile.Profile;
-
-import eu.darkcube.system.lobbysystem.Lobby;
 
 public class DailyRewardNPC {
 

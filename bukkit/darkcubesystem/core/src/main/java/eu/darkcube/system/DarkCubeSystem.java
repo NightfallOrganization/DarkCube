@@ -10,6 +10,8 @@ package eu.darkcube.system;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.arguments.EntityOptions;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.userapi.BukkitUserAPI;
+import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.Bukkit;
@@ -24,6 +26,10 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		instance = this;
 	}
 
+	public static DarkCubeSystem getInstance() {
+		return instance;
+	}
+
 	@Override
 	public void onLoad() {
 		VersionSupport.init();
@@ -34,24 +40,22 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 	}
 
 	@Override
-	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(this, this);
+	public void onDisable() {
+		AsyncExecutor.stop();
+		AdventureSupport.audienceProvider().close();
 	}
 
 	@Override
-	public void onDisable() {
-		AsyncExecutor.stop();
+	public void onEnable() {
+		BukkitUserAPI.init();
+		Bukkit.getPluginManager().registerEvents(this, this);
+		AdventureSupport.audienceProvider(); // Initializes adventure
 	}
 
 	@EventHandler
-	public void handle(PlayerKickEvent event) {
+	private void handle(PlayerKickEvent event) {
 		if (event.getReason() == "disconnect.spam") {
 			event.setCancelled(true);
 		}
 	}
-
-	public static DarkCubeSystem getInstance() {
-		return instance;
-	}
-
 }

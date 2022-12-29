@@ -7,27 +7,27 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.jumpandrun.JaRRegion;
+import eu.darkcube.system.lobbysystem.listener.BaseListener;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
-import eu.darkcube.system.lobbysystem.jumpandrun.JaRRegion;
-import eu.darkcube.system.lobbysystem.listener.BaseListener;
-import net.md_5.bungee.api.ChatColor;
 
 public class CommandCreateRegion extends LobbyCommandExecutor {
 
 	public CommandCreateRegion() {
 		super("createRegion", b -> b.executes(ctx -> {
 			if (ctx.getSource().asPlayer().hasMetadata("creatingRegion")) {
-				ctx.getSource().sendErrorMessage(
-						new CustomComponentBuilder("Du erstellst bereits eine Region!").create());
+				ctx.getSource().sendMessage(Component.text("Du erstellst bereits eine Region!")
+						.color(NamedTextColor.RED));
 				return 0;
 			}
 			ctx.getSource().asPlayer().sendMessage(
@@ -53,10 +53,8 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 				if (event.getPlayer().equals(source.asPlayer())) {
 					if (data.loc1 == null) {
 						data.loc1 = event.getBlock();
-						source.sendFeedback(
-								new CustomComponentBuilder("Wähle nun die zweite Ecke aus!")
-										.create(),
-								true);
+						source.sendMessage(Component.text("Wähle nun die zweite Ecke aus!")
+								.color(NamedTextColor.RED));
 					} else if (data.loc2 == null) {
 						data.loc2 = event.getBlock();
 						data.stopCreating();
@@ -79,6 +77,7 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 		}
 	}
 
+
 	public static class CData {
 		public CListener l;
 		public Block loc1;
@@ -93,17 +92,17 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 			l.unregister();
 			if (loc1 != null && loc2 != null) {
 				if (loc1.getWorld() != loc2.getWorld()) {
-					l.source.sendErrorMessage(new CustomComponentBuilder(
-							"Die Blöcke sind nicht in der gleichen Welt!").create());
+					l.source.sendMessage(
+							Component.text("Die Blöcke sind nicht in der gleichen Welt!")
+									.color(NamedTextColor.RED));
 					return;
 				}
 				int distX = Math.abs(loc1.getX() - loc2.getX());
 				int distZ = Math.abs(loc1.getZ() - loc2.getZ());
 				int distY = Math.abs(loc1.getY() - loc2.getY());
 				if (distX < 30 || distZ < 30 || distY < 15) {
-					l.source.sendErrorMessage(
-							new CustomComponentBuilder("Die Region müss größer als 30x15x30 sein")
-									.create());
+					l.source.sendMessage(Component.text("Die Region müss größer als 30x15x30 sein")
+							.color(NamedTextColor.RED));
 					return;
 				}
 				int x = Math.min(loc1.getX(), loc2.getX());
@@ -112,10 +111,8 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 				JaRRegion reg = new JaRRegion(loc1.getWorld(), x, y, z, distX, distY, distZ);
 				Lobby.getInstance().getJaRManager().getRegions().add(reg);
 				Lobby.getInstance().getJaRManager().saveRegions();
-				l.source.sendFeedback(
-						new CustomComponentBuilder("Die Region wurde erfolgreich erstellt!")
-								.color(ChatColor.GREEN).create(),
-						true);
+				l.source.sendMessage(Component.text("Die Blöcke sind nicht in der gleichen Welt!")
+						.color(NamedTextColor.GREEN));
 			}
 		}
 	}

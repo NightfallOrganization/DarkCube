@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.inventoryapi.v1;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -16,16 +17,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-import static eu.darkcube.system.inventoryapi.v1.IInventory.*;
+import static eu.darkcube.system.inventoryapi.v1.IInventory.slot;
+import static eu.darkcube.system.inventoryapi.v1.IInventory.slot0;
 
 public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 
-	public DefaultAsyncPagedInventory(InventoryType inventoryType, String title, BooleanSupplier instant) {
+	public DefaultAsyncPagedInventory(InventoryType inventoryType, Component title,
+			BooleanSupplier instant) {
 		this(inventoryType, title, 6 * 9, AsyncPagedInventory.box(3, 2, 5, 8), instant);
 	}
 
-	public DefaultAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
-			BooleanSupplier instant) {
+	public DefaultAsyncPagedInventory(InventoryType inventoryType, Component title, int size,
+			int[] box, BooleanSupplier instant) {
 		super(inventoryType, title, size, instant, box, IInventory.slot(1, 5));
 	}
 
@@ -36,10 +39,10 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 		}
 	}
 
-	protected void playSound() {
-		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
-			p.playSound(p.getLocation(), Sound.NOTE_STICKS, 100, 1);
-		});
+	@Override
+	protected void insertDefaultItems() {
+		this.insertArrowItems();
+		this.insertFallbackItems();
 	}
 
 	@Override
@@ -47,19 +50,17 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 
 	}
 
-	protected void insertArrowItems() {
-		this.arrowSlots.putIfAbsent(PageArrow.PREVIOUS, new Integer[] {
-				slot(3, 1), slot(4, 1), slot(5, 1)
-		});
-		this.arrowSlots.putIfAbsent(PageArrow.NEXT, new Integer[] {
-				slot(3, 9), slot(4, 9), slot(5, 9)
+	protected void playSound() {
+		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
+			p.playSound(p.getLocation(), Sound.NOTE_STICKS, 100, 1);
 		});
 	}
 
-	@Override
-	protected void insertDefaultItems() {
-		this.insertArrowItems();
-		this.insertFallbackItems();
+	protected void insertArrowItems() {
+		this.arrowSlots.putIfAbsent(PageArrow.PREVIOUS,
+				new Integer[] {slot(3, 1), slot(4, 1), slot(5, 1)});
+		this.arrowSlots.putIfAbsent(PageArrow.NEXT,
+				new Integer[] {slot(3, 9), slot(4, 9), slot(5, 9)});
 	}
 
 	protected void insertFallbackItems() {

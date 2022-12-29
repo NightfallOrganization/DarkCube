@@ -7,7 +7,9 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.pserver.plugin.Item;
@@ -30,14 +32,16 @@ public class UserManagmentUserInventory extends DefaultPServerSyncPagedInventory
 
 	@SuppressWarnings("deprecation")
 	public UserManagmentUserInventory(User user, UUID targetUUID, String targetName) {
-		super(user, TYPE, Message.USER_MANAGMENT_USER_INVENTORY_TITLE.getMessageString(user, targetName));
+		super(user, TYPE,
+				Message.USER_MANAGMENT_USER_INVENTORY_TITLE.getMessage(user.getCommandExecutor(),
+						targetName));
 		this.targetUUID = targetUUID;
 		this.target = UserManager.getInstance().getUser(this.targetUUID);
-		this.staticItems.put(IInventory.slot0(5, 1),
-				new ItemBuilder(Material.SKULL_ITEM).durability(3).displayname(ChatColor.GRAY + targetName)
-						.owner(targetName).lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER
-								.getMessageString(user, targetName, targetUUID).split("\n"))
-						.build());
+		this.staticItems.put(IInventory.slot0(5, 1), ItemBuilder.item(Material.SKULL_ITEM).damage(3)
+				.displayname(ChatColor.GRAY + targetName)
+				.meta(new SkullBuilderMeta(new UserProfile(targetName, targetUUID)))
+				.lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessage(
+						user.getCommandExecutor(), targetName, targetUUID)).build());
 		tryFillInv();
 	}
 

@@ -16,7 +16,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -24,7 +24,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class WorldArgument implements ArgumentType<World> {
 
-	private static final DynamicCommandExceptionType INVALID_WORLD = Message.INVALID_WORLD.newDynamicCommandExceptionType();
+	private static final DynamicCommandExceptionType INVALID_WORLD =
+			Messages.INVALID_WORLD.newDynamicCommandExceptionType();
 
 	private WorldArgument() {
 	}
@@ -33,8 +34,7 @@ public class WorldArgument implements ArgumentType<World> {
 		return new WorldArgument();
 	}
 
-	public static World getWorld(CommandContext<CommandSource> context,
-					String name) {
+	public static World getWorld(CommandContext<CommandSource> context, String name) {
 		return context.getArgument(name, World.class);
 	}
 
@@ -50,8 +50,9 @@ public class WorldArgument implements ArgumentType<World> {
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(
-					CommandContext<S> context, SuggestionsBuilder builder) {
-		return ISuggestionProvider.suggest(Bukkit.getWorlds().stream().map(World::getName), builder);
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
+		return ISuggestionProvider.suggest(Bukkit.getWorlds().stream().map(World::getName),
+				builder);
 	}
 }

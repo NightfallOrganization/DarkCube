@@ -10,7 +10,8 @@ package de.pixel.bedwars.state;
 import de.pixel.bedwars.Main;
 import de.pixel.bedwars.listener.*;
 import de.pixel.bedwars.util.*;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,33 +31,28 @@ import java.util.*;
 
 public class Lobby extends GameState {
 
+	public static final ScoreboardTeam[] LOBBY_SCOREBOARD_TEAMS =
+			new ScoreboardTeam[] {ScoreboardTeam.LOBBY_MAPS, ScoreboardTeam.LOBBY_TIMER,
+					ScoreboardTeam.LOBBY_GOLD, ScoreboardTeam.LOBBY_IRON};
 	public static LobbyCountdown lobbyCountdown = new LobbyCountdown();
-
-	public static final ScoreboardTeam[] LOBBY_SCOREBOARD_TEAMS = new ScoreboardTeam[] {
-			ScoreboardTeam.LOBBY_MAPS,
-			ScoreboardTeam.LOBBY_TIMER, ScoreboardTeam.LOBBY_GOLD, ScoreboardTeam.LOBBY_IRON
-	};
-
-	public Lobby() {
-		super(new LobbyBlock(), new LobbyPlayerJoin(), new LobbyInventoryClick(), new LobbyFoodLevelChange(),
-				new LobbyEntityDamage(), new LobbyPlayerInteract(), new LobbyItemDropPickup(), new LobbyPlayerQuit(),
-				lobbyCountdown, new LobbyInventoryClose(), new LobbyPlayerLogin());
-	}
-
 	public boolean gold = true;
 	public boolean iron = true;
 	public de.pixel.bedwars.map.Map map = null;
-
 	public Map<Player, Boolean> VOTE_GOLD = new HashMap<>();
 	public Map<Player, Boolean> VOTE_IRON = new HashMap<>();
 	public Map<Player, de.pixel.bedwars.map.Map> VOTE_MAP = new HashMap<>();
-
 	public Map<Player, Inventory> INVENTORY_OPEN_TEAMS = new HashMap<>();
 	public Map<Player, Inventory> INVENTORY_OPEN_MAPS = new HashMap<>();
 	public Map<Player, Inventory> INVENTORY_OPEN_GOLD = new HashMap<>();
 	public Map<Player, Inventory> INVENTORY_OPEN_IRON = new HashMap<>();
-
 	private Location spawn;
+
+	public Lobby() {
+		super(new LobbyBlock(), new LobbyPlayerJoin(), new LobbyInventoryClick(),
+				new LobbyFoodLevelChange(), new LobbyEntityDamage(), new LobbyPlayerInteract(),
+				new LobbyItemDropPickup(), new LobbyPlayerQuit(), lobbyCountdown,
+				new LobbyInventoryClose(), new LobbyPlayerLogin());
+	}
 
 	@Override
 	protected void onEnable() {
@@ -72,12 +68,13 @@ public class Lobby extends GameState {
 
 		reloadSpawn();
 		Bukkit.getOnlinePlayers().forEach(this::setupPlayer);
-		Bukkit.getOnlinePlayers().stream().map(p -> new PlayerJoinEvent(p, "joined bla bla bla")).forEach(e -> {
-			lobbyCountdown.handle(e);
-		});
+		Bukkit.getOnlinePlayers().stream().map(p -> new PlayerJoinEvent(p, "joined bla bla bla"))
+				.forEach(e -> {
+					lobbyCountdown.handle(e);
+				});
 
-		this.map = new ArrayList<>(de.pixel.bedwars.map.Map.getMaps())
-				.get(new Random().nextInt(de.pixel.bedwars.map.Map.getMaps().size()));
+		this.map = new ArrayList<>(de.pixel.bedwars.map.Map.getMaps()).get(
+				new Random().nextInt(de.pixel.bedwars.map.Map.getMaps().size()));
 		recalculateGold();
 		recalculateIron();
 		recalculateMap();
@@ -94,15 +91,15 @@ public class Lobby extends GameState {
 		lobbyCountdown.cancel();
 	}
 
+	public Location getSpawn() {
+		return spawn;
+	}
+
 	public void setSpawn(Location spawn) {
 		this.spawn = spawn;
 		YamlConfiguration cfg = Main.getInstance().getConfig("spawns");
 		cfg.set("lobby", Locations.serialize(spawn));
 		Main.getInstance().saveConfig(cfg);
-	}
-
-	public Location getSpawn() {
-		return spawn;
 	}
 
 	public void reloadSpawn() {
@@ -171,15 +168,15 @@ public class Lobby extends GameState {
 	}
 
 	public void setItemsVotingGoldInventory(Inventory inv, Player p) {
-		ItemBuilder b = new ItemBuilder(
-				Item.LOBBY_VOTING_GOLD_YES.getItem(p, new String[0], Integer.toString(getVoteCount(VOTE_GOLD, true))));
+		ItemBuilder b = ItemBuilder.item(Item.LOBBY_VOTING_GOLD_YES.getItem(p, new String[0],
+				Integer.toString(getVoteCount(VOTE_GOLD, true))));
 		if (VOTE_GOLD.getOrDefault(p, false)) {
 			b.glow();
 		}
 		inv.setItem(3, b.build());
 
-		b = new ItemBuilder(
-				Item.LOBBY_VOTING_GOLD_NO.getItem(p, new String[0], Integer.toString(getVoteCount(VOTE_GOLD, false))));
+		b = ItemBuilder.item(Item.LOBBY_VOTING_GOLD_NO.getItem(p, new String[0],
+				Integer.toString(getVoteCount(VOTE_GOLD, false))));
 		if (!VOTE_GOLD.getOrDefault(p, true)) {
 			b.glow();
 		}
@@ -202,15 +199,15 @@ public class Lobby extends GameState {
 	}
 
 	public void setItemsVotingIronInventory(Inventory inv, Player p) {
-		ItemBuilder b = new ItemBuilder(
-				Item.LOBBY_VOTING_IRON_YES.getItem(p, new String[0], Integer.toString(getVoteCount(VOTE_IRON, true))));
+		ItemBuilder b = ItemBuilder.item(Item.LOBBY_VOTING_IRON_YES.getItem(p, new String[0],
+				Integer.toString(getVoteCount(VOTE_IRON, true))));
 		if (VOTE_IRON.getOrDefault(p, false)) {
 			b.glow();
 		}
 		inv.setItem(3, b.build());
 
-		b = new ItemBuilder(
-				Item.LOBBY_VOTING_IRON_NO.getItem(p, new String[0], Integer.toString(getVoteCount(VOTE_IRON, false))));
+		b = ItemBuilder.item(Item.LOBBY_VOTING_IRON_NO.getItem(p, new String[0],
+				Integer.toString(getVoteCount(VOTE_IRON, false))));
 		if (!VOTE_IRON.getOrDefault(p, true)) {
 			b.glow();
 		}
@@ -232,7 +229,8 @@ public class Lobby extends GameState {
 		}
 		if (size == 0)
 			size = 9;
-		Inventory inv = Bukkit.createInventory(null, size, Item.LOBBY_TEAMS.getItem(p).getItemMeta().getDisplayName());
+		Inventory inv = Bukkit.createInventory(null, size,
+				Item.LOBBY_TEAMS.getItem(p).getItemMeta().getDisplayName());
 		INVENTORY_OPEN_TEAMS.put(p, inv);
 		setItemsTeamsInventory(inv, p);
 		p.openInventory(inv);
@@ -243,13 +241,16 @@ public class Lobby extends GameState {
 		int slot = 0;
 		de.pixel.bedwars.team.Team t = de.pixel.bedwars.team.Team.getTeam(p);
 		for (de.pixel.bedwars.team.Team team : de.pixel.bedwars.team.Team.getTeams()) {
-			ItemBuilder b = new ItemBuilder(Material.BOOK);
-			b.displayname(
-					"§" + team.getNamecolor() + I18n.translate(I18n.getPlayerLanguage(p), team.getTranslationName()));
+			ItemBuilder b = ItemBuilder.item(Material.BOOK);
+			b.displayname("§" + team.getNamecolor() + I18n.translate(I18n.getPlayerLanguage(p),
+					team.getTranslationName()));
 			for (Player pl : team.getPlayers()) {
 				b.lore("§" + team.getNamecolor() + pl.getName());
 			}
-			b.getUnsafe().setString("itemId", "team").setString("team", team.getTranslationName());
+			b.persistentDataStorage()
+					.iset(ItemManager.keyItemId, PersistentDataTypes.STRING, "team")
+					.iset(ItemManager.keyTeam, PersistentDataTypes.STRING,
+							team.getTranslationName());
 			if (t == team) {
 				b.glow();
 			}
@@ -272,7 +273,8 @@ public class Lobby extends GameState {
 		}
 		if (size == 0)
 			size = 9;
-		Inventory inv = Bukkit.createInventory(null, size, Item.LOBBY_MAPS.getItem(p).getItemMeta().getDisplayName());
+		Inventory inv = Bukkit.createInventory(null, size,
+				Item.LOBBY_MAPS.getItem(p).getItemMeta().getDisplayName());
 		INVENTORY_OPEN_MAPS.put(p, inv);
 		setItemsVotingMapsInventory(inv, p);
 		p.openInventory(inv);
@@ -283,10 +285,12 @@ public class Lobby extends GameState {
 		int slot = 0;
 		de.pixel.bedwars.map.Map m = VOTE_MAP.get(p);
 		for (de.pixel.bedwars.map.Map map : de.pixel.bedwars.map.Map.getMaps()) {
-			ItemBuilder b = new ItemBuilder(map.getIcon().getMaterial()).durability(map.getIcon().getId());
+			ItemBuilder b =
+					ItemBuilder.item(map.getIcon().getMaterial()).damage(map.getIcon().getId());
 			b.displayname("§6" + map.getName());
 			b.lore("§a" + getVoteCount(VOTE_MAP, map));
-			b.getUnsafe().setString("itemId", "map").setString("map", map.getName());
+			b.persistentDataStorage().iset(ItemManager.keyItemId, PersistentDataTypes.STRING, "map")
+					.iset(ItemManager.keyMap, PersistentDataTypes.STRING, map.getName());
 			if (map == m) {
 				b.glow();
 			}

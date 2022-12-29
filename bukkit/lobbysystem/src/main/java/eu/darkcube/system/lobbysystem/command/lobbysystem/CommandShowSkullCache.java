@@ -7,10 +7,9 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandShowSkullCache extends LobbyCommandExecutor {
 
@@ -19,13 +18,10 @@ public class CommandShowSkullCache extends LobbyCommandExecutor {
 			b.executes(ctx -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("SkullCache (").append(SkullCache.cache.size()).append("):\n");
-				SkullCache.cache.entrySet().forEach(e -> {
-					sb.append(" - ").append(
-							SkullCache.getCachedItem(e.getKey()).getItemMeta().getDisplayName());
-				});
-				ctx.getSource().sendFeedback(
-						CustomComponentBuilder.cast(TextComponent.fromLegacyText(sb.toString())),
-						true);
+				SkullCache.cache.forEach((key, value) -> sb.append(" - ")
+						.append(SkullCache.getCachedItem(key).getItemMeta().getDisplayName()));
+				ctx.getSource().sendMessage(
+						LegacyComponentSerializer.legacySection().deserialize(sb.toString()));
 				return 0;
 			});
 		});

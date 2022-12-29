@@ -1,28 +1,13 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.miners.util;
 
-import eu.darkcube.system.util.ChatUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.Arrays;
-import java.util.List;
-
 public class Util {
-
-	public static void sendActionbar(String message, Player... players) {
-		if (message == null)
-			return;
-		ChatUtils.ChatEntry.build(new ChatUtils.ChatEntry.Builder().text(message).build())
-				.send(players);
-	}
-
-	public static void sendActionbarToAll(String message, Player... exclude) {
-		if (message == null)
-			return;
-		List<Player> excludes = Arrays.asList(exclude);
-		sendActionbar(message, Bukkit.getOnlinePlayers().stream().filter(p -> !excludes.contains(p))
-				.toArray(i -> new Player[i]));
-	}
 
 	public static String secondsToTime(int seconds, boolean showZeroHours, boolean showZeroMins,
 			String color1, String color2) {

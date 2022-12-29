@@ -7,14 +7,19 @@
 
 package eu.darkcube.system.commandapi.v3;
 
+import com.avaje.ebean.validation.NotNull;
 import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.ResultConsumer;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
 import eu.darkcube.system.commandapi.v3.arguments.EntityAnchorArgument.Type;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
@@ -23,17 +28,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CommandSource implements ISuggestionProvider {
+public class CommandSource implements ISuggestionProvider, ForwardingAudience {
 
-	public static final SimpleCommandExceptionType REQUIRES_PLAYER_EXCEPTION_TYPE = new SimpleCommandExceptionType(
-			new LiteralMessage("You need to be a player!"));
+	public static final SimpleCommandExceptionType REQUIRES_PLAYER_EXCEPTION_TYPE =
+			new SimpleCommandExceptionType(new LiteralMessage("You need to be a player!"));
 
-	public static final SimpleCommandExceptionType REQUIRES_ENTITY_EXCEPTION_TYPE = new SimpleCommandExceptionType(
-			new LiteralMessage("You need to be an entity!"));
+	public static final SimpleCommandExceptionType REQUIRES_ENTITY_EXCEPTION_TYPE =
+			new SimpleCommandExceptionType(new LiteralMessage("You need to be an entity!"));
 
 	private final ICommandExecutor source;
 
@@ -57,6 +63,30 @@ public class CommandSource implements ISuggestionProvider {
 
 	private final Map<String, Object> extra;
 
+	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name,
+			String displayName, Entity entity, Vector2f rotation, Map<String, Object> extra) {
+		this(source, pos, world, name, displayName, false, entity, (context, success, result) -> {
+		}, Type.FEET, rotation, extra);
+	}
+
+	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name,
+			String displayName, boolean feedbackDisabled, Entity entity,
+			ResultConsumer<CommandSource> resultConsumer, Type entityAnchorType, Vector2f rotation,
+			Map<String, Object> extra) {
+		super();
+		this.source = source;
+		this.pos = pos;
+		this.world = world;
+		this.name = name;
+		this.displayName = displayName;
+		this.feedbackDisabled = feedbackDisabled;
+		this.entity = entity;
+		this.resultConsumer = resultConsumer;
+		this.entityAnchorType = entityAnchorType;
+		this.rotation = rotation;
+		this.extra = extra;
+	}
+
 	public static CommandSource create(CommandSender sender) {
 		ICommandExecutor executor = new BukkitCommandExecutor(sender);
 		Vector3d pos = null;
@@ -77,83 +107,91 @@ public class CommandSource implements ISuggestionProvider {
 			rotation = new Vector2f(0, 0);
 			world = b.getBlock().getWorld();
 		}
-		return new CommandSource(executor, pos, world, name, displayName, entity, rotation, new HashMap<>());
+		return new CommandSource(executor, pos, world, name, displayName, entity, rotation,
+				new HashMap<>());
 	}
 
-	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name, String displayName,
-			Entity entity, Vector2f rotation, Map<String, Object> extra) {
-		this(source, pos, world, name, displayName, false, entity, (context, success, result) -> {
-		}, Type.FEET, rotation, extra);
+	public void sendMessage(Message message) {
+		if (message instanceof MessageWrapper) {
+			MessageWrapper w = (MessageWrapper) message;
+			BaseMessage m = w.getMessage();
+			sendMessage(m.getMessage(source, w.getComponents()));
+		} else {
+			sendMessage(Component.text(message.getString()).color(NamedTextColor.RED));
+		}
 	}
 
-	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name, String displayName,
-			boolean feedbackDisabled, Entity entity, ResultConsumer<CommandSource> resultConsumer,
-			Type entityAnchorType, Vector2f rotation, Map<String, Object> extra) {
-		super();
-		this.source = source;
-		this.pos = pos;
-		this.world = world;
-		this.name = name;
-		this.displayName = displayName;
-		this.feedbackDisabled = feedbackDisabled;
-		this.entity = entity;
-		this.resultConsumer = resultConsumer;
-		this.entityAnchorType = entityAnchorType;
-		this.rotation = rotation;
-		this.extra = extra;
+	public void sendMessage(BaseMessage message, Object... objects) {
+		sendMessage(message.getMessage(source, objects));
+	}
+
+	@Override
+	public @NotNull Iterable<? extends Audience> audiences() {
+		return Collections.singleton(source);
 	}
 
 	public CommandSource withEntity(Entity entity) {
-		return this.entity == entity ? this
+		return this.entity == entity
+				? this
 				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, entity, this.resultConsumer, this.entityAnchorType, this.rotation,
-						this.extra);
+						this.feedbackDisabled, entity, this.resultConsumer, this.entityAnchorType,
+						this.rotation, this.extra);
 	}
 
 	public CommandSource withPos(Vector3d pos) {
-		return this.pos == pos ? this
-				: new CommandSource(this.source, pos, this.world, this.name, this.displayName, this.feedbackDisabled,
-						this.entity, this.resultConsumer, this.entityAnchorType, this.rotation, this.extra);
+		return this.pos == pos
+				? this
+				: new CommandSource(this.source, pos, this.world, this.name, this.displayName,
+						this.feedbackDisabled, this.entity, this.resultConsumer,
+						this.entityAnchorType, this.rotation, this.extra);
 	}
 
 	public CommandSource withRotation(Vector2f rotation) {
-		return this.rotation == rotation ? this
+		return this.rotation == rotation
+				? this
 				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType, rotation,
-						this.extra);
+						this.feedbackDisabled, this.entity, this.resultConsumer,
+						this.entityAnchorType, rotation, this.extra);
 	}
 
 	public CommandSource withResultConsumer(ResultConsumer<CommandSource> resultConsumer) {
-		return this.resultConsumer == resultConsumer ? this
+		return this.resultConsumer == resultConsumer
+				? this
 				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, resultConsumer, this.entityAnchorType, this.rotation,
-						this.extra);
+						this.feedbackDisabled, this.entity, resultConsumer, this.entityAnchorType,
+						this.rotation, this.extra);
 	}
 
 	public CommandSource withFeedbackDisabled(boolean feedbackDisabled) {
-		return this.feedbackDisabled == feedbackDisabled ? this
-				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName, feedbackDisabled,
-						this.entity, this.resultConsumer, this.entityAnchorType, this.rotation, this.extra);
+		return this.feedbackDisabled == feedbackDisabled
+				? this
+				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+						feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType,
+						this.rotation, this.extra);
 	}
 
 	public CommandSource withAnchorType(Type entityAnchorType) {
-		return this.entityAnchorType == entityAnchorType ? this
+		return this.entityAnchorType == entityAnchorType
+				? this
 				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, this.resultConsumer, entityAnchorType, this.rotation,
-						this.extra);
+						this.feedbackDisabled, this.entity, this.resultConsumer, entityAnchorType,
+						this.rotation, this.extra);
 	}
 
 	public CommandSource withWorld(World world) {
-		return this.world == world ? this
-				: new CommandSource(this.source, this.pos, world, this.name, this.displayName, this.feedbackDisabled,
-						this.entity, this.resultConsumer, this.entityAnchorType, this.rotation, this.extra);
+		return this.world == world
+				? this
+				: new CommandSource(this.source, this.pos, world, this.name, this.displayName,
+						this.feedbackDisabled, this.entity, this.resultConsumer,
+						this.entityAnchorType, this.rotation, this.extra);
 	}
 
 	public CommandSource with(String key, Object object) {
 		Map<String, Object> extra = new HashMap<>(this.extra);
 		extra.put(key, object);
-		return new CommandSource(this.source, this.pos, this.world, this.name, this.displayName, this.feedbackDisabled,
-				this.entity, this.resultConsumer, this.entityAnchorType, this.rotation, extra);
+		return new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+				this.feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType,
+				this.rotation, extra);
 	}
 
 	public <T> T get(String key) {
@@ -179,8 +217,10 @@ public class CommandSource implements ISuggestionProvider {
 		double d1 = lookPos.y - vector3d.y;
 		double d2 = lookPos.z - vector3d.z;
 		double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
-		float f = MathHelper.wrapDegrees((float) (-(MathHelper.atan2(d1, d3) * (180F / (float) Math.PI))));
-		float f1 = MathHelper.wrapDegrees((float) (MathHelper.atan2(d2, d0) * (180F / (float) Math.PI)) - 90.0F);
+		float f = MathHelper.wrapDegrees(
+				(float) (-(MathHelper.atan2(d1, d3) * (180F / (float) Math.PI))));
+		float f1 = MathHelper.wrapDegrees(
+				(float) (MathHelper.atan2(d2, d0) * (180F / (float) Math.PI)) - 90.0F);
 		return this.withRotation(new Vector2f(f, f1));
 	}
 
@@ -190,18 +230,6 @@ public class CommandSource implements ISuggestionProvider {
 
 	public Entity getEntity() {
 		return this.entity;
-	}
-
-	public void sendFeedback(TextComponent[] message, boolean allowLogging) {
-		if (this.source.shouldReceiveFeedback() && !this.feedbackDisabled) {
-			this.source.sendMessage(message);
-		}
-		if (allowLogging && this.source.allowLogging() && !this.feedbackDisabled) {
-			this.logFeedback(message);
-		}
-	}
-
-	private void logFeedback(TextComponent... message) {
 	}
 
 	public Entity assertIsEntity() throws CommandSyntaxException {
@@ -216,31 +244,6 @@ public class CommandSource implements ISuggestionProvider {
 			throw CommandSource.REQUIRES_PLAYER_EXCEPTION_TYPE.create();
 		}
 		return (Player) this.entity;
-	}
-
-	public void sendErrorMessage(Message message, Object... components) {
-		if (this.source.shouldReceiveErrors() && !this.feedbackDisabled) {
-			this.source.sendMessage(
-					message.apply(b -> b.color(ChatColor.RED), this.source.getMessageToStringFunction(), components));
-		}
-	}
-
-	public void sendErrorMessage(com.mojang.brigadier.Message message, Object... components) {
-		if (this.source.shouldReceiveErrors() && !this.feedbackDisabled) {
-			this.source.sendMessage(b -> b.color(ChatColor.RED), message, components);
-		}
-	}
-
-	public void sendErrorMessage(TextComponent... message) {
-		if (this.source.shouldReceiveErrors() && !this.feedbackDisabled) {
-			this.source.sendMessage(b -> b.color(ChatColor.RED), message);
-		}
-	}
-
-	public void onCommandComplete(CommandContext<CommandSource> context, boolean success, int result) {
-		if (this.resultConsumer != null) {
-			this.resultConsumer.onCommandComplete(context, success, result);
-		}
 	}
 
 	@Override
@@ -258,10 +261,6 @@ public class CommandSource implements ISuggestionProvider {
 
 	public Vector3d getPos() {
 		return this.pos;
-	}
-
-	public ResultConsumer<CommandSource> getResultConsumer() {
-		return this.resultConsumer;
 	}
 
 	public Vector2f getRotation() {

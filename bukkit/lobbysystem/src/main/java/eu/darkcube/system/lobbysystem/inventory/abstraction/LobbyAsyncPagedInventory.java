@@ -9,6 +9,7 @@ package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
 import eu.darkcube.system.inventoryapi.v1.DefaultAsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.userapi.User;
@@ -21,33 +22,26 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
 
 	private boolean done = false;
 
-	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, LobbyUser user) {
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, Component title, LobbyUser user) {
 		super(inventoryType, title, () -> !user.isAnimations());
 		this.user = user;
 		this.complete();
 	}
 
-	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, User user) {
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, Component title, User user) {
 		this(inventoryType, title, UserWrapper.fromUser(user));
 	}
 
-	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
-			LobbyUser user) {
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, Component title, int size,
+			int[] box, LobbyUser user) {
 		super(inventoryType, title, size, box, () -> !user.isAnimations());
 		this.user = user;
 		this.complete();
 	}
 
-	public LobbyAsyncPagedInventory(InventoryType inventoryType, String title, int size, int[] box,
-			User user) {
+	public LobbyAsyncPagedInventory(InventoryType inventoryType, Component title, int size,
+			int[] box, User user) {
 		this(inventoryType, title, size, box, UserWrapper.fromUser(user));
-	}
-
-	@Override
-	protected final void playSound() {
-		if (user.isSounds()) {
-			playSound0();
-		}
 	}
 
 	protected void playSound0() {
@@ -72,6 +66,13 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
 	protected final void insertDefaultItems() {
 		if (this.done()) {
 			this.insertDefaultItems0();
+		}
+	}
+
+	@Override
+	protected final void playSound() {
+		if (user.isSounds()) {
+			playSound0();
 		}
 	}
 

@@ -7,24 +7,16 @@
 
 package eu.darkcube.system.version;
 
-import com.google.gson.JsonArray;
-import com.mojang.brigadier.suggestion.Suggestion;
 import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.util.ChatBaseComponent;
-import eu.darkcube.system.util.ChatUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.title.TitlePart;
+import eu.darkcube.system.inventoryapi.item.ItemProvider;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R1.command.CraftCommandMap;
 import org.bukkit.craftbukkit.v1_19_R1.command.VanillaCommandWrapper;
@@ -44,10 +36,12 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class Version_1_19_2 implements Version {
 	private CommandAPI commandAPI;
+	private ItemProvider itemProvider;
 
 	@Override
 	public void init() {
 		this.commandAPI = new CommandApi();
+		this.itemProvider = new ItemProvider_1_19_2();
 	}
 
 	@Override
@@ -56,35 +50,37 @@ public class Version_1_19_2 implements Version {
 	}
 
 	@Override
-	public String getSpigotUnknownCommandMessage() {
-		return SpigotConfig.unknownCommandMessage;
-	}
-
-	@Override
-	public void sendMessage(ChatBaseComponent component, CommandSender... senders) {
-		ChatUtils.ChatEntry[] entries = component.getEntries();
-		JsonArray a = new JsonArray();
-		for (ChatUtils.ChatEntry entry : entries) {
-			a.add(entry.getJson());
-		}
-		Component c = GsonComponentSerializer.gson().deserialize(a.toString());
-		for (CommandSender s : senders) {
-			switch (component.getDisplay()) {
-				case ACTIONBAR -> s.sendActionBar(c);
-				case CHAT -> s.sendMessage(c);
-				case TITLE -> {
-					switch (component.getTitleType()) {
-						case TITLE -> s.sendTitlePart(TitlePart.TITLE, c);
-						case SUBTITLE -> s.sendTitlePart(TitlePart.SUBTITLE, c);
-						case CLEAR -> s.clearTitle();
-					}
-				}
-			}
-		}
+	public ItemProvider itemProvider() {
+		return itemProvider;
 	}
 
 	private static class CommandApi implements CommandAPI {
 		private final Executor executor = new Executor();
+
+		@Override
+		public String getSpigotUnknownCommandMessage() {
+			return SpigotConfig.unknownCommandMessage;
+		}
+
+		@Override
+		public PluginCommand registerLegacy(Plugin plugin, Command command) {
+			try {
+				Constructor<PluginCommand> constructor =
+						PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+				constructor.setAccessible(true);
+				PluginCommand plugincommand = constructor.newInstance(command.getName(), plugin);
+				plugincommand.setAliases(Arrays.asList(command.getAliases()));
+				plugincommand.setUsage(command.getSimpleLongUsage());
+				plugincommand.setPermission(command.getPermission());
+				CraftServer server = (CraftServer) Bukkit.getServer();
+				CraftCommandMap commandMap = (CraftCommandMap) server.getCommandMap();
+				register(commandMap, commandMap.getKnownCommands(), plugin, plugincommand);
+				return plugincommand;
+			} catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException |
+					InstantiationException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
 		@Override
 		public void register(CommandExecutor command) {
@@ -139,6 +135,14 @@ public class Version_1_19_2 implements Version {
 			}
 		}
 
+		@Override
+		public double[] getEntityBB(Entity entity) {
+			return new double[] {entity.getBoundingBox().getMinX(),
+					entity.getBoundingBox().getMinY(), entity.getBoundingBox().getMinZ(),
+					entity.getBoundingBox().getMaxX(), entity.getBoundingBox().getMaxY(),
+					entity.getBoundingBox().getMaxZ()};
+		}
+
 		private void checkAmbiguities(String registerName,
 				Map<String, org.bukkit.command.Command> knownCommands, PluginCommand command) {
 			if (knownCommands.containsKey(registerName)) {
@@ -164,50 +168,56 @@ public class Version_1_19_2 implements Version {
 			return args.length == 0 ? label : (label + " " + String.join(" ", args));
 		}
 
-
-		@Override
-		public void registerLegacy(Plugin plugin, Command owner) {
-			Set<Command> commandSet = new HashSet<>();
-			commandSet.add(owner);
-			for (Command command : commandSet) {
-				try {
-					Constructor<PluginCommand> constructor =
-							PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-					constructor.setAccessible(true);
-					PluginCommand plugincommand =
-							constructor.newInstance(command.getName(), plugin);
-					plugincommand.setAliases(Arrays.asList(owner.getAliases()));
-					plugincommand.setUsage(command.getSimpleLongUsage());
-					plugincommand.setPermission(command.getPermission());
-					CraftServer server = (CraftServer) Bukkit.getServer();
-					CraftCommandMap commandMap = (CraftCommandMap) server.getCommandMap();
-					commandMap.register("system", plugincommand);
-
-					Map<String, org.bukkit.command.Command> knownCommands =
-							commandMap.getKnownCommands();
-					if (knownCommands.get(
-							owner.getName().toLowerCase()) instanceof VanillaCommandWrapper) {
-						knownCommands.put(owner.getName().toLowerCase(), plugincommand);
-					}
-					for (String alias : owner.getAliases()) {
-						if (knownCommands.get(
-								alias.toLowerCase()) instanceof VanillaCommandWrapper) {
-							knownCommands.put(alias.toLowerCase(), plugincommand);
-						}
-					}
-				} catch (IllegalAccessException | NoSuchMethodException |
-						InvocationTargetException | InstantiationException e) {
-					throw new RuntimeException(e);
-				}
+		private void register(CommandMap commandMap, Map<String, org.bukkit.command.Command> known,
+				Plugin plugin, PluginCommand command) {
+			String name = command.getName().toLowerCase(Locale.ENGLISH);
+			String prefix = plugin.getName().toLowerCase(Locale.ENGLISH);
+			List<String> successfulNames = new ArrayList<>();
+			register(known, name, prefix, false, command, successfulNames);
+			for (String alias : command.getAliases()) {
+				register(known, alias, prefix, true, command, successfulNames);
 			}
 		}
 
-		@Override
-		public double[] getEntityBB(Entity entity) {
-			return new double[] {entity.getBoundingBox().getMinX(),
-					entity.getBoundingBox().getMinY(), entity.getBoundingBox().getMinZ(),
-					entity.getBoundingBox().getMaxX(), entity.getBoundingBox().getMaxY(),
-					entity.getBoundingBox().getMaxZ()};
+		private void register(Map<String, org.bukkit.command.Command> known, String name,
+				String prefix, boolean alias, org.bukkit.command.Command command,
+				List<String> successfulNames) {
+			String key = prefix + ":" + name;
+			boolean work = false;
+			if (known.containsKey(key)) {
+				org.bukkit.command.Command ex = known.get(key);
+				DarkCubeSystem.getInstance().getLogger().warning(
+						"[CommandAPI] Failed to register command: Command with that name already exists");
+				DarkCubeSystem.getInstance().getLogger()
+						.warning("[CommandAPI] Command: " + key + " - " + ex);
+				if (!alias) {
+					command.setLabel(key);
+				}
+			} else {
+				work = true;
+			}
+			if (work) {
+				known.put(key, command);
+				successfulNames.add(key);
+			}
+			work = false;
+			if (known.containsKey(name)) {
+				org.bukkit.command.Command ex = known.get(name);
+				if (ex instanceof VanillaCommandWrapper) {
+					work = true;
+				} else {
+					DarkCubeSystem.getInstance().getLogger().warning(
+							"[CommandAPI] Failed to register command: Command with that name already exists");
+					DarkCubeSystem.getInstance().getLogger()
+							.warning("[CommandAPI] Command: " + name + " - " + ex);
+				}
+			} else {
+				work = true;
+			}
+			if (work) {
+				known.put(name, command);
+				successfulNames.add(name);
+			}
 		}
 
 		private class Executor implements TabExecutor {
@@ -228,7 +238,7 @@ public class Version_1_19_2 implements Version {
 						int version = ViaSupport.getVersion(p);
 						if (version < 393) { // 393 is the version for 1.13
 							// https://minecraft.fandom.com/wiki/Protocol_version
-							executor.sendMessage(new CustomComponentBuilder(" ").create());
+							executor.sendMessage(Component.text(" "));
 							executor.sendCompletions(commandLine, completions);
 						}
 					}
