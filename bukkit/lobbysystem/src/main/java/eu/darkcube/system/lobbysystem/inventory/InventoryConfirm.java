@@ -10,6 +10,7 @@ package eu.darkcube.system.lobbysystem.inventory;
 import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
@@ -25,7 +26,7 @@ public class InventoryConfirm extends LobbyAsyncPagedInventory {
 
 	public final Runnable onCancel;
 
-	public InventoryConfirm(String title, User user, Runnable onConfirm, Runnable onCancel) {
+	public InventoryConfirm(Component title, User user, Runnable onConfirm, Runnable onCancel) {
 		super(InventoryConfirm.type_confirm, title, 3 * 9, AsyncPagedInventory.box(1, 1, 3, 9),
 				user);
 		// super(title, null, 3 * 9, InventoryConfirm.type_confirm, box(1, 1, 3, 9));

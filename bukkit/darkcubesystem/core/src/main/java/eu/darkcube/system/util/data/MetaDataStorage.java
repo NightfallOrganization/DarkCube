@@ -5,55 +5,48 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.userapi.data;
-
-import java.util.function.Supplier;
+package eu.darkcube.system.util.data;
 
 public interface MetaDataStorage {
 
 	/**
 	 * Stores some data
-	 * 
-	 * @param key
-	 * @param value
+	 *
+	 * @param key   the key
+	 * @param value the value
 	 */
 	void set(Key key, Object value);
 
 	/**
-	 * 
-	 * @param <T>
-	 * @param key
+	 * @param <T> the type
+	 * @param key the key
+	 *
 	 * @return stored data, null if not present
 	 */
 	<T> T get(Key key);
 
 	/**
-	 * @param <T>
-	 * @param key
-	 * @param orElse
+	 * @param <T>    the type
+	 * @param key    the key
+	 * @param orElse the default value
+	 *
 	 * @return stored data, the given fallback data if not present
 	 */
 	<T> T getOr(Key key, T orElse);
 
 	/**
-	 * @param <T>
-	 * @param key
-	 * @param orElse
-	 * @return stored data, the given fallback data if not present
-	 */
-	<T> T getOr(Key key, Supplier<T> orElse);
-
-	/**
-	 * @param key
-	 * @return whether or not this storage has data under the given key
+	 * @param key the key
+	 *
+	 * @return whether this storage has data under the given key
 	 */
 	boolean has(Key key);
 
 	/**
 	 * Removes some data
-	 * 
-	 * @param <T>
-	 * @param key
+	 *
+	 * @param <T> the type
+	 * @param key the key
+	 *
 	 * @return the removed data
 	 */
 	<T> T remove(Key key);

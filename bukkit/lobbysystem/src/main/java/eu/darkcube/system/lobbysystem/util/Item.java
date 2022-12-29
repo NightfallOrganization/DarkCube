@@ -7,16 +7,22 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.userapi.User;
-import org.bukkit.ChatColor;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
 
 import static org.bukkit.Material.*;
 
@@ -36,7 +42,6 @@ public enum Item {
 	INVENTORY_SETTINGS_SOUNDS_ON(ItemBuilder.item(GOLD_RECORD)),
 	INVENTORY_SETTINGS_SOUNDS_OFF(ItemBuilder.item(GOLD_RECORD)),
 
-
 	INVENTORY_COMPASS_JUMPANDRUN(ItemBuilder.item(DIAMOND_BOOTS)),
 	INVENTORY_COMPASS_SPAWN(ItemBuilder.item(NETHER_STAR)),
 	INVENTORY_COMPASS_SMASH(ItemBuilder.item(FIREBALL)),
@@ -50,9 +55,9 @@ public enum Item {
 	GADGET_GRAPPLING_HOOK(
 			ItemBuilder.item(FISHING_ROD).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE)),
 
-	LIGHT_GRAY_GLASS_PANE(ItemBuilder.item(STAINED_GLASS_PANE).durability(7)),
-	DARK_GRAY_GLASS_PANE(ItemBuilder.item(STAINED_GLASS_PANE).durability(15)),
-	LIME_GLASS_PANE(ItemBuilder.item(STAINED_GLASS_PANE).durability(5)),
+	LIGHT_GRAY_GLASS_PANE(ItemBuilder.item(STAINED_GLASS_PANE).damage(7)),
+	DARK_GRAY_GLASS_PANE(ItemBuilder.item(STAINED_GLASS_PANE).damage(15)),
+	LIME_GLASS_PANE(ItemBuilder.item(STAINED_GLASS_PANE).damage(5)),
 
 	INVENTORY_PSERVER_PUBLIC(ItemBuilder.item(PAPER)),
 	INVENTORY_PSERVER_PRIVATE(ItemBuilder.item(COMMAND)),
@@ -68,49 +73,98 @@ public enum Item {
 	INVENTORY_PSERVER(ItemBuilder.item(COMMAND)),
 	GAMESERVER_SELECTION_WOOLBATTLE(ItemBuilder.item(BOW)),
 	INVENTORY_NEW_PSERVER(ItemBuilder.item(COMMAND)),
-	PSERVER_SLOT(ItemBuilder.item(STAINED_GLASS_PANE).durability(5)),
+	PSERVER_SLOT(ItemBuilder.item(STAINED_GLASS_PANE).damage(5)),
 	WORLD_PSERVER(ItemBuilder.item(GRASS)),
 	GAME_PSERVER(ItemBuilder.item(DIAMOND_SWORD)),
 	GAMESERVER_WOOLBATTLE(ItemBuilder.item(BOW)),
 	PSERVER_DELETE(ItemBuilder.item(TNT).lore("")),
-	CONFIRM(ItemBuilder.item(INK_SACK).durability(10)),
-	CANCEL(ItemBuilder.item(INK_SACK).durability(1)),
-	START_PSERVER(ItemBuilder.item(INK_SACK).durability(2)),
-	STOP_PSERVER(ItemBuilder.item(INK_SACK).durability(1)),
-	PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE)
-			.fireworkEffect(
-					FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())
+	CONFIRM(ItemBuilder.item(INK_SACK).damage(10)),
+	CANCEL(ItemBuilder.item(INK_SACK).damage(1)),
+	START_PSERVER(ItemBuilder.item(INK_SACK).damage(2)),
+	STOP_PSERVER(ItemBuilder.item(INK_SACK).damage(1)),
+	PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE).meta(new FireworkBuilderMeta(
+					FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build()))
 			.flag(ItemFlag.HIDE_POTION_EFFECTS)),
-	PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE)
-			.fireworkEffect(FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build())
+
+	PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE).meta(new FireworkBuilderMeta(
+					FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build()))
 			.flag(ItemFlag.HIDE_POTION_EFFECTS)),
 
 	ARROW_NEXT(ItemBuilder.item(ARROW)),
+
 	ARROW_PREVIOUS(ItemBuilder.item(ARROW)),
 
 	GAME_NOT_FOUND(ItemBuilder.item(BARRIER)),
-	LOADING(ItemBuilder.item(BARRIER)),
 
+	LOADING(ItemBuilder.item(BARRIER)),
 	;
 
+	private static final Key itemId = new Key(Lobby.getInstance(), "itemId");
 	private final ItemBuilder builder;
-
 	private final String key = this.name();
 
-	private Item(ItemBuilder builder) {
+	Item(ItemBuilder builder) {
 		this.builder = builder;
 	}
 
-	@SuppressWarnings("deprecation")
-	public ItemBuilder getBuilder() {
-		return new ItemBuilder(this.builder);
+	public static ItemStack getItem(Item item, User user, Object... replacements) {
+		return Item.getItem(item, user, replacements, new Object[0]);
 	}
 
-	public String getDisplayName(User user) {
+	public static ItemStack getItem(Item item, User user, Object[] replacements,
+			Object... loreReplacements) {
+		ItemBuilder builder = setItemId(item.getBuilder(), item.getItemId());
+		Component name = Item.getDisplayName(item, user, replacements);
+		builder.displayname(name);
+		if (builder.lore().size() != 0) {
+			builder.setLore(new ArrayList<>());
+			builder.lore(Item.getLore(item, user, loreReplacements));
+		}
+		return builder.build();
+	}
+
+	public static String getItemId(Item item) {
+		return Message.PREFIX_ITEM + item.getKey();
+	}
+
+	public static String getItemId(ItemStack item) {
+		return ItemBuilder.item(item).persistentDataStorage()
+				.get(itemId, PersistentDataTypes.STRING);
+	}
+
+	public static ItemBuilder setItemId(ItemBuilder b, String itemId) {
+		return b.persistentDataStorage().iset(Item.itemId, PersistentDataTypes.STRING, itemId)
+				.builder();
+	}
+
+	public static Component getDisplayName(Item item, User user, Object... replacements) {
+		return Message.getMessage(Item.getItemId(item), user.getLanguage(), replacements);
+	}
+
+	public static Component getLore(Item item, User user, Object... loreReplacements) {
+		return Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(),
+				user.getLanguage(), loreReplacements);
+	}
+
+	public static Item byGadget(Gadget gadget) {
+		for (Item item : Item.values()) {
+			if (item.getKey().startsWith("GADGET_") && item.getKey().substring(7)
+					.equals(gadget.name())) {
+				return item;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+
+	public ItemBuilder getBuilder() {
+		return builder.clone();
+	}
+
+	public Component getDisplayName(User user) {
 		return this.getDisplayName(user, new Object[0]);
 	}
 
-	public String getDisplayName(User user, Object... replacements) {
+	public Component getDisplayName(User user, Object... replacements) {
 		return Item.getDisplayName(this, user, replacements);
 	}
 
@@ -132,65 +186,5 @@ public enum Item {
 
 	public String getItemId() {
 		return Item.getItemId(this);
-	}
-
-	public static ItemStack getItem(Item item, User user, Object... replacements) {
-		return Item.getItem(item, user, replacements, new Object[0]);
-	}
-
-	public static ItemStack getItem(Item item, User user, Object[] replacements,
-			Object... loreReplacements) {
-		ItemBuilder builder =
-				item.getBuilder().getUnsafe().setString("itemId", Item.getItemId(item)).builder();
-		String name = Item.getDisplayName(item, user, replacements);
-		builder.displayname(name);
-		if (builder.getLores().size() != 0) {
-			builder.getLores().clear();
-			String last = null;
-			String[] lores = Item.getLore(item, user, loreReplacements);
-			for (String lore : lores) {
-				if (last != null) {
-					lore = ChatColor.getLastColors(last) + lore;
-				}
-				last = lore;
-				builder.lore(last);
-			}
-		}
-		return builder.build();
-	}
-
-	public static String getItemId(Item item) {
-		return Message.PREFIX_ITEM + item.getKey();
-	}
-
-	public static String getItemId(ItemStack item) {
-		return Item.getNBTValue(new ItemBuilder(item), "itemId");
-	}
-
-	public static ItemBuilder setItemId(ItemBuilder b, String itemId) {
-		return b.getUnsafe().setString("itemId", itemId).builder();
-	}
-
-	private static String getNBTValue(ItemBuilder builder, String key) {
-		return builder.getUnsafe().getString(key);
-	}
-
-	public static String getDisplayName(Item item, User user, Object... replacements) {
-		return Message.getMessage(Item.getItemId(item), user.getLanguage(), replacements);
-	}
-
-	public static String[] getLore(Item item, User user, Object... loreReplacements) {
-		return Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(),
-				user.getLanguage(), loreReplacements).split("\\%n");
-	}
-
-	public static Item byGadget(Gadget gadget) {
-		for (Item item : Item.values()) {
-			if (item.getKey().startsWith("GADGET_")
-					&& item.getKey().substring(7).equals(gadget.name())) {
-				return item;
-			}
-		}
-		throw new IllegalArgumentException();
 	}
 }

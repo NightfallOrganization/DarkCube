@@ -1,62 +1,74 @@
+/*
+ * Copyright (c) 2022. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.miners.items;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.miners.player.Message;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.Collections;
+
+import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
 
 public enum Item {
 
-	PICKAXE_DEFAULT(new ItemBuilder(Material.STONE_PICKAXE).unbreakable(true)),
-	PICKAXE_IRON(new ItemBuilder(Material.IRON_PICKAXE).unbreakable(true)),
-	PICKAXE_GOLD(new ItemBuilder(Material.GOLD_PICKAXE).unbreakable(true)),
-	PICKAXE_DIAMOND(new ItemBuilder(Material.DIAMOND_PICKAXE).unbreakable(true)),
+	PICKAXE_DEFAULT(item(Material.STONE_PICKAXE).unbreakable(true)),
+	PICKAXE_IRON(item(Material.IRON_PICKAXE).unbreakable(true)),
+	PICKAXE_GOLD(item(Material.GOLD_PICKAXE).unbreakable(true)),
+	PICKAXE_DIAMOND(item(Material.DIAMOND_PICKAXE).unbreakable(true)),
 
-	INGOT_IRON(new ItemBuilder(Material.IRON_INGOT)),
-	INGOT_GOLD(new ItemBuilder(Material.GOLD_INGOT)),
-	DIAMOND(new ItemBuilder(Material.DIAMOND)),
-	COBBLESTONE(new ItemBuilder(Material.COBBLESTONE)),
-	TNT(new ItemBuilder(Material.TNT)),
-	SHEARS(new ItemBuilder(Material.SHEARS)),
-	CRAFTING_TABLE(new ItemBuilder(Material.WORKBENCH)),
-	STICK(new ItemBuilder(Material.STICK))
-
-	;
+	INGOT_IRON(item(Material.IRON_INGOT)),
+	INGOT_GOLD(item(Material.GOLD_INGOT)),
+	DIAMOND(item(Material.DIAMOND)),
+	COBBLESTONE(item(Material.COBBLESTONE)),
+	TNT(item(Material.TNT)),
+	SHEARS(item(Material.SHEARS)),
+	CRAFTING_TABLE(item(Material.WORKBENCH)),
+	STICK(item(Material.STICK));
 
 	public static final String ITEM_PREFIX = "ITEM_";
 	public static final String NAME_SUFFIX = "_NAME";
 	public static final String LORE_SUFFIX = "_LORE";
-
+	private static final Key itemId = new Key(Miners.getInstance(), "itemId");
 	private final ItemBuilder itemBuilder;
-
 	private final String KEY_NAME;
 	private final String KEY_LORE;
 
-	private Item(ItemBuilder ib) {
+	Item(ItemBuilder ib) {
 		this.itemBuilder = ib;
-		ib.unsafe().setString("ITEM", this.name());
 		this.KEY_NAME = ITEM_PREFIX + this.name() + NAME_SUFFIX;
 		this.KEY_LORE = ITEM_PREFIX + this.name() + LORE_SUFFIX;
 	}
 
-	public String getName(Language lang) {
+	public Component getName(Language lang) {
 		return Message.getMessage(KEY_NAME, lang);
 	}
 
-	public String getLore(Language lang) {
+	public Component getLore(Language lang) {
 		return Message.getMessage(KEY_LORE, lang);
 	}
 
 	public ItemStack getItem(Language lang, int amount) {
-		String lore = getLore(lang);
-		return lore.equals("") ? itemBuilder.displayname(getName(lang)).amount(amount).build()
-				: itemBuilder.displayname(getName(lang)).lore(Arrays.asList(getLore(lang).split("\n"))).amount(amount)
-						.build();
+		Component lore = getLore(lang);
+		ItemBuilder itemBuilder = this.itemBuilder.clone();
+		itemBuilder.persistentDataStorage().iset(itemId, PersistentDataTypes.STRING, this.name());
+		return "".equals(PlainTextComponentSerializer.plainText().serialize(lore))
+				? itemBuilder.displayname(getName(lang)).amount(amount).build()
+				: itemBuilder.displayname(getName(lang))
+						.lore(Collections.singletonList(getLore(lang))).amount(amount).build();
 	}
 
 	public ItemStack getItem(Player player, int amount) {

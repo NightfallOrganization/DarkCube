@@ -1,4 +1,9 @@
 dependencies {
     compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
-    implementation project(':bukkit:darkcubesystem:core')
+    implementation project(path: ':bukkit:darkcubesystem:core', configuration: 'shadow')
+    compileOnly cloudnetDriver
+}
+
+java {
+    withSourcesJar()
 }

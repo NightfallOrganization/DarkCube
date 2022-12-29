@@ -7,21 +7,18 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import com.google.common.reflect.TypeToken;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.scheduler.BukkitRunnable;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.parser.Locations;
 import eu.darkcube.system.lobbysystem.util.Border.Shape;
+import org.bukkit.Location;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DataManager {
 
@@ -69,13 +66,17 @@ public class DataManager {
 		}.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60 * 2);
 	}
 
+	public boolean isJumpAndRunEnabled() {
+		return jarEnabled;
+	}
+
 	public void setJumpAndRunEnabled(boolean enabled) {
 		jarEnabled = enabled;
 		database.update("jumpAndRunEnabled", new JsonDocument("value", enabled));
 	}
 
-	public boolean isJumpAndRunEnabled() {
-		return jarEnabled;
+	public boolean isWinter() {
+		return winter;
 	}
 
 	public void setWinter(boolean winter) {
@@ -83,19 +84,9 @@ public class DataManager {
 		database.update("winter", new JsonDocument().append("value", winter));
 	}
 
-	public boolean isWinter() {
-		return winter;
-	}
-
 	private void setDefault(String key, JsonDocument val) {
 		if (!database.contains(key))
 			database.insert(key, val);
-	}
-
-	public DataManager setBorder(Border border) {
-		database.update("border", border.serializeToDocument());
-		this.border = border;
-		return this;
 	}
 
 	public void fetchWoolBattleTasks() {
@@ -109,87 +100,66 @@ public class DataManager {
 		return woolbattleTasks;
 	}
 
-	public DataManager setWoolBattleTasks(Set<String> tasks) {
+	public void setWoolBattleTasks(Set<String> tasks) {
+		this.woolbattleTasks = tasks;
 		database.update("woolbattleTasks", new JsonDocument().append("tasks", tasks));
-		return this;
 	}
 
 	public Location getWoolBattleSpawn() {
 		return Locations.fromDocument(database.get("woolbattleSpawn"), null);
 	}
 
+	public void setWoolBattleSpawn(Location loc) {
+		database.update("woolbattleSpawn", Locations.toDocument(loc, false));
+	}
+
 	public Location getJumpAndRunSpawn() {
 		return Locations.fromDocument(database.get("jumpAndRunSpawn"), null);
 	}
 
-	public DataManager setJumpAndRunSpawn(Location loc) {
+	public void setJumpAndRunSpawn(Location loc) {
 		database.update("jumpAndRunSpawn", Locations.toDocument(loc, false));
-		return this;
 	}
 
 	public Location getJumpAndRunPlate() {
 		return jarPlate;
 	}
 
-	public DataManager setJumpAndRunPlate(Location loc) {
+	public void setJumpAndRunPlate(Location loc) {
 		jarPlate = loc;
 		database.update("jumpAndRunPlate", Locations.toDocument(loc, false));
-		return this;
-	}
-
-	public DataManager setWoolBattleSpawn(Location loc) {
-		database.update("woolbattleSpawn", Locations.toDocument(loc, false));
-		return this;
-	}
-
-	public DataManager setWoolBattleNPCLocation(Location loc) {
-		database.update("woolbattleNPCLocation", Locations.toDocument(loc, false));
-		return this;
 	}
 
 	public Location getWoolBattleNPCLocation() {
 		return Locations.fromDocument(database.get("woolbattleNPCLocation"), null);
 	}
 
-	public DataManager setDailyRewardNPCLocation(Location loc) {
-		database.update("dailyrewardNPCLocation", Locations.toDocument(loc, false));
-		return this;
+	public void setWoolBattleNPCLocation(Location loc) {
+		database.update("woolbattleNPCLocation", Locations.toDocument(loc, false));
 	}
 
 	public Location getDailyRewardNPCLocation() {
 		return Locations.fromDocument(database.get("dailyrewardNPCLocation"), null);
 	}
 
-	public Location toLocation(JsonDocument doc) {
-		String d = doc.getString("p");
-		String[] s = d.split(":");
-		double x = Double.parseDouble(s[0]);
-		double y = Double.parseDouble(s[1]);
-		double z = Double.parseDouble(s[2]);
-		float yaw = Float.parseFloat(s[3]);
-		float pit = Float.parseFloat(s[4]);
-		UUID uid = UUID.fromString(s[5]);
-		World w = Bukkit.getWorld(uid);
-		return new Location(w, x, y, z, yaw, pit);
-	}
-
-	public JsonDocument toDocument(Location loc) {
-		JsonDocument doc = new JsonDocument();
-		doc.append("p", loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":"
-				+ loc.getPitch() + ":" + loc.getWorld().getUID());
-		return doc;
+	public void setDailyRewardNPCLocation(Location loc) {
+		database.update("dailyrewardNPCLocation", Locations.toDocument(loc, false));
 	}
 
 	public Border getBorder() {
 		return border;
 	}
 
-	public DataManager setSpawn(Location spawn) {
-		database.update("spawn", Locations.toDocument(spawn, false));
-		return this;
+	public void setBorder(Border border) {
+		database.update("border", border.serializeToDocument());
+		this.border = border;
 	}
 
 	public Location getSpawn() {
 		return Locations.fromDocument(database.get("spawn"), null);
+	}
+
+	public void setSpawn(Location spawn) {
+		database.update("spawn", Locations.toDocument(spawn, false));
 	}
 }

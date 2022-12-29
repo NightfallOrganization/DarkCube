@@ -15,9 +15,9 @@ import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.ParticleEffect;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.data.Key;
-import eu.darkcube.system.userapi.data.PersistentDataType;
-import eu.darkcube.system.userapi.data.PersistentDataTypes;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -42,9 +42,9 @@ public class LobbyUser {
 	private static final Key GADGET = new Key(Lobby.getInstance(), "gadget");
 	private static final Key POSITION = new Key(Lobby.getInstance(), "position");
 	private static final Key SELECTEDSLOT = new Key(Lobby.getInstance(), "selectedSlot");
+	final User user;
 	volatile IInventory openInventory;
 	boolean buildMode = false;
-	final User user;
 
 	public LobbyUser(User user) {
 		this.user = user;
@@ -124,16 +124,12 @@ public class LobbyUser {
 		user.getPersistentDataStorage().set(REWARDSLOTSUSED, INTEGERS, slots);
 	}
 
-	public void setBuildMode(boolean buildMode) {
-		this.buildMode = buildMode;
-	}
-
 	public boolean isBuildMode() {
 		return this.buildMode;
 	}
 
-	public void setLastPosition(Location position) {
-		user.getPersistentDataStorage().set(POSITION, PersistentDataTypes.LOCATION, position);
+	public void setBuildMode(boolean buildMode) {
+		this.buildMode = buildMode;
 	}
 
 	public Location getLastPosition() {
@@ -141,12 +137,24 @@ public class LobbyUser {
 				() -> Lobby.getInstance().getDataManager().getSpawn());
 	}
 
+	public void setLastPosition(Location position) {
+		user.getPersistentDataStorage().set(POSITION, PersistentDataTypes.LOCATION, position);
+	}
+
 	public boolean isSounds() {
 		return user.getPersistentDataStorage().get(SOUNDS, PersistentDataTypes.BOOLEAN);
 	}
 
+	public void setSounds(boolean sounds) {
+		user.getPersistentDataStorage().set(SOUNDS, PersistentDataTypes.BOOLEAN, sounds);
+	}
+
 	public boolean isAnimations() {
 		return user.getPersistentDataStorage().get(ANIMATIONS, PersistentDataTypes.BOOLEAN);
+	}
+
+	public void setAnimations(boolean animations) {
+		user.getPersistentDataStorage().set(ANIMATIONS, PersistentDataTypes.BOOLEAN, animations);
 	}
 
 	public long getLastDailyReward() {
@@ -211,12 +219,8 @@ public class LobbyUser {
 		}
 	}
 
-	public void setSounds(boolean sounds) {
-		user.getPersistentDataStorage().set(SOUNDS, PersistentDataTypes.BOOLEAN, sounds);
-	}
-
-	public void setAnimations(boolean animations) {
-		user.getPersistentDataStorage().set(ANIMATIONS, PersistentDataTypes.BOOLEAN, animations);
+	public Gadget getGadget() {
+		return user.getPersistentDataStorage().get(GADGET, TGADGET);
 	}
 
 	public LobbyUser setGadget(Gadget gadget) {
@@ -230,10 +234,6 @@ public class LobbyUser {
 			user.getPersistentDataStorage().set(GADGET, TGADGET, gadget);
 		}
 		return this;
-	}
-
-	public Gadget getGadget() {
-		return user.getPersistentDataStorage().get(GADGET, TGADGET);
 	}
 
 }

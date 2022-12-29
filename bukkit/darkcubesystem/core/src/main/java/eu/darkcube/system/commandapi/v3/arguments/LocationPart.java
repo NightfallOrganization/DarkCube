@@ -10,12 +10,13 @@ package eu.darkcube.system.commandapi.v3.arguments;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 
 public class LocationPart {
-	public static final SimpleCommandExceptionType EXPECTED_DOUBLE = Message.EXPECTED_DOUBLE
-			.newSimpleCommandExceptionType();
-	public static final SimpleCommandExceptionType EXPECTED_INT = Message.EXPECTED_INT.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType EXPECTED_DOUBLE =
+			Messages.EXPECTED_DOUBLE.newSimpleCommandExceptionType();
+	public static final SimpleCommandExceptionType EXPECTED_INT =
+			Messages.EXPECTED_INT.newSimpleCommandExceptionType();
 	private final boolean relative;
 	private final double value;
 
@@ -24,11 +25,8 @@ public class LocationPart {
 		this.value = valueIn;
 	}
 
-	public double get(double coord) {
-		return this.relative ? this.value + coord : this.value;
-	}
-
-	public static LocationPart parseDouble(StringReader reader, boolean centerIntegers) throws CommandSyntaxException {
+	public static LocationPart parseDouble(StringReader reader, boolean centerIntegers)
+			throws CommandSyntaxException {
 		if (reader.canRead() && reader.peek() == '^') {
 			throw Vec3Argument.POS_MIXED_TYPES.createWithContext(reader);
 		} else if (!reader.canRead()) {
@@ -79,6 +77,17 @@ public class LocationPart {
 		return flag;
 	}
 
+	public double get(double coord) {
+		return this.relative ? this.value + coord : this.value;
+	}
+
+	@Override
+	public int hashCode() {
+		int i = this.relative ? 1 : 0;
+		long j = Double.doubleToLongBits(this.value);
+		return 31 * i + (int) (j ^ j >>> 32);
+	}
+
 	@Override
 	public boolean equals(Object p_equals_1_) {
 		if (this == p_equals_1_) {
@@ -92,13 +101,6 @@ public class LocationPart {
 			}
 			return Double.compare(locationpart.value, this.value) == 0;
 		}
-	}
-
-	@Override
-	public int hashCode() {
-		int i = this.relative ? 1 : 0;
-		long j = Double.doubleToLongBits(this.value);
-		return 31 * i + (int) (j ^ j >>> 32);
 	}
 
 	public boolean isRelative() {

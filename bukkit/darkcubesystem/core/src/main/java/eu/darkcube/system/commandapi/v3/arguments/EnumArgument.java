@@ -16,7 +16,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +24,8 @@ import java.util.function.Function;
 
 public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 
-	private static final DynamicCommandExceptionType INVALID_ENUM = Message.INVALID_ENUM.newDynamicCommandExceptionType();
+	private static final DynamicCommandExceptionType INVALID_ENUM =
+			Messages.INVALID_ENUM.newDynamicCommandExceptionType();
 
 	private final Function<T, String[]> toStringFunction;
 	private final Function<String, T> fromStringFunction;
@@ -36,17 +37,29 @@ public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 	}
 
 	private EnumArgument(T[] values, Function<T, String[]> toStringFunction,
-					Function<String, T> fromStringFunction) {
+			Function<String, T> fromStringFunction) {
 		this.values = values;
-		this.toStringFunction = toStringFunction == null
-						? defaultToStringFunction()
-						: toStringFunction;
-		this.fromStringFunction = fromStringFunction == null
-						? defaultFromStringFunction()
-						: fromStringFunction;
+		this.toStringFunction =
+				toStringFunction == null ? defaultToStringFunction() : toStringFunction;
+		this.fromStringFunction =
+				fromStringFunction == null ? defaultFromStringFunction() : fromStringFunction;
 	}
 
-	private final Function<String, T> defaultFromStringFunction() {
+	public static <T extends Enum<?>> T getEnumArgument(CommandContext<CommandSource> context,
+			String name, Class<T> enumClass) {
+		return context.getArgument(name, enumClass);
+	}
+
+	public static <T extends Enum<?>> EnumArgument<T> enumArgument(T[] values) {
+		return new EnumArgument<>(values);
+	}
+
+	public static <T extends Enum<?>> EnumArgument<T> enumArgument(T[] values,
+			Function<T, String[]> toStringFunction) {
+		return new EnumArgument<>(values, toStringFunction, null);
+	}
+
+	private Function<String, T> defaultFromStringFunction() {
 		final Map<String, T> map = new HashMap<>();
 		for (T t : values) {
 			String[] arr = toStringFunction.apply(t);
@@ -61,29 +74,12 @@ public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 		return map::get;
 	}
 
-	private final Function<T, String[]> defaultToStringFunction() {
+	private Function<T, String[]> defaultToStringFunction() {
 		final Map<T, String[]> map = new HashMap<>();
 		for (T t : values) {
-			map.put(t, new String[] {
-							t.name()
-			});
+			map.put(t, new String[] {t.name()});
 		}
 		return map::get;
-	}
-
-	public static <T extends Enum<?>> T getEnumArgument(
-					CommandContext<CommandSource> context, String name,
-					Class<T> enumClass) {
-		return context.getArgument(name, enumClass);
-	}
-
-	public static <T extends Enum<?>> EnumArgument<T> enumArgument(T[] values) {
-		return new EnumArgument<>(values);
-	}
-
-	public static <T extends Enum<?>> EnumArgument<T> enumArgument(T[] values,
-					Function<T, String[]> toStringFunction) {
-		return new EnumArgument<>(values, toStringFunction, null);
 	}
 
 	@Override
@@ -99,8 +95,8 @@ public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(
-					CommandContext<S> context, SuggestionsBuilder builder) {
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
 		List<String> suggestions = new ArrayList<>();
 		for (T t : values) {
 			suggestions.addAll(Arrays.asList(toStringFunction.apply(t)));

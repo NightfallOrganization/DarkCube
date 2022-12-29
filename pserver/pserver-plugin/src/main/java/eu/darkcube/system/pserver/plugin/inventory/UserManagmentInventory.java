@@ -7,13 +7,19 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.pserver.plugin.Message;
+import eu.darkcube.system.pserver.plugin.PServerPlugin;
 import eu.darkcube.system.pserver.plugin.listener.UserManagmentInventoryListener;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserCache;
-import org.bukkit.ChatColor;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,15 +29,16 @@ import java.util.UUID;
 public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 
 	public static final InventoryType TYPE = InventoryType.of("PServer_UserManagment");
-	public static final String KEY = "KEY";
+	public static final Key KEY = new Key(PServerPlugin.getInstance(), "KEY");
 	public static final String KEY_VALUE = "UserManagmentInventoryUser";
-	public static final String USER_UUID_KEY = "user-uuid";
-	public static final String USER_NAME_KEY = "user-name";
+	public static final Key USER_UUID_KEY = new Key(PServerPlugin.getInstance(), "user-uuid");
+	public static final Key USER_NAME_KEY = new Key(PServerPlugin.getInstance(), "user-name");
 
 	private final UserManagmentInventoryListener listener;
 
 	public UserManagmentInventory(User user) {
-		super(user, TYPE, Message.USER_MANAGMENT_INVENTORY_TITLE.getMessageString(user));
+		super(user, TYPE,
+				Message.USER_MANAGMENT_INVENTORY_TITLE.getMessage(user.getCommandExecutor()));
 		this.listener = new UserManagmentInventoryListener(this);
 		this.listener.register();
 	}
@@ -45,12 +52,14 @@ public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 				// Entry is not valid any more.
 				continue;
 			}
-			ItemBuilder builder = new ItemBuilder(Material.SKULL_ITEM).durability(3);
-			builder.owner(entry.name).displayname(ChatColor.GRAY + entry.name);
-			builder.getUnsafe().setString(KEY, KEY_VALUE).setString(USER_UUID_KEY, entry.uuid.toString())
-					.setString(USER_NAME_KEY, entry.name);
-			builder.lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessageString(user, entry.name, entry.uuid)
-					.split("(\r\n|\r|\n)"));
+			ItemBuilder builder = ItemBuilder.item(Material.SKULL_ITEM).damage(3);
+			builder.meta(new SkullBuilderMeta(new UserProfile(entry.name, entry.uuid)));
+			builder.displayname(Component.text(entry.name).color(NamedTextColor.GRAY));
+			builder.persistentDataStorage().iset(KEY, PersistentDataTypes.STRING, KEY_VALUE)
+					.iset(USER_UUID_KEY, PersistentDataTypes.STRING, entry.uuid.toString())
+					.iset(USER_NAME_KEY, PersistentDataTypes.STRING, entry.name);
+			builder.lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessage(
+					user.getCommandExecutor(), entry.name, entry.uuid));
 			items.put(index++, builder.build());
 		}
 	}

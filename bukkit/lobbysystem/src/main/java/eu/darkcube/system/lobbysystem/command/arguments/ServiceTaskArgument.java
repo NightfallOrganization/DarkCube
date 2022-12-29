@@ -7,26 +7,27 @@
 
 package eu.darkcube.system.lobbysystem.command.arguments;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceEnvironmentType;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
+import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
 
 	private static final DynamicCommandExceptionType TASK_NOT_PRESENT =
-			Message.SERVICE_TASK_NOT_PRESENT.newDynamicCommandExceptionType();
+			Messages.SERVICE_TASK_NOT_PRESENT.newDynamicCommandExceptionType();
 
 	public static ServiceTaskArgument serviceTask() {
 		return new ServiceTaskArgument();
@@ -54,10 +55,8 @@ public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
 
 	protected Stream<String> tasksStream() {
 		return CloudNetDriver.getInstance().getServiceTaskProvider().getPermanentServiceTasks()
-				.stream()
-				.filter(t -> t.getProcessConfiguration()
-						.getEnvironment() == ServiceEnvironmentType.MINECRAFT_SERVER)
-				.map(t -> t.getName());
+				.stream().filter(t -> t.getProcessConfiguration().getEnvironment()
+						== ServiceEnvironmentType.MINECRAFT_SERVER).map(t -> t.getName());
 
 	}
 }

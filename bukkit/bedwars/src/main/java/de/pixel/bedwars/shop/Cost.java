@@ -8,16 +8,19 @@
 package de.pixel.bedwars.shop;
 
 import de.pixel.bedwars.util.Message;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class Cost {
 
-	public static final Cost GOLD = new Cost(new ItemBuilder(Material.GOLD_INGOT).build(), Message.GOLD);
-	public static final Cost IRON = new Cost(new ItemBuilder(Material.IRON_INGOT).build(), Message.IRON);
-	public static final Cost BRONZE = new Cost(new ItemBuilder(Material.CLAY_BRICK).build(), Message.BRONZE);
-	public static final Cost NONE = new Cost(new ItemBuilder(Material.AIR).build(), Message.NONE);
+	public static final Cost GOLD =
+			new Cost(ItemBuilder.item(Material.GOLD_INGOT).build(), Message.GOLD);
+	public static final Cost IRON =
+			new Cost(ItemBuilder.item(Material.IRON_INGOT).build(), Message.IRON);
+	public static final Cost BRONZE =
+			new Cost(ItemBuilder.item(Material.CLAY_BRICK).build(), Message.BRONZE);
+	public static final Cost NONE = new Cost(ItemBuilder.item(Material.AIR).build(), Message.NONE);
 
 	private final ItemStack item;
 	private final Message translation;
@@ -29,7 +32,7 @@ public class Cost {
 		this.item.setAmount(1);
 		this.translation = translation;
 	}
-	
+
 	public final Cost of(final int amount) {
 		return this.amount(amount);
 	}
@@ -39,7 +42,7 @@ public class Cost {
 		item.setAmount(amount);
 		return new Cost(item, getTranslation());
 	}
-	
+
 	public final Message getTranslation() {
 		return this.translation;
 	}

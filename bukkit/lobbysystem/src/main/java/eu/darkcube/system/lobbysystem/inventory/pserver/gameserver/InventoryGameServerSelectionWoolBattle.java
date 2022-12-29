@@ -9,7 +9,7 @@ package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
@@ -46,7 +46,7 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
 			} else {
 				text = "Invalid Task!";
 			}
-			return new ItemBuilder(Item.GAMESERVER_WOOLBATTLE.getItem(user, text));
+			return ItemBuilder.item(Item.GAMESERVER_WOOLBATTLE.getItem(user, text));
 		}
 
 	}

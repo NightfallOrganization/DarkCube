@@ -7,6 +7,11 @@
 
 package eu.darkcube.system.util;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.ComponentLike;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,33 +21,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public enum Language {
 
-	GERMAN(Locale.GERMAN), ENGLISH(Locale.ENGLISH)
-
-	;
+	GERMAN(Locale.GERMAN), ENGLISH(Locale.ENGLISH);
 
 	public static final Language DEFAULT = Language.GERMAN;
 
 	private final Locale locale;
 	private final Bundle bundle;
 
-	private Language(Locale locale) {
+	Language(Locale locale) {
 		this.locale = locale;
 		this.bundle = new Bundle();
-	}
-
-	public String getMessage(String key, Object... replacements) {
-		if (this.bundle.containsKey(key)) {
-			return String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
-		}
-		return new StringBuilder().append(key).append('[')
-				.append(String.join(", ",
-						Arrays.asList(replacements).stream().map(String::valueOf)
-								.collect(Collectors.toList()).toArray(new String[0])))
-				.append(']').toString();
 	}
 
 	public static void validateEntries(String[] entrySet, Function<String, String> keyModifier) {
@@ -51,12 +42,68 @@ public enum Language {
 		}
 	}
 
+	public static InputStream getResource(ClassLoader loader, String path) {
+		return loader.getResourceAsStream(path);
+	}
+
+	public static Reader getReader(InputStream stream) {
+		return new InputStreamReader(stream, Language.getCharset());
+	}
+
+	public static Charset getCharset() {
+		return StandardCharsets.UTF_8;
+	}
+
+	public static Language fromString(String language) {
+		for (Language l : Language.values()) {
+			if (l.name().equalsIgnoreCase(language)) {
+				return l;
+			}
+		}
+		return GERMAN;
+	}
+
+	public Component getMessage(String key, Object... replacements) {
+		List<Component> components = new ArrayList<>();
+		for (int i = 0; i < replacements.length; i++) {
+			if (replacements[i] instanceof ComponentLike) {
+				ComponentLike componentLike = (ComponentLike) replacements[i];
+				replacements[i] = (Formattable) (formatter, flags, width, precision) -> {
+					int index = components.size();
+					components.add(componentLike.asComponent());
+					formatter.format("&#!$%s%s;", (char) 1054, index);
+				};
+			}
+		}
+		if (this.bundle.containsKey(key)) {
+			String formatted =
+					String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
+			Component c = Component.text().asComponent();
+			for (int i = 0; i < components.size(); i++) {
+				String[] s = formatted.split(String.format("&#!\\$%s%s;", (char) 1054, i), 2);
+				c = c.append(LegacyComponentSerializer.legacyAmpersand().deserialize(s[0]));
+				if (s.length == 2) {
+					c = c.append(components.get(i))
+							.append(LegacyComponentSerializer.legacyAmpersand().deserialize(s[1]));
+				}
+			}
+			if (components.isEmpty()) {
+				c = LegacyComponentSerializer.legacyAmpersand().deserialize(formatted);
+			}
+			return c;
+		} else {
+			return LegacyComponentSerializer.legacyAmpersand().deserialize(
+					key + '[' + String.join(", ",
+							Arrays.stream(replacements).map(String::valueOf).toArray(String[]::new))
+							+ ']');
+		}
+	}
+
 	public void validate(String[] entrySet, Function<String, String> keyModifier) {
 		for (String key : entrySet) {
 			String mapped = keyModifier.apply(key);
 			if (!this.bundle.containsKey(mapped)) {
-				System.out.println(
-						"Missing translation for language " + this.toString() + ": " + mapped);
+				System.out.println("Missing translation for language " + this + ": " + mapped);
 			}
 		}
 	}
@@ -85,36 +132,11 @@ public enum Language {
 		this.registerLookup(loader, path, s -> s);
 	}
 
-	public static InputStream getResource(ClassLoader loader, String path) {
-		return loader.getResourceAsStream(path);
-	}
-
-	public static Reader getReader(InputStream stream) {
-		return new InputStreamReader(stream, Language.getCharset());
-	}
-
-	public static Charset getCharset() {
-		return StandardCharsets.UTF_8;
-	}
-
 	public Locale getLocale() {
 		return this.locale;
 	}
 
-	public ResourceBundle getBundle() {
-		return this.bundle;
-	}
-
-	public static Language fromString(String language) {
-		for (Language l : Language.values()) {
-			if (l.name().equalsIgnoreCase(language)) {
-				return l;
-			}
-		}
-		return GERMAN;
-	}
-
-	private class Bundle extends ResourceBundle {
+	private static class Bundle extends ResourceBundle {
 
 		private Map<String, Object> lookup = new HashMap<>();
 
@@ -137,45 +159,41 @@ public enum Language {
 		}
 
 		@Override
-		protected Object handleGetObject(String key) {
-			if (key == null) {
-				throw new NullPointerException();
-			}
+		protected Object handleGetObject(@NotNull String key) {
 			return this.lookup.get(key);
 		}
 
 		@Override
-		public Enumeration<String> getKeys() {
+		public @NotNull Enumeration<String> getKeys() {
 			ResourceBundle parent = this.parent;
 			return new ResourceBundleEnumeration(this.lookup.keySet(),
 					(parent != null) ? parent.getKeys() : null);
 		}
 
 		@Override
-		public Set<String> handleKeySet() {
+		public @NotNull Set<String> handleKeySet() {
 			return this.lookup.keySet();
 		}
 
-		public class ResourceBundleEnumeration implements Enumeration<String> {
+		public static class ResourceBundleEnumeration implements Enumeration<String> {
 
 			Set<String> set;
 			Iterator<String> iterator;
 			Enumeration<String> enumeration; // may remain null
+			String next = null;
 
 			/**
 			 * Constructs a resource bundle enumeration.
-			 * 
-			 * @param set an set providing some elements of the enumeration
+			 *
+			 * @param set         an set providing some elements of the enumeration
 			 * @param enumeration an enumeration providing more elements of the enumeration.
-			 *        enumeration may be null.
+			 *                    enumeration may be null.
 			 */
 			public ResourceBundleEnumeration(Set<String> set, Enumeration<String> enumeration) {
 				this.set = set;
 				this.iterator = set.iterator();
 				this.enumeration = enumeration;
 			}
-
-			String next = null;
 
 			@Override
 			public boolean hasMoreElements() {

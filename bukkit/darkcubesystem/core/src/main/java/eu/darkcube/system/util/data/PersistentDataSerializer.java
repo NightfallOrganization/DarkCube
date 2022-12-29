@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.userapi.data;
+package eu.darkcube.system.util.data;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 

@@ -2,5 +2,5 @@ name: PServerPlugin
 version: 1.0
 author: DasBabyPixel
 main: eu.darkcube.system.pserver.plugin.PServerPlugin
-softdepend: [System, WoolBattle]
-depend: [CommandAPI, PServer, InventoryAPI, LanguageAPICore]
+softdepend: [ WoolBattle ]
+depend: [ System, PServer ]
