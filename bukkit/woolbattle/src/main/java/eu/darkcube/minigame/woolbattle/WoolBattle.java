@@ -69,73 +69,86 @@ import java.util.stream.Collectors;
 
 public class WoolBattle extends Plugin {
 
-	public String name;
-
-	public String tabprefix;
-
-	public String atall;
-
-	public String atteam;
-
-	private UserWrapper userWrapper;
-
-	private GameState state;
-
-	private Lobby lobby;
-
-	private Ingame ingame;
-
-	private Endgame endgame;
-
-	private Map map;
-
-	private TeamManager teamManager;
-
-	private MapManager mapManager;
-
-	private Collection<SchedulerTask> schedulers;
-
-	private PluginClassLoader pluginClassLoader;
-
-	private BukkitTask tickTask;
-
-	private ListenerPlayerInteract listenerPlayerInteract;
-
-	private ListenerInventoryClick listenerInventoryClick;
-
-	private ListenerInventoryClose listenerInventoryClose;
-
-	private ListenerFoodLevelChange listenerFoodLevelChange;
-
-	private ListenerWeatherChange listenerWeatherChange;
-
-	private ListenerLaunchable listenerLaunchable;
-
-	private ListenerAntiMonster listenerAntiMonster;
-
-	public Integer baseLifes;
-
-	public Map baseMap;
-
-	private ListenerChat listenerChat;
-
-	private MySQL mysql;
-
-	private int maxPlayers;
-
-	private boolean epGlitch = true;
-
-	private int currentTick;
-
-	private static WoolBattle instance;
-
 	public static String tab_header;
-
 	public static String tab_footer;
+	private static WoolBattle instance;
+	public String name;
+	public String tabprefix;
+	public String atall;
+	public String atteam;
+	public Integer baseLifes;
+	public Map baseMap;
+	private UserWrapper userWrapper;
+	private GameState state;
+	private Lobby lobby;
+	private Ingame ingame;
+	private Endgame endgame;
+	private Map map;
+	private TeamManager teamManager;
+	private MapManager mapManager;
+	private Collection<SchedulerTask> schedulers;
+	private PluginClassLoader pluginClassLoader;
+	private BukkitTask tickTask;
+	private ListenerPlayerInteract listenerPlayerInteract;
+	private ListenerInventoryClick listenerInventoryClick;
+	private ListenerInventoryClose listenerInventoryClose;
+	private ListenerFoodLevelChange listenerFoodLevelChange;
+	private ListenerWeatherChange listenerWeatherChange;
+	private ListenerLaunchable listenerLaunchable;
+	private ListenerAntiMonster listenerAntiMonster;
+	private ListenerChat listenerChat;
+	private MySQL mysql;
+	private int maxPlayers;
+	private boolean epGlitch = true;
+	private int currentTick;
 
 	public WoolBattle() {
 		WoolBattle.instance = this;
 		System.setProperty("file.encoding", "UTF-8");
+	}
+
+	public static final void initScoreboard(Scoreboard sb, User owner) {
+		// Spectator is not included in "Team"
+		Collection<Team> teams =
+				new HashSet<>(WoolBattle.getInstance().getTeamManager().getTeams());
+		teams.add(WoolBattle.getInstance().getTeamManager().getSpectator());
+		for (Team t : teams) {
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
+					sb.createTeam(t.getType().getScoreboardTag());
+			team.setPrefix(t.getPrefix());
+		}
+		for (ScoreboardObjective obj : ScoreboardObjective.values()) {
+			Objective o = sb.createObjective(obj.getKey(), IScoreboardCriteria.b);
+			o.setDisplayName(Message.getMessage(obj.getMessageKey(), owner.getLanguage()));
+		}
+		for (ObjectiveTeam team : ObjectiveTeam.values()) {
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team t = sb.createTeam(team.getKey());
+			t.setPrefix(Message.getMessage(team.getMessagePrefix(), owner.getLanguage()));
+			t.setSuffix(Message.getMessage(team.getMessageSuffix(), owner.getLanguage()));
+		}
+	}
+
+	public static final WoolBattle getInstance() {
+		return WoolBattle.instance;
+	}
+
+	public static final void registerListeners(Listener... listener) {
+		for (Listener l : listener) {
+			if (l instanceof RegisterNotifyListener) {
+				((RegisterNotifyListener) l).registered();
+			}
+			WoolBattle.getInstance().getServer().getPluginManager()
+					.registerEvents(l, WoolBattle.getInstance());
+		}
+	}
+
+	public static final void unregisterListeners(Listener... listener) {
+		for (Listener l : listener) {
+			if (l instanceof RegisterNotifyListener) {
+				((RegisterNotifyListener) l).unregistered();
+			}
+			HandlerList.unregisterAll(l);
+		}
 	}
 
 	@Override
@@ -224,7 +237,6 @@ public class WoolBattle extends Plugin {
 			}
 			if (!type.isEnabled()) {
 				types.remove(type);
-				return;
 			}
 		});
 		this.teamManager = new DefaultTeamManager().loadSpectator(spec.get());
@@ -256,6 +268,16 @@ public class WoolBattle extends Plugin {
 				InvalidDescriptionException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@Override
+	public void onDisable() {
+		// Server-Client sync problem fixing -> player has to rejoin
+		// Bukkit.getOnlinePlayers().forEach(p -> {
+		// p.kickPlayer("§cReloading");
+		// });
+		this.tickTask.cancel();
+		this.mysql.disconnect();
 	}
 
 	@Override
@@ -360,25 +382,20 @@ public class WoolBattle extends Plugin {
 	}
 
 	@Override
-	public void onDisable() {
-		// Server-Client sync problem fixing -> player has to rejoin
-		// Bukkit.getOnlinePlayers().forEach(p -> {
-		// p.kickPlayer("§cReloading");
-		// });
-		this.tickTask.cancel();
-		this.mysql.disconnect();
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+		return new ChunkGenerator() {
+
+			@Override
+			public ChunkData generateChunkData(World world, Random random, int x, int z,
+					BiomeGrid biome) {
+				return this.createChunkData(world);
+			}
+
+		};
 	}
 
 	public Map getMap() {
 		return this.baseMap == null ? this.map : this.baseMap;
-	}
-
-	public int getMaxPlayers() {
-		return this.maxPlayers;
-	}
-
-	public boolean isEpGlitch() {
-		return this.epGlitch;
 	}
 
 	public void setMap(Map map) {
@@ -388,6 +405,25 @@ public class WoolBattle extends Plugin {
 				this.setMap(p);
 			});
 		}
+	}
+
+	public void setMap(User user) {
+		if (this.getLobby().isEnabled()) {
+			Scoreboard sb = new Scoreboard(user);
+			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
+					sb.getTeam(ObjectiveTeam.MAP.getKey());
+			Map m = this.getMap();
+			String suffix = m == null ? "§cNo Maps" : m.getName();
+			team.setSuffix(suffix);
+		}
+	}
+
+	public int getMaxPlayers() {
+		return this.maxPlayers;
+	}
+
+	public boolean isEpGlitch() {
+		return this.epGlitch;
 	}
 
 	public void setEpGlitch(boolean glitch) {
@@ -409,17 +445,6 @@ public class WoolBattle extends Plugin {
 		team.setSuffix(suffix);
 	}
 
-	public void setMap(User user) {
-		if (this.getLobby().isEnabled()) {
-			Scoreboard sb = new Scoreboard(user);
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-					sb.getTeam(ObjectiveTeam.MAP.getKey());
-			Map m = this.getMap();
-			String suffix = m == null ? "§cNo Maps" : m.getName();
-			team.setSuffix(suffix);
-		}
-	}
-
 	public void setOnline(User user) {
 		Scoreboard sb = new Scoreboard(user);
 		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
@@ -430,27 +455,6 @@ public class WoolBattle extends Plugin {
 
 	public int getCurrentTick() {
 		return this.currentTick;
-	}
-
-	public static final void initScoreboard(Scoreboard sb, User owner) {
-		// Spectator is not included in "Team"
-		Collection<Team> teams =
-				new HashSet<>(WoolBattle.getInstance().getTeamManager().getTeams());
-		teams.add(WoolBattle.getInstance().getTeamManager().getSpectator());
-		for (Team t : teams) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-					sb.createTeam(t.getType().getScoreboardTag());
-			team.setPrefix(t.getPrefix());
-		}
-		for (ScoreboardObjective obj : ScoreboardObjective.values()) {
-			Objective o = sb.createObjective(obj.getKey(), IScoreboardCriteria.b);
-			o.setDisplayName(Message.getMessage(obj.getMessageKey(), owner.getLanguage()));
-		}
-		for (ObjectiveTeam team : ObjectiveTeam.values()) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team t = sb.createTeam(team.getKey());
-			t.setPrefix(Message.getMessage(team.getMessagePrefix(), owner.getLanguage()));
-			t.setSuffix(Message.getMessage(team.getMessageSuffix(), owner.getLanguage()));
-		}
 	}
 
 	public UserWrapper getUserWrapper() {
@@ -492,19 +496,6 @@ public class WoolBattle extends Plugin {
 	@Override
 	public String getCommandPrefix() {
 		return this.reloadConfig("config").getString(Config.COMMAND_PREFIX);
-	}
-
-	@Override
-	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-		return new ChunkGenerator() {
-
-			@Override
-			public ChunkData generateChunkData(World world, Random random, int x, int z,
-					BiomeGrid biome) {
-				return this.createChunkData(world);
-			}
-
-		};
 	}
 
 	public boolean disableStats() {
@@ -592,10 +583,6 @@ public class WoolBattle extends Plugin {
 		}
 	}
 
-	public static final WoolBattle getInstance() {
-		return WoolBattle.instance;
-	}
-
 	public final void sendMessage(Message msg, Object... replacements) {
 		this.sendMessage(msg, (u) -> replacements);
 	}
@@ -610,25 +597,6 @@ public class WoolBattle extends Plugin {
 		Object[] replacements = new Object[0];
 		replacements = Arrays.addAfter(replacements, function.apply(console));
 		this.sendConsole(msg.getMessage(console.getLanguage(), replacements));
-	}
-
-	public static final void registerListeners(Listener... listener) {
-		for (Listener l : listener) {
-			if (l instanceof RegisterNotifyListener) {
-				((RegisterNotifyListener) l).registered();
-			}
-			WoolBattle.getInstance().getServer().getPluginManager()
-					.registerEvents(l, WoolBattle.getInstance());
-		}
-	}
-
-	public static final void unregisterListeners(Listener... listener) {
-		for (Listener l : listener) {
-			if (l instanceof RegisterNotifyListener) {
-				((RegisterNotifyListener) l).unregistered();
-			}
-			HandlerList.unregisterAll(l);
-		}
 	}
 
 }

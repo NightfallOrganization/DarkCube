@@ -12,6 +12,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import eu.darkcube.minigame.woolbattle.util.gson.TypeAdapterLocation;
+import eu.darkcube.minigame.woolbattle.util.gson.TypeAdapterMap;
 import org.bukkit.Location;
 
 import com.google.gson.ExclusionStrategy;
@@ -20,8 +22,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import eu.darkcube.minigame.woolbattle.map.Map;
-import eu.darkcube.minigame.woolbattle.util.gson.TypeAdapterLocation;
-import eu.darkcube.minigame.woolbattle.util.gson.TypeAdapterMap;
 
 public class GsonSerializer {
 

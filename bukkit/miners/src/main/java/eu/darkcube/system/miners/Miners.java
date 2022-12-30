@@ -22,6 +22,9 @@ import eu.darkcube.system.miners.player.Message;
 import eu.darkcube.system.miners.player.PlayerManager;
 import eu.darkcube.system.miners.player.TNTManager;
 import eu.darkcube.system.miners.player.TeamManager;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,165 +37,169 @@ import java.util.ArrayList;
 
 public class Miners extends DarkCubePlugin {
 
-    private static Miners instance;
+	public static final String MINING_WORLD_NAME = "MinersCubes";
+	public static final String PVP_WORLD_NAME = "MinersPVP";
+	public static final String PREFIX =
+			ChatColor.GRAY + "[" + ChatColor.DARK_AQUA + "Miners" + ChatColor.GRAY + "] "
+					+ ChatColor.RESET;
+	private static Miners instance;
+	private static int gamephase = 0;
+	private static PlayerManager playerManager;
+	private static TeamManager teamManager;
+	private static Lobbyphase gamephaseLobby;
+	private static Miningphase gamephaseMining;
+	private static PVPPhase gamephasePVP;
+	private static EndPhase gamephaseEnd;
+	private static GameUpdater gameUpdater;
+	private static MinersConfig minersConfig;
 
-    private static int gamephase = 0;
+	public Miners() {
+		instance = this;
+	}
 
-    private static PlayerManager playerManager;
-    private static TeamManager teamManager;
+	public static Miners getInstance() {
+		return instance;
+	}
 
-    private static Lobbyphase gamephaseLobby;
-    private static Miningphase gamephaseMining;
-    private static PVPPhase gamephasePVP;
-    private static EndPhase gamephaseEnd;
-    private static GameUpdater gameUpdater;
+	public static MinersConfig getMinersConfig() {
+		return minersConfig;
+	}
 
-    private static MinersConfig minersConfig;
+	public static int getGamephase() {
+		return gamephase;
+	}
 
-    public static final String MINING_WORLD_NAME = "MinersCubes";
-    public static final String PVP_WORLD_NAME = "MinersPVP";
+	public static PlayerManager getPlayerManager() {
+		return playerManager;
+	}
 
+	public static TeamManager getTeamManager() {
+		return teamManager;
+	}
 
-    public static final String PREFIX = ChatColor.GRAY + "[" + ChatColor.DARK_AQUA + "Miners" + ChatColor.GRAY + "] " + ChatColor.RESET;
+	public static Lobbyphase getLobbyPhase() {
+		return gamephaseLobby;
+	}
 
-    public Miners() {
-        instance = this;
-    }
+	public static Miningphase getMiningPhase() {
+		return gamephaseMining;
+	}
 
-    @Override
-    public void onLoad() {
-        this.saveDefaultConfig("config");
-        this.createConfig("config");
-        minersConfig = new MinersConfig();
+	public static PVPPhase getPVPPhase() {
+		return gamephasePVP;
+	}
 
-        try {
-            Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties", Message.KEY_MODIFIER);
-            Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties", Message.KEY_MODIFIER);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
+	public static EndPhase getEndPhase() {
+		return gamephaseEnd;
+	}
 
-    @Override
-    public void onEnable() {
-        playerManager = new PlayerManager();
-        teamManager = new TeamManager();
+	public static void nextGamephase() {
+		switch (gamephase) {
+			case 0:
+				gamephaseLobby.disable();
+				gamephaseMining.enable();
+				gameUpdater.start();
+				break;
+			case 1:
+				gamephaseMining.disable();
+				gamephasePVP.enable();
+				break;
+			case 2:
+				gamephaseEnd.enable();
+				gameUpdater.stop();
+				break;
+		}
+		gamephase++;
+	}
 
-        CommandAPI api = CommandAPI.getInstance();
-        api.register(new CommandTest());
-        api.register(new CommandTimer());
-        api.register(new CommandTeam());
+	public static void endGame() {
+		gamephase = 3;
+		gamephaseLobby.disable();
+		gamephaseMining.disable();
+		gamephasePVP.disable();
+		gamephaseEnd.enable();
+		gameUpdater.stop();
+	}
 
-        registerListeners(new ListenerPlayerQuit(), new ListenerPlayerLogin(), new ListenerPlayerJoin(), new ListenerBlockBreak(), new ListenerPlaceBlock(),
-                new ListenerItemInteract(), new ListenerPlayerDamage(), new ListenerChatMessage(), new ListenerCrafting(), new ListenerItemPickup());
-        registerListeners(new TNTManager());
+	private static void registerListeners(Listener... listeners) {
+		for (Listener l : listeners)
+			Miners.getInstance().getServer().getPluginManager()
+					.registerEvents(l, Miners.getInstance());
+	}
 
-        Bukkit.createWorld(new WorldCreator(MINING_WORLD_NAME));
-        Bukkit.createWorld(new WorldCreator(PVP_WORLD_NAME));
+	public static ArrayList<Player> getOnlinePlayers() {
+		return new ArrayList<>(Bukkit.getOnlinePlayers());
+	}
 
-        gamephaseLobby = new Lobbyphase();
-        gamephaseMining = new Miningphase();
-        gamephasePVP = new PVPPhase();
-        gamephaseEnd = new EndPhase();
-        gameUpdater = new GameUpdater();
+	public static void sendTranslatedMessage(Player player, Message message,
+			Object... replacements) {
+		User user = UserAPI.getInstance().getUser(player);
+		user.sendMessage(message, replacements);
+		//        player.sendMessage(PREFIX + message.getMessage(player, replacements));
+	}
 
-        Bukkit.getWorlds().forEach(w -> {
-            w.setGameRuleValue("doMobSpawning", "false");
-            w.setGameRuleValue("doTileDrops", "false");
-            w.setGameRuleValue("naturalRegeneration", "false");
-        });
+	public static void sendTranslatedMessageAll(Message message, Object... replacements) {
+		Bukkit.getOnlinePlayers().forEach(p -> sendTranslatedMessage(p, message, replacements));
+		AdventureSupport.audienceProvider().sender(Bukkit.getConsoleSender())
+				.sendMessage(message.getMessage(Bukkit.getConsoleSender(), replacements));
+	}
 
-    }
+	public static void log(Object o) {
+		System.out.println("[Miners] " + o.toString());
+	}
 
-    @Override
-    public void onDisable() {
-        Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(""));
-    }
+	@Override
+	public void onLoad() {
+		this.saveDefaultConfig("config");
+		this.createConfig("config");
+		minersConfig = new MinersConfig();
 
-    public static Miners getInstance() {
-        return instance;
-    }
+		try {
+			Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties",
+					Message.KEY_MODIFIER);
+			Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties",
+					Message.KEY_MODIFIER);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
 
-    public static MinersConfig getMinersConfig() {
-        return minersConfig;
-    }
+	@Override
+	public void onDisable() {
+		Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(""));
+	}
 
-    public static int getGamephase() {
-        return gamephase;
-    }
+	@Override
+	public void onEnable() {
+		playerManager = new PlayerManager();
+		teamManager = new TeamManager();
 
-    public static PlayerManager getPlayerManager() {
-        return playerManager;
-    }
+		CommandAPI api = CommandAPI.getInstance();
+		api.register(new CommandTest());
+		api.register(new CommandTimer());
+		api.register(new CommandTeam());
 
-    public static TeamManager getTeamManager() {
-        return teamManager;
-    }
+		registerListeners(new ListenerPlayerQuit(), new ListenerPlayerLogin(),
+				new ListenerPlayerJoin(), new ListenerBlockBreak(), new ListenerPlaceBlock(),
+				new ListenerItemInteract(), new ListenerPlayerDamage(), new ListenerChatMessage(),
+				new ListenerCrafting(), new ListenerItemPickup());
+		registerListeners(new TNTManager());
 
-    public static Lobbyphase getLobbyPhase() {
-        return gamephaseLobby;
-    }
+		Bukkit.createWorld(new WorldCreator(MINING_WORLD_NAME));
+		Bukkit.createWorld(new WorldCreator(PVP_WORLD_NAME));
 
-    public static Miningphase getMiningPhase() {
-        return gamephaseMining;
-    }
+		gamephaseLobby = new Lobbyphase();
+		gamephaseMining = new Miningphase();
+		gamephasePVP = new PVPPhase();
+		gamephaseEnd = new EndPhase();
+		gameUpdater = new GameUpdater();
 
-    public static PVPPhase getPVPPhase() {
-        return gamephasePVP;
-    }
+		Bukkit.getWorlds().forEach(w -> {
+			w.setGameRuleValue("doMobSpawning", "false");
+			w.setGameRuleValue("doTileDrops", "false");
+			w.setGameRuleValue("naturalRegeneration", "false");
+		});
 
-    public static EndPhase getEndPhase() {
-        return gamephaseEnd;
-    }
-
-    public static void nextGamephase() {
-        switch (gamephase) {
-            case 0:
-                gamephaseLobby.disable();
-                gamephaseMining.enable();
-                gameUpdater.start();
-                break;
-            case 1:
-                gamephaseMining.disable();
-                gamephasePVP.enable();
-                break;
-            case 2:
-                gamephaseEnd.enable();
-                gameUpdater.stop();
-                break;
-        }
-        gamephase++;
-    }
-
-    public static void endGame() {
-        gamephase = 3;
-        gamephaseLobby.disable();
-        gamephaseMining.disable();
-        gamephasePVP.disable();
-        gamephaseEnd.enable();
-        gameUpdater.stop();
-    }
-
-    private static void registerListeners(Listener... listeners) {
-        for (Listener l : listeners)
-            Miners.getInstance().getServer().getPluginManager().registerEvents(l, Miners.getInstance());
-    }
-
-    public static ArrayList<Player> getOnlinePlayers() {
-        return new ArrayList<>(Bukkit.getOnlinePlayers());
-    }
-
-    public static void sendTranslatedMessage(Player player, Message message, Object... replacements) {
-        player.sendMessage(PREFIX + message.getMessage(player, replacements));
-    }
-
-    public static void sendTranslatedMessageAll(Message message, Object... replacements) {
-        Bukkit.getOnlinePlayers().forEach(p -> sendTranslatedMessage(p, message, replacements));
-        getInstance().sendConsole(message.getServerMessage(replacements));
-    }
-
-    public static void log(Object o) {
-        System.out.println("[Miners] " + o.toString());
-    }
+	}
 
 }

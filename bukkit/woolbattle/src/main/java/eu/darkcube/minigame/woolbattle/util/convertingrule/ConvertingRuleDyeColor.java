@@ -7,9 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.util.convertingrule;
 
-import org.bukkit.DyeColor;
-
 import eu.darkcube.minigame.woolbattle.util.Arrays.ConvertingRule;
+import org.bukkit.DyeColor;
 
 public class ConvertingRuleDyeColor extends ConvertingRule<DyeColor> {
 

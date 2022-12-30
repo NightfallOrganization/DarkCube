@@ -22,7 +22,10 @@ public enum Message implements BaseMessage {
 	XP_OF_PLAYERS_SET,
 	SPAWNER_GIVEN_TO_SELF,
 	SPAWNER_GIVEN_TO_PLAYER,
-	SPAWNER_GIVEN_TO_PLAYERS;
+	SPAWNER_GIVEN_TO_PLAYERS,
+	YOU_WERE_HEALED,
+	YOU_HEALED_PLAYERS,
+	;
 
 	private final String key;
 

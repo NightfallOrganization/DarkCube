@@ -161,7 +161,7 @@ public class DarkEssentials extends Plugin {
 		try {
 			Language.ENGLISH.registerLookup(getClass().getClassLoader(), "messages_en.properties",
 					k -> Message.getPrefix() + k);
-			Language.GERMAN.registerLookup(getClass().getClassLoader(), "messages_en.properties",
+			Language.GERMAN.registerLookup(getClass().getClassLoader(), "messages_de.properties",
 					k -> Message.getPrefix() + k);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -266,7 +266,7 @@ public class DarkEssentials extends Plugin {
 		CommandAPI.enable(this, new CommandNight());
 		CommandAPI.enable(this, new CommandStop());
 		CommandAPI.enable(this, new CommandEnderChest());
-		CommandAPI.enable(this, new CommandHeal());
+		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandHeal());
 		CommandAPI.enable(this, new CommandFeed());
 		CommandAPI.enable(this, new CommandTrash());
 		CommandAPI.enable(this, new CommandPTime());
