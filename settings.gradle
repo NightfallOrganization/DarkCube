@@ -3,9 +3,13 @@ pluginManagement {
         gradlePluginPortal()
         maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     }
+    plugins {
+        id("com.github.johnrengelman.shadow") version "7.1.2"
+    }
 }
 
 rootProject.name = 'DarkCube'
+include 'adventure'
 include 'bukkit'
 include 'bukkit:autovoidworld'
 include 'bukkit:bauserver'
@@ -29,11 +33,11 @@ include 'bungee:cmd-bauserver'
 include 'bungee:friendsystem'
 include 'bungee:partysystem'
 include 'bungee:werbung'
-include 'cloudban'
-include 'cloudban:cloudban-bukkit'
-include 'cloudban:cloudban-bungee'
-include 'cloudban:cloudban-common'
-include 'cloudban:cloudban-module'
+//include 'cloudban'
+//include 'cloudban:cloudban-bukkit'
+//include 'cloudban:cloudban-bungee'
+//include 'cloudban:cloudban-common'
+//include 'cloudban:cloudban-module'
 include 'cloudnet'
 include 'cloudnet:cloudnet-database-mysql'
 include 'cloudnet:lobbysystem-migrator'
@@ -47,8 +51,8 @@ include 'pserver:pserver-cloudnet'
 include 'pserver:pserver-plugin'
 
 def includeSubProjects(String rootProject, String... subProjects) {
-    include(rootProject);
-    for(String subProject : subProjects) {
+    include(rootProject)
+    for (String subProject : subProjects) {
         include "$rootProject:$subProject"
     }
 }

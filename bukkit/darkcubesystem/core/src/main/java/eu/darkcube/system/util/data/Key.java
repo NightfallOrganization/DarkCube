@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.userapi.data;
+package eu.darkcube.system.util.data;
 
 import org.bukkit.plugin.Plugin;
 
@@ -26,17 +26,17 @@ public class Key {
 		this.key = key;
 	}
 
+	public static Key fromString(String string) {
+		String[] a = string.split(":", 2);
+		return new Key(a[0], a[1]);
+	}
+
 	public String getKey() {
 		return this.key;
 	}
 
 	public String getPlugin() {
 		return this.plugin;
-	}
-
-	@Override
-	public String toString() {
-		return plugin + ":" + key;
 	}
 
 	@Override
@@ -56,9 +56,9 @@ public class Key {
 		return Objects.equals(this.key, other.key) && Objects.equals(this.plugin, other.plugin);
 	}
 
-	public static Key fromString(String string) {
-		String[] a = string.split(":", 2);
-		return new Key(a[0], a[1]);
+	@Override
+	public String toString() {
+		return plugin + ":" + key;
 	}
 
 }

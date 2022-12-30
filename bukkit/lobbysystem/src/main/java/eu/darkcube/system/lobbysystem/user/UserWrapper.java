@@ -13,8 +13,8 @@ import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.userapi.data.Key;
 import eu.darkcube.system.userapi.data.UserModifier;
+import eu.darkcube.system.util.data.Key;
 import org.bukkit.Bukkit;
 
 import java.util.Collection;

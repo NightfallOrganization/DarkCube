@@ -14,6 +14,7 @@ import eu.darkcube.system.stats.api.StatsPlugin;
 import eu.darkcube.system.stats.api.stats.Stats;
 import eu.darkcube.system.stats.api.user.StatsUserManager;
 import eu.darkcube.system.stats.api.user.User;
+import eu.darkcube.system.util.AdventureSupport;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -52,7 +53,7 @@ public class CommandYStats extends Command {
 			User user = CommandStats.doPlayerStuff(sender, args[0]);
 			if (user != null) {
 				Stats stats = user.getLastStats(Duration.YEAR);
-				stats.formatComponent().send(sender);
+				AdventureSupport.audienceProvider().sender(sender).sendMessage(stats.format());
 			}
 			return true;
 		}

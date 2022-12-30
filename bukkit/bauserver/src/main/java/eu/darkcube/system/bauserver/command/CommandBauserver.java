@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.bauserver.command;
 
-import org.bukkit.metadata.FixedMetadataValue;
 import eu.darkcube.system.bauserver.Main;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class CommandBauserver extends CommandExecutor {
 
@@ -23,11 +23,10 @@ public class CommandBauserver extends CommandExecutor {
 					ctx.getSource().asPlayer().getWorld().setMetadata("mayrain",
 							new FixedMetadataValue(Main.getInstance(), true));
 				} else {
-					ctx.getSource().asPlayer().getWorld().removeMetadata("mayrain",
-							Main.getInstance());
+					ctx.getSource().asPlayer().getWorld()
+							.removeMetadata("mayrain", Main.getInstance());
 				}
-				ctx.getSource().sendFeedback(new CustomComponentBuilder("MayRain: " + may).create(),
-						true);
+				ctx.getSource().sendMessage(Component.text("MayRain: " + may));
 				return 0;
 			}));
 		});

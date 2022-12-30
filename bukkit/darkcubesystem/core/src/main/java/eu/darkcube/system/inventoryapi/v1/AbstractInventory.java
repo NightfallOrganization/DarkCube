@@ -8,6 +8,8 @@
 package eu.darkcube.system.inventoryapi.v1;
 
 import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
@@ -26,19 +28,20 @@ public abstract class AbstractInventory implements IInventory {
 	protected final Collection<HumanEntity> opened = new HashSet<>();
 	protected final Inventory handle;
 	protected final InventoryListener listener;
+	protected final Component title;
 
-	public AbstractInventory(final InventoryType inventoryType,
-					final String title, final int size) {
+	public AbstractInventory(final InventoryType inventoryType, final Component title,
+			final int size) {
 		this.inventoryType = inventoryType;
-		this.handle = Bukkit.createInventory(null, size, ChatColor.stripColor(title));
+		this.title = title;
+		this.handle = Bukkit.createInventory(null, size,
+				ChatColor.stripColor(LegacyComponentSerializer.legacySection().serialize(title)));
 		this.listener = new InventoryListener();
 		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubeSystem.getInstance());
 	}
 
-	@Override
-	public void open(HumanEntity player) {
-		player.openInventory(this.handle);
-		this.opened.add(player);
+	public Component getTitle() {
+		return title;
 	}
 
 	protected void handleClose(HumanEntity player) {
@@ -55,11 +58,6 @@ public abstract class AbstractInventory implements IInventory {
 	}
 
 	@Override
-	public boolean isOpened(HumanEntity player) {
-		return this.opened.contains(player);
-	}
-
-	@Override
 	public InventoryType getType() {
 		return this.inventoryType;
 	}
@@ -67,6 +65,17 @@ public abstract class AbstractInventory implements IInventory {
 	@Override
 	public Inventory getHandle() {
 		return this.handle;
+	}
+
+	@Override
+	public void open(HumanEntity player) {
+		player.openInventory(this.handle);
+		this.opened.add(player);
+	}
+
+	@Override
+	public boolean isOpened(HumanEntity player) {
+		return this.opened.contains(player);
 	}
 
 	protected class InventoryListener implements Listener {

@@ -30,8 +30,6 @@ public class Listener {
 		}
 	}
 
-
-
 	@EventListener
 	public void handle(CloudServicePreStopEvent e) {
 		UniqueId id = ServiceInfoUtil.getInstance()

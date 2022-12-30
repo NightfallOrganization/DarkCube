@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.darkessentials.command;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
 import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
 import eu.darkcube.system.darkessentials.util.ExpFix;
 import eu.darkcube.system.darkessentials.util.Message;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -64,18 +64,18 @@ public class CommandXp extends EssentialsCommand {
 				target.giveExp(raw);
 		}
 		if (targets.size() == 1) {
-			context.getSource().sendFeedback(
+			context.getSource().sendMessage(
 					Message.XP_ADDED_TO_PLAYER.getMessage(context.getSource().getSource(),
 							Objects.requireNonNull(targets.stream().findAny().orElse(null))
 									.getDisplayName(), raw,
 							(levels ? Message.XP_LEVELS : Message.XP_POINTS).getMessageString(
-									context.getSource().getSource())), true);
+									context.getSource().getSource())));
 		} else {
-			context.getSource().sendFeedback(
+			context.getSource().sendMessage(
 					Message.XP_ADDED_TO_PLAYERS.getMessage(context.getSource().getSource(),
 							targets.size(), raw,
 							(levels ? Message.XP_LEVELS : Message.XP_POINTS).getMessageString(
-									context.getSource().getSource())), true);
+									context.getSource().getSource())));
 		}
 		return 0;
 	}
@@ -95,18 +95,18 @@ public class CommandXp extends EssentialsCommand {
 			}
 		}
 		if (targets.size() == 1) {
-			context.getSource().sendFeedback(
+			context.getSource().sendMessage(
 					Message.XP_OF_PLAYER_SET.getMessage(context.getSource().getSource(),
 							Objects.requireNonNull(targets.stream().findAny().orElse(null))
 									.getDisplayName(), raw,
 							(levels ? Message.XP_LEVELS : Message.XP_POINTS).getMessageString(
-									context.getSource().getSource())), true);
+									context.getSource().getSource())));
 		} else {
-			context.getSource().sendFeedback(
+			context.getSource().sendMessage(
 					Message.XP_OF_PLAYERS_SET.getMessage(context.getSource().getSource(),
 							targets.size(), raw,
 							(levels ? Message.XP_LEVELS : Message.XP_POINTS).getMessageString(
-									context.getSource().getSource())), true);
+									context.getSource().getSource())));
 		}
 		return 0;
 	}
@@ -129,33 +129,33 @@ public class CommandXp extends EssentialsCommand {
 				ExpFix.setTotalExperience(target, ExpFix.getTotalExperience(target) - raw);
 		}
 		if (targets.size() == 1) {
-			context.getSource().sendFeedback(
+			context.getSource().sendMessage(
 					Message.XP_REMOVED_FROM_PLAYER.getMessage(context.getSource().getSource(),
 							Objects.requireNonNull(targets.stream().findAny().orElse(null))
 									.getDisplayName(), raw,
 							(levels ? Message.XP_LEVELS : Message.XP_POINTS).getMessageString(
-									context.getSource().getSource())), true);
+									context.getSource().getSource())));
 		} else {
-			context.getSource().sendFeedback(
+			context.getSource().sendMessage(
 					Message.XP_REMOVED_FROM_PLAYERS.getMessage(context.getSource().getSource(),
 							targets.size(), raw,
 							(levels ? Message.XP_LEVELS : Message.XP_POINTS).getMessageString(
-									context.getSource().getSource())), true);
+									context.getSource().getSource())));
 		}
 		return 0;
 	}
 
 	private static int get(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		CustomComponentBuilder ccb = new CustomComponentBuilder("");
-		ccb.append("\n");
+		Component ccb = Component.text("");
+		ccb = ccb.appendNewline();
 		Collection<Player> targets = EntityArgument.getPlayers(context, "targets");
 		for (Player target : targets) {
 			int points = ExpFix.getTotalExperience(target);
 			int levels = target.getLevel();
-			ccb.append(Message.XP_OF_PLAYER.getMessage(context.getSource().getSource(),
-					target.getDisplayName(), levels, points)).append("\n");
+			ccb = ccb.append(Message.XP_OF_PLAYER.getMessage(context.getSource().getSource(),
+					target.getDisplayName(), levels, points)).appendNewline();
 		}
-		context.getSource().sendFeedback(ccb.create(), true);
+		context.getSource().sendMessage(ccb);
 		return 0;
 	}
 

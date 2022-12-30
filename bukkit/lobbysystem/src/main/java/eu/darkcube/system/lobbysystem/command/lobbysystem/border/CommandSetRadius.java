@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
-import com.mojang.brigadier.arguments.DoubleArgumentType;
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.CustomComponentBuilder;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.DoubleArgumentType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
 import eu.darkcube.system.lobbysystem.util.Border;
-import net.md_5.bungee.api.ChatColor;
 
 public class CommandSetRadius extends LobbyCommandExecutor {
 
@@ -24,8 +24,8 @@ public class CommandSetRadius extends LobbyCommandExecutor {
 					Border border = Lobby.getInstance().getDataManager().getBorder();
 					border = new Border(border.getShape(), d, border.getLoc1(), border.getLoc2());
 					Lobby.getInstance().getDataManager().setBorder(border);
-					ctx.getSource().sendFeedback(new CustomComponentBuilder("Radius neugesetzt!")
-							.color(ChatColor.GREEN).create(), true);
+					ctx.getSource().sendMessage(
+							Component.text("Radius neugesetzt!").color(NamedTextColor.GREEN));
 					return 0;
 				})));
 	}

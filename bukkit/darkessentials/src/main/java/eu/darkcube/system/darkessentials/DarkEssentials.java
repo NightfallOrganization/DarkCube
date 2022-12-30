@@ -17,8 +17,10 @@ import eu.darkcube.system.darkessentials.util.EssentialCollections.SortingRule;
 import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.darkessentials.util.NumbzUtils;
 import eu.darkcube.system.darkessentials.util.WarpPoint;
-import eu.darkcube.system.util.ChatBaseComponent;
-import eu.darkcube.system.util.ChatUtils;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.libs.net.kyori.adventure.title.Title;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -30,6 +32,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class DarkEssentials extends Plugin {
@@ -37,179 +41,31 @@ public class DarkEssentials extends Plugin {
 	public static FileConfiguration config;
 	public static String colorFail, colorConfirm, colorValue;
 
-	@Override
-	public String getCommandPrefix() {
-		return "§5Dark§dCube";
-	}
-
-	@Override
-	public void onDisable() {
-		saveConfig();
-	}
-
-	@Override
-	public void onEnable() {
-		try {
-			Language.ENGLISH.registerLookup(getClass().getClassLoader(), "messages_en.properties",
-					k -> Message.getPrefix() + k);
-			Language.GERMAN.registerLookup(getClass().getClassLoader(), "messages_en.properties",
-					k -> Message.getPrefix() + k);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		saveDefaultConfig();
-		config = getConfig();
-
-		colorConfirm = ChatColor.valueOf(config.getString("main.colors.confirmColor")).toString();
-		colorFail = ChatColor.valueOf(config.getString("main.colors.failColor")).toString();
-		colorValue = ChatColor.valueOf(config.getString("main.colors.valueColor")).toString();
-
-		//		System.out.println(config.getBoolean("command.burn.enabled"));
-
-		EssentialCollections.addSortingRule(new SortingRule<World>() {
-			@Override
-			public String toString(World t) {
-				return t.getName();
-			}
-
-			@Override
-			public Class<World> getRuleClass() {
-				return World.class;
-			}
-
-			@Override
-			public boolean instanceOf(Object obj) {
-				return obj instanceof World;
-			}
-		});
-		EssentialCollections.addSortingRule(new SortingRule<Player>() {
-			@Override
-			public String toString(Player t) {
-				return t.getName();
-			}
-
-			@Override
-			public Class<Player> getRuleClass() {
-				return Player.class;
-			}
-
-			@Override
-			public boolean instanceOf(Object obj) {
-				return obj instanceof World;
-			}
-		});
-		EssentialCollections.addSortingRule(new SortingRule<EntityType>() {
-
-			@Override
-			public boolean instanceOf(Object obj) {
-				return obj instanceof EntityType;
-			}
-
-			@SuppressWarnings("deprecation")
-			@Override
-			public String toString(EntityType t) {
-				return t.getName();
-			}
-
-			@Override
-			public Class<EntityType> getRuleClass() {
-				return EntityType.class;
-			}
-		});
-		EssentialCollections.addSortingRule(new SortingRule<WarpPoint>() {
-
-			@Override
-			public boolean instanceOf(Object obj) {
-				return obj instanceof WarpPoint;
-			}
-
-			@Override
-			public String toString(WarpPoint t) {
-				return t.getName();
-			}
-
-			@Override
-			public Class<WarpPoint> getRuleClass() {
-				return WarpPoint.class;
-			}
-		});
-		EssentialCollections.addSortingRule(new SortingRule<Material>() {
-
-			@Override
-			public boolean instanceOf(Object obj) {
-				return obj instanceof Material;
-			}
-
-			@Override
-			public String toString(Material t) {
-				return t.toString();
-			}
-
-			@Override
-			public Class<Material> getRuleClass() {
-				return Material.class;
-			}
-		});
-		if (config.getBoolean("command.burn.enabled"))
-			CommandAPI.enable(this, new CommandBurn());
-		if (config.getBoolean("command.day.enabled"))
-			CommandAPI.enable(this, new CommandDay());
-		CommandAPI.enable(this, new CommandNight());
-		CommandAPI.enable(this, new CommandStop());
-		CommandAPI.enable(this, new CommandEnderChest());
-		CommandAPI.enable(this, new CommandHeal());
-		CommandAPI.enable(this, new CommandFeed());
-		CommandAPI.enable(this, new CommandTrash());
-		CommandAPI.enable(this, new CommandPTime());
-		CommandAPI.enable(this, new CommandPWeather());
-		CommandAPI.enable(this, new CommandSpeed());
-		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandXp());
-		CommandAPI.enable(this, new CommandSpawner());
-		CommandAPI.enable(this, new CommandFly());
-		CommandAPI.enable(this, new CommandPing());
-		CommandAPI.enable(this, new CommandRepair());
-		CommandAPI.enable(this, new CommandGM());
-		CommandAPI.enable(this, new CommandEnchant());
-		CommandAPI.enable(this, new CommandPos());
-		CommandAPI.enable(this, new CommandInvsee());
-		CommandAPI.enable(this, new CommandHat());
-		CommandAPI.enable(this, new CommandNear());
-		CommandAPI.enable(this, new CommandSkull());
-		CommandAPI.enable(this, new CommandItemclear());
-		CommandAPI.enable(this, new CommandCraft());
-		CommandAPI.enable(this, new CommandGms());
-		CommandAPI.enable(this, new CommandGmc());
-		CommandAPI.enable(this, new CommandGma());
-		CommandAPI.enable(this, new CommandGmsp());
-		CommandAPI.enable(this, new CommandTimefreeze());
-		CommandAPI.enable(this, new CommandTeleportto());
-		CommandAPI.enable(this, new CommandGamemodeAll());
-		CommandAPI.enable(this, new CommandTeleportWorld());
-		if (config.getBoolean("command.warp.enabled")) {
-			CommandAPI.enable(this, new CommandWarp());
-			CommandAPI.enable(this, new CommandWarpEdit());
-		}
-
-	}
-
-	@Override
-	public void onLoad() {
-	}
-
 	public static DarkEssentials getInstance() {
 		return DarkEssentials.getPlugin(DarkEssentials.class);
 	}
 
 	public static void sendTitle(String title, String subtitle, int come, int stay, int go) {
-		Bukkit.getOnlinePlayers().forEach(p -> sendTitle(p, title, subtitle, come, stay, go));
+		sendTitle(LegacyComponentSerializer.legacySection().deserialize(title),
+				LegacyComponentSerializer.legacySection().deserialize(subtitle), come, stay, go);
 	}
 
 	public static void sendTitle(Player p, String title, String subtitle, int come, int stay,
 			int go) {
-		ChatUtils.ChatEntry.buildTitle(new ChatUtils.ChatEntry.Builder().text(subtitle).build(),
-				ChatBaseComponent.TitleType.SUBTITLE, come, stay, go).send(p);
-		ChatUtils.ChatEntry.buildTitle(new ChatUtils.ChatEntry.Builder().text(title).build(),
-				ChatBaseComponent.TitleType.TITLE, come, stay, go).send(p);
+		sendTitle(p, LegacyComponentSerializer.legacySection().deserialize(title),
+				LegacyComponentSerializer.legacySection().deserialize(subtitle), come, stay, go);
+	}
+
+	public static void sendTitle(Component title, Component subtitle, int come, int stay, int go) {
+		Bukkit.getOnlinePlayers().forEach(p -> sendTitle(p, title, subtitle, come, stay, go));
+	}
+
+	public static void sendTitle(Player p, Component title, Component subtitle, int come, int stay,
+			int go) {
+		UserAPI.getInstance().getUser(p).showTitle(Title.title(title, subtitle,
+				Title.Times.times(Duration.of(come / 50, ChronoUnit.MILLIS),
+						Duration.of(stay / 50, ChronoUnit.MILLIS),
+						Duration.of(go / 50, ChronoUnit.MILLIS))));
 	}
 
 	public static void sendMessagePlayernameRequired(CommandSender sender) {
@@ -284,6 +140,165 @@ public class DarkEssentials extends Plugin {
 
 	public static String cValue() {
 		return colorValue;
+	}
+
+	@Override
+	public String getCommandPrefix() {
+		return "§5Dark§dCube";
+	}
+
+	@Override
+	public void onLoad() {
+	}
+
+	@Override
+	public void onDisable() {
+		saveConfig();
+	}
+
+	@Override
+	public void onEnable() {
+		try {
+			Language.ENGLISH.registerLookup(getClass().getClassLoader(), "messages_en.properties",
+					k -> Message.getPrefix() + k);
+			Language.GERMAN.registerLookup(getClass().getClassLoader(), "messages_en.properties",
+					k -> Message.getPrefix() + k);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		saveDefaultConfig();
+		config = getConfig();
+
+		colorConfirm = ChatColor.valueOf(config.getString("main.colors.confirmColor")).toString();
+		colorFail = ChatColor.valueOf(config.getString("main.colors.failColor")).toString();
+		colorValue = ChatColor.valueOf(config.getString("main.colors.valueColor")).toString();
+
+		//		System.out.println(config.getBoolean("command.burn.enabled"));
+
+		EssentialCollections.addSortingRule(new SortingRule<World>() {
+			@Override
+			public boolean instanceOf(Object obj) {
+				return obj instanceof World;
+			}
+
+			@Override
+			public String toString(World t) {
+				return t.getName();
+			}
+
+			@Override
+			public Class<World> getRuleClass() {
+				return World.class;
+			}
+		});
+		EssentialCollections.addSortingRule(new SortingRule<Player>() {
+			@Override
+			public boolean instanceOf(Object obj) {
+				return obj instanceof World;
+			}
+
+			@Override
+			public String toString(Player t) {
+				return t.getName();
+			}
+
+			@Override
+			public Class<Player> getRuleClass() {
+				return Player.class;
+			}
+		});
+		EssentialCollections.addSortingRule(new SortingRule<EntityType>() {
+
+			@Override
+			public boolean instanceOf(Object obj) {
+				return obj instanceof EntityType;
+			}
+
+			@SuppressWarnings("deprecation")
+			@Override
+			public String toString(EntityType t) {
+				return t.getName();
+			}
+
+			@Override
+			public Class<EntityType> getRuleClass() {
+				return EntityType.class;
+			}
+		});
+		EssentialCollections.addSortingRule(new SortingRule<WarpPoint>() {
+
+			@Override
+			public boolean instanceOf(Object obj) {
+				return obj instanceof WarpPoint;
+			}
+
+			@Override
+			public String toString(WarpPoint t) {
+				return t.getName();
+			}
+
+			@Override
+			public Class<WarpPoint> getRuleClass() {
+				return WarpPoint.class;
+			}
+		});
+		EssentialCollections.addSortingRule(new SortingRule<Material>() {
+
+			@Override
+			public boolean instanceOf(Object obj) {
+				return obj instanceof Material;
+			}
+
+			@Override
+			public String toString(Material t) {
+				return t.toString();
+			}
+
+			@Override
+			public Class<Material> getRuleClass() {
+				return Material.class;
+			}
+		});
+		if (config.getBoolean("command.burn.enabled"))
+			CommandAPI.enable(this, new CommandBurn());
+		if (config.getBoolean("command.day.enabled"))
+			CommandAPI.enable(this, new CommandDay());
+		CommandAPI.enable(this, new CommandNight());
+		CommandAPI.enable(this, new CommandStop());
+		CommandAPI.enable(this, new CommandEnderChest());
+		CommandAPI.enable(this, new CommandHeal());
+		CommandAPI.enable(this, new CommandFeed());
+		CommandAPI.enable(this, new CommandTrash());
+		CommandAPI.enable(this, new CommandPTime());
+		CommandAPI.enable(this, new CommandPWeather());
+		CommandAPI.enable(this, new CommandSpeed());
+		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandXp());
+		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandSpawner());
+		CommandAPI.enable(this, new CommandFly());
+		CommandAPI.enable(this, new CommandPing());
+		CommandAPI.enable(this, new CommandRepair());
+		CommandAPI.enable(this, new CommandGM());
+		CommandAPI.enable(this, new CommandEnchant());
+		CommandAPI.enable(this, new CommandPos());
+		CommandAPI.enable(this, new CommandInvsee());
+		CommandAPI.enable(this, new CommandHat());
+		CommandAPI.enable(this, new CommandNear());
+		CommandAPI.enable(this, new CommandSkull());
+		CommandAPI.enable(this, new CommandItemclear());
+		CommandAPI.enable(this, new CommandCraft());
+		CommandAPI.enable(this, new CommandGms());
+		CommandAPI.enable(this, new CommandGmc());
+		CommandAPI.enable(this, new CommandGma());
+		CommandAPI.enable(this, new CommandGmsp());
+		CommandAPI.enable(this, new CommandTimefreeze());
+		CommandAPI.enable(this, new CommandTeleportto());
+		CommandAPI.enable(this, new CommandGamemodeAll());
+		CommandAPI.enable(this, new CommandTeleportWorld());
+		if (config.getBoolean("command.warp.enabled")) {
+			CommandAPI.enable(this, new CommandWarp());
+			CommandAPI.enable(this, new CommandWarpEdit());
+		}
+
 	}
 
 }

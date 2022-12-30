@@ -8,29 +8,32 @@
 package eu.darkcube.system.commandapi.v3;
 
 import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.Language;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Collections;
 
-public class BukkitCommandExecutor implements ILanguagedCommandExecutor {
+public class BukkitCommandExecutor implements ILanguagedCommandExecutor, ForwardingAudience {
 
 	private CommandSender sender;
-	private TextComponent[] messagePrefix =
-			new CustomComponentBuilder("[").color(ChatColor.DARK_GRAY).append("???")
-					.color(ChatColor.GOLD).append("]").color(ChatColor.DARK_GRAY).append(" ")
-					.color(ChatColor.GRAY).create();
-	private Function<Message, String> messageToStringFunction = Message::getKey;
+	private Audience audience;
 
 	public BukkitCommandExecutor(CommandSender sender) {
 		this.sender = sender;
+		this.audience = AdventureSupport.audienceProvider().sender(sender);
 		Bukkit.getPluginManager().callEvent(new BukkitCommandExecutorConfigureEvent(this));
+	}
+
+	@Override
+	public @NotNull Iterable<? extends Audience> audiences() {
+		return Collections.singleton(audience);
 	}
 
 	@Override
@@ -50,68 +53,7 @@ public class BukkitCommandExecutor implements ILanguagedCommandExecutor {
 	}
 
 	@Override
-	public boolean hasPermission(String permission) {
-		return sender.hasPermission(permission);
-	}
-
-	@Override
-	public String getName() {
-		return sender.getName();
-	}
-
-	@Override
-	public void sendMessage(Consumer<CustomComponentBuilder> messageCreator) {
-		CustomComponentBuilder b = new CustomComponentBuilder(this.messagePrefix);
-		messageCreator.accept(b);
-		if (sender instanceof Player) {
-			((Player) sender).spigot().sendMessage(b.create());
-		} else {
-			sender.sendMessage(TextComponent.toLegacyText(b.create()));
-		}
-	}
-
-	public CommandSender getSender() {
-		return sender;
-	}
-
-	@Override
-	public TextComponent[] getMessagePrefix() {
-		return messagePrefix;
-	}
-
-	@Override
 	public String getCommandPrefix() {
 		return sender instanceof Player ? "/" : ILanguagedCommandExecutor.super.getCommandPrefix();
 	}
-
-	@Override
-	public void setMessagePrefix(TextComponent[] messagePrefix) {
-		this.messagePrefix = messagePrefix;
-	}
-
-	@Override
-	public Function<Message, String> getMessageToStringFunction() {
-		return messageToStringFunction;
-	}
-
-	@Override
-	public void setMessageToStringFunction(Function<Message, String> messageToStringFunction) {
-		this.messageToStringFunction = messageToStringFunction;
-	}
-
-	@Override
-	public boolean shouldReceiveFeedback() {
-		return true;
-	}
-
-	@Override
-	public boolean shouldReceiveErrors() {
-		return true;
-	}
-
-	@Override
-	public boolean allowLogging() {
-		return true;
-	}
-
 }

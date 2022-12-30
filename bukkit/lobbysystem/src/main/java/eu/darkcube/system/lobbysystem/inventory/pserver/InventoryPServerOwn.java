@@ -9,11 +9,12 @@ package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
@@ -23,6 +24,8 @@ import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -33,14 +36,11 @@ import java.util.Map;
 
 public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
-	private static final InventoryType type_pserver_own = InventoryType.of("pserver_own");
-
-	public static final String META_KEY_PSERVERID = "lobbysystem.pserver.own.pserverid";
-
-	private static final String PSERVER_COUNT_PERMISSION = "pserver.own.count.";
-
+	public static final Key META_KEY_PSERVERID =
+			new Key(Lobby.getInstance(), "lobbysystem.pserver.own.pserverid");
 	public static final String ITEMID_EXISTING = "InventoryPServerOwnPServerSlotExisting";
-
+	private static final InventoryType type_pserver_own = InventoryType.of("pserver_own");
+	private static final String PSERVER_COUNT_PERMISSION = "pserver.own.count.";
 	private final Listener listener;
 
 	public InventoryPServerOwn(User user) {
@@ -73,7 +73,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
 		Collection<UniqueId> col =
 				PServerProvider.getInstance().getPServerIDs(user.getUser().getUniqueId());
-		pservercount = Math.max(pservercount,col.size());
+		pservercount = Math.max(pservercount, col.size());
 		Iterator<UniqueId> it = col.iterator();
 
 		for (int slot = 0; slot < pservercount; slot++) {
@@ -81,7 +81,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 			ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
 
 			if (item == null) {
-				item = new ItemBuilder(
+				item = ItemBuilder.item(
 						Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
 			} else {
 				Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
@@ -103,8 +103,9 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 			}
 
 			if (pserverId != null)
-				item.unsafe()
-						.setString(InventoryPServerOwn.META_KEY_PSERVERID, pserverId.toString());
+				item.persistentDataStorage()
+						.set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING,
+								pserverId.toString());
 
 			items.put(slot, item.build());
 		}

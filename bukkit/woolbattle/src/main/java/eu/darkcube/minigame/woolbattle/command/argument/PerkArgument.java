@@ -7,43 +7,39 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import eu.darkcube.minigame.woolbattle.perk.PerkType;
+import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.commandapi.v3.Messages;
+import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import eu.darkcube.minigame.woolbattle.perk.PerkType;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
-
 public class PerkArgument implements ArgumentType<PerkTypeSelector> {
-	private static final DynamicCommandExceptionType INVALID_ENUM = Message.INVALID_ENUM
-			.newDynamicCommandExceptionType();
+	private static final DynamicCommandExceptionType INVALID_ENUM =
+			Messages.INVALID_ENUM.newDynamicCommandExceptionType();
 	private final Supplier<PerkType[]> values;
 	private final Function<PerkType, String[]> toStringFunction;
 	private final Function<String, PerkType> fromStringFunction;
 
 	private PerkArgument(Supplier<PerkType[]> teams, Predicate<PerkType> filter,
-			Function<PerkType, String[]> toStringFunction, Function<String, PerkType> fromStringFunction,
-			boolean single) {
+			Function<PerkType, String[]> toStringFunction,
+			Function<String, PerkType> fromStringFunction, boolean single) {
 		this.values = teams == null ? () -> PerkType.values() : teams;
-		this.toStringFunction = toStringFunction == null ? defaultToStringFunction() : toStringFunction;
-		this.fromStringFunction = fromStringFunction == null ? defaultFromStringFunction() : fromStringFunction;
+		this.toStringFunction =
+				toStringFunction == null ? defaultToStringFunction() : toStringFunction;
+		this.fromStringFunction =
+				fromStringFunction == null ? defaultFromStringFunction() : fromStringFunction;
 	}
 
 	public static PerkArgument perkArgument() {
@@ -54,7 +50,8 @@ public class PerkArgument implements ArgumentType<PerkTypeSelector> {
 		return new PerkArgument(null, filter, null, null, true);
 	}
 
-	public static Collection<PerkType> getPerkTypes(CommandContext<CommandSource> context, String name) {
+	public static Collection<PerkType> getPerkTypes(CommandContext<CommandSource> context,
+			String name) {
 		return context.getArgument(name, PerkTypeSelector.class).select();
 	}
 
@@ -71,16 +68,6 @@ public class PerkArgument implements ArgumentType<PerkTypeSelector> {
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-		List<String> suggestions = new ArrayList<>();
-		for (PerkType t : values()) {
-			suggestions.addAll(Arrays.asList(toStringFunction.apply(t)));
-		}
-		suggestions.add("*");
-		return ISuggestionProvider.suggest(suggestions, builder);
-	}
-
-	@Override
 	public PerkTypeSelector parse(StringReader reader) throws CommandSyntaxException {
 		int cursor = reader.getCursor();
 		reader.skipWhitespace();
@@ -94,6 +81,17 @@ public class PerkArgument implements ArgumentType<PerkTypeSelector> {
 			throw INVALID_ENUM.createWithContext(reader, in);
 		}
 		return new PerkTypeSelector(false, type);
+	}
+
+	@Override
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
+		List<String> suggestions = new ArrayList<>();
+		for (PerkType t : values()) {
+			suggestions.addAll(Arrays.asList(toStringFunction.apply(t)));
+		}
+		suggestions.add("*");
+		return ISuggestionProvider.suggest(suggestions, builder);
 	}
 
 	private String read(StringReader reader) {
@@ -124,7 +122,7 @@ public class PerkArgument implements ArgumentType<PerkTypeSelector> {
 	private final Function<PerkType, String[]> defaultToStringFunction() {
 		final Map<PerkType, String[]> map = new HashMap<>();
 		for (PerkType t : values()) {
-			map.put(t, new String[] { t.getPerkName().getName() });
+			map.put(t, new String[] {t.getPerkName().getName()});
 		}
 		return map::get;
 	}

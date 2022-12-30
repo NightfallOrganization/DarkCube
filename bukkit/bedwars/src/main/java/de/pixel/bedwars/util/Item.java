@@ -7,22 +7,22 @@
 
 package de.pixel.bedwars.util;
 
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static eu.darkcube.system.inventoryapi.ItemBuilder.item;
+import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
 import static org.bukkit.Material.*;
 
 public enum Item {
 
 	LOBBY_VOTING_IRON("LOBBY_VOTING_IRON", item(IRON_INGOT)),
-	LOBBY_VOTING_IRON_YES("LOBBY_VOTING_IRON_YES", item(INK_SACK).durability((short) 10).lore("")),
-	LOBBY_VOTING_IRON_NO("LOBBY_VOTING_IRON_NO", item(INK_SACK).durability((short) 1).lore("")),
+	LOBBY_VOTING_IRON_YES("LOBBY_VOTING_IRON_YES", item(INK_SACK).damage(10).lore("")),
+	LOBBY_VOTING_IRON_NO("LOBBY_VOTING_IRON_NO", item(INK_SACK).damage(1).lore("")),
 
 	LOBBY_VOTING_GOLD("LOBBY_VOTING_GOLD", item(GOLD_INGOT)),
-	LOBBY_VOTING_GOLD_YES("LOBBY_VOTING_GOLD_YES", item(INK_SACK).durability((short) 10).lore("")),
-	LOBBY_VOTING_GOLD_NO("LOBBY_VOTING_GOLD_NO", item(INK_SACK).durability((short) 1).lore("")),
+	LOBBY_VOTING_GOLD_YES("LOBBY_VOTING_GOLD_YES", item(INK_SACK).damage(10).lore("")),
+	LOBBY_VOTING_GOLD_NO("LOBBY_VOTING_GOLD_NO", item(INK_SACK).damage(1).lore("")),
 
 	LOBBY_TEAMS("LOBBY_TEAMS", item(BOOK)),
 
@@ -42,9 +42,8 @@ public enum Item {
 		return itemId;
 	}
 
-	@SuppressWarnings("deprecation")
 	public ItemBuilder getBuilder() {
-		return new ItemBuilder(builder);
+		return builder.clone();
 	}
 
 	public String getDisplayName(Player user) {

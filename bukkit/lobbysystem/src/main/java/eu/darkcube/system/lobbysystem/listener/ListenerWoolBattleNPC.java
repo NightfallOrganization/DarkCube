@@ -7,21 +7,22 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import com.github.juliarn.npc.NPC;
-import com.github.juliarn.npc.event.PlayerNPCInteractEvent;
-import com.github.juliarn.npc.modifier.LabyModModifier.LabyModAction;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import eu.darkcube.system.labymod.emotes.Emotes;
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
+import eu.darkcube.system.libs.com.github.juliarn.npc.event.PlayerNPCInteractEvent;
+import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.LabyModModifier.LabyModAction;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryWoolBattle;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.userapi.UserAPI;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class ListenerWoolBattleNPC extends BaseListener {
 

@@ -7,8 +7,6 @@
 
 package eu.darkcube.system.lobbysystem;
 
-import com.github.juliarn.npc.NPC;
-import com.github.juliarn.npc.NPCPool;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
@@ -16,6 +14,8 @@ import de.dytanic.cloudnet.driver.service.ServiceTask;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
+import eu.darkcube.system.libs.com.github.juliarn.npc.NPCPool;
 import eu.darkcube.system.loader.ReflectionClassLoader;
 import eu.darkcube.system.lobbysystem.command.CommandLobbysystem;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.CommandBuild;
@@ -60,9 +60,22 @@ public class Lobby extends Plugin {
 		Lobby.instance = this;
 	}
 
+	public static Lobby getInstance() {
+		return Lobby.instance;
+	}
+
 	@Override
 	public void onLoad() {
 		new DependencyManager(new ReflectionClassLoader(this)).loadDependencies();
+	}
+
+	@Override
+	public void onDisable() {
+
+		if (PServerSupport.isSupported()) {
+			SkullCache.unregister();
+			this.pServerJoinOnStart.unregister();
+		}
 	}
 
 	@Override
@@ -87,16 +100,16 @@ public class Lobby extends Plugin {
 			ex.printStackTrace();
 		}
 		List<String> languageEntries = new ArrayList<>();
-		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey)
-				.collect(Collectors.toList()));
 		languageEntries.addAll(
-				Arrays.asList(Item.values()).stream().map(i -> Message.PREFIX_ITEM + i.getKey())
+				Arrays.stream(Message.values()).map(Message::getKey).collect(Collectors.toList()));
+		languageEntries.addAll(
+				Arrays.stream(Item.values()).map(i -> Message.PREFIX_ITEM + i.getKey())
 						.collect(Collectors.toList()));
-		languageEntries.addAll(Arrays.asList(Item.values()).stream()
-				.filter(i -> i.getBuilder().getLores().size() > 0)
-				.map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey())
-				.collect(Collectors.toList()));
-		Language.validateEntries(languageEntries.toArray(new String[languageEntries.size()]),
+		languageEntries.addAll(
+				Arrays.stream(Item.values()).filter(i -> i.getBuilder().lore().size() > 0)
+						.map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey())
+						.collect(Collectors.toList()));
+		Language.validateEntries(languageEntries.toArray(new String[0]),
 				s -> Message.KEY_PREFIX + s);
 
 		this.dataManager = new DataManager();
@@ -199,15 +212,6 @@ public class Lobby extends Plugin {
 		}
 	}
 
-	@Override
-	public void onDisable() {
-
-		if (PServerSupport.isSupported()) {
-			SkullCache.unregister();
-			this.pServerJoinOnStart.unregister();
-		}
-	}
-
 	public void savePlayer(LobbyUser user) {
 		Player p = user.getUser().asPlayer();
 		user.setLastPosition(p.getLocation());
@@ -291,9 +295,5 @@ public class Lobby extends Plugin {
 	@Override
 	public String getCommandPrefix() {
 		return "§aLobbySystem";
-	}
-
-	public static Lobby getInstance() {
-		return Lobby.instance;
 	}
 }

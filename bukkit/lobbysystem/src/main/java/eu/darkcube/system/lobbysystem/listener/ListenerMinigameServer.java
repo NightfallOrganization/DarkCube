@@ -8,8 +8,10 @@
 package eu.darkcube.system.lobbysystem.listener;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
 import eu.darkcube.system.lobbysystem.util.UUIDManager;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -26,12 +28,14 @@ public class ListenerMinigameServer extends BaseListener {
 		if (item == null) {
 			return;
 		}
-		String itemid = new ItemBuilder(item).getUnsafe().getString("minigameServer");
+		String itemid = ItemBuilder.item(item).persistentDataStorage()
+				.get(MinigameInventory.minigameServer, PersistentDataTypes.STRING);
 		if (itemid == null || itemid.isEmpty()) {
 			return;
 		}
 		p.closeInventory();
-		UUIDManager.getManager().getPlayerExecutor(p.getUniqueId()).connect(CloudNetDriver.getInstance()
-				.getCloudServiceProvider().getCloudService(UUID.fromString(itemid)).getServiceId().getName());
+		UUIDManager.getManager().getPlayerExecutor(p.getUniqueId()).connect(
+				CloudNetDriver.getInstance().getCloudServiceProvider()
+						.getCloudService(UUID.fromString(itemid)).getServiceId().getName());
 	}
 }

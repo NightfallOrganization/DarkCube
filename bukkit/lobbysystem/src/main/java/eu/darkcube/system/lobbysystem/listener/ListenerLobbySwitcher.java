@@ -10,13 +10,14 @@ package eu.darkcube.system.lobbysystem.listener;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.wrapper.Wrapper;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.lobbysystem.inventory.InventoryLobbySwitcher;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.UUIDManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -31,7 +32,8 @@ public class ListenerLobbySwitcher extends BaseListener {
 			return;
 		Player p = (Player) e.getWhoClicked();
 		User user = UserAPI.getInstance().getUser(p);
-		String serverId = new ItemBuilder(item).getUnsafe().getString("server");
+		String serverId = ItemBuilder.item(item).persistentDataStorage()
+				.get(InventoryLobbySwitcher.server, PersistentDataTypes.STRING);
 		if (serverId == null || serverId.isEmpty())
 			return;
 		ServiceInfoSnapshot service =
@@ -40,9 +42,9 @@ public class ListenerLobbySwitcher extends BaseListener {
 			UserWrapper.fromUser(user).setOpenInventory(new InventoryLobbySwitcher(user));
 			return;
 		}
-		if (!service.isConnected()
-				|| !service.getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false)) {
-			p.sendMessage(Message.SERVER_NOT_STARTED.getMessage(user));
+		if (!service.isConnected() || !service.getProperty(BridgeServiceProperty.IS_ONLINE)
+				.orElse(false)) {
+			user.sendMessage(Message.SERVER_NOT_STARTED.getMessage(user));
 			p.closeInventory();
 			return;
 		}

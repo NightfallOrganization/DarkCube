@@ -8,6 +8,7 @@
 package eu.darkcube.system.inventoryapi.v1;
 
 import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.AsyncExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,36 +37,10 @@ public abstract class AnimatedInventory extends AbstractInventory {
 	private final BooleanSupplier instant;
 	//					(i1, i2) -> Long.valueOf(i1.showAfter).compareTo(Long.valueOf(i2.showAfter)));
 
-	public AnimatedInventory(InventoryType inventoryType, String title, int size,
+	public AnimatedInventory(InventoryType inventoryType, Component title, int size,
 			BooleanSupplier instant) {
 		super(inventoryType, title, size);
 		this.instant = instant;
-	}
-
-	protected class AnimationRunnable extends BukkitRunnable {
-
-		@Override
-		public void run() {
-			boolean updated = false;
-			final long started = AnimatedInventory.this.animationStarted.get();
-			final long time = System.currentTimeMillis();
-			AnimatedInventory.this.tick();
-			List<AnimationInformation> toRemove = new ArrayList<>();
-			for (AnimationInformation information : AnimatedInventory.this.informations) {
-				if (information.showAfter + started > time) {
-					continue;
-				}
-				toRemove.add(information);
-				AnimatedInventory.this.handle.setItem(information.slot, information.item);
-				updated = true;
-			}
-			AnimatedInventory.this.informations.removeAll(toRemove);
-			if (updated) {
-				AnimatedInventory.this.opened.stream().filter(p -> p instanceof Player)
-						.map(p -> (Player) p).forEach(p -> p.updateInventory());
-			}
-		}
-
 	}
 
 	public boolean isInstant() {
@@ -80,26 +55,6 @@ public abstract class AnimatedInventory extends AbstractInventory {
 	}
 
 	protected void asyncOfferAnimations(final Collection<AnimationInformation> informations) {
-	}
-
-	public class AnimationInformation {
-
-		public final long showAfter;
-
-		public final int slot;
-
-		public final ItemStack item;
-
-		public AnimationInformation(long showAfter, int slot, ItemStack item) {
-			this.showAfter = showAfter;
-			this.slot = slot;
-			this.item = item;
-		}
-
-		public AnimationInformation(int slot, ItemStack item) {
-			this(-1, slot, item);
-		}
-
 	}
 
 	protected void startAnimation() {
@@ -128,6 +83,53 @@ public abstract class AnimatedInventory extends AbstractInventory {
 	protected void destroy() {
 		super.destroy();
 		this.stopAnimation();
+	}
+
+	protected class AnimationRunnable extends BukkitRunnable {
+
+		@Override
+		public void run() {
+			boolean updated = false;
+			final long started = AnimatedInventory.this.animationStarted.get();
+			final long time = System.currentTimeMillis();
+			AnimatedInventory.this.tick();
+			List<AnimationInformation> toRemove = new ArrayList<>();
+			for (AnimationInformation information : AnimatedInventory.this.informations) {
+				if (information.showAfter + started > time) {
+					continue;
+				}
+				toRemove.add(information);
+				AnimatedInventory.this.handle.setItem(information.slot, information.item);
+				updated = true;
+			}
+			AnimatedInventory.this.informations.removeAll(toRemove);
+			if (updated) {
+				AnimatedInventory.this.opened.stream().filter(p -> p instanceof Player)
+						.map(p -> (Player) p).forEach(p -> p.updateInventory());
+			}
+		}
+
+	}
+
+
+	public class AnimationInformation {
+
+		public final long showAfter;
+
+		public final int slot;
+
+		public final ItemStack item;
+
+		public AnimationInformation(long showAfter, int slot, ItemStack item) {
+			this.showAfter = showAfter;
+			this.slot = slot;
+			this.item = item;
+		}
+
+		public AnimationInformation(int slot, ItemStack item) {
+			this(-1, slot, item);
+		}
+
 	}
 
 }

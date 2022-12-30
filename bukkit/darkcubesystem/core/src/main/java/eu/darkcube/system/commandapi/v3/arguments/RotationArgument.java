@@ -17,7 +17,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,32 +25,17 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public class RotationArgument implements ArgumentType<ILocationArgument> {
+	public static final SimpleCommandExceptionType ROTATION_INCOMPLETE =
+			Messages.ROTATION_INCOMPLETE.newSimpleCommandExceptionType();
 	private static final Collection<String> EXAMPLES = Arrays.asList("0 0", "~ ~", "~-5 ~5");
-	public static final SimpleCommandExceptionType ROTATION_INCOMPLETE = Message.ROTATION_INCOMPLETE
-			.newSimpleCommandExceptionType();
 
 	public static RotationArgument rotation() {
 		return new RotationArgument();
 	}
 
-	public static ILocationArgument getRotation(CommandContext<CommandSource> context, String name) {
+	public static ILocationArgument getRotation(CommandContext<CommandSource> context,
+			String name) {
 		return context.getArgument(name, ILocationArgument.class);
-	}
-
-	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> source, SuggestionsBuilder builder) {
-		if (!(source.getSource() instanceof ISuggestionProvider)) {
-			return Suggestions.empty();
-		}
-		String s = builder.getRemaining();
-		Collection<ISuggestionProvider.Coordinates> collection;
-		if (!s.isEmpty() && s.charAt(0) == '^') {
-			collection = Collections.emptyList();
-		} else {
-			collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
-		}
-
-		return ISuggestionProvider.suggestVec2(s, collection, builder, Commands.predicate(this::parse));
 	}
 
 	@Override
@@ -67,6 +52,24 @@ public class RotationArgument implements ArgumentType<ILocationArgument> {
 		}
 		reader.setCursor(i);
 		throw RotationArgument.ROTATION_INCOMPLETE.createWithContext(reader);
+	}
+
+	@Override
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> source,
+			SuggestionsBuilder builder) {
+		if (!(source.getSource() instanceof ISuggestionProvider)) {
+			return Suggestions.empty();
+		}
+		String s = builder.getRemaining();
+		Collection<ISuggestionProvider.Coordinates> collection;
+		if (!s.isEmpty() && s.charAt(0) == '^') {
+			collection = Collections.emptyList();
+		} else {
+			collection = ((ISuggestionProvider) source.getSource()).getCoordinates();
+		}
+
+		return ISuggestionProvider.suggestVec2(s, collection, builder,
+				Commands.predicate(this::parse));
 	}
 
 	@Override

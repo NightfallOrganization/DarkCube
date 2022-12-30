@@ -11,18 +11,21 @@ import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.packets.PacketUserPersistentDataRemove;
 import eu.darkcube.system.userapi.packets.PacketUserPersistentDataSet;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataStorage;
+import eu.darkcube.system.util.data.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class BasicPersistentDataStorage implements PersistentDataStorage {
+public class UserPersistentDataStorage implements PersistentDataStorage {
 
 	private final User user;
 	private final JsonDocument data = new JsonDocument();
 	private final Map<Key, Object> caches = new HashMap<>();
 
-	public BasicPersistentDataStorage(User user) {
+	public UserPersistentDataStorage(User user) {
 		this.user = user;
 	}
 

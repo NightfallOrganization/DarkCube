@@ -7,15 +7,13 @@
 
 package eu.darkcube.system.stats.api.stats;
 
-import java.util.List;
-
-import eu.darkcube.system.util.ChatUtils.ChatEntry;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsElo {
 
-	public default void insertElo(Stats stats, List<ChatEntry> builder, double elo, long placementElo) {
-		StatsUtil.insertElo(stats, builder, elo, placementElo);
+	default Component insertElo(Stats stats, double elo, long placementElo) {
+		return StatsUtil.insertElo(stats, elo, placementElo);
 	}
 
 }

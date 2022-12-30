@@ -11,77 +11,82 @@ import eu.darkcube.system.miners.util.Timer;
 
 public class PVPPhase {
 
-	public static World PVP_WORLD;
+    public static World PVP_WORLD;
 
-	private Spawns spawns;
-	private WorldBorder worldBorder;
-	private Timer pvpTimer;
+    private final Spawns spawns;
+    private WorldBorder worldBorder;
+    private Timer pvpTimer;
 
-	public PVPPhase() {
-		PVP_WORLD = Bukkit.getWorld(Miners.PVP_WORLD_NAME);
-		spawns = new Spawns(PVP_WORLD);
-		worldBorder = PVP_WORLD.getWorldBorder();
-		worldBorder.setCenter(PVP_WORLD.getSpawnLocation());
-		worldBorder.setSize(200);
-		worldBorder.setDamageBuffer(0);
-		worldBorder.setDamageAmount(1);
-		worldBorder.setWarningDistance(0);
-		worldBorder.setWarningTime(10);
+    public PVPPhase() {
+        PVP_WORLD = Bukkit.getWorld(Miners.PVP_WORLD_NAME);
+        spawns = new Spawns(PVP_WORLD);
+        worldBorder = PVP_WORLD.getWorldBorder();
+        worldBorder.setCenter(PVP_WORLD.getSpawnLocation());
+        worldBorder.setSize(200);
+        worldBorder.setDamageBuffer(0);
+        worldBorder.setDamageAmount(1);
+        worldBorder.setWarningDistance(0);
+        worldBorder.setWarningTime(10);
 
-		PVP_WORLD.setGameRuleValue("naturalRegeneration", "true");
-		PVP_WORLD.setSpawnLocation(0, 100, 0);
+        PVP_WORLD.setGameRuleValue("naturalRegeneration", "true");
+        PVP_WORLD.setSpawnLocation(0, 100, 0);
 
-		pvpTimer = new Timer() {
-			private int[] notifications = { 240, 180, 120, 60, 30, 10 };
-			private int nextNotification = 0;
+        pvpTimer = new Timer() {
+            private int[] notifications = {
+                    240,
+                    180,
+                    120,
+                    60,
+                    30,
+                    10
+            };
+            private int nextNotification = 0;
 
-			@Override
-			public void onIncrement() {
-				int remainingSeconds = (int) Math.ceil(getTimeRemainingMillis() / 1000);
-				if (nextNotification < notifications.length && remainingSeconds == notifications[nextNotification]) {
-					sendTimeRemaining(notifications[nextNotification]);
-					nextNotification++;
-				}
-			}
+            @Override
+            public void onIncrement() {
+                int remainingSeconds = (int) Math.ceil(getTimeRemainingMillis() / 1000);
+                if (nextNotification < notifications.length && remainingSeconds == notifications[nextNotification]) {
+                    sendTimeRemaining(notifications[nextNotification]);
+                    nextNotification++;
+                }
+            }
 
-			@Override
-			public void onEnd() {
+            @Override
+            public void onEnd() {
 //				Bukkit.getOnlinePlayers().forEach(p -> {
 //					if (Miners.getTeamManager().getPlayerTeam(p) != 0)
 //						p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100000, 2, true, true), true);
 //				});
-			}
+            }
 
-			private void sendTimeRemaining(int secs) {
-				if (secs > 60) {
-					int mins = secs / 60;
-					Bukkit.getOnlinePlayers().forEach(
-							p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, mins, Message.TIME_MINUTES));
-				} else {
-					Bukkit.getOnlinePlayers().forEach(
-							p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, secs, Message.TIME_SECONDS));
-				}
-			}
-		};
-	}
+            private void sendTimeRemaining(int secs) {
+                if (secs > 60) {
+                    int mins = secs / 60;
+                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, mins, Message.TIME_MINUTES));
+                } else {
+                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, secs, Message.TIME_SECONDS));
+                }
+            }
+        };
+    }
 
-	public void enable() {
-		for (int i = 1; i <= Miners.getMinersConfig().TEAM_COUNT; i++) {
-			Location l = spawns.getRandomSpawn();
-			Miners.getTeamManager().getPlayersInTeam(i).forEach(p -> p.teleport(l));
-		}
-		Miners.getTeamManager().getPlayersWithoutTeam().forEach(p -> p.teleport(PVP_WORLD.getSpawnLocation()));
-		worldBorder.setSize(0, Miners.getMinersConfig().PVP_PHASE_DURATION);
+    public void enable() {
+        for (int i = 1; i <= Miners.getMinersConfig().TEAM_COUNT; i++) {
+            Location l = spawns.getRandomSpawn();
+            Miners.getTeamManager().getPlayersInTeam(i).forEach(p -> p.teleport(l));
+        }
+        Miners.getTeamManager().getPlayersWithoutTeam().forEach(p -> p.teleport(PVP_WORLD.getSpawnLocation()));
+        worldBorder.setSize(0, Miners.getMinersConfig().PVP_PHASE_DURATION);
 
-		pvpTimer.start(Miners.getMinersConfig().PVP_PHASE_DURATION);
-	}
+        pvpTimer.start(Miners.getMinersConfig().PVP_PHASE_DURATION);
+    }
 
-	public void disable() {
-		pvpTimer.cancel(false);
-	}
+    public void disable() {
+        pvpTimer.cancel(false);
+    }
 
-	public Timer getTimer() {
-		return pvpTimer;
-	}
+    public Timer getTimer() {
+        return pvpTimer;
+    }
 
 }

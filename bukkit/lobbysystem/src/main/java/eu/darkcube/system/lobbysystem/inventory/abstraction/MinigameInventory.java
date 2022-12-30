@@ -14,21 +14,25 @@ import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
-import eu.darkcube.system.inventoryapi.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.GameState;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public abstract class MinigameInventory extends LobbyAsyncPagedInventory
-
-{
+public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
+	public static final Key minigameServer = new Key(Lobby.getInstance(), "minigameserver");
 
 	private boolean done = false;
 
@@ -36,7 +40,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 
 	private Listener listener = new Listener();
 
-	public MinigameInventory(String title, Item minigameItem, InventoryType type, User user) {
+	public MinigameInventory(Component title, Item minigameItem, InventoryType type, User user) {
 		super(type, title, user);
 		this.minigameItem = minigameItem;
 		this.done = true;
@@ -49,13 +53,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 	@Override
 	protected boolean done() {
 		return super.done() && this.done;
-	}
-
-	@Override
-	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 5),
-				this.minigameItem.getItem(this.user.getUser()));
-		super.insertFallbackItems();
 	}
 
 	@Override
@@ -73,14 +70,14 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		super.fillItems(items);
 
 		Collection<ServiceInfoSnapshot> servers = new HashSet<>();
-		this.getCloudTasks().stream().forEach(task -> servers.addAll(
+		this.getCloudTasks().forEach(task -> servers.addAll(
 				CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(task)));
 
 		Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
 		for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
 			try {
-				GameState state = GameState
-						.fromString(server.getProperty(BridgeServiceProperty.STATE).orElse(null));
+				GameState state = GameState.fromString(
+						server.getProperty(BridgeServiceProperty.STATE).orElse(null));
 				if (state == null || state == GameState.UNKNOWN)
 					throw new NullPointerException();
 				if (state == GameState.STOPPING) {
@@ -113,28 +110,27 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 				states.remove(server);
 				continue;
 			}
-			ItemBuilder builder = new ItemBuilder(Material.STAINED_CLAY);
-			builder.unsafeStackSize(true);
+			ItemBuilder builder = ItemBuilder.item(Material.STAINED_CLAY);
 			builder.amount(online);
 			builder.displayname(motd);
 			builder.lore("§7Spieler: " + online + "/" + maxPlayers);
 			if (state == GameState.LOBBY) {
 				if (online == 0) {
-					builder.durability(DyeColor.GRAY.getWoolData());
+					builder.damage(DyeColor.GRAY.getWoolData());
 				} else {
-					builder.durability(DyeColor.LIME.getWoolData());
+					builder.damage(DyeColor.LIME.getWoolData());
 				}
 			} else if (state == GameState.INGAME) {
-				builder.durability(DyeColor.ORANGE.getWoolData());
+				builder.damage(DyeColor.ORANGE.getWoolData());
 			} else if (state == GameState.STOPPING) {
-				builder.durability(DyeColor.RED.getWoolData());
+				builder.damage(DyeColor.RED.getWoolData());
 			} else if (state == GameState.UNKNOWN) {
-				builder.durability(DyeColor.RED.getWoolData());
+				builder.damage(DyeColor.RED.getWoolData());
 			}
 			ItemStack item = builder.build();
-			item = new ItemBuilder(item).getUnsafe()
-					.setString("minigameServer", server.getServiceId().getUniqueId().toString())
-					.builder().build();
+			item = ItemBuilder.item(item).persistentDataStorage()
+					.iset(minigameServer, PersistentDataTypes.STRING,
+							server.getServiceId().getUniqueId().toString()).builder().build();
 			ItemSortingInfo info = new ItemSortingInfo(item, online, maxPlayers, state);
 			itemSortingInfos.add(info);
 		}
@@ -146,16 +142,14 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		}
 	}
 
-	public class Listener {
-
-		@EventListener
-		public void handle(CloudServiceInfoUpdateEvent event) {
-			MinigameInventory.this.recalculate();
-		}
-
+	@Override
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 5),
+				this.minigameItem.getItem(this.user.getUser()));
+		super.insertFallbackItems();
 	}
 
-	protected class ItemSortingInfo implements Comparable<ItemSortingInfo> {
+	protected static class ItemSortingInfo implements Comparable<ItemSortingInfo> {
 
 		private ItemStack item;
 
@@ -174,7 +168,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 		}
 
 		@Override
-		public int compareTo(ItemSortingInfo other) {
+		public int compareTo(@NotNull ItemSortingInfo other) {
 			int amt = 0;
 			switch (this.state) {
 				case LOBBY:
@@ -185,7 +179,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 				case INGAME:
 					if (other.state == GameState.LOBBY)
 						return 1;
-					if (other.state != GameState.LOBBY && other.state != GameState.INGAME)
+					if (other.state != GameState.INGAME)
 						return -1;
 					amt = Integer.compare(other.onPlayers, this.onPlayers);
 					break;
@@ -212,11 +206,21 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory
 			if (this.item.hasItemMeta()) {
 				return Optional.ofNullable(this.item.getItemMeta().getDisplayName());
 			}
-			return Optional.ofNullable(null);
+			return Optional.empty();
 		}
 
 		public ItemStack getItem() {
-			return new ItemBuilder(this.item).build();
+			return ItemBuilder.item(this.item).build();
+		}
+
+	}
+
+
+	public class Listener {
+
+		@EventListener
+		public void handle(CloudServiceInfoUpdateEvent event) {
+			MinigameInventory.this.recalculate();
 		}
 
 	}

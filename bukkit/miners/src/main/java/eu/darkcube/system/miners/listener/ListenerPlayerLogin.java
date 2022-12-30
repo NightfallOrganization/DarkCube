@@ -10,16 +10,12 @@ import eu.darkcube.system.miners.Miners;
 
 public class ListenerPlayerLogin implements Listener {
 
-	@EventHandler
-	public void onPlayerLogin(PlayerLoginEvent e) {
-		switch (Miners.getGamephase()) {
-		case 0:
-			if (Bukkit.getOnlinePlayers().size() >= Miners.getMinersConfig().MAX_PLAYERS)
-				e.disallow(Result.KICK_BANNED, "§cDieser Server ist voll!");
-			break;
-		default:
-			break;
-		}
-	}
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent e) {
+        if (Miners.getGamephase() != 0)
+            return;
+        if (Bukkit.getOnlinePlayers().size() >= Miners.getMinersConfig().MAX_PLAYERS)
+            e.disallow(Result.KICK_FULL, "§cDieser Server ist voll!");
+    }
 
 }

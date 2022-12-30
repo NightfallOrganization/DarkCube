@@ -17,7 +17,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Message;
+import eu.darkcube.system.commandapi.v3.Messages;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -28,41 +28,21 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 
 	//	public static final SimpleCommandExceptionType SELECTOR_NOT_ALLOWED = Message.SELECTOR_NOT_ALLOWED.newSimpleCommandExceptionType();
 	public static final SimpleCommandExceptionType TOO_MANY_ENTITIES =
-			Message.TOO_MANY_ENTITIES.newSimpleCommandExceptionType();
+			Messages.TOO_MANY_ENTITIES.newSimpleCommandExceptionType();
 	public static final SimpleCommandExceptionType TOO_MANY_PLAYERS =
-			Message.TOO_MANY_PLAYERS.newSimpleCommandExceptionType();
+			Messages.TOO_MANY_PLAYERS.newSimpleCommandExceptionType();
 	public static final SimpleCommandExceptionType ONLY_PLAYERS_ALLOWED =
-			Message.ONLY_PLAYERS_ALLOWED.newSimpleCommandExceptionType();
+			Messages.ONLY_PLAYERS_ALLOWED.newSimpleCommandExceptionType();
 	public static final SimpleCommandExceptionType ENTITY_NOT_FOUND =
-			Message.ENTITY_NOT_FOUND.newSimpleCommandExceptionType();
+			Messages.ENTITY_NOT_FOUND.newSimpleCommandExceptionType();
 	public static final SimpleCommandExceptionType PLAYER_NOT_FOUND =
-			Message.PLAYER_NOT_FOUND.newSimpleCommandExceptionType();
+			Messages.PLAYER_NOT_FOUND.newSimpleCommandExceptionType();
 
 	private final boolean single, playersOnly;
 
 	public EntityArgument(boolean singleIn, boolean playersOnlyIn) {
 		this.single = singleIn;
 		this.playersOnly = playersOnlyIn;
-	}
-
-	@Override
-	public EntitySelector parse(StringReader reader) throws CommandSyntaxException {
-		EntitySelectorParser entityselectorparser = new EntitySelectorParser(reader);
-		EntitySelector entityselector = entityselectorparser.parse();
-		if (entityselector.getLimit() > 1 && this.single) {
-			if (this.playersOnly) {
-				reader.setCursor(0);
-				throw EntityArgument.TOO_MANY_PLAYERS.createWithContext(reader);
-			}
-			reader.setCursor(0);
-			throw EntityArgument.TOO_MANY_ENTITIES.createWithContext(reader);
-		} else if (entityselector.includesEntities() && this.playersOnly
-				&& !entityselector.isSelfSelector()) {
-			reader.setCursor(0);
-			throw EntityArgument.ONLY_PLAYERS_ALLOWED.createWithContext(reader);
-		} else {
-			return entityselector;
-		}
 	}
 
 	public static Entity getEntity(CommandContext<CommandSource> context, String name)
@@ -78,31 +58,6 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 			throw EntityArgument.ENTITY_NOT_FOUND.create();
 		}
 		return collection;
-	}
-
-	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
-			SuggestionsBuilder builder) {
-		if (context.getSource() instanceof ISuggestionProvider) {
-			StringReader reader = new StringReader(builder.getInput());
-			reader.setCursor(builder.getStart());
-			ISuggestionProvider suggestionProvider = (ISuggestionProvider) context.getSource();
-			EntitySelectorParser parser = new EntitySelectorParser(reader, true);
-
-			try {
-				parser.parse();
-			} catch (CommandSyntaxException commandsyntaxexception) {
-			}
-
-			return parser.fillSuggestions(builder, sbuilder -> {
-				Collection<String> collection = suggestionProvider.getPlayerNames();
-				Iterable<String> iterable = this.playersOnly
-						? collection
-						: Iterables.concat(collection, suggestionProvider.getTargetedEntity());
-				ISuggestionProvider.suggest(iterable, sbuilder);
-			});
-		}
-		return Suggestions.empty();
 	}
 
 	public static Player getPlayer(CommandContext<CommandSource> context, String name)
@@ -143,5 +98,50 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
 
 	public static EntityArgument players() {
 		return new EntityArgument(false, true);
+	}
+
+	@Override
+	public EntitySelector parse(StringReader reader) throws CommandSyntaxException {
+		EntitySelectorParser entityselectorparser = new EntitySelectorParser(reader);
+		EntitySelector entityselector = entityselectorparser.parse();
+		if (entityselector.getLimit() > 1 && this.single) {
+			if (this.playersOnly) {
+				reader.setCursor(0);
+				throw EntityArgument.TOO_MANY_PLAYERS.createWithContext(reader);
+			}
+			reader.setCursor(0);
+			throw EntityArgument.TOO_MANY_ENTITIES.createWithContext(reader);
+		} else if (entityselector.includesEntities() && this.playersOnly
+				&& !entityselector.isSelfSelector()) {
+			reader.setCursor(0);
+			throw EntityArgument.ONLY_PLAYERS_ALLOWED.createWithContext(reader);
+		} else {
+			return entityselector;
+		}
+	}
+
+	@Override
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
+			SuggestionsBuilder builder) {
+		if (context.getSource() instanceof ISuggestionProvider) {
+			StringReader reader = new StringReader(builder.getInput());
+			reader.setCursor(builder.getStart());
+			ISuggestionProvider suggestionProvider = (ISuggestionProvider) context.getSource();
+			EntitySelectorParser parser = new EntitySelectorParser(reader, true);
+
+			try {
+				parser.parse();
+			} catch (CommandSyntaxException commandsyntaxexception) {
+			}
+
+			return parser.fillSuggestions(builder, sbuilder -> {
+				Collection<String> collection = suggestionProvider.getPlayerNames();
+				Iterable<String> iterable = this.playersOnly
+						? collection
+						: Iterables.concat(collection, suggestionProvider.getTargetedEntity());
+				ISuggestionProvider.suggest(iterable, sbuilder);
+			});
+		}
+		return Suggestions.empty();
 	}
 }
