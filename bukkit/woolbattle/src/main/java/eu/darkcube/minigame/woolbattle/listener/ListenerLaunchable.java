@@ -19,10 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class ListenerLaunchable implements Listener {
 

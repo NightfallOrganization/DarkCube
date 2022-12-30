@@ -17,6 +17,7 @@ tasks {
 }
 
 dependencies {
+    api('org.jetbrains:annotations:23.1.0')
     api(libs.bundles.adventure) {
         exclude(group: "org.checkerframework")
         exclude(group: "net.kyori", module: "adventure-api")
