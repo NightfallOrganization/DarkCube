@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.perk;
 
 public class PerkName {
 
+	public static final  PerkName FREEZER = new PerkName("FREEZER");
 	public static final PerkName CAPSULE = new PerkName("CAPSULE");
 	public static final PerkName SWITCHER = new PerkName("SWITCHER");
 	public static final PerkName LINE_BUILDER = new PerkName("LINE_BUILDER");

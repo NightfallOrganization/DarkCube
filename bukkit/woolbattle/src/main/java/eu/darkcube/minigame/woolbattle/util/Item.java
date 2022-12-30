@@ -43,6 +43,9 @@ public enum Item {
 	LOBBY_PERKS_2(ItemBuilder.item(CHEST).addLore()),
 	LOBBY_PERKS_3(ItemBuilder.item(ENDER_CHEST).addLore()),
 
+	PERK_FREEZER(ItemBuilder.item(ICE).addLore()),
+	PERK_FREEZER_COOLDOWN(ItemBuilder.item(ICE).addLore().addLore()),
+
 	PERK_CAPSULE(ItemBuilder.item(STAINED_GLASS).setDurability(14).addLore()),
 	PERK_CAPSULE_COOLDOWN(ItemBuilder.item(STAINED_GLASS).addLore()),
 
