@@ -1,5 +1,7 @@
 package eu.darkcube.system.skyland.Equipment;
 
+import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -15,10 +17,12 @@ public enum Materials {
 
     private PlayerStats[] stats;
     private Rarity rarity;
+    private ItemStack model;
     private static HashMap<Rarity, ArrayList<Materials>> materials = new HashMap<>();
-    Materials(PlayerStats[] stats, Rarity rarity){
+    Materials(PlayerStats[] stats, Rarity rarity, ItemStack model){
         this.stats = stats;
         this.rarity = rarity;
+        this.model = model;
 
         if(!getMaterials().containsKey(rarity)){
             getMaterials().put(rarity, new ArrayList<>());
