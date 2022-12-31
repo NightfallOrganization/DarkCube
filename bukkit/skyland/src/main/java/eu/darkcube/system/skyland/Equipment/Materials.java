@@ -10,7 +10,7 @@ import java.util.Random;
 
 public enum Materials {
 
-    DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE, new ItemStack(Material.DIAMOND_AXE), 10),//beispiel
+    DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE, new ItemStack(Material.DIAMOND_AXE), 10),
 
 
 
