@@ -11,12 +11,18 @@ public class Equipments implements Equipment{
     Rarity rarity;
     int lvl;
     ArrayList<Components> components;
+    EquipmentType equipmentType;
 
 
 
     public Equipments(){
         //todo initialization
     }
+    public Equipments(ItemStack itemStack){
+        //todo load from item
+    }
+
+
 
     @Override
     public int getHaltbarkeit() {
