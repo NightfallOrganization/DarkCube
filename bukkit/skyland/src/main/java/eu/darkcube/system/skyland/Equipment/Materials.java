@@ -1,5 +1,6 @@
 package eu.darkcube.system.skyland.Equipment;
 
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -17,9 +18,9 @@ public enum Materials {
 
     private PlayerStats[] stats;
     private Rarity rarity;
-    private ItemStack model;
+    private Item model;
     private static HashMap<Rarity, ArrayList<Materials>> materials = new HashMap<>();
-    Materials(PlayerStats[] stats, Rarity rarity, ItemStack model){
+    Materials(PlayerStats[] stats, Rarity rarity, Item model){
         this.stats = stats;
         this.rarity = rarity;
         this.model = model;
