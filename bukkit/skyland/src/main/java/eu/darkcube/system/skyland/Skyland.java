@@ -28,7 +28,6 @@ public class Skyland extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		System.out.println("disable");
-		CustomArmor.onDisable(this);
 	}
 
 	@Override
@@ -56,9 +55,10 @@ public class Skyland extends JavaPlugin {
 		instance.getCommand("unloadworld").setExecutor(new UnloadWorld());
 		instance.getCommand("createworld").setExecutor(new CreateWorld());
 		instance.getCommand("getitem").setExecutor(new GetItem());
+		instance.getCommand("getgui").setExecutor(new GetGUI());
 		TrainingStand trainingStand = new TrainingStand();
 		instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
 		Bukkit.getPluginManager().registerEvents(trainingStand, this);
-		CustomArmor.onEnable(this);
+
 	}
 }

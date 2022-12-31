@@ -7,8 +7,7 @@
 
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.LeatherArmorBuilderMeta;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -31,189 +30,7 @@ import java.util.Arrays;
 
 public final class CustomArmor {
 
-	public static void onEnable(JavaPlugin plugin) {
-		Recipes.addRecipe(getNetherblockHelmetRecipe(plugin));
-		Recipes.addRecipe(getNetherblockChestplateRecipe(plugin));
-		Recipes.addRecipe(getNetherblockLeggingsRecipe(plugin));
-		Recipes.addRecipe(getNetherblockBootsRecipe(plugin));
-		Recipes.addRecipe(getStarterSwordRecipe(plugin));
-		Recipes.addRecipe(getNetherblockPickaxeRecipe(plugin));
-		Recipes.addRecipe(getMiningHelmetRecipe(plugin));
-		Recipes.addRecipe(getMiningChestplateRecipe(plugin));
-		Recipes.addRecipe(getMiningLeggingsRecipe(plugin));
-		Recipes.addRecipe(getMiningBootsRecipe(plugin));
-		Recipes.addRecipe(getSpeedHelmetRecipe(plugin));
-		Recipes.addRecipe(getSpeedChestplateRecipe(plugin));
-		Recipes.addRecipe(getSpeedLeggingsRecipe(plugin));
-		Recipes.addRecipe(getSpeedBootsRecipe(plugin));
-		Recipes.addRecipe(getEsdeathBootsRecipe(plugin));
-	}
 
-	public static void onDisable(JavaPlugin plugin) {
-		Recipes.removeRecipe(new NamespacedKey(plugin, "netheritehelmet"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "netheritechestplate"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "netheriteleggings"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "netheriteboots"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "startersword"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "netheritepickaxe"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "mininghelmet"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "miningchestplate"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "miningleggings"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "miningboots"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "speedhelmet"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "speedchestplate"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "speedleggings"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "speedboots"));
-		Recipes.removeRecipe(new NamespacedKey(plugin, "esdeathboots"));
-	}
-
-	public static ShapedRecipe getNetherblockHelmetRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "netheritehelmet");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getNetherblockHelmetItem());
-
-		shapedRecipe.shape("BBB", "B B", "   ");
-		shapedRecipe.setIngredient('B', Material.NETHERITE_BLOCK);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getNetherblockChestplateRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "netheritechestplate");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getNetherblockChestplateItem());
-
-		shapedRecipe.shape("B B", "BBB", "BBB");
-		shapedRecipe.setIngredient('B', Material.NETHERITE_BLOCK);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getNetherblockLeggingsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "netheriteleggings");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getNetherblockLeggingsItem());
-
-		shapedRecipe.shape("BBB", "B B", "B B");
-		shapedRecipe.setIngredient('B', Material.NETHERITE_BLOCK);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getNetherblockBootsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "netheriteboots");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getNetherblockBootsItem());
-
-		shapedRecipe.shape("   ", "B B", "B B");
-		shapedRecipe.setIngredient('B', Material.NETHERITE_BLOCK);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getStarterSwordRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "startersword");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getStarterSwordItem());
-
-		shapedRecipe.shape(" C ", " C ", " S ");
-		shapedRecipe.setIngredient('C', Material.STONE);
-		shapedRecipe.setIngredient('S', Material.STICK);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getNetherblockPickaxeRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "netheritepickaxe");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getNetherblockPickaxeItem());
-
-		shapedRecipe.shape("BBB", " S ", " S ");
-		shapedRecipe.setIngredient('B', Material.NETHERITE_BLOCK);
-		shapedRecipe.setIngredient('S', Material.STICK);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getMiningHelmetRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "mininghelmet");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getMiningHelmetItem());
-
-		shapedRecipe.shape("DPD", "I I", "   ");
-		shapedRecipe.setIngredient('D', Material.POLISHED_DEEPSLATE);
-		shapedRecipe.setIngredient('P', Material.NETHERITE_PICKAXE);
-		shapedRecipe.setIngredient('I', Material.INFESTED_DEEPSLATE);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getMiningChestplateRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "miningchestplate");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getMiningChestplateItem());
-
-		shapedRecipe.shape("D D", "IPI", "DDD");
-		shapedRecipe.setIngredient('D', Material.POLISHED_DEEPSLATE);
-		shapedRecipe.setIngredient('P', Material.NETHERITE_PICKAXE);
-		shapedRecipe.setIngredient('I', Material.INFESTED_DEEPSLATE);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getMiningLeggingsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "miningleggings");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getMiningLeggingsItem());
-
-		shapedRecipe.shape("DPD", "I I", "I I");
-		shapedRecipe.setIngredient('D', Material.POLISHED_DEEPSLATE);
-		shapedRecipe.setIngredient('P', Material.NETHERITE_PICKAXE);
-		shapedRecipe.setIngredient('I', Material.INFESTED_DEEPSLATE);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getMiningBootsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "miningboots");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getMiningBootsItem());
-
-		shapedRecipe.shape("   ", "I I", "D D");
-		shapedRecipe.setIngredient('D', Material.POLISHED_DEEPSLATE);
-		shapedRecipe.setIngredient('I', Material.INFESTED_DEEPSLATE);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getSpeedHelmetRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "speedhelmet");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getSpeedHelmetItem());
-
-		shapedRecipe.shape("LLL", "LDL", "LLL");
-		shapedRecipe.setIngredient('D', Material.DIAMOND_HELMET);
-		shapedRecipe.setIngredient('L', Material.LIGHTNING_ROD);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getSpeedChestplateRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "speedchestplate");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getSpeedChestplateItem());
-
-		shapedRecipe.shape("LLL", "LDL", "LLL");
-		shapedRecipe.setIngredient('D', Material.DIAMOND_CHESTPLATE);
-		shapedRecipe.setIngredient('L', Material.LIGHTNING_ROD);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getSpeedLeggingsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "speedleggings");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getSpeedLeggingsItem());
-
-		shapedRecipe.shape("LLL", "LDL", "LLL");
-		shapedRecipe.setIngredient('D', Material.DIAMOND_LEGGINGS);
-		shapedRecipe.setIngredient('L', Material.LIGHTNING_ROD);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getSpeedBootsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "speedboots");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getSpeedBootsItem());
-
-		shapedRecipe.shape("LLL", "LDL", "LLL");
-		shapedRecipe.setIngredient('D', Material.DIAMOND_BOOTS);
-		shapedRecipe.setIngredient('L', Material.LIGHTNING_ROD);
-		return shapedRecipe;
-	}
-
-	public static ShapedRecipe getEsdeathBootsRecipe(JavaPlugin plugin) {
-		NamespacedKey namespacedKey = new NamespacedKey(plugin, "esdeathboots");
-		ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, getEsdeathBootsItem());
-
-		shapedRecipe.shape("   ", "I I", "I I");
-		shapedRecipe.setIngredient('I', Material.ICE);
-		return shapedRecipe;
-	}
 
 	public static ItemStack getNetherblockHelmetItem() {
 		ItemStack item = new ItemStack(Material.NETHERITE_HELMET);
@@ -540,7 +357,7 @@ public final class CustomArmor {
 		return item;
 	}
 
-	public static ItemStack getEsdeathBootsItem() {
+	/*public static ItemStack getEsdeathBootsItem() {
 		ItemBuilder item =
 				ItemBuilder.item(Material.LEATHER_BOOTS).enchant(Enchantment.FROST_WALKER, 30)
 						.enchant(Enchantment.MENDING, 1).enchant(Enchantment.DURABILITY, 100)
@@ -563,5 +380,142 @@ public final class CustomArmor {
 		item.unbreakable(true);
 		return item.build();
 	}
+ */
 
+	public static ItemStack getGUI1() {
+		ItemStack item = new ItemStack(Material.NETHERITE_SWORD);
+		ItemMeta meta = item.getItemMeta();
+		((Damageable) meta).setDamage(3);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+		meta.setUnbreakable(true);
+
+		ComponentLike starter = Component.text().content("");
+		ComponentLike sword = Component.text().content("");
+
+		meta.displayName(
+				Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
+
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack getGUI2() {
+		ItemStack item = new ItemStack(Material.NETHERITE_SWORD);
+		ItemMeta meta = item.getItemMeta();
+		((Damageable) meta).setDamage(2);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+		meta.setUnbreakable(true);
+
+		ComponentLike starter = Component.text().content("");
+		ComponentLike sword = Component.text().content("");
+
+		meta.displayName(
+				Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
+
+		item.setItemMeta(meta);
+		return item;
+	}
+
+
+	public static ItemStack getS1() {
+		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
+		ItemMeta meta = item.getItemMeta();
+		((Damageable) meta).setDamage(11);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		meta.setUnbreakable(true);
+
+		meta.setLore(Arrays.asList(" ", "§7§m      §7« §bStats §7»§m      ", " ", "§7Damage §a+55",
+				"§7Health §a+90", "§7Healing §a+15", "§7Speed §c-10%", " ",
+				"§7§m      §7« §dReqir §7»§7§m      ", " ", "§7Level §a40", "§7Rarity §3Rare", " ",
+				"§7§m      §7« §eSmith §7»§7§m      ", " ", "§7Klinge §9Saphir", "§7Segen NONE",
+				" "));
+
+		ComponentLike starter = Component.text().content("§7« §fSword");
+		ComponentLike sword = Component.text().content("§7One §7»");
+
+		meta.displayName(
+				Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
+
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack getS2() {
+		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
+		ItemMeta meta = item.getItemMeta();
+		((Damageable) meta).setDamage(12);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		meta.setUnbreakable(true);
+
+		meta.setLore(Arrays.asList(" ", "§7§m      §7« §bStats §7»§m      ", " ", "§7Damage §a+55",
+				"§7Health §a+90", "§7Healing §a+15", "§7Speed §c-10%", " ",
+				"§7§m      §7« §dReqir §7»§7§m      ", " ", "§7Level §a40", "§7Rarity §3Rare", " ",
+				"§7§m      §7« §eSmith §7»§7§m      ", " ", "§7Klinge §9Saphir", "§7Segen NONE",
+				" "));
+
+		ComponentLike starter = Component.text().content("§7« §fSword");
+		ComponentLike sword = Component.text().content("§7Two §7»");
+
+		meta.displayName(
+				Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
+
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack getS3() {
+		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
+		ItemMeta meta = item.getItemMeta();
+		((Damageable) meta).setDamage(13);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		meta.setUnbreakable(true);
+
+		meta.setLore(Arrays.asList(" ", "§7§m      §7« §bStats §7»§m      ", " ", "§7Damage §a+55",
+				"§7Health §a+90", "§7Healing §a+15", "§7Speed §c-10%", " ",
+				"§7§m      §7« §dReqir §7»§7§m      ", " ", "§7Level §a40", "§7Rarity §3Rare", " ",
+				"§7§m      §7« §eSmith §7»§7§m      ", " ", "§7Klinge §9Saphir", "§7Segen NONE",
+				" "));
+
+		ComponentLike starter = Component.text().content("§7« §fSword");
+		ComponentLike sword = Component.text().content("§7Three §7»");
+
+		meta.displayName(
+				Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
+
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack getS4() {
+		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
+		ItemMeta meta = item.getItemMeta();
+		((Damageable) meta).setDamage(14);
+		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+		meta.setUnbreakable(true);
+
+		meta.setLore(Arrays.asList(" ", "§7§m      §7« §bStats §7»§m      ", " ", "§7Damage §a+55",
+				"§7Health §a+90", "§7Healing §a+15", "§7Speed §c-10%", " ",
+				"§7§m      §7« §dReqir §7»§7§m      ", " ", "§7Level §a40", "§7Rarity §3Rare", " ",
+				"§7§m      §7« §eSmith §7»§7§m      ", " ", "§7Klinge §9Saphir", "§7Segen NONE",
+				" "));
+
+		ComponentLike starter = Component.text().content("§7« §fSword");
+		ComponentLike sword = Component.text().content("§7Four §7»");
+
+		meta.displayName(
+				Component.join(JoinConfiguration.separator(Component.space()), starter, sword));
+
+		item.setItemMeta(meta);
+		return item;
+	}
 }

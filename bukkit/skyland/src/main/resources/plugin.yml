@@ -19,3 +19,4 @@ commands:
   unloadworld:
   createworld:
   getitem:
+  getgui:
