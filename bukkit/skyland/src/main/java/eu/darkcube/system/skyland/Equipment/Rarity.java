@@ -6,13 +6,13 @@ import java.util.Random;
 
 public enum Rarity {
 
-    ORDINARY("&7", 3500),
-    RARE("&7", 1500),
-    EPIC("&7", 500),
-    MYTHIC("&7", 250),
-    LEGENDARY("&7", 100),
-    DIVINE("&7", 1),
-    UNIGUE("&7", 0),
+    ORDINARY("&a", 3500),
+    RARE("&9", 1500),
+    EPIC("&d", 500),
+    MYTHIC("&3", 250),
+    LEGENDARY("&6", 100),
+    DIVINE("&e", 1),
+    UNIGUE("&b", 0),
     ;
 
     private String prefix;
