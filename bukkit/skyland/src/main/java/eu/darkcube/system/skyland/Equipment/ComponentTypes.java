@@ -1,4 +1,4 @@
 package eu.darkcube.system.skyland.Equipment;
 
-public interface Armor extends Equipment{
+public enum ComponentTypes {
 }

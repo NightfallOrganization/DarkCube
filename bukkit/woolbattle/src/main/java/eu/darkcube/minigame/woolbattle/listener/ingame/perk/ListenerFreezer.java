@@ -14,7 +14,7 @@ public class ListenerFreezer extends BasicPerkListener {
 
     @Override
     protected boolean activateRight(User user, Perk perk) {
-        user.
+        //user.
         return true;
 
     }

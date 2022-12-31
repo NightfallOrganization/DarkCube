@@ -7,8 +7,6 @@ public interface Equipment {
 
     int getHaltbarkeit();
     void setHaltbarkeit(int haltbarkeit);
-    String getName();
-    void setName(String s);
     ItemStack getModel();
     void setModel(ItemStack model);
     Rarity getRarity();
