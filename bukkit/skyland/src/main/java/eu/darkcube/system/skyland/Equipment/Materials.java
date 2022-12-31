@@ -1,5 +1,6 @@
 package eu.darkcube.system.skyland.Equipment;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,7 +10,7 @@ import java.util.Random;
 
 public enum Materials {
 
-    DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE)//beispiel
+    DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE, new ItemStack(Material.DIAMOND_AXE), 10),//beispiel
 
 
 
@@ -18,12 +19,13 @@ public enum Materials {
 
     private PlayerStats[] stats;
     private Rarity rarity;
-    private Item model;
+    private ItemStack model;
     private static HashMap<Rarity, ArrayList<Materials>> materials = new HashMap<>();
-    Materials(PlayerStats[] stats, Rarity rarity, Item model){
+    Materials(PlayerStats[] stats, Rarity rarity, ItemStack model, int durability){
         this.stats = stats;
         this.rarity = rarity;
         this.model = model;
+        this.model.setDurability((short) durability);
 
         if(!getMaterials().containsKey(rarity)){
             getMaterials().put(rarity, new ArrayList<>());
