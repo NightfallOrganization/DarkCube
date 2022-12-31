@@ -1,11 +1,12 @@
 package eu.darkcube.system.skyland.Equipment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public enum Rarity {
 
-    RARE("&7", 1000)
+    RARE("&7", 1000)//beispiel
     ;
 
     private String prefix;
@@ -22,15 +23,16 @@ public enum Rarity {
         return rarities;
     }
 
-    public static Rarity rollRarity(){
+    public static Rarity rollRarity(HashMap<Rarity, ArrayList<Materials>> materials){
+
         int totalWeight = 0;
-        for (Rarity r : rarities){
+        for (Rarity r : materials.keySet()){
             totalWeight+= r.weight;
         }
 
         Random random = new Random();
         random.nextInt(totalWeight);
-        for (Rarity r: rarities) {
+        for (Rarity r: materials.keySet()) {
             if (totalWeight <= r.weight){
                 return r;
             }

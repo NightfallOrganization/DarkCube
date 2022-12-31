@@ -2,6 +2,6 @@ package eu.darkcube.system.skyland.Equipment;
 
 public interface Weapon extends Equipment{
 
-    Damage[] getDamage();
+    int getDamage();
     Ability getAbility();
 }

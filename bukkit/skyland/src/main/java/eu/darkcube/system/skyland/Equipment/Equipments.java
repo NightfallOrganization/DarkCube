@@ -14,14 +14,21 @@ public class Equipments implements Equipment{
     EquipmentType equipmentType;
 
 
-
-    public Equipments(){
-        //todo initialization
+    public Equipments(int haltbarkeit, ItemStack model, Rarity rarity, int lvl, ArrayList<Components> components, EquipmentType equipmentType) {
+        this.haltbarkeit = haltbarkeit;
+        this.model = model;
+        this.rarity = rarity;
+        this.lvl = lvl;
+        this.components = components;
+        this.equipmentType = equipmentType;
+        //todo color weapon
     }
+
     public Equipments(ItemStack itemStack){
         //todo load from item
     }
 
+    //todo to string and parse from string
 
 
     @Override
