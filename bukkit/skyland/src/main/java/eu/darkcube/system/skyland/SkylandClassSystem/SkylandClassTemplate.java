@@ -1,4 +1,6 @@
-package eu.darkcube.system.skyland.Equipment;
+package eu.darkcube.system.skyland.SkylandClassSystem;
+
+import eu.darkcube.system.skyland.Equipment.EquipmentType;
 
 import java.util.LinkedList;
 

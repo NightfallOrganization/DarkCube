@@ -1,5 +1,8 @@
-package eu.darkcube.system.skyland.Equipment;
+package eu.darkcube.system.skyland.SkylandClassSystem;
 
+import eu.darkcube.system.skyland.Equipment.Equipment;
+import eu.darkcube.system.skyland.Equipment.PlayerStats;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandClassTemplate;
 import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
