@@ -17,9 +17,10 @@ public class Weapons extends Equipments implements Weapon{
 
     }
 
-    public Weapons(ItemStack itemStack) {
-        super(itemStack);
-    }
+/*    public Weapons(ItemStack itemStack) {
+        super();
+
+    }*/
 
     @Override
     public int getDamage() {

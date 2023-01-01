@@ -1,5 +1,7 @@
 package eu.darkcube.system.skyland.Equipment;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -17,17 +19,30 @@ public enum Rarity {
 
     private String prefix;
     private int weight;
-    private static ArrayList<Rarity> rarities = new ArrayList<>();
+
+    //private static ArrayList<Rarity> rarities = new ArrayList<>();
 
     Rarity(String prefix, int weight){
         this.prefix = prefix;
         this.weight = weight;
-        Rarity.getRarities().add(this);
+        //Rarity.getRarities().add(this);
     }
 
-    public static ArrayList<Rarity> getRarities() {
+/*    public static ArrayList<Rarity> getRarities() {
+        System.out.println("");
+        if (rarities == null){
+            System.out.println("rarities is null");
+            rarities = new ArrayList<>();
+        }else {
+            System.out.println("rarities:");
+            for (Rarity r : rarities) {
+                System.out.println(r);
+            }
+        }
+        System.out.println("");
+
         return rarities;
-    }
+    }*/
 
     public static Rarity rollRarity(HashMap<Rarity, ArrayList<Materials>> materials){
 
@@ -47,5 +62,13 @@ public enum Rarity {
 
         //sollte nie auftreten!!!
         return null;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 }

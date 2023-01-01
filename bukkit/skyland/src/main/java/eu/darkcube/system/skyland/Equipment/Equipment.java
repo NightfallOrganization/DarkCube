@@ -15,6 +15,7 @@ public interface Equipment {
     void setLvl(int lvl);
     PlayerStats[] getStats();
     void setStats(PlayerStats[] stats);
+    void addComponent(Components components);
 
 
 }

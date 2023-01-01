@@ -10,7 +10,7 @@ import java.util.Random;
 
 public enum Materials {
 
-    DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE, new ItemStack(Material.DIAMOND_AXE), 10),
+    DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE, new ItemStack(Material.DIAMOND_AXE), 10, 40),//beispiel
 
 
 
@@ -20,24 +20,26 @@ public enum Materials {
     private PlayerStats[] stats;
     private Rarity rarity;
     private ItemStack model;
-    private static HashMap<Rarity, ArrayList<Materials>> materials = new HashMap<>();
-    Materials(PlayerStats[] stats, Rarity rarity, ItemStack model, int durability){
+    private int lvlReq;
+    //private static HashMap<Rarity, ArrayList<Materials>> materials = new HashMap<>();
+    Materials(PlayerStats[] stats, Rarity rarity, ItemStack model, int durability, int lvlReq){
         this.stats = stats;
         this.rarity = rarity;
         this.model = model;
         this.model.setDurability((short) durability);
+        this.lvlReq = lvlReq;
 
-        if(!getMaterials().containsKey(rarity)){
+/*        if(!getMaterials().containsKey(rarity)){
             getMaterials().put(rarity, new ArrayList<>());
         }
 
-        Materials.getMaterials().get(rarity).add(this);
+        Materials.getMaterials().get(rarity).add(this);*/
 
     }
 
-    public static HashMap<Rarity, ArrayList<Materials>> getMaterials() {
+/*    public static HashMap<Rarity, ArrayList<Materials>> getMaterials() {
         return materials;
-    }
+    }*/
 
     public static Materials getRandomMaterial(HashMap<Rarity, ArrayList<Materials>> materials){
         Rarity r = Rarity.rollRarity(materials);
@@ -45,5 +47,9 @@ public enum Materials {
         Random random = new Random();
         int i = random.nextInt(materials1.size());
         return materials1.get(i);
+    }
+
+    public PlayerStats[] getStats() {
+        return stats;
     }
 }
