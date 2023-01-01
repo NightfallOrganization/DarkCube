@@ -426,7 +426,7 @@ public final class CustomArmor {
 	public static ItemStack getS1() {
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta meta = item.getItemMeta();
-		((Damageable) meta).setDamage(11);
+		((Damageable) meta).setDamage(1);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		meta.setUnbreakable(true);
@@ -450,7 +450,7 @@ public final class CustomArmor {
 	public static ItemStack getS2() {
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta meta = item.getItemMeta();
-		((Damageable) meta).setDamage(12);
+		((Damageable) meta).setDamage(2);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		meta.setUnbreakable(true);
@@ -474,7 +474,7 @@ public final class CustomArmor {
 	public static ItemStack getS3() {
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta meta = item.getItemMeta();
-		((Damageable) meta).setDamage(13);
+		((Damageable) meta).setDamage(3);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		meta.setUnbreakable(true);
@@ -498,7 +498,7 @@ public final class CustomArmor {
 	public static ItemStack getS4() {
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta meta = item.getItemMeta();
-		((Damageable) meta).setDamage(14);
+		((Damageable) meta).setDamage(4);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		meta.setUnbreakable(true);
