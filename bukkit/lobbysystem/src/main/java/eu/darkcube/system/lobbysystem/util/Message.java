@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,11 +7,9 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.Language;
+import eu.darkcube.system.BaseMessage;
 
-public enum Message {
+public enum Message implements BaseMessage {
 
 	LOADED,
 	SERVER_NOT_STARTED,
@@ -41,26 +39,13 @@ public enum Message {
 		key = name();
 	}
 
-	public static Component getMessage(String key, Language language, Object... replacements) {
-		return language.getMessage(KEY_PREFIX + key, replacements);
+	@Override
+	public String getPrefixModifier() {
+		return KEY_PREFIX;
 	}
 
 	public String getKey() {
 		return key;
-	}
-
-	public Component getMessage(Language language, Object... replacements) {
-		// return language.getMessage(KEY_PREFIX + key, replacements);
-		return getMessage(key, language, replacements);
-		// return getMessage(key, language, replacements);
-	}
-
-	public Component getServerMessage(Object... replacements) {
-		return getMessage(Language.ENGLISH, replacements);
-	}
-
-	public Component getMessage(User user, Object... replacements) {
-		return getMessage(user.getLanguage(), replacements);
 	}
 
 	// public static final String getMessage(String key, Language language,

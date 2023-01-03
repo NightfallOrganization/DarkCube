@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,20 +7,21 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
+import eu.darkcube.system.lobbysystem.user.UserWrapper;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.user.LobbyUser;
-import eu.darkcube.system.lobbysystem.user.UserWrapper;
-import eu.darkcube.system.userapi.UserAPI;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ListenerDoublejump extends BaseListener {
 
@@ -35,6 +36,8 @@ public class ListenerDoublejump extends BaseListener {
 			return;
 		}
 		if (!e.isFlying())
+			return;
+		if (user.getCurrentJaR() != null)
 			return;
 		e.setCancelled(true);
 		if (!this.cooldown.containsKey(p)) {

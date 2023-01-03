@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -97,6 +97,7 @@ public enum Item {
 	GAME_NOT_FOUND(ItemBuilder.item(BARRIER)),
 
 	LOADING(ItemBuilder.item(BARRIER)),
+	JUMPANDRUN_STOP(ItemBuilder.item(INK_SACK).damage(1)),
 	;
 
 	private static final Key itemId = new Key(Lobby.getInstance(), "itemId");
@@ -138,12 +139,13 @@ public enum Item {
 	}
 
 	public static Component getDisplayName(Item item, User user, Object... replacements) {
-		return Message.getMessage(Item.getItemId(item), user.getLanguage(), replacements);
+		return user.getLanguage().getMessage(Message.KEY_PREFIX + item.getItemId(), replacements);
 	}
 
 	public static Component getLore(Item item, User user, Object... loreReplacements) {
-		return Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(),
-				user.getLanguage(), loreReplacements);
+		return user.getLanguage().getMessage(
+				Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(),
+				loreReplacements);
 	}
 
 	public static Item byGadget(Gadget gadget) {

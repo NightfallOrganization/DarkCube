@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -71,7 +71,8 @@ public class Lobby extends Plugin {
 
 	@Override
 	public void onDisable() {
-
+		Bukkit.getOnlinePlayers().stream().map(UserAPI.getInstance()::getUser)
+				.map(UserWrapper::fromUser).forEach(LobbyUser::stopJaR);
 		if (PServerSupport.isSupported()) {
 			SkullCache.unregister();
 			this.pServerJoinOnStart.unregister();
@@ -225,8 +226,7 @@ public class Lobby extends Plugin {
 		DataManager dataManager = getDataManager();
 		Location spawn = dataManager.getSpawn();
 		p.setGameMode(GameMode.SURVIVAL);
-		if (!p.getAllowFlight())
-			p.setAllowFlight(true);
+		p.setAllowFlight(user.getCurrentJaR() == null);
 		p.setCompassTarget(spawn.getBlock().getLocation());
 		p.setExhaustion(0);
 		p.setSaturation(0);
@@ -254,18 +254,23 @@ public class Lobby extends Plugin {
 		User u = user.getUser();
 		PlayerInventory inv = p.getInventory();
 		inv.clear();
-		inv.setItem(0, Item.INVENTORY_COMPASS.getItem(u));
-		inv.setItem(1, Item.INVENTORY_SETTINGS.getItem(u));
-		inv.setItem(4, Item.byGadget(user.getGadget()).getItem(u));
-		try {
-			if (PServerSupport.isSupported()) {
-				inv.setItem(6, Item.PSERVER_MAIN_ITEM.getItem(u));
+		if (user.getCurrentJaR() == null) {
+			user.setGadget(user.getGadget());
+			inv.setItem(0, Item.INVENTORY_COMPASS.getItem(u));
+			inv.setItem(1, Item.INVENTORY_SETTINGS.getItem(u));
+			inv.setItem(4, Item.byGadget(user.getGadget()).getItem(u));
+			try {
+				if (PServerSupport.isSupported()) {
+					inv.setItem(6, Item.PSERVER_MAIN_ITEM.getItem(u));
+				}
+			} catch (Exception ignored) {
 			}
-		} catch (Exception ex) {
-		}
 
-		inv.setItem(7, Item.INVENTORY_GADGET.getItem(u));
-		inv.setItem(8, Item.INVENTORY_LOBBY_SWITCHER.getItem(u));
+			inv.setItem(7, Item.INVENTORY_GADGET.getItem(u));
+			inv.setItem(8, Item.INVENTORY_LOBBY_SWITCHER.getItem(u));
+		} else {
+			inv.setItem(8, Item.JUMPANDRUN_STOP.getItem(u));
+		}
 	}
 
 	public PServerJoinOnStart getPServerJoinOnStart() {

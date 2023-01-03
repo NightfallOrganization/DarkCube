@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -12,6 +12,7 @@ import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
+import eu.darkcube.system.lobbysystem.jumpandrun.JaR;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.ParticleEffect;
 import eu.darkcube.system.userapi.User;
@@ -45,6 +46,7 @@ public class LobbyUser {
 	final User user;
 	volatile IInventory openInventory;
 	boolean buildMode = false;
+	private JaR currentJaR;
 
 	public LobbyUser(User user) {
 		this.user = user;
@@ -67,6 +69,29 @@ public class LobbyUser {
 			Lobby.getInstance().getLogger()
 					.info("Loading LobbyUser took very long: " + (System.currentTimeMillis()
 							- time1) + " | " + (System.currentTimeMillis() - time2));
+		}
+	}
+
+	public JaR getCurrentJaR() {
+		return currentJaR;
+	}
+
+	public void startJaR() {
+		stopJaR();
+		this.currentJaR = Lobby.getInstance().getJaRManager().startJaR(this);
+		user.asPlayer().setAllowFlight(false);
+		Lobby.getInstance().setItems(this);
+	}
+
+	public void stopJaR() {
+		if (this.currentJaR != null) {
+			this.currentJaR.stop();
+			this.currentJaR = null;
+			Lobby.getInstance().setItems(this);
+			user.asPlayer().setAllowFlight(true);
+			user.asPlayer().teleport(
+					Lobby.getInstance().getDataManager().getJumpAndRunSpawn().clone()
+							.add(0, 0.1, 0));
 		}
 	}
 
@@ -188,7 +213,7 @@ public class LobbyUser {
 		Player p = user.asPlayer();
 		if (p != null) {
 			this.playSound(Sound.NOTE_PLING, 10, 1);
-			p.teleport(loc);
+			p.teleport(loc.clone().add(0, 0.1, 0));
 			p.setGameMode(GameMode.SURVIVAL);
 			p.setAllowFlight(true);
 			new BukkitRunnable() {
@@ -227,9 +252,11 @@ public class LobbyUser {
 		EventGadgetSelect e = new EventGadgetSelect(this, gadget);
 		Bukkit.getPluginManager().callEvent(e);
 		if (!e.isCancelled()) {
-			Player p = user.asPlayer();
-			if (p != null) {
-				p.getInventory().setItem(4, Item.byGadget(gadget).getItem(user));
+			if (getCurrentJaR() != null) {
+				Player p = user.asPlayer();
+				if (p != null) {
+					p.getInventory().setItem(4, Item.byGadget(gadget).getItem(user));
+				}
 			}
 			user.getPersistentDataStorage().set(GADGET, TGADGET, gadget);
 		}

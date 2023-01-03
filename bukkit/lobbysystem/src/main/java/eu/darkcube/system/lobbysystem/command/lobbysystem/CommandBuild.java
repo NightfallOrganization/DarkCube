@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -39,7 +39,6 @@ public class CommandBuild extends LobbyCommandExecutor {
 			LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(t));
 			if (user.isBuildMode()) {
 				Lobby.getInstance().setupPlayer(user);
-				user.setGadget(user.getGadget());
 				user.setBuildMode(false);
 				Lobby.getInstance().sendMessage("§cNun nicht mehr im §eBau-Modus§c!", t);
 				if (!ctx.getSource().assertIsEntity().equals(t)) {
