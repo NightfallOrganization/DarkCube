@@ -42,44 +42,17 @@ public class Miningphase {
         }
 
         miningTimer = new Timer() {
-            private final int[] notifications = {
-                    240,
-                    180,
-                    120,
-                    60,
-                    30,
-                    10,
-                    5,
-                    4,
-                    3,
-                    2,
-                    1
-            };
-            private int nextNotification = 0;
-
             @Override
             public void onIncrement() {
-                int remainingSeconds = (int) Math.ceil(getTimeRemainingMillis() / 1000);
-                if (nextNotification < notifications.length && remainingSeconds == notifications[nextNotification]) {
-                    sendTimeRemaining(notifications[nextNotification]);
-                    nextNotification++;
-                }
             }
 
             @Override
             public void onEnd() {
                 Miners.nextGamephase();
             }
-
-            private void sendTimeRemaining(int secs) {
-                if (secs > 60) {
-                    int mins = secs / 60;
-                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.REMAINING_MINUTES, mins));
-                } else {
-                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.REMAINING_SECONDS, secs));
-                }
-            }
         };
+        miningTimer.setNotificationInterval(60);
+        miningTimer.addCustomNotification(1, 2, 3, 4, 5, 10, 30);
     }
 
     public void enable() {
