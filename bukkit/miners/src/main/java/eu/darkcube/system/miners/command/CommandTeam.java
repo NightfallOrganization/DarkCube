@@ -1,8 +1,8 @@
 package eu.darkcube.system.miners.command;
 
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import org.bukkit.entity.Player;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.Commands;

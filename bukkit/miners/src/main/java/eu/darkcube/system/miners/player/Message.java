@@ -14,35 +14,33 @@ import java.util.function.Function;
 // copied from woolbattle
 public enum Message implements BaseMessage {
 
-	SERVER_STOP,
-	TIME_REMAINING,
-	TIME_SECONDS,
-	TIME_MINUTES,
-	PLAYER_JOINED,
-	PLAYER_LEFT,
-	PLAYER_DIED,
-	PLAYER_WAS_KILLED,
-	COMMAND_TIMER_CHANGED,
-	FAIL_PLACE_BLOCK,
-	FAIL_PLACE_BLOCK_AT_SPAWN,
-	FAIL_TEAM_FULL,
-	FAIL_GAME_RUNNING;
+    REMAINING_SECONDS,
+    REMAINING_MINUTES,
+    PLAYER_JOINED,
+    PLAYER_LEFT,
+    PLAYER_DIED,
+    PLAYER_WAS_KILLED,
+    COMMAND_TIMER_CHANGED,
+    FAIL_PLACE_BLOCK,
+    FAIL_PLACE_BLOCK_AT_SPAWN,
+    FAIL_TEAM_FULL,
+    FAIL_GAME_RUNNING;
 
-	public static final String KEY_PREFIX = "MINERS_";
-	public static final Function<String, String> KEY_MODIFIER = s -> KEY_PREFIX + s;
+    public static final String KEY_PREFIX = "MINERS_";
+    public static final Function<String, String> KEY_MODIFIER = s -> KEY_PREFIX + s;
 
-	private final String key;
+    private final String key;
 
-	Message() {
-		this.key = this.name();
-	}
+    Message() {
+        this.key = this.name();
+    }
 
-	@Override
-	public String getPrefixModifier() {
-		return KEY_PREFIX;
-	}
+    @Override
+    public String getPrefixModifier() {
+        return KEY_PREFIX;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 }

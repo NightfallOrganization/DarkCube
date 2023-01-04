@@ -1,14 +1,13 @@
 package eu.darkcube.system.miners.command;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.miners.player.Message;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class CommandTimer extends CommandExecutor {
 

@@ -62,9 +62,9 @@ public class PVPPhase {
             private void sendTimeRemaining(int secs) {
                 if (secs > 60) {
                     int mins = secs / 60;
-                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, mins, Message.TIME_MINUTES));
+                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.REMAINING_MINUTES, mins));
                 } else {
-                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.TIME_REMAINING, secs, Message.TIME_SECONDS));
+                    Bukkit.getOnlinePlayers().forEach(p -> Miners.sendTranslatedMessage(p, Message.REMAINING_SECONDS, secs));
                 }
             }
         };

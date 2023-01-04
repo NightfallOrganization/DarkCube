@@ -1,5 +1,4 @@
 dependencies {
-	implementation project(':bukkit:darkcubesystem')
-	implementation 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-	implementation project(path: ':bukkit:darkcubesystem:core')
+    compileOnlyApi project(':bukkit:darkcubesystem')
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
 }

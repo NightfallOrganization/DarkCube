@@ -1,5 +1,7 @@
 package eu.darkcube.system.miners.command;
 
+import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.miners.player.Message;
 import org.bukkit.entity.Player;
 
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
@@ -12,7 +14,7 @@ public class CommandTest extends CommandExecutor {
     }
 
     public static int test(Player p) {
-        TNTManager.explodeTNT(p.getLocation(), p, 10);
+        Miners.sendTranslatedMessage(p, Message.PLAYER_DIED, p.getName());
         return 0;
     }
 
