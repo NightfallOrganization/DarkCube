@@ -3,9 +3,12 @@ package eu.darkcube.system.miners.player;
 import java.util.*;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import eu.darkcube.system.miners.Miners;
+import org.bukkit.entity.TNTPrimed;
 
 public class TeamManager {
 
@@ -100,6 +103,27 @@ public class TeamManager {
         if (TEAMS.containsKey(p))
             return TEAMS.get(p);
         return 0;
+    }
+
+    public boolean isInSameTeam(Player p1, Player p2) {
+        if (p1 == null || p2 == null)
+            return false;
+        return TEAMS.get(p1).equals(TEAMS.get(p2));
+    }
+
+    public boolean isOwnerInSameTeam(Player p, Entity e) {
+        if (e instanceof Player)
+            return isInSameTeam(p, (Player) e);
+
+        if (e instanceof Arrow)
+            if (((Arrow) e).getShooter() instanceof Player)
+                return isInSameTeam(p, (Player) ((Arrow) e).getShooter());
+
+        if (e instanceof TNTPrimed)
+            if (TNTManager.getTNTOwner((TNTPrimed) e) != null)
+                return isInSameTeam(p, TNTManager.getTNTOwner((TNTPrimed) e));
+
+        return false;
     }
 
 }
