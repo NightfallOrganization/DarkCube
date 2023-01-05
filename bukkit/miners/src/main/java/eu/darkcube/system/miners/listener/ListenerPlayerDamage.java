@@ -27,8 +27,6 @@ public class ListenerPlayerDamage implements Listener {
             return;
         if (Miners.getGamephase() == 0 || Miners.getGamephase() == 3) // can't take damage in lobby or end
             e.setCancelled(true);
-        if (Miners.getTeamManager().getPlayerTeam((Player) e.getEntity()) == 0) // spectators don't take damage
-            e.setCancelled(true);
 
         if (e.getFinalDamage() >= ((Player) e.getEntity()).getHealth()) // if this hit would kill the player handle the death
             handleDeath(e);

@@ -32,23 +32,14 @@ public class ListenerBlockBreak implements Listener {
         handleDrops(e.getBlock(), e.getPlayer());
     }
 
-    @EventHandler
-    public void onBlockBreakBad(BlockBreakEvent e) {
-        if (Miners.getGamephase() != 1) {
-            e.setCancelled(true);
-        } else {
-            if (DONT_BREAK.contains(e.getBlock().getType()))
-                e.setCancelled(true);
-            e.setExpToDrop(0);
-            handleDrops(e.getBlock(), e.getPlayer());
-        }
-    }
-
     public static boolean shouldDouble(Player p) {
         return false;
     }
 
     public static void handleDrops(Block b, Player p) {
+        if (ListenerSpectators.isSpectatorPlayer(p))
+            return;
+
         switch (b.getType()) {
             case AIR:
                 return;

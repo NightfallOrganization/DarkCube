@@ -1,6 +1,7 @@
 package eu.darkcube.system.miners.listener;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -13,25 +14,26 @@ public class ListenerPlayerQuit implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        if (Miners.getTeamManager().getPlayerTeam(e.getPlayer()) != 0)
-            Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
         e.setQuitMessage(null);
-        Miners.getPlayerManager().removePlayer(e.getPlayer());
-
-        if (Miners.getGamephase() == 0 && Miners.getLobbyPhase().getTimer().isRunning()) {
-            if (Bukkit.getOnlinePlayers().size() == 2)
-                Miners.getLobbyPhase().getTimer().cancel(false);
-        }
+        handlePlayerLeave(e.getPlayer());
     }
 
 
     @EventHandler
-    public void onPlayerQuit(PlayerKickEvent e) {
-        if (Miners.getGamephase() != 3 && Miners.getTeamManager().getPlayerTeam(e.getPlayer()) != 0)
-            Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
+    public void onPlayerKick(PlayerKickEvent e) {
         e.setLeaveMessage(null);
-        Miners.getPlayerManager().removePlayer(e.getPlayer());
-        Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, e.getPlayer().getName());
+        handlePlayerLeave(e.getPlayer());
+    }
+
+    private void handlePlayerLeave(Player player) {
+        if (!ListenerSpectators.isSpectatorPlayer(player) && Miners.getGamephase() != 3) // don't send leave messages for spectators or in endphase
+            Miners.sendTranslatedMessageAll(Message.PLAYER_LEFT, player.getName());
+
+        Miners.getPlayerManager().removePlayer(player);
+        updateLobbyTimer(); // automatic checking in the timer occurs only once per second
+    }
+
+    private void updateLobbyTimer() {
         if (Miners.getGamephase() == 0 && Miners.getLobbyPhase().getTimer().isRunning()) {
             if (Bukkit.getOnlinePlayers().size() == 2)
                 Miners.getLobbyPhase().getTimer().cancel(false);

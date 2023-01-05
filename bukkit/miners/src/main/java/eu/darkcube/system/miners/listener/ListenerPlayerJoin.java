@@ -14,12 +14,14 @@ public class ListenerPlayerJoin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 0, false, false));
         Miners.getPlayerManager().addPlayer(e.getPlayer());
         Miners.getPlayerManager().getMinersPlayer(e.getPlayer()).updatePlayer();
+
+        e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 100000, 0, false, false));
         e.getPlayer().setGameMode(GameMode.SURVIVAL);
+
         e.setJoinMessage(null);
-        if (Miners.getTeamManager().getPlayerTeam(e.getPlayer()) != 0)
+        if (!ListenerSpectators.isSpectatorPlayer(e.getPlayer()) && Miners.getGamephase() != 3) // don't send join messages for spectators or in endphase
             Miners.sendTranslatedMessageAll(Message.PLAYER_JOINED, e.getPlayer().getCustomName());
     }
 

@@ -17,14 +17,13 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 
 public class ListenerItemPickup implements Listener {
 
-	@EventHandler
-	public void onItemPickup(PlayerPickupItemEvent e) {
-		ItemBuilder ib = ItemBuilder.item(e.getItem().getItemStack());
-		if (!ib.persistentDataStorage().has(ItemKey.ITEM))
-			return;
-		e.getItem().setItemStack(Item.valueOf(
-						ib.persistentDataStorage().get(ItemKey.ITEM, PersistentDataTypes.STRING))
-				.getItem(e.getPlayer(), e.getItem().getItemStack().getAmount()));
-	}
+    @EventHandler
+    public void onItemPickup(PlayerPickupItemEvent e) {
+        ItemBuilder ib = ItemBuilder.item(e.getItem().getItemStack());
+        if (!ib.persistentDataStorage().has(ItemKey.ITEM))
+            return;
+        e.getItem().setItemStack(Item.valueOf(ib.persistentDataStorage().get(ItemKey.ITEM, PersistentDataTypes.STRING))
+                .getItem(e.getPlayer(), e.getItem().getItemStack().getAmount())); // TODO: understand BabyPixel
+    }
 
 }
