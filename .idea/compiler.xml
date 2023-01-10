@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="DarkCube.bukkit.commandapi.main" target="8" />
+      <module name="DarkCube.bukkit.commandapi.test" target="8" />
+      <module name="DarkCube.bukkit.commons.main" target="8" />
+      <module name="DarkCube.bukkit.commons.test" target="8" />
+      <module name="DarkCube.bukkit.cubesapi.main" target="8" />
+      <module name="DarkCube.bukkit.cubesapi.test" target="8" />
+      <module name="DarkCube.bukkit.inventoryapi.main" target="8" />
+      <module name="DarkCube.bukkit.inventoryapi.test" target="8" />
+      <module name="DarkCube.bukkit.languageapi.main" target="8" />
+      <module name="DarkCube.bukkit.languageapi.test" target="8" />
+      <module name="DarkCube.bukkit.packetapi.main" target="8" />
+      <module name="DarkCube.bukkit.packetapi.test" target="8" />
+      <module name="DarkCube.bukkit.userapi.main" target="8" />
+      <module name="DarkCube.bukkit.userapi.test" target="8" />
+      <module name="DarkCube.cloudban.cloudban-bukkit.main" target="8" />
+      <module name="DarkCube.cloudban.cloudban-bukkit.test" target="8" />
+      <module name="DarkCube.cloudban.cloudban-bungee.main" target="8" />
+      <module name="DarkCube.cloudban.cloudban-bungee.test" target="8" />
+      <module name="DarkCube.cloudban.cloudban-common.main" target="8" />
+      <module name="DarkCube.cloudban.cloudban-common.test" target="8" />
+      <module name="DarkCube.cloudban.cloudban-module.main" target="8" />
+      <module name="DarkCube.cloudban.cloudban-module.test" target="8" />
+      <module name="DarkCube.pserver.main" target="8" />
+      <module name="DarkCube.pserver.pserver-common.main" target="8" />
+      <module name="DarkCube.pserver.pserver-common.test" target="8" />
+      <module name="DarkCube.pserver.test" target="8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
