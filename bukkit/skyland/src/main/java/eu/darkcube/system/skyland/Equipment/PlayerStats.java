@@ -28,12 +28,13 @@ public class PlayerStats {
 
     @Override
     public String toString() {
+
         //todo
-        return super.toString();
+        return type + "``" + menge;
     }
 
-    public PlayerStats parseString(String s){
-        //todo
-        return null;
+    public static PlayerStats parseString(String s){
+
+        return new PlayerStats(PlayerStatsType.valueOf(s.split("``")[0]), Integer.parseInt(s.split("``")[1]));
     }
 }

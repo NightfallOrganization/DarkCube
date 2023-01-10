@@ -11,6 +11,7 @@ import eu.darkcube.system.skyland.Listener.DamageListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -69,5 +70,15 @@ public class Skyland extends JavaPlugin {
 		instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
 		Bukkit.getPluginManager().registerEvents(trainingStand, this);
 
+	}
+
+	public SkylandPlayer getSkylandPlayers(Player player) {
+		for (SkylandPlayer sp : players){
+			if (player.equals(sp.getPlayer())){
+				return sp;
+			}
+		}
+		System.out.println("No SkylandPlayer found for player " + player.getName());
+		return null;
 	}
 }

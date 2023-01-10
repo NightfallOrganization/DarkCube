@@ -4,7 +4,9 @@ import eu.darkcube.system.skyland.Equipment.EquipmentType;
 
 import java.util.LinkedList;
 
-public class SkylandClassTemplate {
+public enum SkylandClassTemplate {
+
+    ;
 
     LinkedList<EquipmentType> allowedEquip;
 
