@@ -7,14 +7,19 @@
 
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.skyland.Listener.DamageListener;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Skyland extends JavaPlugin {
 
+
+	ArrayList<SkylandPlayer> players = new ArrayList<>();
 	private static Skyland instance;
 
 	public Skyland() {
@@ -32,7 +37,7 @@ public class Skyland extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		try {
+/*		try {
 			Language.GERMAN.registerLookup(getClassLoader(), "messages_de.properties",
 					s -> Message.PREFIX + s);
 			Language.ENGLISH.registerLookup(getClassLoader(), "messages_en.properties",
@@ -40,6 +45,10 @@ public class Skyland extends JavaPlugin {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		*/
+
+		DamageListener damageListener = new DamageListener(this);
+		instance.getServer().getPluginManager().registerEvents(damageListener, instance);
 
 		instance.getCommand("gm").setExecutor(new GM());
 		instance.getCommand("heal").setExecutor(new Heal());

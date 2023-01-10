@@ -1,14 +1,14 @@
 package eu.darkcube.system.skyland.Equipment;
 
 import eu.darkcube.system.skyland.Skyland;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Equipments implements Equipment{
 
@@ -19,6 +19,7 @@ public class Equipments implements Equipment{
     ArrayList<Components> components;
     EquipmentType equipmentType;
     static NamespacedKey namespacedKey = new NamespacedKey(Skyland.getInstance(), "EquipInfo");
+    String seperator = "**";//todo implement
 
 
 
@@ -30,50 +31,70 @@ public class Equipments implements Equipment{
         this.lvl = lvl;
         this.components = components;
         this.equipmentType = equipmentType;
-        model.getItemMeta().getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, toString());
+        ItemMeta meta = model.getItemMeta();
+        meta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, toString());
+        model.setItemMeta(meta);
         //todo color weapon stack
         model.getItemMeta().setDisplayName(rarity.getPrefix() + model.getItemMeta().getDisplayName());
         setModelLore();
     }
 
-    private void setModelLore(){
+    private ArrayList<String> setModelLore(){
         ArrayList<String> out = new ArrayList<>();
         out.add("");
         out.add("§7§m      §7« §bStats §7»§m      ");
         out.add("");
 
         for (PlayerStats pl: getStats()) {
-            out.add(pl.getType() + " " + pl.getMenge());
+            if(pl.getMenge() > 0){
+                out.add(pl.getType() + " §a+" + pl.getMenge());
+            }else {
+                out.add(pl.getType() + " §c-" + pl.getMenge());
+            }
+
         }
         out.add("");
         out.add("§7§m      §7« §dReqir §7»§7§m      ");
         out.add("");
-        out.add("Level " + lvl);
-        out.add("Rarity " + rarity);
+        out.add("Level §a" + lvl);
+        out.add("Rarity " + rarity.getPrefix() + rarity);
 
         /*out.add("");
         out.add("§7§m      §7« §eSmith §7»§7§m      ");
         out.add("");*/
 
         model.setLore(out);
+        return out;
     }
 
 
     public static Equipments loadFromItem(ItemStack itemStack){
 
-        if(itemStack.getItemMeta().getPersistentDataContainer().has(namespacedKey)){
+        //itemStack.getItemMeta().getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, "test");
+
+        if(itemStack.getItemMeta().getPersistentDataContainer().has(namespacedKey, PersistentDataType.STRING)){
+            System.out.println("Key found");
             String s = itemStack.getItemMeta().getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING);
 
 
             String[] temp = s.split(",");
             ArrayList<Components> comps = new ArrayList<>();
             for (int i = 8; i < temp.length; i++) {
-                comps.add(Components.parseFromString(temp[i]));
+
+                if (temp[i] != null) {
+                    if(Components.parseFromString(temp[i]) == null){
+                        System.out.println("parse is null!!");
+                    }
+                    comps.add(Components.parseFromString(temp[i]));
+                    System.out.println("test: " + (temp[i]));
+                }
+
             }
 
             return new Equipments(Integer.parseInt(temp[1]), itemStack, Rarity.valueOf(temp[3]), Integer.parseInt(temp[5]), comps, EquipmentType.valueOf(temp[7]));
         }
-
+        System.out.println("key vaL: " + itemStack.getItemMeta().getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING));
+        System.out.println("nenene null warum");
         return null;
     }
 
@@ -87,10 +108,15 @@ public class Equipments implements Equipment{
                 ", equipmentType=," + equipmentType;
 
         for (Components c :components) {
+            if (c != null) {
+                out = out + "," + c;
 
-            out = out + "," + c.toString();
+            }
 
         }
+
+
+        System.out.println(out);
         return out;
     }
 
@@ -146,12 +172,13 @@ public class Equipments implements Equipment{
 
     @Override
     public PlayerStats[] getStats() {
-        ArrayList<PlayerStats> out = new ArrayList<>();
+
         HashMap<PlayerStatsType, Integer> temp = new HashMap<>();
 
 
 
         for (Components c:components) {
+
             for (PlayerStats p : c.getPStats()){
                 if (!temp.containsKey(p.getType())){
                     temp.put(p.getType(), p.getMenge());
@@ -162,11 +189,17 @@ public class Equipments implements Equipment{
 
         }
 
+        PlayerStats[] out = new PlayerStats[temp.keySet().size()];
+        AtomicInteger i = new AtomicInteger();
         temp.forEach((playerStatsType, integer) -> {
-            out.add(new PlayerStats(playerStatsType, integer));
+            out[i.get()] = new PlayerStats(playerStatsType, integer);
+            i.getAndIncrement();
         });
+
+
+
         //kann optimiert werden durch cachen
-        return (PlayerStats[]) out.toArray();
+        return out;
     }
 
     @Override
@@ -174,5 +207,7 @@ public class Equipments implements Equipment{
 
     }
 
-
+    public EquipmentType getEquipmentType() {
+        return equipmentType;
+    }
 }

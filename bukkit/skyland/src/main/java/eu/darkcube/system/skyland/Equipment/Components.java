@@ -17,14 +17,14 @@ public class Components {
     @Override
     public String toString() {
         return "Components{" +
-                "type=,**" + type +
-                "**, compType=,**" + compType + "**"+
+                "type=**" + type +
+                "** compType=**" + compType + "**"+
                 '}';
     }
 
     public static Components parseFromString(String s){
         String[] temp = s.split("\\*\\*");
-        return null;
+        return new Components(Materials.valueOf(temp[1]), ComponentTypes.valueOf(temp[3]));
     }
 
 }

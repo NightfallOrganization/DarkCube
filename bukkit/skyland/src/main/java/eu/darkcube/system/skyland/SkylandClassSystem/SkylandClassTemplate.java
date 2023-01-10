@@ -8,4 +8,9 @@ public class SkylandClassTemplate {
 
     LinkedList<EquipmentType> allowedEquip;
 
+    public LinkedList<EquipmentType> getAllowedEquip() {
+        return allowedEquip;
+    }
+
+
 }

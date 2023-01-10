@@ -25,4 +25,15 @@ public class PlayerStats {
     public void setType(PlayerStatsType type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        //todo
+        return super.toString();
+    }
+
+    public PlayerStats parseString(String s){
+        //todo
+        return null;
+    }
 }
