@@ -5,6 +5,7 @@ plugins {
 tasks {
     shadowJar {
         archiveClassifier.set("")
+        relocate('com.github.unldenis.hologram', 'eu.darkcube.system.libs.lobbysystem.com.github.unldenis.hologram')
     }
     build {
         dependsOn(shadowJar)
@@ -17,6 +18,7 @@ dependencies {
     compileOnly project(':pserver:pserver-bukkit')
     compileOnly project(':pserver:pserver-api')
     api project(':common:labymod-emotes')
+    implementation 'com.github.unldenis:Hologram-Lib:efaed21'
     compileOnly 'org.jetbrains:annotations:23.1.0'
     compileOnly cloudnetDriver
     compileOnly cloudnetWrapper

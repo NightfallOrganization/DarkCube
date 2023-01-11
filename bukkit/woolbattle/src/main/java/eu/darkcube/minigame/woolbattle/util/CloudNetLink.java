@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -8,7 +8,6 @@
 package eu.darkcube.minigame.woolbattle.util;
 
 import com.google.gson.JsonObject;
-
 import de.dytanic.cloudnet.ext.bridge.BridgeHelper;
 import de.dytanic.cloudnet.ext.bridge.server.BridgeServerHelper;
 import de.dytanic.cloudnet.wrapper.Wrapper;
@@ -18,9 +17,8 @@ import eu.darkcube.system.util.GameState;
 
 public class CloudNetLink {
 
-	private static boolean isCloudnet;
-
 	public static boolean shouldDisplay = true;
+	private static boolean isCloudnet;
 
 	static {
 		try {
@@ -47,24 +45,18 @@ public class CloudNetLink {
 				json.addProperty("online",
 						WoolBattle.getInstance().getLobby().isEnabled()
 								? WoolBattle.getInstance().getUserWrapper().getUsers().size()
-								: WoolBattle.getInstance()
-										.getUserWrapper()
-										.getUsers()
-										.stream()
+								: WoolBattle.getInstance().getUserWrapper().getUsers().stream()
 										.filter(u -> u.getTeam().getType() != TeamType.SPECTATOR)
 										.count());
 				json.addProperty("max", WoolBattle.getInstance().getMaxPlayers());
 				BridgeServerHelper.setExtra(json.toString());
 				BridgeServerHelper.setMaxPlayers(1000);
-				String mapname = WoolBattle.getInstance().getMap() == null ? "Unknown Map"
+				String mapname = WoolBattle.getInstance().getMap() == null
+						? "Unknown Map"
 						: WoolBattle.getInstance().getMap().getName();
-				BridgeServerHelper.setMotd("§a" + mapname + " §7("
-						+ Wrapper.getInstance()
-								.getCurrentServiceInfoSnapshot()
-								.getServiceId()
-								.getTaskName()
-								.substring("woolbattle".length())
-						+ ")");
+				BridgeServerHelper.setMotd("§d" + mapname + " §7(" + Wrapper.getInstance()
+						.getCurrentServiceInfoSnapshot().getServiceId().getTaskName()
+						.substring("woolbattle".length()) + ")");
 				BridgeHelper.updateServiceInfo();
 			}
 		} catch (Exception ex) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -18,6 +18,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
+
+import java.util.Objects;
 
 public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 	private static DarkCubeSystem instance;
@@ -43,6 +45,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 	public void onDisable() {
 		AsyncExecutor.stop();
 		AdventureSupport.audienceProvider().close();
+		Plugin.saveStorages();
 	}
 
 	@Override
@@ -54,7 +57,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 
 	@EventHandler
 	private void handle(PlayerKickEvent event) {
-		if (event.getReason() == "disconnect.spam") {
+		if (Objects.equals(event.getReason(), "disconnect.spam")) {
 			event.setCancelled(true);
 		}
 	}

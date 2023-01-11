@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -20,6 +20,7 @@ import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.MinigameServerSortingInfo;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.GameState;
 import eu.darkcube.system.util.data.Key;
@@ -33,11 +34,8 @@ import java.util.*;
 
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 	public static final Key minigameServer = new Key(Lobby.getInstance(), "minigameserver");
-
 	private boolean done = false;
-
 	private Item minigameItem;
-
 	private Listener listener = new Listener();
 
 	public MinigameInventory(Component title, Item minigameItem, InventoryType type, User user) {
@@ -152,52 +150,19 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 	protected static class ItemSortingInfo implements Comparable<ItemSortingInfo> {
 
 		private ItemStack item;
-
-		private int onPlayers;
-
-		private int maxPlayers;
-
-		private GameState state;
+		private MinigameServerSortingInfo minigame;
 
 		public ItemSortingInfo(ItemStack item, int onPlayers, int maxPlayers, GameState state) {
 			super();
 			this.item = item;
-			this.onPlayers = onPlayers;
-			this.maxPlayers = maxPlayers;
-			this.state = state;
+			this.minigame = new MinigameServerSortingInfo(onPlayers, maxPlayers, state);
 		}
 
 		@Override
 		public int compareTo(@NotNull ItemSortingInfo other) {
-			int amt = 0;
-			switch (this.state) {
-				case LOBBY:
-					if (other.state != GameState.LOBBY)
-						return -1;
-					amt = Integer.compare(other.onPlayers, this.onPlayers);
-					break;
-				case INGAME:
-					if (other.state == GameState.LOBBY)
-						return 1;
-					if (other.state != GameState.INGAME)
-						return -1;
-					amt = Integer.compare(other.onPlayers, this.onPlayers);
-					break;
-				default:
-					if (other.state != GameState.UNKNOWN)
-						return 1;
-					amt = Integer.compare(other.onPlayers, this.onPlayers);
-					break;
-			}
+			int amt = minigame.compareTo(other.minigame);
 			if (amt == 0) {
-				amt = Integer.compare(other.onPlayers, this.onPlayers);
-				if (amt != 0) {
-					return amt;
-				}
-				amt = Integer.compare(this.maxPlayers, other.maxPlayers);
-				if (amt == 0) {
-					amt = this.getDisplay().orElse("").compareTo(other.getDisplay().orElse(""));
-				}
+				amt = this.getDisplay().orElse("").compareTo(other.getDisplay().orElse(""));
 			}
 			return amt;
 		}

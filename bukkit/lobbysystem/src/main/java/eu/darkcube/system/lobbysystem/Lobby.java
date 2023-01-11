@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.lobbysystem;
 
+import com.github.unldenis.hologram.HologramPool;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
@@ -23,6 +24,7 @@ import eu.darkcube.system.lobbysystem.gadget.listener.ListenerGrapplingHook;
 import eu.darkcube.system.lobbysystem.gadget.listener.ListenerHookArrow;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaRManager;
 import eu.darkcube.system.lobbysystem.listener.*;
+import eu.darkcube.system.lobbysystem.npc.ConnectorNPC;
 import eu.darkcube.system.lobbysystem.npc.DailyRewardNPC;
 import eu.darkcube.system.lobbysystem.npc.WoolBattleNPC;
 import eu.darkcube.system.lobbysystem.pserver.PServerJoinOnStart;
@@ -55,6 +57,7 @@ public class Lobby extends Plugin {
 	private NPC dailyRewardNpc;
 	private PServerJoinOnStart pServerJoinOnStart;
 	private JaRManager jaRManager;
+	private HologramPool hologramPool;
 
 	public Lobby() {
 		Lobby.instance = this;
@@ -77,6 +80,7 @@ public class Lobby extends Plugin {
 			SkullCache.unregister();
 			this.pServerJoinOnStart.unregister();
 		}
+		ConnectorNPC.clear();
 	}
 
 	@Override
@@ -84,6 +88,7 @@ public class Lobby extends Plugin {
 		this.npcPool =
 				NPCPool.builder(this).spawnDistance(50).actionDistance(45).tabListRemoveTicks(40L)
 						.build();
+		this.hologramPool = new HologramPool(this, 50, 0, 0);
 
 		UserWrapper userWrapper = new UserWrapper();
 		UserAPI.getInstance().addModifier(userWrapper);
@@ -139,6 +144,7 @@ public class Lobby extends Plugin {
 						ServiceTask serviceTask =
 								CloudNetDriver.getInstance().getServiceTaskProvider()
 										.getServiceTask(task);
+						assert serviceTask != null;
 						Collection<ServiceInfoSnapshot> services =
 								CloudNetDriver.getInstance().getCloudServiceProvider()
 										.getCloudServices(serviceTask.getName());
@@ -155,6 +161,7 @@ public class Lobby extends Plugin {
 							ServiceInfoSnapshot snap =
 									CloudNetDriver.getInstance().getCloudServiceFactory()
 											.createCloudService(serviceTask);
+							assert snap != null;
 							CloudNetDriver.getInstance().getCloudServiceProvider(snap)
 									.setCloudServiceLifeCycle(ServiceLifeCycle.RUNNING);
 						}
@@ -176,6 +183,7 @@ public class Lobby extends Plugin {
 		new ListenerInteract();
 		new ListenerLobbySwitcher();
 		new ListenerWoolBattleNPC();
+		new ListenerGamemodeConnectorNPC();
 		new ListenerMinigameServer();
 		new ListenerItemDropPickup();
 		new ListenerFish();
@@ -211,6 +219,12 @@ public class Lobby extends Plugin {
 			world.setStorm(getDataManager().isWinter());
 			world.setThundering(false);
 		}
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				ConnectorNPC.load();
+			}
+		}.runTask(this);
 	}
 
 	public void savePlayer(LobbyUser user) {
@@ -287,6 +301,10 @@ public class Lobby extends Plugin {
 
 	public DataManager getDataManager() {
 		return this.dataManager;
+	}
+
+	public HologramPool getHologramPool() {
+		return hologramPool;
 	}
 
 	public JaRManager getJaRManager() {

@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.lobbysystem.jumpandrun;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.ParticleEffect;
@@ -50,8 +52,25 @@ public class JaR {
 				ParticleEffect.VILLAGER_HAPPY.display(0.2F, 0.2F, 0.2F, 1, 1,
 						getCurrentBlock().getLocation().add(0.5, 1.5, 0.5),
 						user.getUser().asPlayer());
+				int n = node.prev != null ? node.prev.count / 5 : 0;
+				user.getUser().sendActionBar(Component.text("-[").color(NamedTextColor.GRAY)
+						.append(Component.text(Integer.toString(n))
+								.color(NamedTextColor.LIGHT_PURPLE))
+						.append(Component.text("]-").color(NamedTextColor.GRAY)));
 			}
 		}).runTaskTimer(Lobby.getInstance(), 2, 2);
+	}
+
+	public void reset() {
+		if (node != null)
+			deleteAll(node);
+		oldNode = null;
+		node = null;
+		generate();
+		if (getCurrentBlock() != null)
+			user.getUser().asPlayer().teleport(getCurrentBlock().getLocation().add(0.5, 1, 0.5)
+					.setDirection(getCurrentDirection()));
+		user.playSound(Sound.VILLAGER_NO, 100, 1);
 	}
 
 	public void startFromBeginning() {
@@ -98,6 +117,8 @@ public class JaR {
 		if (destroyed)
 			return null;
 		generate();
+		if (node == null)
+			return null;
 		return node.block.toLocation(node.region.world).getBlock();
 	}
 
@@ -135,6 +156,8 @@ public class JaR {
 		if (destroyed)
 			return;
 		if (node == null) {
+			if (manager.regions.isEmpty())
+				return;
 			JaRRegion region = oldNode != null
 					? oldNode.region
 					: manager.regions.get(r.nextInt(manager.regions.size()));
@@ -151,7 +174,7 @@ public class JaR {
 			}
 			build(node);
 		}
-		setBorders(node.region);
+		//		setBorders(node.region);
 		int depth = 1;
 		JarNode current = node;
 		while (depth < PREGEN) {
@@ -235,35 +258,35 @@ public class JaR {
 				FORCE_FIELD_STRENGTH);
 	}
 
-	private void setBorders(JaRRegion region) {
-		for (int dx = 0; dx < region.widthX; dx++) {
-			setBlock(region, dx, 0, 0);
-			setBlock(region, dx, 0, region.widthZ);
-			setBlock(region, dx, region.height, 0);
-			setBlock(region, dx, region.height, region.widthZ);
-		}
-		for (int dz = 0; dz < region.widthZ; dz++) {
-			setBlock(region, 0, 0, dz);
-			setBlock(region, region.widthX, 0, dz);
-			setBlock(region, 0, region.height, dz);
-			setBlock(region, region.widthX, region.height, dz);
-		}
-		for (int dy = 0; dy < region.height; dy++) {
-			setBlock(region, 0, dy, 0);
-			setBlock(region, 0, dy, region.widthZ);
-			setBlock(region, region.widthX, dy, 0);
-			setBlock(region, region.widthX, dy, region.widthZ);
-		}
-	}
+	//	private void setBorders(JaRRegion region) {
+	//		for (int dx = 0; dx < region.widthX; dx++) {
+	//			setBlock(region, dx, 0, 0);
+	//			setBlock(region, dx, 0, region.widthZ);
+	//			setBlock(region, dx, region.height, 0);
+	//			setBlock(region, dx, region.height, region.widthZ);
+	//		}
+	//		for (int dz = 0; dz < region.widthZ; dz++) {
+	//			setBlock(region, 0, 0, dz);
+	//			setBlock(region, region.widthX, 0, dz);
+	//			setBlock(region, 0, region.height, dz);
+	//			setBlock(region, region.widthX, region.height, dz);
+	//		}
+	//		for (int dy = 0; dy < region.height; dy++) {
+	//			setBlock(region, 0, dy, 0);
+	//			setBlock(region, 0, dy, region.widthZ);
+	//			setBlock(region, region.widthX, dy, 0);
+	//			setBlock(region, region.widthX, dy, region.widthZ);
+	//		}
+	//	}
 
 	private double distance(double value, double min, double max) {
 		return Math.min(Math.abs(value - min), Math.abs(value - max));
 	}
 
-	private void setBlock(JaRRegion region, int dx, int dy, int dz) {
-		region.world.getBlockAt(region.x + dx, region.y + dy, region.z + dz)
-				.setType(Material.DIAMOND_BLOCK);
-	}
+	//	private void setBlock(JaRRegion region, int dx, int dy, int dz) {
+	//		region.world.getBlockAt(region.x + dx, region.y + dy, region.z + dz)
+	//				.setType(Material.DIAMOND_BLOCK);
+	//	}
 
 	private void build(JarNode node) {
 		Block block = node.block.toLocation(node.region.world).getBlock();

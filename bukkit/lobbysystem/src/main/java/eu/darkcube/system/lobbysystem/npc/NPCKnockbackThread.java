@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -13,9 +13,10 @@ import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.AnimationModifier
 import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.LabyModModifier.LabyModAction;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class NPCKnockbackThread extends Thread {
+public class NPCKnockbackThread extends BukkitRunnable {
 
 	private final NPC npc;
 
@@ -25,39 +26,21 @@ public class NPCKnockbackThread extends Thread {
 
 	@Override
 	public void run() {
-		Consumer cons = new Consumer();
-		while (true) {
-			this.npc.getLocation().getWorld()
-					.getNearbyEntities(this.npc.getLocation().clone().add(0, 0.6, 0), 0.3, 0.7, 0.3)
-					.stream().filter(e -> e instanceof Player)
-					.filter(e -> !e.hasPermission("system.npc.knockback.ignore"))
-					.map(e -> (Player) e).forEach(cons);
-			try {
-				Thread.sleep(250);
-			} catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}
-		}
+		npc.getLocation().getWorld()
+				.getNearbyEntities(npc.getLocation().clone().add(0, 0.6, 0), 0.3, 0.7, 0.3).stream()
+				.filter(Player.class::isInstance).map(Player.class::cast).filter(npc::isShownFor)
+				.filter(e -> !e.hasPermission("system.npc.knockback.ignore")).forEach(p -> {
+					if (p.isFlying())
+						return;
+					Location loc1 = p.getLocation();
+					Location loc2 = npc.getLocation();
+					double x = loc1.getX() - loc2.getX();
+					double y = loc1.getY() - loc2.getY();
+					double z = loc1.getZ() - loc2.getZ();
+					p.setVelocity(new Vector(x, Math.abs(y) > 1.7 ? 2 : Math.abs(y) + 0.3, z).normalize()
+							.multiply(.7));
+					npc.animation().queue(EntityAnimation.SWING_MAIN_ARM).send(p);
+					npc.labymod().queue(LabyModAction.EMOTE, Emotes.KARATE.getId()).send(p);
+				});
 	}
-
-	private class Consumer implements java.util.function.Consumer<Player> {
-
-		@Override
-		public void accept(Player p) {
-			if (p.isFlying())
-				return;
-			Location loc1 = p.getLocation();
-			Location loc2 = NPCKnockbackThread.this.npc.getLocation();
-			double x = loc1.getX() - loc2.getX();
-			double y = loc1.getY() - loc2.getY();
-			double z = loc1.getZ() - loc2.getZ();
-			p.setVelocity(new Vector(x, Math.abs(y) > 1.7 ? 2 : Math.abs(y) + 0.3, z).normalize()
-					.multiply(.7));
-			NPCKnockbackThread.this.npc.animation().queue(EntityAnimation.SWING_MAIN_ARM).send(p);
-			NPCKnockbackThread.this.npc.labymod().queue(LabyModAction.EMOTE, Emotes.KARATE.getId())
-					.send(p);
-		}
-
-	}
-
 }

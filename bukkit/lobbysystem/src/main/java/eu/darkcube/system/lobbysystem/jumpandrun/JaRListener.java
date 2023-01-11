@@ -28,9 +28,12 @@ public class JaRListener extends BaseListener {
 		if (event.getPlayer() != jar.getUser().getUser().asPlayer()) {
 			return;
 		}
+		if (jar.getCurrentBlock() == null) {
+			return;
+		}
 		Location to = event.getTo();
 		if (to.getY() < jar.getCurrentBlock().getLocation().getY() - 5) {
-			jar.user.stopJaR();
+			jar.reset();
 			return;
 		}
 		if (to.distance(jar.getCurrentBlock().getLocation().add(1, 1.5, 1)) < 1.5) {
