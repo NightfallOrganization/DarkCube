@@ -269,10 +269,10 @@ public class Lobby extends Plugin {
 		PlayerInventory inv = p.getInventory();
 		inv.clear();
 		if (user.getCurrentJaR() == null) {
-			user.setGadget(user.getGadget());
 			inv.setItem(0, Item.INVENTORY_COMPASS.getItem(u));
 			inv.setItem(1, Item.INVENTORY_SETTINGS.getItem(u));
 			inv.setItem(4, Item.byGadget(user.getGadget()).getItem(u));
+			user.getGadget().fillExtraItems(user);
 			try {
 				if (PServerSupport.isSupported()) {
 					inv.setItem(6, Item.PSERVER_MAIN_ITEM.getItem(u));

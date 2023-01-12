@@ -9,11 +9,9 @@ package eu.darkcube.system.lobbysystem.user;
 
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaR;
-import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.ParticleEffect;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
@@ -47,6 +45,8 @@ public class LobbyUser {
 	volatile IInventory openInventory;
 	boolean buildMode = false;
 	private JaR currentJaR;
+	private boolean disableAnimations = false;
+	private boolean disableSounds = false;
 
 	public LobbyUser(User user) {
 		this.user = user;
@@ -104,10 +104,9 @@ public class LobbyUser {
 	}
 
 	public LobbyUser setOpenInventory(IInventory openInventory) {
-		boolean oldAnimations = this.isAnimations();
 		if (this.openInventory != null && openInventory.getClass()
 				.equals(this.openInventory.getClass())) {
-			this.setAnimations(false);
+			this.disableAnimations(true);
 		}
 
 		Player p = user.asPlayer();
@@ -129,7 +128,7 @@ public class LobbyUser {
 		} else {
 			this.openInventory = openInventory;
 		}
-		this.setAnimations(oldAnimations);
+		this.disableAnimations(false);
 		return this;
 	}
 
@@ -147,6 +146,14 @@ public class LobbyUser {
 
 	public void setRewardSlotsUsed(Set<Integer> slots) {
 		user.getPersistentDataStorage().set(REWARDSLOTSUSED, INTEGERS, slots);
+	}
+
+	public boolean disableAnimations() {
+		return disableAnimations;
+	}
+
+	public void disableAnimations(boolean disableAnimations) {
+		this.disableAnimations = disableAnimations;
 	}
 
 	public boolean isBuildMode() {
@@ -167,6 +174,8 @@ public class LobbyUser {
 	}
 
 	public boolean isSounds() {
+		if (disableSounds())
+			return false;
 		return user.getPersistentDataStorage().get(SOUNDS, PersistentDataTypes.BOOLEAN);
 	}
 
@@ -174,7 +183,17 @@ public class LobbyUser {
 		user.getPersistentDataStorage().set(SOUNDS, PersistentDataTypes.BOOLEAN, sounds);
 	}
 
+	public boolean disableSounds() {
+		return disableSounds;
+	}
+
+	public void disableSounds(boolean disableSounds) {
+		this.disableSounds = disableSounds;
+	}
+
 	public boolean isAnimations() {
+		if (disableAnimations())
+			return false;
 		return user.getPersistentDataStorage().get(ANIMATIONS, PersistentDataTypes.BOOLEAN);
 	}
 
@@ -218,10 +237,8 @@ public class LobbyUser {
 			p.setAllowFlight(true);
 			new BukkitRunnable() {
 
+				final double r = .8;
 				double t = 0;
-
-				double r = .8;
-
 				double x, y, z;
 
 				@Override
@@ -248,19 +265,13 @@ public class LobbyUser {
 		return user.getPersistentDataStorage().get(GADGET, TGADGET);
 	}
 
-	public LobbyUser setGadget(Gadget gadget) {
-		EventGadgetSelect e = new EventGadgetSelect(this, gadget);
-		Bukkit.getPluginManager().callEvent(e);
-		if (!e.isCancelled()) {
-			if (getCurrentJaR() != null) {
-				Player p = user.asPlayer();
-				if (p != null) {
-					p.getInventory().setItem(4, Item.byGadget(gadget).getItem(user));
-				}
-			}
-			user.getPersistentDataStorage().set(GADGET, TGADGET, gadget);
+	public void setGadget(Gadget gadget) {
+		Gadget current = getGadget();
+		if (current == gadget) {
+			return;
 		}
-		return this;
+		user.getPersistentDataStorage().set(GADGET, TGADGET, gadget);
+		Lobby.getInstance().setItems(this);
 	}
 
 }

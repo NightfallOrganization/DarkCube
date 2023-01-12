@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -24,6 +24,7 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 	private final User user;
 	private final JsonDocument data = new JsonDocument();
 	private final Map<Key, Object> caches = new HashMap<>();
+	public boolean changed = false;
 
 	public UserPersistentDataStorage(User user) {
 		this.user = user;
@@ -35,18 +36,10 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 		type.serialize(d, key.toString(), data);
 		user.lock();
 		this.data.append(d);
+		changed = true;
 		caches.put(key, data);
 		user.unlock();
 		new PacketUserPersistentDataSet(user.getUniqueId(), d).sendAsync();
-	}
-
-	@Override
-	public <T> void setIfNotPresent(Key key, PersistentDataType<T> type, T data) {
-		user.lock();
-		if (!this.data.contains(key.toString())) {
-			set(key, type, data);
-		}
-		user.unlock();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -59,22 +52,11 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 			t = type.deserialize(this.data, key.toString());
 		}
 		data.remove(key.toString());
+		changed = true;
 		user.unlock();
 		if (!contains)
 			return null;
 		new PacketUserPersistentDataRemove(user.getUniqueId(), key).sendAsync();
-		return t;
-	}
-
-	@Override
-	public <T> T get(Key key, PersistentDataType<T> type, Supplier<T> defaultValue) {
-		user.lock();
-		T t = get(key, type);
-		if (t == null) {
-			t = defaultValue.get();
-			set(key, type, t);
-		}
-		user.unlock();
 		return t;
 	}
 
@@ -97,6 +79,27 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 	}
 
 	@Override
+	public <T> T get(Key key, PersistentDataType<T> type, Supplier<T> defaultValue) {
+		user.lock();
+		T t = get(key, type);
+		if (t == null) {
+			t = defaultValue.get();
+			set(key, type, t);
+		}
+		user.unlock();
+		return t;
+	}
+
+	@Override
+	public <T> void setIfNotPresent(Key key, PersistentDataType<T> type, T data) {
+		user.lock();
+		if (!this.data.contains(key.toString())) {
+			set(key, type, data);
+		}
+		user.unlock();
+	}
+
+	@Override
 	public boolean has(Key key) {
 		user.lock();
 		boolean con = data.contains(key.toString());
@@ -104,17 +107,26 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 		return con;
 	}
 
+	public void append(JsonDocument other) {
+		user.lock();
+		this.data.append(other);
+		for (String key : other.keys()) {
+			caches.remove(Key.fromString(key));
+		}
+		user.unlock();
+	}
+
+	public void remove(Key key) {
+		user.lock();
+		data.remove(key.toString());
+		caches.remove(key);
+		user.unlock();
+	}
+
 	public JsonDocument getData() {
 		user.lock();
 		JsonDocument data = this.data;
 		user.unlock();
 		return data;
-	}
-
-	public void clear() {
-		user.lock();
-		data.clear();
-		caches.clear();
-		user.unlock();
 	}
 }

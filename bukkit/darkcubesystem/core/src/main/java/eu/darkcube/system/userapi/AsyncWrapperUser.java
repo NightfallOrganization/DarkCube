@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -53,12 +53,17 @@ class AsyncWrapperUser implements User {
 			} else {
 				api.lock.readLock().unlock();
 				api.lock.writeLock().lock();
-				DarkCubeSystem.getInstance().getLogger().warning(
-						"[UserAPI] User was loaded by accessing object. This most likely "
-								+ "indicates a memory leak! Use User#isLoaded before you use a "
-								+ "User object if the user is not online!");
-				new Exception().printStackTrace();
-				user = api.loadUser(uuid);
+				cur = api.users.get(uuid);
+				if (cur == null) {
+					DarkCubeSystem.getInstance().getLogger().warning(
+							"[UserAPI] User was loaded by accessing object. This most likely "
+									+ "indicates a memory leak! Use User#isLoaded before you use a "
+									+ "User object if the user is not online!");
+					new Exception().printStackTrace();
+					user = api.loadUser(uuid);
+				} else {
+					user = cur;
+				}
 				api.lock.readLock().lock();
 				api.lock.writeLock().unlock();
 				reference.set(user);

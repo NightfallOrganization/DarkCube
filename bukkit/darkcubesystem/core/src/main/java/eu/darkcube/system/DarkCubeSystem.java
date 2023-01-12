@@ -11,6 +11,7 @@ import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.arguments.EntityOptions;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.BukkitUserAPI;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.version.VersionSupport;
@@ -43,6 +44,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 
 	@Override
 	public void onDisable() {
+		UserAPI.getInstance().loadedUsersForEach(user -> UserAPI.getInstance().unloadUser(user));
 		AsyncExecutor.stop();
 		AdventureSupport.audienceProvider().close();
 		Plugin.saveStorages();

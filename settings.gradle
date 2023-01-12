@@ -4,7 +4,8 @@ pluginManagement {
         maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     }
     plugins {
-        id("com.github.johnrengelman.shadow") version "7.1.2"
+        id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+        id("net.kyori.blossom") version "1.3.1" apply false
     }
 }
 
@@ -15,8 +16,7 @@ include 'bukkit:autovoidworld'
 include 'bukkit:bauserver'
 include 'bukkit:bedwars'
 include 'bukkit:changepermissionmessage'
-includeSubProjects('bukkit:darkcubesystem', '1.8.8', '1.19.2', 'core')
-include 'bukkit:darkcubesystem:'
+includeSubProjects('bukkit:darkcubesystem', '1.8.8', '1.19.2', 'core', 'module')
 include 'bukkit:darkessentials'
 include 'bukkit:holograms'
 include 'bukkit:jumpleague'

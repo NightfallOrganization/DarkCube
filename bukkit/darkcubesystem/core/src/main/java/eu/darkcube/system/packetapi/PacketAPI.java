@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -20,6 +20,11 @@ import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 public class PacketAPI {
 
 	public static final String CHANNEL = "darkCubePacketAPI";
+	private static PacketAPI instance;
+
+	static {
+		instance = new PacketAPI();
+	}
 
 	private Listener listener;
 	private BiMap<Class<? extends Packet>, PacketHandler<?>> handlers = HashBiMap.create();
@@ -27,6 +32,14 @@ public class PacketAPI {
 	private PacketAPI() {
 		this.listener = new Listener();
 		load();
+	}
+
+	public static PacketAPI getInstance() {
+		return instance;
+	}
+
+	public static void init() {
+
 	}
 
 	void load() {
@@ -72,11 +85,13 @@ public class PacketAPI {
 
 	public Packet sendPacketQuery(Packet packet) {
 		ChannelMessage msg = preparePacket(packet).sendSingleQuery();
+		assert msg != null;
 		return PacketSerializer.getPacket(msg.getJson(), PacketSerializer.getClass(msg.getJson()));
 	}
 
 	public <T extends Packet> T sendPacketQuery(Packet packet, Class<T> responsePacketType) {
 		ChannelMessage msg = preparePacket(packet).sendSingleQuery();
+		assert msg != null;
 		return PacketSerializer.getPacket(msg.getJson(), responsePacketType);
 	}
 
@@ -100,7 +115,7 @@ public class PacketAPI {
 				.build();
 	}
 
-	public JsonDocument receive(JsonDocument doc) throws Exception {
+	public JsonDocument receive(JsonDocument doc) {
 		Class<? extends Packet> packetClass = PacketSerializer.getClass(doc);
 		if (handlers.containsKey(packetClass)) {
 			try {
@@ -124,10 +139,11 @@ public class PacketAPI {
 		handlers.inverse().remove(handler);
 	}
 
+
 	public class Listener {
 		@EventListener
 		public void handle(ChannelMessageReceiveEvent e) {
-			if (e.getChannel() == null || !e.getChannel().equals(CHANNEL)) {
+			if (!e.getChannel().equals(CHANNEL)) {
 				return;
 			}
 			try {
@@ -143,20 +159,5 @@ public class PacketAPI {
 				ex.printStackTrace();
 			}
 		}
-	}
-
-
-	private static PacketAPI instance;
-
-	static {
-		instance = new PacketAPI();
-	}
-
-	public static PacketAPI getInstance() {
-		return instance;
-	}
-
-	public static void init() {
-
 	}
 }

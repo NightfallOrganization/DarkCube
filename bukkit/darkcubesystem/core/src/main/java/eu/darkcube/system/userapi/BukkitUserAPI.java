@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -18,6 +18,7 @@ import eu.darkcube.system.userapi.events.UserLoadEvent;
 import eu.darkcube.system.userapi.events.UserUnloadEvent;
 import eu.darkcube.system.userapi.packets.PacketUserPersistentDataRemove;
 import eu.darkcube.system.userapi.packets.PacketUserPersistentDataSet;
+import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,6 +26,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -90,53 +93,63 @@ public class BukkitUserAPI extends AbstractUserAPI {
 			CloudNetDriver.getInstance().getDatabaseProvider().deleteDatabase("cubesapi_cubes");
 		}
 		PacketAPI.getInstance().registerHandler(PacketUserPersistentDataSet.class, packet -> {
-			if (isUserLoaded(packet.getUniqueId())) {
-				AsyncWrapperUser user = getUser(packet.getUniqueId());
+			AsyncExecutor.service().submit(() -> {
 				try {
-					user.lock();
-					user.getPersistentDataStorage().getData().append(packet.getData());
+					lock.readLock().lock();
+					if (isUserLoaded(packet.getUniqueId())) {
+						AsyncWrapperUser user = getUser(packet.getUniqueId());
+						user.getPersistentDataStorage().append(packet.getData());
+					}
 				} finally {
-					user.unlock();
+					lock.readLock().unlock();
 				}
-			}
+			});
 			return null;
 		});
 		PacketAPI.getInstance().registerHandler(PacketUserPersistentDataRemove.class, packet -> {
-			if (isUserLoaded(packet.getUniqueId())) {
-				AsyncWrapperUser user = getUser(packet.getUniqueId());
+			AsyncExecutor.service().submit(() -> {
 				try {
-					user.lock();
-					user.getPersistentDataStorage().getData().remove(packet.getKey().toString());
+					lock.readLock().lock();
+					if (isUserLoaded(packet.getUniqueId())) {
+						AsyncWrapperUser user = getUser(packet.getUniqueId());
+						user.getPersistentDataStorage().remove(packet.getKey());
+					}
 				} finally {
-					user.unlock();
+					lock.readLock().unlock();
 				}
-			}
+			});
 			return null;
 		});
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				List<User> unload = new ArrayList<>();
-				lock.readLock().lock();
-				for (BukkitUser user : users.values()) {
-					Player player = user.asPlayer();
-					if (player != null && player.isOnline()) {
-						user.lastAccess(System.currentTimeMillis());
-						continue;
-					}
-					if (user.lastAccess() + UNLOAD_USERS_AFTER_MILLIS - System.currentTimeMillis()
-							< 0) {
-						if (user.lock.tryLock()) {
-							user.lock.unlock();
-							unload.add(user);
+				try {
+					lock.readLock().lock();
+					for (BukkitUser user : users.values()) {
+						Player player = user.asPlayer();
+						if (player != null && player.isOnline()) {
+							user.lastAccess(System.currentTimeMillis());
+							continue;
+						}
+						if (user.lastAccess() + UNLOAD_USERS_AFTER_MILLIS
+								- System.currentTimeMillis() < 0) {
+							if (user.lock.tryLock()) {
+								user.lock.unlock();
+								unload.add(user);
+							}
 						}
 					}
+				} finally {
+					lock.readLock().unlock();
 				}
-				lock.readLock().unlock();
 				if (!unload.isEmpty()) {
-					lock.writeLock().lock();
-					unload.forEach(u -> unloadUser(u));
-					lock.writeLock().unlock();
+					try {
+						lock.writeLock().lock();
+						unload.forEach(u -> unloadUser(u));
+					} finally {
+						lock.writeLock().unlock();
+					}
 				}
 			}
 		}.runTaskTimerAsynchronously(DarkCubeSystem.getInstance(), 1,
@@ -151,20 +164,126 @@ public class BukkitUserAPI extends AbstractUserAPI {
 	}
 
 	public AsyncWrapperUser getUser(UUID uuid) {
-		lock.readLock().lock();
-		BukkitUser bu = users.get(uuid);
-		if (bu == null) {
-			lock.readLock().unlock();
-			lock.writeLock().lock();
+		t:
+		try {
 			lock.readLock().lock();
-			bu = users.get(uuid);
+			BukkitUser bu = users.get(uuid);
+			if (bu == null) {
+				break t;
+			}
+			return new AsyncWrapperUser(bu);
+		} finally {
+			lock.readLock().unlock();
+		}
+		try {
+			lock.writeLock().lock();
+			BukkitUser bu = users.get(uuid);
 			if (bu == null) {
 				bu = loadUser(uuid);
 			}
+			return new AsyncWrapperUser(bu);
+		} finally {
 			lock.writeLock().unlock();
 		}
+	}
+
+	@Override
+	public void loadedUsersForEach(Consumer<? super User> consumer) {
+		try {
+			lock.readLock().lock();
+			users.values().stream().map(AsyncWrapperUser::new).forEach(consumer);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public void unloadUser(User user) {
+		try {
+			lock.writeLock().lock();
+			BukkitUser u = users.get(user.getUniqueId());
+			if (u == null) {
+				throw new IllegalArgumentException("User " + user.getName() + " is not loaded!");
+			}
+			CloudNetDriver.getInstance().getEventManager().callEvent(new UserUnloadEvent(u));
+			AsyncWrapperUser bu = (AsyncWrapperUser) user;
+			bu.lock();
+			boolean changed = bu.getPersistentDataStorage().changed;
+			bu.getPersistentDataStorage().changed = false;
+			JsonDocument persistentData = bu.getPersistentDataStorage().getData().clone();
+			String name = user.getName();
+			bu.unlock();
+
+			if (changed) {
+				JsonDocument doc = new JsonDocument();
+				doc.append("uuid", user.getUniqueId());
+				doc.append("name", name);
+				doc.append("persistentData", persistentData);
+				saving.put(user.getUniqueId(), u);
+				database.containsAsync(user.getUniqueId().toString()).fireExceptionOnFailure()
+						.addListener(new ITaskListener<Boolean>() {
+							ITaskListener<Boolean> failureListener = new ITaskListener<Boolean>() {
+								@Override
+								public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+									saving.remove(user.getUniqueId());
+									new PacketUserPersistentDataSet(user.getUniqueId(),
+											persistentData).sendAsync();
+								}
+
+								@Override
+								public void onCancelled(ITask<Boolean> task) {
+									saving.remove(user.getUniqueId());
+									new IllegalStateException(
+											"DON'T CANCEL THIS TASK!!! THINGS MAY BREAK!!!").printStackTrace();
+								}
+
+								@Override
+								public void onFailure(ITask<Boolean> task, Throwable th) {
+									saving.remove(user.getUniqueId());
+									new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!",
+											th).printStackTrace();
+								}
+							};
+
+							@Override
+							public void onComplete(ITask<Boolean> task, Boolean t) {
+								if (t) {
+									database.updateAsync(user.getUniqueId().toString(), doc)
+											.fireExceptionOnFailure().addListener(failureListener);
+								} else {
+									database.insertAsync(user.getUniqueId().toString(), doc)
+											.fireExceptionOnFailure().addListener(failureListener);
+								}
+							}
+
+							@Override
+							public void onCancelled(ITask<Boolean> task) {
+								saving.remove(user.getUniqueId());
+								new IllegalStateException(
+										"CANT CANCEL THIS TASK!!! THINGS MAY BREAK!!!").printStackTrace();
+							}
+
+							@Override
+							public void onFailure(ITask<Boolean> task, Throwable th) {
+								saving.remove(user.getUniqueId());
+								new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!",
+										th).printStackTrace();
+							}
+						});
+			}
+			modifiers.forEach(m -> m.onUnload(u));
+			u.loaded(false);
+			users.remove(user.getUniqueId());
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	public AsyncWrapperUser getIfLoaded(UUID uuid) {
+		lock.readLock().lock();
+		BukkitUser bukkitUser = users.get(uuid);
 		lock.readLock().unlock();
-		return new AsyncWrapperUser(bu);
+		return bukkitUser == null ? null : new AsyncWrapperUser(bukkitUser);
 	}
 
 	@Override
@@ -177,133 +296,55 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		}
 	}
 
-	public AsyncWrapperUser getIfLoaded(UUID uuid) {
-		lock.readLock().lock();
-		BukkitUser bukkitUser = users.get(uuid);
-		lock.readLock().unlock();
-		return bukkitUser == null ? null : new AsyncWrapperUser(bukkitUser);
-	}
-
 	BukkitUser loadUser(UUID uuid) {
-		lock.writeLock().lock();
-		BukkitUser usaving = saving.get(uuid);
-		long time1 = System.currentTimeMillis();
-		String name = uuid.toString().substring(0, 16);
-		JsonDocument persistentData = new JsonDocument();
-		BukkitUser user;
-		if (usaving == null) {
-			if (users.containsKey(uuid)) {
-				return users.get(uuid);
+		try {
+			lock.writeLock().lock();
+			BukkitUser usaving = saving.get(uuid);
+			long time1 = System.currentTimeMillis();
+			String name = uuid.toString().substring(0, 16);
+			JsonDocument persistentData = new JsonDocument();
+			BukkitUser user;
+			if (usaving == null) {
+				if (users.containsKey(uuid)) {
+					return users.get(uuid);
+				}
+				if (database.contains(uuid.toString())) {
+					JsonDocument doc = database.get(uuid.toString());
+					uuid = UUID.fromString(doc.getString("uuid"));
+					name = doc.getString("name");
+					persistentData = doc.getDocument("persistentData");
+				}
+				user = new BukkitUser(uuid, name);
+			} else {
+				user = usaving;
 			}
-			if (database.contains(uuid.toString())) {
-				JsonDocument doc = database.get(uuid.toString());
-				uuid = UUID.fromString(doc.getString("uuid"));
-				name = doc.getString("name");
-				persistentData = doc.getDocument("persistentData");
+			long time2 = System.currentTimeMillis();
+			user.getPersistentDataStorage().getData().append(persistentData);
+			long time3 = System.currentTimeMillis();
+			users.put(user.getUniqueId(), user);
+			modifiers.forEach(m -> m.onLoad(user));
+			CloudNetDriver.getInstance().getEventManager().callEvent(new UserLoadEvent(user));
+			user.loaded(true);
+			if (System.currentTimeMillis() - time1 > 1000) {
+				DarkCubeSystem.getInstance().getLogger()
+						.info("Loading user took very long: " + (System.currentTimeMillis() - time1)
+								+ " | " + (System.currentTimeMillis() - time2) + " | " + (
+								System.currentTimeMillis() - time3));
 			}
-			user = new BukkitUser(uuid, name);
-		} else {
-			user = usaving;
-		}
-		long time2 = System.currentTimeMillis();
-		user.getPersistentDataStorage().getData().append(persistentData);
-		user.getCubes();
-		long time3 = System.currentTimeMillis();
-		user.getLanguage();
-		users.put(user.getUniqueId(), user);
-		modifiers.forEach(m -> m.onLoad(user));
-		CloudNetDriver.getInstance().getEventManager().callEvent(new UserLoadEvent(user));
-		user.loaded(true);
-		if (System.currentTimeMillis() - time1 > 1000) {
-			DarkCubeSystem.getInstance().getLogger()
-					.info("Loading user took very long: " + (System.currentTimeMillis() - time1)
-							+ " | " + (System.currentTimeMillis() - time2) + " | " + (
-							System.currentTimeMillis() - time3));
-		}
-		lock.writeLock().unlock();
-		return user;
-	}
-
-	@Override
-	public void unloadUser(User user) {
-		lock.writeLock().lock();
-		BukkitUser u = users.get(user.getUniqueId());
-		if (u == null) {
+			return user;
+		} finally {
 			lock.writeLock().unlock();
-			throw new IllegalArgumentException("User " + user.getName() + " is not loaded!");
 		}
-		CloudNetDriver.getInstance().getEventManager().callEvent(new UserUnloadEvent(u));
-		JsonDocument doc = new JsonDocument();
-		doc.append("uuid", user.getUniqueId());
-		doc.append("name", user.getName());
-		JsonDocument persistentData = new JsonDocument();
-		AsyncWrapperUser bu = (AsyncWrapperUser) user;
-		persistentData.append(bu.getPersistentDataStorage().getData());
-		doc.append("persistentData", persistentData);
-		saving.put(user.getUniqueId(), u);
-		database.containsAsync(user.getUniqueId().toString()).fireExceptionOnFailure()
-				.addListener(new ITaskListener<Boolean>() {
-					ITaskListener<Boolean> failureListener = new ITaskListener<Boolean>() {
-						@Override
-						public void onCancelled(ITask<Boolean> task) {
-							saving.remove(user.getUniqueId());
-							new IllegalStateException(
-									"DON'T CANCEL THIS TASK!!! THINGS MAY BREAK!!!").printStackTrace();
-						}
-
-						@Override
-						public void onFailure(ITask<Boolean> task, Throwable th) {
-							saving.remove(user.getUniqueId());
-							new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!",
-									th).printStackTrace();
-						}
-
-						@Override
-						public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
-							saving.remove(user.getUniqueId());
-						}
-					};
-
-					@Override
-					public void onComplete(ITask<Boolean> task, Boolean t) {
-						if (t) {
-							database.updateAsync(user.getUniqueId().toString(), doc)
-									.fireExceptionOnFailure().addListener(failureListener);
-						} else {
-							database.insertAsync(user.getUniqueId().toString(), doc)
-									.fireExceptionOnFailure().addListener(failureListener);
-						}
-					}
-
-					@Override
-					public void onCancelled(ITask<Boolean> task) {
-						saving.remove(user.getUniqueId());
-						new IllegalStateException(
-								"CANT CANCEL THIS TASK!!! THINGS MAY BREAK!!!").printStackTrace();
-					}
-
-					@Override
-					public void onFailure(ITask<Boolean> task, Throwable th) {
-						saving.remove(user.getUniqueId());
-						new IllegalStateException("TASK FAILED!!! THINGS MAY BREAK!!!",
-								th).printStackTrace();
-					}
-				});
-		modifiers.forEach(m -> m.onUnload(u));
-		u.loaded(false);
-		users.remove(user.getUniqueId());
-		lock.writeLock().unlock();
 	}
-
-	@Override
-	public void loadedUsersForEach(Consumer<? super User> consumer) {
-		lock.readLock().lock();
-		users.values().forEach(consumer);
-		lock.readLock().unlock();
-	}
-
 
 	public class UListener implements Listener {
+		@EventHandler(priority = EventPriority.HIGHEST)
+		public void handle(PlayerLoginEvent event) {
+			if (event.getResult() == Result.ALLOWED) {
+				loadUser(event.getPlayer().getUniqueId());
+			}
+		}
+
 		@EventHandler(priority = EventPriority.LOWEST)
 		public void handle(PlayerJoinEvent event) {
 			loadUser(event.getPlayer().getUniqueId());

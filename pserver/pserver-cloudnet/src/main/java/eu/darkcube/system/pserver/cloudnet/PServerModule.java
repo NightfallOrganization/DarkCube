@@ -1,18 +1,11 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
 package eu.darkcube.system.pserver.cloudnet;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.reflect.TypeToken;
 import de.dytanic.cloudnet.CloudNet;
@@ -29,14 +22,19 @@ import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PacketManager;
 import eu.darkcube.system.pserver.common.packet.packets.*;
 
-public class PServerModule extends DriverModule {
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
-	private static PServerModule instance;
+public class PServerModule extends DriverModule {
 
 	public static final String PLUGIN_NAME = new File(
 			PServerModule.class.getProtectionDomain().getCodeSource().getLocation()
 					.getPath()).getName();
-
+	private static PServerModule instance;
 	public Listener listener;
 
 	public String sqlDatabase;
@@ -50,6 +48,23 @@ public class PServerModule extends DriverModule {
 	public static String getSelf() {
 		return PServerModule.getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode()
 				.getUniqueId();
+	}
+
+	public static CloudNet getCloudNet() {
+		return CloudNet.getInstance();
+	}
+
+	public static PServerModule getInstance() {
+		return PServerModule.instance;
+	}
+
+	public static Collection<UniqueId> getCurrentPServerIDs() {
+		return PServerProvider.getInstance().getPServers().stream().map(PServer::getId)
+				.collect(Collectors.toList());
+	}
+
+	public static Collection<UniqueId> getUsedPServerIDs() {
+		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getUsedPServerIDs();
 	}
 
 	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.LOADED)
@@ -131,23 +146,6 @@ public class PServerModule extends DriverModule {
 
 	public List<String> getDeploymentExclusions() {
 		return Collections.unmodifiableList(this.deploymentExclusions);
-	}
-
-	public static final CloudNet getCloudNet() {
-		return CloudNet.getInstance();
-	}
-
-	public static PServerModule getInstance() {
-		return PServerModule.instance;
-	}
-
-	public static Collection<UniqueId> getCurrentPServerIDs() {
-		return PServerProvider.getInstance().getPServers().stream().map(PServer::getId)
-				.collect(Collectors.toList());
-	}
-
-	public static Collection<UniqueId> getUsedPServerIDs() {
-		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getUsedPServerIDs();
 	}
 
 }
