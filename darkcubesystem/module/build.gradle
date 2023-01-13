@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    withSourcesJar()
+}
+
+dependencies {
+    compileOnly cloudnet
+    compileOnly cloudnetBridge
+    compileOnly parent.project('core')
+}

@@ -8,6 +8,16 @@
       <module name="DarkCube.bukkit.commons.test" target="8" />
       <module name="DarkCube.bukkit.cubesapi.main" target="8" />
       <module name="DarkCube.bukkit.cubesapi.test" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.1.19.2.main" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.1.19.2.test" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.1.8.8.main" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.1.8.8.test" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.core.main" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.core.test" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.main" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.module.main" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.module.test" target="8" />
+      <module name="DarkCube.bukkit.darkcubesystem.test" target="8" />
       <module name="DarkCube.bukkit.inventoryapi.main" target="8" />
       <module name="DarkCube.bukkit.inventoryapi.test" target="8" />
       <module name="DarkCube.bukkit.languageapi.main" target="8" />

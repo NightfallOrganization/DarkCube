@@ -14,7 +14,7 @@ tasks {
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    compileOnly project(':bukkit:darkcubesystem')
+    compileOnly project(':darkcubesystem')
     compileOnly project(':pserver:pserver-bukkit')
     compileOnly project(':pserver:pserver-api')
     api project(':common:labymod-emotes')

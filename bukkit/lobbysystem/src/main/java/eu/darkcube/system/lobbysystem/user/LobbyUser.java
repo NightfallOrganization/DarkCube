@@ -61,8 +61,8 @@ public class LobbyUser {
 				.setIfNotPresent(REWARDSLOTSUSED, INTEGERS, new HashSet<>());
 		this.user.getPersistentDataStorage()
 				.setIfNotPresent(GADGET, TGADGET, Gadget.GRAPPLING_HOOK);
-		this.user.getPersistentDataStorage()
-				.setIfNotPresent(SELECTEDSLOT, PersistentDataTypes.INTEGER, 0);
+		this.user.getPersistentDataStorage().setIfNotPresent(SELECTEDSLOT, PersistentDataTypes.LONG,
+				System.currentTimeMillis());
 		long time2 = System.currentTimeMillis();
 		this.openInventory = new InventoryPlayer();
 		if (System.currentTimeMillis() - time1 > 1000) {

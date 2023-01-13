@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -17,6 +17,7 @@ import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.UUIDManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,6 +50,14 @@ public class ListenerLobbySwitcher extends BaseListener {
 			return;
 		}
 		p.closeInventory();
-		UUIDManager.getManager().getPlayerExecutor(p.getUniqueId()).connect(serverId);
+		UserWrapper.fromUser(user).setLastPosition(p.getLocation());
+		AsyncExecutor.service().submit(() -> {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException ex) {
+				throw new RuntimeException(ex);
+			}
+			UUIDManager.getManager().getPlayerExecutor(p.getUniqueId()).connect(serverId);
+		});
 	}
 }

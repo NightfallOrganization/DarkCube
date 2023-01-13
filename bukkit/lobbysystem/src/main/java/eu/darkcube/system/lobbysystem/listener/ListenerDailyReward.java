@@ -45,8 +45,7 @@ public class ListenerDailyReward extends BaseListener {
 			}
 		}
 
-		int cubes = minCubes + new Random().nextInt(maxCubes - minCubes + 1);
-		return cubes;
+		return minCubes + new Random().nextInt(maxCubes - minCubes + 1);
 	}
 
 	@EventHandler

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -75,6 +75,7 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 		if (c.get(Calendar.DAY_OF_YEAR) != c2.get(Calendar.DAY_OF_YEAR)
 				|| c.get(Calendar.YEAR) != c2.get(Calendar.YEAR)) {
 			this.user.setRewardSlotsUsed(new HashSet<>());
+			user.setLastDailyReward(System.currentTimeMillis());
 		}
 
 		ItemStack used = ItemBuilder.item(Material.SULPHUR)
@@ -133,9 +134,8 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void playSound0() {
-		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
-			p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
-		});
+		this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
+				.forEach(p -> p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1));
 	}
 
 	private ItemStack reward(ItemStack old, int reward) {
