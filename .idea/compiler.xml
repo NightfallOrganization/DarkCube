@@ -34,6 +34,17 @@
       <module name="DarkCube.cloudban.cloudban-common.test" target="8" />
       <module name="DarkCube.cloudban.cloudban-module.main" target="8" />
       <module name="DarkCube.cloudban.cloudban-module.test" target="8" />
+      <module name="DarkCube.darkcubesystem.1.19.2" target="17" />
+      <module name="DarkCube.darkcubesystem.1.19.2.main" target="17" />
+      <module name="DarkCube.darkcubesystem.1.19.2.test" target="17" />
+      <module name="DarkCube.darkcubesystem.1.8.8.main" target="8" />
+      <module name="DarkCube.darkcubesystem.1.8.8.test" target="8" />
+      <module name="DarkCube.darkcubesystem.core.main" target="8" />
+      <module name="DarkCube.darkcubesystem.core.test" target="8" />
+      <module name="DarkCube.darkcubesystem.main" target="8" />
+      <module name="DarkCube.darkcubesystem.module.main" target="8" />
+      <module name="DarkCube.darkcubesystem.module.test" target="8" />
+      <module name="DarkCube.darkcubesystem.test" target="8" />
       <module name="DarkCube.pserver.main" target="8" />
       <module name="DarkCube.pserver.pserver-common.main" target="8" />
       <module name="DarkCube.pserver.pserver-common.test" target="8" />
