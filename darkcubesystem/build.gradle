@@ -1,0 +1,28 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'java-library'
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+    }
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+java {
+    withSourcesJar()
+}
+
+dependencies {
+    api(project(path: 'core', configuration: 'shadow'))
+    runtimeOnly project(path: '1.8.8', configuration: 'default')
+    //println project(path: '1.19.2').getMetaPropertyValues()
+    runtimeOnly project(path: '1.19.2', configuration: 'reobf')
+    runtimeOnly project(path: 'module')
+}

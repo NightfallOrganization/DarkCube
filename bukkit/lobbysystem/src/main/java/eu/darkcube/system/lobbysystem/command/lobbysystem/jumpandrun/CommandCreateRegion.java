@@ -54,7 +54,7 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 					if (data.loc1 == null) {
 						data.loc1 = event.getBlock();
 						source.sendMessage(Component.text("Wähle nun die zweite Ecke aus!")
-								.color(NamedTextColor.RED));
+								.color(NamedTextColor.GOLD));
 					} else if (data.loc2 == null) {
 						data.loc2 = event.getBlock();
 						data.stopCreating();
@@ -101,7 +101,7 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 				int distZ = Math.abs(loc1.getZ() - loc2.getZ());
 				int distY = Math.abs(loc1.getY() - loc2.getY());
 				if (distX < 30 || distZ < 30 || distY < 15) {
-					l.source.sendMessage(Component.text("Die Region müss größer als 30x15x30 sein")
+					l.source.sendMessage(Component.text("Die Region muss größer als 30x15x30 sein")
 							.color(NamedTextColor.RED));
 					return;
 				}
@@ -111,8 +111,8 @@ public class CommandCreateRegion extends LobbyCommandExecutor {
 				JaRRegion reg = new JaRRegion(loc1.getWorld(), x, y, z, distX, distY, distZ);
 				Lobby.getInstance().getJaRManager().getRegions().add(reg);
 				Lobby.getInstance().getJaRManager().saveRegions();
-				l.source.sendMessage(Component.text("Die Blöcke sind nicht in der gleichen Welt!")
-						.color(NamedTextColor.GREEN));
+				l.source.sendMessage(
+						Component.text("Region erstellt!").color(NamedTextColor.GREEN));
 			}
 		}
 	}

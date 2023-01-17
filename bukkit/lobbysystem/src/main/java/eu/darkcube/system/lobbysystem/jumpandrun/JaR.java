@@ -178,6 +178,9 @@ public class JaR {
 		int depth = 1;
 		JarNode current = node;
 		while (depth < PREGEN) {
+			if (current.last) {
+				return;
+			}
 			if (current.next != null) {
 				current = current.next;
 				build(current);

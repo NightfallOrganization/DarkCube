@@ -211,6 +211,8 @@ public class ConnectorNPC {
 
 	public void show() {
 		npcs.add(this);
+		if (location.getWorld() == null)
+			location.setWorld(Bukkit.getWorlds().get(0));
 		Profile profile =
 				new Profile(new UUID(new Random().nextLong(), 0), ProfileUtils.randomName(),
 						Collections.singleton(new DailyRewardNPC.DailyRewardSkin()));
