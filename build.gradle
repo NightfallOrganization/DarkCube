@@ -1,13 +1,4 @@
 ext {
-    cloudnetVersion = '3.4.5-RELEASE'
-
-    cloudnetDriver = "de.dytanic.cloudnet:cloudnet-driver:$cloudnetVersion"
-    cloudnet = "de.dytanic.cloudnet:cloudnet:$cloudnetVersion"
-    cloudnetBridge = "de.dytanic.cloudnet:cloudnet-bridge:$cloudnetVersion"
-    cloudnetWrapper = "de.dytanic.cloudnet:cloudnet-wrapper-jvm:$cloudnetVersion"
-    bungee = "net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT"
-    luckperms = "net.luckperms:api:5.4"
-    protocollib = "com.comphenix.protocol:ProtocolLib:4.8.0"
     shadow = "com.github.johnrengelman.shadow"
 }
 
@@ -30,7 +21,7 @@ allprojects {
         maven { url = 'https://repo.cloudnetservice.eu/repository/releases/' }
         maven { url = 'https://repo.cloudnetservice.eu/repository/snapshots/' }
         maven { url = 'https://repo.viaversion.com' }
-        maven { url "https://repo.dmulloy2.net/repository/public/" }
+        maven { url = 'https://repo.dmulloy2.net/repository/public/' }
         maven { url = 'https://jitpack.io' }
     }
 

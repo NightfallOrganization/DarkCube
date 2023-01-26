@@ -8,7 +8,7 @@ plugins {
 dependencies {
     paperweightDevelopmentBundle('io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT')
     implementation project(path: parent.project('core').path, configuration: 'shadow')
-    compileOnly cloudnetDriver
+    compileOnly libs.cloudnetDriver
 }
 
 java {

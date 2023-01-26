@@ -20,7 +20,7 @@ java {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     compileOnlyApi 'com.viaversion:viaversion-api:4.4.2'
-    compileOnlyApi cloudnetDriver
+    compileOnlyApi libs.cloudnetDriver
     api project(path: ':adventure', configuration: 'shadow')
     api 'com.github.juliarn:npc-lib:2.6-RELEASE'
     api 'com.mojang:brigadier:1.0.17'

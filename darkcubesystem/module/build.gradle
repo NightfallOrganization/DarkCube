@@ -7,7 +7,7 @@ java {
 }
 
 dependencies {
-    compileOnly cloudnet
-    compileOnly cloudnetBridge
+    compileOnly libs.cloudnet
+    compileOnly libs.cloudnetBridge
     compileOnly parent.project('core')
 }

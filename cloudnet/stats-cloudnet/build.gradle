@@ -1,5 +1,5 @@
 dependencies {
     implementation project(':bukkit:statsapi')
-    implementation cloudnet
+    implementation libs.cloudnet
     implementation "mysql:mysql-connector-java:5.1.47"
 }

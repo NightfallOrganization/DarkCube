@@ -16,8 +16,8 @@ tasks {
 }
 
 dependencies {
-    compileOnlyApi cloudnet
-    compileOnlyApi cloudnetBridge
+    compileOnlyApi libs.cloudnet
+    compileOnlyApi libs.cloudnetBridge
     api project(':pserver:pserver-api')
     runtimeOnly project(':pserver:pserver-bukkit')
 }

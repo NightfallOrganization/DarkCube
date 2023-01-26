@@ -1,6 +1,6 @@
 {
 	"runtimeModule": true,
-	"group": "de.pixel.cloudnet.modules",
+	"group": "eu.darkcube.system.modules",
 	"name": "PServer",
 	"version": "1.0",
 	"author": "DasBabyPixel",

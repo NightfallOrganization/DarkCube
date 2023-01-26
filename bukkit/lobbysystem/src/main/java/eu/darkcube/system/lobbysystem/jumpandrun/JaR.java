@@ -36,6 +36,7 @@ public class JaR {
 	JaRListener jaRListener;
 	BukkitRunnable particles;
 	JarNode node;
+	JarNode fallbackNode = null;
 	JarNode oldNode = null;
 	boolean destroyed = false;
 
@@ -47,6 +48,9 @@ public class JaR {
 		(particles = new BukkitRunnable() {
 			@Override
 			public void run() {
+				JarNode node = JaR.this.node;
+				if (node == null)
+					node = fallbackNode;
 				if (node == null)
 					return;
 				ParticleEffect.VILLAGER_HAPPY.display(0.2F, 0.2F, 0.2F, 1, 1,
@@ -65,6 +69,7 @@ public class JaR {
 		if (node != null)
 			deleteAll(node);
 		oldNode = null;
+		fallbackNode = node;
 		node = null;
 		generate();
 		if (getCurrentBlock() != null)

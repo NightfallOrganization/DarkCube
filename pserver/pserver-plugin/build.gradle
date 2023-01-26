@@ -7,5 +7,5 @@ dependencies {
     implementation project(':pserver:pserver-api')
     implementation project(':darkcubesystem')
     implementation project(':bukkit:woolbattle')
-    implementation luckperms
+    implementation libs.luckperms
 }

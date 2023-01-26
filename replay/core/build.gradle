@@ -1,0 +1,9 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api parent.project('api')
+    compileOnlyApi project(':darkcubesystem')
+    compileOnlyApi libs.cloudnetDriver
+}

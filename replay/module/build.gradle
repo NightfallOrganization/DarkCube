@@ -1,0 +1,8 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    compileOnly parent.project('core')
+    compileOnly libs.cloudnet
+}
