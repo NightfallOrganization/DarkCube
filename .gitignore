@@ -17,6 +17,7 @@ gradle-app.setting
 .project
 .settings/
 bin
+.idea/.name
 
 .idea/**/gradle.xml
 .idea/**/libraries
@@ -40,5 +41,5 @@ bin
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-.idea/**/modules
+.idea/modules
 .idea/modules.xml
