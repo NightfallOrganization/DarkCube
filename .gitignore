@@ -41,3 +41,4 @@ bin
 .idea/**/dbnavigator.xml
 
 .idea/**/modules
+.idea/modules.xml

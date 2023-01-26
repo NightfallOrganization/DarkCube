@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.darkessentials.command;
 
 import eu.darkcube.system.commandapi.v3.CommandSource;
@@ -37,6 +36,7 @@ public class CommandSpawner extends EssentialsCommand implements Listener {
 			PersistentDataTypes.enumType(EntityType.class);
 	private static final Key spawnerType = new Key(DarkEssentials.getInstance(), "spawnerType");
 
+	@SuppressWarnings("deprecation")
 	public CommandSpawner() {
 		super("spawner", b -> b.then(Commands.argument("type",
 						EnumArgument.enumArgument(EntityType.values(),
@@ -51,6 +51,7 @@ public class CommandSpawner extends EssentialsCommand implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, DarkEssentials.getInstance());
 	}
 
+	@SuppressWarnings("deprecation")
 	private static int execute(CommandSource source, EntityType type, Collection<Player> players) {
 		String name = type.getName();
 		ItemStack item =

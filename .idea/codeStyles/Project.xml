@@ -34,7 +34,7 @@
       <option name="KEEP_BLANK_LINES_BETWEEN_PACKAGE_DECLARATION_AND_HEADER" value="0" />
       <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
       <option name="BLANK_LINES_BEFORE_IMPORTS" value="0" />
-      <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
       <option name="ALIGN_MULTILINE_THROWS_LIST" value="true" />
       <option name="ALIGN_THROWS_KEYWORD" value="true" />
       <option name="ALIGN_MULTILINE_EXTENDS_LIST" value="true" />
@@ -58,6 +58,7 @@
       <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
       <option name="VARIABLE_ANNOTATION_WRAP" value="2" />
       <option name="ENUM_CONSTANTS_WRAP" value="5" />
+      <option name="WRAP_ON_TYPING" value="1" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
         <option name="SMART_TABS" value="true" />

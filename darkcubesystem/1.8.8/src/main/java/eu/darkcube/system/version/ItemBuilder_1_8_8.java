@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.version;
 
 import com.mojang.authlib.GameProfile;
@@ -41,7 +40,7 @@ public class ItemBuilder_1_8_8 extends AbstractItemBuilder {
 
 	private static final Field CraftMetaSkull$profile =
 			ReflectionUtils.getField("CraftMetaSkull", PackageType.CRAFTBUKKIT_INVENTORY, true,
-					"profile");
+			                         "profile");
 
 	public ItemBuilder_1_8_8() {
 	}
@@ -52,12 +51,15 @@ public class ItemBuilder_1_8_8 extends AbstractItemBuilder {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			unbreakable(meta.spigot().isUnbreakable());
-			displayname(meta.getDisplayName());
+			displayname(
+					LegacyComponentSerializer.legacySection().deserialize(meta.getDisplayName()));
 			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
 				enchant(e.getKey(), e.getValue());
 			}
 			setFlags(meta.getItemFlags());
-			lores(meta.hasLore() ? meta.getLore() : new ArrayList<>());
+			lore(meta.hasLore() ? meta.getLore().stream()
+					.map(LegacyComponentSerializer.legacySection()::deserialize)
+					.collect(Collectors.toList()) : new ArrayList<>());
 			damage(item.getDurability());
 			if (meta instanceof FireworkEffectMeta)
 				meta(FireworkBuilderMeta.class).setFireworkEffect(
@@ -101,12 +103,12 @@ public class ItemBuilder_1_8_8 extends AbstractItemBuilder {
 			}
 			meta.addItemFlags(flags.toArray(new ItemFlag[0]));
 			meta.setLore(lore.stream().map(LegacyComponentSerializer.legacySection()::serialize)
-					.collect(Collectors.toList()));
+					             .collect(Collectors.toList()));
 			if (glow) {
 				if (enchantments.isEmpty()) {
 					meta.addEnchant(material == Material.BOW
-							? Enchantment.PROTECTION_ENVIRONMENTAL
-							: Enchantment.ARROW_INFINITE, 1, true);
+							                ? Enchantment.PROTECTION_ENVIRONMENTAL
+							                : Enchantment.ARROW_INFINITE, 1, true);
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				}
 			}
@@ -123,8 +125,8 @@ public class ItemBuilder_1_8_8 extends AbstractItemBuilder {
 							owner.getName());
 					if (texture != null)
 						profile.getProperties().put("textures",
-								new Property("textures", texture.getValue(),
-										texture.getSignature()));
+						                            new Property("textures", texture.getValue(),
+						                                         texture.getSignature()));
 					ReflectionUtils.setValue(meta, CraftMetaSkull$profile, profile);
 				} else if (builderMeta instanceof LeatherArmorBuilderMeta) {
 					((LeatherArmorMeta) meta).setColor(
