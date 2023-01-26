@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.npc;
 
 import com.github.unldenis.hologram.AbstractLine;
@@ -300,7 +299,6 @@ public class ConnectorNPC {
 		}
 	}
 
-
 	private class ConnectorHologram extends Hologram {
 
 		private final AbstractLine<?> l1;
@@ -308,6 +306,7 @@ public class ConnectorNPC {
 		private final Method show, hide;
 		private volatile boolean l2visible = false;
 
+		@SuppressWarnings("deprecation")
 		public ConnectorHologram(Location location) {
 			super(Lobby.getInstance(), location, hologramPlaceholders(),
 					new Object[] {"%%online%%", false}, new Object[] {"%%description%%", false});
@@ -357,7 +356,6 @@ public class ConnectorNPC {
 			ReflectionUtils.invokeMethod(line, hide, player);
 		}
 	}
-
 
 	public class CurrentServer {
 

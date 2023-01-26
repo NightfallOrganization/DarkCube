@@ -49,6 +49,7 @@ public class ListenerSlimePlatform extends BasicPerkListener {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     private void setBlock(Location block, ArrayList<Block> l) {
         if (block.getBlock().getType() == Material.AIR) {
             block.getBlock().setType(Material.STAINED_CLAY);

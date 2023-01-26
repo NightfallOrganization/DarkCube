@@ -4,13 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.pserver;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelectionWoolBattle;
 import eu.darkcube.system.lobbysystem.util.Item;
@@ -28,12 +29,12 @@ public class PServerDataManager {
 			if (data.contains("task")) {
 				ItemBuilder b =
 						PServerDataManager.getDisplayItemGamemode(user, data.getString("task"));
-				b.lore("§7ID: " + pserverId);
+				b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
 				return b;
 			}
 			ItemBuilder b = ItemBuilder.item(SkullCache.getCachedItem(user.getUniqueId()));
 			b.displayname(Item.WORLD_PSERVER.getDisplayName(user));
-			b.lore("§7ID: " + pserverId);
+			b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
 			return b;
 		}
 		return null;
@@ -51,7 +52,7 @@ public class PServerDataManager {
 			}
 		}
 		ItemBuilder b = ItemBuilder.item(Material.BARRIER);
-		b.displayname("§cTask not found: " + task);
+		b.displayname(Component.text("Task not found: " + task).color(NamedTextColor.RED));
 		return b;
 	}
 }

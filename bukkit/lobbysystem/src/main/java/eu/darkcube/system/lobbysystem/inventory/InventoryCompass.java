@@ -4,12 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
@@ -30,14 +31,14 @@ public class InventoryCompass extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void insertFallbackItems() {
-		ItemStack m =
-				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(2).displayname("§6").build();
-		ItemStack p =
-				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(10).displayname("§6").build();
-		ItemStack l =
-				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(7).displayname("§6").build();
-		ItemStack d =
-				ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(15).displayname("§6").build();
+		ItemStack m = ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(2)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
+		ItemStack p = ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(10)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
+		ItemStack l = ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(7)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
+		ItemStack d = ItemBuilder.item(Material.STAINED_GLASS_PANE).damage(15)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
 		this.fallbackItems.put(IInventory.slot(1, 1), p);
 		this.fallbackItems.put(IInventory.slot(1, 2), m);
 		this.fallbackItems.put(IInventory.slot(1, 3), p);

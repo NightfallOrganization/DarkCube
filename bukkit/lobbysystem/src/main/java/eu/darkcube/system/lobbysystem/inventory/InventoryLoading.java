@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -12,6 +11,7 @@ import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
@@ -49,7 +49,8 @@ public class InventoryLoading extends LobbyAsyncPagedInventory {
 		// Arrays.fill(this.TOTAL_SORT, 0);
 		this.inventoryFunction = inventoryFunction;
 
-		final ItemStack loading = ItemBuilder.item(Material.BARRIER).displayname(" ").build();
+		final ItemStack loading = ItemBuilder.item(Material.BARRIER)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
 		this.iterator = new PositionedIterator<>(
 				new ItemStack[] {loading, loading, loading, loading, loading, null, null, null});
 	}
@@ -105,7 +106,8 @@ public class InventoryLoading extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void playSound0() {}
+	protected void playSound0() {
+	}
 
 	private class Runner {
 

@@ -39,8 +39,6 @@ public class Holograms extends DarkCubePlugin implements Listener {
 							if (this.editing.contains(p)) {
 								return 0;
 							}
-							UserAPI.getInstance().getUser(p).openBook(
-									eu.darkcube.system.libs.net.kyori.adventure.inventory.Book.builder().);
 							Book book = new Book();
 							book.addPage(new CustomComponentBuilder("tasdasd").event(
 											new HoverEvent(HoverEvent.Action.SHOW_TEXT,

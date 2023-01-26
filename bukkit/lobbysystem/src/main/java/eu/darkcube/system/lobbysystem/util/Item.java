@@ -77,7 +77,7 @@ public enum Item {
 	WORLD_PSERVER(ItemBuilder.item(GRASS)),
 	GAME_PSERVER(ItemBuilder.item(DIAMOND_SWORD)),
 	GAMESERVER_WOOLBATTLE(ItemBuilder.item(BOW)),
-	PSERVER_DELETE(ItemBuilder.item(TNT).lore("")),
+	PSERVER_DELETE(ItemBuilder.item(TNT).lore(Component.empty())),
 	CONFIRM(ItemBuilder.item(INK_SACK).damage(10)),
 	CANCEL(ItemBuilder.item(INK_SACK).damage(1)),
 	START_PSERVER(ItemBuilder.item(INK_SACK).damage(2)),

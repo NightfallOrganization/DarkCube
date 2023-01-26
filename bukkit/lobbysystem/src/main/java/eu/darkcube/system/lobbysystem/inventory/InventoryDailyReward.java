@@ -4,13 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Message;
@@ -80,7 +81,8 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
 		ItemStack used = ItemBuilder.item(Material.SULPHUR)
 				.displayname(Message.REWARD_ALREADY_USED.getMessage(this.user.getUser())).build();
-		ItemStack unused = ItemBuilder.item(Material.GLOWSTONE_DUST).displayname("§e???").build();
+		ItemStack unused = ItemBuilder.item(Material.GLOWSTONE_DUST)
+				.displayname(Component.text("???").color(NamedTextColor.YELLOW)).build();
 		Set<Integer> usedSlots = this.user.getRewardSlotsUsed();
 		if (usedSlots.contains(1)) {
 			items.put(21, reward(used, 1));
@@ -101,8 +103,8 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void insertFallbackItems() {
-		ItemStack l =
-				ItemBuilder.item(Material.STAINED_GLASS_PANE).displayname("§6").damage(7).build();
+		ItemStack l = ItemBuilder.item(Material.STAINED_GLASS_PANE)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).damage(7).build();
 		this.fallbackItems.put(IInventory.slot(1, 1), l);
 		this.fallbackItems.put(IInventory.slot(1, 2), l);
 		this.fallbackItems.put(IInventory.slot(1, 3), l);

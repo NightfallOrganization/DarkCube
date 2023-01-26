@@ -309,6 +309,7 @@ public final class CustomArmor {
 		return item;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static ItemStack getStarterSwordItem() {
 		ItemStack item = new ItemStack(Material.STONE_SWORD);
 		ItemMeta meta = item.getItemMeta();

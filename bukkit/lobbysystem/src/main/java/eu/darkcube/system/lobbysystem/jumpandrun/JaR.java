@@ -296,6 +296,7 @@ public class JaR {
 	//				.setType(Material.DIAMOND_BLOCK);
 	//	}
 
+	@SuppressWarnings("deprecation")
 	private void build(JarNode node) {
 		Block block = node.block.toLocation(node.region.world).getBlock();
 		if (node.last) {
