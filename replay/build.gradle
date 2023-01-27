@@ -21,8 +21,8 @@ java {
 
 dependencies {
     api project(path: 'api')
-    runtimeOnly project(path: 'core', configuration: 'default')
-    runtimeOnly project(path: '1.8.8', configuration: 'default')
+    runtimeOnly project(path: 'bukkit', configuration: 'default')
+    runtimeOnly project(path: 'bukkit:1.8.8', configuration: 'default')
     //runtimeOnly project(path: '1.19.2', configuration: 'reobf')
     runtimeOnly project(path: 'module')
 }

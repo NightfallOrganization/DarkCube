@@ -49,7 +49,8 @@ include 'pserver:pserver-api'
 include 'pserver:pserver-bukkit'
 include 'pserver:pserver-cloudnet'
 include 'pserver:pserver-plugin'
-includeSubProjects('replay', '1.8.8', 'api', 'core', 'module')
+includeSubProjects('replay', 'api', 'module')
+includeSubProjects('replay:bukkit', '1.8.8')
 
 def includeSubProjects(String rootProject, String... subProjects) {
     include rootProject

@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    compileOnly parent.project('core')
+    compileOnly parent
 }
