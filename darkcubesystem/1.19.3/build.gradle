@@ -1,12 +1,12 @@
 import java.nio.charset.StandardCharsets
 
 plugins {
-    id 'io.papermc.paperweight.userdev' version '1.4.0'
+    id 'io.papermc.paperweight.userdev'
     id 'java-library'
 }
 
 dependencies {
-    paperweightDevelopmentBundle('io.papermc.paper:dev-bundle:1.19.2-R0.1-SNAPSHOT')
+    paperweightDevelopmentBundle('io.papermc.paper:dev-bundle:1.19.3-R0.1-SNAPSHOT')
     implementation project(path: parent.project('core').path, configuration: 'shadow')
     compileOnly libs.cloudnetDriver
 }
@@ -15,6 +15,7 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
     withSourcesJar()
 }
+
 
 tasks {
     reobfJar {

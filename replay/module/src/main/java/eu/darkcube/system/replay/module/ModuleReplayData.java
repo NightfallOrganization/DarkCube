@@ -74,4 +74,7 @@ public class ModuleReplayData implements ReplayData {
 		return path;
 	}
 
+	public ReplayModule module() {
+		return module;
+	}
 }

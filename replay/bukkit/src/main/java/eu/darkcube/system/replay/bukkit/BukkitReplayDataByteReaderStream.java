@@ -4,8 +4,9 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.replay.module;
+package eu.darkcube.system.replay.bukkit;
 
+import eu.darkcube.system.replay.api.ReplayData;
 import eu.darkcube.system.replay.api.ReplayDataByteReaderStream;
 
 import java.io.IOException;
@@ -13,13 +14,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ModuleReplayDataByteReaderStream implements ReplayDataByteReaderStream {
+public class BukkitReplayDataByteReaderStream implements ReplayDataByteReaderStream {
 	private final SeekableByteChannel channel;
 	private final AtomicLong pos = new AtomicLong(0);
 	private final ByteBuffer lbuf;
 	private volatile long length = -1;
 
-	public ModuleReplayDataByteReaderStream(SeekableByteChannel channel) {
+	public BukkitReplayDataByteReaderStream(SeekableByteChannel channel) {
 		this.channel = channel;
 		try {
 			channel.position(channel.position() + 8);

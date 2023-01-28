@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.version;
 
 import eu.darkcube.system.DarkCubeSystem;
@@ -17,9 +16,9 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R1.command.CraftCommandMap;
-import org.bukkit.craftbukkit.v1_19_R1.command.VanillaCommandWrapper;
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R2.command.CraftCommandMap;
+import org.bukkit.craftbukkit.v1_19_R2.command.VanillaCommandWrapper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
