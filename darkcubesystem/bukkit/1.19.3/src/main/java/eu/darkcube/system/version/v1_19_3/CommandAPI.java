@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.version.v1_19_3;
 
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
@@ -16,7 +16,10 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.version.Version;
 import eu.darkcube.system.version.ViaSupport;
 import org.bukkit.Bukkit;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R2.command.CraftCommandMap;
 import org.bukkit.craftbukkit.v1_19_R2.command.VanillaCommandWrapper;
@@ -74,7 +77,7 @@ public class CommandAPI implements Version.CommandAPI {
 			}
 			final String[] aliases = command.getAliases();
 			final PluginCommand plugincommand =
-					constructor.newInstance(name, DarkCubeSystem.getInstance());
+					constructor.newInstance(name, DarkCubePlugin.systemPlugin());
 			plugincommand.setAliases(Arrays.asList(aliases));
 			plugincommand.setUsage("/" + name);
 			plugincommand.setPermission(command.getPermission());
@@ -83,8 +86,8 @@ public class CommandAPI implements Version.CommandAPI {
 			Field ftimings = plugincommand.getClass().getField("timings");
 			Method timingsOf = Class.forName("co.aikar.timings.Timings")
 					.getMethod("of", Plugin.class, String.class);
-			ftimings.set(plugincommand, timingsOf.invoke(null, DarkCubeSystem.getInstance(),
-					DarkCubeSystem.getInstance().getName() + ":" + command.getName()));
+			ftimings.set(plugincommand, timingsOf.invoke(null, DarkCubePlugin.systemPlugin(),
+					DarkCubePlugin.systemPlugin().getName() + ":" + command.getName()));
 			SimpleCommandMap commandMap = ((CraftServer) Bukkit.getServer()).getCommandMap();
 			final Map<String, org.bukkit.command.Command> knownCommands =
 					commandMap.getKnownCommands();
@@ -165,9 +168,9 @@ public class CommandAPI implements Version.CommandAPI {
 		boolean work = false;
 		if (known.containsKey(key)) {
 			org.bukkit.command.Command ex = known.get(key);
-			DarkCubeSystem.getInstance().getLogger().warning(
+			DarkCubePlugin.systemPlugin().getLogger().warning(
 					"[CommandAPI] Failed to register command: Command with that name already exists");
-			DarkCubeSystem.getInstance().getLogger()
+			DarkCubePlugin.systemPlugin().getLogger()
 					.warning("[CommandAPI] Command: " + key + " - " + ex);
 			if (!alias) {
 				command.setLabel(key);
@@ -185,9 +188,9 @@ public class CommandAPI implements Version.CommandAPI {
 			if (ex instanceof VanillaCommandWrapper) {
 				work = true;
 			} else {
-				DarkCubeSystem.getInstance().getLogger().warning(
+				DarkCubePlugin.systemPlugin().getLogger().warning(
 						"[CommandAPI] Failed to register command: Command with that name already exists");
-				DarkCubeSystem.getInstance().getLogger()
+				DarkCubePlugin.systemPlugin().getLogger()
 						.warning("[CommandAPI] Command: " + name + " - " + ex);
 			}
 		} else {

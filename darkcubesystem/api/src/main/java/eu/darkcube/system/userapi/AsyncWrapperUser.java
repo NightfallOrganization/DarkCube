@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.userapi;
 
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.data.UserPersistentDataStorage;
@@ -52,7 +52,7 @@ class AsyncWrapperUser implements User {
 			} else {
 				cur = api.users.get(uuid);
 				if (cur == null) {
-					DarkCubeSystem.getInstance().getLogger().warning(
+					DarkCubePlugin.systemPlugin().getLogger().warning(
 							"[UserAPI] User was loaded by accessing object. This most likely "
 									+ "indicates a memory leak! Use User#isLoaded before you use a "
 									+ "User object if the user is not online!");

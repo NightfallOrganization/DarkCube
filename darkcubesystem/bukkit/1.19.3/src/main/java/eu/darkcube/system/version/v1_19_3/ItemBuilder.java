@@ -10,7 +10,7 @@ package eu.darkcube.system.version.v1_19_3;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.BuilderMeta;
 import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
@@ -36,7 +36,7 @@ import java.util.UUID;
 public class ItemBuilder extends AbstractItemBuilder {
 
 	private static final NamespacedKey persistentDataKey =
-			new NamespacedKey(DarkCubeSystem.getInstance(), "persistentDataStorage");
+			new NamespacedKey(DarkCubePlugin.systemPlugin(), "persistentDataStorage");
 
 	public ItemBuilder() {
 	}

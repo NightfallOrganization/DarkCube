@@ -8,11 +8,11 @@
 package eu.darkcube.system.inventoryapi.v1;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
@@ -77,7 +77,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 		this.insertDefaultItems();
 		this.listener = new PagedListener();
-		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubeSystem.getInstance());
+		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubePlugin.systemPlugin());
 		this.startAnimation();
 	}
 

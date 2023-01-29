@@ -4,10 +4,8 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.commandapi.v3;
 
-import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.Language;
@@ -19,9 +17,11 @@ import org.bukkit.entity.Player;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.logging.Logger;
 
 public class BukkitCommandExecutor implements ILanguagedCommandExecutor, ForwardingAudience {
 
+	private static final Logger logger = Logger.getLogger("System");
 	private CommandSender sender;
 	private Audience audience;
 
@@ -49,7 +49,7 @@ public class BukkitCommandExecutor implements ILanguagedCommandExecutor, Forward
 		if (sender instanceof Player) {
 			UserAPI.getInstance().getUser((Player) sender).setLanguage(language);
 		}
-		DarkCubeSystem.getInstance().getLogger().warning("Can't set language of the console!");
+		logger.warning("Can't set language of the console!");
 	}
 
 	@Override

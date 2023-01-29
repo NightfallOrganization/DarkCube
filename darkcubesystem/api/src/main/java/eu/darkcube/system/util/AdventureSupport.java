@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.util;
 
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.libs.net.kyori.adventure.platform.bukkit.BukkitAudiences;
 
 public class AdventureSupport {
@@ -16,7 +16,7 @@ public class AdventureSupport {
 
 	public static BukkitAudiences audienceProvider() {
 		if (audienceProvider == null) {
-			audienceProvider = BukkitAudiences.create(DarkCubeSystem.getInstance());
+			audienceProvider = BukkitAudiences.create(DarkCubePlugin.systemPlugin());
 		}
 		return audienceProvider;
 	}

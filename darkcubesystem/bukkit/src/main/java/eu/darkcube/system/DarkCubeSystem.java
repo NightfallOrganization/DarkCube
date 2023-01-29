@@ -4,11 +4,12 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system;
 
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.arguments.EntityOptions;
+import eu.darkcube.system.link.LinkManager;
+import eu.darkcube.system.link.luckperms.LuckPermsLink;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.BukkitUserAPI;
 import eu.darkcube.system.userapi.UserAPI;
@@ -24,8 +25,10 @@ import java.util.Objects;
 
 public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 	private static DarkCubeSystem instance;
+	private final LinkManager linkManager = new LinkManager();
 
 	public DarkCubeSystem() {
+		DarkCubePlugin.systemPlugin(this);
 		instance = this;
 	}
 
@@ -40,6 +43,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		EntityOptions.registerOptions();
 		PacketAPI.init();
 		CommandAPI.init(this);
+		linkManager.addLink(LuckPermsLink::new);
 	}
 
 	@Override
@@ -48,6 +52,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		AsyncExecutor.stop();
 		AdventureSupport.audienceProvider().close();
 		Plugin.saveStorages();
+		linkManager.unregisterLinks();
 	}
 
 	@Override

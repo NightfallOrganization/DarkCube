@@ -80,7 +80,7 @@ public class PServerPlugin extends DarkCubePlugin {
 		api.register(new KillCommand());
 		api.register(new CommandsCommand());
 		api.register(new EffectCommand());
-		api.register(new UsersCommand());
+//		api.register(new UsersCommand());
 		api.register(new CommandBlockCommand());
 
 		new InactivityListener();

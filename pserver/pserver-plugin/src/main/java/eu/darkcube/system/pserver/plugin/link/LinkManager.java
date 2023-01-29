@@ -19,7 +19,7 @@ public class LinkManager {
 		try {
 			this.links.add(supplier.get());
 			success = true;
-		} catch (Throwable ex) {
+		} catch (Throwable ignored) {
 		}
 		return success;
 	}

@@ -21,7 +21,7 @@ public abstract class Link implements Closeable {
 	protected abstract void unlink();
 
 	@Override
-	public final void close() throws IOException {
+	public final void close() {
 		unlink();
 	}
 }

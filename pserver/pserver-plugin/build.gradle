@@ -4,8 +4,8 @@ plugins {
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    implementation project(':pserver:pserver-api')
-    implementation project(':darkcubesystem')
-    implementation project(':bukkit:woolbattle')
-    implementation libs.luckperms
+    compileOnly project(':pserver:pserver-api')
+    compileOnly project(':darkcubesystem')
+    compileOnly project(':bukkit:woolbattle')
+    compileOnly libs.luckperms
 }

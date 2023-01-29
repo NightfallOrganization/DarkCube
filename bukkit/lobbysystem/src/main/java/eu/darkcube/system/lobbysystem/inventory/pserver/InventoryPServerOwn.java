@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -52,6 +51,8 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
+		if (!user.getUser().isLoaded())
+			return;
 		super.fillItems(items);
 		Player p = user.getUser().asPlayer();
 		if (p == null)
@@ -110,7 +111,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 			items.put(slot, item.build());
 		}
 		for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize;
-				slot < pagesize; slot++) {
+		     slot < pagesize; slot++) {
 			items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
 		}
 	}

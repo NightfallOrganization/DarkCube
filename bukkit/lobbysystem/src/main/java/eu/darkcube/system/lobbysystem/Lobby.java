@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem;
 
 import com.github.unldenis.hologram.HologramPool;
@@ -252,7 +251,7 @@ public class Lobby extends Plugin {
 		p.setFoodLevel(20);
 		p.setExp(1);
 		PlayerInventory inv = p.getInventory();
-		inv.setHeldItemSlot(user.getSelectedSlot());
+		inv.setHeldItemSlot(Math.max(Math.min(user.getSelectedSlot(), 8), 0));
 
 		Location l = user.getLastPosition();
 		if (!dataManager.getBorder().isInside(l)) {

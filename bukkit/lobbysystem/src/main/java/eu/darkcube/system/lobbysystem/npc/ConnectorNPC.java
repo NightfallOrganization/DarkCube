@@ -50,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -173,7 +174,7 @@ public class ConnectorNPC {
 					UserAPI.getInstance().getUser(p), online, maxplayers);
 		});
 		h.add("%%description%%", p -> {
-			Info server = currentServer.newServer;
+			Info server = currentServer.server;
 			if (server != null) {
 				return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(
 						UserAPI.getInstance().getUser(p), server.motd);
@@ -304,14 +305,15 @@ public class ConnectorNPC {
 		private final AbstractLine<?> l1;
 		private final AbstractLine<?> l2;
 		private final Method show, hide;
-		private volatile boolean l2visible = false;
+		private final Set<Player> l2visible = new CopyOnWriteArraySet<>();
 
 		@SuppressWarnings("deprecation")
 		public ConnectorHologram(Location location) {
+			//noinspection UnstableApiUsage
 			super(Lobby.getInstance(), location, hologramPlaceholders(),
 					new Object[] {"%%online%%", false}, new Object[] {"%%description%%", false});
-			l1 = lines.get(0);
-			l2 = lines.get(1);
+			l1 = lines.get(1);
+			l2 = lines.get(0);
 			try {
 				show = AbstractLine.class.getDeclaredMethod("show", Player.class);
 				show.setAccessible(true);
@@ -325,24 +327,37 @@ public class ConnectorNPC {
 		private synchronized void update() {
 			currentServer.server = currentServer.newServer;
 			l1.update();
-			if (l2visible)
+			if (currentServer.server == null) {
+				l2visible.forEach(p -> {
+					hide(l2, p);
+					l2visible.remove(p);
+				});
+			} else {
 				l2.update();
+				for (Player p : seeingPlayers) {
+					if (!l2visible.contains(p)) {
+						show(l2, p);
+						l2visible.add(p);
+					}
+				}
+			}
 		}
 
 		@Override
 		protected void show(@NotNull Player player) {
 			seeingPlayers.add(player);
 			show(l1, player);
-			l2visible = currentServer.server != null;
-			if (l2visible)
-				show(l2, player);
+			boolean l2 = currentServer.server != null;
+			if (l2) {
+				l2visible.add(player);
+				show(this.l2, player);
+			}
 		}
 
 		@Override
 		protected void hide(@NotNull Player player) {
 			hide(l1, player);
-			if (l2visible) {
-				l2visible = false;
+			if (l2visible.remove(player)) {
 				hide(l2, player);
 			}
 			seeingPlayers.remove(player);

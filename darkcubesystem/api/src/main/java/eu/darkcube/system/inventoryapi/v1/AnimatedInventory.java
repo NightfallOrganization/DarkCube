@@ -4,12 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.v1;
 
-import eu.darkcube.system.DarkCubeSystem;
-import eu.darkcube.system.util.AsyncExecutor;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.util.AsyncExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,7 +61,7 @@ public abstract class AnimatedInventory extends AbstractInventory {
 			this.offerAnimations(this.informations);
 			AnimationRunnable runnable = new AnimationRunnable();
 			this.animation.set(runnable);
-			runnable.runTaskTimer(DarkCubeSystem.getInstance(), 0, 1);
+			runnable.runTaskTimer(DarkCubePlugin.systemPlugin(), 0, 1);
 			this.animationStarted.set(System.currentTimeMillis());
 		}
 	}
@@ -110,7 +109,6 @@ public abstract class AnimatedInventory extends AbstractInventory {
 		}
 
 	}
-
 
 	public class AnimationInformation {
 

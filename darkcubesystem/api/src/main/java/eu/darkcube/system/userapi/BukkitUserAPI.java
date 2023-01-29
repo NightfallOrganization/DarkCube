@@ -4,13 +4,12 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.userapi;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.packets.PacketQueryUser;
 import eu.darkcube.system.userapi.packets.PacketUserPersistentDataUpdate;
@@ -47,10 +46,10 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		super();
 		instance = this;
 		UListener listener = new UListener();
-		Bukkit.getPluginManager().registerEvents(listener, DarkCubeSystem.getInstance());
+		Bukkit.getPluginManager().registerEvents(listener, DarkCubePlugin.systemPlugin());
 
 		// Migration process
-		DarkCubeSystem.getInstance().getLogger().info("Starting migration process");
+		DarkCubePlugin.systemPlugin().getLogger().info("Starting migration process");
 		if (CloudNetDriver.getInstance().getDatabaseProvider().containsDatabase("user_languages")) {
 			Database db = CloudNetDriver.getInstance().getDatabaseProvider()
 					.getDatabase("user_languages");
@@ -58,7 +57,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 				UUID uuid = UUID.fromString(key);
 				User user = getUser(uuid);
 				user.setLanguage(db.get(key).get("language", Language.class));
-				DarkCubeSystem.getInstance().getLogger()
+				DarkCubePlugin.systemPlugin().getLogger()
 						.info("Migrating language: " + user.getName() + "(" + user.getUniqueId()
 								+ ")");
 				unloadUser(user);
@@ -73,7 +72,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 				BigInteger cubes = doc.getBigInteger("cubes");
 				User user = getUser(UUID.fromString(key));
 				user.setCubes(cubes);
-				DarkCubeSystem.getInstance().getLogger()
+				DarkCubePlugin.systemPlugin().getLogger()
 						.info("Migrating cubes: " + user.getName() + "(" + user.getUniqueId()
 								+ ")");
 				unloadUser(user);
@@ -104,7 +103,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 					unload.forEach(u -> unloadUser(u));
 				}
 			}
-		}.runTaskTimerAsynchronously(DarkCubeSystem.getInstance(), 1,
+		}.runTaskTimerAsynchronously(DarkCubePlugin.systemPlugin(), 1,
 				TimeUnit.MINUTES.toSeconds(1) * 20);
 	}
 

@@ -48,8 +48,6 @@ public class Resetter implements Runnable {
 		case YEAR:
 			millis = getMillisUntilNextYear();
 			break;
-		case ALLTIME:
-			break;
 		}
 		if (millis < 0) {
 			millis = Integer.MAX_VALUE;

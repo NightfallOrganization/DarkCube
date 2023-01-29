@@ -13,7 +13,6 @@ pluginManagement {
 }
 
 rootProject.name = 'DarkCube'
-include 'adventure'
 include 'bukkit'
 include 'bukkit:autovoidworld'
 include 'bukkit:bauserver'
@@ -47,7 +46,6 @@ include 'bungee:werbung'
 //include 'cloudban:cloudban-module'
 include 'cloudnet'
 include 'cloudnet:cloudnet-database-mysql'
-include 'cloudnet:lobbysystem-migrator'
 include 'cloudnet:stats-cloudnet'
 include 'common'
 include 'common:labymod-emotes'

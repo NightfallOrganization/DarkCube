@@ -1,7 +1,7 @@
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    implementation project(':darkcubesystem')
-    implementation libs.cloudnetDriver
-    implementation libs.cloudnetBridge
-    implementation libs.cloudnetWrapper
+    compileOnly project(':darkcubesystem')
+    compileOnly libs.cloudnetDriver
+    compileOnly libs.cloudnetBridge
+    compileOnly libs.cloudnetWrapper
 }

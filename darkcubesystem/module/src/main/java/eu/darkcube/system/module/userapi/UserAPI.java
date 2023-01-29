@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.module.userapi;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
@@ -15,6 +14,7 @@ import de.dytanic.cloudnet.ext.bridge.event.BridgeProxyPlayerDisconnectEvent;
 import de.dytanic.cloudnet.ext.bridge.event.BridgeProxyPlayerLoginSuccessEvent;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudOfflinePlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import eu.darkcube.system.libs.com.google.gson.internal.bind.util.ISO8601Utils;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.packets.PacketQueryUser;
 import eu.darkcube.system.userapi.packets.PacketQueryUser.Result;
@@ -123,12 +123,17 @@ public class UserAPI {
 	private ModuleUser load(UUID uuid) {
 		lock.writeLock().lock();
 		JsonDocument entry = null;
-		String name;
+		String name = null;
+		boolean useCloud = true;
 
 		if (database.contains(uuid.toString())) {
 			entry = database.get(uuid.toString());
 			name = entry.getString("name");
-		} else {
+			if (!uuid.toString().startsWith(name)) {
+				useCloud = false;
+			}
+		}
+		if (useCloud) {
 			ICloudOfflinePlayer player = playerManager.getOfflinePlayer(uuid);
 			if (player != null) {
 				name = player.getName();

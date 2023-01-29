@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.inventoryapi.v1;
 
-import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -37,7 +37,7 @@ public abstract class AbstractInventory implements IInventory {
 		this.handle = Bukkit.createInventory(null, size,
 				ChatColor.stripColor(LegacyComponentSerializer.legacySection().serialize(title)));
 		this.listener = new InventoryListener();
-		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubeSystem.getInstance());
+		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubePlugin.systemPlugin());
 	}
 
 	public Component getTitle() {
