@@ -3,26 +3,11 @@ plugins {
     id 'java-library'
 }
 
-tasks {
-    shadowJar {
-        archiveClassifier.set("")
-    }
-    build {
-        dependsOn(shadowJar)
-    }
-}
-
-compileJava.options.encoding = "UTF-8"
-compileTestJava.options.encoding = "UTF-8"
-
-java {
-    withSourcesJar()
-}
+tasks.shadowJar.archiveClassifier.set('')
+tasks.build.dependsOn(tasks.shadowJar)
 
 dependencies {
-    api(project(path: 'core', configuration: 'shadow'))
-    runtimeOnly project(path: '1.8.8', configuration: 'default')
-    //println project(path: '1.19.2').getMetaPropertyValues()
-    runtimeOnly project(path: '1.19.2', configuration: 'reobf')
+    api project(path: 'api')
+    runtimeOnly project(path: 'bukkit')
     runtimeOnly project(path: 'module')
 }

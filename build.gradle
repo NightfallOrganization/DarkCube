@@ -4,7 +4,11 @@ ext {
 
 allprojects {
     repositories {
-        mavenLocal()
+        maven {
+            name 'DarkCube'
+            credentials PasswordCredentials
+            url 'https://nexus.darkcube.eu/repository/darkcube/'
+        }
         mavenCentral()
         maven { url = 'https://repo.papermc.io/repository/maven-public/' }
         maven {
@@ -14,23 +18,21 @@ allprojects {
                 includeGroup 'org.spigotmc'
             }
         }
-        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url = 'https://oss.sonatype.org/content/repositories/central' }
         maven { url = 'https://libraries.minecraft.net' }
         maven { url = 'https://repo.dmulloy2.net/repository/public/' }
         maven { url = 'https://repo.cloudnetservice.eu/repository/releases/' }
-        maven { url = 'https://repo.cloudnetservice.eu/repository/snapshots/' }
         maven { url = 'https://repo.viaversion.com' }
-        maven { url = 'https://repo.dmulloy2.net/repository/public/' }
-        maven { url = 'https://jitpack.io' }
     }
-
     pluginManager.withPlugin('java') {
         java {
             toolchain.languageVersion.set(JavaLanguageVersion.of(8))
         }
 
+        javadoc.options.encoding = 'UTF-8'
         compileJava.options.encoding = 'UTF-8'
+    }
+    pluginManager.withPlugin('io.freefair.aggregate-javadoc') {
+        aggregateJavadoc.options.encoding = 'UTF-8'
     }
 
     tasks.withType(JavaCompile) {

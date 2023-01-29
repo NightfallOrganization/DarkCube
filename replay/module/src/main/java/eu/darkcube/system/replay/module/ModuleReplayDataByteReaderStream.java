@@ -21,6 +21,11 @@ public class ModuleReplayDataByteReaderStream implements ReplayDataByteReaderStr
 
 	public ModuleReplayDataByteReaderStream(SeekableByteChannel channel) {
 		this.channel = channel;
+		try {
+			channel.position(channel.position() + 8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		lbuf = ByteBuffer.allocate(Long.BYTES);
 	}
 

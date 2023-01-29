@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+}
+
+dependencies {
+    api parent.project('api')
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnlyApi project(':darkcubesystem')
+    compileOnlyApi libs.cloudnetDriver
+}

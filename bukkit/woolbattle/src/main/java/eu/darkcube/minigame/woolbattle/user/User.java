@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.user;
 
 import eu.darkcube.minigame.woolbattle.nbt.DataStorage;
@@ -23,7 +22,7 @@ import java.util.UUID;
 public interface User {
 	/**
 	 * The {@link DataStorage} returned by this method gets deleted once the user is unloaded
-	 * 
+	 *
 	 * @return the temporary data storage for this user
 	 */
 	DataStorage getTemporaryDataStorage();
@@ -50,8 +49,8 @@ public interface User {
 
 	/**
 	 * Sets the language for this player
-	 * 
-	 * @param language
+	 *
+	 * @param language the {@link Language}
 	 */
 	void setLanguage(Language language);
 
@@ -62,8 +61,8 @@ public interface User {
 
 	/**
 	 * Sets the team this player is in
-	 * 
-	 * @param team
+	 *
+	 * @param team the new {@link Team}
 	 */
 	void setTeam(Team team);
 
@@ -78,7 +77,8 @@ public interface User {
 	void loadPerks();
 
 	/**
-	 * @param number
+	 * @param number the {@link PerkNumber}
+	 *
 	 * @return the perk on the given {@link PerkNumber}
 	 */
 	Perk getPerk(PerkNumber number);
@@ -104,43 +104,44 @@ public interface User {
 	Perk getEnderPearl();
 
 	/**
-	 * @param itemId
+	 * @param itemId the itemid to search by
+	 *
 	 * @return a perk this player has given by the itemid, null if no perk is found
 	 */
 	Perk getPerkByItemId(String itemId);
 
 	/**
 	 * Sets the first active perk for this player
-	 * 
-	 * @param perk
+	 *
+	 * @param perk the active 1 {@link Perk}
 	 */
 	void setActivePerk1(Perk perk);
 
 	/**
 	 * Sets the second active perk for this player
-	 * 
-	 * @param perk
+	 *
+	 * @param perk the active 2 {@link Perk}
 	 */
 	void setActivePerk2(Perk perk);
 
 	/**
 	 * Sets the passive perk for this player
-	 * 
-	 * @param perk
+	 *
+	 * @param perk the passive {@link Perk}
 	 */
 	void setPassivePerk(Perk perk);
 
 	/**
 	 * Sets the ender pearl perk for this player
-	 * 
-	 * @param perk
+	 *
+	 * @param perk the enderpearl {@link Perk}
 	 */
 	void setEnderPearl(Perk perk);
 
 	/**
 	 * Sends this player a packet
-	 * 
-	 * @param packet
+	 *
+	 * @param packet a packet
 	 */
 	void sendPacket(Packet<?> packet);
 
@@ -166,15 +167,15 @@ public interface User {
 
 	/**
 	 * Sets the spawn protection ticks for the player
-	 * 
-	 * @param ticks
+	 *
+	 * @param ticks the number of spawn protection ticks
 	 */
 	void setSpawnProtectionTicks(int ticks);
 
 	/**
 	 * Sets the troll mode for the player
-	 * 
-	 * @param trollmode
+	 *
+	 * @param trollmode wether troll is active
 	 */
 	void setTrollMode(boolean trollmode);
 
@@ -195,8 +196,8 @@ public interface User {
 
 	/**
 	 * Sets the open inventory for the player
-	 * 
-	 * @param id
+	 *
+	 * @param id the {@link InventoryId}
 	 */
 	void setOpenInventory(InventoryId id);
 
@@ -212,8 +213,8 @@ public interface User {
 
 	/**
 	 * Sets the last player that hit this player
-	 * 
-	 * @param user
+	 *
+	 * @param user the user that last hit this user
 	 */
 	void setLastHit(User user);
 
@@ -224,8 +225,8 @@ public interface User {
 
 	/**
 	 * Sets the amount of ticks passed since this player was last hit
-	 * 
-	 * @param ticks
+	 *
+	 * @param ticks the number of ticks
 	 */
 	void setTicksAfterLastHit(int ticks);
 
@@ -246,15 +247,15 @@ public interface User {
 
 	/**
 	 * Sets the number of kills this player made
-	 * 
-	 * @param kills
+	 *
+	 * @param kills the number of kills
 	 */
 	void setKills(int kills);
 
 	/**
 	 * Sets the number of times this player died
-	 * 
-	 * @param deaths
+	 *
+	 * @param deaths the number of deaths
 	 */
 	void setDeaths(int deaths);
 

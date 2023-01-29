@@ -1,0 +1,10 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api parent.project('adventure-platform-facet')
+    api parent.project('adventure-text-serializer-gson')
+    compileOnly 'io.netty:netty-all:4.0.23.Final'
+    compileOnlyApi libs.viaversion
+}

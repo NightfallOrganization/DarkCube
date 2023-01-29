@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet.database;
 
 import java.sql.*;
@@ -30,12 +29,13 @@ public class PServerDatabase extends Database {
 
 	private Connection getConnection() {
 		try {
-			SQLDatabaseProvider provider = ((SQLDatabaseProvider) CloudNet.getInstance()
-					.getServicesRegistry()
-					.getService(AbstractDatabaseProvider.class, PServerModule.getInstance().sqlDatabase));
+			SQLDatabaseProvider provider =
+					((SQLDatabaseProvider) CloudNet.getInstance().getServicesRegistry()
+							.getService(AbstractDatabaseProvider.class,
+									PServerModule.getInstance().sqlDatabase));
 			try {
 				return provider.getConnection();
-			} catch (Exception ex) {
+			} catch (Exception ignored) {
 			}
 			provider.init();
 			return provider.getConnection();
@@ -62,12 +62,12 @@ public class PServerDatabase extends Database {
 
 	public boolean contains(UniqueId pserver) {
 		String cmd = String.format(COMMANDS[5], pserver.toString());
-		return executeQuery(cmd, r -> r.first());
+		return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::first));
 	}
 
 	public boolean contains(UUID owner, UniqueId pserver) {
 		String cmd = String.format(COMMANDS[2], owner.toString(), pserver.toString());
-		return executeQuery(cmd, r -> r.first());
+		return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::first));
 	}
 
 	private boolean insert(UUID owner, UniqueId pserver) {
@@ -166,7 +166,7 @@ public class PServerDatabase extends Database {
 		//@formatter:on
 	}
 
-	private static interface ExceptionalFunction<T, Q> {
+	private interface ExceptionalFunction<T, Q> {
 		Q apply(T t) throws Exception;
 	}
 }

@@ -1,5 +1,4 @@
 dependencies {
-    implementation project(':darkcubesystem')
-    implementation 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    implementation project(path: ':darkcubesystem:core')
+    compileOnly project(':darkcubesystem')
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
 }

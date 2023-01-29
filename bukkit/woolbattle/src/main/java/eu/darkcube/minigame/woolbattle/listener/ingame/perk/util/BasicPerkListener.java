@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -46,8 +46,8 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	/**
 	 * Called when the perk is activated
 	 * 
-	 * @param user
-	 * @param perk
+	 * @param user the user
+	 * @param perk the perk
 	 * @return if the perk was activated and cooldown should start
 	 */
 	protected boolean activate(User user, Perk perk) {
@@ -57,8 +57,8 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	/**
 	 * Called when the perk is activated with a right click
 	 * 
-	 * @param user
-	 * @param perk
+	 * @param user the user
+	 * @param perk the perk
 	 * @return if the perk was activated and cooldown should start
 	 */
 	protected boolean activateRight(User user, Perk perk) {
@@ -68,8 +68,8 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	/**
 	 * Called when the perk is activated with a left click
 	 * 
-	 * @param user
-	 * @param perk
+	 * @param user the user
+	 * @param perk the perk
 	 * @return if the perk was activated and cooldown should start
 	 */
 	protected boolean activateLeft(User user, Perk perk) {
@@ -80,8 +80,8 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	 * Called when any of the activate methods return true. Default implementation is paying wool
 	 * and starting cooldown
 	 * 
-	 * @param user
-	 * @param perk
+	 * @param user the user
+	 * @param perk the perk
 	 */
 	protected void activated(User user, Perk perk) {
 		payForThePerk(user, perkType);
