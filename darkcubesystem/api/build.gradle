@@ -1,0 +1,25 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'java-library'
+}
+
+tasks {
+    shadowJar {
+        relocate('com.mojang.brigadier', 'eu.darkcube.system.libs.com.mojang.brigadier')
+    }
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    compileOnly libs.viaversion
+    compileOnly libs.cloudnetDriver
+    api parent.project('libs')
+}

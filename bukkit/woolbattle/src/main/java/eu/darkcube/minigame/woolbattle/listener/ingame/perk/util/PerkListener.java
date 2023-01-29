@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.util;
 
 import java.util.function.BooleanSupplier;
+
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -28,55 +29,41 @@ public abstract class PerkListener implements Listener {
 	// eu.darkcube.minigame.woolbattle.game.Ingame
 
 	/**
-	 * @param user
-	 * @param perk
+	 * @param perk the perk to check
+	 *
 	 * @return if the given perk is usable
 	 */
 	protected static boolean checkUsable(Perk perk) {
-		return checkUsable(perk, null, null);
-	}
-
-	/**
-	 * @param user
-	 * @param perk
-	 * @param successRunnable
-	 * @param failureRunnable
-	 * @return if the given perk is usable
-	 */
-	protected static boolean checkUsable(Perk perk, Runnable successRunnable,
-			Runnable failureRunnable) {
 		User user = perk.getOwner();
 		Player p = user.getBukkitEntity();
 		if (!p.getInventory().contains(Material.WOOL, perk.getCost()) || perk.getCooldown() > 0) {
 			Ingame.playSoundNotEnoughWool(user);
 			new Scheduler(perk::setItem).runTask();
-			if (failureRunnable != null)
-				failureRunnable.run();
 			return false;
 		}
-		if (successRunnable != null)
-			successRunnable.run();
 		return true;
 	}
 
 	/**
 	 * if the perk given by the item is usable
-	 * 
-	 * @param user
-	 * @param perkItem
+	 *
+	 * @param user     the user
+	 * @param perkItem the Item
+	 *
 	 * @return if the check is successful
 	 */
 	protected static boolean checkUsable(User user, Item perkItem) {
 		Perk perk = user.getPerkByItemId(perkItem.getItemId());
-		return perk != null ? checkUsable(perk) : false;
+		return perk != null && checkUsable(perk);
 	}
 
 	/**
 	 * if the usedItem matches the perkItem and the perk given by the perkItem is usable
-	 * 
-	 * @param user
-	 * @param perkType
-	 * @param usedItem
+	 *
+	 * @param user     the {@link User}
+	 * @param perkType the {@link PerkType}
+	 * @param usedItem the used {@link ItemStack}
+	 *
 	 * @return if the checks are successful
 	 */
 	protected static boolean checkUsable(User user, PerkType perkType, ItemStack usedItem) {
@@ -85,13 +72,14 @@ public abstract class PerkListener implements Listener {
 
 	/**
 	 * if the usedItem matches the perkItem and the perk given by the perkItem is usable
-	 * 
+	 * <p>
 	 * Also runs the itemMatchRunnable if the items match
-	 * 
-	 * @param user
-	 * @param perkItem
-	 * @param usedItem
-	 * @param itemMatchRunnable
+	 *
+	 * @param user              the {@link User}
+	 * @param perkType          the {@link PerkType}
+	 * @param usedItem          the used {@link ItemStack}
+	 * @param itemMatchRunnable the runnable to execute if the perk is usable match
+	 *
 	 * @return if the checks are successful
 	 */
 	protected static boolean checkUsable(User user, PerkType perkType, ItemStack usedItem,
@@ -99,27 +87,12 @@ public abstract class PerkListener implements Listener {
 		String usedItemId = ItemManager.getItemId(usedItem);
 		Perk perk = user.getPerkByItemId(perkType.getItem().getItemId());
 		String perkItemId = perk == null ? null : ItemManager.getItemId(perk.calculateItem());
-		if (perkType.getItem().getItemId().equals(usedItemId)
-				|| perkType.getCooldownItem().getItemId().equals(usedItemId)
-				|| (perkItemId != null && perkItemId.equals(usedItemId))) {
+		if (perkType.getItem().getItemId().equals(usedItemId) || perkType.getCooldownItem()
+				.getItemId().equals(usedItemId) || (perkItemId != null && perkItemId.equals(
+				usedItemId))) {
 			if (itemMatchRunnable != null)
 				itemMatchRunnable.run();
 			return checkUsable(user, perkType.getItem());
-		}
-		return false;
-	}
-
-	/**
-	 * if the perk in the user's hand is usable
-	 * 
-	 * @param user
-	 * @return if the check is successful
-	 */
-	protected static boolean checkPerkInHandUsable(User user) {
-		Perk perk =
-				user.getPerkByItemId(ItemManager.getItemId(user.getBukkitEntity().getItemInHand()));
-		if (perk != null) {
-			return checkUsable(perk);
 		}
 		return false;
 	}

@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
+    implementation project(path: parent.parent.project('api').path, configuration: 'shadow')
+    compileOnly libs.cloudnetDriver
+}
+
+java {
+    withSourcesJar()
+}

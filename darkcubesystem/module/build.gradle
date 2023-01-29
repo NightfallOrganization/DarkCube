@@ -9,5 +9,5 @@ java {
 dependencies {
     compileOnly libs.cloudnet
     compileOnly libs.cloudnetBridge
-    compileOnly parent.project('core')
+    compileOnly parent.project('api')
 }

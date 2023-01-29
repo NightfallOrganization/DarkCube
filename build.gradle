@@ -28,7 +28,11 @@ allprojects {
             toolchain.languageVersion.set(JavaLanguageVersion.of(8))
         }
 
+        javadoc.options.encoding = 'UTF-8'
         compileJava.options.encoding = 'UTF-8'
+    }
+    pluginManager.withPlugin('io.freefair.aggregate-javadoc') {
+        aggregateJavadoc.options.encoding = 'UTF-8'
     }
 
     tasks.withType(JavaCompile) {

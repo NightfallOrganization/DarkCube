@@ -12,11 +12,6 @@ pluginManagement {
     }
 }
 
-dependencyResolutionManagement {
-
-//    repositoriesMode = RepositoriesMode.PREFER_SETTINGS
-}
-
 rootProject.name = 'DarkCube'
 include 'adventure'
 include 'bukkit'
@@ -24,7 +19,11 @@ include 'bukkit:autovoidworld'
 include 'bukkit:bauserver'
 //include 'bukkit:bedwars'
 include 'bukkit:changepermissionmessage'
-includeSubProjects('darkcubesystem', '1.8.8', '1.19.3', 'core', 'module')
+includeSubProjects('darkcubesystem', 'api', 'module')
+includeSubProjects('darkcubesystem:libs', 'brigadier', 'gson', 'annotations', 'npc-lib')
+includeSubProjects('darkcubesystem:libs:adventure', 'adventure-api', 'adventure-key', 'adventure-nbt', 'adventure-platform-api', 'adventure-platform-bukkit', 'adventure-platform-facet', 'adventure-platform-viaversion', 'adventure-text-serializer-bungeecord', 'adventure-text-serializer-gson', 'adventure-text-serializer-gson-legacy-impl', 'adventure-text-serializer-legacy', 'adventure-text-serializer-plain', 'examination-api', 'examination-string')
+includeSubProjects('darkcubesystem:bukkit', '1.8.8', '1.19.3')
+//includeSubProjects('darkcubesystem', '1.8.8', '1.19.3', 'core', 'module')
 include 'bukkit:darkessentials'
 //include 'bukkit:holograms'
 include 'bukkit:jumpleague'
@@ -33,7 +32,7 @@ include 'bukkit:lobbysystem'
 include 'bukkit:luckperms-prefixplugin'
 include 'bukkit:miners'
 include 'bukkit:skyland'
-include 'bukkit:smash'
+//include 'bukkit:smash'
 include 'bukkit:statsapi'
 include 'bukkit:woolbattle'
 include 'bungee'
