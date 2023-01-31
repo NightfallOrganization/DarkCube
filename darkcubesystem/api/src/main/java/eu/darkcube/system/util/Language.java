@@ -4,13 +4,18 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.util;
 
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.ComponentLike;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.ComponentSerializer;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,27 +83,36 @@ public enum Language {
 		if (this.bundle.containsKey(key)) {
 			String formatted =
 					String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
+			formatted = ChatColor.translateAlternateColorCodes('&', formatted);
 			Component c = Component.text().asComponent();
 			for (int i = 0; i < components.size(); i++) {
 				String[] s = formatted.split(String.format("&#!\\$%s%s;", (char) 1054, i), 2);
+				c = c.append(LegacyComponentSerializer.legacySection().deserialize(s[0]));
 				Component o = c;
-				c = c.append(LegacyComponentSerializer.legacyAmpersand().deserialize(s[0]));
 				if (s.length == 2) {
-					c = c.append(components.get(i))
-							.append(LegacyComponentSerializer.legacyAmpersand().deserialize(s[1])
-									.style(o.style()));
+					c = c.append(components.get(i));
+					String str = LegacyComponentSerializer.legacySection()
+							.serialize(Component.text(" ").style(getLastStyle(o)));
+					str = str.substring(0, str.length() - 1);
+					c = c.append(LegacyComponentSerializer.legacySection().deserialize(str + s[1]));
 				}
 			}
 			if (components.isEmpty()) {
-				c = LegacyComponentSerializer.legacyAmpersand().deserialize(formatted);
+				c = LegacyComponentSerializer.legacySection().deserialize(formatted);
 			}
 			return c;
 		} else {
-			return LegacyComponentSerializer.legacyAmpersand().deserialize(
+			return LegacyComponentSerializer.legacySection().deserialize(
 					key + '[' + String.join(", ",
 							Arrays.stream(replacements).map(String::valueOf).toArray(String[]::new))
 							+ ']');
 		}
+	}
+
+	private Style getLastStyle(Component c) {
+		return c.children().isEmpty()
+				? c.style()
+				: c.children().get(c.children().size() - 1).style();
 	}
 
 	public void validate(String[] entrySet, Function<String, String> keyModifier) {
@@ -119,7 +133,7 @@ public enum Language {
 	}
 
 	public void registerLookup(Reader reader, Function<String, String> keyModifier)
-			throws IOException {
+	throws IOException {
 		Properties properties = new Properties();
 		properties.load(reader);
 		this.registerLookup(properties, keyModifier);
