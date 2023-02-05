@@ -9,6 +9,7 @@ package eu.darkcube.system;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.arguments.EntityOptions;
 import eu.darkcube.system.link.LinkManager;
+import eu.darkcube.system.link.cloudnet.CloudNetLink;
 import eu.darkcube.system.link.luckperms.LuckPermsLink;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.BukkitUserAPI;
@@ -44,6 +45,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		PacketAPI.init();
 		CommandAPI.init(this);
 		linkManager.addLink(LuckPermsLink::new);
+		linkManager.addLink(CloudNetLink::new);
 	}
 
 	@Override
@@ -60,6 +62,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		BukkitUserAPI.init();
 		Bukkit.getPluginManager().registerEvents(this, this);
 		AdventureSupport.audienceProvider(); // Initializes adventure
+		linkManager.enableLinks();
 	}
 
 	@EventHandler

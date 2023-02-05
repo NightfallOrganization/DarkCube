@@ -22,6 +22,10 @@ public class LinkManager {
 		return success;
 	}
 
+	public void enableLinks() {
+		links.forEach(Link::enable);
+	}
+
 	public Collection<Link> getLinks() {
 		return links;
 	}
@@ -31,6 +35,7 @@ public class LinkManager {
 	}
 
 	public void unregisterLink(Link link) {
+		link.disable();
 		link.unlink();
 		links.remove(link);
 	}

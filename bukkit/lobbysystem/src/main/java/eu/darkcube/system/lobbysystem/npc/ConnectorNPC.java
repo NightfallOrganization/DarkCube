@@ -10,8 +10,6 @@ import com.github.unldenis.hologram.AbstractLine;
 import com.github.unldenis.hologram.Hologram;
 import com.github.unldenis.hologram.HologramPool;
 import com.github.unldenis.hologram.placeholder.Placeholders;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
@@ -19,7 +17,7 @@ import de.dytanic.cloudnet.driver.event.events.service.CloudServiceConnectNetwor
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceDisconnectNetworkEvent;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
+import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
 import eu.darkcube.system.libs.com.github.juliarn.npc.modifier.MetadataModifier;
 import eu.darkcube.system.libs.com.github.juliarn.npc.profile.Profile;
@@ -171,7 +169,7 @@ public class ConnectorNPC {
 						UserAPI.getInstance().getUser(p));
 			}
 			return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(
-					UserAPI.getInstance().getUser(p), online, maxplayers);
+					UserAPI.getInstance().getUser(p), online, maxplayers == -1 ? 100 : maxplayers);
 		});
 		h.add("%%description%%", p -> {
 			Info server = currentServer.server;
@@ -384,11 +382,11 @@ public class ConnectorNPC {
 			Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
 			for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
 				try {
-					GameState state = GameState.fromString(
-							server.getProperty(BridgeServiceProperty.STATE).orElse(null));
-					if (state == null || state == GameState.UNKNOWN)
+					GameState state =
+							server.getProperty(DarkCubeServiceProperty.GAME_STATE).orElse(null);
+					if (state == null || state == GameState.UNKNOWN) {
 						throw new NullPointerException();
-					if (state != GameState.LOBBY) {
+					} else if (state != GameState.LOBBY) {
 						continue;
 					}
 					states.put(server, state);
@@ -398,29 +396,21 @@ public class ConnectorNPC {
 			}
 			List<Info> sortingInfos = new ArrayList<>();
 			for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-				String extraText = server.getProperty(BridgeServiceProperty.EXTRA).orElse(null);
+				int playingPlayers =
+						server.getProperty(DarkCubeServiceProperty.PLAYING_PLAYERS).orElse(-1);
+				int maxPlayingPlayers =
+						server.getProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS).orElse(-1);
 
-				int online = server.getProperty(BridgeServiceProperty.ONLINE_COUNT).orElse(-1);
-				int maxPlayers = server.getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1);
-				try {
-					JsonObject json = new Gson().fromJson(extraText, JsonObject.class);
-					if (json == null)
-						continue;
-					online = json.getAsJsonPrimitive("online").getAsInt();
-					maxPlayers = json.getAsJsonPrimitive("max").getAsInt();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
 				GameState state = states.get(server);
-				String motd = server.getProperty(BridgeServiceProperty.MOTD).orElse(null);
-				if (motd == null || motd.contains("§cLoading...")) {
+				String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
+				if (motd == null || motd.toLowerCase().contains("loading")) {
 					servers.remove(server);
 					states.remove(server);
 					continue;
 				}
-				sortingInfos.add(
-						new Info(new MinigameServerSortingInfo(online, maxPlayers, state), server,
-								motd));
+				sortingInfos.add(new Info(
+						new MinigameServerSortingInfo(playingPlayers, maxPlayingPlayers, state),
+						server, "§d" + motd));
 			}
 			Collections.sort(sortingInfos);
 			this.newServer = sortingInfos.stream().findFirst().orElse(null);

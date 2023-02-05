@@ -103,14 +103,14 @@ public abstract class AnimatedInventory extends AbstractInventory {
 			}
 			AnimatedInventory.this.informations.removeAll(toRemove);
 			if (updated) {
-				AnimatedInventory.this.opened.stream().filter(p -> p instanceof Player)
-						.map(p -> (Player) p).forEach(p -> p.updateInventory());
+				AnimatedInventory.this.opened.stream().filter(Player.class::isInstance)
+						.map(Player.class::cast).forEach(Player::updateInventory);
 			}
 		}
 
 	}
 
-	public class AnimationInformation {
+	public static class AnimationInformation {
 
 		public final long showAfter;
 

@@ -1,5 +1,5 @@
 dependencies {
-    compileOnlyApi project(':darkcubesystem')
+    compileOnlyApi project(':darkcubesystem:bukkit')
     compileOnlyApi project(':bukkit:statsapi')
     compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
     compileOnlyApi libs.cloudnetBridge

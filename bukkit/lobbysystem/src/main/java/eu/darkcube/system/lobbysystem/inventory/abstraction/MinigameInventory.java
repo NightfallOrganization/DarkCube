@@ -4,16 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
+import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
@@ -60,7 +58,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 		super.destroy();
 	}
 
-	protected void destroy0() {}
+	protected void destroy0() {
+	}
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -87,33 +86,26 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 			}
 		}
 		List<ItemSortingInfo> itemSortingInfos = new ArrayList<>();
-		for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-			String extraText = server.getProperty(BridgeServiceProperty.EXTRA).orElse(null);
+		for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
 
-			int online = server.getProperty(BridgeServiceProperty.ONLINE_COUNT).orElse(-1);
-			int maxPlayers = server.getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1);
-			try {
-				JsonObject json = new Gson().fromJson(extraText, JsonObject.class);
-				if (json == null)
-					continue;
-				online = json.getAsJsonPrimitive("online").getAsInt();
-				maxPlayers = json.getAsJsonPrimitive("max").getAsInt();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			int playingPlayers =
+					server.getProperty(DarkCubeServiceProperty.PLAYING_PLAYERS).orElse(-1);
+			int maxPlayingPlayers =
+					server.getProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS).orElse(-1);
+
 			GameState state = states.get(server);
-			String motd = server.getProperty(BridgeServiceProperty.MOTD).orElse(null);
-			if (motd == null || motd.contains("§cLoading...")) {
+			String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
+			if (motd == null || motd.toLowerCase().contains("loading")) {
 				servers.remove(server);
 				states.remove(server);
 				continue;
 			}
 			ItemBuilder builder = ItemBuilder.item(Material.STAINED_CLAY);
-			builder.amount(online);
+			builder.amount(playingPlayers);
 			builder.displayname(motd);
-			builder.lore("§7Spieler: " + online + "/" + maxPlayers);
+			builder.lore("§7Spieler: " + playingPlayers + "/" + maxPlayingPlayers);
 			if (state == GameState.LOBBY) {
-				if (online == 0) {
+				if (playingPlayers == 0) {
 					builder.damage(DyeColor.GRAY.getWoolData());
 				} else {
 					builder.damage(DyeColor.LIME.getWoolData());
@@ -129,7 +121,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 			item = ItemBuilder.item(item).persistentDataStorage()
 					.iset(minigameServer, PersistentDataTypes.STRING,
 							server.getServiceId().getUniqueId().toString()).builder().build();
-			ItemSortingInfo info = new ItemSortingInfo(item, online, maxPlayers, state);
+			ItemSortingInfo info =
+					new ItemSortingInfo(item, playingPlayers, maxPlayingPlayers, state);
 			itemSortingInfos.add(info);
 		}
 
@@ -179,7 +172,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 		}
 
 	}
-
 
 	public class Listener {
 

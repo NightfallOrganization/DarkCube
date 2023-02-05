@@ -1,0 +1,30 @@
+plugins {
+    id "com.github.johnrengelman.shadow"
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set('')
+        relocate('net.wesjd.anvilgui', 'eu.darkcube.system.vanillaaddons.libs.net.wesjd.anvilgui')
+    }
+    jar {
+        archiveClassifier.set('pure')
+    }
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
+    compileOnlyApi project(':darkcubesystem')
+    implementation 'net.wesjd:anvilgui:1.6.3-SNAPSHOT'
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+repositories {
+    maven { url = 'https://repo.codemc.io/repository/maven-snapshots/' }
+}

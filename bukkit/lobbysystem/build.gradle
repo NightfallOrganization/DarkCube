@@ -20,7 +20,7 @@ dependencies {
     api project(':common:labymod-emotes')
     implementation 'com.github.unldenis:Hologram-Lib:efaed21'
     compileOnly 'org.jetbrains:annotations:23.1.0'
-    compileOnly libs.cloudnetDriver
+//    compileOnly libs.cloudnetDriver
     compileOnly libs.cloudnetBridge
     compileOnly libs.luckperms
 }

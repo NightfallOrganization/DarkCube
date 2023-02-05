@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.v1;
 
 import com.google.common.util.concurrent.AtomicDouble;
@@ -143,8 +142,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	protected abstract void postTick(boolean changedInformations);
 
 	protected void calculatePageItems() {
-		Set<Integer> update = new HashSet<>();
-		update.addAll(this.pageItems.keySet());
+		Set<Integer> update = new HashSet<>(this.pageItems.keySet());
 		this.pageItems.clear();
 		final int page = this.getPage();
 		final int skip = (page - 1) * this.pageSize;
@@ -222,14 +220,14 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 	private PageArrow getArrowType(ItemStack arrowItem) {
 		Map<String, PageArrow> arrowNames = new HashMap<>();
-		Arrays.asList(PageArrow.values()).stream().forEach(a -> arrowNames.put(a.name(), a));
+		Arrays.asList(PageArrow.values()).forEach(a -> arrowNames.put(a.name(), a));
 		return arrowNames.get(ItemBuilder.item(arrowItem).persistentDataStorage()
 				.get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
 	}
 
 	private boolean isArrowItem(ItemStack arrowItem) {
-		List<String> arrowNames = Arrays.asList(PageArrow.values()).stream().map(Enum::name)
-				.collect(Collectors.toList());
+		List<String> arrowNames =
+				Arrays.stream(PageArrow.values()).map(Enum::name).collect(Collectors.toList());
 		ItemBuilder b = ItemBuilder.item(arrowItem);
 		return b.persistentDataStorage().has(AsyncPagedInventory.META_KEY_ARROW_TYPE)
 				&& arrowNames.contains(b.persistentDataStorage()

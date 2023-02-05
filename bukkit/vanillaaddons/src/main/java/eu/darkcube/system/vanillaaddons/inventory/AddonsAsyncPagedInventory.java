@@ -1,17 +1,20 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.inventoryapi.v1;
+package eu.darkcube.system.vanillaaddons.inventory;
 
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
+import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.inventoryapi.v1.PageArrow;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -19,14 +22,14 @@ import java.util.function.BooleanSupplier;
 import static eu.darkcube.system.inventoryapi.v1.IInventory.slot;
 import static eu.darkcube.system.inventoryapi.v1.IInventory.slot0;
 
-public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
+public class AddonsAsyncPagedInventory extends AsyncPagedInventory {
 
-	public DefaultAsyncPagedInventory(InventoryType inventoryType, Component title,
+	public AddonsAsyncPagedInventory(InventoryType inventoryType, Component title,
 			BooleanSupplier instant) {
 		this(inventoryType, title, 6 * 9, AsyncPagedInventory.box(3, 2, 5, 8), instant);
 	}
 
-	public DefaultAsyncPagedInventory(InventoryType inventoryType, Component title, int size,
+	public AddonsAsyncPagedInventory(InventoryType inventoryType, Component title, int size,
 			int[] box, BooleanSupplier instant) {
 		super(inventoryType, title, size, instant, box, IInventory.slot(1, 5));
 	}
@@ -50,8 +53,8 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	protected void playSound() {
-		this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
-				.forEach(p -> p.playSound(p.getLocation(), Sound.NOTE_STICKS, 100, 1));
+//		this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
+//				.forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, 100, 1));
 	}
 
 	protected void insertArrowItems() {
@@ -62,15 +65,10 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	protected void insertFallbackItems() {
-
-		ItemStack l = new ItemStack(Material.STAINED_GLASS_PANE);
-		l.setDurability((short) 7);
-		ItemMeta meta = l.getItemMeta();
-		meta.setDisplayName("§6");
-		l.setItemMeta(meta);
-		ItemStack d = new ItemStack(Material.STAINED_GLASS_PANE);
-		d.setDurability((short) 15);
-		d.setItemMeta(meta);
+		ItemStack l = ItemBuilder.item(Material.BROWN_STAINED_GLASS_PANE)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
+		ItemStack d = ItemBuilder.item(Material.GRAY_STAINED_GLASS_PANE)
+				.displayname(Component.text(" ").color(NamedTextColor.GOLD)).build();
 		this.fallbackItems.putIfAbsent(slot0(1, 1), l);
 		this.fallbackItems.putIfAbsent(slot0(2, 1), l);
 		this.fallbackItems.putIfAbsent(slot0(3, 1), l);
@@ -131,5 +129,4 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 		this.fallbackItems.putIfAbsent(slot0(8, 6), l);
 		this.fallbackItems.putIfAbsent(slot0(9, 6), l);
 	}
-
 }

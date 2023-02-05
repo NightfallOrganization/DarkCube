@@ -7,14 +7,33 @@
 package eu.darkcube.system.link;
 
 import java.io.Closeable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Link implements Closeable {
+
+	private final AtomicBoolean enabled = new AtomicBoolean(false);
 
 	public Link() throws Throwable {
 		this.link();
 	}
 
 	protected abstract void link() throws Throwable;
+
+	public final void enable() {
+		if (enabled.compareAndSet(false, true))
+			onEnable();
+	}
+
+	public final void disable() {
+		if (enabled.compareAndSet(true, false))
+			onDisable();
+	}
+
+	protected void onEnable() {
+	}
+
+	protected void onDisable() {
+	}
 
 	protected abstract void unlink();
 
