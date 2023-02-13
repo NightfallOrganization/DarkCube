@@ -18,6 +18,7 @@ public class LinkManager {
 			this.links.add(supplier.get());
 			success = true;
 		} catch (Throwable ignored) {
+			ignored.printStackTrace();
 		}
 		return success;
 	}

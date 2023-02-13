@@ -7,9 +7,6 @@ minplayercount: 2
 maxblockarrowhits: 3
 spawnprotectionticks: 80
 spawnprotectionticksglobal: 600
-tab:
-   header: '\n%name%\n%prefix%\n'
-   footer: '\n&7Server: &6%server%\n&7Map: &6%map%\n'
-   
+
 scoreboard:
    displayname: '&5DarkCube.eu'

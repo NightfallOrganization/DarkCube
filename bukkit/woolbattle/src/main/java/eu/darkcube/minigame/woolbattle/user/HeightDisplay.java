@@ -4,12 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.user;
 
 import org.bukkit.ChatColor;
 
-public class HeightDisplay {
+public final class HeightDisplay {
 
 	public boolean enabled;
 	public int maxDistance;
@@ -26,6 +25,11 @@ public class HeightDisplay {
 
 	public static HeightDisplay getDefault() {
 		return new HeightDisplay(true, -1, ChatColor.GOLD.getChar());
+	}
+
+	@Override
+	protected HeightDisplay clone() {
+		return new HeightDisplay(enabled, maxDistance, color);
 	}
 
 	public int getMaxDistance() {
@@ -48,12 +52,12 @@ public class HeightDisplay {
 		return color;
 	}
 
-	public ChatColor getColor() {
-		return ChatColor.getByChar(color);
-	}
-
 	public void setColorRaw(char color) {
 		this.color = color;
+	}
+
+	public ChatColor getColor() {
+		return ChatColor.getByChar(color);
 	}
 
 	public void setColor(ChatColor color) {

@@ -4,9 +4,19 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.ArrowRainPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.FastArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.TntArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.ItemManager;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
@@ -19,15 +29,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.game.Ingame;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.perk.PerkName;
-import eu.darkcube.minigame.woolbattle.perk.PerkType;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-
 public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 
 	@Override
@@ -35,7 +36,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 	public void handle(ProjectileLaunchEvent e) {
 		if (e.getEntity().getShooter() instanceof Player) {
 			Player p = (Player) e.getEntity().getShooter();
-			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			WBUser user = WBUser.getUser(p);
 			if (e.getEntityType() == EntityType.ARROW) {
 				Arrow arrow = (Arrow) e.getEntity();
 
@@ -47,15 +48,13 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 				}
 
 				WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
-				ItemManager.removeItems(user, p.getInventory(),
-						new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()), 1);
+				ItemManager.removeItems(user, p.getInventory(), new ItemStack(Material.WOOL, 1,
+						user.getTeam().getType().getWoolColorByte()), 1);
 				arrow.setVelocity(arrow.getVelocity());
-				if (user.getPassivePerk().getPerkName().equals(PerkName.FAST_ARROW)) {
+				if (user.perks().count(FastArrowPerk.FAST_ARROW) > 0) {
 					Vector vec = arrow.getVelocity().multiply(1.7);
 
-					double[] ds = new double[] {
-							vec.getX(), vec.getY(), vec.getZ()
-					};
+					double[] ds = new double[] {vec.getX(), vec.getY(), vec.getZ()};
 
 					double div = 1;
 					for (double d : ds) {
@@ -74,95 +73,85 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 
 					arrow.setVelocity(vec);
 				}
-				if (user.getPassivePerk().getPerkName().equals(PerkType.ARROW_RAIN.getPerkName())) {
-					int arrowCount = 6;
-					arrowCount = (arrowCount / 2) * 2;
+				for (UserPerk perk : user.perks().perks(ActivationType.PASSIVE)) {
+					if (perk.perk().perkName().equals(ArrowRainPerk.ARROW_RAIN)) {
+						int arrowCount = 6;
+						arrowCount = (arrowCount / 2) * 2;
 
-					if (user.getPassivePerk().getCooldown() > 0) {
-						user.getPassivePerk().setCooldown(user.getPassivePerk().getCooldown() - 1);
-						return;
-					}
-					if (!p.getInventory().contains(Material.WOOL, PerkType.ARROW_RAIN.getCost())) {
+						if (perk.cooldown() > 0) {
+							perk.cooldown(perk.cooldown() - 1);
+							return;
+						}
+						if (!p.getInventory().contains(Material.WOOL, perk.perk().cost())) {
+							new Scheduler() {
+								@Override
+								public void run() {
+									perk.currentPerkItem().setItem();
+								}
+							}.runTask();
+							return;
+						}
+
+						int cost = perk.perk().cost() - arrowCount;
+						ItemStack wool = new ItemStack(Material.WOOL, 1,
+								user.getTeam().getType().getWoolColorByte());
+
+						if (cost < 0) {
+							wool.setAmount(-cost);
+							p.getInventory().addItem(wool);
+						} else {
+							ItemManager.removeItems(user, p.getInventory(), wool, cost);
+						}
+
+						perk.cooldown(perk.perk().cooldown() + arrowCount);
+
+						this.shootArrows(user, 20F / arrowCount, arrowCount / 2, arrow);
+						this.shootArrows(user, -20F / arrowCount, arrowCount / 2, arrow);
+					} else if (perk.perk().perkName().equals(TntArrowPerk.TNT_ARROW)) {
+						if (perk.cooldown() > 0) {
+							perk.cooldown(perk.cooldown() - 1);
+							return;
+						}
+						perk.cooldown(perk.perk().cooldown());
 						new Scheduler() {
-
 							@Override
 							public void run() {
-								user.getPassivePerk().setItem();
-							}
-
-						}.runTask();
-						return;
-					}
-
-					int cost = PerkType.ARROW_RAIN.getCost() - arrowCount;
-					ItemStack wool = new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte());
-
-					if (cost < 0) {
-						wool.setAmount(0 - cost);
-						p.getInventory().addItem(wool);
-					} else {
-						ItemManager.removeItems(user, p.getInventory(), wool, cost);
-					}
-
-					user.getPassivePerk().setCooldown(user.getPassivePerk().getMaxCooldown() + arrowCount);
-
-					this.shootArrows(user, 20F / arrowCount, arrowCount / 2, arrow);
-					this.shootArrows(user, -20F / arrowCount, arrowCount / 2, arrow);
-
-//					for (int i = 0; i < 4; i++) {
-//						p.launchProjectile(Arrow.class);
-//					}
-				} else if (user.getPassivePerk().getPerkName().equals(PerkType.TNT_ARROW.getPerkName())) {
-					if (user.getPassivePerk().getCooldown() > 0) {
-						user.getPassivePerk().setCooldown(user.getPassivePerk().getCooldown() - 1);
-						return;
-					}
-					user.getPassivePerk().setCooldown(user.getPassivePerk().getMaxCooldown());
-					new Scheduler() {
-
-						@Override
-						public void run() {
-							if (arrow.isDead() || !arrow.isValid()) {
-								this.cancel();
-								if (user.getPassivePerk().getPerkName().equals(PerkType.TNT_ARROW.getPerkName())) {
-									if (!p.getInventory().contains(Material.WOOL, PerkType.TNT_ARROW.getCost())) {
-										new Scheduler() {
-
-											@Override
-											public void run() {
-												user.getPassivePerk().setItem();
-											}
-
-										}.runTask();
+								if (arrow.isDead() || !arrow.isValid()) {
+									this.cancel();
+									if (!p.getInventory()
+											.contains(Material.WOOL, perk.perk().cost())) {
+										perk.currentPerkItem().setItem();
 										return;
 									}
 
-									int cost = PerkType.TNT_ARROW.getCost();
+									int cost = perk.perk().cost();
 									ItemStack wool = new ItemStack(Material.WOOL, 1,
 											user.getTeam().getType().getWoolColorByte());
 									if (cost < 0) {
-										wool.setAmount(0 - cost);
+										wool.setAmount(-cost);
 										p.getInventory().addItem(wool);
 									} else {
 										ItemManager.removeItems(user, p.getInventory(), wool, cost);
 									}
-									TNTPrimed tnt = arrow.getWorld().spawn(arrow.getLocation(), TNTPrimed.class);
+									TNTPrimed tnt = arrow.getWorld()
+											.spawn(arrow.getLocation(), TNTPrimed.class);
 
-									tnt.setMetadata("boost", new FixedMetadataValue(WoolBattle.getInstance(), 2));
-									tnt.setMetadata("source", new FixedMetadataValue(WoolBattle.getInstance(), user));
+									tnt.setMetadata("boost",
+											new FixedMetadataValue(WoolBattle.getInstance(), 2));
+									tnt.setMetadata("source",
+											new FixedMetadataValue(WoolBattle.getInstance(), user));
 									tnt.setIsIncendiary(false);
 									tnt.setFuseTicks(2);
 								}
 							}
-						}
-
-					}.runTaskTimer(1);
+						}.runTaskTimer(1);
+					}
 				}
 			}
 		}
 	}
 
-	private void shootArrows(User user, float angle, int count, Arrow original) {
+	private void shootArrows(WBUser user, float angle, int count, Arrow original) {
 		Player p = user.getBukkitEntity();
 		for (int i = 0; i < count; i++) {
 			Arrow arrow = p.launchProjectile(Arrow.class);

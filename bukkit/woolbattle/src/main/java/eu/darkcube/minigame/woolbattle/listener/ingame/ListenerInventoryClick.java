@@ -4,11 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import java.util.function.Consumer;
-import org.bukkit.Bukkit;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.Arrays;
+import eu.darkcube.minigame.woolbattle.util.ItemManager;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,16 +23,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.SkullMeta;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.perk.Perk;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+
+import java.util.function.Consumer;
 
 public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 	public static ListenerInventoryClick instance;
@@ -49,28 +45,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		int slot = e.getRawSlot();
 
 		Player p = (Player) e.getWhoClicked();
-		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
-		if (user.getTeam().getType() == TeamType.SPECTATOR) {
-			e.setCancelled(true);
-			if (user.getOpenInventory() != null) {
-				switch (user.getOpenInventory()) {
-					case COMPASS_TELEPORT:
-						ItemStack item = e.getCurrentItem();
-						if (item != null && item.getType() == Material.SKULL_ITEM) {
-							SkullMeta meta = (SkullMeta) item.getItemMeta();
-							Player t = Bukkit.getPlayerExact(meta.getOwner());
-							if (t != null) {
-								p.teleport(t);
-								p.closeInventory();
-							}
-						}
-						break;
-					default:
-						break;
-				}
-			}
-			return;
-		}
+		WBUser user = WBUser.getUser(p);
 		if (e.getView().getType() == InventoryType.CRAFTING) {
 			if (slot == 0 || slot == 1 || slot == 2 || slot == 3 || slot == 4 || slot == -999
 					|| slot == -1 || slot == 5 || slot == 6 || slot == 7 || slot == 8) {
@@ -89,7 +64,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		ItemStack item = e.getCurrentItem();
 		ItemStack cursor = e.getCursor();
 		// Otherwise there is the possibility that I get the NORMAL slot 26 of the inventory and not
-		// a hotbarslot.
+		// a hotbar-slot.
 		ItemStack hotbar = hotbarSlot == -1 ? null : e.getView().getItem(hotbarSlot + 36);
 
 		boolean var1 = item != null && item.getType() != Material.AIR;
@@ -100,14 +75,15 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		String tagCursor = var2 ? ItemManager.getItemId(cursor) : "Unknown Perk";
 		String tagHotbar = var3 ? ItemManager.getItemId(hotbar) : "Unknown Perk";
 
+		//		Handle[] handles = new Handle[0];
+		//		handles = Arrays.addAfter(handles,
+		//				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),
+		//				new Handle(user.getData().getPerks()::setSlotArrow, Item.DEFAULT_ARROW.getItemId()),
+		//				new Handle(user.getData().getPerks()::setSlotShears,
+		//						Item.DEFAULT_SHEARS.getItemId()));
 		Handle[] handles = new Handle[0];
-		handles = Arrays.addAfter(handles,
-				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),
-				new Handle(user.getData().getPerks()::setSlotArrow, Item.DEFAULT_ARROW.getItemId()),
-				new Handle(user.getData().getPerks()::setSlotShears,
-						Item.DEFAULT_SHEARS.getItemId()));
-		for (Perk perk : Arrays.asList(user.getActivePerk1(), user.getActivePerk2(),
-				user.getPassivePerk(), user.getEnderPearl())) {
+
+		for (UserPerk perk : user.perks().perks()) {
 			handles = Arrays.addAfter(handles, new Handle(perk));
 		}
 		for (Handle handle : handles) {
@@ -250,15 +226,14 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		if (tag == null)
 			return;
 		Player p = (Player) e.getPlayer();
-		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		WBUser user = WBUser.getUser(p);
 		Handle[] handles = new Handle[0];
-		handles = Arrays.addAfter(handles,
-				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),
-				new Handle(user.getData().getPerks()::setSlotArrow, Item.DEFAULT_ARROW.getItemId()),
-				new Handle(user.getData().getPerks()::setSlotShears,
-						Item.DEFAULT_SHEARS.getItemId()));
-		for (Perk perk : Arrays.asList(user.getActivePerk1(), user.getActivePerk2(),
-				user.getPassivePerk(), user.getEnderPearl())) {
+		//		handles = Arrays.addAfter(handles,
+		//				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),
+		//				new Handle(user.getData().getPerks()::setSlotArrow, Item.DEFAULT_ARROW.getItemId()),
+		//				new Handle(user.getData().getPerks()::setSlotShears,
+		//						Item.DEFAULT_SHEARS.getItemId()));
+		for (UserPerk perk : user.perks().perks()) {
 			handles = Arrays.addAfter(handles, new Handle(perk));
 		}
 
@@ -276,14 +251,20 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		}
 	}
 
+	private void tue(String tagHotbar, String tagItem, String tagCursor, String tag) {
+		throw new UnknownError(
+				"Can not access this code: hotbar: " + tagHotbar + ", item: " + tagItem
+						+ ", cursor: " + tagCursor + ", perkTag: " + tag);
+	}
+
 	static class Handle {
 
 		private final Consumer<Integer> consumer;
 		private final String tag;
-		private Perk perk;
+		private UserPerk perk;
 
-		Handle(Perk perk) {
-			this(perk::setSlotSilent, ItemManager.getItemId(perk.calculateItem()));
+		Handle(UserPerk perk) {
+			this(perk::slotSilent, perk.currentPerkItem().item().getItemId());
 			this.perk = perk;
 		}
 
@@ -298,7 +279,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 
 		public void update() {
 			if (perk != null) {
-				perk.setItem();
+				perk.currentPerkItem().setItem();
 			}
 		}
 
@@ -306,10 +287,5 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 			// System.out.println("new sot: " + slot);
 			consumer.accept(slot);
 		}
-	}
-
-	private void tue(String tagHotbar, String tagItem, String tagCursor, String tag) {
-		throw new UnknownError("Can not access this code: hotbar: " + tagHotbar + ", item: "
-				+ tagItem + ", cursor: " + tagCursor + ", perkTag: " + tag);
 	}
 }

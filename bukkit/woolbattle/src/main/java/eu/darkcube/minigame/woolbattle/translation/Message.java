@@ -4,16 +4,16 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.translation;
 
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.Language;
 
 import java.util.function.Function;
 
-public enum Message {
+public enum Message implements BaseMessage {
 
 	NO_PLAYER,
 	COMMAND_LANGUAGE_USAGE,
@@ -24,10 +24,18 @@ public enum Message {
 	TEAM_IS_FULL,
 	EP_GLITCH_ON,
 	EP_GLITCH_OFF,
+	PERK_COOLDOWN_SET,
+	PERK_COST_SET,
+	MAP_CHANGED,
+	STATS_WERE_DISABLED,
+	STATS_ARE_ENABLED,
+	STATS_ARE_DISABLED,
 	VOTED_FOR_EP_GLITCH,
 	VOTED_AGAINST_EP_GLITCH,
+	VOTED_LIFES,
 	ALREADY_VOTED_FOR_THIS,
 	VOTED_FOR_MAP,
+	PERK_SET_FOR_PLAYER,
 	NOT_IMPLEMENTED,
 	ALREADY_VOTED_FOR_MAP,
 	SELECTED,
@@ -77,46 +85,29 @@ public enum Message {
 		this.key = this.name();
 	}
 
-	public static String getMessage(String messageKey, Language language, Object... replacements) {
-		return LegacyComponentSerializer.legacySection()
-				.serialize(language.getMessage(KEY_PREFIX + messageKey, replacements));
-		//		try {
-		//			String msg = language.getBundle().getString(messageKey);
-		//			for (int i = 0; msg.contains("{}")
-		//							&& i < replacements.length; i++) {
-		//				msg = msg.replaceFirst("\\{\\}", replacements[i]);
-		//			}
-		//			return ChatColor.translateAlternateColorCodes('&', msg);
-		//		} catch (Exception ex) {
-		//			StringBuilder builder = new StringBuilder();
-		//			builder.append(messageKey);
-		//			if (replacements.length > 0) {
-		//				builder.append('[');
-		//				for (int i = 0; i + 1 < replacements.length; i++) {
-		//					builder.append(replacements[i]).append(',');
-		//				}
-		//				builder.append(replacements[replacements.length
-		//								- 1]).append(']');
-		//			}
-		//			return builder.toString();
-		//		}
+	public static Component getMessage(String messageKey, Language language,
+			Object... replacements) {
+		return language.getMessage(KEY_PREFIX + messageKey, replacements);
+	}
+
+	@Override
+	public String getPrefixModifier() {
+		return KEY_PREFIX;
 	}
 
 	public String getKey() {
 		return key;
 	}
 
-	public final String getMessage(Language language, Object... replacements) {
+	public final Component getMessage(Language language, Object... replacements) {
 		return getMessage(key, language, replacements);
 	}
 
-	public final String getServerMessage(Object... replacements) {
-		//		return getMessage(Main.getInstance().getServerLanguage(), replacements);
-		//		return Language.ENGLISH.getMessage(key, replacements);
+	public final Component getServerMessage(Object... replacements) {
 		return getMessage(key, Language.ENGLISH, replacements);
 	}
 
-	public final String getMessage(User user, Object... replacements) {
+	public final Component getMessage(WBUser user, Object... replacements) {
 		return getMessage(user.getLanguage(), replacements);
 	}
 }

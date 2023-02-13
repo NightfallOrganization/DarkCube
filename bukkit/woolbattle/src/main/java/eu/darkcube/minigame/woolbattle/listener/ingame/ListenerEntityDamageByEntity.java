@@ -4,13 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.Predicate;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGhost;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import net.minecraft.server.v1_8_R3.Blocks;
+import net.minecraft.server.v1_8_R3.EntityFallingBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,15 +27,11 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.MetadataValue;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.game.Ingame;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.ListenerGhost;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import net.minecraft.server.v1_8_R3.Blocks;
-import net.minecraft.server.v1_8_R3.EntityFallingBlock;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityEvent> {
 
@@ -41,14 +41,14 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 		if (e.getEntity() instanceof Player) {
 			e.setDamage(0);
 			WoolBattle main = WoolBattle.getInstance();
-			User target = main.getUserWrapper().getUser(e.getEntity().getUniqueId());
+			WBUser target = WBUser.getUser((Player) e.getEntity());
 			Ingame ingame = main.getIngame();
 			if (target.hasSpawnProtection() || ingame.isGlobalSpawnProtection) {
 				e.setCancelled(true);
 				return;
 			}
 			if (e.getDamager() instanceof Player) {
-				User user = main.getUserWrapper().getUser(e.getDamager().getUniqueId());
+				WBUser user = WBUser.getUser((Player) e.getDamager());
 				if (!user.isTrollMode()) {
 					if (e.isCancelled())
 						return;
@@ -69,14 +69,14 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 				EnderPearl pearl = (EnderPearl) e.getDamager();
 				if (pearl.getShooter() instanceof Player) {
 					Player p = (Player) pearl.getShooter();
-					User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+					WBUser user = WBUser.getUser(p);
 					if (ListenerGhost.isGhost(target)) {
 						return;
 					}
 
 					if (!user.isTrollMode()) {
-						if (target.getUniqueId().equals(user.getUniqueId())
-								|| user.getTeam().equals(target.getTeam())
+						if (target.getUniqueId().equals(user.getUniqueId()) || user.getTeam()
+								.equals(target.getTeam())
 								|| user.getTeam().getType() == TeamType.SPECTATOR) {
 							e.setCancelled(true);
 							return;
@@ -88,29 +88,28 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 				Snowball ball = (Snowball) e.getDamager();
 				if (ball.getShooter() instanceof Player) {
 					Player p = (Player) ball.getShooter();
-					User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+					WBUser user = WBUser.getUser(p);
 					if (ListenerGhost.isGhost(target)) {
 						return;
 					}
 
 					if (!user.isTrollMode()) {
-						if (target.getUniqueId().equals(user.getUniqueId())
-								|| user.getTeam().equals(target.getTeam())
+						if (target.getUniqueId().equals(user.getUniqueId()) || user.getTeam()
+								.equals(target.getTeam())
 								|| user.getTeam().getType() == TeamType.SPECTATOR) {
 							e.setCancelled(true);
 							return;
 						}
 					}
-					if (ball.hasMetadata("type")
-							&& ball.getMetadata("type").get(0).asString().equals("minigun")) {
+					if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString()
+							.equals("minigun")) {
 						WoolBattle.getInstance().getIngame().attack(user, target);
 						e.setCancelled(true);
 						target.getBukkitEntity().damage(0);
 
-						target.getBukkitEntity()
-								.setVelocity(ball.getVelocity().setY(0).normalize()
-										.multiply(.47 + new Random().nextDouble() / 70 + 1.1)
-										.setY(.400023));
+						target.getBukkitEntity().setVelocity(ball.getVelocity().setY(0).normalize()
+								.multiply(.47 + new Random().nextDouble() / 70 + 1.1)
+								.setY(.400023));
 					}
 
 				}
@@ -120,15 +119,15 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 				Arrow arrow = (Arrow) e.getDamager();
 				if (arrow.getShooter() instanceof Player) {
 					Player p = (Player) arrow.getShooter();
-					User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+					WBUser user = WBUser.getUser(p);
 
 					if (ListenerGhost.isGhost(target)) {
 						return;
 					}
 
 					if (!user.isTrollMode()) {
-						if (target.getUniqueId().equals(user.getUniqueId())
-								|| user.getTeam().equals(target.getTeam())
+						if (target.getUniqueId().equals(user.getUniqueId()) || user.getTeam()
+								.equals(target.getTeam())
 								|| user.getTeam().getType() == TeamType.SPECTATOR) {
 							e.setCancelled(true);
 							return;
@@ -146,8 +145,9 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 						target.getBukkitEntity().damage(0);
 						user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(),
 								Sound.SUCCESSFUL_HIT, 1, 0);
-						target.getBukkitEntity().getWorld().playSound(
-								target.getBukkitEntity().getLocation(), Sound.ARROW_HIT, 1, 1);
+						target.getBukkitEntity().getWorld()
+								.playSound(target.getBukkitEntity().getLocation(), Sound.ARROW_HIT,
+										1, 1);
 
 						new Scheduler() {
 							Location loc = target.getBukkitEntity().getLocation();
@@ -171,16 +171,15 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 												int dmg = Ingame.getBlockDamage(b);
 												if (dmg >= 2) {
 													Random r = new Random();
-													double x =
-															r.nextBoolean() ? r.nextDouble() / 3
-																	: -r.nextDouble() / 3,
-															y = r.nextDouble() / 2,
-															z = r.nextBoolean() ? r.nextDouble() / 3
-																	: -r.nextDouble() / 3;
+													double x = r.nextBoolean()
+															? r.nextDouble() / 3
+															: -r.nextDouble() / 3, y =
+															r.nextDouble() / 2, z = r.nextBoolean()
+															? r.nextDouble() / 3
+															: -r.nextDouble() / 3;
 													EntityFallingBlock block =
 															new EntityFallingBlock(
-																	((CraftWorld) b.getWorld())
-																			.getHandle(),
+																	((CraftWorld) b.getWorld()).getHandle(),
 																	b.getLocation().getBlockX()
 																			+ .5,
 																	b.getLocation().getBlockY()
@@ -224,11 +223,9 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 
 							}
 						}.runTaskLater(3);
-						target.getBukkitEntity()
-								.setVelocity(arrow.getVelocity().setY(0).normalize()
-										.multiply(.47 + new Random().nextDouble() / 70
-												+ arrow.getKnockbackStrength() / 1.42)
-										.setY(.400023));
+						target.getBukkitEntity().setVelocity(arrow.getVelocity().setY(0).normalize()
+								.multiply(.47 + new Random().nextDouble() / 70
+										+ arrow.getKnockbackStrength() / 1.42).setY(.400023));
 						arrow.remove();
 					} else {
 						arrow.remove();

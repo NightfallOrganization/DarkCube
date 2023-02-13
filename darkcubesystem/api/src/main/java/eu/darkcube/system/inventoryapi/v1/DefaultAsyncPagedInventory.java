@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.v1;
 
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -33,8 +32,8 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	@Override
-	protected void postTick(boolean changedInformations) {
-		if (changedInformations) {
+	protected void postTick(boolean changedInformation) {
+		if (changedInformation) {
 			this.playSound();
 		}
 	}
@@ -51,9 +50,8 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	protected void playSound() {
-		this.opened.stream().filter(p -> p instanceof Player).map(p -> (Player) p).forEach(p -> {
-			p.playSound(p.getLocation(), Sound.NOTE_STICKS, 100, 1);
-		});
+		this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
+				.forEach(p -> p.playSound(p.getLocation(), Sound.NOTE_STICKS, 100, 1));
 	}
 
 	protected void insertArrowItems() {
@@ -64,7 +62,6 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	protected void insertFallbackItems() {
-
 		ItemStack l = new ItemStack(Material.STAINED_GLASS_PANE);
 		l.setDurability((short) 7);
 		ItemMeta meta = l.getItemMeta();

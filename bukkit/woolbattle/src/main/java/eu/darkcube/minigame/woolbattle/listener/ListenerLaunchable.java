@@ -4,12 +4,9 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -19,7 +16,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ListenerLaunchable implements Listener {
 

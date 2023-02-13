@@ -4,118 +4,129 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.util;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
-import eu.darkcube.minigame.woolbattle.perk.PerkType;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BasicPerkListener extends PerkListener implements RegisterNotifyListener {
 
 	private final Handle handle = new Handle();
 
-	private final PerkType perkType;
+	private final Perk perk;
 
-	public BasicPerkListener(PerkType perkType) {
-		this.perkType = perkType;
+	public BasicPerkListener(PerkName perkName) {
+		this(WoolBattle.getInstance().perkRegistry().perks().get(perkName));
+	}
+
+	public BasicPerkListener(Perk perk) {
+		this.perk = perk;
 	}
 
 	@Override
-	public final void registered() {
+	public void registered() {
 		WoolBattle.registerListeners(this.handle);
 	}
 
 	@Override
-	public final void unregistered() {
+	public void unregistered() {
 		WoolBattle.unregisterListeners(this.handle);
 	}
 
-	public PerkType getPerkType() {
-		return this.perkType;
+	public Perk perk() {
+		return perk;
 	}
 
 	/**
 	 * Called when the perk is activated
-	 * 
-	 * @param user the user
+	 *
 	 * @param perk the perk
+	 *
 	 * @return if the perk was activated and cooldown should start
 	 */
-	protected boolean activate(User user, Perk perk) {
+	protected boolean activate(UserPerk perk) {
 		return false;
 	}
 
 	/**
 	 * Called when the perk is activated with a right click
-	 * 
-	 * @param user the user
+	 *
 	 * @param perk the perk
+	 *
 	 * @return if the perk was activated and cooldown should start
 	 */
-	protected boolean activateRight(User user, Perk perk) {
+	protected boolean activateRight(UserPerk perk) {
 		return false;
 	}
 
 	/**
 	 * Called when the perk is activated with a left click
-	 * 
-	 * @param user the user
+	 *
 	 * @param perk the perk
+	 *
 	 * @return if the perk was activated and cooldown should start
 	 */
-	protected boolean activateLeft(User user, Perk perk) {
+	protected boolean activateLeft(UserPerk perk) {
 		return false;
 	}
 
 	/**
 	 * Called when any of the activate methods return true. Default implementation is paying wool
 	 * and starting cooldown
-	 * 
-	 * @param user the user
+	 *
 	 * @param perk the perk
 	 */
-	protected void activated(User user, Perk perk) {
-		payForThePerk(user, perkType);
-		startCooldown(user, perkType);
+	protected void activated(UserPerk perk) {
+		payForThePerk(perk);
+		startCooldown(perk);
+	}
+
+	protected boolean mayActivate() {
+		return true;
 	}
 
 	private class Handle implements Listener {
 
 		@EventHandler
 		private void handle(LaunchableInteractEvent event) {
+			if (!mayActivate())
+				return;
 			ItemStack item = event.getItem();
 			if (item == null) {
 				return;
 			}
-			User user = WoolBattle.getInstance().getUserWrapper()
-					.getUser(event.getPlayer().getUniqueId());
-			if (!checkUsable(user, perkType, item, () -> {
+			WBUser user = WBUser.getUser(event.getPlayer());
+			AtomicReference<UserPerk> refUserPerk = new AtomicReference<>();
+			if (!checkUsable(user, item, userPerk -> {
+				refUserPerk.set(userPerk);
 				if (event.getEntity() != null) {
-					Perk perk = user.getPerkByItemId(perkType.getItem().getItemId());
-					perk.setItem();
-					new Scheduler(perk::setItem).runTask();
+					event.getEntity().remove();
+					userPerk.currentPerkItem().setItem();
+					new Scheduler(userPerk.currentPerkItem()::setItem).runTask();
 				}
 				event.setCancelled(true);
 			})) {
 				return;
 			}
-			Perk perk = user.getPerkByItemId(perkType.getItem().getItemId());
+			UserPerk userPerk = refUserPerk.get();
 			boolean left = event.getAction() == Action.LEFT_CLICK_AIR
 					|| event.getAction() == Action.LEFT_CLICK_BLOCK;
-			if (!activate(user, perk)
-					&& !(left ? activateLeft(user, perk) : activateRight(user, perk))) {
+			if (!activate(userPerk) && !(left ? activateLeft(userPerk) : activateRight(userPerk))) {
 				return;
 			}
-			activated(user, perk);
+			activated(userPerk);
 		}
 
 	}

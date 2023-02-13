@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import net.minecraft.server.v1_8_R3.IScoreboardCriteria;
 
 public class Scoreboard {
@@ -27,7 +27,7 @@ public class Scoreboard {
 		objs = new HashMap<>();
 	}
 
-	public Scoreboard(User owner) {
+	public Scoreboard(WBUser owner) {
 		sb = owner.getBukkitEntity().getScoreboard();
 		teams = new HashMap<>();
 		sb.getTeams().forEach(team -> {
@@ -39,8 +39,8 @@ public class Scoreboard {
 		});
 	}
 
-	public Objective createObjective(String name, IScoreboardCriteria criteria) {
-		org.bukkit.scoreboard.Objective objective = sb.registerNewObjective(name, criteria.getName());
+	public Objective createObjective(String name, String criteria) {
+		org.bukkit.scoreboard.Objective objective = sb.registerNewObjective(name, criteria);
 		Objective obj = new Objective(objective);
 		objs.put(name, obj);
 		return obj;

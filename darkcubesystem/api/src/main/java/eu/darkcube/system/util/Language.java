@@ -68,6 +68,10 @@ public enum Language {
 		return GERMAN;
 	}
 
+	public boolean containsMessage(String key) {
+		return bundle.containsKey(key);
+	}
+
 	public Component getMessage(String key, Object... replacements) {
 		List<Component> components = new ArrayList<>();
 		for (int i = 0; i < replacements.length; i++) {
@@ -201,7 +205,7 @@ public enum Language {
 			/**
 			 * Constructs a resource bundle enumeration.
 			 *
-			 * @param set         an set providing some elements of the enumeration
+			 * @param set         a set providing some elements of the enumeration
 			 * @param enumeration an enumeration providing more elements of the enumeration.
 			 *                    enumeration may be null.
 			 */

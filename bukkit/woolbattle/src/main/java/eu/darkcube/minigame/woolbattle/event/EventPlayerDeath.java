@@ -10,19 +10,19 @@ package eu.darkcube.minigame.woolbattle.event;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 
 public class EventPlayerDeath extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	private User user;
+	private WBUser user;
 
-	public EventPlayerDeath(User user) {
+	public EventPlayerDeath(WBUser user) {
 		this.user = user;
 	}
 
-	public User getUser() {
+	public WBUser getUser() {
 		return user;
 	}
 

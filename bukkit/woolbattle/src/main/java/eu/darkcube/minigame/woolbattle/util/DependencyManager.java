@@ -44,7 +44,7 @@ public class DependencyManager {
 		}
 	}
 
-	public static enum Dependency {
+	public enum Dependency {
 
 		MYSQL_DRIVER("mysql_driver.jar")
 

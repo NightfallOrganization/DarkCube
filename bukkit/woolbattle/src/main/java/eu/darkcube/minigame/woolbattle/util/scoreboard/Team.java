@@ -4,9 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.scoreboard.NameTagVisibility;
 
 public class Team {
@@ -43,16 +44,18 @@ public class Team {
 		team.setDisplayName(name);
 	}
 
-	public void setPrefix(String prefix) {
-		if (prefix.length() > 16)
-			prefix = prefix.substring(0, 16);
-		team.setPrefix(prefix);
+	public void setPrefix(Component prefix) {
+		String p = LegacyComponentSerializer.legacySection().serialize(prefix);
+		if (p.length() > 16)
+			p = p.substring(0, 16);
+		team.setPrefix(p);
 	}
 
-	public void setSuffix(String suffix) {
-		if (suffix.length() > 16)
-			suffix = suffix.substring(0, 16);
-		team.setSuffix(suffix);
+	public void setSuffix(Component suffix) {
+		String s = LegacyComponentSerializer.legacySection().serialize(suffix);
+		if (s.length() > 16)
+			s = s.substring(0, 16);
+		team.setSuffix(s);
 	}
 
 	public void setNameTagVisibility(NameTagVisibility visibility) {

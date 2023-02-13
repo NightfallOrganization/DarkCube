@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.team;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class DefaultTeamManager implements TeamManager {
 
 	private final Collection<Team> TEAMS;
-	private final Map<User, Team> TEAM_BY_USER;
+	private final Map<WBUser, Team> TEAM_BY_USER;
 	private Team SPECTATOR;
 
 	public DefaultTeamManager() {
@@ -32,10 +32,10 @@ public class DefaultTeamManager implements TeamManager {
 	}
 
 	@Override
-	public void setTeam(User user, Team team) {
+	public void setTeam(WBUser user, Team team) {
 		Team t = getTeam(user);
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			User u = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+			WBUser u = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
 			Scoreboard s = new Scoreboard(u);
 			if (t != null)
 				s.getTeam(t.getType().getScoreboardTag()).removePlayer(user.getPlayerName());
@@ -89,7 +89,7 @@ public class DefaultTeamManager implements TeamManager {
 	}
 
 	@Override
-	public Team getTeam(User user) {
+	public Team getTeam(WBUser user) {
 		return TEAM_BY_USER.get(user);
 	}
 

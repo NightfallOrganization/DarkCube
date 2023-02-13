@@ -34,9 +34,7 @@ public class CommandExecutor {
 		this.argumentBuilder = argumentBuilder;
 		this.names = new String[this.aliases.length + 1];
 		this.names[0] = name;
-		for (int i = 1; i < this.names.length; i++) {
-			this.names[i] = this.aliases[i - 1];
-		}
+		System.arraycopy(this.aliases, 0, this.names, 1, this.names.length - 1);
 	}
 
 	public final LiteralArgumentBuilder<CommandSource> builder() {

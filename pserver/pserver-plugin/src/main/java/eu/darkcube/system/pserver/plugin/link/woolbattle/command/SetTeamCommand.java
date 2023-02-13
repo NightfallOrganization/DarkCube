@@ -11,7 +11,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
@@ -43,7 +43,7 @@ public class SetTeamCommand extends PServerExecutor {
 			TeamType teamtype) {
 		Team team = WoolBattle.getInstance().getTeamManager().getTeam(teamtype);
 		for (Player player : players) {
-			User user = WoolBattle.getInstance().getUserWrapper().getUser(player.getUniqueId());
+			WBUser user = WoolBattle.getInstance().getUserWrapper().getUser(player.getUniqueId());
 			WoolBattle.getInstance().getTeamManager().setTeam(user, team);
 		}
 		if (players.size() == 1) {

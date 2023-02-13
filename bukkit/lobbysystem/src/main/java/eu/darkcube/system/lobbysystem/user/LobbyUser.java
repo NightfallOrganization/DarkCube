@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.user;
 
 import eu.darkcube.system.inventoryapi.v1.IInventory;
@@ -32,15 +31,15 @@ import java.util.Set;
 public class LobbyUser {
 	private static final PersistentDataType<Set<Integer>> INTEGERS =
 			PersistentDataTypes.set(PersistentDataTypes.INTEGER);
-	private static final PersistentDataType<Gadget> TGADGET =
+	private static final PersistentDataType<Gadget> TYPE_GADGET =
 			PersistentDataTypes.enumType(Gadget.class);
 	private static final Key ANIMATIONS = new Key(Lobby.getInstance(), "animations");
 	private static final Key SOUNDS = new Key(Lobby.getInstance(), "sounds");
-	private static final Key LASTDAILYREWARD = new Key(Lobby.getInstance(), "lastDailyReward");
-	private static final Key REWARDSLOTSUSED = new Key(Lobby.getInstance(), "rewardSlotsUsed");
+	private static final Key LAST_DAILY_REWARD = new Key(Lobby.getInstance(), "lastDailyReward");
+	private static final Key REWARD_SLOTS_USED = new Key(Lobby.getInstance(), "rewardSlotsUsed");
 	private static final Key GADGET = new Key(Lobby.getInstance(), "gadget");
 	private static final Key POSITION = new Key(Lobby.getInstance(), "position");
-	private static final Key SELECTEDSLOT = new Key(Lobby.getInstance(), "selectedSlot");
+	private static final Key SELECTED_SLOT = new Key(Lobby.getInstance(), "selectedSlot");
 	final User user;
 	volatile IInventory openInventory;
 	boolean buildMode = false;
@@ -56,13 +55,14 @@ public class LobbyUser {
 		this.user.getPersistentDataStorage()
 				.setIfNotPresent(SOUNDS, PersistentDataTypes.BOOLEAN, true);
 		this.user.getPersistentDataStorage()
-				.setIfNotPresent(LASTDAILYREWARD, PersistentDataTypes.LONG, 0L);
+				.setIfNotPresent(LAST_DAILY_REWARD, PersistentDataTypes.LONG, 0L);
 		this.user.getPersistentDataStorage()
-				.setIfNotPresent(REWARDSLOTSUSED, INTEGERS, new HashSet<>());
+				.setIfNotPresent(REWARD_SLOTS_USED, INTEGERS, new HashSet<>());
 		this.user.getPersistentDataStorage()
-				.setIfNotPresent(GADGET, TGADGET, Gadget.GRAPPLING_HOOK);
-		this.user.getPersistentDataStorage().setIfNotPresent(SELECTEDSLOT, PersistentDataTypes.LONG,
-				System.currentTimeMillis());
+				.setIfNotPresent(GADGET, TYPE_GADGET, Gadget.GRAPPLING_HOOK);
+		this.user.getPersistentDataStorage()
+				.setIfNotPresent(SELECTED_SLOT, PersistentDataTypes.LONG,
+						System.currentTimeMillis());
 		long time2 = System.currentTimeMillis();
 		this.openInventory = new InventoryPlayer();
 		if (System.currentTimeMillis() - time1 > 1000) {
@@ -133,19 +133,19 @@ public class LobbyUser {
 	}
 
 	public int getSelectedSlot() {
-		return user.getPersistentDataStorage().get(SELECTEDSLOT, PersistentDataTypes.INTEGER);
+		return user.getPersistentDataStorage().get(SELECTED_SLOT, PersistentDataTypes.INTEGER);
 	}
 
 	public void setSelectedSlot(int slot) {
-		user.getPersistentDataStorage().set(SELECTEDSLOT, PersistentDataTypes.INTEGER, slot);
+		user.getPersistentDataStorage().set(SELECTED_SLOT, PersistentDataTypes.INTEGER, slot);
 	}
 
 	public Set<Integer> getRewardSlotsUsed() {
-		return user.getPersistentDataStorage().get(REWARDSLOTSUSED, INTEGERS);
+		return user.getPersistentDataStorage().get(REWARD_SLOTS_USED, INTEGERS);
 	}
 
 	public void setRewardSlotsUsed(Set<Integer> slots) {
-		user.getPersistentDataStorage().set(REWARDSLOTSUSED, INTEGERS, slots);
+		user.getPersistentDataStorage().set(REWARD_SLOTS_USED, INTEGERS, slots);
 	}
 
 	public boolean disableAnimations() {
@@ -202,12 +202,12 @@ public class LobbyUser {
 	}
 
 	public long getLastDailyReward() {
-		return user.getPersistentDataStorage().get(LASTDAILYREWARD, PersistentDataTypes.LONG);
+		return user.getPersistentDataStorage().get(LAST_DAILY_REWARD, PersistentDataTypes.LONG);
 	}
 
 	public void setLastDailyReward(long lastDailyReward) {
 		user.getPersistentDataStorage()
-				.set(LASTDAILYREWARD, PersistentDataTypes.LONG, lastDailyReward);
+				.set(LAST_DAILY_REWARD, PersistentDataTypes.LONG, lastDailyReward);
 	}
 
 	public void playSound(Sound sound, float volume, float pitch) {
@@ -262,7 +262,7 @@ public class LobbyUser {
 	}
 
 	public Gadget getGadget() {
-		return user.getPersistentDataStorage().get(GADGET, TGADGET);
+		return user.getPersistentDataStorage().get(GADGET, TYPE_GADGET);
 	}
 
 	public void setGadget(Gadget gadget) {
@@ -270,7 +270,7 @@ public class LobbyUser {
 		if (current == gadget) {
 			return;
 		}
-		user.getPersistentDataStorage().set(GADGET, TGADGET, gadget);
+		user.getPersistentDataStorage().set(GADGET, TYPE_GADGET, gadget);
 		Lobby.getInstance().setItems(this);
 	}
 

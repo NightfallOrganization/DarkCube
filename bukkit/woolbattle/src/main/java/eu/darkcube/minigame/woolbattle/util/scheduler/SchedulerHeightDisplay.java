@@ -4,14 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.util.AdventureSupport;
 import org.bukkit.Bukkit;
@@ -33,8 +32,8 @@ public class SchedulerHeightDisplay extends Scheduler {
 	}
 
 	public final void display(Player p) {
-		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
-		HeightDisplay display = user.getData().getHeightDisplay();
+		WBUser user = WBUser.getUser(p);
+		HeightDisplay display = user.heightDisplay();
 		if (display.isEnabled()) {
 			int deathHeight = WoolBattle.getInstance().getMap().getDeathHeight();
 			int currentHeight = p.getLocation().getBlockY();
