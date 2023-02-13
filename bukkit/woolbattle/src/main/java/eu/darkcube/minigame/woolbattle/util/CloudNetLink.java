@@ -6,11 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle.util;
 
-import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.ext.bridge.server.BridgeServerHelper;
 import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.util.GameState;
 
@@ -41,12 +40,12 @@ public class CloudNetLink {
 					current = GameState.STOPPING;
 				}
 				DarkCubeBukkit.gameState(current);
-				DarkCubeBukkit.playingPlayers().set(WoolBattle.getInstance().getLobby().isEnabled()
-						? WoolBattle.getInstance().getUserWrapper().getUsers().size()
-						: (int) WoolBattle.getInstance().getUserWrapper().getUsers().stream()
-								.filter(u -> u.getTeam().getType() != TeamType.SPECTATOR).count());
+				DarkCubeBukkit.playingPlayers()
+						.set(WoolBattle.getInstance().getLobby().isEnabled()
+								? WBUser.onlineUsers().size()
+								: (int) WBUser.onlineUsers().stream()
+										.filter(u -> u.getTeam().canPlay()).count());
 				DarkCubeBukkit.maxPlayingPlayers().set(WoolBattle.getInstance().getMaxPlayers());
-				JsonObject json = new JsonObject();
 				BridgeServerHelper.setMaxPlayers(1000);
 				String mapname = WoolBattle.getInstance().getMap() == null
 						? "Unknown Map"
