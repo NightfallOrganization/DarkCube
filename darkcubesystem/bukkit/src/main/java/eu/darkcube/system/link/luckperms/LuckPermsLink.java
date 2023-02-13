@@ -17,7 +17,7 @@ public class LuckPermsLink extends Link {
 	}
 
 	@Override
-	protected void link() throws Throwable {
+	protected void link() {
 		calculator = new LinkContextCalculator();
 		LuckPermsProvider.get().getContextManager().registerCalculator(calculator);
 	}

@@ -29,9 +29,6 @@ tasks {
             }
         }
     }
-}
-
-tasks {
     assemble {
         dependsOn(reobfJar)
     }
