@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.listener;
 
 import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
@@ -12,7 +11,7 @@ import eu.darkcube.system.libs.com.github.juliarn.npc.event.PlayerNPCInteractEve
 import eu.darkcube.system.lobbysystem.npc.ConnectorNPC;
 import org.bukkit.event.EventHandler;
 
-public class ListenerGamemodeConnectorNPC extends BaseListener {
+public class ListenerConnectorNPC extends BaseListener {
 	@EventHandler
 	public void handle(PlayerNPCInteractEvent e) {
 		NPC npc = e.getNPC();

@@ -6,15 +6,12 @@
  */
 package eu.darkcube.system.util;
 
+import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.ComponentLike;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
-import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.ComponentSerializer;
-import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;
@@ -71,6 +68,10 @@ public enum Language {
 	public Component getMessage(String key, Object... replacements) {
 		List<Component> components = new ArrayList<>();
 		for (int i = 0; i < replacements.length; i++) {
+			if (replacements[i] instanceof BaseMessage) {
+				BaseMessage message = (BaseMessage) replacements[i];
+				replacements[i] = message.getMessage(this);
+			}
 			if (replacements[i] instanceof ComponentLike) {
 				ComponentLike componentLike = (ComponentLike) replacements[i];
 				replacements[i] = (Formattable) (formatter, flags, width, precision) -> {

@@ -103,6 +103,7 @@ public class ConnectorNPC {
 	private final List<String> permissions = new ArrayList<>();
 	private final int id;
 	private final CurrentServer currentServer = new CurrentServer();
+	private final Collection<Player> connectingPlayers = ConcurrentHashMap.newKeySet();
 	private NPC npc;
 	private ConnectorHologram hologram;
 	private NPCKnockbackThread npcKnockbackThread;
@@ -191,6 +192,17 @@ public class ConnectorNPC {
 	}
 
 	public void connect(Player player) {
+		for (Player p : connectingPlayers) {
+			if (p == player) // Cooldown of 1 sec
+				return;
+		}
+		connectingPlayers.add(player);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				connectingPlayers.remove(player);
+			}
+		}.runTaskLater(Lobby.getInstance(), 20);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -384,9 +396,7 @@ public class ConnectorNPC {
 				try {
 					GameState state =
 							server.getProperty(DarkCubeServiceProperty.GAME_STATE).orElse(null);
-					if (state == null || state == GameState.UNKNOWN) {
-						throw new NullPointerException();
-					} else if (state != GameState.LOBBY) {
+					if (state == null) {
 						continue;
 					}
 					states.put(server, state);
@@ -403,7 +413,8 @@ public class ConnectorNPC {
 
 				GameState state = states.get(server);
 				String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
-				if (motd == null || motd.toLowerCase().contains("loading")) {
+				if (motd == null || motd.toLowerCase().contains("loading")
+						|| state != GameState.LOBBY) {
 					servers.remove(server);
 					states.remove(server);
 					continue;

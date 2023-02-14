@@ -21,7 +21,7 @@ public class CloudNetLink {
 
 	static {
 		try {
-			Class.forName("de.dytanic.cloudnet.wrapper.Wrapper");
+			Wrapper.getInstance().getServiceId();
 			CloudNetLink.isCloudnet = true;
 			DarkCubeBukkit.autoConfigure(false);
 		} catch (Exception ex) {

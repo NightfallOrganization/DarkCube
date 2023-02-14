@@ -4,13 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceId;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
@@ -90,18 +88,10 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 		List<ServiceInfoSnapshot> lobbies =
 				CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices(taskName)
 						.stream().filter(ServiceInfoSnapshot::isConnected)
-						.filter(s -> s.getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false))
-						.sorted(new Comparator<ServiceInfoSnapshot>() {
+						.sorted(Comparator.comparingInt(o -> o.getServiceId().getTaskServiceId()))
+						.collect(Collectors.toList());
 
-							@Override
-							public int compare(ServiceInfoSnapshot o1, ServiceInfoSnapshot o2) {
-								return Integer.compare(o1.getServiceId().getTaskServiceId(),
-										o2.getServiceId().getTaskServiceId());
-							}
-
-						}).collect(Collectors.toList());
-
-		if (lobbies == null || lobbies.isEmpty()) {
+		if (lobbies.isEmpty()) {
 			ItemStack item = new ItemStack(Material.BARRIER);
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName("§cUnable to load lobbies!");
@@ -117,8 +107,7 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 			ItemMeta meta = item.getItemMeta();
 			String id = s.getServiceId().getName();
 			if (id.length() > 0) {
-				id = Character.toUpperCase(id.charAt(0)) + id.substring(1)
-						.replace("-", " ");
+				id = Character.toUpperCase(id.charAt(0)) + id.substring(1).replace("-", " ");
 			}
 			if (s.getServiceId().equals(thisLobby.getServiceId())) {
 				item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user.getUser());

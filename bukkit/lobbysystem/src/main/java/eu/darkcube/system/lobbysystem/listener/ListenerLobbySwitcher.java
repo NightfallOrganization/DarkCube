@@ -4,11 +4,9 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.listener;
 
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.lobbysystem.inventory.InventoryLobbySwitcher;
@@ -43,9 +41,8 @@ public class ListenerLobbySwitcher extends BaseListener {
 			UserWrapper.fromUser(user).setOpenInventory(new InventoryLobbySwitcher(user));
 			return;
 		}
-		if (!service.isConnected() || !service.getProperty(BridgeServiceProperty.IS_ONLINE)
-				.orElse(false)) {
-			user.sendMessage(Message.SERVER_NOT_STARTED.getMessage(user));
+		if (!service.isConnected()) {
+			user.sendMessage(Message.SERVER_NOT_STARTED);
 			p.closeInventory();
 			return;
 		}

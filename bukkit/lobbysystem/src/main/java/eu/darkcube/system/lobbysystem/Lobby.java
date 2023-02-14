@@ -11,7 +11,7 @@ import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
+import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
@@ -150,8 +150,9 @@ public class Lobby extends Plugin {
 
 						int freeServices = 0;
 						for (ServiceInfoSnapshot service : services) {
-							GameState state = GameState.fromString(
-									service.getProperty(BridgeServiceProperty.STATE).orElse(null));
+							GameState state =
+									service.getProperty(DarkCubeServiceProperty.GAME_STATE)
+											.orElse(null);
 							if (state == GameState.LOBBY || state == GameState.UNKNOWN) {
 								freeServices++;
 							}
@@ -182,7 +183,7 @@ public class Lobby extends Plugin {
 		new ListenerInteract();
 		new ListenerLobbySwitcher();
 		new ListenerWoolBattleNPC();
-		new ListenerGamemodeConnectorNPC();
+		new ListenerConnectorNPC();
 		new ListenerMinigameServer();
 		new ListenerItemDropPickup();
 		new ListenerFish();

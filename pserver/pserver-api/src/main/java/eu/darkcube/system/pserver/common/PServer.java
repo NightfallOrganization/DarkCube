@@ -4,13 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.common;
+
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 
 import java.util.Collection;
 import java.util.UUID;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 
 public interface PServer {
 
@@ -30,9 +30,9 @@ public interface PServer {
 
 	boolean isPrivate();
 
-	boolean isPublic();
-
 	void setPrivate(boolean privateServer);
+
+	boolean isPublic();
 
 	UniqueId getId();
 
@@ -72,7 +72,7 @@ public interface PServer {
 		return getState() == State.STARTING;
 	}
 
-	public static enum State {
+	enum State {
 		RUNNING, STARTING, STOPPING, OFFLINE
 	}
 }

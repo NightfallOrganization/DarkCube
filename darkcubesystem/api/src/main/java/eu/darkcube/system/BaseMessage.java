@@ -4,18 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system;
 
-import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.commandapi.v3.ILanguagedCommandExecutor;
 import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
-import eu.darkcube.system.util.Language;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.util.Language;
 import org.bukkit.command.CommandSender;
 
 public interface BaseMessage {
@@ -57,13 +56,21 @@ public interface BaseMessage {
 		return getMessage(executor, new String[0], args);
 	}
 
+	default Component getMessage(Language language, Object... args) {
+		return getMessage(language, new String[0], args);
+	}
+
+	default Component getMessage(Language language, String[] prefixes, Object... args) {
+		return language.getMessage(getPrefixModifier() + String.join("", prefixes) + getKey(),
+				args);
+	}
+
 	default Component getMessage(ICommandExecutor executor, String[] prefixes, Object... args) {
 		Language language = Language.DEFAULT;
 		if (executor instanceof ILanguagedCommandExecutor) {
 			language = ((ILanguagedCommandExecutor) executor).getLanguage();
 		}
-		return language.getMessage(getPrefixModifier() + String.join("", prefixes) + getKey(),
-				args);
+		return getMessage(language, prefixes, args);
 	}
 
 }

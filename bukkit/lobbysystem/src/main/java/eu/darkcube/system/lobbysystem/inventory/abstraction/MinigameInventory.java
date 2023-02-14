@@ -10,7 +10,6 @@ import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
@@ -18,6 +17,7 @@ import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.MinigameServerSortingInfo;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.GameState;
@@ -64,7 +64,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
-		super.fillItems(items);
 
 		Collection<ServiceInfoSnapshot> servers = new HashSet<>();
 		this.getCloudTasks().forEach(task -> servers.addAll(
@@ -73,10 +72,10 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 		Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
 		for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
 			try {
-				GameState state = GameState.fromString(
-						server.getProperty(BridgeServiceProperty.STATE).orElse(null));
+				GameState state =
+						server.getProperty(DarkCubeServiceProperty.GAME_STATE).orElse(null);
 				if (state == null || state == GameState.UNKNOWN)
-					throw new NullPointerException();
+					continue;
 				if (state == GameState.STOPPING) {
 					continue;
 				}
@@ -95,7 +94,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 
 			GameState state = states.get(server);
 			String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
-			if (motd == null || motd.toLowerCase().contains("loading")) {
+			if (motd == null || motd.toLowerCase().contains("loading") || state == null) {
 				servers.remove(server);
 				states.remove(server);
 				continue;
@@ -110,12 +109,14 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 				} else {
 					builder.damage(DyeColor.LIME.getWoolData());
 				}
+				builder.lore(
+						Message.GAMESERVER_STATE.getMessage(user.getUser(), Message.STATE_LOBBY));
 			} else if (state == GameState.INGAME) {
 				builder.damage(DyeColor.ORANGE.getWoolData());
-			} else if (state == GameState.STOPPING) {
-				builder.damage(DyeColor.RED.getWoolData());
-			} else if (state == GameState.UNKNOWN) {
-				builder.damage(DyeColor.RED.getWoolData());
+				builder.lore(
+						Message.GAMESERVER_STATE.getMessage(user.getUser(), Message.STATE_INGAME));
+			} else {
+				throw new IllegalStateException();
 			}
 			ItemStack item = builder.build();
 			item = ItemBuilder.item(item).persistentDataStorage()

@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.util;
 
 import eu.darkcube.system.BaseMessage;
@@ -35,7 +34,9 @@ public enum Message implements BaseMessage {
 	CONNECTOR_NPC_SERVER_STARTING,
 	CONNECTOR_NPC_SERVER_ONLINE,
 	CONNECTOR_NPC_SERVER_DESCRIPTION,
-	;
+	STATE_LOBBY,
+	STATE_INGAME,
+	GAMESERVER_STATE;
 
 	public static final String PREFIX_ITEM = "ITEM_";
 	public static final String PREFIX_LORE = "LORE_";
