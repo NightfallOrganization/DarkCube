@@ -68,9 +68,9 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
 		Vote<Boolean> vote = WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
 		if (vote != null) {
 			if (vote.vote) {
-				b1.glow();
+				b1.glow(true);
 			} else {
-				b2.glow();
+				b2.glow(true);
 			}
 		}
 		fallbackItems.put(IInventory.slot(3, 4), b1.build());

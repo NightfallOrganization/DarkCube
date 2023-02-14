@@ -109,7 +109,7 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 			}
 			WBUser user = WBUser.getUser(event.getPlayer());
 			AtomicReference<UserPerk> refUserPerk = new AtomicReference<>();
-			if (!checkUsable(user, item, userPerk -> {
+			if (!checkUsable(user, item, perk(), userPerk -> {
 				refUserPerk.set(userPerk);
 				if (event.getEntity() != null) {
 					event.getEntity().remove();

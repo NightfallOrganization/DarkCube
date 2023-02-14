@@ -48,13 +48,13 @@ public class ItemBuilder extends AbstractItemBuilder {
 	public ItemBuilder(ItemStack item) {
 		material(item.getType());
 		amount(item.getAmount());
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
+		if (item.hasItemMeta()) {
+			ItemMeta meta = item.getItemMeta();
 			unbreakable(meta.spigot().isUnbreakable());
 			String displayname = meta.getDisplayName();
 			if (displayname != null)
 				displayname(LegacyComponentSerializer.legacySection().deserialize(displayname));
-			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
+			for (Map.Entry<Enchantment, Integer> e : meta.getEnchants().entrySet()) {
 				enchant(e.getKey(), e.getValue());
 			}
 			setFlags(meta.getItemFlags());
@@ -98,7 +98,9 @@ public class ItemBuilder extends AbstractItemBuilder {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			meta.spigot().setUnbreakable(unbreakable);
-			meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(displayname));
+			if (displayname != null)
+				meta.setDisplayName(
+						LegacyComponentSerializer.legacySection().serialize(displayname));
 			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
 				meta.addEnchant(e.getKey(), e.getValue(), true);
 			}

@@ -24,6 +24,6 @@ public class CooldownUserPerk extends DefaultUserPerk {
 
 	@Override
 	protected Item currentItem() {
-		return useCooldownItem() ? super.currentItem() : cooldownItem;
+		return useCooldownItem() ? cooldownItem : super.currentItem();
 	}
 }

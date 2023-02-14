@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.user;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
@@ -27,7 +28,6 @@ public class DefaultUserPerk implements UserPerk {
 		this.slot = owner.perksStorage().perkInvSlot(perk.activationType(), this.perkSlot);
 		this.cooldown = 0;
 		this.owner = owner;
-		currentPerkItem().setItem();
 	}
 
 	protected Item currentItem() {
@@ -55,19 +55,21 @@ public class DefaultUserPerk implements UserPerk {
 
 	@Override
 	public PerkItem currentPerkItem() {
-		return new PerkItem(currentItem(), this);
+		return new PerkItem(this::currentItem, this);
 	}
 
 	@Override
 	public void slot(int slot) {
 		int oldValue = this.slot;
 		slotSilent(slot);
-		if (oldValue == 100) {
-			owner().getBukkitEntity().getOpenInventory().setCursor(null);
-		} else {
-			owner().getBukkitEntity().getOpenInventory().setItem(oldValue, null);
+		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+			if (oldValue == 100) {
+				owner().getBukkitEntity().getOpenInventory().setCursor(null);
+			} else {
+				owner().getBukkitEntity().getOpenInventory().setItem(oldValue, null);
+			}
+			currentPerkItem().setItem();
 		}
-		currentPerkItem().setItem();
 	}
 
 	@Override
@@ -83,7 +85,9 @@ public class DefaultUserPerk implements UserPerk {
 	@Override
 	public void cooldown(int cooldown) {
 		this.cooldown = Math.min(cooldown, perk.cooldown());
-		currentPerkItem().setItem();
+		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+			currentPerkItem().setItem();
+		}
 	}
 
 	@Override

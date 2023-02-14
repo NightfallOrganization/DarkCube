@@ -8,7 +8,6 @@ package eu.darkcube.minigame.woolbattle.util;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -116,20 +115,12 @@ public enum Item {
 		return this.builder.clone();
 	}
 
-	public Component getDisplayName(WBUser user) {
-		return this.getDisplayName(user, new Object[0]);
-	}
-
 	public String getItemId() {
 		return ItemManager.getItemId(this);
 	}
 
 	public String getKey() {
 		return this.key;
-	}
-
-	public Component getDisplayName(WBUser user, Object... replacements) {
-		return ItemManager.getDisplayName(this, user.getLanguage(), replacements);
 	}
 
 	public ItemStack getItem(WBUser user) {

@@ -56,6 +56,7 @@ public class TeamsInventory extends WoolBattlePagedInventory {
 		}
 		user.setTeam(team);
 		user.user().sendMessage(Message.CHANGED_TEAM, team.getName(user.user()));
+		Bukkit.getPluginManager().callEvent(new Refresh());
 	}
 
 	@Override
@@ -65,8 +66,9 @@ public class TeamsInventory extends WoolBattlePagedInventory {
 			ItemBuilder b = ItemBuilder.item(Material.WOOL);
 			b.displayname(team.getName(user.user()));
 			b.damage(team.getType().getWoolColorByte());
-			if (team.getUsers().contains(user))
-				b.glow();
+			if (team.getUsers().contains(user)) {
+				b.glow(true);
+			}
 			team.getUsers().forEach(u -> b.lore(u.getTeamPlayerName()));
 			ItemManager.setId(b, TEAM, team.getType().getDisplayNameKey());
 			items.put(i++, b.build());
@@ -87,6 +89,9 @@ public class TeamsInventory extends WoolBattlePagedInventory {
 
 	public static class Refresh extends Event {
 		private static final HandlerList handlers = new HandlerList();
+
+		public Refresh() {
+		}
 
 		public static HandlerList getHandlerList() {
 			return handlers;

@@ -11,7 +11,6 @@ import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerInventoryClick.Ha
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,37 +29,37 @@ public class ListenerInventoryDrag extends Listener<InventoryDragEvent> {
 			WBUser user = WBUser.getUser(p);
 			ItemStack item = e.getOldCursor();
 			boolean var1 = item != null && item.getType() != Material.AIR;
-			String itemTag = var1 ? ItemManager.getItemId(item) : "Unknown Perk";
+			int perkId = ListenerInventoryClick.perkId(item);
 
 			if (e.getView().getType() == InventoryType.CRAFTING) {
 				if (e.getRawSlots().size() != 1) {
 					e.setCancelled(true);
 					return;
 				}
-				int slot = e.getRawSlots().stream().findFirst().get();
-				SlotType stype = null;
+				int slot = e.getRawSlots().stream().findFirst().orElseThrow(RuntimeException::new);
+				SlotType slotType = null;
 				switch (e.getView().getType()) {
 					case PLAYER:
 					case CRAFTING:
 						if (slot < 5) {
-							stype = SlotType.CRAFTING;
+							slotType = SlotType.CRAFTING;
 						} else if (slot < 9) {
-							stype = SlotType.ARMOR;
+							slotType = SlotType.ARMOR;
 						} else if (slot < 18) {
-							stype = SlotType.QUICKBAR;
+							slotType = SlotType.QUICKBAR;
 						} else {
-							stype = SlotType.CONTAINER;
+							slotType = SlotType.CONTAINER;
 						}
 						break;
 					default:
 						break;
 				}
-				if (stype == null) {
+				if (slotType == null) {
 					e.setCancelled(true);
 					p.sendMessage("§cInvalid Inventory: " + e.getView().getType() + ", " + slot);
 					return;
 				}
-				if (stype == SlotType.ARMOR || stype == SlotType.CRAFTING) {
+				if (slotType == SlotType.ARMOR || slotType == SlotType.CRAFTING) {
 					e.setCancelled(true);
 					return;
 				}
@@ -71,10 +70,10 @@ public class ListenerInventoryDrag extends Listener<InventoryDragEvent> {
 				}
 
 				for (Handle handle : handles) {
-					String tag = handle.getTag();
+					int id = handle.perk().id();
 
 					if (var1) {
-						if (tag.equals(itemTag)) {
+						if (id == perkId) {
 							handle.invoke(slot);
 							e.setCursor(null);
 						}

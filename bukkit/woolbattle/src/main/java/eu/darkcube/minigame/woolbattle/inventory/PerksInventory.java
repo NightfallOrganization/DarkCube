@@ -14,7 +14,6 @@ import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.util.data.Key;
@@ -29,8 +28,7 @@ public class PerksInventory extends WoolBattlePagedInventory {
 			new Key(WoolBattle.getInstance(), "perks-type-number");
 
 	public PerksInventory(WBUser user) {
-		super(TYPE, Message.INVENTORY_PERKS.getMessage(user), 9,
-				AsyncPagedInventory.box(1, 1, 1, 9), user);
+		super(TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
 	}
 
 	@Override
@@ -61,9 +59,5 @@ public class PerksInventory extends WoolBattlePagedInventory {
 				}
 			}
 		}
-	}
-
-	@Override
-	protected void insertFallbackItems() {
 	}
 }

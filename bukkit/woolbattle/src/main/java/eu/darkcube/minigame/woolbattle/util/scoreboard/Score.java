@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
 
 public class Score {
@@ -13,7 +12,7 @@ public class Score {
 	private Scoreboard sb;
 	private Objective obj;
 
-	public Score(Objective obj, Team team) {
+	public Score(Objective obj, ScoreboardTeam team) {
 		this(team.getScoreboard(), obj, team.getTeam().getName());
 	}
 
@@ -23,13 +22,13 @@ public class Score {
 		this.sb = sb;
 	}
 
+	public int getScore() {
+		return score.getScore();
+	}
+
 	public Score setScore(int score) {
 		this.score.setScore(score);
 		return this;
-	}
-
-	public int getScore() {
-		return score.getScore();
 	}
 
 	public Scoreboard getScoreboard() {

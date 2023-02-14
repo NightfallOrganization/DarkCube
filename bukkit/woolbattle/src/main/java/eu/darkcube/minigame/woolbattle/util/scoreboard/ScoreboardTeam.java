@@ -10,12 +10,12 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.scoreboard.NameTagVisibility;
 
-public class Team {
+public class ScoreboardTeam {
 
 	private org.bukkit.scoreboard.Team team;
 	private Scoreboard sb;
 
-	public Team(Scoreboard sb, org.bukkit.scoreboard.Team team) {
+	public ScoreboardTeam(Scoreboard sb, org.bukkit.scoreboard.Team team) {
 		this.team = team;
 		this.sb = sb;
 	}
@@ -32,15 +32,15 @@ public class Team {
 		return team;
 	}
 
-	public void setAllowFriendlyFire(boolean flag) {
+	public void allowFriendlyFire(boolean flag) {
 		team.setAllowFriendlyFire(flag);
 	}
 
-	public void setCanSeeFriendlyInvisibles(boolean flag) {
+	public void canSeeFriendlyInvisible(boolean flag) {
 		team.setCanSeeFriendlyInvisibles(flag);
 	}
 
-	public void setDisplayName(String name) {
+	public void displayName(String name) {
 		team.setDisplayName(name);
 	}
 
@@ -58,7 +58,7 @@ public class Team {
 		team.setSuffix(s);
 	}
 
-	public void setNameTagVisibility(NameTagVisibility visibility) {
+	public void nameTagVisibility(NameTagVisibility visibility) {
 		team.setNameTagVisibility(visibility);
 	}
 

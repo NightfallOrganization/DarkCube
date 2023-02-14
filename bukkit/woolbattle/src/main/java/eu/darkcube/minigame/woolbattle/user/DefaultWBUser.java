@@ -119,7 +119,8 @@ class DefaultWBUser implements WBUser {
 
 				@Override
 				public void serialize(JsonDocument doc, String key, int[] data) {
-					ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES]);
+					ByteBuffer buf =
+							ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
 					IntBuffer ib = buf.asIntBuffer();
 					ib.put(data.length);
 					for (int i : data)
@@ -171,7 +172,7 @@ class DefaultWBUser implements WBUser {
 
 	@Override
 	public Component getTeamPlayerName() {
-		return getTeam().getName(user);
+		return Component.text(user.getName()).style(getTeam().getPrefixStyle());
 	}
 
 	@Override
@@ -297,6 +298,8 @@ class DefaultWBUser implements WBUser {
 	@Override
 	public void setOpenInventory(IInventory id) {
 		this.openInventory = id;
+		if (this.openInventory != null)
+			this.openInventory.open(this.getBukkitEntity());
 	}
 
 	@Override

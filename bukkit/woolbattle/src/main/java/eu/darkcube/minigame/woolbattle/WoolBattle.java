@@ -30,6 +30,7 @@ import eu.darkcube.minigame.woolbattle.util.convertingrule.*;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
@@ -37,6 +38,7 @@ import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.ILanguagedCommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.loader.PluginClassLoader;
 import eu.darkcube.system.loader.ReflectionClassLoader;
 import eu.darkcube.system.userapi.UserAPI;
@@ -110,8 +112,9 @@ public class WoolBattle extends Plugin {
 				new HashSet<>(WoolBattle.getInstance().getTeamManager().getTeams());
 		teams.add(WoolBattle.getInstance().getTeamManager().getSpectator());
 		for (Team t : teams) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-					sb.createTeam(t.getType().getScoreboardTag());
+			ScoreboardTeam team = sb.createTeam(t.getType().getScoreboardTag());
+			System.out.println(java.util.Arrays.toString(LegacyComponentSerializer.legacySection()
+					.serialize(Component.text("", t.getPrefixStyle())).toCharArray()));
 			team.setPrefix(Component.text("", t.getPrefixStyle()));
 		}
 		for (ScoreboardObjective obj : ScoreboardObjective.values()) {
@@ -119,7 +122,7 @@ public class WoolBattle extends Plugin {
 			o.setDisplayName(Message.getMessage(obj.getMessageKey(), owner.getLanguage()));
 		}
 		for (ObjectiveTeam team : ObjectiveTeam.values()) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team t = sb.createTeam(team.getKey());
+			ScoreboardTeam t = sb.createTeam(team.getKey());
 			t.setPrefix(Message.getMessage(team.getMessagePrefix(), owner.getLanguage()));
 			t.setSuffix(Message.getMessage(team.getMessageSuffix(), owner.getLanguage()));
 		}
@@ -324,7 +327,7 @@ public class WoolBattle extends Plugin {
 		// reloaded there are)
 		// loadWorlds();
 
-		// Enable Lobbystate
+		// Enable Lobby
 		this.lobby.enable();
 
 		// Enable commands
@@ -362,8 +365,7 @@ public class WoolBattle extends Plugin {
 	public void setMap(WBUser user) {
 		if (this.getLobby().isEnabled()) {
 			Scoreboard sb = new Scoreboard(user);
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-					sb.getTeam(ObjectiveTeam.MAP.getKey());
+			ScoreboardTeam team = sb.getTeam(ObjectiveTeam.MAP.getKey());
 			Map m = this.getMap();
 			Component suffix =
 					m == null ? text("No Maps").color(NamedTextColor.RED) : text(m.getName());
@@ -386,8 +388,7 @@ public class WoolBattle extends Plugin {
 
 	public void setEpGlitch(WBUser user) {
 		Scoreboard sb = new Scoreboard(user);
-		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-				sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
+		ScoreboardTeam team = sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
 		Component suffix = this.epGlitch
 				? Message.EP_GLITCH_ON.getMessage(user)
 				: Message.EP_GLITCH_OFF.getMessage(user);
@@ -396,8 +397,7 @@ public class WoolBattle extends Plugin {
 
 	public void setOnline(WBUser user) {
 		Scoreboard sb = new Scoreboard(user);
-		eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-				sb.getTeam(ObjectiveTeam.ONLINE.getKey());
+		ScoreboardTeam team = sb.getTeam(ObjectiveTeam.ONLINE.getKey());
 		Component suffix = text(Bukkit.getOnlinePlayers().size());
 		team.setSuffix(suffix);
 	}
@@ -453,7 +453,7 @@ public class WoolBattle extends Plugin {
 		this.sendMessage(msg, (u) -> replacements);
 	}
 
-	public final <T> void sendMessage(Message msg,
+	public final void sendMessage(Message msg,
 			Function<ILanguagedCommandExecutor, Object[]> function) {
 		for (WBUser user : WBUser.onlineUsers()) {
 			user.user().sendMessage(msg, function.apply(user.user()));

@@ -18,7 +18,7 @@ import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
 import eu.darkcube.minigame.woolbattle.util.ScoreboardObjective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Team;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,7 +50,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		Objective obj = sb.getObjective(ScoreboardObjective.LOBBY.getKey());
 		int minPlayerCount =
 				WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
-		Team needed = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
+		ScoreboardTeam needed = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
 		for (int i = 0; i < ObjectiveTeam.values().length; i++) {
 			ObjectiveTeam ot = ObjectiveTeam.values()[i];
 			sb.getTeam(ot.getKey()).addPlayer(ot.getInvisTag());
@@ -102,8 +102,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		if (e.getJoinMessage() != null) {
 			lobby.setTimer(Math.max(lobby.getTimer(), 300));
 
-			WoolBattle.getInstance().sendMessage(Message.PLAYER_JOINED,
-					executor -> new Object[] {user.getTeamPlayerName()});
+			WoolBattle.getInstance().sendMessage(Message.PLAYER_JOINED, user.getTeamPlayerName());
 
 			e.setJoinMessage(null);
 		} else {

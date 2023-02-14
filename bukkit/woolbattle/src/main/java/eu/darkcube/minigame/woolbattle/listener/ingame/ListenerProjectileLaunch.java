@@ -50,7 +50,6 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 				WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
 				ItemManager.removeItems(user, p.getInventory(), new ItemStack(Material.WOOL, 1,
 						user.getTeam().getType().getWoolColorByte()), 1);
-				arrow.setVelocity(arrow.getVelocity());
 				if (user.perks().count(FastArrowPerk.FAST_ARROW) > 0) {
 					Vector vec = arrow.getVelocity().multiply(1.7);
 

@@ -64,7 +64,7 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
 			lifeVotes = WoolBattle.getInstance().getLobby().VOTES_LIFES.get(user);
 		}
 		if (lifeVotes == lifes) {
-			builder.glow();
+			builder.glow(true);
 		}
 		fallbackItems.put(slot, builder.build());
 		updateSlots.offer(slot);

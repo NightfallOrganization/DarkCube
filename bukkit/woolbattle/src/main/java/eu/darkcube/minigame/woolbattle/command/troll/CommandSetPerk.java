@@ -26,8 +26,8 @@ import java.util.Collection;
 public class CommandSetPerk extends WBCommandExecutor {
 	public CommandSetPerk() {
 		super("setPerk", b -> {
-			RequiredArgumentBuilder<CommandSource, EntitySelector> b2;
-			b.then(b2 = Commands.argument("players", EntityArgument.players()));
+			RequiredArgumentBuilder<CommandSource, EntitySelector> b2 =
+					Commands.argument("players", EntityArgument.players());
 			for (ActivationType type : ActivationType.values()) {
 				b2.then(Commands.literal(type.name().toLowerCase())
 						.then(Commands.argument("perkSlot",
@@ -55,6 +55,8 @@ public class CommandSetPerk extends WBCommandExecutor {
 											return 0;
 										}))));
 			}
+			b.then(b2);
+
 		});
 	}
 	//	@Override

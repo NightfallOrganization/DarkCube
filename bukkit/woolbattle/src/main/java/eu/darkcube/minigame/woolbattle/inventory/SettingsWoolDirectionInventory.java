@@ -33,9 +33,9 @@ public class SettingsWoolDirectionInventory extends WoolBattlePagedInventory {
 		ItemBuilder rtl = item(Item.SETTINGS_WOOL_DIRECTION_RIGHT_TO_LEFT.getItem(user));
 		WoolSubtractDirection dir = user.woolSubtractDirection();
 		if (dir == WoolSubtractDirection.LEFT_TO_RIGHT) {
-			ltr.glow();
+			ltr.glow(true);
 		} else if (dir == WoolSubtractDirection.RIGHT_TO_LEFT) {
-			rtl.glow();
+			rtl.glow(true);
 		}
 		fallbackItems.put(IInventory.slot(3, 4), ltr.build());
 		fallbackItems.put(IInventory.slot(3, 6), rtl.build());

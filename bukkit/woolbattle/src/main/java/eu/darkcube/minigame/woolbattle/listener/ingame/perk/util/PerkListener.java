@@ -47,18 +47,6 @@ public abstract class PerkListener implements Listener {
 
 	/**
 	 * if the usedItem matches the perkItem and the perk given by the perkItem is usable
-	 *
-	 * @param user     the {@link WBUser}
-	 * @param usedItem the used {@link ItemStack}
-	 *
-	 * @return if the checks are successful
-	 */
-	protected static boolean checkUsable(WBUser user, ItemStack usedItem) {
-		return checkUsable(user, usedItem, null);
-	}
-
-	/**
-	 * if the usedItem matches the perkItem and the perk given by the perkItem is usable
 	 * <p>
 	 * Also runs the itemMatchRunnable if the items match
 	 *
@@ -68,7 +56,7 @@ public abstract class PerkListener implements Listener {
 	 *
 	 * @return if the checks are successful
 	 */
-	protected static boolean checkUsable(WBUser user, ItemStack usedItem,
+	protected static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk,
 			Consumer<UserPerk> itemMatchRunnable) {
 		ItemBuilder builder = ItemBuilder.item(usedItem);
 		if (!builder.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
@@ -77,6 +65,9 @@ public abstract class PerkListener implements Listener {
 		int perkId =
 				builder.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
 		UserPerk userPerk = user.perks().perk(perkId);
+		if (!userPerk.perk().equals(perk)) {
+			return false;
+		}
 		if (itemMatchRunnable != null)
 			itemMatchRunnable.accept(userPerk);
 		return checkUsable(userPerk);

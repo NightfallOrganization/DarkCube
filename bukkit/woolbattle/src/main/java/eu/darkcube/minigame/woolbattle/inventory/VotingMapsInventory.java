@@ -70,7 +70,7 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
 			ItemManager.setId(bu, MAP, map.getName());
 			if (vote != null)
 				if (map.equals(vote.vote))
-					bu.glow();
+					bu.glow(true);
 			bu.displayname(text(map.getName()).color(NamedTextColor.GREEN));
 			items.put(i, bu.build());
 		}

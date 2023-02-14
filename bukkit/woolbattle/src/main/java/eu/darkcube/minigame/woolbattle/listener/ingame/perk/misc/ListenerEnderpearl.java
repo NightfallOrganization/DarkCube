@@ -13,8 +13,8 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class ListenerEnderpearlLaunchable extends BasicPerkListener {
-	public ListenerEnderpearlLaunchable() {
+public class ListenerEnderpearl extends BasicPerkListener {
+	public ListenerEnderpearl() {
 		super(EnderPearlPerk.ENDERPEARL);
 	}
 

@@ -56,6 +56,7 @@ public class PerksTypeInventory extends WoolBattlePagedInventory {
 		perks.perk(type, number, perk);
 		user.perksStorage(perks);
 		user.perks().reloadFromStorage();
+		recalculate();
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class PerksTypeInventory extends WoolBattlePagedInventory {
 				b.lore(Message.SELECTED.getMessage(user));
 			}
 			if (userPerks.get(number).equals(perks[i].perkName())) {
-				b.glow();
+				b.glow(true);
 			}
 			items.put(i, b.build());
 		}

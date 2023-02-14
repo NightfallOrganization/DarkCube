@@ -253,6 +253,7 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 		return this;
 	}
 
+	@Override
 	public abstract ItemBuilder clone();
 
 	public void setLore(ArrayList<Component> lore) {

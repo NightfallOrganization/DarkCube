@@ -24,9 +24,9 @@ public class SettingsInventory extends WoolBattlePagedInventory {
 	@Override
 	protected void insertFallbackItems() {
 		super.insertFallbackItems();
-		items.put(IInventory.slot(1, 5), Item.SETTINGS.getItem(user));
-		items.put(IInventory.slot(3, 4), Item.SETTINGS_WOOL_DIRECTION.getItem(user));
-		items.put(IInventory.slot(3, 6), Item.SETTINGS_HEIGHT_DISPLAY.getItem(user));
+		fallbackItems.put(IInventory.slot(1, 5), Item.SETTINGS.getItem(user));
+		fallbackItems.put(IInventory.slot(3, 4), Item.SETTINGS_WOOL_DIRECTION.getItem(user));
+		fallbackItems.put(IInventory.slot(3, 6), Item.SETTINGS_HEIGHT_DISPLAY.getItem(user));
 	}
 
 	@Override

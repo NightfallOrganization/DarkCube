@@ -10,17 +10,38 @@ import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.GrapplingHookPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import org.bukkit.Location;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public class ListenerGrapplingHook extends BasicPerkListener {
+	private final Handle handle = new Handle();
 
 	public ListenerGrapplingHook() {
 		super(GrapplingHookPerk.GRAPPLING_HOOK);
+	}
+
+	@Override
+	public void registered() {
+		super.registered();
+		WoolBattle.registerListeners(handle);
+	}
+
+	@Override
+	public void unregistered() {
+		WoolBattle.unregisterListeners(handle);
+		super.unregistered();
 	}
 
 	@Override
@@ -31,13 +52,17 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 		return false;
 	}
 
+	@Override
+	protected boolean mayActivate() {
+		return false;
+	}
+
 	@EventHandler
 	public void handle(PlayerFishEvent event) {
 		FishHook hook = event.getHook();
 		PlayerFishEvent.State state = event.getState();
-		if (!hook.hasMetadata("perk")) {
+		if (!hook.hasMetadata("perk"))
 			return;
-		}
 		Object objectPerk = hook.getMetadata("perk").get(0).value();
 		if (!(objectPerk instanceof UserPerk))
 			return;
@@ -63,23 +88,31 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 		}
 	}
 
-	//			ItemManager.removeItems(user, p.getInventory(),
-	//					new ItemStack(Material.WOOL, 1, user.getTeam().getType().getWoolColorByte()),
-	//					PerkType.GRAPPLING_HOOK.getCost());
-	//
-	//			Location from = p.getLocation();
-	//			Location to = hook.getLocation();
-	//
-	//			double x = to.getX() - from.getX();
-	//			double y = to.getY() - from.getY() + 3;
-	//			double z = to.getZ() - from.getZ();
-	//			Vector v = new Vector(x, y, z);
-	//			double mult = Math.pow(v.length(), 0.35);
-	//			v = v.normalize().multiply(new Vector(mult, mult * 1.1, mult));
-	//
-	//			p.setVelocity(v);
-	//
-	//			startCooldown(perk);
-	//		}
-	//	}
+	private class Handle implements Listener {
+
+		@EventHandler
+		private void handle(ProjectileLaunchEvent event) {
+			if (!(event.getEntity() instanceof FishHook)) {
+				return;
+			}
+			if (!(event.getEntity().getShooter() instanceof Player))
+				return;
+			WBUser user = WBUser.getUser((Player) event.getEntity().getShooter());
+			ItemStack item = user.getBukkitEntity().getItemInHand();
+			if (item == null)
+				return;
+			AtomicReference<UserPerk> refUserPerk = new AtomicReference<>();
+			if (!checkUsable(user, item, perk(), userPerk -> {
+				refUserPerk.set(userPerk);
+				userPerk.currentPerkItem().setItem();
+				new Scheduler(userPerk.currentPerkItem()::setItem).runTask();
+			})) {
+				return;
+			}
+			UserPerk userPerk = refUserPerk.get();
+			event.getEntity().setMetadata("perk",
+					new FixedMetadataValue(WoolBattle.getInstance(), userPerk));
+			event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(1.5));
+		}
+	}
 }

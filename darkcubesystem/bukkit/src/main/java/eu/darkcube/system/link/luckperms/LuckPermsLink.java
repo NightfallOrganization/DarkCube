@@ -6,25 +6,33 @@
  */
 package eu.darkcube.system.link.luckperms;
 
-import eu.darkcube.system.link.Link;
+import eu.darkcube.system.link.PluginLink;
 import net.luckperms.api.LuckPermsProvider;
 
-public class LuckPermsLink extends Link {
+public class LuckPermsLink extends PluginLink {
 	private LinkContextCalculator calculator;
 
 	public LuckPermsLink() throws Throwable {
-		super();
+		super("LuckPerms");
 	}
 
 	@Override
 	protected void link() {
 		calculator = new LinkContextCalculator();
+	}
+
+	@Override
+	protected void onEnable() {
 		LuckPermsProvider.get().getContextManager().registerCalculator(calculator);
 	}
 
 	@Override
-	protected void unlink() {
+	protected void onDisable() {
 		LuckPermsProvider.get().getContextManager().unregisterCalculator(calculator);
+	}
+
+	@Override
+	protected void unlink() {
 		calculator = null;
 	}
 }

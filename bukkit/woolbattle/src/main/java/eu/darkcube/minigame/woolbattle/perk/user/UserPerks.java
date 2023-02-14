@@ -47,6 +47,7 @@ public class UserPerks {
 							.orElseThrow(Error::new);
 					p.perk(type, i, perk.perkName());
 					user.perksStorage(p);
+					System.out.println("Fixing perk: " + perks[i] + " -> " + perk.perkName());
 				}
 				perk(perk, i);
 			}
@@ -55,7 +56,11 @@ public class UserPerks {
 
 	public void perk(Perk perk, int perkSlot) {
 		int id = UserPerks.id.getAndIncrement();
-		perks.put(id, perk.perkCreator().create(user, perk, id, perkSlot));
+		UserPerk up;
+		perks.put(id, up = perk.perkCreator().create(user, perk, id, perkSlot));
+		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+			up.currentPerkItem().setItem();
+		}
 	}
 
 	public int count(PerkName perkName) {

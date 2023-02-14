@@ -13,7 +13,7 @@ import eu.darkcube.minigame.woolbattle.event.EventPlayerDeath;
 import eu.darkcube.minigame.woolbattle.event.EventPlayerKill;
 import eu.darkcube.minigame.woolbattle.listener.ingame.*;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.*;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.misc.ListenerEnderpearlLaunchable;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.misc.ListenerEnderpearl;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive.ListenerDoubleJump;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -28,6 +28,7 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerHeightDisplay;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
@@ -87,7 +88,7 @@ public class Ingame extends GamePhase {
 	public final ListenerExplode listenerExplode;
 	public final ListenerLineBuilder listenerLineBuilder;
 	public final ListenerRonjasToiletSplash listenerRonjasToiletSplash;
-	public final ListenerEnderpearlLaunchable listenerEnderpearlLaunchable;
+	public final ListenerEnderpearl listenerEnderpearl;
 	public final ListenerSafetyPlatform listenerSafetyPlatform;
 	public final ListenerWallGenerator listenerWallGenerator;
 	public final ListenerBlink listenerBlink;
@@ -145,7 +146,7 @@ public class Ingame extends GamePhase {
 		this.listenerExplode = new ListenerExplode();
 		this.listenerLineBuilder = new ListenerLineBuilder();
 		this.listenerRonjasToiletSplash = new ListenerRonjasToiletSplash();
-		this.listenerEnderpearlLaunchable = new ListenerEnderpearlLaunchable();
+		this.listenerEnderpearl = new ListenerEnderpearl();
 		this.listenerSafetyPlatform = new ListenerSafetyPlatform();
 		this.listenerBlink = new ListenerBlink();
 		this.listenerWallGenerator = new ListenerWallGenerator();
@@ -375,13 +376,13 @@ public class Ingame extends GamePhase {
 				this.listenerProjectileLaunch, this.listenerInventoryClick,
 				this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcher,
 				this.listenerInteract, this.listenerGameModeChange, this.listenerPlayerMove,
-				this.listenerEntitySpawn, this.listenerEnderpearlLaunchable,
-				this.listenerSafetyPlatform, this.listenerTNTEntityDamageByEntity,
-				this.listenerWoolBomb, this.listenerExplode, this.listenerLineBuilder,
-				this.listenerRonjasToiletSplash, this.listenerBlink, this.listenerWallGenerator,
-				this.listenerGrandpasClock, this.listenerGhost, this.listenerMinigun,
-				this.listenerDeathMove, this.listenerGrabber, this.listenerBooster,
-				this.listenerGrapplingHook, this.listenerRope, this.listenerSlimePlatform);
+				this.listenerEntitySpawn, this.listenerEnderpearl, this.listenerSafetyPlatform,
+				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerExplode,
+				this.listenerLineBuilder, this.listenerRonjasToiletSplash, this.listenerBlink,
+				this.listenerWallGenerator, this.listenerGrandpasClock, this.listenerGhost,
+				this.listenerMinigun, this.listenerDeathMove, this.listenerGrabber,
+				this.listenerBooster, this.listenerGrapplingHook, this.listenerRope,
+				this.listenerSlimePlatform);
 
 		WBUser.onlineUsers().forEach(u -> {
 			this.loadScoreboardObjective(u);
@@ -429,13 +430,13 @@ public class Ingame extends GamePhase {
 				this.listenerProjectileLaunch, this.listenerInventoryClick,
 				this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcher,
 				this.listenerInteract, this.listenerGameModeChange, this.listenerPlayerMove,
-				this.listenerEntitySpawn, this.listenerEnderpearlLaunchable,
-				this.listenerSafetyPlatform, this.listenerTNTEntityDamageByEntity,
-				this.listenerWoolBomb, this.listenerExplode, this.listenerLineBuilder,
-				this.listenerRonjasToiletSplash, this.listenerBlink, this.listenerWallGenerator,
-				this.listenerGrandpasClock, this.listenerGhost, this.listenerMinigun,
-				this.listenerDeathMove, this.listenerGrabber, this.listenerBooster,
-				this.listenerGrapplingHook, this.listenerRope, this.listenerSlimePlatform);
+				this.listenerEntitySpawn, this.listenerEnderpearl, this.listenerSafetyPlatform,
+				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerExplode,
+				this.listenerLineBuilder, this.listenerRonjasToiletSplash, this.listenerBlink,
+				this.listenerWallGenerator, this.listenerGrandpasClock, this.listenerGhost,
+				this.listenerMinigun, this.listenerDeathMove, this.listenerGrabber,
+				this.listenerBooster, this.listenerGrapplingHook, this.listenerRope,
+				this.listenerSlimePlatform);
 		for (Block b : this.placedBlocks) {
 			b.setType(Material.AIR);
 			Ingame.resetBlockDamage(b);
@@ -551,8 +552,7 @@ public class Ingame extends GamePhase {
 		Objective obj = sb.getObjective(ScoreboardObjective.INGAME.getKey());
 		int i = 0;
 		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team t =
-					sb.getTeam(team.getType().getIngameScoreboardTag());
+			ScoreboardTeam t = sb.getTeam(team.getType().getIngameScoreboardTag());
 			t.addPlayer(team.getType().getInvisibleTag());
 			t.setSuffix(Component.text(Characters.SHIFT_SHIFT_LEFT.toString())
 					.color(NamedTextColor.GOLD).append(team.getName(user.user())));
@@ -691,7 +691,7 @@ public class Ingame extends GamePhase {
 
 		CraftPlayer p = user.getBukkitEntity();
 		InventoryView v = p.getOpenInventory();
-		int woolcount = ItemManager.countItems(Material.WOOL, p.getInventory());
+		int woolCount = ItemManager.countItems(Material.WOOL, p.getInventory());
 		v.getBottomInventory().clear();
 		v.getTopInventory().clear();
 		v.setCursor(new ItemStack(Material.AIR));
@@ -715,25 +715,16 @@ public class Ingame extends GamePhase {
 			user.perks().reloadFromStorage();
 		}
 
-		for (ActivationType type : ActivationType.values()) {
-			for (UserPerk perk : user.perks().perks()) {
-				perk.currentPerkItem().setItem();
-			}
+		for (UserPerk perk : user.perks().perks()) {
+			perk.currentPerkItem().setItem();
 		}
 
-		for (int i = 0; i < woolcount; i++) {
+		for (int i = 0; i < woolCount; i++) {
 			p.getInventory().addItem(ItemBuilder.item(Material.WOOL)
 					.damage(user.getTeam().getType().getWoolColorByte()).build());
 		}
 		p.getHandle().updateInventory(p.getHandle().activeContainer);
 		p.getHandle().collidesWithEntities = true;
-	}
-
-	private void setPlayerItem(InventoryView v, int slot, ItemStack item) {
-		if (slot == 100)
-			v.setCursor(item);
-		else
-			v.setItem(slot, item);
 	}
 
 	public void fixSpectator(WBUser user) {

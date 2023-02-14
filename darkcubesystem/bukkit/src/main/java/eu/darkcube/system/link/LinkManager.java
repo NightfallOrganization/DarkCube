@@ -8,6 +8,7 @@ package eu.darkcube.system.link;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class LinkManager {
 	private Collection<Link> links = new ArrayList<>();
@@ -17,18 +18,20 @@ public class LinkManager {
 		try {
 			this.links.add(supplier.get());
 			success = true;
-		} catch (Throwable ignored) {
-			ignored.printStackTrace();
+		} catch (Throwable ex) {
+			ex.printStackTrace();
 		}
 		return success;
 	}
 
 	public void enableLinks() {
 		links.forEach(Link::enable);
+		links.stream().filter(PluginLink.class::isInstance).map(PluginLink.class::cast)
+				.forEach(PluginLink::registerListener);
 	}
 
-	public Collection<Link> getLinks() {
-		return links;
+	public Collection<Link> links() {
+		return Collections.unmodifiableCollection(links);
 	}
 
 	public void unregisterLinks() {
@@ -36,6 +39,9 @@ public class LinkManager {
 	}
 
 	public void unregisterLink(Link link) {
+		if (link instanceof PluginLink) {
+			((PluginLink) link).unregisterListener();
+		}
 		link.disable();
 		link.unlink();
 		links.remove(link);

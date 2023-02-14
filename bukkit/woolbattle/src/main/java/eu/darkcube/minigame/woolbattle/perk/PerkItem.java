@@ -18,16 +18,18 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.function.Supplier;
+
 public class PerkItem {
 
 	public static final Key KEY_PERK_ID = new Key(WoolBattle.getInstance(), "perkId");
 	public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
 
-	private final Item item;
+	private final Supplier<Item> itemSupplier;
 	private final UserPerk perk;
 
-	public PerkItem(Item item, UserPerk perk) {
-		this.item = item;
+	public PerkItem(Supplier<Item> itemSupplier, UserPerk perk) {
+		this.itemSupplier = itemSupplier;
 		this.perk = perk;
 	}
 
@@ -47,7 +49,10 @@ public class PerkItem {
 	}
 
 	public ItemStack calculateItem() {
-		ItemBuilder b = ItemBuilder.item(item().getItem(perk.owner()));
+		ItemBuilder b = ItemBuilder.item(itemSupplier.get().getItem(perk.owner()));
+		if (perk.cooldown() > 0) {
+			b.amount(perk.cooldown());
+		}
 		b.persistentDataStorage().set(KEY_PERK_ID, TYPE_PERK_ID, perk.id());
 		return b.build();
 	}
@@ -56,10 +61,6 @@ public class PerkItem {
 		EntityPlayer ep = perk.owner().getBukkitEntity().getHandle();
 		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId, slot,
 				CraftItemStack.asNMSCopy(item)));
-	}
-
-	public Item item() {
-		return item;
 	}
 
 	public UserPerk perk() {

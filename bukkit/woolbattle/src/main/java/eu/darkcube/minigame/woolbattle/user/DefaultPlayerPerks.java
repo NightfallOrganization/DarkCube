@@ -65,7 +65,7 @@ public class DefaultPlayerPerks implements PlayerPerks {
 
 	@Override
 	public void perk(ActivationType type, int perkSlot, PerkName perk) {
-		perks(type)[perkSlot] = perk;
+		perks.get(type)[perkSlot] = perk;
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class DefaultPlayerPerks implements PlayerPerks {
 
 	@Override
 	public void perkInvSlot(ActivationType type, int perkSlot, int slot) {
-		perkInvSlots(type)[perkSlot] = slot;
+		perkSlots.get(type)[perkSlot] = slot;
 	}
 
 	@Override

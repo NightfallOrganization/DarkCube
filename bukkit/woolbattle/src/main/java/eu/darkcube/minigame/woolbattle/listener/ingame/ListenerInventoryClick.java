@@ -8,11 +8,12 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,13 +25,20 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.function.Consumer;
-
 public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 	public static ListenerInventoryClick instance;
 
 	public ListenerInventoryClick() {
 		instance = this;
+	}
+
+	static int perkId(ItemStack item) {
+		if (item == null || !item.hasItemMeta())
+			return -1;
+		ItemBuilder b = ItemBuilder.item(item);
+		if (!b.persistentDataStorage().has(PerkItem.KEY_PERK_ID))
+			return -1;
+		return b.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
 	}
 
 	@Override
@@ -67,51 +75,49 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		// a hotbar-slot.
 		ItemStack hotbar = hotbarSlot == -1 ? null : e.getView().getItem(hotbarSlot + 36);
 
-		boolean var1 = item != null && item.getType() != Material.AIR;
-		boolean var2 = cursor != null && cursor.getType() != Material.AIR;
-		boolean var3 = hotbar != null && hotbar.getType() != Material.AIR;
+		//		boolean var1 = item != null && item.getType() != Material.AIR;
+		//		boolean var2 = cursor != null && cursor.getType() != Material.AIR;
+		//		boolean var3 = hotbar != null && hotbar.getType() != Material.AIR;
+		int idItem = perkId(item);
+		int idCursor = perkId(cursor);
+		int idHotbar = perkId(hotbar);
 
-		String tagItem = var1 ? ItemManager.getItemId(item) : "Unknown Perk";
-		String tagCursor = var2 ? ItemManager.getItemId(cursor) : "Unknown Perk";
-		String tagHotbar = var3 ? ItemManager.getItemId(hotbar) : "Unknown Perk";
+		//		String tagItem = var1 ? ItemManager.getItemId(item) : "Unknown Perk";
+		//		String tagCursor = var2 ? ItemManager.getItemId(cursor) : "Unknown Perk";
+		//		String tagHotbar = var3 ? ItemManager.getItemId(hotbar) : "Unknown Perk";
 
-		//		Handle[] handles = new Handle[0];
-		//		handles = Arrays.addAfter(handles,
-		//				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),
-		//				new Handle(user.getData().getPerks()::setSlotArrow, Item.DEFAULT_ARROW.getItemId()),
-		//				new Handle(user.getData().getPerks()::setSlotShears,
-		//						Item.DEFAULT_SHEARS.getItemId()));
 		Handle[] handles = new Handle[0];
 
 		for (UserPerk perk : user.perks().perks()) {
 			handles = Arrays.addAfter(handles, new Handle(perk));
 		}
-		for (Handle handle : handles) {
-			String tag = handle.getTag();
-			if (var1 || var2 || var3) {
+		if (idItem != -1 || idCursor != -1 || idHotbar != -1) {
+			for (Handle handle : handles) {
+				int id = handle.perk.id();
+				//			String tag = handle.getTag();
 				switch (e.getAction()) {
 					case HOTBAR_SWAP:
-						if (tag.equals(tagHotbar)) {
+						if (id == idHotbar) {
 							handle.invoke(slot);
-						} else if (tag.equals(tagItem)) {
+						} else if (id == idItem) {
 							handle.invoke(hotbarSlot + 36);
-						} else if (tag.equals(tagCursor)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idCursor) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case CLONE_STACK:
-						if (tag.equals(tagHotbar) || tag.equals(tagCursor)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						if (id == idHotbar || id == idCursor) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case COLLECT_TO_CURSOR:
-						if (tag.equals(tagHotbar)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
-						} else if (tag.equals(tagCursor)) {
+						if (id == idHotbar) {
+							tue(idHotbar, idItem, idCursor, id);
+						} else if (id == idCursor) {
 							WoolBattle.getInstance().sendConsole(
 									"Player " + p.getName() + " had slot error. Values:");
 							System.out.println("Slot: " + slot);
-							System.out.println("Tag: " + tag);
+							System.out.println("Tag: " + id);
 							System.out.println("HotbarButton: " + hotbarSlot);
 							System.out.println("Cursor: " + cursor);
 						}
@@ -137,44 +143,44 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 					case NOTHING:
 						break;
 					case PICKUP_ALL:
-						if (tag.equals(tagItem)) {
+						if (id == idItem) {
 							handle.invoke(100);
-						} else if (tag.equals(tagHotbar) || tag.equals(tagCursor)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar || id == idCursor) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case PICKUP_HALF:
-						if (tag.equals(tagItem)) {
+						if (id == idItem) {
 							e.setCancelled(true);
-						} else if (tag.equals(tagHotbar) || tag.equals(tagCursor)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar || id == idCursor) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case PICKUP_ONE:
-						if (tag.equals(tagItem)) {
+						if (id == idItem) {
 							e.setCancelled(true);
-						} else if (tag.equals(tagHotbar) || tag.equals(tagCursor)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar || id == idCursor) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case PICKUP_SOME:
-						if (tag.equals(tagItem)) {
+						if (id == idItem) {
 							e.setCancelled(true);
-						} else if (tag.equals(tagHotbar) || tag.equals(tagCursor)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar || id == idCursor) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case PLACE_ALL:
-						if (tag.equals(tagCursor)) {
+						if (id == idCursor) {
 							handle.invoke(slot);
-						} else if (tag.equals(tagItem)) {
+						} else if (id == idItem) {
 							e.setCancelled(true);
-						} else if (tag.equals(tagHotbar)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case PLACE_ONE:
-						if (tag.equals(tagCursor)) {
+						if (id == idCursor) {
 							new Scheduler() {
 								@Override
 								public void run() {
@@ -183,34 +189,32 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 									e.getView().setCursor(null);
 								}
 							}.runTask();
-						} else if (tag.equals(tagHotbar) || tag.equals(tagItem)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar || id == idItem) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case PLACE_SOME:
-						if (tag.equals(tagCursor)) {
+						if (id == idCursor) {
 							e.setCancelled(true);
-						} else if (tag.equals(tagHotbar) || tag.equals(tagItem)) {
-							tue(tagHotbar, tagItem, tagCursor, tag);
+						} else if (id == idHotbar || id == idItem) {
+							tue(idHotbar, idItem, idCursor, id);
 						}
 						break;
 					case SWAP_WITH_CURSOR:
-						if (tag.equals(tagItem)) {
+						if (id == idItem) {
 							handle.invoke(100);
-						} else if (tag.equals(tagCursor)) {
+						} else if (id == idCursor) {
 							handle.invoke(slot);
-						} else if (tag.equals(tagHotbar)) {
+						} else if (id == idHotbar) {
 							throw new UnknownError("Can not access this code");
 						}
 						break;
 					case UNKNOWN:
-						tue(tagHotbar, tagItem, tagCursor, tag);
+						tue(idHotbar, idItem, idCursor, id);
 						break;
 				}
 			}
-
 		}
-
 	}
 
 	@EventHandler
@@ -222,24 +226,19 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		if (cursor == null || cursor.getType() == Material.AIR) {
 			return;
 		}
-		String tag = ItemManager.getItemId(cursor);
-		if (tag == null)
+		int perkId = perkId(cursor);
+		if (perkId == -1)
 			return;
-		Player p = (Player) e.getPlayer();
-		WBUser user = WBUser.getUser(p);
+		UserPerk perk = WBUser.getUser((Player) e.getPlayer()).perks().perk(perkId);
+		WBUser user = perk.owner();
 		Handle[] handles = new Handle[0];
-		//		handles = Arrays.addAfter(handles,
-		//				new Handle(user.getData().getPerks()::setSlotBow, Item.DEFAULT_BOW.getItemId()),
-		//				new Handle(user.getData().getPerks()::setSlotArrow, Item.DEFAULT_ARROW.getItemId()),
-		//				new Handle(user.getData().getPerks()::setSlotShears,
-		//						Item.DEFAULT_SHEARS.getItemId()));
-		for (UserPerk perk : user.perks().perks()) {
-			handles = Arrays.addAfter(handles, new Handle(perk));
+		for (UserPerk p : user.perks().perks()) {
+			handles = Arrays.addAfter(handles, new Handle(p));
 		}
 
 		for (Handle handle : handles) {
-			if (tag.equals(handle.getTag())) {
-				PlayerInventory inv = p.getInventory();
+			if (handle.perk.id() == perkId) {
+				PlayerInventory inv = user.getBukkitEntity().getInventory();
 				int first = inv.firstEmpty();
 				if (-first == 1) {
 					first = inv.first(Material.WOOL);
@@ -251,7 +250,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		}
 	}
 
-	private void tue(String tagHotbar, String tagItem, String tagCursor, String tag) {
+	private void tue(int tagHotbar, int tagItem, int tagCursor, int tag) {
 		throw new UnknownError(
 				"Can not access this code: hotbar: " + tagHotbar + ", item: " + tagItem
 						+ ", cursor: " + tagCursor + ", perkTag: " + tag);
@@ -259,22 +258,10 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 
 	static class Handle {
 
-		private final Consumer<Integer> consumer;
-		private final String tag;
 		private UserPerk perk;
 
 		Handle(UserPerk perk) {
-			this(perk::slotSilent, perk.currentPerkItem().item().getItemId());
 			this.perk = perk;
-		}
-
-		Handle(Consumer<Integer> consumer, String tag) {
-			this.consumer = consumer;
-			this.tag = tag;
-		}
-
-		public String getTag() {
-			return tag;
 		}
 
 		public void update() {
@@ -283,9 +270,13 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 			}
 		}
 
+		public UserPerk perk() {
+			return perk;
+		}
+
 		public void invoke(int slot) {
 			// System.out.println("new sot: " + slot);
-			consumer.accept(slot);
+			perk.slotSilent(slot);
 		}
 	}
 }

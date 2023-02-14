@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
@@ -43,7 +42,7 @@ public class SetTeamCommand extends PServerExecutor {
 			TeamType teamtype) {
 		Team team = WoolBattle.getInstance().getTeamManager().getTeam(teamtype);
 		for (Player player : players) {
-			WBUser user = WoolBattle.getInstance().getUserWrapper().getUser(player.getUniqueId());
+			WBUser user = WBUser.getUser(player);
 			WoolBattle.getInstance().getTeamManager().setTeam(user, team);
 		}
 		if (players.size() == 1) {

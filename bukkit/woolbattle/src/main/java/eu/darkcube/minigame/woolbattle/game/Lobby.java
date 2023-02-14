@@ -19,6 +19,7 @@ import eu.darkcube.minigame.woolbattle.util.observable.ObservableObject;
 import eu.darkcube.minigame.woolbattle.util.observable.SimpleObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -299,8 +300,7 @@ public class Lobby extends GamePhase {
 	public void reloadUsers(WBUser user) {
 		Scoreboard sb = this.SCOREBOARD_BY_USER.get(user);
 		for (WBUser u : this.SCOREBOARD_MISSING_USERS.get(user)) {
-			eu.darkcube.minigame.woolbattle.util.scoreboard.Team team =
-					sb.getTeam(u.getTeam().getType().getScoreboardTag());
+			ScoreboardTeam team = sb.getTeam(u.getTeam().getType().getScoreboardTag());
 			team.addPlayer(u.getPlayerName());
 		}
 	}

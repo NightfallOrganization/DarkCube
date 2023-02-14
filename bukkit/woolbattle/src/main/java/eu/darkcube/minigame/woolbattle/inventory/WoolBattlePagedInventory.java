@@ -8,10 +8,7 @@ package eu.darkcube.minigame.woolbattle.inventory;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
-import eu.darkcube.system.inventoryapi.v1.DefaultAsyncPagedInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.inventoryapi.v1.*;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 import java.util.Collection;
@@ -32,9 +29,16 @@ public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventor
 	}
 
 	@Override
-	protected void offerAnimations(Collection<AnimationInformation> informations) {
+	protected final void offerAnimations(Collection<AnimationInformation> informations) {
 		// We want everything synced and on main thread
 		asyncOfferAnimations(informations);
+	}
+
+	@Override
+	protected final void asyncOfferAnimations(Collection<AnimationInformation> information) {
+		if (done()) {
+			super.asyncOfferAnimations(information);
+		}
 	}
 
 	protected void complete() {
@@ -64,6 +68,12 @@ public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventor
 
 	@Override
 	protected void insertArrowItems() {
+		arrowSlots.putIfAbsent(PageArrow.PREVIOUS,
+				new Integer[] {IInventory.slot(2, 1), IInventory.slot(3, 1),
+						IInventory.slot(4, 1)});
+		arrowSlots.putIfAbsent(PageArrow.NEXT,
+				new Integer[] {IInventory.slot(2, 9), IInventory.slot(3, 9),
+						IInventory.slot(4, 9)});
 		arrowItem.put(PageArrow.PREVIOUS, Item.PREV_PAGE.getItem(user));
 		arrowItem.put(PageArrow.NEXT, Item.NEXT_PAGE.getItem(user));
 		super.insertArrowItems();

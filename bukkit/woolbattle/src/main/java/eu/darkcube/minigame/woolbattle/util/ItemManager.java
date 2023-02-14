@@ -134,11 +134,12 @@ public class ItemManager {
 	public static ItemStack getItem(Item item, WBUser user, Object[] replacements,
 			Object... loreReplacements) {
 		ItemBuilder builder = item.getBuilder().persistentDataStorage()
-				.iset(ITEM_ID, PersistentDataTypes.STRING, ItemManager.getItemId(item)).builder();
+				.iset(ITEM_ID, PersistentDataTypes.STRING, item.getItemId()).builder();
 		Language language = user.getLanguage();
 		Component name = ItemManager.getDisplayName(item, language, replacements);
 		builder.displayname(name);
-		if (language.containsMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name())) {
+		if (language.containsMessage(
+				Message.KEY_PREFIX + Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name())) {
 			builder.lore(Message.getMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(),
 					language, loreReplacements));
 		}
