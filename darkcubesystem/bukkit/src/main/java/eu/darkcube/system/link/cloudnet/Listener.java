@@ -24,7 +24,8 @@ public class Listener implements org.bukkit.event.Listener {
 				.append("playingPlayers", DarkCubeBukkit.playingPlayers().get())
 				.append("spectatingPlayers", DarkCubeBukkit.spectatingPlayers().get())
 				.append("maxPlayingPlayers", DarkCubeBukkit.maxPlayingPlayers().get())
-				.append("displayName", DarkCubeBukkit.displayName());
+				.append("displayName", DarkCubeBukkit.displayName())
+				.append("autoconfigured", DarkCubeBukkit.autoConfigure());
 	}
 
 	@EventHandler

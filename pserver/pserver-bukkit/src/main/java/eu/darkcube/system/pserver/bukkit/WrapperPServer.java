@@ -4,27 +4,18 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.bukkit;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 import eu.darkcube.system.pserver.common.packet.Packet;
 import eu.darkcube.system.pserver.common.packet.PacketException;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperBoolean;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeConnectPlayer;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeRemove;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeSetData;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeStart;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeStop;
+import eu.darkcube.system.pserver.common.packet.packets.*;
+
+import java.util.Collection;
+import java.util.UUID;
 
 public class WrapperPServer implements PServer {
 
@@ -61,37 +52,6 @@ public class WrapperPServer implements PServer {
 	}
 
 	@Override
-	public String getTaskName() {
-		return taskName;
-	}
-
-	@Override
-	public synchronized JsonDocument getData() {
-		return this.data;
-	}
-
-	@Override
-	public PServerSerializable getSerializable() {
-		return serializable;
-	}
-
-	@Override
-	public synchronized void setPrivate(boolean privateServer) {
-		data.append("private", privateServer);
-		new PacketWrapperNodeSetData(id, data).sendAsync();
-	}
-
-	@Override
-	public synchronized boolean isPrivate() {
-		return data.getBoolean("private", false);
-	}
-
-	@Override
-	public void remove() {
-		new PacketWrapperNodeRemove(id).sendQuery();
-	}
-
-	@Override
 	public State getState() {
 		return state;
 	}
@@ -117,8 +77,8 @@ public class WrapperPServer implements PServer {
 	}
 
 	@Override
-	public void connectPlayer(UUID player) {
-		new PacketWrapperNodeConnectPlayer(player, id).sendAsync();
+	public void remove() {
+		new PacketWrapperNodeRemove(id).sendQuery();
 	}
 
 	@Override
@@ -129,6 +89,17 @@ public class WrapperPServer implements PServer {
 	@Override
 	public boolean isGamemode() {
 		return temporary;
+	}
+
+	@Override
+	public synchronized boolean isPrivate() {
+		return data.getBoolean("private", false);
+	}
+
+	@Override
+	public synchronized void setPrivate(boolean privateServer) {
+		data.append("private", privateServer);
+		new PacketWrapperNodeSetData(id, data).sendAsync();
 	}
 
 	@Override
@@ -159,5 +130,25 @@ public class WrapperPServer implements PServer {
 	@Override
 	public long getStartedAt() {
 		return startedAt;
+	}
+
+	@Override
+	public synchronized JsonDocument getData() {
+		return this.data;
+	}
+
+	@Override
+	public PServerSerializable getSerializable() {
+		return serializable;
+	}
+
+	@Override
+	public String getTaskName() {
+		return taskName;
+	}
+
+	@Override
+	public void connectPlayer(UUID player) {
+		new PacketWrapperNodeConnectPlayer(player, id).sendAsync();
 	}
 }

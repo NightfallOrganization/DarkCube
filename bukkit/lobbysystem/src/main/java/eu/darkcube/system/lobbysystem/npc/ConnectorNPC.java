@@ -413,8 +413,9 @@ public class ConnectorNPC {
 
 				GameState state = states.get(server);
 				String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
-				if (motd == null || motd.toLowerCase().contains("loading")
-						|| state != GameState.LOBBY) {
+				if (motd == null || motd.toLowerCase().contains("loading") || (
+						state != GameState.LOBBY && !server.getProperty(
+								DarkCubeServiceProperty.AUTOCONFIGURED).orElse(false))) {
 					servers.remove(server);
 					states.remove(server);
 					continue;

@@ -12,6 +12,8 @@ import eu.darkcube.system.util.GameState;
 
 public class DarkCubeServiceProperty {
 
+	public static final ServiceProperty<Boolean> AUTOCONFIGURED =
+			DefaultJsonServiceProperty.createFromClass("autoconfigured", Boolean.class);
 	public static final ServiceProperty<GameState> GAME_STATE =
 			DefaultJsonServiceProperty.createFromClass("gameState", GameState.class)
 					.forbidModification();

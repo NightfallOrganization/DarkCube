@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
@@ -21,7 +20,6 @@ import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.pserver.common.packet.PServerSerializable;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperDataUpdate;
 import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperUpdateInfo;
 
 import java.util.Collection;
@@ -160,13 +158,22 @@ public class NodePServer implements PServer {
 
 	@Override
 	public boolean isPrivate() {
-		return data.getBoolean("private", false);
+		if (data.contains("private")) {
+			return data.getBoolean("private");
+		}
+		setPrivate(true);
+		return true;
 	}
 
 	@Override
 	public void setPrivate(boolean privateServer) {
 		data.append("private", privateServer);
-		new PacketNodeWrapperDataUpdate(id, data);
+		NodePServerProvider.getInstance().setPServerData(id, data);
+	}
+
+	@Override
+	public boolean isPublic() {
+		return !isPrivate();
 	}
 
 	@Override
@@ -230,16 +237,8 @@ public class NodePServer implements PServer {
 				return;
 			}
 			PlayerExecutor ex = pm.getPlayerExecutor(cp);
-			if (ex == null) {
-				return;
-			}
 			ex.connect(snapshot.getName());
 		});
-	}
-
-	@Override
-	public boolean isPublic() {
-		return !isPrivate();
 	}
 
 	public ServiceId getServiceId() {

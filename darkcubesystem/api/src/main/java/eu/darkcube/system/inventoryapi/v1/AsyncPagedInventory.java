@@ -127,6 +127,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
 		Map<Integer, ItemStack> items = new HashMap<>();
 		this.fillItems(items);
+		this.items.clear();
 		this.items.putAll(items);
 		this.calculatePageItems();
 	}
@@ -155,9 +156,9 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 			}
 			this.pageItems.put(this.PAGE_SLOTS[slot], e.getValue());
 		}
+		this.calculateArrows();
 		update.addAll(this.pageItems.keySet());
 		this.updateSlots.addAll(update);
-		this.calculateArrows();
 	}
 
 	protected void calculateArrows() {

@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -20,6 +19,8 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
+import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServer;
 import eu.darkcube.system.pserver.common.PServer.State;
@@ -56,51 +57,55 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
-		super.fillItems(items);
-		SortedMap<Long, ItemStack> sitems = new TreeMap<>();
+		try {
+			SortedMap<Long, ItemStack> sitems = new TreeMap<>();
 
-		for (PServer ps : PServerProvider.getInstance().getPServers()) {
-			if (ps.getState() != State.RUNNING || !ListenerPServer.mayJoin(this.user, ps)) {
-				continue;
-			}
-			boolean publicServer = ps.isPublic();
-			int online = ps.getOnlinePlayers();
-			long ontime = ps.getOntime();
-			UUID owner = ps.getOwners().stream().findAny().orElse(null);
-
-			ItemBuilder b = null;
-
-			if (ps.isGamemode()) {
-				b = PServerDataManager.getDisplayItemGamemode(this.user.getUser(),
-						ps.getTaskName());
-			}
-			if (b == null) {
-				if (owner == null) {
-					b = ItemBuilder.item(Material.BARRIER);
-				} else {
-					b = ItemBuilder.item(Material.SKULL_ITEM).damage(SkullType.PLAYER.ordinal());
-					ItemStack item = b.build();
-					item.setItemMeta(SkullCache.getCachedItem(owner).getItemMeta());
-					b = ItemBuilder.item(item);
+			for (PServer ps : PServerProvider.getInstance().getPServers()) {
+				if (ps.getState() != State.RUNNING || !ListenerPServer.mayJoin(this.user, ps)) {
+					continue;
 				}
-			}
-			b.amount(online);
-			b.displayname(
-					Message.PSERVER_ITEM_TITLE.getMessage(this.user.getUser(), ps.getServerName()));
-			b.lore(publicServer
-					? Message.CLICK_TO_JOIN.getMessage(this.user.getUser())
-					: Message.PSERVER_NOT_PUBLIC.getMessage(this.user.getUser()));
-			Item.setItemId(b, InventoryPServer.ITEMID);
-			b.persistentDataStorage()
-					.set(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING,
-							ps.getId().toString());
-			sitems.put(ontime, b.build());
-		}
+				boolean publicServer = ps.isPublic();
+				int online = ps.getOnlinePlayers();
+				long ontime = ps.getOntime();
+				UUID owner = ps.getOwners().stream().findAny().orElse(null);
 
-		int slot = 0;
-		for (long ontime : sitems.keySet()) {
-			items.put(slot, sitems.get(ontime));
-			slot++;
+				ItemBuilder b = null;
+
+				if (ps.isGamemode()) {
+					b = PServerDataManager.getDisplayItemGamemode(this.user.getUser(),
+							ps.getTaskName());
+				}
+				if (b == null) {
+					if (owner == null) {
+						b = ItemBuilder.item(Material.BARRIER);
+					} else {
+						b = ItemBuilder.item(Material.SKULL_ITEM)
+								.damage(SkullType.PLAYER.ordinal());
+						ItemStack item = b.build();
+						item.setItemMeta(SkullCache.getCachedItem(owner).getItemMeta());
+						b = ItemBuilder.item(item);
+					}
+				}
+				b.amount(online);
+				b.displayname(Message.PSERVER_ITEM_TITLE.getMessage(this.user.getUser(),
+						ps.getServerName()));
+				b.lore(publicServer
+						? Message.CLICK_TO_JOIN.getMessage(this.user.getUser())
+						: Message.PSERVER_NOT_PUBLIC.getMessage(this.user.getUser()));
+				Item.setItemId(b, InventoryPServer.ITEMID);
+				b.persistentDataStorage()
+						.set(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING,
+								ps.getId().toString());
+				sitems.put(ontime, b.build());
+			}
+
+			int slot = 0;
+			for (long ontime : sitems.keySet()) {
+				items.put(slot, sitems.get(ontime));
+				slot++;
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 	}
 
@@ -136,6 +141,16 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 		@EventListener
 		public void handle(PServerUpdateEvent event) {
 			InventoryPServer.this.recalculate();
+		}
+
+		@EventListener
+		public void handle(PServerAddEvent event) {
+			recalculate();
+		}
+
+		@EventListener
+		public void handle(PServerRemoveEvent event) {
+			recalculate();
 		}
 
 	}

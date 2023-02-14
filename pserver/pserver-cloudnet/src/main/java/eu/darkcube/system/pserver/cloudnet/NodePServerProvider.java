@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet;
 
 import de.dytanic.cloudnet.CloudNet;
@@ -35,20 +34,16 @@ import java.util.stream.Collectors;
 
 public class NodePServerProvider extends PServerProvider {
 
-	private static final ExecutorService executor = Executors.newFixedThreadPool(1);
-
-	private static NodePServerProvider instance;
-
 	public static final String pserverTaskName = "pserver";
-
+	private static final ExecutorService executor = Executors.newFixedThreadPool(1);
+	private static NodePServerProvider instance;
 	public ServiceTask pserverTask;
 
 	public ServiceTemplate globalTemplate;
 
 	public ServiceTemplate worldTemplate;
-
+	public ConcurrentMap<UniqueId, NodePServer> pservers = new ConcurrentHashMap<>();
 	private Database pserverData;
-
 	private TemplateStorage storage = CloudNetDriver.getInstance().getLocalTemplateStorage();
 
 	private NodePServerProvider() {
@@ -104,54 +99,12 @@ public class NodePServerProvider extends PServerProvider {
 				CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("pserver_data");
 	}
 
-	public ConcurrentMap<UniqueId, NodePServer> pservers = new ConcurrentHashMap<>();
-
-	@Override
-	public String newName() {
-		Collection<String> used = this.pservers.values().stream().map(PServer::getServerName)
-				.collect(Collectors.toList());
-		for (int big = 1; true; big++) {
-			for (int major = 1; major <= 10; major++) {
-				for (int minor = 1; minor <= 10; minor++) {
-					String name = "ps-" + big + "_" + major + "." + minor;
-					if (!used.contains(name)) {
-						return name;
-					}
-				}
-			}
-		}
+	public static NodePServerProvider getInstance() {
+		return NodePServerProvider.instance;
 	}
 
-	@Override
-	public JsonDocument getPServerData(UniqueId pserver) {
-		return pserverData.get(pserver.toString());
-	}
-
-	@Override
-	public ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
-		CompletableTask<Void> task = new CompletableTask<>();
-		pserverData.containsAsync(pserver.toString()).fireExceptionOnFailure().onComplete(con -> {
-			if (con) {
-				pserverData.update(pserver.toString(), data);
-			} else {
-				pserverData.insert(pserver.toString(), data);
-			}
-			task.complete(null);
-		});
-		return task;
-	}
-
-	@Override
-	public ITask<Void> clearOwners(UniqueId id) {
-		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id);
-		CompletableTask<Void> task = new CompletableTask<>();
-		task.complete(null);
-		return task;
-	}
-
-	@Override
-	public Collection<UniqueId> getPServerIDs(UUID owner) {
-		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getPServers(owner);
+	public static void init() {
+		NodePServerProvider.instance = new NodePServerProvider();
 	}
 
 	public void remove(NodePServer pserver) {
@@ -172,95 +125,12 @@ public class NodePServerProvider extends PServerProvider {
 		new PacketNodeWrapperUpdateInfo(pserver.getSerializable()).sendAsync();
 	}
 
-	@Override
-	public ITask<Void> addOwner(UniqueId id, UUID owner) {
-		DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, owner);
-		this.getPServerOptional(id).ifPresent(ps -> {
-			ps.getOwners().add(owner);
-			ps.rebuildSerializable();
-		});
-		new PacketNodeWrapperAddOwner(id, owner).sendAsync();
-		CompletableTask<Void> task = new CompletableTask<>();
-		task.complete(null);
-		return task;
-	}
-
-	@Override
-	public ITask<Void> removeOwner(UniqueId id, UUID owner) {
-		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, owner);
-		this.getPServerOptional(id).ifPresent(ps -> {
-			ps.getOwners().remove(owner);
-			ps.rebuildSerializable();
-		});
-		new PacketNodeWrapperRemoveOwner(id, owner).sendAsync();
-		CompletableTask<Void> task = new CompletableTask<>();
-		task.complete(null);
-		return task;
-	}
-
-	@Override
-	public Optional<NodePServer> getPServerOptional(UniqueId uuid) {
-		return Optional.ofNullable(this.getPServer(uuid));
-	}
-
-	@Override
-	public NodePServer getPServer(UniqueId uuid) {
-		return this.pservers.getOrDefault(uuid, null);
-	}
-
-	@Override
-	public Collection<NodePServer> getPServers() {
-		return this.pservers.values();
-	}
-
-	@Override
-	public Collection<UUID> getOwners(UniqueId pserver) {
-		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getOwners(pserver);
-	}
-
-	public static NodePServerProvider getInstance() {
-		return NodePServerProvider.instance;
-	}
-
-	@Override
-	public NodePServer createPServer(PServerSerializable configuration) {
-		if (this.isPServer(configuration.id)) {
-			return this.getPServer(configuration.id);
-		}
-		if (configuration.taskName == null) {
-			configuration.taskName = this.pserverTask.getName();
-		}
-		NodePServer pserver = this.newPServer(configuration, getPServerData(configuration.id));
-		this.addOrUpdate(pserver);
-		return pserver;
-	}
-
 	public Collection<String> getAllTemplateIDs() {
 		return this.storage.getTemplates().stream()
 				.filter(s -> s.getPrefix().equals(PServerProvider.getTemplatePrefix()))
 				.map(ServiceTemplate::getName)
 				.filter(s -> !(s.equals(".world") || s.equals(".global")))
 				.collect(Collectors.toList());
-	}
-
-	@Override
-	public ITask<Void> delete(UniqueId pserver) {
-		CompletableTask<Void> task = new CompletableTask<>();
-		NodePServerProvider.executor.submit(() -> {
-			this.getPServerOptional(pserver).ifPresent(ps -> {
-				ServiceInfoSnapshot snap = ps.getSnapshot();
-				ps.stop();
-				if (snap != null) {
-					snap.provider().kill();
-				}
-			});
-			ServiceTemplate template = PServerProvider.getTemplate(pserver);
-			if (this.storage.has(template)) {
-				this.storage.delete(template);
-			}
-			task.complete(null);
-		});
-		return task;
 	}
 
 	private NodePServer newPServer(PServerSerializable s, JsonDocument data) {
@@ -296,14 +166,16 @@ public class NodePServerProvider extends PServerProvider {
 		return new NodePServer(s.id, s.temporary, s.serverName, s.taskName, conf, data);
 	}
 
-	public static void init() {
-		NodePServerProvider.instance = new NodePServerProvider();
-	}
-
 	public boolean isPServer(UniqueId uniqueId) {
 		if (uniqueId == null)
 			return false;
 		return this.pservers.containsKey(uniqueId);
+	}
+
+	@Override
+	public void setPServerCommand(BiFunction<Object, String[], Boolean> command)
+	throws IllegalStateException {
+		throw new IllegalStateException();
 	}
 
 	@Override
@@ -312,14 +184,136 @@ public class NodePServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public void setPServerCommand(BiFunction<Object, String[], Boolean> command)
-			throws IllegalStateException {
+	public PServer getCurrentPServer() throws IllegalStateException {
 		throw new IllegalStateException();
 	}
 
 	@Override
-	public PServer getCurrentPServer() throws IllegalStateException {
-		throw new IllegalStateException();
+	public NodePServer getPServer(UniqueId uuid) {
+		return this.pservers.getOrDefault(uuid, null);
+	}
+
+	@Override
+	public JsonDocument getPServerData(UniqueId pserver) {
+		return pserverData.get(pserver.toString());
+	}
+
+	@Override
+	public ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
+		CompletableTask<Void> task = new CompletableTask<>();
+		pserverData.containsAsync(pserver.toString()).fireExceptionOnFailure().onComplete(con -> {
+			if (con) {
+				pserverData.update(pserver.toString(), data);
+			} else {
+				pserverData.insert(pserver.toString(), data);
+			}
+			task.complete(null);
+		});
+		new PacketNodeWrapperDataUpdate(pserver, data).sendAsync();
+		return task;
+	}
+
+	@Override
+	public NodePServer createPServer(PServerSerializable configuration) {
+		if (this.isPServer(configuration.id)) {
+			return this.getPServer(configuration.id);
+		}
+		if (configuration.taskName == null) {
+			configuration.taskName = this.pserverTask.getName();
+		}
+		NodePServer pserver = this.newPServer(configuration, getPServerData(configuration.id));
+		this.addOrUpdate(pserver);
+		return pserver;
+	}
+
+	@Override
+	public Optional<NodePServer> getPServerOptional(UniqueId uuid) {
+		return Optional.ofNullable(this.getPServer(uuid));
+	}
+
+	@Override
+	public Collection<NodePServer> getPServers() {
+		return this.pservers.values();
+	}
+
+	@Override
+	public Collection<UniqueId> getPServerIDs(UUID owner) {
+		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getPServers(owner);
+	}
+
+	@Override
+	public Collection<UUID> getOwners(UniqueId pserver) {
+		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getOwners(pserver);
+	}
+
+	@Override
+	public ITask<Void> delete(UniqueId pserver) {
+		CompletableTask<Void> task = new CompletableTask<>();
+		NodePServerProvider.executor.submit(() -> {
+			this.getPServerOptional(pserver).ifPresent(ps -> {
+				ServiceInfoSnapshot snap = ps.getSnapshot();
+				ps.stop();
+				if (snap != null) {
+					snap.provider().kill();
+				}
+			});
+			ServiceTemplate template = PServerProvider.getTemplate(pserver);
+			if (this.storage.has(template)) {
+				this.storage.delete(template);
+			}
+			task.complete(null);
+		});
+		return task;
+	}
+
+	@Override
+	public ITask<Void> clearOwners(UniqueId id) {
+		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id);
+		CompletableTask<Void> task = new CompletableTask<>();
+		task.complete(null);
+		return task;
+	}
+
+	@Override
+	public ITask<Void> addOwner(UniqueId id, UUID owner) {
+		DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, owner);
+		this.getPServerOptional(id).ifPresent(ps -> {
+			ps.getOwners().add(owner);
+			ps.rebuildSerializable();
+		});
+		new PacketNodeWrapperAddOwner(id, owner).sendAsync();
+		CompletableTask<Void> task = new CompletableTask<>();
+		task.complete(null);
+		return task;
+	}
+
+	@Override
+	public ITask<Void> removeOwner(UniqueId id, UUID owner) {
+		DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, owner);
+		this.getPServerOptional(id).ifPresent(ps -> {
+			ps.getOwners().remove(owner);
+			ps.rebuildSerializable();
+		});
+		new PacketNodeWrapperRemoveOwner(id, owner).sendAsync();
+		CompletableTask<Void> task = new CompletableTask<>();
+		task.complete(null);
+		return task;
+	}
+
+	@Override
+	public String newName() {
+		Collection<String> used = this.pservers.values().stream().map(PServer::getServerName)
+				.collect(Collectors.toList());
+		for (int big = 1; true; big++) {
+			for (int major = 1; major <= 10; major++) {
+				for (int minor = 1; minor <= 10; minor++) {
+					String name = "ps-" + big + "_" + major + "." + minor;
+					if (!used.contains(name)) {
+						return name;
+					}
+				}
+			}
+		}
 	}
 
 }
