@@ -4,15 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.common.packet.Packet;
-import eu.darkcube.system.pserver.common.packet.PacketHandler;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperData;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeGetData;
+import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperData;
+import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeGetData;
 
 public class HandlerGetData implements PacketHandler<PacketWrapperNodeGetData> {
 

@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet;
 
 import com.google.common.reflect.TypeToken;
@@ -16,11 +15,11 @@ import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.cloudnet.packethandler.*;
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packet.PacketManager;
 import eu.darkcube.system.pserver.common.packet.packets.*;
+import eu.darkcube.system.pserver.common.packets.*;
 
 import java.io.File;
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class PServerModule extends DriverModule {
 	}
 
 	public static Collection<UniqueId> getCurrentPServerIDs() {
-		return PServerProvider.getInstance().getPServers().stream().map(PServer::getId)
+		return PServerProvider.getInstance().getPServers().stream().map(PServerExecutor::getId)
 				.collect(Collectors.toList());
 	}
 

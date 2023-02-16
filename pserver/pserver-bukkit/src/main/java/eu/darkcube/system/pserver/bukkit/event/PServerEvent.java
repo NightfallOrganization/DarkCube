@@ -4,22 +4,21 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.bukkit.event;
 
 import de.dytanic.cloudnet.driver.event.Event;
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 
 public abstract class PServerEvent extends Event {
 
-	private final PServer pserver;
+	private final PServerExecutor pserver;
 
-	public PServerEvent(PServer pserver) {
+	public PServerEvent(PServerExecutor pserver) {
 		super();
 		this.pserver = pserver;
 	}
 
-	public PServer getPServer() {
+	public PServerExecutor getPServer() {
 		return pserver;
 	}
 }

@@ -4,18 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.bukkit.event;
 
-import java.util.UUID;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 
-import eu.darkcube.system.pserver.common.PServer;
+import java.util.UUID;
 
 public class PServerRemoveOwnerEvent extends PServerEvent {
 
 	private UUID owner;
 
-	public PServerRemoveOwnerEvent(PServer pserver, UUID owner) {
+	public PServerRemoveOwnerEvent(PServerExecutor pserver, UUID owner) {
 		super(pserver);
 		this.owner = owner;
 	}

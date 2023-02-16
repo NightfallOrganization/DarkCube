@@ -19,4 +19,6 @@ public interface PersistentDataType<T> {
 
 	void serialize(JsonDocument doc, String key, T data);
 
+	T clone(T object);
+
 }

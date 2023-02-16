@@ -19,7 +19,7 @@ import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
@@ -86,15 +86,16 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 						Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
 			} else {
 				Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
-				PServer ps = PServerProvider.getInstance().getPServer(pserverId);
-				PServer.State state = ps == null ? PServer.State.OFFLINE : ps.getState();
-				Message mstate = state == PServer.State.OFFLINE
+				PServerExecutor ps = PServerProvider.getInstance().getPServer(pserverId);
+				PServerExecutor.State state =
+						ps == null ? PServerExecutor.State.OFFLINE : ps.getState();
+				Message mstate = state == PServerExecutor.State.OFFLINE
 						? Message.STATE_OFFLINE
-						: state == PServer.State.RUNNING
+						: state == PServerExecutor.State.RUNNING
 								? Message.STATE_RUNNING
-								: state == PServer.State.STARTING
+								: state == PServerExecutor.State.STARTING
 										? Message.STATE_STARTING
-										: state == PServer.State.STOPPING
+										: state == PServerExecutor.State.STOPPING
 												? Message.STATE_STOPPING
 												: null;
 				if (mstate == null)

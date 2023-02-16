@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.userapi.data;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
@@ -15,8 +14,7 @@ import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class UserPersistentDataStorage implements PersistentDataStorage {
@@ -27,6 +25,15 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 
 	public UserPersistentDataStorage(BukkitUser user) {
 		this.user = user;
+	}
+
+	@Override
+	public Collection<Key> keys() {
+		List<Key> keys = new ArrayList<>();
+		for (String s : data.keys()) {
+			keys.add(Key.fromString(s));
+		}
+		return Collections.unmodifiableCollection(keys);
 	}
 
 	@Override

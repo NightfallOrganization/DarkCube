@@ -4,14 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.bukkit.event;
 
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 
 public class PServerAddEvent extends PServerEvent {
 
-	public PServerAddEvent(PServer pserver) {
+	public PServerAddEvent(PServerExecutor pserver) {
 		super(pserver);
 	}
 }

@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet.command;
 
 import de.dytanic.cloudnet.CloudNet;
@@ -18,15 +17,11 @@ import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudOfflinePlayer;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
-import eu.darkcube.system.pserver.cloudnet.NodePServer;
+import eu.darkcube.system.pserver.cloudnet.NodePServerExecutor;
 import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
 import eu.darkcube.system.pserver.cloudnet.PServerModule;
-import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.PServer.State;
-import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.UniqueIdProvider;
-import eu.darkcube.system.pserver.common.packet.PServerSerializable;
+import eu.darkcube.system.pserver.common.*;
+import eu.darkcube.system.pserver.common.PServerExecutor.State;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -80,7 +75,7 @@ public class CommandPServers extends SubCommandHandler {
 					String serverName = PServerProvider.getInstance().newName();
 					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
 							startedAt, null, serverName, State.OFFLINE);
-					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
+					NodePServerExecutor ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer loaded! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
 				}, SubCommand::async, exactStringIgnoreCase("load"), dynamicString("id", "PServer does not exist", s ->
 						NodePServerProvider.getInstance().getAllTemplateIDs().contains(s), 
@@ -95,7 +90,7 @@ public class CommandPServers extends SubCommandHandler {
 					String serverName = PServerProvider.getInstance().newName();
 					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
 							startedAt,  null, serverName,State.OFFLINE);
-					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
+					NodePServerExecutor ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer created! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
 				}, SubCommand::async, exactStringIgnoreCase("new"))
 				.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
@@ -106,13 +101,13 @@ public class CommandPServers extends SubCommandHandler {
 					}
 					UniqueId uid = UniqueIdProvider.getInstance().newUniqueId();
 					int online = 0;
-					PServer.State state = State.OFFLINE;
+					PServerExecutor.State state = State.OFFLINE;
 					boolean temporary = true;
 					long startedAt = System.currentTimeMillis();
 					String serverName = PServerProvider.getInstance().newName();
 					PServerSerializable ser = new PServerSerializable(uid, online,  temporary,
 							startedAt,  taskn, serverName,state);
-					NodePServer ps = NodePServerProvider.getInstance().createPServer(ser);
+					NodePServerExecutor ps = NodePServerProvider.getInstance().createPServer(ser);
 					sender.sendMessage("PServer created! ID: " + ps.getId().toString() + ", Name: " + ps.getServerName());
 				}, SubCommand::async, exactStringIgnoreCase("by"), dynamicString("task", "Task nicht gefunden",
 						s -> CloudNet.getInstance().getServiceTaskProvider().isServiceTaskPresent(s), 
@@ -133,7 +128,7 @@ public class CommandPServers extends SubCommandHandler {
 				)
 				.preExecute((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 					UniqueId id = new UniqueId(args.argument("id").orElse("").toString());
-					PServer ps = PServerProvider.getInstance().getPServer(id);
+					PServerExecutor ps = PServerProvider.getInstance().getPServer(id);
 					if(ps == null) {
 						sender.sendMessage("Invalid PServer: Errors expected!");
 					}
@@ -153,11 +148,11 @@ public class CommandPServers extends SubCommandHandler {
 		// @formatter:off
 		builder.generateCommand(
 				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-					displayInformation(sender, (PServer)internalProperties.get("ps"));
+					displayInformation(sender, (PServerExecutor)internalProperties.get("ps"));
 		});
 		builder.generateCommand(
 				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-			PServer ps = (PServer)internalProperties.get("ps");
+			PServerExecutor ps = (PServerExecutor)internalProperties.get("ps");
 			boolean bool = ps.start();
 			if(bool) {
 				sender.sendMessage("PServer started! (Name: " + ps.getServerName() + ")");
@@ -166,7 +161,7 @@ public class CommandPServers extends SubCommandHandler {
 			}
 		}, SubCommand::async, exactStringIgnoreCase("start"));
 		builder.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-			PServer ps = (PServer)internalProperties.get("ps");
+			PServerExecutor ps = (PServerExecutor)internalProperties.get("ps");
 			boolean bool = ps.stop();
 			if(bool) {
 				sender.sendMessage("PServer stopped! (Name: " + ps.getServerName() + ")");
@@ -175,14 +170,14 @@ public class CommandPServers extends SubCommandHandler {
 			}
 		}, s -> s.async(), exactStringIgnoreCase("stop"));
 		builder.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-			PServer ps = (PServer)internalProperties.get("ps");
+			PServerExecutor ps = (PServerExecutor)internalProperties.get("ps");
 			ps.remove();
 			sender.sendMessage("PServer stopped and removed! (Name: " + ps.getServerName() + ")");
 		}, s-> s.async(), exactStringIgnoreCase("remove"));
 		builder.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 			String name = (String)args.argument("player").orElse(null);
 			ICloudPlayer player = playerManager.getFirstOnlinePlayer(name);
-			PServer ps = (PServer) internalProperties.get("ps");
+			PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
 			UUID uuid = player.getUniqueId();
 			if(ps.getOwners().contains(uuid)) {
 				sender.sendMessage("Player is already an Owner of this PServer");
@@ -196,7 +191,7 @@ public class CommandPServers extends SubCommandHandler {
 				() -> playerManager.onlinePlayers().asNames()));
 		builder.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
 			String name = (String)args.argument("player").orElse(null);
-			PServer ps = (PServer)internalProperties.get("ps");
+			PServerExecutor ps = (PServerExecutor)internalProperties.get("ps");
 			ICloudOfflinePlayer player = null;
 			try {
 				player = playerManager.getOfflinePlayer(UUID.fromString(name));
@@ -218,7 +213,7 @@ public class CommandPServers extends SubCommandHandler {
 			return playerManager.onlinePlayers().asUUIDs().stream().map(UUID::toString).collect(Collectors.toList());
 		}));
 		builder.generateCommand((subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-			PServer ps = (PServer)internalProperties.get("ps");
+			PServerExecutor ps = (PServerExecutor)internalProperties.get("ps");
 			sender.sendMessage("Owners of " + ps.getServerName() + ": (" + ps.getOwners().size() + ")");
 			for(UUID uuid : ps.getOwners()) {
 				sender.sendMessage(" - " + playerManager.getOfflinePlayer(uuid).getName() + " (" + uuid + ")");
@@ -227,10 +222,10 @@ public class CommandPServers extends SubCommandHandler {
 		// @formatter:on
 	}
 
-	private static void displayInformation(ICommandSender sender, PServer ps) {
+	private static void displayInformation(ICommandSender sender, PServerExecutor ps) {
 		sender.sendMessage(// @formatter:off
 				"* ID: " + ps.getId().toString(),
-				"* Online: " + ps.getOnlinePlayers() + "/" + ((NodePServer)ps).getSnapshot().getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1),
+				"* Online: " + ps.getOnlinePlayers() + "/" + ((NodePServerExecutor)ps).getSnapshot().getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1),
 				"* Ontime: " + TimeUnit.MILLISECONDS.toSeconds(ps.getOntime()) + "s",
 				"* ServerName: " + ps.getServerName(),
 				"* Owners: " + ps.getOwners().toString(),

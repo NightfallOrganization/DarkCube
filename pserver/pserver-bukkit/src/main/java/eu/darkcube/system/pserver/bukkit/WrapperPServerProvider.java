@@ -14,9 +14,10 @@ import eu.darkcube.system.pserver.bukkit.event.PServerEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.pserver.common.PServerSerializable;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packet.PServerSerializable;
 import eu.darkcube.system.pserver.common.packet.packets.*;
+import eu.darkcube.system.pserver.common.packets.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,9 +30,9 @@ public class WrapperPServerProvider extends PServerProvider {
 
 	private static WrapperPServerProvider instance = new WrapperPServerProvider();
 
-	private final Map<UniqueId, WrapperPServer> pservers = new ConcurrentHashMap<>();
+	private final Map<UniqueId, WrapperPServerExecutor> pservers = new ConcurrentHashMap<>();
 
-	WrapperPServer pserver;
+	WrapperPServerExecutor pserver;
 
 	private WrapperPServerProvider() {
 		PacketNodeWrapperPServers pservers =
@@ -49,11 +50,11 @@ public class WrapperPServerProvider extends PServerProvider {
 
 	}
 
-	public synchronized WrapperPServer remove(UniqueId id) {
+	public synchronized WrapperPServerExecutor remove(UniqueId id) {
 		if (!pservers.containsKey(id)) {
 			return null;
 		}
-		WrapperPServer ps = pservers.get(id);
+		WrapperPServerExecutor ps = pservers.get(id);
 		try {
 			publishUpdate(ps);
 			publishRemove(ps);
@@ -78,14 +79,14 @@ public class WrapperPServerProvider extends PServerProvider {
 		});
 	}
 
-	public synchronized WrapperPServer updateAndInsertIfNecessary(PServerSerializable pserver) {
+	public synchronized WrapperPServerExecutor updateAndInsertIfNecessary(
+			PServerSerializable pserver) {
 		UniqueId uuid = pserver.id;
-		Optional<WrapperPServer> pso = getPServerOptional(uuid);
+		Optional<WrapperPServerExecutor> pso = getPServerOptional(uuid);
 		if (!pso.isPresent()) {
 			Collection<UUID> owners = getOwners(uuid);
-			WrapperPServer ps =
-					new WrapperPServer(pserver, PServerProvider.getInstance().getPServerData(uuid),
-							owners);
+			WrapperPServerExecutor ps = new WrapperPServerExecutor(pserver,
+					PServerProvider.getInstance().getPServerData(uuid), owners);
 			pservers.put(uuid, ps);
 			pso = Optional.of(ps);
 			publishAdd(ps);
@@ -100,15 +101,15 @@ public class WrapperPServerProvider extends PServerProvider {
 		CloudNetDriver.getInstance().getEventManager().callEvent(event);
 	}
 
-	private void publishAdd(WrapperPServer ps) {
+	private void publishAdd(WrapperPServerExecutor ps) {
 		publishEvent(new PServerAddEvent(ps));
 	}
 
-	private void publishUpdate(WrapperPServer ps) {
+	private void publishUpdate(WrapperPServerExecutor ps) {
 		publishEvent(new PServerUpdateEvent(ps));
 	}
 
-	private void publishRemove(WrapperPServer ps) {
+	private void publishRemove(WrapperPServerExecutor ps) {
 		publishEvent(new PServerRemoveEvent(ps));
 	}
 
@@ -124,15 +125,15 @@ public class WrapperPServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public synchronized WrapperPServer getCurrentPServer() throws IllegalStateException {
-		if (pserver == null)
-			throw new IllegalStateException();
-		return pserver;
+	public WrapperPServerExecutor createPServer(PServerSerializable configuration) {
+		return updateAndInsertIfNecessary(
+				new PacketWrapperNodeCreatePServer(configuration).sendQuery()
+						.cast(PacketNodeWrapperPServer.class).getInfo());
 	}
 
 	@Override
-	public synchronized WrapperPServer getPServer(UniqueId uuid) {
-		return pservers.getOrDefault(uuid, null);
+	public synchronized Collection<WrapperPServerExecutor> getPServers() {
+		return pservers.values();
 	}
 
 	//	@Override
@@ -141,40 +142,6 @@ public class WrapperPServerProvider extends PServerProvider {
 	//				task == null ? null : task.getName()).sendQuery()
 	//				.cast(PacketNodeWrapperPServer.class).getInfo());
 	//	}
-
-	@Override
-	public synchronized JsonDocument getPServerData(UniqueId pserver) {
-		if (pservers.containsKey(pserver)) {
-			return pservers.get(pserver).getData().clone();
-		}
-		return new PacketWrapperNodeGetData(pserver).sendQuery().cast(PacketNodeWrapperData.class)
-				.getData();
-	}
-
-	@Override
-	public synchronized ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
-		if (pservers.containsKey(pserver)) {
-			pservers.get(pserver).update(data);
-		}
-		return new PacketWrapperNodeSetData(pserver, data).sendQueryAsync().map(p -> null);
-	}
-
-	@Override
-	public WrapperPServer createPServer(PServerSerializable configuration) {
-		return updateAndInsertIfNecessary(
-				new PacketWrapperNodeCreatePServer(configuration).sendQuery()
-						.cast(PacketNodeWrapperPServer.class).getInfo());
-	}
-
-	@Override
-	public Optional<WrapperPServer> getPServerOptional(UniqueId uuid) {
-		return Optional.ofNullable(getPServer(uuid));
-	}
-
-	@Override
-	public synchronized Collection<WrapperPServer> getPServers() {
-		return pservers.values();
-	}
 
 	@Override
 	public Collection<UniqueId> getPServerIDs(UUID owner) {
@@ -218,5 +185,39 @@ public class WrapperPServerProvider extends PServerProvider {
 	public String newName() {
 		return new PacketWrapperNodeNewName().sendQuery().cast(PacketNodeWrapperString.class)
 				.getString();
+	}
+
+	@Override
+	public synchronized WrapperPServerExecutor getCurrentPServer() throws IllegalStateException {
+		if (pserver == null)
+			throw new IllegalStateException();
+		return pserver;
+	}
+
+	@Override
+	public synchronized WrapperPServerExecutor getPServer(UniqueId uuid) {
+		return pservers.getOrDefault(uuid, null);
+	}
+
+	@Override
+	public synchronized JsonDocument getPServerData(UniqueId pserver) {
+		if (pservers.containsKey(pserver)) {
+			return pservers.get(pserver).getData().clone();
+		}
+		return new PacketWrapperNodeGetData(pserver).sendQuery().cast(PacketNodeWrapperData.class)
+				.getData();
+	}
+
+	@Override
+	public synchronized ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
+		if (pservers.containsKey(pserver)) {
+			pservers.get(pserver).update(data);
+		}
+		return new PacketWrapperNodeSetData(pserver, data).sendQueryAsync().map(p -> null);
+	}
+
+	@Override
+	public Optional<WrapperPServerExecutor> getPServerOptional(UniqueId uuid) {
+		return Optional.ofNullable(getPServer(uuid));
 	}
 }

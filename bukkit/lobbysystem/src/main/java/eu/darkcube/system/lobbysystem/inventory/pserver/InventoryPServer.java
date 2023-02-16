@@ -22,8 +22,8 @@ import eu.darkcube.system.lobbysystem.util.SkullCache;
 import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
-import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.PServer.State;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -60,7 +60,7 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 		try {
 			SortedMap<Long, ItemStack> sitems = new TreeMap<>();
 
-			for (PServer ps : PServerProvider.getInstance().getPServers()) {
+			for (PServerExecutor ps : PServerProvider.getInstance().getPServers()) {
 				if (ps.getState() != State.RUNNING || !ListenerPServer.mayJoin(this.user, ps)) {
 					continue;
 				}

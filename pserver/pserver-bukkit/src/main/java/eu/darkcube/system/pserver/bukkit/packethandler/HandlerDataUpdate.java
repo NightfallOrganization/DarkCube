@@ -6,10 +6,9 @@
  */
 package eu.darkcube.system.pserver.bukkit.packethandler;
 
+import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.bukkit.WrapperPServerProvider;
-import eu.darkcube.system.pserver.common.packet.Packet;
-import eu.darkcube.system.pserver.common.packet.PacketHandler;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperDataUpdate;
+import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperDataUpdate;
 
 public class HandlerDataUpdate implements PacketHandler<PacketNodeWrapperDataUpdate> {
 

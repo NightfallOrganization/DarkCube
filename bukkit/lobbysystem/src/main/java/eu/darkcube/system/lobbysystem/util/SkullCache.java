@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.util;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -16,7 +15,7 @@ import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerAddOwnerEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveOwnerEvent;
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.util.ReflectionUtils;
@@ -38,7 +37,6 @@ import java.util.stream.Collectors;
 
 public class SkullCache implements Listener {
 
-	public static Map<UUID, Object> cache = new HashMap<>();
 	private static final Method asNMSCopy = ReflectionUtils.getMethod(
 			ReflectionUtils.getClass("CraftItemStack",
 					ReflectionUtils.PackageType.CRAFTBUKKIT_INVENTORY), "asNMSCopy",
@@ -47,6 +45,8 @@ public class SkullCache implements Listener {
 			ReflectionUtils.getClass("CraftItemStack",
 					ReflectionUtils.PackageType.CRAFTBUKKIT_INVENTORY), "asBukkitCopy",
 			asNMSCopy.getReturnType());
+	public static Map<UUID, Object> cache = new HashMap<>();
+	private static SkullCache sc = new SkullCache();
 
 	public static void loadToCache(UUID ownerUUID, String ownerName) {
 		if (SkullCache.cache.containsKey(ownerUUID)) {
@@ -68,8 +68,6 @@ public class SkullCache implements Listener {
 		return (ItemStack) ReflectionUtils.invokeMethod(null, asBukkitCopy,
 				SkullCache.cache.get(ownerUUID));
 	}
-
-	private static SkullCache sc = new SkullCache();
 
 	public static void register() {
 		CloudNetDriver.getInstance().getEventManager().registerListener(SkullCache.sc);
@@ -112,7 +110,7 @@ public class SkullCache implements Listener {
 	public void handle(PlayerQuitEvent e) {
 		AsyncExecutor.service().submit(() -> {
 			Set<UUID> uuids = new HashSet<>();
-			PServerProvider.getInstance().getPServers().stream().map(PServer::getOwners)
+			PServerProvider.getInstance().getPServers().stream().map(PServerExecutor::getOwners)
 					.forEach(uuids::addAll);
 			uuids.addAll(Bukkit.getOnlinePlayers().stream().filter(s -> !s.equals(e.getPlayer()))
 					.map(Player::getUniqueId).collect(Collectors.toList()));
@@ -138,7 +136,7 @@ public class SkullCache implements Listener {
 		AsyncExecutor.service().submit(() -> {
 			Set<UUID> uuids = new HashSet<>();
 			PServerProvider.getInstance().getPServers().stream().filter(ps -> ps != e.getPServer())
-					.map(PServer::getOwners).forEach(uuids::addAll);
+					.map(PServerExecutor::getOwners).forEach(uuids::addAll);
 			uuids.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId)
 					.collect(Collectors.toList()));
 			for (UUID owner : e.getPServer().getOwners()) {
@@ -165,7 +163,7 @@ public class SkullCache implements Listener {
 		AsyncExecutor.service().submit(() -> {
 			Set<UUID> uuids = new HashSet<>();
 			PServerProvider.getInstance().getPServers().stream().filter(ps -> ps != e.getPServer())
-					.map(PServer::getOwners).forEach(uuids::addAll);
+					.map(PServerExecutor::getOwners).forEach(uuids::addAll);
 			uuids.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId)
 					.collect(Collectors.toList()));
 			if (!uuids.contains(e.getOwner())) {

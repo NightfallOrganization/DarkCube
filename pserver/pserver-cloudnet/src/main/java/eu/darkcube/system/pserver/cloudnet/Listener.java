@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet;
 
 import de.dytanic.cloudnet.driver.event.EventListener;
@@ -35,7 +34,7 @@ public class Listener {
 		UniqueId id = ServiceInfoUtil.getInstance()
 				.getUniqueId(e.getCloudService().getServiceInfoSnapshot());
 		if (NodePServerProvider.getInstance().isPServer(id)) {
-			NodePServer ps = NodePServerProvider.getInstance().getPServer(id);
+			NodePServerExecutor ps = NodePServerProvider.getInstance().getPServer(id);
 			e.getCloudService().deployResources(false);
 			ps.remove();
 		}
@@ -44,7 +43,7 @@ public class Listener {
 	@EventListener
 	public void handle(CloudServiceInfoUpdateEvent e) {
 		ServiceInfoSnapshot info = e.getServiceInfo();
-		for (NodePServer ps : NodePServerProvider.getInstance().getPServers()) {
+		for (NodePServerExecutor ps : NodePServerProvider.getInstance().getPServers()) {
 			if (ps.getServiceId() != null) {
 				if (ps.getServiceId().getUniqueId().equals(info.getServiceId().getUniqueId())) {
 					ps.setSnapshot(info);

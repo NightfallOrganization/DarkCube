@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.listener;
 
 import com.google.gson.Gson;
@@ -26,11 +25,7 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.UniqueIdProvider;
-import eu.darkcube.system.pserver.common.packet.PServerSerializable;
+import eu.darkcube.system.pserver.common.*;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -46,7 +41,7 @@ import java.util.concurrent.ExecutionException;
 
 public class ListenerPServer extends BaseListener {
 
-	public static boolean mayJoin(LobbyUser user, PServer pserver) {
+	public static boolean mayJoin(LobbyUser user, PServerExecutor pserver) {
 		boolean mayjoin = !pserver.isPrivate();
 		if (pserver.getOwners().contains(user.getUser().getUniqueId())) {
 			mayjoin = true;
@@ -88,7 +83,7 @@ public class ListenerPServer extends BaseListener {
 			if (itemid.equals(InventoryPServer.ITEMID)) {
 				String psid = itemb.persistentDataStorage()
 						.get(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING);
-				PServer ps = PServerProvider.getInstance().getPServer(new UniqueId(psid));
+				PServerExecutor ps = PServerProvider.getInstance().getPServer(new UniqueId(psid));
 				if (ps == null) {
 					cinv.recalculate();
 					return;
@@ -186,7 +181,7 @@ public class ListenerPServer extends BaseListener {
 							e.getWhoClicked().closeInventory();
 						}
 					}.runTask(Lobby.getInstance());
-					for (PServer ps : PServerProvider.getInstance().getPServers()) {
+					for (PServerExecutor ps : PServerProvider.getInstance().getPServers()) {
 						JsonDocument data = ps.getData();
 						if (data.contains("startedBy")) {
 							UUID uuid = UUID.fromString(data.getString("startedBy"));
@@ -209,11 +204,11 @@ public class ListenerPServer extends BaseListener {
 					boolean temporary = taskName != null;
 					PServerSerializable ser = new PServerSerializable(cinv.pserverId, 0, temporary,
 							System.currentTimeMillis(), taskName, serverName,
-							PServer.State.STARTING);
+							PServerExecutor.State.STARTING);
 					JsonDocument data = PServerProvider.getInstance().getPServerData(ser.id);
 					data.append("startedBy", user.getUser().getUniqueId().toString());
 					PServerProvider.getInstance().setPServerData(ser.id, data);
-					PServer ps = PServerProvider.getInstance().createPServer(ser);
+					PServerExecutor ps = PServerProvider.getInstance().createPServer(ser);
 					ps.start();
 					Lobby.getInstance().getPServerJoinOnStart().register(user, ps);
 				});

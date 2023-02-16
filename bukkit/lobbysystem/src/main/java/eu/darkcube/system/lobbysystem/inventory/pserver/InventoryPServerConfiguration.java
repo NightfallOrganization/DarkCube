@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
@@ -18,8 +17,8 @@ import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInven
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
-import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.PServer.State;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
@@ -58,7 +57,7 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		super.fillItems(items);
 		items.put(8, Item.PSERVER_DELETE.getItem(this.user.getUser()));
-		PServer ps = PServerProvider.getInstance().getPServer(pserverId);
+		PServerExecutor ps = PServerProvider.getInstance().getPServer(pserverId);
 		State state = ps == null ? State.OFFLINE : ps.getState();
 		if (state == State.OFFLINE) {
 			items.put(12, Item.START_PSERVER.getItem(this.user.getUser()));

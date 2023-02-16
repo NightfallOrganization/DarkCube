@@ -4,15 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.bukkit.packethandler;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
+import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveOwnerEvent;
 import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.common.packet.Packet;
-import eu.darkcube.system.pserver.common.packet.PacketHandler;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperRemoveOwner;
+import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperRemoveOwner;
 
 public class HandlerRemoveOwner implements PacketHandler<PacketNodeWrapperRemoveOwner> {
 
@@ -21,10 +19,8 @@ public class HandlerRemoveOwner implements PacketHandler<PacketNodeWrapperRemove
 		PServerProvider.getInstance().getPServerOptional(packet.getUniqueId()).ifPresent(ps -> {
 			ps.getOwners().remove(packet.getOwner());
 		});
-		CloudNetDriver.getInstance()
-				.getEventManager()
-				.callEvent(new PServerRemoveOwnerEvent(PServerProvider.getInstance().getPServer(packet.getUniqueId()),
-						packet.getOwner()));
+		CloudNetDriver.getInstance().getEventManager().callEvent(new PServerRemoveOwnerEvent(
+				PServerProvider.getInstance().getPServer(packet.getUniqueId()), packet.getOwner()));
 		return null;
 	}
 

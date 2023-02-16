@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.pserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -14,8 +13,8 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
-import eu.darkcube.system.pserver.common.PServer;
-import eu.darkcube.system.pserver.common.PServer.State;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
@@ -55,7 +54,7 @@ public class PServerJoinOnStart implements Listener {
 		this.runnable.runTaskTimer(Lobby.getInstance(), 10, 10);
 	}
 
-	public void register(LobbyUser user, PServer pserver) {
+	public void register(LobbyUser user, PServerExecutor pserver) {
 		if (pserver.getState() == State.RUNNING) {
 			AsyncExecutor.service().submit(() -> {
 				pserver.connectPlayer(user.getUser().getUniqueId());
