@@ -7,6 +7,8 @@
 package eu.darkcube.system.util.data;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -17,8 +19,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
 	private final JsonDocument data = new JsonDocument();
 	private final Map<Key, Object> cache = new HashMap<>();
-
-	private
+	private final Collection<@NotNull UpdateNotifier> updateNotifiers = new ArrayList<>();
 
 	@Override
 	public Collection<Key> keys() {
@@ -173,11 +174,38 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 
 	@Override
 	public void loadFromJsonDocument(JsonDocument document) {
-
+		try {
+			lock.writeLock().lock();
+			data.clear();
+			cache.clear();
+			data.append(document);
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 	@Override
 	public JsonDocument storeToJsonDocument() {
-		return null;
+		try {
+			lock.readLock().lock();
+			return JsonDocument.newDocument().append(data);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public @UnmodifiableView Collection<@NotNull UpdateNotifier> updateNotifiers() {
+		return Collections.unmodifiableCollection(updateNotifiers);
+	}
+
+	@Override
+	public void addUpdateNotifier(UpdateNotifier notifier) {
+		updateNotifiers.add(notifier);
+	}
+
+	@Override
+	public void removeUpdateNotifier(UpdateNotifier notifier) {
+		updateNotifiers.remove(notifier);
 	}
 }
