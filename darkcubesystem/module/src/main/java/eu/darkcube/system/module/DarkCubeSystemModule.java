@@ -12,6 +12,7 @@ import de.dytanic.cloudnet.driver.module.ModuleLifeCycle;
 import de.dytanic.cloudnet.driver.module.ModuleTask;
 import de.dytanic.cloudnet.driver.module.driver.DriverModule;
 import eu.darkcube.system.module.userapi.UserAPI;
+import eu.darkcube.system.module.util.data.SynchronizedPersistentDataStorages;
 import eu.darkcube.system.packetapi.PacketAPI;
 
 import java.io.File;
@@ -27,5 +28,6 @@ public class DarkCubeSystemModule extends DriverModule {
 		UserAPI userAPI = new UserAPI();
 		CloudNetDriver.getInstance().getEventManager().registerListener(userAPI);
 		CloudNetDriver.getInstance().getEventManager().registerListener(new Listener());
+		SynchronizedPersistentDataStorages.init();
 	}
 }

@@ -4,17 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
-import eu.darkcube.system.util.data.plugin.PacketPluginDataRemove;
-import eu.darkcube.system.util.data.plugin.PacketPluginDataSet;
-import eu.darkcube.system.util.data.plugin.PluginPersistentDataStorage;
+import eu.darkcube.system.util.data.SynchronizedPersistentDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -34,11 +32,10 @@ public abstract class Plugin extends JavaPlugin {
 	private static final Database pluginPersistentData =
 			CloudNetDriver.getInstance().getDatabaseProvider()
 					.getDatabase("plugin_persistent_data");
-	private static final Collection<PluginPersistentDataStorage> storages =
-			ConcurrentHashMap.newKeySet();
 	private static HashMap<YamlConfiguration, File> fileFromConfig = new HashMap<>();
 	private static HashMap<String, YamlConfiguration> configFromName = new HashMap<>();
-	private final PluginPersistentDataStorage storage = new PluginPersistentDataStorage(this);
+	private final SynchronizedPersistentDataStorage storage = null;
+	private Key key;
 	private final AtomicBoolean storageLoaded = new AtomicBoolean();
 
 	public Plugin() {

@@ -4,26 +4,20 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
-package eu.darkcube.system.util.data.plugin;
+package eu.darkcube.system.util.data.packets;
 
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.util.data.Key;
 
-public class PacketPluginDataRemove extends Packet {
-	private String plugin;
-	private Key key;
+public class PacketWrapperNodeQuery extends Packet {
 
-	public PacketPluginDataRemove(String plugin, Key key) {
-		this.plugin = plugin;
+	private final Key key;
+
+	public PacketWrapperNodeQuery(Key key) {
 		this.key = key;
 	}
 
-	public String getPlugin() {
-		return plugin;
-	}
-
-	public Key getKey() {
+	public Key key() {
 		return key;
 	}
 }

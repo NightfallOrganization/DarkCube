@@ -4,26 +4,26 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
-package eu.darkcube.system.util.data.plugin;
+package eu.darkcube.system.util.data.packets;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.util.data.Key;
 
-public class PacketPluginDataSet extends Packet {
-	private String plugin;
-	private JsonDocument data;
+public class PacketWrapperNodeDataSet extends Packet {
+	private final Key key;
+	private final JsonDocument data;
 
-	public PacketPluginDataSet(String plugin, JsonDocument data) {
-		this.plugin = plugin;
+	public PacketWrapperNodeDataSet(Key key, JsonDocument data) {
+		this.key = key;
 		this.data = data;
 	}
 
-	public String getPlugin() {
-		return plugin;
+	public JsonDocument data() {
+		return data;
 	}
 
-	public JsonDocument getData() {
-		return data;
+	public Key key() {
+		return key;
 	}
 }
