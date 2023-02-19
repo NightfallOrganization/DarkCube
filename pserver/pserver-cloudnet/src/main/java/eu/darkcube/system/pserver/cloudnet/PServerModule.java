@@ -11,6 +11,7 @@ import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.driver.module.ModuleLifeCycle;
 import de.dytanic.cloudnet.driver.module.ModuleTask;
 import de.dytanic.cloudnet.driver.module.driver.DriverModule;
+import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
@@ -58,7 +59,7 @@ public class PServerModule extends DriverModule {
 	}
 
 	public static Collection<UniqueId> getCurrentPServerIDs() {
-		return PServerProvider.getInstance().getPServers().stream().map(PServerExecutor::getId)
+		return PServerProvider.instance().getPServers().stream().map(PServerExecutor::id)
 				.collect(Collectors.toList());
 	}
 
@@ -81,7 +82,7 @@ public class PServerModule extends DriverModule {
 
 		CloudNet.getInstance().getCommandMap().registerCommand(new CommandPServers());
 
-		PacketManager pm = PacketManager.getInstance();
+		PacketAPI pm = PacketAPI.getInstance();
 		pm.registerHandler(PacketWrapperNodeAddOwner.class, new HandlerAddOwner());
 		pm.registerHandler(PacketWrapperNodeClearOwners.class, new HandlerClearOwners());
 		pm.registerHandler(PacketWrapperNodeConnectPlayer.class, new HandlerConnectPlayer());
@@ -96,7 +97,7 @@ public class PServerModule extends DriverModule {
 		pm.registerHandler(PacketWrapperNodeNewUniqueId.class, new HandlerNewUniqueId());
 		pm.registerHandler(PacketWrapperNodeRemove.class, new HandlerRemove());
 		pm.registerHandler(PacketWrapperNodeRemoveOwner.class, new HandlerRemoveOwner());
-		pm.registerHandler(PacketWrapperNodeRetrievePServers.class, new HandlerRetrievePServers());
+		pm.registerHandler(PacketWrapperNodeGetPServers.class, new HandlerGetPServers());
 		pm.registerHandler(PacketWrapperNodeSetRunning.class, new HandlerSetRunning());
 		pm.registerHandler(PacketWrapperNodeStart.class, new HandlerStart());
 		pm.registerHandler(PacketWrapperNodeStop.class, new HandlerStop());

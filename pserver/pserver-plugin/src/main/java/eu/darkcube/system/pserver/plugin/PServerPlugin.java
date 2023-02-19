@@ -36,6 +36,7 @@ public class PServerPlugin extends DarkCubePlugin {
 	private final Path workingDirectory;
 
 	public PServerPlugin() {
+		super("pserver-features");
 		instance = this;
 		workingDirectory = Paths.get("pserver");
 		try {
@@ -99,7 +100,7 @@ public class PServerPlugin extends DarkCubePlugin {
 		new UserCacheListener();
 		new CommandBlockModifyListener();
 
-		PServerProvider.getInstance().setPServerCommand(new PServerCommand());
+		PServerProvider.instance().setPServerCommand(new PServerCommand());
 
 		this.linkManager.addLink(LuckPermsLink::new);
 		this.linkManager.addLink(WoolBattleLink::new);

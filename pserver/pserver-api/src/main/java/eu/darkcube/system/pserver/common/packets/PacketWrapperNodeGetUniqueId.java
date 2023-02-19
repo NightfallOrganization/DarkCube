@@ -7,6 +7,7 @@
 package eu.darkcube.system.pserver.common.packets;
 
 import de.dytanic.cloudnet.driver.service.ServiceId;
+import eu.darkcube.system.packetapi.Packet;
 
 public class PacketWrapperNodeGetUniqueId extends Packet {
 

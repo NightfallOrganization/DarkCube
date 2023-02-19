@@ -57,7 +57,7 @@ public interface PServerExecutor {
 	 *
 	 * @param level the new level
 	 */
-	CompletableFuture<Boolean> publicAccess(@NotNull AccessLevel level);
+	CompletableFuture<Boolean> accessLevel(@NotNull AccessLevel level);
 
 	/**
 	 * @return the unique id of this pserver
@@ -73,6 +73,10 @@ public interface PServerExecutor {
 	 * @return an unmodifiable collection of the owners of this pserver
 	 */
 	@UnmodifiableView Collection<@NotNull UUID> owners();
+
+	CompletableFuture<Boolean> addOwner(UUID uuid);
+
+	CompletableFuture<Boolean> removeOwner(UUID uuid);
 
 	/**
 	 * @return the name of this pserver. This might be auto-generated. Two pservers with the same

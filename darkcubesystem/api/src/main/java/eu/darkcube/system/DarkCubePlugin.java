@@ -6,11 +6,20 @@
  */
 package eu.darkcube.system;
 
+import eu.darkcube.system.util.data.Key;
 import org.bukkit.event.Listener;
 
 public class DarkCubePlugin extends Plugin implements Listener {
 
 	private static DarkCubePlugin systemPlugin = null;
+
+	public DarkCubePlugin(Key key) {
+		super(key);
+	}
+
+	public DarkCubePlugin(String pluginName) {
+		super(pluginName);
+	}
 
 	@Override
 	public String getCommandPrefix() {

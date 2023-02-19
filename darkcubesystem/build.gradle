@@ -7,7 +7,7 @@ tasks.shadowJar.archiveClassifier.set('')
 tasks.build.dependsOn(tasks.shadowJar)
 
 dependencies {
-    api project(path: 'api')
-    runtimeOnly project(path: 'bukkit')
-    runtimeOnly project(path: 'module')
+    api project('api')
+    runtimeOnly project('bukkit')
+    runtimeOnly project('module')
 }

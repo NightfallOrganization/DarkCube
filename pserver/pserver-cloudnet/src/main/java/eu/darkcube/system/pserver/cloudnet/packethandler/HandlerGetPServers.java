@@ -8,14 +8,14 @@ package eu.darkcube.system.pserver.cloudnet.packethandler;
 
 import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
 import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperPServers;
-import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeRetrievePServers;
+import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeGetPServers;
 
 import java.util.stream.Collectors;
 
-public class HandlerRetrievePServers implements PacketHandler<PacketWrapperNodeRetrievePServers> {
+public class HandlerGetPServers implements PacketHandler<PacketWrapperNodeGetPServers> {
 
 	@Override
-	public Packet handle(PacketWrapperNodeRetrievePServers packet) {
+	public Packet handle(PacketWrapperNodeGetPServers packet) {
 		return new PacketNodeWrapperPServers(
 				NodePServerProvider.getInstance().getPServers().stream()
 						.map(s -> s.getSerializable()).collect(Collectors.toSet()));

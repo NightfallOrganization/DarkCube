@@ -36,7 +36,7 @@ public class WrapperPServerProvider extends PServerProvider {
 
 	private WrapperPServerProvider() {
 		PacketNodeWrapperPServers pservers =
-				new PacketWrapperNodeRetrievePServers().sendQuery(PacketNodeWrapperPServers.class);
+				new PacketWrapperNodeGetPServers().sendQuery(PacketNodeWrapperPServers.class);
 		for (PServerSerializable s : pservers) {
 			updateAndInsertIfNecessary(s);
 		}

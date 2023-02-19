@@ -7,11 +7,15 @@
 package eu.darkcube.system.module.util.data;
 
 import com.google.common.collect.HashBiMap;
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataClearSet;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataRemove;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataSet;
+import eu.darkcube.system.util.data.packets.PacketWrapperNodeQuery;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -20,6 +24,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SynchronizedPersistentDataStorages {
+	static final Database database = CloudNetDriver.getInstance().getDatabaseProvider()
+			.getDatabase("plugin_persistent_data");
 	private static final ReferenceQueue<SynchronizedPersistentDataStorage> queue =
 			new ReferenceQueue<>();
 	private static final Lock lock = new ReentrantLock(false);
@@ -33,6 +39,14 @@ public class SynchronizedPersistentDataStorages {
 		SynchronizedPersistentDataStorage storage = ref == null ? null : ref.get();
 		if (storage == null) {
 			storage = new SynchronizedPersistentDataStorage(key);
+			if (database.contains(key.key())) {
+				JsonDocument doc = database.get(key.toString());
+				database.delete(key.toString());
+				database.insert(key.toString(), doc);
+				storage.loadFromJsonDocument(doc);
+			} else if (database.contains(key.toString())) {
+				storage.loadFromJsonDocument(database.get(key.toString()));
+			}
 			ref = new SoftReference<>(storage);
 			storages.put(key, ref);
 		}
@@ -49,6 +63,7 @@ public class SynchronizedPersistentDataStorages {
 				.registerHandler(PacketWrapperNodeDataClearSet.class, new HandlerClearSet());
 		PacketAPI.getInstance()
 				.registerHandler(PacketWrapperNodeDataRemove.class, new HandlerRemove());
+		PacketAPI.getInstance().registerHandler(PacketWrapperNodeQuery.class, new HandlerQuery());
 		new CollectorHandler();
 	}
 

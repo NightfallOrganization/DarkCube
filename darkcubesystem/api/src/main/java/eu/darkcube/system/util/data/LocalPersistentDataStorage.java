@@ -48,10 +48,12 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		notifyNotifiers();
 	}
 
 	@Override
 	public <T> T remove(Key key, PersistentDataType<T> type) {
+		T ret;
 		try {
 			lock.writeLock().lock();
 			if (!data.contains(key.toString())) {
@@ -63,10 +65,12 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 				old = type.deserialize(data, key.toString());
 			}
 			data.remove(key.toString());
-			return type.clone(old);
+			ret = type.clone(old);
 		} finally {
 			lock.writeLock().unlock();
 		}
+		notifyNotifiers();
+		return ret;
 	}
 
 	@Override
@@ -108,6 +112,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 		} finally {
 			lock.readLock().unlock();
 		}
+		T ret;
 		try {
 			lock.writeLock().lock();
 			if (cache.containsKey(key)) {
@@ -122,10 +127,12 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 			T val = type.clone(defaultValue.get());
 			type.serialize(data, key.toString(), val);
 			cache.put(key, val);
-			return val;
+			ret = val;
 		} finally {
 			lock.writeLock().unlock();
 		}
+		notifyNotifiers();
+		return ret;
 	}
 
 	@Override
@@ -149,6 +156,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		notifyNotifiers();
 	}
 
 	@Override
@@ -167,6 +175,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 			lock.writeLock().lock();
 			data.clear();
 			cache.clear();
+			notifyNotifiers();
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -182,6 +191,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		notifyNotifiers();
 	}
 
 	@Override
@@ -197,6 +207,12 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 	@Override
 	public @UnmodifiableView Collection<@NotNull UpdateNotifier> updateNotifiers() {
 		return Collections.unmodifiableCollection(updateNotifiers);
+	}
+
+	private void notifyNotifiers() {
+		for (UpdateNotifier updateNotifier : updateNotifiers) {
+			updateNotifier.notify(this);
+		}
 	}
 
 	@Override

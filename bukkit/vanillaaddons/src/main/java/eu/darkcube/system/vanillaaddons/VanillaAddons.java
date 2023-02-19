@@ -27,6 +27,10 @@ public class VanillaAddons extends DarkCubePlugin {
 	private InventoryRegistry inventoryRegistry;
 	private UserModifier userModifier;
 
+	public VanillaAddons() {
+		super("vanillaaddons");
+	}
+
 	@Override
 	public void onEnable() {
 		inventoryRegistry = new InventoryRegistry();

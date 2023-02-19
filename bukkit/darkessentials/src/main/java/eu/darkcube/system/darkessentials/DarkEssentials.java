@@ -41,6 +41,10 @@ public class DarkEssentials extends Plugin {
 	public static FileConfiguration config;
 	public static String colorFail, colorConfirm, colorValue;
 
+	public DarkEssentials() {
+		super("darkessentials");
+	}
+
 	public static DarkEssentials getInstance() {
 		return DarkEssentials.getPlugin(DarkEssentials.class);
 	}

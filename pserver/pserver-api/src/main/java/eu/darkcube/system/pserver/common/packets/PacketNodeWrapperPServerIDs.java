@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.pserver.common.packets;
 
+import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 import java.util.Collection;

@@ -59,6 +59,7 @@ public class Lobby extends Plugin {
 	private HologramPool hologramPool;
 
 	public Lobby() {
+		super("lobby");
 		Lobby.instance = this;
 	}
 

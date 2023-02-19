@@ -4,10 +4,12 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.jumpleague;
 
 import eu.darkcube.system.DarkCubePlugin;
 
 public class JumpLeague extends DarkCubePlugin {
+	public JumpLeague() {
+		super("jumpleague");
+	}
 }

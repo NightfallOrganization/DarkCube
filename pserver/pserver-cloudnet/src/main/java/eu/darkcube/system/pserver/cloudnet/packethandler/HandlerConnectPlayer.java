@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeConnectPlayer;
 
@@ -13,7 +15,7 @@ public class HandlerConnectPlayer implements PacketHandler<PacketWrapperNodeConn
 
 	@Override
 	public Packet handle(PacketWrapperNodeConnectPlayer packet) {
-		PServerProvider.getInstance().getPServerOptional(packet.getPServer())
+		PServerProvider.instance().pServerOptional(packet.getPServer())
 				.ifPresent(ps -> ps.connectPlayer(packet.getPlayer()));
 		return null;
 	}

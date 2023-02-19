@@ -6,32 +6,32 @@
  */
 package eu.darkcube.system.pserver.common;
 
+import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.State;
+import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 
 public final class PServerSerializable {
 
-	public UniqueId id;
-	public int online;
-	public boolean temporary;
-	public long startedAt;
-	public String serverName;
-	public String taskName;
-	public State state;
+	public final UniqueId id;
+	public final int onlinePlayers;
+	public final Type type;
+	public final long startedAt;
+	public final String serverName;
+	public final String taskName;
+	public final State state;
+	public final AccessLevel accessLevel;
 
-	public PServerSerializable(UniqueId id, int online, boolean temporary, long startedAt,
-			String taskName, String serverName, State state) {
+	public PServerSerializable(UniqueId id, int onlinePlayers, Type type, long startedAt,
+			String serverName, String taskName, State state, AccessLevel accessLevel) {
 		this.id = id;
-		this.online = online;
-		this.temporary = temporary;
+		this.onlinePlayers = onlinePlayers;
+		this.type = type;
 		this.startedAt = startedAt;
-		this.taskName = taskName;
 		this.serverName = serverName;
+		this.taskName = taskName;
 		this.state = state;
-	}
-
-	@Override
-	public PServerSerializable clone() {
-		return new PServerSerializable(id, online, temporary, startedAt, taskName, serverName,
-				state);
+		this.accessLevel = accessLevel;
 	}
 }
+
+

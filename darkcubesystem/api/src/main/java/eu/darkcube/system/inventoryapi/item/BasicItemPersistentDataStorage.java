@@ -4,14 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.item;
 
-import eu.darkcube.system.util.data.BasicPersistentDataStorage;
 import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.LocalPersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
 
-public class BasicItemPersistentDataStorage extends BasicPersistentDataStorage
+public class BasicItemPersistentDataStorage extends LocalPersistentDataStorage
 		implements ItemPersistentDataStorage {
 	private final ItemBuilder builder;
 

@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.pserver.common.packets;
 
+import eu.darkcube.system.packetapi.Packet;
+
 public class PacketNodeWrapperString extends Packet {
 
 	private String string;

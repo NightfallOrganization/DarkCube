@@ -11,7 +11,6 @@ import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperActionConfirm;
 import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperPServerNotFound;
-import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeRemove;
 
 import java.util.Optional;
 

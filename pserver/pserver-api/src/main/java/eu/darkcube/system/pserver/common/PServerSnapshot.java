@@ -9,7 +9,6 @@ package eu.darkcube.system.pserver.common;
 import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
-import eu.darkcube.system.util.data.PersistentDataStorage;
 
 import java.util.Objects;
 
@@ -20,24 +19,19 @@ public class PServerSnapshot {
 	private final PServerExecutor.AccessLevel accessLevel;
 	private final String taskName;
 	private final int onlinePlayers;
-	private final long ontime;
 	private final long startedAt;
 	private final String serverName;
-	private final PersistentDataStorage storage;
 
 	public PServerSnapshot(UniqueId uniqueId, State state, Type type, AccessLevel accessLevel,
-			String taskName, int onlinePlayers, long ontime, long startedAt, String serverName,
-			PersistentDataStorage storage) {
+			String taskName, int onlinePlayers, long startedAt, String serverName) {
 		this.uniqueId = uniqueId;
 		this.state = state;
 		this.type = type;
 		this.accessLevel = accessLevel;
 		this.taskName = taskName;
 		this.onlinePlayers = onlinePlayers;
-		this.ontime = ontime;
 		this.startedAt = startedAt;
 		this.serverName = serverName;
-		this.storage = storage;
 	}
 
 	public UniqueId uniqueId() {
@@ -64,10 +58,6 @@ public class PServerSnapshot {
 		return onlinePlayers;
 	}
 
-	public long ontime() {
-		return ontime;
-	}
-
 	public long startedAt() {
 		return startedAt;
 	}
@@ -76,14 +66,10 @@ public class PServerSnapshot {
 		return serverName;
 	}
 
-	public PersistentDataStorage storage() {
-		return storage;
-	}
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(uniqueId, state, type, accessLevel, taskName, onlinePlayers, ontime,
-				startedAt, serverName, storage);
+		return Objects.hash(uniqueId, state, type, accessLevel, taskName, onlinePlayers, startedAt,
+				serverName);
 	}
 
 	@Override
@@ -93,18 +79,17 @@ public class PServerSnapshot {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		PServerSnapshot that = (PServerSnapshot) o;
-		return onlinePlayers == that.onlinePlayers && ontime == that.ontime
-				&& startedAt == that.startedAt && Objects.equals(uniqueId, that.uniqueId)
-				&& state == that.state && type == that.type && accessLevel == that.accessLevel
-				&& Objects.equals(taskName, that.taskName) && Objects.equals(serverName,
-				that.serverName) && Objects.equals(storage, that.storage);
+		return onlinePlayers == that.onlinePlayers && startedAt == that.startedAt && Objects.equals(
+				uniqueId, that.uniqueId) && state == that.state && type == that.type
+				&& accessLevel == that.accessLevel && Objects.equals(taskName, that.taskName)
+				&& Objects.equals(serverName, that.serverName);
 	}
 
 	@Override
 	public String toString() {
 		return "PServerSnapshot{" + "uniqueId=" + uniqueId + ", state=" + state + ", type=" + type
 				+ ", accessLevel=" + accessLevel + ", taskName='" + taskName + '\''
-				+ ", onlinePlayers=" + onlinePlayers + ", ontime=" + ontime + ", startedAt="
-				+ startedAt + ", serverName='" + serverName + '\'' + ", storage=" + storage + '}';
+				+ ", onlinePlayers=" + onlinePlayers + ", startedAt=" + startedAt + ", serverName='"
+				+ serverName + '\'' + '}';
 	}
 }

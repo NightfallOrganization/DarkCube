@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
 import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperActionConfirm;
 import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeAddOwner;
@@ -14,13 +16,7 @@ public class HandlerAddOwner implements PacketHandler<PacketWrapperNodeAddOwner>
 
 	@Override
 	public Packet handle(PacketWrapperNodeAddOwner packet) {
-		//		if (NodePServerProvider.getInstance().isPServer(packet.getId())) {
-		//			NodePServer ps = NodePServerProvider.getInstance().getPServer(packet.getId());
-		//			ps.addOwner(packet.getOwner());
-		//			return new PacketNodeWrapperActionConfirm();
-		//		}
-		//		return new PacketNodeWrapperPServerNotFound(packet.getId());
-		NodePServerProvider.getInstance().addOwner(packet.getId(), packet.getOwner());
+		NodePServerProvider.instance().addOwner(packet.getId(), packet.getOwner());
 		return new PacketNodeWrapperActionConfirm();
 	}
 }

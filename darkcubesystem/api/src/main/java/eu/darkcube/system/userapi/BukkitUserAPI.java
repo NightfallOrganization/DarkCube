@@ -81,7 +81,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		}
 		PacketAPI.getInstance().registerHandler(PacketUserPersistentDataUpdate.class, packet -> {
 			ifLoaded(packet.getUniqueId(),
-					user -> user.getPersistentDataStorage().set(packet.getData()));
+					user -> user.getPersistentDataStorage().loadFromJsonDocument(packet.getData()));
 			return null;
 		});
 		new BukkitRunnable() {
@@ -167,7 +167,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		PacketQueryUser.Result result =
 				new PacketQueryUser(uuid).sendQuery().cast(PacketQueryUser.Result.class);
 		BukkitUser user = new BukkitUser(uuid, result.getName());
-		user.getPersistentDataStorage().set(result.getData());
+		user.getPersistentDataStorage().loadFromJsonDocument(result.getData());
 		return user;
 	}
 

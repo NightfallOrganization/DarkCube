@@ -7,6 +7,7 @@
 package eu.darkcube.system.pserver.common.packets;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.darkcube.system.packetapi.Packet;
 
 public class PacketNodeWrapperData extends Packet {
 

@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.pserver.common.packets;
 
+import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.pserver.common.PServerSerializable;
 
 import java.util.Collection;
@@ -20,7 +21,7 @@ public class PacketNodeWrapperPServers extends Packet implements Iterable<PServe
 		this.pservers.addAll(pservers);
 	}
 
-	public Collection<PServerSerializable> getPServers() {
+	public Collection<PServerSerializable> pServers() {
 		return pservers;
 	}
 

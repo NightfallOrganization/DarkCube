@@ -20,6 +20,9 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Random;
 
 public class Main extends DarkCubePlugin implements Listener {
+	public Main() {
+		super("voidworld");
+	}
 
 	@Override
 	public void onEnable() {

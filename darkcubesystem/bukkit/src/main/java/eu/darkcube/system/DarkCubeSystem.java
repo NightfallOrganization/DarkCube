@@ -29,6 +29,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 	private final LinkManager linkManager = new LinkManager();
 
 	public DarkCubeSystem() {
+		super("system");
 		DarkCubePlugin.systemPlugin(this);
 		instance = this;
 	}
@@ -53,7 +54,6 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		UserAPI.getInstance().loadedUsersForEach(user -> UserAPI.getInstance().unloadUser(user));
 		AsyncExecutor.stop();
 		AdventureSupport.audienceProvider().close();
-		Plugin.saveStorages();
 		linkManager.unregisterLinks();
 	}
 

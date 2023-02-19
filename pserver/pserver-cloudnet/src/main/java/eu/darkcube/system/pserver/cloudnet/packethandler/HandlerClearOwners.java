@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperActionConfirm;
 import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeClearOwners;
@@ -14,7 +16,7 @@ public class HandlerClearOwners implements PacketHandler<PacketWrapperNodeClearO
 
 	@Override
 	public Packet handle(PacketWrapperNodeClearOwners packet) {
-		PServerProvider.getInstance().clearOwners(packet.getId());
+		PServerProvider.instance().clearOwners(packet.getId());
 		return new PacketNodeWrapperActionConfirm();
 	}
 }

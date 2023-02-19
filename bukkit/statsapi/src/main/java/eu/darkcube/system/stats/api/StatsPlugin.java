@@ -31,6 +31,7 @@ public class StatsPlugin extends Plugin implements Listener {
 	private MySQL mysql;
 
 	public StatsPlugin() {
+		super("stats");
 		instance = this;
 	}
 

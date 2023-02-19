@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
 import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperPServer;
 import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeCreatePServer;
@@ -19,7 +21,6 @@ public class HandlerCreatePServer implements PacketHandler<PacketWrapperNodeCrea
 		//						: CloudNetDriver.getInstance().getServiceTaskProvider().getServiceTask(packet.getTask()))
 		//				.getSerializable());
 		return new PacketNodeWrapperPServer(
-				NodePServerProvider.getInstance().createPServer(packet.getInfo())
-						.getSerializable());
+				NodePServerProvider.instance().createPServer(packet.getInfo()));
 	}
 }

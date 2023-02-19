@@ -54,6 +54,7 @@ public class Miners extends DarkCubePlugin {
 	private static MinersConfig minersConfig;
 
 	public Miners() {
+		super("miners");
 		instance = this;
 	}
 

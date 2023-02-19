@@ -6,10 +6,8 @@
  */
 package eu.darkcube.system;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
-import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.SynchronizedPersistentDataStorage;
@@ -24,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Plugin extends JavaPlugin {
 
@@ -34,50 +30,24 @@ public abstract class Plugin extends JavaPlugin {
 					.getDatabase("plugin_persistent_data");
 	private static HashMap<YamlConfiguration, File> fileFromConfig = new HashMap<>();
 	private static HashMap<String, YamlConfiguration> configFromName = new HashMap<>();
-	private final SynchronizedPersistentDataStorage storage = null;
-	private Key key;
-	private final AtomicBoolean storageLoaded = new AtomicBoolean();
+	private final SynchronizedPersistentDataStorage storage;
+	private final Key key;
 
-	public Plugin() {
+	public Plugin(String pluginName) {
+		this(new Key(pluginName, pluginName));
 	}
 
-	protected static void saveStorages() {
-		storages.forEach(storage -> {
-			if (pluginPersistentData.contains(storage.plugin.getName())) {
-				pluginPersistentData.update(storage.plugin.getName(), storage.data);
-			} else {
-				pluginPersistentData.insert(storage.plugin.getName(), storage.data);
-			}
-		});
+	public Plugin(Key key) {
+		this.storage = new SynchronizedPersistentDataStorage(key);
+		this.key = key;
 	}
 
 	public PersistentDataStorage persistentDataStorage() {
-		if (!storageLoaded.get()) {
-			synchronized (storage) {
-				if (!storageLoaded.get()) {
-					PacketAPI.getInstance().registerHandler(PacketPluginDataSet.class, packet -> {
-						storage.lock.lock();
-						storage.data.append(packet.getData());
-						storage.lock.unlock();
-						return null;
-					});
-					PacketAPI.getInstance()
-							.registerHandler(PacketPluginDataRemove.class, packet -> {
-								storage.lock.lock();
-								storage.data.remove(packet.getKey().toString());
-								storage.lock.unlock();
-								return null;
-							});
-					if (pluginPersistentData.contains(this.getName())) {
-						JsonDocument doc = pluginPersistentData.get(this.getName());
-						storage.data.append(doc);
-					}
-					storages.add(storage);
-					storageLoaded.set(true);
-				}
-			}
-		}
 		return storage;
+	}
+
+	public Key key() {
+		return key;
 	}
 
 	public abstract String getCommandPrefix();

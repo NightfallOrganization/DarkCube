@@ -102,6 +102,7 @@ public class WoolBattle extends Plugin {
 	private int currentTick;
 
 	public WoolBattle() {
+		super("woolbattle");
 		WoolBattle.instance = this;
 		System.setProperty("file.encoding", "UTF-8");
 	}

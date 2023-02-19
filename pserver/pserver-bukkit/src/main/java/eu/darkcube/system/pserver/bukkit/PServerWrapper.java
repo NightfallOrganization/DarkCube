@@ -10,6 +10,7 @@ import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.CommandAPI;
+import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.bukkit.command.CommandPServer;
 import eu.darkcube.system.pserver.bukkit.command.PServerCommand;
 import eu.darkcube.system.pserver.bukkit.packethandler.*;
@@ -25,6 +26,7 @@ public class PServerWrapper extends Plugin {
 	// private UniqueId id;
 
 	public PServerWrapper() {
+		super("pserver");
 		instance = this;
 	}
 
@@ -47,7 +49,7 @@ public class PServerWrapper extends Plugin {
 		WrapperServiceInfoUtil.init();
 		WrapperPServerProvider.init();
 
-		PacketManager pm = PacketManager.getInstance();
+		PacketAPI pm = PacketAPI.getInstance();
 		pm.registerHandler(PacketNodeWrapperAddPServer.class, new HandlerAddPServer());
 		pm.registerHandler(PacketNodeWrapperRemovePServer.class, new HandlerRemovePServer());
 		pm.registerHandler(PacketNodeWrapperUpdateInfo.class, new HandlerUpdateInfo());
