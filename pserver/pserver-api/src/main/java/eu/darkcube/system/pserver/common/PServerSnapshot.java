@@ -6,32 +6,31 @@
  */
 package eu.darkcube.system.pserver.common;
 
-import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 import eu.darkcube.system.pserver.common.PServerExecutor.State;
-import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 
-import java.util.Objects;
+import java.util.*;
 
-public class PServerSnapshot {
+public final class PServerSnapshot {
 	private final UniqueId uniqueId;
 	private final PServerExecutor.State state;
-	private final PServerExecutor.Type type;
-	private final PServerExecutor.AccessLevel accessLevel;
-	private final String taskName;
 	private final int onlinePlayers;
 	private final long startedAt;
 	private final String serverName;
+	private final UUID[] owners;
 
-	public PServerSnapshot(UniqueId uniqueId, State state, Type type, AccessLevel accessLevel,
-			String taskName, int onlinePlayers, long startedAt, String serverName) {
+	public PServerSnapshot(UniqueId uniqueId, State state, int onlinePlayers, long startedAt,
+			String serverName, UUID[] owners) {
 		this.uniqueId = uniqueId;
 		this.state = state;
-		this.type = type;
-		this.accessLevel = accessLevel;
-		this.taskName = taskName;
 		this.onlinePlayers = onlinePlayers;
 		this.startedAt = startedAt;
 		this.serverName = serverName;
+		this.owners = owners.clone();
+	}
+
+	public @Unmodifiable Collection<UUID> owners() {
+		return Collections.unmodifiableCollection(Arrays.asList(owners));
 	}
 
 	public UniqueId uniqueId() {
@@ -40,18 +39,6 @@ public class PServerSnapshot {
 
 	public State state() {
 		return state;
-	}
-
-	public Type type() {
-		return type;
-	}
-
-	public AccessLevel accessLevel() {
-		return accessLevel;
-	}
-
-	public String taskName() {
-		return taskName;
 	}
 
 	public int onlinePlayers() {
@@ -68,8 +55,9 @@ public class PServerSnapshot {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(uniqueId, state, type, accessLevel, taskName, onlinePlayers, startedAt,
-				serverName);
+		int result = Objects.hash(uniqueId, state, onlinePlayers, startedAt, serverName);
+		result = 31 * result + Arrays.hashCode(owners);
+		return result;
 	}
 
 	@Override
@@ -80,16 +68,14 @@ public class PServerSnapshot {
 			return false;
 		PServerSnapshot that = (PServerSnapshot) o;
 		return onlinePlayers == that.onlinePlayers && startedAt == that.startedAt && Objects.equals(
-				uniqueId, that.uniqueId) && state == that.state && type == that.type
-				&& accessLevel == that.accessLevel && Objects.equals(taskName, that.taskName)
-				&& Objects.equals(serverName, that.serverName);
+				uniqueId, that.uniqueId) && state == that.state && Objects.equals(serverName,
+				that.serverName) && Arrays.equals(owners, that.owners);
 	}
 
 	@Override
 	public String toString() {
-		return "PServerSnapshot{" + "uniqueId=" + uniqueId + ", state=" + state + ", type=" + type
-				+ ", accessLevel=" + accessLevel + ", taskName='" + taskName + '\''
-				+ ", onlinePlayers=" + onlinePlayers + ", startedAt=" + startedAt + ", serverName='"
-				+ serverName + '\'' + '}';
+		return "PServerSnapshot{" + "uniqueId=" + uniqueId + ", state=" + state + ", onlinePlayers="
+				+ onlinePlayers + ", startedAt=" + startedAt + ", serverName='" + serverName + '\''
+				+ ", owners=" + Arrays.toString(owners) + '}';
 	}
 }

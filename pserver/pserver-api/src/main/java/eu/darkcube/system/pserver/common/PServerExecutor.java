@@ -8,7 +8,7 @@ package eu.darkcube.system.pserver.common;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -19,16 +19,11 @@ public interface PServerExecutor {
 	String CHANNEL = "pserver";
 
 	/**
-	 * @return the current state of the pserver
-	 */
-	@NotNull State state();
-
-	/**
 	 * Starts this pserver.<br> The future contains whether the start was successful
 	 *
 	 * @return a future
 	 */
-	CompletableFuture<Boolean> start();
+	@NotNull CompletableFuture<@NotNull Boolean> start();
 
 	/**
 	 * Stops the pserver.
@@ -38,66 +33,34 @@ public interface PServerExecutor {
 	@NotNull CompletableFuture<Void> stop();
 
 	/**
-	 * @return the amount of players currently playing on the pserver
-	 */
-	int onlinePlayers();
-
-	/**
-	 * @return the pserver type
-	 */
-	@NotNull Type type();
-
-	/**
-	 * @return the access level of this pserver
-	 */
-	@NotNull AccessLevel accessLevel();
-
-	/**
 	 * Sets the access level
 	 *
 	 * @param level the new level
 	 */
-	CompletableFuture<Boolean> accessLevel(@NotNull AccessLevel level);
+	@NotNull CompletableFuture<@NotNull Boolean> accessLevel(@NotNull AccessLevel level);
 
 	/**
-	 * @return the unique id of this pserver
+	 * Adds an owner to this pserver
+	 *
+	 * @param uuid the owner
+	 *
+	 * @return true if successful
 	 */
-	UniqueId id();
+	@NotNull CompletableFuture<@NotNull Boolean> addOwner(UUID uuid);
 
 	/**
-	 * @return the amount of time (in milliseconds) how long this pserver has been online
+	 * Adds an owner to this pserver
+	 *
+	 * @param uuid the owner
+	 *
+	 * @return true if successful
 	 */
-	long ontime();
-
-	/**
-	 * @return an unmodifiable collection of the owners of this pserver
-	 */
-	@UnmodifiableView Collection<@NotNull UUID> owners();
-
-	CompletableFuture<Boolean> addOwner(UUID uuid);
-
-	CompletableFuture<Boolean> removeOwner(UUID uuid);
-
-	/**
-	 * @return the name of this pserver. This might be auto-generated. Two pservers with the same
-	 * name may not exist at the same time.
-	 */
-	@Nullable String serverName();
-
-	/**
-	 * @return when this pserver was started
-	 */
-	long startedAt();
+	@NotNull CompletableFuture<@NotNull Boolean> removeOwner(UUID uuid);
 
 	/**
 	 * @return a new {@link PServerSnapshot} for this pserver
 	 */
-	@NotNull PServerSnapshot createSnapshot();
-
-	/**
-	 * @return the taskname of this pserver
-	 */
-	String taskName();
+	@NotNull CompletableFuture<@NotNull PServerSnapshot> createSnapshot();
 
 	/**
 	 * Connects a player to the pserver
@@ -107,7 +70,63 @@ public interface PServerExecutor {
 	 * @return a future for when the player is connected. The future contains false when connection
 	 * failed
 	 */
-	CompletableFuture<Boolean> connectPlayer(UUID player);
+	@NotNull CompletableFuture<@NotNull Boolean> connectPlayer(UUID player);
+
+	/**
+	 * @return the unique id of this pserver
+	 */
+	@NotNull UniqueId id();
+
+	/**
+	 * @return the current state of the pserver
+	 */
+	@NotNull CompletableFuture<@NotNull State> state();
+
+	/**
+	 * @return the pserver type
+	 */
+	@NotNull CompletableFuture<@NotNull Type> type();
+
+	/**
+	 * @return the access level of this pserver
+	 */
+	@NotNull CompletableFuture<@NotNull AccessLevel> accessLevel();
+
+	/**
+	 * @return a {@link PServerPersistentDataStorage} for this pserver
+	 */
+	PServerPersistentDataStorage storage();
+
+	/**
+	 * @return when this pserver was started
+	 */
+	@NotNull CompletableFuture<@NotNull Long> startedAt();
+
+	/**
+	 * @return the amount of time (in milliseconds) how long this pserver has been online
+	 */
+	@NotNull CompletableFuture<@NotNull Long> ontime();
+
+	/**
+	 * @return the amount of players currently playing on the pserver
+	 */
+	@NotNull CompletableFuture<@NotNull Integer> onlinePlayers();
+
+	/**
+	 * @return the name of this pserver. This might be auto-generated. Two pservers with the same
+	 * name may not exist at the same time.
+	 */
+	@Nullable CompletableFuture<@Nullable String> serverName();
+
+	/**
+	 * @return an unmodifiable collection of the owners of this pserver
+	 */
+	@NotNull CompletableFuture<@NotNull @Unmodifiable Collection<@NotNull UUID>> owners();
+
+	/**
+	 * @return the taskname of this pserver
+	 */
+	@NotNull CompletableFuture<@Nullable String> taskName();
 
 	enum State {
 		RUNNING, STARTING, STOPPING, OFFLINE

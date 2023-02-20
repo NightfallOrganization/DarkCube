@@ -11,10 +11,10 @@ import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudOfflinePlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerAddOwnerEvent;
-import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveOwnerEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerStartEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerStopEvent;
 import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.AsyncExecutor;
@@ -121,7 +121,7 @@ public class SkullCache implements Listener {
 	}
 
 	@EventListener
-	public void handle(PServerAddEvent e) {
+	public void handle(PServerStartEvent e) {
 		AsyncExecutor.service().submit(() -> {
 			IPlayerManager pm = CloudNetDriver.getInstance().getServicesRegistry()
 					.getFirstService(IPlayerManager.class);
@@ -132,7 +132,7 @@ public class SkullCache implements Listener {
 	}
 
 	@EventListener
-	public void handle(PServerRemoveEvent e) {
+	public void handle(PServerStopEvent e) {
 		AsyncExecutor.service().submit(() -> {
 			Set<UUID> uuids = new HashSet<>();
 			PServerProvider.getInstance().getPServers().stream().filter(ps -> ps != e.getPServer())

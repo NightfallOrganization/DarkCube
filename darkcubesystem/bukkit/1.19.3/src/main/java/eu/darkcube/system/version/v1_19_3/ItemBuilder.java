@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.version.v1_19_3;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
@@ -74,8 +73,9 @@ public class ItemBuilder extends AbstractItemBuilder {
 			if (meta instanceof LeatherArmorMeta lmeta)
 				meta(LeatherArmorBuilderMeta.class).setColor(lmeta.getColor());
 			if (meta.getPersistentDataContainer().has(persistentDataKey)) {
-				storage.getData().append(JsonDocument.newDocument(meta.getPersistentDataContainer()
-						.get(persistentDataKey, PersistentDataType.STRING)));
+				storage.loadFromJsonDocument(JsonDocument.newDocument(
+						meta.getPersistentDataContainer()
+								.get(persistentDataKey, PersistentDataType.STRING)));
 			}
 		}
 	}
@@ -131,8 +131,10 @@ public class ItemBuilder extends AbstractItemBuilder {
 							"Meta not supported for this mc version: " + builderMeta);
 				}
 			}
-			meta.getPersistentDataContainer()
-					.set(persistentDataKey, PersistentDataType.STRING, storage.getData().toJson());
+			//			meta.getPersistentDataContainer()
+			//					.set(persistentDataKey, PersistentDataType.STRING, storage.getData().toJson());
+			meta.getPersistentDataContainer().set(persistentDataKey, PersistentDataType.STRING,
+					storage.storeToJsonDocument().toJson());
 			item.setItemMeta(meta);
 		} else {
 			throw new IllegalArgumentException("Item without Meta: " + material);
@@ -146,7 +148,8 @@ public class ItemBuilder extends AbstractItemBuilder {
 				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
 						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
 						.material(material).unbreakable(unbreakable).metas(metas);
-		builder.persistentDataStorage().getData().append(storage.getData());
+		//		builder.persistentDataStorage().getData().append(storage.getData());
+		builder.persistentDataStorage().loadFromJsonDocument(storage.storeToJsonDocument());
 		return builder;
 	}
 }

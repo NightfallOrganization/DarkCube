@@ -32,6 +32,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
@@ -72,48 +73,54 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 		}
 		final int pagesize = this.getPageSize();
 
-		Collection<UniqueId> col =
-				PServerProvider.getInstance().getPServerIDs(user.getUser().getUniqueId());
-		pservercount = Math.max(pservercount, col.size());
-		Iterator<UniqueId> it = col.iterator();
+		try {
+			Collection<UniqueId> col =
+					PServerProvider.instance().pservers(user.getUser().getUniqueId()).get();
+			pservercount = Math.max(pservercount, col.size());
+			Iterator<UniqueId> it = col.iterator();
 
-		for (int slot = 0; slot < pservercount; slot++) {
-			UniqueId pserverId = it.hasNext() ? it.next() : null;
-			ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
+			for (int slot = 0; slot < pservercount; slot++) {
+				UniqueId pserverId = it.hasNext() ? it.next() : null;
+				ItemBuilder item =
+						PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
 
-			if (item == null) {
-				item = ItemBuilder.item(
-						Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
-			} else {
-				Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
-				PServerExecutor ps = PServerProvider.getInstance().getPServer(pserverId);
-				PServerExecutor.State state =
-						ps == null ? PServerExecutor.State.OFFLINE : ps.getState();
-				Message mstate = state == PServerExecutor.State.OFFLINE
-						? Message.STATE_OFFLINE
-						: state == PServerExecutor.State.RUNNING
-								? Message.STATE_RUNNING
-								: state == PServerExecutor.State.STARTING
-										? Message.STATE_STARTING
-										: state == PServerExecutor.State.STOPPING
-												? Message.STATE_STOPPING
-												: null;
-				if (mstate == null)
-					throw new IllegalStateException();
-				item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(),
-						mstate.getMessage(user.getUser())));
+				if (item == null) {
+					item = ItemBuilder.item(
+							Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
+				} else {
+					Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
+					PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
+					PServerExecutor.State state =
+							ps == null ? PServerExecutor.State.OFFLINE : ps.state();
+					Message mstate = state == PServerExecutor.State.OFFLINE
+							? Message.STATE_OFFLINE
+							: state == PServerExecutor.State.RUNNING
+									? Message.STATE_RUNNING
+									: state == PServerExecutor.State.STARTING
+											? Message.STATE_STARTING
+											: state == PServerExecutor.State.STOPPING
+													? Message.STATE_STOPPING
+													: null;
+					if (mstate == null)
+						throw new IllegalStateException();
+					item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(),
+							mstate.getMessage(user.getUser())));
+				}
+
+				if (pserverId != null)
+					item.persistentDataStorage()
+							.set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING,
+									pserverId.toString());
+
+				items.put(slot, item.build());
 			}
-
-			if (pserverId != null)
-				item.persistentDataStorage()
-						.set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING,
-								pserverId.toString());
-
-			items.put(slot, item.build());
-		}
-		for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize;
-		     slot < pagesize; slot++) {
-			items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
+			for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize;
+			     slot < pagesize; slot++) {
+				items.put(slot,
+						Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

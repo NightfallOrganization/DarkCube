@@ -6,103 +6,78 @@
  */
 package eu.darkcube.system.pserver.bukkit;
 
-import eu.darkcube.system.packetapi.Packet;
+import de.dytanic.cloudnet.common.concurrent.ITask;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerPersistentDataStorage;
 import eu.darkcube.system.pserver.common.PServerSnapshot;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packets.*;
-import eu.darkcube.system.util.data.PersistentDataStorage;
+import eu.darkcube.system.pserver.common.packets.wn.*;
+import eu.darkcube.system.pserver.common.packets.wn.PacketState.Response;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class WrapperPServerExecutor implements PServerExecutor {
 
 	private final UniqueId id;
-	private volatile State state;
-	private volatile Type type;
-	private volatile AccessLevel accessLevel;
-	private volatile long startedAt;
-	private volatile Collection<UUID> owners;
-	private volatile String serverName;
-	private volatile int onlinePlayers;
-	private volatile String taskName;
-	private volatile PersistentDataStorage storage;
+	private final PServerPersistentDataStorage storage;
 
 	WrapperPServerExecutor(UniqueId id) {
 		this.id = id;
+		this.storage = new PServerStorage(id);
 	}
 
-	public void update(PServerSnapshot info) {
-		this.state = info.state();
-		this.onlinePlayers = info.onlinePlayers();
-		this.type = info.type();
-		this.startedAt = info.startedAt();
-		this.taskName = info.taskName();
-		this.accessLevel = info.accessLevel();
-		this.serverName = info.serverName();
-	}
-
-	@Override
-	public State state() {
-		return state;
-	}
-
-	private <T, V extends Packet> CompletableFuture<T> future(Packet packet, Class<V> returnClass,
-			Function<V, T> mapper) {
+	private static <T> CompletableFuture<T> wrap(ITask<T> task) {
 		CompletableFuture<T> fut = new CompletableFuture<>();
-		packet.sendQueryAsync(returnClass).onComplete(p -> fut.complete(mapper.apply(p)))
-				.onCancelled(t -> fut.completeExceptionally(
-						new CancellationException("Task " + "cancelled")))
-				.onFailure(fut::completeExceptionally);
+		task.onComplete(fut::complete).onFailure(fut::completeExceptionally).onCancelled(
+				t -> fut.completeExceptionally(new CancellationException("Task cancelled")));
 		return fut;
 	}
 
-	private CompletableFuture<Void> voidFuture(Packet packet) {
-		return future(packet, PacketNodeWrapperActionConfirm.class, p -> null);
-	}
-
-	private CompletableFuture<Boolean> booleanFuture(Packet packet) {
-		return future(packet, PacketNodeWrapperBoolean.class, PacketNodeWrapperBoolean::is);
-	}
-
 	@Override
-	public CompletableFuture<Boolean> start() {
-		return booleanFuture(new PacketWrapperNodeStart(id));
+	public CompletableFuture<@NotNull Boolean> start() {
+		return wrap(new PacketStart(id).sendQueryAsync(PacketStart.Response.class)
+				.map(PacketStart.Response::success));
 	}
 
 	@Override
 	public CompletableFuture<Void> stop() {
-		return this.voidFuture(new PacketWrapperNodeStop(id));
+		return wrap(new PacketStop(id).sendQueryAsync(PacketStop.Response.class).map(p -> null));
 	}
 
 	@Override
-	public CompletableFuture<Boolean> connectPlayer(UUID player) {
-		return booleanFuture(new PacketWrapperNodeConnectPlayer(player, id));
+	public CompletableFuture<@NotNull Boolean> accessLevel(AccessLevel level) {
+		return wrap(new PacketAccessLevelSet(id, level).sendQueryAsync(
+				PacketAccessLevelSet.Response.class).map(PacketAccessLevelSet.Response::success));
 	}
 
 	@Override
-	public int onlinePlayers() {
-		return onlinePlayers;
+	public CompletableFuture<@NotNull Boolean> addOwner(UUID uuid) {
+		return wrap(new PacketAddOwner(id, uuid).sendQueryAsync(PacketAddOwner.Response.class)
+				.map(PacketAddOwner.Response::success));
 	}
 
 	@Override
-	public Type type() {
-		return type;
+	public CompletableFuture<@NotNull Boolean> removeOwner(UUID uuid) {
+		return wrap(new PacketRemoveOwner(id, uuid).sendQueryAsync(PacketAddOwner.Response.class)
+				.map(PacketAddOwner.Response::success));
 	}
 
 	@Override
-	public AccessLevel accessLevel() {
-		return accessLevel;
+	public CompletableFuture<@NotNull PServerSnapshot> createSnapshot() {
+		return wrap(new PacketCreateSnapshot(id).sendQueryAsync(PacketCreateSnapshot.Response.class)
+				.map(PacketCreateSnapshot.Response::snapshot));
 	}
 
 	@Override
-	public CompletableFuture<Boolean> accessLevel(AccessLevel level) {
-		return booleanFuture(new PacketWrapperNodeAccessLevel(accessLevel));
+	public CompletableFuture<@NotNull Boolean> connectPlayer(UUID player) {
+		return wrap(new PacketConnectPlayer(id, player).sendQueryAsync(
+				PacketConnectPlayer.Response.class).map(PacketConnectPlayer.Response::success));
 	}
 
 	@Override
@@ -111,33 +86,61 @@ public class WrapperPServerExecutor implements PServerExecutor {
 	}
 
 	@Override
-	public long ontime() {
-		return System.currentTimeMillis() - startedAt();
+	public CompletableFuture<@NotNull State> state() {
+		return wrap(new PacketState(id).sendQueryAsync(PacketState.Response.class)
+				.map(Response::state));
 	}
 
 	@Override
-	public Collection<UUID> owners() {
-		return Collections.unmodifiableCollection(owners);
+	public CompletableFuture<@NotNull Type> type() {
+		return wrap(new PacketType(id).sendQueryAsync(PacketType.Response.class)
+				.map(PacketType.Response::type));
 	}
 
 	@Override
-	public String serverName() {
-		return serverName;
+	public CompletableFuture<@NotNull AccessLevel> accessLevel() {
+		return wrap(new PacketAccessLevel(id).sendQueryAsync(PacketAccessLevel.Response.class)
+				.map(PacketAccessLevel.Response::accessLevel));
 	}
 
 	@Override
-	public long startedAt() {
-		return startedAt;
+	public PServerPersistentDataStorage storage() {
+		return storage;
 	}
 
 	@Override
-	public PServerSnapshot createSnapshot() {
-		return new PServerSnapshot(id, state, type, accessLevel, taskName, onlinePlayers, startedAt,
-				serverName);
+	public CompletableFuture<@NotNull Long> startedAt() {
+		return wrap(new PacketStartedAt(id).sendQueryAsync(PacketStartedAt.Response.class)
+				.map(PacketStartedAt.Response::startedAt));
 	}
 
 	@Override
-	public String taskName() {
-		return taskName;
+	public CompletableFuture<@NotNull Long> ontime() {
+		return wrap(new PacketOntime(id).sendQueryAsync(PacketOntime.Response.class)
+				.map(PacketOntime.Response::ontime));
+	}
+
+	@Override
+	public CompletableFuture<@NotNull Integer> onlinePlayers() {
+		return wrap(new PacketOnlinePlayers(id).sendQueryAsync(PacketOnlinePlayers.Response.class)
+				.map(PacketOnlinePlayers.Response::onlinePlayers));
+	}
+
+	@Override
+	public CompletableFuture<@Nullable String> serverName() {
+		return wrap(new PacketServerName(id).sendQueryAsync(PacketServerName.Response.class)
+				.map(PacketServerName.Response::serverName));
+	}
+
+	@Override
+	public CompletableFuture<@NotNull @Unmodifiable Collection<@NotNull UUID>> owners() {
+		return wrap(new PacketOwners(id).sendQueryAsync(PacketOwners.Response.class)
+				.map(PacketOwners.Response::owners));
+	}
+
+	@Override
+	public CompletableFuture<@Nullable String> taskName() {
+		return wrap(new PacketTaskName(id).sendQueryAsync(PacketTaskName.Response.class)
+				.map(PacketTaskName.Response::taskName));
 	}
 }

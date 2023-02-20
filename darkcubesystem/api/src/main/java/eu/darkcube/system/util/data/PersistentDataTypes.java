@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.util.data;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
@@ -28,6 +27,11 @@ public class PersistentDataTypes {
 				public void serialize(JsonDocument doc, String key, BigInteger data) {
 					doc.append(key, data);
 				}
+
+				@Override
+				public BigInteger clone(BigInteger object) {
+					return object;
+				}
 			};
 	public static final PersistentDataType<JsonDocument> JSONDOCUMENT =
 			new PersistentDataType<JsonDocument>() {
@@ -40,6 +44,11 @@ public class PersistentDataTypes {
 				public void serialize(JsonDocument doc, String key, JsonDocument data) {
 					doc.append(key, data);
 				}
+
+				@Override
+				public JsonDocument clone(JsonDocument object) {
+					return object.clone();
+				}
 			};
 	public static final PersistentDataType<String> STRING = new PersistentDataType<String>() {
 		@Override
@@ -50,6 +59,11 @@ public class PersistentDataTypes {
 		@Override
 		public void serialize(JsonDocument doc, String key, String data) {
 			doc.append(key, data);
+		}
+
+		@Override
+		public String clone(String object) {
+			return object;
 		}
 	};
 	public static final PersistentDataType<byte[]> BYTE_ARRAY = new PersistentDataType<byte[]>() {
@@ -62,6 +76,11 @@ public class PersistentDataTypes {
 		public void serialize(JsonDocument doc, String key, byte[] data) {
 			doc.append(key, data);
 		}
+
+		@Override
+		public byte[] clone(byte[] object) {
+			return object.clone();
+		}
 	};
 	public static final PersistentDataType<Boolean> BOOLEAN = new PersistentDataType<Boolean>() {
 		@Override
@@ -72,6 +91,11 @@ public class PersistentDataTypes {
 		@Override
 		public void serialize(JsonDocument doc, String key, Boolean data) {
 			doc.append(key, data);
+		}
+
+		@Override
+		public Boolean clone(Boolean object) {
+			return object;
 		}
 	};
 	public static final PersistentDataType<Integer> INTEGER = new PersistentDataType<Integer>() {
@@ -85,6 +109,11 @@ public class PersistentDataTypes {
 		public void serialize(JsonDocument doc, String key, Integer data) {
 			doc.append(key, data);
 		}
+
+		@Override
+		public Integer clone(Integer object) {
+			return object;
+		}
 	};
 	public static final PersistentDataType<Long> LONG = new PersistentDataType<Long>() {
 		@Override
@@ -96,6 +125,11 @@ public class PersistentDataTypes {
 		public void serialize(JsonDocument doc, String key, Long data) {
 			doc.append(key, data);
 		}
+
+		@Override
+		public Long clone(Long object) {
+			return object;
+		}
 	};
 	public static final PersistentDataType<Double> DOUBLE = new PersistentDataType<Double>() {
 		@Override
@@ -106,6 +140,11 @@ public class PersistentDataTypes {
 		@Override
 		public void serialize(JsonDocument doc, String key, Double data) {
 			doc.append(key, data);
+		}
+
+		@Override
+		public Double clone(Double object) {
+			return object;
 		}
 	};
 	public static final PersistentDataType<Location> LOCATION = new PersistentDataType<Location>() {
@@ -133,6 +172,11 @@ public class PersistentDataTypes {
 			d.append("world", data.getWorld().getUID().toString());
 			doc.append(key, d);
 		}
+
+		@Override
+		public Location clone(Location object) {
+			return object.clone();
+		}
 	};
 
 	public static <T> PersistentDataType<Set<T>> set(PersistentDataType<T> dataType) {
@@ -146,6 +190,15 @@ public class PersistentDataTypes {
 			@Override
 			public void serialize(JsonDocument doc, String key, Set<T> data) {
 				l.serialize(doc, key, new ArrayList<>(data));
+			}
+
+			@Override
+			public Set<T> clone(Set<T> object) {
+				Set<T> set = new HashSet<>();
+				for (T value : object) {
+					set.add(dataType.clone(value));
+				}
+				return set;
 			}
 		};
 	}
@@ -172,6 +225,15 @@ public class PersistentDataTypes {
 				}
 				doc.append(key, d);
 			}
+
+			@Override
+			public List<T> clone(List<T> object) {
+				List<T> list = new ArrayList<>();
+				for (T value : object) {
+					list.add(dataType.clone(value));
+				}
+				return list;
+			}
 		};
 	}
 
@@ -186,11 +248,16 @@ public class PersistentDataTypes {
 			public void serialize(JsonDocument doc, String key, T data) {
 				doc.append(key, data);
 			}
+
+			@Override
+			public T clone(T object) {
+				return object;
+			}
 		};
 	}
 
 	public static <T, V> PersistentDataType<T> map(PersistentDataType<V> type,
-			Function<T, V> serialize, Function<V, T> deserialize) {
+			Function<T, V> serialize, Function<V, T> deserialize, Function<T, T> clone) {
 		return new PersistentDataType<T>() {
 			@Override
 			public T deserialize(JsonDocument doc, String key) {
@@ -200,6 +267,11 @@ public class PersistentDataTypes {
 			@Override
 			public void serialize(JsonDocument doc, String key, T data) {
 				type.serialize(doc, key, serialize.apply(data));
+			}
+
+			@Override
+			public T clone(T object) {
+				return clone.apply(object);
 			}
 		};
 	}

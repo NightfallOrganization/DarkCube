@@ -11,6 +11,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
@@ -19,7 +20,26 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
 	private final JsonDocument data = new JsonDocument();
 	private final Map<Key, Object> cache = new HashMap<>();
-	private final Collection<@NotNull UpdateNotifier> updateNotifiers = new ArrayList<>();
+	private final Collection<@NotNull UpdateNotifier> updateNotifiers =
+			new CopyOnWriteArrayList<>();
+
+	public void appendDocument(JsonDocument document) {
+		try {
+			lock.writeLock().lock();
+			for (String key : document.keys()) {
+				cache.remove(Key.fromString(key));
+			}
+			data.append(document);
+			notifyNotifiers();
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public @UnmodifiableView PersistentDataStorage unmodifiable() {
+		return new UnmodifiablePersistentDataStorage(this);
+	}
 
 	@Override
 	public Collection<Key> keys() {
@@ -59,13 +79,19 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 			if (!data.contains(key.toString())) {
 				return null;
 			}
-			@SuppressWarnings("unchecked")
-			T old = (T) cache.remove(key);
-			if (old == null) {
-				old = type.deserialize(data, key.toString());
+			if (type != null) {
+				@SuppressWarnings("unchecked")
+				T old = (T) cache.remove(key);
+				if (old == null) {
+					old = type.deserialize(data, key.toString());
+				}
+				data.remove(key.toString());
+				ret = type.clone(old);
+			} else {
+				cache.remove(key);
+				data.remove(key.toString());
+				ret = null;
 			}
-			data.remove(key.toString());
-			ret = type.clone(old);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -209,12 +235,6 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 		return Collections.unmodifiableCollection(updateNotifiers);
 	}
 
-	private void notifyNotifiers() {
-		for (UpdateNotifier updateNotifier : updateNotifiers) {
-			updateNotifier.notify(this);
-		}
-	}
-
 	@Override
 	public void addUpdateNotifier(UpdateNotifier notifier) {
 		updateNotifiers.add(notifier);
@@ -223,5 +243,11 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 	@Override
 	public void removeUpdateNotifier(UpdateNotifier notifier) {
 		updateNotifiers.remove(notifier);
+	}
+
+	private void notifyNotifiers() {
+		for (UpdateNotifier updateNotifier : updateNotifiers) {
+			updateNotifier.notify(this);
+		}
 	}
 }

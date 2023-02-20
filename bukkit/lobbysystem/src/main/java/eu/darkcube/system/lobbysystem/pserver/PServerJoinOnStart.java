@@ -11,7 +11,7 @@ import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerStopEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerExecutor.State;
@@ -76,7 +76,7 @@ public class PServerJoinOnStart implements Listener {
 	}
 
 	@EventListener
-	public void handle(PServerRemoveEvent event) {
+	public void handle(PServerStopEvent event) {
 		Set<UUID> toRemove = new HashSet<>();
 		for (Map.Entry<UUID, UniqueId> e : this.waiting.entrySet()) {
 			if (e.getValue().equals(event.getPServer().getId())) {

@@ -18,7 +18,7 @@ public abstract class PServerEvent extends Event {
 		this.pserver = pserver;
 	}
 
-	public PServerExecutor getPServer() {
+	public PServerExecutor pserver() {
 		return pserver;
 	}
 }

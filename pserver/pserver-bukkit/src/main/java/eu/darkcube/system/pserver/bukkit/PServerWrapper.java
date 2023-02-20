@@ -14,9 +14,12 @@ import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.bukkit.command.CommandPServer;
 import eu.darkcube.system.pserver.bukkit.command.PServerCommand;
 import eu.darkcube.system.pserver.bukkit.packethandler.*;
+import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.ServiceInfoUtil;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packets.*;
+import eu.darkcube.system.pserver.common.packets.nw.*;
+import eu.darkcube.system.pserver.common.packets.wn.PacketGetUniqueId;
+import eu.darkcube.system.pserver.common.packets.wn.PacketSetRunning;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PServerWrapper extends Plugin {
@@ -50,23 +53,22 @@ public class PServerWrapper extends Plugin {
 		WrapperPServerProvider.init();
 
 		PacketAPI pm = PacketAPI.getInstance();
-		pm.registerHandler(PacketNodeWrapperAddPServer.class, new HandlerAddPServer());
-		pm.registerHandler(PacketNodeWrapperRemovePServer.class, new HandlerRemovePServer());
-		pm.registerHandler(PacketNodeWrapperUpdateInfo.class, new HandlerUpdateInfo());
-		pm.registerHandler(PacketNodeWrapperAddOwner.class, new HandlerAddOwner());
-		pm.registerHandler(PacketNodeWrapperRemoveOwner.class, new HandlerRemoveOwner());
-		pm.registerHandler(PacketNodeWrapperDataUpdate.class, new HandlerDataUpdate());
+		pm.registerHandler(PacketStart.class, new HandlerStart());
+		pm.registerHandler(PacketStop.class, new HandlerStop());
+		pm.registerHandler(PacketUpdate.class, new HandlerUpdate());
+		pm.registerHandler(PacketAddOwner.class, new HandlerAddOwner());
+		pm.registerHandler(PacketRemoveOwner.class, new HandlerRemoveOwner());
 
 		UniqueId id;
 		try {
-			id = new PacketWrapperNodeGetUniqueId(Wrapper.getInstance().getServiceId()).sendQuery(
-					PacketNodeWrapperUniqueId.class).getUniqueId();
+			id = new PacketGetUniqueId(Wrapper.getInstance().getServiceId()).sendQuery(
+					PacketGetUniqueId.Response.class).id();
 			ServiceInfoSnapshot info = Wrapper.getInstance().getCurrentServiceInfoSnapshot();
 			info.setProperty(ServiceInfoUtil.property_uid, id);
 			Wrapper.getInstance().publishServiceInfoUpdate(info);
 			System.out.println("[PSERVER] LOADING PSERVER...");
-			WrapperPServerProvider.getInstance().pserver =
-					WrapperPServerProvider.getInstance().getPServer(id);
+			WrapperPServerProvider.instance().self =
+					WrapperPServerProvider.instance().pserver(id).get();
 			System.out.println("[PSERVER] PSERVER ID: " + id);
 		} catch (Exception ex) {
 			System.out.println("[PSERVER] LOADING PSERVER API...");
@@ -81,14 +83,13 @@ public class PServerWrapper extends Plugin {
 	@Override
 	public void onEnable() {
 		CommandAPI.enable(this, new CommandPServer());
-		if (WrapperPServerProvider.getInstance().isPServer()) {
+		if (WrapperPServerProvider.instance().isPServer()) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
 					System.out.println("[PServer] Set status as RUNNING");
-					new PacketWrapperNodeSetRunning(
-							WrapperPServerProvider.getInstance().getCurrentPServer()
-									.getId()).sendAsync();
+					new PacketSetRunning(
+							PServerProvider.instance().currentPServer().id()).sendAsync();
 				}
 			}.runTaskAsynchronously(PServerWrapper.getInstance());
 		}

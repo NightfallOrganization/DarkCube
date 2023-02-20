@@ -6,13 +6,11 @@
  */
 package eu.darkcube.system.pserver.common;
 
-import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.service.ServiceTemplate;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
@@ -52,11 +50,11 @@ public abstract class PServerProvider {
 	/**
 	 * @return true if this Server is a {@link PServerExecutor}
 	 */
-	public abstract @NotNull boolean isPServer();
+	public abstract boolean isPServer();
 
 	/**
 	 * @return the current {@link PServerExecutor}, if this is a {@link PServerExecutor}. Otherwise
-	 * {@link IllegalStateException}
+	 * throws {@link IllegalStateException}
 	 *
 	 * @throws IllegalStateException if this server is no a pserver
 	 * @see #isPServer()
@@ -64,55 +62,36 @@ public abstract class PServerProvider {
 	public abstract @NotNull PServerExecutor currentPServer() throws IllegalStateException;
 
 	/**
+	 * This will get a {@link PServerExecutor} instance.
+	 *
 	 * @param pserver the id of the pserver
 	 *
 	 * @return the pserver with the id
 	 */
-	public abstract @NotNull CompletableFuture<@NotNull PServerExecutor> pServer(
+	public abstract @NotNull CompletableFuture<@Nullable ? extends PServerExecutor> pserver(
 			@NotNull UniqueId pserver);
 
 	/**
-	 * @param pserver the pserver
-	 *
-	 * @return the pserverData for the given pserver id
-	 */
-	public abstract @NotNull CompletableFuture<JsonDocument> pServerData(@NotNull UniqueId pserver);
-
-	/**
-	 * Sets the pserverData for a given pserver id
-	 *
 	 * @param pserver the pserver id
-	 * @param data    the data
 	 *
-	 * @return whether the operation was successful
+	 * @return whether the pserver is loaded
 	 */
-	public abstract CompletableFuture<Boolean> pServerData(UniqueId pserver, JsonDocument data);
+	public abstract @NotNull CompletableFuture<@NotNull Boolean> pserverExists(
+			@NotNull UniqueId pserver);
 
-	public abstract CompletableFuture<PServerExecutor> createPServer(
-			PServerSerializable configuration);
+	public abstract CompletableFuture<? extends PServerExecutor> createPServer(
+			PServerBuilder builder);
 
 	/**
-	 * @param pserver the id of the pserver
-	 *
-	 * @return the pserver with the id, null if no pserver exists
+	 * @return all running pservers
 	 */
-	public @NotNull Optional<? extends PServerExecutor> pServerOptional(UniqueId pserver) {
-		return Optional.ofNullable(pServer(pserver));
-	}
+	public abstract CompletableFuture<Collection<? extends PServerExecutor>> pservers();
 
-	public abstract Collection<? extends PServerExecutor> getPServers();
+	/**
+	 * @param owner a player
+	 *
+	 * @return all pservers the player is owner of
+	 */
+	public abstract CompletableFuture<Collection<UniqueId>> pservers(UUID owner);
 
-	public abstract Collection<UniqueId> getPServerIDs(UUID owner);
-
-	public abstract Collection<UUID> getOwners(UniqueId pserver);
-
-	public abstract ITask<Void> delete(UniqueId pserver);
-
-	public abstract ITask<Void> clearOwners(UniqueId id);
-
-	public abstract ITask<Void> addOwner(UniqueId id, UUID owner);
-
-	public abstract ITask<Void> removeOwner(UniqueId id, UUID owner);
-
-	public abstract String newName();
 }

@@ -8,11 +8,14 @@ package eu.darkcube.system.module.util.data;
 
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.util.data.packets.PacketData;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeQuery;
 
 class HandlerQuery implements PacketHandler<PacketWrapperNodeQuery> {
 	@Override
 	public Packet handle(PacketWrapperNodeQuery packet) {
-		return null;
+		SynchronizedPersistentDataStorage storage =
+				SynchronizedPersistentDataStorages.storage(packet.key());
+		return new PacketData(storage.storeToJsonDocument());
 	}
 }

@@ -83,8 +83,8 @@ public class ItemBuilder extends AbstractItemBuilder {
 			NBTTagCompound tag = mci.getTag();
 			if (tag != null) {
 				if (tag.hasKey("System:persistentDataStorage")) {
-					storage.getData().append(JsonDocument.newDocument(
-							tag.getString("System:persistentDataStorage")));
+					storage.loadFromJsonDocument(JsonDocument.newDocument(
+							tag.getString("System" + ":persistentDataStorage")));
 				}
 			}
 		}
@@ -142,7 +142,7 @@ public class ItemBuilder extends AbstractItemBuilder {
 			item.setItemMeta(meta);
 			net.minecraft.server.v1_8_R3.ItemStack mci = CraftItemStack.asNMSCopy(item);
 			NBTTagCompound tag = mci.getTag() == null ? new NBTTagCompound() : mci.getTag();
-			tag.setString("System:persistentDataStorage", storage.getData().toJson());
+			tag.setString("System:persistentDataStorage", storage.storeToJsonDocument().toJson());
 			mci.setTag(tag);
 			item = CraftItemStack.asBukkitCopy(mci);
 		} else {
@@ -157,7 +157,7 @@ public class ItemBuilder extends AbstractItemBuilder {
 				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
 						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
 						.material(material).unbreakable(unbreakable).metas(metas);
-		builder.persistentDataStorage().getData().append(storage.getData());
+		builder.persistentDataStorage().loadFromJsonDocument(storage.storeToJsonDocument());
 		return builder;
 	}
 }

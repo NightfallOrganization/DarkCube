@@ -19,6 +19,11 @@ public interface PersistentDataType<T> {
 
 	void serialize(JsonDocument doc, String key, T data);
 
+	/**
+	 * @param object the object to clone
+	 *
+	 * @return a new cloned object, or the same if immutable
+	 */
 	T clone(T object);
 
 }

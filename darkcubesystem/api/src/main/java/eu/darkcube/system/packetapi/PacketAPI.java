@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.packetapi;
 
 import com.google.common.collect.BiMap;
@@ -68,7 +67,8 @@ public class PacketAPI {
 
 	public Packet sendPacketQuery(Packet packet, ServiceInfoSnapshot snapshot) {
 		ChannelMessage msg = preparePacket(packet, snapshot).sendSingleQuery();
-		assert msg != null;
+		if (msg == null)
+			return null;
 		return PacketSerializer.getPacket(msg.getJson(), PacketSerializer.getClass(msg.getJson()));
 	}
 
@@ -86,13 +86,15 @@ public class PacketAPI {
 
 	public Packet sendPacketQuery(Packet packet) {
 		ChannelMessage msg = preparePacket(packet).sendSingleQuery();
-		assert msg != null;
+		if (msg == null)
+			return null;
 		return PacketSerializer.getPacket(msg.getJson(), PacketSerializer.getClass(msg.getJson()));
 	}
 
 	public <T extends Packet> T sendPacketQuery(Packet packet, Class<T> responsePacketType) {
 		ChannelMessage msg = preparePacket(packet).sendSingleQuery();
-		assert msg != null;
+		if (msg == null)
+			return null;
 		return PacketSerializer.getPacket(msg.getJson(), responsePacketType);
 	}
 
@@ -103,7 +105,7 @@ public class PacketAPI {
 	}
 
 	private JsonDocument prepareDocument(Packet packet) {
-		return PacketSerializer.insert(JsonDocument.newDocument(), packet);
+		return PacketSerializer.serialize(packet);
 	}
 
 	private ChannelMessage preparePacket(Packet packet, ServiceInfoSnapshot snapshot) {
@@ -114,22 +116,6 @@ public class PacketAPI {
 	private ChannelMessage preparePacket(Packet packet) {
 		return ChannelMessage.builder().targetAll().channel(CHANNEL).json(prepareDocument(packet))
 				.build();
-	}
-
-	public JsonDocument receive(JsonDocument doc) {
-		Class<? extends Packet> packetClass = PacketSerializer.getClass(doc);
-		if (handlers.containsKey(packetClass)) {
-			try {
-				Packet packet = PacketSerializer.getPacket(doc, packetClass);
-				@SuppressWarnings("unchecked")
-				PacketHandler<Packet> handler = (PacketHandler<Packet>) handlers.get(packetClass);
-				Packet response = handler.handle(packet);
-				return PacketSerializer.insert(JsonDocument.newDocument(), response);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		return null;
 	}
 
 	public <T extends Packet> void registerHandler(Class<T> clazz, PacketHandler<T> handler) {
@@ -147,12 +133,35 @@ public class PacketAPI {
 				return;
 			}
 			try {
-				JsonDocument doc = receive(e.getData());
-				if (e.isQuery()) {
-					if (doc != null) {
+				JsonDocument doc;
+				Packet received = null;
+
+				Class<? extends Packet> packetClass = PacketSerializer.getClass(e.getData());
+				if (handlers.containsKey(packetClass)) {
+					try {
+						received = PacketSerializer.getPacket(e.getData(), packetClass);
+						@SuppressWarnings("unchecked")
+						PacketHandler<Packet> handler =
+								(PacketHandler<Packet>) handlers.get(packetClass);
+						Packet response = handler.handle(received);
+						doc = PacketSerializer.serialize(response);
+					} catch (Throwable ex) {
+						ex.printStackTrace();
+						doc = null;
+					}
+				} else {
+					doc = null;
+				}
+				if (doc != null) {
+					if (e.isQuery()) {
 						e.setQueryResponse(
 								ChannelMessage.buildResponseFor(e.getChannelMessage()).json(doc)
 										.build());
+					} else {
+						CloudNetDriver.getInstance().getLogger().warning(
+								"[PacketAPI] Invalid packet. Handler for " + received.getClass()
+										.getName() + " returned a response, but no response was "
+										+ "requested by that packet.");
 					}
 				}
 			} catch (Exception ex) {

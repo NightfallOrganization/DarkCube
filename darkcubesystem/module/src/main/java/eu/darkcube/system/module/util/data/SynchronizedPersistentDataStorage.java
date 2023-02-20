@@ -14,6 +14,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.UnmodifiablePersistentDataStorage;
 import eu.darkcube.system.util.data.packets.PacketNodeWrapperDataClearSet;
 import eu.darkcube.system.util.data.packets.PacketNodeWrapperDataRemove;
 import eu.darkcube.system.util.data.packets.PacketNodeWrapperDataSet;
@@ -40,6 +41,11 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 
 	SynchronizedPersistentDataStorage(Key key) {
 		this.key = key;
+	}
+
+	@Override
+	public @UnmodifiableView PersistentDataStorage unmodifiable() {
+		return new UnmodifiablePersistentDataStorage(this);
 	}
 
 	@Override
@@ -243,6 +249,16 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 		return Collections.unmodifiableCollection(updateNotifiers);
 	}
 
+	@Override
+	public void addUpdateNotifier(UpdateNotifier notifier) {
+		updateNotifiers.add(notifier);
+	}
+
+	@Override
+	public void removeUpdateNotifier(UpdateNotifier notifier) {
+		updateNotifiers.remove(notifier);
+	}
+
 	private void save() {
 		if (saving.compareAndSet(false, true)) {
 			SynchronizedPersistentDataStorages.database.containsAsync(key.toString())
@@ -335,15 +351,5 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 
 	public Key key() {
 		return key;
-	}
-
-	@Override
-	public void addUpdateNotifier(UpdateNotifier notifier) {
-		updateNotifiers.add(notifier);
-	}
-
-	@Override
-	public void removeUpdateNotifier(UpdateNotifier notifier) {
-		updateNotifiers.remove(notifier);
 	}
 }

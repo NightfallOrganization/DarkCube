@@ -10,7 +10,6 @@ import de.dytanic.cloudnet.CloudNet;
 import de.dytanic.cloudnet.database.AbstractDatabaseProvider;
 import de.dytanic.cloudnet.database.sql.SQLDatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.PServerModule;
-import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 import java.sql.Connection;
@@ -67,22 +66,6 @@ public class PServerDatabase extends Database {
 		} catch (Exception e) {
 			throw new UnsupportedOperationException(e);
 		}
-	}
-
-	public boolean update(PServerExecutor pserver) {
-		boolean success = true;
-		UniqueId id = pserver.getId();
-		for (UUID owner : pserver.getOwners()) {
-			success &= update(id, owner);
-		}
-		return success;
-	}
-
-	public boolean update(UniqueId pserver, UUID owner) {
-		if (!contains(owner, pserver)) {
-			return insert(owner, pserver);
-		}
-		return true;
 	}
 
 	public boolean contains(UniqueId pserver) {

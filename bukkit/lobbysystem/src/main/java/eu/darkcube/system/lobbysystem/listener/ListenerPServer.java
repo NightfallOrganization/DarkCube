@@ -25,9 +25,15 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.pserver.common.*;
+import eu.darkcube.system.pserver.common.PServerBuilder;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.Type;
+import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -40,6 +46,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class ListenerPServer extends BaseListener {
+
+	private static final Key STARTED_BY = new Key(Lobby.getInstance(), "startedBy");
 
 	public static boolean mayJoin(LobbyUser user, PServerExecutor pserver) {
 		boolean mayjoin = !pserver.isPrivate();
@@ -103,20 +111,18 @@ public class ListenerPServer extends BaseListener {
 				user.setOpenInventory(
 						new InventoryLoading(Component.text("Creating Server..."), user.getUser(),
 								u -> {
-									UniqueId pserverId =
-											UniqueIdProvider.getInstance().newUniqueId();
-
 									try {
-										PServerProvider.getInstance()
-												.addOwner(pserverId, user.getUser().getUniqueId())
+										PServerExecutor ex = PServerProvider.instance()
+												.createPServer(
+														new PServerBuilder().type(Type.WORLD))
 												.get();
+										ex.addOwner(user.getUser().getUniqueId()).get();
 										Thread.sleep(1000);
+										return new InventoryPServerConfiguration(user.getUser(),
+												ex.id());
 									} catch (InterruptedException | ExecutionException ex) {
 										throw new RuntimeException(ex);
 									}
-
-									return new InventoryPServerConfiguration(user.getUser(),
-											pserverId);
 								}));
 			}
 		} else if (inv instanceof InventoryGameServersSelection) {
@@ -140,12 +146,13 @@ public class ListenerPServer extends BaseListener {
 							}
 							JsonDocument data = new JsonDocument();
 							data.append("task", task.getName());
-							data.append("private", false);
 							UniqueId pserverId = UniqueIdProvider.getInstance().newUniqueId();
 
 							try {
-								PServerProvider.getInstance()
-										.addOwner(pserverId, user.getUser().getUniqueId()).get();
+								PServerExecutor ps =
+										PServerProvider.instance().pserver(pserverId).get();
+								ps.addOwner(user.getUser().getUniqueId()).get();
+
 								PServerProvider.getInstance().setPServerData(pserverId, data).get();
 								Thread.sleep(1000);
 							} catch (ExecutionException | InterruptedException ex) {
@@ -161,18 +168,14 @@ public class ListenerPServer extends BaseListener {
 			if (itemid.equals(Item.PSERVER_DELETE.getItemId())) {
 				user.setOpenInventory(new InventoryConfirm(cinv.getTitle(), user.getUser(), () -> {
 					try {
-						PServerProvider.getInstance()
-								.removeOwner(cinv.pserverId, user.getUser().getUniqueId()).get();
-						if (PServerProvider.getInstance().getOwners(cinv.pserverId).isEmpty()) {
-							PServerProvider.getInstance().delete(cinv.pserverId).get();
-						}
+						PServerExecutor ps =
+								PServerProvider.instance().pserver(cinv.pserverId).get();
+						ps.removeOwner(user.getUser().getUniqueId());
 					} catch (InterruptedException | ExecutionException ex) {
 						throw new RuntimeException(ex);
 					}
 					user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
-				}, () -> {
-					user.setOpenInventory(cinv);
-				}));
+				}, () -> user.setOpenInventory(cinv)));
 			} else if (itemid.equals(Item.START_PSERVER.getItemId())) {
 				AsyncExecutor.service().submit(() -> {
 					new BukkitRunnable() {
@@ -181,22 +184,26 @@ public class ListenerPServer extends BaseListener {
 							e.getWhoClicked().closeInventory();
 						}
 					}.runTask(Lobby.getInstance());
-					for (PServerExecutor ps : PServerProvider.getInstance().getPServers()) {
-						JsonDocument data = ps.getData();
-						if (data.contains("startedBy")) {
-							UUID uuid = UUID.fromString(data.getString("startedBy"));
-							if (uuid.equals(user.getUser().getUniqueId())) {
-								new BukkitRunnable() {
-									@Override
-									public void run() {
-										user.getUser().sendMessage(
-												Message.STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER.getMessage(
-														user.getUser()));
-									}
-								}.runTask(Lobby.getInstance());
-								return;
+					try {
+						for (PServerExecutor ps : PServerProvider.instance().pservers().get()) {
+							PersistentDataStorage storage = ps.storage();
+							if (data.contains("startedBy")) {
+								UUID uuid = UUID.fromString(data.getString("startedBy"));
+								if (uuid.equals(user.getUser().getUniqueId())) {
+									new BukkitRunnable() {
+										@Override
+										public void run() {
+											user.getUser().sendMessage(
+													Message.STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER.getMessage(
+															user.getUser()));
+										}
+									}.runTask(Lobby.getInstance());
+									return;
+								}
 							}
 						}
+					} catch (InterruptedException | ExecutionException ex) {
+						throw new RuntimeException(ex);
 					}
 					String serverName = PServerProvider.getInstance().newName();
 					String taskName = PServerProvider.getInstance().getPServerData(cinv.pserverId)
@@ -214,13 +221,13 @@ public class ListenerPServer extends BaseListener {
 				});
 			} else if (itemid.equals(Item.STOP_PSERVER.getItemId())) {
 				AsyncExecutor.service().submit(() -> {
-					PServerProvider.getInstance().getPServer(cinv.pserverId).stop();
+					PServerProvider.instance().pserver(cinv.pserverId)
+							.thenAccept(PServerExecutor::stop);
 				});
 			} else if (itemid.equals(Item.PSERVER_PUBLIC.getItemId())) {
 				AsyncExecutor.service().submit(() -> {
-					JsonDocument data =
-							PServerProvider.getInstance().getPServerData(cinv.pserverId);
-					data.append("private", true);
+
+					JsonDocument data = PServerProvider.instance().getPServerData(cinv.pserverId);
 					try {
 						PServerProvider.getInstance().setPServerData(cinv.pserverId, data).get();
 					} catch (InterruptedException | ExecutionException ex) {

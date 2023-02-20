@@ -4,20 +4,19 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.packetapi;
 
-import eu.darkcube.system.libs.com.google.gson.JsonSyntaxException;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.darkcube.system.libs.com.google.gson.JsonSyntaxException;
 
 public class PacketSerializer {
 
-	public static JsonDocument insert(JsonDocument doc, Packet packet) {
+	public static JsonDocument serialize(Packet packet) {
 		if (packet != null) {
-			doc.append("packetClass", packet.getClass().getName());
-			doc.append("packet", packet);
+			return JsonDocument.newDocument().append("packetClass", packet.getClass().getName())
+					.append("packet", packet);
 		}
-		return doc;
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -30,7 +29,8 @@ public class PacketSerializer {
 		return null;
 	}
 
-	public static <T extends Packet> T getPacket(JsonDocument doc, Class<T> clazz) throws JsonSyntaxException {
+	public static <T extends Packet> T getPacket(JsonDocument doc, Class<T> clazz)
+	throws JsonSyntaxException {
 		return doc.get("packet", clazz);
 	}
 }

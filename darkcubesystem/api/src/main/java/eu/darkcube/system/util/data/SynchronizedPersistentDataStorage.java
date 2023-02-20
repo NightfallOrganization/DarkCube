@@ -26,6 +26,71 @@ import java.util.function.Supplier;
 public class SynchronizedPersistentDataStorage implements PersistentDataStorage {
 	private static final Collection<Reference<? extends SynchronizedPersistentDataStorage>>
 			storages = new CopyOnWriteArrayList<>();
+
+	static {
+		PacketAPI.getInstance().registerHandler(PacketNodeWrapperDataClearSet.class, packet -> {
+			for (Reference<? extends SynchronizedPersistentDataStorage> ref : storages) {
+				SynchronizedPersistentDataStorage storage = ref.get();
+				if (storage == null) {
+					storages.remove(ref);
+					continue;
+				}
+				if (storage.key.equals(packet.key())) {
+					storage.lock.writeLock().lock();
+					storage.data.clear();
+					storage.cache.clear();
+					storage.data.append(packet.data());
+					storage.lock.writeLock().unlock();
+					storage.notifyNotifiers();
+				}
+			}
+			return null;
+		});
+		PacketAPI.getInstance().registerHandler(PacketNodeWrapperDataRemove.class, packet -> {
+			for (Reference<? extends SynchronizedPersistentDataStorage> ref : storages) {
+				SynchronizedPersistentDataStorage storage = ref.get();
+				if (storage == null) {
+					storages.remove(ref);
+					continue;
+				}
+				if (storage.key.equals(packet.key())) {
+					try {
+						storage.lock.writeLock().lock();
+						if (storage.data.contains(packet.data().toString())) {
+							storage.data.remove(packet.data().toString());
+							storage.cache.remove(packet.data());
+						} else {
+							continue;
+						}
+					} finally {
+						storage.lock.writeLock().unlock();
+					}
+					storage.notifyNotifiers();
+				}
+			}
+			return null;
+		});
+		PacketAPI.getInstance().registerHandler(PacketNodeWrapperDataSet.class, packet -> {
+			for (Reference<? extends SynchronizedPersistentDataStorage> ref : storages) {
+				SynchronizedPersistentDataStorage storage = ref.get();
+				if (storage == null) {
+					storages.remove(ref);
+					continue;
+				}
+				if (storage.key.equals(packet.key())) {
+					storage.lock.writeLock().lock();
+					storage.data.append(packet.data());
+					for (String key : packet.data().keys()) {
+						storage.cache.remove(Key.fromString(key));
+					}
+					storage.lock.writeLock().unlock();
+				}
+			}
+			return null;
+		});
+
+	}
+
 	private final Key key;
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
 	private final JsonDocument data = new JsonDocument();
@@ -37,6 +102,11 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 		this.key = key;
 		this.data.append(new PacketWrapperNodeQuery(key).sendQuery().cast(PacketData.class).data());
 		storages.add(new WeakReference<>(this));
+	}
+
+	@Override
+	public @UnmodifiableView PersistentDataStorage unmodifiable() {
+		return new UnmodifiablePersistentDataStorage(this);
 	}
 
 	@Override
@@ -234,20 +304,10 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 			lock.readLock().unlock();
 		}
 	}
-	public Key key() {
-		return key;
-	}
-
 
 	@Override
 	public @UnmodifiableView Collection<@NotNull UpdateNotifier> updateNotifiers() {
 		return Collections.unmodifiableCollection(updateNotifiers);
-	}
-
-	private void notifyNotifiers() {
-		for (UpdateNotifier updateNotifier : updateNotifiers) {
-			updateNotifier.notify(this);
-		}
 	}
 
 	@Override
@@ -260,67 +320,13 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 		updateNotifiers.remove(notifier);
 	}
 
-	static {
-		PacketAPI.getInstance().registerHandler(PacketNodeWrapperDataClearSet.class, packet -> {
-			for (Reference<? extends SynchronizedPersistentDataStorage> ref : storages) {
-				SynchronizedPersistentDataStorage storage = ref.get();
-				if (storage == null) {
-					storages.remove(ref);
-					continue;
-				}
-				if (storage.key.equals(packet.key())) {
-					storage.lock.writeLock().lock();
-					storage.data.clear();
-					storage.cache.clear();
-					storage.data.append(packet.data());
-					storage.lock.writeLock().unlock();
-					storage.notifyNotifiers();
-				}
-			}
-			return null;
-		});
-		PacketAPI.getInstance().registerHandler(PacketNodeWrapperDataRemove.class, packet -> {
-			for (Reference<? extends SynchronizedPersistentDataStorage> ref : storages) {
-				SynchronizedPersistentDataStorage storage = ref.get();
-				if (storage == null) {
-					storages.remove(ref);
-					continue;
-				}
-				if (storage.key.equals(packet.key())) {
-					try {
-						storage.lock.writeLock().lock();
-						if (storage.data.contains(packet.data().toString())) {
-							storage.data.remove(packet.data().toString());
-							storage.cache.remove(packet.data());
-						} else {
-							continue;
-						}
-					} finally {
-						storage.lock.writeLock().unlock();
-					}
-					storage.notifyNotifiers();
-				}
-			}
-			return null;
-		});
-		PacketAPI.getInstance().registerHandler(PacketNodeWrapperDataSet.class, packet -> {
-			for (Reference<? extends SynchronizedPersistentDataStorage> ref : storages) {
-				SynchronizedPersistentDataStorage storage = ref.get();
-				if (storage == null) {
-					storages.remove(ref);
-					continue;
-				}
-				if (storage.key.equals(packet.key())) {
-					storage.lock.writeLock().lock();
-					storage.data.append(packet.data());
-					for (String key : packet.data().keys()) {
-						storage.cache.remove(Key.fromString(key));
-					}
-					storage.lock.writeLock().unlock();
-				}
-			}
-			return null;
-		});
+	public Key key() {
+		return key;
+	}
 
+	private void notifyNotifiers() {
+		for (UpdateNotifier updateNotifier : updateNotifiers) {
+			updateNotifier.notify(this);
+		}
 	}
 }

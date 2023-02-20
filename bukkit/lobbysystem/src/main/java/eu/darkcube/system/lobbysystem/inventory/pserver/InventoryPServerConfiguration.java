@@ -6,7 +6,6 @@
  */
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -18,13 +17,16 @@ import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 
@@ -33,7 +35,7 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 
 	public final UniqueId pserverId;
 
-	private boolean done = false;
+	private boolean done;
 
 	public InventoryPServerConfiguration(User user, UniqueId pserverId) {
 		super(type_pserver_configuration, getDisplayName(user, pserverId), user);
@@ -57,18 +59,24 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		super.fillItems(items);
 		items.put(8, Item.PSERVER_DELETE.getItem(this.user.getUser()));
-		PServerExecutor ps = PServerProvider.getInstance().getPServer(pserverId);
-		State state = ps == null ? State.OFFLINE : ps.getState();
-		if (state == State.OFFLINE) {
-			items.put(12, Item.START_PSERVER.getItem(this.user.getUser()));
-		} else {
-			items.put(12, Item.STOP_PSERVER.getItem(this.user.getUser()));
-		}
-		JsonDocument data = PServerProvider.getInstance().getPServerData(pserverId);
-		if (data.getBoolean("private", false)) {
-			items.put(10, Item.PSERVER_PRIVATE.getItem(user.getUser()));
-		} else {
-			items.put(10, Item.PSERVER_PUBLIC.getItem(user.getUser()));
+		try {
+			PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
+			State state = ps.state().get();
+			AccessLevel accessLevel = ps.accessLevel().get();
+			if (state == State.OFFLINE) {
+				items.put(12, Item.START_PSERVER.getItem(this.user.getUser()));
+			} else {
+				items.put(12, Item.STOP_PSERVER.getItem(this.user.getUser()));
+			}
+			if (accessLevel == AccessLevel.PRIVATE) {
+				items.put(10, Item.PSERVER_PRIVATE.getItem(user.getUser()));
+			} else if (accessLevel == AccessLevel.PUBLIC) {
+				items.put(10, Item.PSERVER_PUBLIC.getItem(user.getUser()));
+			} else {
+				items.put(10, new ItemStack(Material.BARRIER));
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -86,7 +94,7 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory {
 
 	@EventListener
 	public void handle(PServerUpdateEvent event) {
-		if (!event.getPServer().getId().equals(pserverId)) {
+		if (!event.getPServer().id().equals(pserverId)) {
 			return;
 		}
 		this.recalculate();

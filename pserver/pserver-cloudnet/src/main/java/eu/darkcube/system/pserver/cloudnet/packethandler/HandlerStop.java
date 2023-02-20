@@ -1,30 +1,23 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.packetapi.PacketHandler;
-import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperBoolean;
-import eu.darkcube.system.pserver.common.packets.PacketNodeWrapperPServerNotFound;
-import eu.darkcube.system.pserver.common.packets.PacketWrapperNodeStop;
+import eu.darkcube.system.pserver.common.packets.wn.PacketStop;
+import eu.darkcube.system.pserver.common.packets.wn.PacketStop.Response;
 
-import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
-public class HandlerStop implements PacketHandler<PacketWrapperNodeStop> {
-
+public class HandlerStop implements PacketHandler<PacketStop> {
 	@Override
-	public Packet handle(PacketWrapperNodeStop packet) {
-		Optional<? extends PServerExecutor> op =
-				PServerProvider.getInstance().getPServerOptional(packet.getId());
-		if (op.isPresent()) {
-			boolean suc = op.get().stop();
-			return new PacketNodeWrapperBoolean(suc);
-		}
-		return new PacketNodeWrapperPServerNotFound(packet.getId());
+	public Packet handle(PacketStop packet) throws ExecutionException, InterruptedException {
+		PServerProvider.instance().pserver(packet.id()).get().stop().get();
+		return new Response();
 	}
 }

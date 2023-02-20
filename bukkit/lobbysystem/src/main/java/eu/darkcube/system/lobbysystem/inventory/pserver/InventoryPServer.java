@@ -19,11 +19,13 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
-import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
-import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerStartEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerStopEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.State;
+import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -60,20 +62,20 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 		try {
 			SortedMap<Long, ItemStack> sitems = new TreeMap<>();
 
-			for (PServerExecutor ps : PServerProvider.getInstance().getPServers()) {
-				if (ps.getState() != State.RUNNING || !ListenerPServer.mayJoin(this.user, ps)) {
+			for (PServerExecutor ps : PServerProvider.instance().pservers().get()) {
+				if (ps.state() != State.RUNNING || !ListenerPServer.mayJoin(this.user, ps)) {
 					continue;
 				}
-				boolean publicServer = ps.isPublic();
-				int online = ps.getOnlinePlayers();
-				long ontime = ps.getOntime();
-				UUID owner = ps.getOwners().stream().findAny().orElse(null);
+				boolean publicServer = ps.accessLevel() == AccessLevel.PUBLIC;
+				int online = ps.onlinePlayers();
+				long ontime = ps.ontime();
+				UUID owner = ps.owners().stream().findAny().orElse(null);
 
 				ItemBuilder b = null;
 
-				if (ps.isGamemode()) {
+				if (ps.type() == Type.GAMEMODE) {
 					b = PServerDataManager.getDisplayItemGamemode(this.user.getUser(),
-							ps.getTaskName());
+							ps.taskName());
 				}
 				if (b == null) {
 					if (owner == null) {
@@ -88,14 +90,14 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 				}
 				b.amount(online);
 				b.displayname(Message.PSERVER_ITEM_TITLE.getMessage(this.user.getUser(),
-						ps.getServerName()));
+						ps.serverName()));
 				b.lore(publicServer
 						? Message.CLICK_TO_JOIN.getMessage(this.user.getUser())
 						: Message.PSERVER_NOT_PUBLIC.getMessage(this.user.getUser()));
 				Item.setItemId(b, InventoryPServer.ITEMID);
 				b.persistentDataStorage()
 						.set(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING,
-								ps.getId().toString());
+								ps.id().toString());
 				sitems.put(ontime, b.build());
 			}
 
@@ -144,12 +146,12 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
 		}
 
 		@EventListener
-		public void handle(PServerAddEvent event) {
+		public void handle(PServerStartEvent event) {
 			recalculate();
 		}
 
 		@EventListener
-		public void handle(PServerRemoveEvent event) {
+		public void handle(PServerStopEvent event) {
 			recalculate();
 		}
 

@@ -7,110 +7,45 @@
 package eu.darkcube.system.pserver.bukkit;
 
 import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
-import eu.darkcube.system.pserver.bukkit.event.PServerEvent;
-import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
-import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
-import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.pserver.common.PServerSerializable;
-import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packet.packets.*;
-import eu.darkcube.system.pserver.common.packets.*;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.pserver.common.*;
+import eu.darkcube.system.pserver.common.packets.wn.PacketCreate;
+import eu.darkcube.system.pserver.common.packets.wn.PacketExists;
+import eu.darkcube.system.pserver.common.packets.wn.PacketExists.Response;
+import eu.darkcube.system.pserver.common.packets.wn.PacketPServers;
+import eu.darkcube.system.pserver.common.packets.wn.PacketPServersByOwner;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class WrapperPServerProvider extends PServerProvider {
 
-	private static WrapperPServerProvider instance = new WrapperPServerProvider();
+	private static final WrapperPServerProvider instance = new WrapperPServerProvider();
 
-	private final Map<UniqueId, WrapperPServerExecutor> pservers = new ConcurrentHashMap<>();
-
-	WrapperPServerExecutor pserver;
+	volatile WrapperPServerExecutor self;
 
 	private WrapperPServerProvider() {
-		PacketNodeWrapperPServers pservers =
-				new PacketWrapperNodeGetPServers().sendQuery(PacketNodeWrapperPServers.class);
-		for (PServerSerializable s : pservers) {
-			updateAndInsertIfNecessary(s);
-		}
 	}
 
-	public static WrapperPServerProvider getInstance() {
+	public static WrapperPServerProvider instance() {
 		return instance;
 	}
 
 	public static void init() {
-
 	}
 
-	public synchronized WrapperPServerExecutor remove(UniqueId id) {
-		if (!pservers.containsKey(id)) {
-			return null;
-		}
-		WrapperPServerExecutor ps = pservers.get(id);
-		try {
-			publishUpdate(ps);
-			publishRemove(ps);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		pservers.remove(id);
-		return ps;
-	}
-
-	public void update(PServerSerializable pserver) {
-		getPServerOptional(pserver.id).ifPresent(ps -> {
-			ps.update(pserver);
-			publishUpdate(ps);
-		});
-	}
-
-	public void update(UniqueId pserverId, JsonDocument data) {
-		getPServerOptional(pserverId).ifPresent(ps -> {
-			ps.update(data);
-			publishUpdate(ps);
-		});
-	}
-
-	public synchronized WrapperPServerExecutor updateAndInsertIfNecessary(
-			PServerSerializable pserver) {
-		UniqueId uuid = pserver.id;
-		Optional<WrapperPServerExecutor> pso = getPServerOptional(uuid);
-		if (!pso.isPresent()) {
-			Collection<UUID> owners = getOwners(uuid);
-			WrapperPServerExecutor ps = new WrapperPServerExecutor(pserver,
-					PServerProvider.getInstance().getPServerData(uuid), owners);
-			pservers.put(uuid, ps);
-			pso = Optional.of(ps);
-			publishAdd(ps);
-		} else {
-			pso.get().update(pserver);
-		}
-		publishUpdate(pso.get());
-		return getPServer(uuid);
-	}
-
-	private void publishEvent(PServerEvent event) {
-		CloudNetDriver.getInstance().getEventManager().callEvent(event);
-	}
-
-	private void publishAdd(WrapperPServerExecutor ps) {
-		publishEvent(new PServerAddEvent(ps));
-	}
-
-	private void publishUpdate(WrapperPServerExecutor ps) {
-		publishEvent(new PServerUpdateEvent(ps));
-	}
-
-	private void publishRemove(WrapperPServerExecutor ps) {
-		publishEvent(new PServerRemoveEvent(ps));
+	private static <T> CompletableFuture<T> wrap(ITask<T> task) {
+		CompletableFuture<T> fut = new CompletableFuture<>();
+		task.onComplete(fut::complete).onFailure(fut::completeExceptionally).onCancelled(
+				t -> fut.completeExceptionally(new CancellationException("Task cancelled!")));
+		return fut;
 	}
 
 	@Override
@@ -120,104 +55,58 @@ public class WrapperPServerProvider extends PServerProvider {
 	}
 
 	@Override
-	public synchronized boolean isPServer() {
-		return pserver != null;
+	public boolean isPServer() {
+		return self != null;
 	}
 
 	@Override
-	public WrapperPServerExecutor createPServer(PServerSerializable configuration) {
-		return updateAndInsertIfNecessary(
-				new PacketWrapperNodeCreatePServer(configuration).sendQuery()
-						.cast(PacketNodeWrapperPServer.class).getInfo());
-	}
-
-	@Override
-	public synchronized Collection<WrapperPServerExecutor> getPServers() {
-		return pservers.values();
-	}
-
-	//	@Override
-	//	public WrapperPServer createPServer(PServerSerializable configuration, ServiceTask task) {
-	//		return updateAndInsertIfNecessary(new PacketWrapperNodeCreatePServer(configuration,
-	//				task == null ? null : task.getName()).sendQuery()
-	//				.cast(PacketNodeWrapperPServer.class).getInfo());
-	//	}
-
-	@Override
-	public Collection<UniqueId> getPServerIDs(UUID owner) {
-		return new PacketWrapperNodeGetPServersOfPlayer(owner).sendQuery()
-				.cast(PacketNodeWrapperPServerIDs.class).getIds();
-	}
-
-	@Override
-	public Collection<UUID> getOwners(UniqueId pserver) {
-		return new PacketWrapperNodeGetOwners(pserver).sendQuery()
-				.cast(PacketNodeWrapperOwners.class).getUuids();
-	}
-
-	@Override
-	public ITask<Void> delete(UniqueId pserver) {
-		return new PacketWrapperNodeDelete(pserver).sendQueryAsync().map(p -> null);
-	}
-
-	@Override
-	public ITask<Void> clearOwners(UniqueId id) {
-		return new PacketWrapperNodeClearOwners(id).sendQueryAsync().map(p -> null);
-	}
-
-	@Override
-	public ITask<Void> addOwner(UniqueId id, UUID owner) {
-		getPServerOptional(id).ifPresent(ps -> {
-			ps.getOwners().add(owner);
-		});
-		return new PacketWrapperNodeAddOwner(id, owner).sendQueryAsync().map(p -> null);
-	}
-
-	@Override
-	public ITask<Void> removeOwner(UniqueId id, UUID owner) {
-		getPServerOptional(id).ifPresent(ps -> {
-			ps.getOwners().remove(owner);
-		});
-		return new PacketWrapperNodeRemoveOwner(id, owner).sendQueryAsync().map(p -> null);
-	}
-
-	@Override
-	public String newName() {
-		return new PacketWrapperNodeNewName().sendQuery().cast(PacketNodeWrapperString.class)
-				.getString();
-	}
-
-	@Override
-	public synchronized WrapperPServerExecutor getCurrentPServer() throws IllegalStateException {
-		if (pserver == null)
+	public PServerExecutor currentPServer() throws IllegalStateException {
+		if (self == null)
 			throw new IllegalStateException();
-		return pserver;
+		return self;
 	}
 
 	@Override
-	public synchronized WrapperPServerExecutor getPServer(UniqueId uuid) {
-		return pservers.getOrDefault(uuid, null);
+	public CompletableFuture<@Nullable WrapperPServerExecutor> pserver(UniqueId pserver) {
+		return CompletableFuture.completedFuture(new WrapperPServerExecutor(pserver));
 	}
 
 	@Override
-	public synchronized JsonDocument getPServerData(UniqueId pserver) {
-		if (pservers.containsKey(pserver)) {
-			return pservers.get(pserver).getData().clone();
-		}
-		return new PacketWrapperNodeGetData(pserver).sendQuery().cast(PacketNodeWrapperData.class)
-				.getData();
+	public CompletableFuture<@NotNull Boolean> pserverExists(UniqueId pserver) {
+		return wrap(new PacketExists(pserver).sendQueryAsync(PacketExists.Response.class)
+				.map(Response::exists));
 	}
 
 	@Override
-	public synchronized ITask<Void> setPServerData(UniqueId pserver, JsonDocument data) {
-		if (pservers.containsKey(pserver)) {
-			pservers.get(pserver).update(data);
-		}
-		return new PacketWrapperNodeSetData(pserver, data).sendQueryAsync().map(p -> null);
+	public CompletableFuture<WrapperPServerExecutor> createPServer(PServerBuilder builder) {
+		return wrap(new PacketCreate(builder.clone()).sendQueryAsync(PacketCreate.Response.class)
+				.map(PacketCreate.Response::snapshot).map(PServerSnapshot::uniqueId)
+				.map(this::pserver).map(f -> {
+					try {
+						return f.get();
+					} catch (InterruptedException | ExecutionException e) {
+						throw new RuntimeException(e);
+					}
+				}));
 	}
 
 	@Override
-	public Optional<WrapperPServerExecutor> getPServerOptional(UniqueId uuid) {
-		return Optional.ofNullable(getPServer(uuid));
+	public CompletableFuture<Collection<? extends PServerExecutor>> pservers() {
+		return wrap(new PacketPServers().sendQueryAsync(PacketPServers.Response.class)
+				.map(PacketPServers.Response::snapshots).map(l -> l.stream().map(s -> {
+					try {
+						return this.pserver(s.uniqueId()).get();
+					} catch (InterruptedException | ExecutionException e) {
+						throw new RuntimeException(e);
+					}
+				}).collect(Collectors.toList())).map(Collections::unmodifiableCollection));
 	}
+
+	@Override
+	public CompletableFuture<Collection<UniqueId>> pservers(UUID owner) {
+		return wrap(new PacketPServersByOwner(owner).sendQueryAsync(
+						PacketPServersByOwner.Response.class).map(PacketPServersByOwner.Response::ids)
+				.map(Collections::unmodifiableCollection));
+	}
+
 }

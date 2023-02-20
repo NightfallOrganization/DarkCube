@@ -20,17 +20,39 @@ import eu.darkcube.system.util.data.packets.PacketWrapperNodeQuery;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SynchronizedPersistentDataStorages {
-	static final Database database = CloudNetDriver.getInstance().getDatabaseProvider()
-			.getDatabase("plugin_persistent_data");
+	static final Database database;
 	private static final ReferenceQueue<SynchronizedPersistentDataStorage> queue =
 			new ReferenceQueue<>();
 	private static final Lock lock = new ReentrantLock(false);
 	private static final HashBiMap<Key, Reference<? extends SynchronizedPersistentDataStorage>>
 			storages = HashBiMap.create();
+
+	static {
+		database =
+				CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("persistent_data");
+		PacketAPI.getInstance().registerHandler(PacketWrapperNodeDataSet.class, new HandlerSet());
+		PacketAPI.getInstance()
+				.registerHandler(PacketWrapperNodeDataClearSet.class, new HandlerClearSet());
+		PacketAPI.getInstance()
+				.registerHandler(PacketWrapperNodeDataRemove.class, new HandlerRemove());
+		PacketAPI.getInstance().registerHandler(PacketWrapperNodeQuery.class, new HandlerQuery());
+		new CollectorHandler();
+		if (CloudNetDriver.getInstance().getDatabaseProvider()
+				.containsDatabase("plugin_persistent_data")) {
+			Database db = CloudNetDriver.getInstance().getDatabaseProvider()
+					.getDatabase("plugin_persistent_data");
+			for (String key : new ArrayList<>(db.keys())) {
+				database.insert(new Key(key, key).toString(), db.get(key));
+			}
+			CloudNetDriver.getInstance().getDatabaseProvider()
+					.deleteDatabase("plugin_persistent_data");
+		}
+	}
 
 	public static SynchronizedPersistentDataStorage storage(Key key) {
 		lock.lock();
@@ -55,16 +77,6 @@ public class SynchronizedPersistentDataStorages {
 	}
 
 	public static void init() {
-	}
-
-	static {
-		PacketAPI.getInstance().registerHandler(PacketWrapperNodeDataSet.class, new HandlerSet());
-		PacketAPI.getInstance()
-				.registerHandler(PacketWrapperNodeDataClearSet.class, new HandlerClearSet());
-		PacketAPI.getInstance()
-				.registerHandler(PacketWrapperNodeDataRemove.class, new HandlerRemove());
-		PacketAPI.getInstance().registerHandler(PacketWrapperNodeQuery.class, new HandlerQuery());
-		new CollectorHandler();
 	}
 
 	private static class CollectorHandler extends Thread {
