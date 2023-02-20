@@ -53,6 +53,7 @@ public enum Message implements BaseMessage {
 		return KEY_PREFIX;
 	}
 
+	@Override
 	public String getKey() {
 		return key;
 	}

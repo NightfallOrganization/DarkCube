@@ -65,7 +65,12 @@ public enum Language {
 		return GERMAN;
 	}
 
+	public boolean containsMessage(String key) {
+		return bundle.containsKey(key);
+	}
+
 	public Component getMessage(String key, Object... replacements) {
+		replacements = Arrays.copyOf(replacements, replacements.length);
 		List<Component> components = new ArrayList<>();
 		for (int i = 0; i < replacements.length; i++) {
 			if (replacements[i] instanceof BaseMessage) {
@@ -85,22 +90,24 @@ public enum Language {
 			String formatted =
 					String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
 			formatted = ChatColor.translateAlternateColorCodes('&', formatted);
-			Component c = Component.text().asComponent();
+			Component c = Component.empty();
 			for (int i = 0; i < components.size(); i++) {
 				String[] s = formatted.split(String.format("&#!\\$%s%s;", (char) 1054, i), 2);
 				c = c.append(LegacyComponentSerializer.legacySection().deserialize(s[0]));
 				Component o = c;
 				if (s.length == 2) {
+					formatted = s[1];
 					c = c.append(components.get(i));
 					String str = LegacyComponentSerializer.legacySection()
 							.serialize(Component.text(" ").style(getLastStyle(o)));
 					str = str.substring(0, str.length() - 1);
-					c = c.append(LegacyComponentSerializer.legacySection().deserialize(str + s[1]));
+					formatted = str + formatted;
+					//					c = c.append(LegacyComponentSerializer.legacySection().deserialize(str + s[1]));
 				}
 			}
-			if (components.isEmpty()) {
-				c = LegacyComponentSerializer.legacySection().deserialize(formatted);
-			}
+			//			if (components.isEmpty()) {
+			c = LegacyComponentSerializer.legacySection().deserialize(formatted);
+			//			}
 			return c;
 		} else {
 			return LegacyComponentSerializer.legacySection().deserialize(
@@ -202,7 +209,7 @@ public enum Language {
 			/**
 			 * Constructs a resource bundle enumeration.
 			 *
-			 * @param set         an set providing some elements of the enumeration
+			 * @param set         a set providing some elements of the enumeration
 			 * @param enumeration an enumeration providing more elements of the enumeration.
 			 *                    enumeration may be null.
 			 */

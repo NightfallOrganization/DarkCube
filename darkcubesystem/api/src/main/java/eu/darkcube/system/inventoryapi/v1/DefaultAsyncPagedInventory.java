@@ -32,8 +32,8 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	@Override
-	protected void postTick(boolean changedInformations) {
-		if (changedInformations) {
+	protected void postTick(boolean changedInformation) {
+		if (changedInformation) {
 			this.playSound();
 		}
 	}
@@ -62,7 +62,6 @@ public abstract class DefaultAsyncPagedInventory extends AsyncPagedInventory {
 	}
 
 	protected void insertFallbackItems() {
-
 		ItemStack l = new ItemStack(Material.STAINED_GLASS_PANE);
 		l.setDurability((short) 7);
 		ItemMeta meta = l.getItemMeta();

@@ -15,8 +15,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,16 +25,10 @@ import java.util.function.BooleanSupplier;
 public abstract class AnimatedInventory extends AbstractInventory {
 
 	protected final AtomicBoolean animationRunning = new AtomicBoolean(false);
-
 	protected final AtomicLong animationStarted = new AtomicLong();
-
 	protected final AtomicReference<AnimationRunnable> animation = new AtomicReference<>();
-
-	protected final List<AnimationInformation> informations =
-			Collections.synchronizedList(new ArrayList<>());
-
+	protected final List<AnimationInformation> informations = new CopyOnWriteArrayList<>();
 	private final BooleanSupplier instant;
-	//					(i1, i2) -> Long.valueOf(i1.showAfter).compareTo(Long.valueOf(i2.showAfter)));
 
 	public AnimatedInventory(InventoryType inventoryType, Component title, int size,
 			BooleanSupplier instant) {
@@ -84,32 +78,6 @@ public abstract class AnimatedInventory extends AbstractInventory {
 		this.stopAnimation();
 	}
 
-	protected class AnimationRunnable extends BukkitRunnable {
-
-		@Override
-		public void run() {
-			boolean updated = false;
-			final long started = AnimatedInventory.this.animationStarted.get();
-			final long time = System.currentTimeMillis();
-			AnimatedInventory.this.tick();
-			List<AnimationInformation> toRemove = new ArrayList<>();
-			for (AnimationInformation information : AnimatedInventory.this.informations) {
-				if (information.showAfter + started > time) {
-					continue;
-				}
-				toRemove.add(information);
-				AnimatedInventory.this.handle.setItem(information.slot, information.item);
-				updated = true;
-			}
-			AnimatedInventory.this.informations.removeAll(toRemove);
-			if (updated) {
-				AnimatedInventory.this.opened.stream().filter(Player.class::isInstance)
-						.map(Player.class::cast).forEach(Player::updateInventory);
-			}
-		}
-
-	}
-
 	public static class AnimationInformation {
 
 		public final long showAfter;
@@ -126,6 +94,32 @@ public abstract class AnimatedInventory extends AbstractInventory {
 
 		public AnimationInformation(int slot, ItemStack item) {
 			this(-1, slot, item);
+		}
+
+	}
+
+	protected class AnimationRunnable extends BukkitRunnable {
+
+		@Override
+		public void run() {
+			boolean updated = false;
+			final long started = animationStarted.get();
+			final long time = System.currentTimeMillis();
+			tick();
+			List<AnimationInformation> toRemove = new ArrayList<>();
+			for (AnimationInformation information : informations) {
+				if (information.showAfter + started > time) {
+					continue;
+				}
+				toRemove.add(information);
+				handle.setItem(information.slot, information.item);
+				updated = true;
+			}
+			informations.removeAll(toRemove);
+			if (updated) {
+				opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
+						.forEach(Player::updateInventory);
+			}
 		}
 
 	}

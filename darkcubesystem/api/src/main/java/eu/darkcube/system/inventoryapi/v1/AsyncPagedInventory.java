@@ -47,7 +47,6 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	protected final AtomicDouble currentSort = new AtomicDouble();
 	protected final PagedListener listener;
 
-	//	protected final double[] PAGE_SORT;
 	protected final double[] SORT;
 	protected final int[] SLOTS;
 	protected final int[] PAGE_SLOTS;
@@ -62,10 +61,6 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		}
 
 		this.PAGE_SLOTS = pageSlots;
-		//		this.PAGE_SORT = new double[this.PAGE_SLOTS.length];
-		//		for (int i = 0; i < this.PAGE_SORT.length; i++) {
-		//			this.PAGE_SORT[i] = IInventory.distance(this.PAGE_SLOTS[i], startSlot);
-		//		}
 		this.SORT = new double[this.SLOTS.length];
 		for (int i = 0; i < this.SORT.length; i++) {
 			this.SORT[i] = IInventory.distance(this.SLOTS[i], startSlot);
@@ -124,7 +119,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	}
 
 	@Override
-	protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
+	protected void asyncOfferAnimations(Collection<AnimationInformation> information) {
 		Map<Integer, ItemStack> items = new HashMap<>();
 		this.fillItems(items);
 		this.items.clear();
@@ -140,7 +135,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		this.updateSlots.clear();
 	}
 
-	protected abstract void postTick(boolean changedInformations);
+	protected abstract void postTick(boolean changedInformation);
 
 	protected void calculatePageItems() {
 		Set<Integer> update = new HashSet<>(this.pageItems.keySet());
@@ -221,7 +216,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
 	private PageArrow getArrowType(ItemStack arrowItem) {
 		Map<String, PageArrow> arrowNames = new HashMap<>();
-		Arrays.asList(PageArrow.values()).forEach(a -> arrowNames.put(a.name(), a));
+		Arrays.stream(PageArrow.values()).forEach(a -> arrowNames.put(a.name(), a));
 		return arrowNames.get(ItemBuilder.item(arrowItem).persistentDataStorage()
 				.get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
 	}
@@ -254,7 +249,7 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		this.calculatePageItems();
 	}
 
-	protected void handleClick(InventoryClickEvent event) {
+	protected final void handleClick(InventoryClickEvent event) {
 		event.setCancelled(true);
 		this.handlePageLogic(event);
 	}
@@ -276,16 +271,16 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 		@EventHandler
 		public void handle(InventoryClickEvent event) {
 			HumanEntity human = event.getWhoClicked();
-			if (AsyncPagedInventory.this.isOpened(human)) {
+			if (isOpened(human)) {
 				if (event.getView().getTopInventory().equals(event.getClickedInventory())) {
-					AsyncPagedInventory.this.handleClick(event);
+					handleClick(event);
 				}
 			}
 		}
 
 		@EventHandler
 		public void handle(InventoryDragEvent event) {
-			if (AsyncPagedInventory.this.isOpened(event.getWhoClicked())) {
+			if (isOpened(event.getWhoClicked())) {
 				event.setCancelled(true);
 			}
 		}

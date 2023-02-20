@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.util;
 
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.stats.api.Duration;
 import eu.darkcube.system.stats.api.StatsAPI;
 import eu.darkcube.system.stats.api.mysql.MySQL;
@@ -31,7 +31,7 @@ public class StatsLink {
 		}
 	}
 
-	public static void updateKillElo(User killer, User dead) {
+	public static void updateKillElo(WBUser killer, WBUser dead) {
 		if (isStats()) {
 			for (Duration duration : Duration.values()) {
 				double elo1 = StatsAPI.getUser(killer.getUniqueId()).getWoolBattleStats(duration).getElo();
@@ -45,49 +45,49 @@ public class StatsLink {
 		}
 	}
 
-	public static void addDeath(User user) {
+	public static void addDeath(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).addWoolBattleDeath();
 		}
 	}
 
-	public static void addWin(User user) {
+	public static void addWin(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).addWoolBattleWin();
 		}
 	}
 
-	public static void addLoss(User user) {
+	public static void addLoss(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).addWoolBattleLoss();
 		}
 	}
 
-	public static void addKill(User user) {
+	public static void addKill(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).addWoolBattleKill();
 		}
 	}
 
-	public static void removeDeath(User user) {
+	public static void removeDeath(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).removeWoolBattleDeath();
 		}
 	}
 
-	public static void removeWin(User user) {
+	public static void removeWin(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).removeWoolBattleWin();
 		}
 	}
 
-	public static void removeLoss(User user) {
+	public static void removeLoss(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).removeWoolBattleLoss();
 		}
 	}
 
-	public static void removeKill(User user) {
+	public static void removeKill(WBUser user) {
 		if (isStats()) {
 			StatsAPI.getUser(user.getUniqueId()).removeWoolBattleKill();
 		}

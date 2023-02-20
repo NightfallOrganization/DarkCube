@@ -4,43 +4,40 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.command.CommandArgument;
+import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandDisable;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandEnable;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandInfo;
-import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandSetDeathHeight;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.map.CommandSetIcon;
-import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.system.commandapi.SpacedCommand;
+import eu.darkcube.system.commandapi.v3.Commands;
 
-public class CommandMap extends SpacedCommand {
-
+public class CommandMap extends WBCommandExecutor {
 	public CommandMap() {
-		super(WoolBattle.getInstance(), "map", new SubCommand[] {
-				new CommandSetIcon(), new CommandEnable(), new CommandDisable(), new CommandInfo(),
-				new CommandSetDeathHeight()
-		}, "Map HauptCommand", CommandArgument.MAP);
+		super("map", b -> b.then(Commands.argument("map", MapArgument.mapArgument())
+				.then(new CommandDisable().builder()).then(new CommandEnable().builder())
+				.then(new CommandInfo().builder()).then(new CommandSetIcon().builder())));
 	}
-
-	@Override
-	public boolean execute(CommandSender paramCommandSender, String[] paramArrayOfString) {
-		return false;
-	}
-
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return Arrays.toSortedStringList(WoolBattle.getInstance().getMapManager().getMaps(), args[0]);
-		}
-		return super.onTabComplete(args);
-	}
+	//	public CommandMap() {
+	//		super(WoolBattle.getInstance(), "map", new SubCommand[] {
+	//				new CommandSetIcon(), new CommandEnable(), new CommandDisable(), new CommandInfo(),
+	//				new CommandSetDeathHeight()
+	//		}, "Map HauptCommand", CommandArgument.MAP);
+	//	}
+	//
+	//	@Override
+	//	public boolean execute(CommandSender paramCommandSender, String[] paramArrayOfString) {
+	//		return false;
+	//	}
+	//
+	//	@Override
+	//	public List<String> onTabComplete(String[] args) {
+	//		if (args.length == 1) {
+	//			return Arrays.toSortedStringList(WoolBattle.getInstance().getMapManager().getMaps(), args[0]);
+	//		}
+	//		return super.onTabComplete(args);
+	//	}
 
 }

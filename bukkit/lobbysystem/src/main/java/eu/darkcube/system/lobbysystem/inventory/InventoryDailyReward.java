@@ -57,11 +57,11 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void postTick(boolean changedInformations) {
+	protected void postTick(boolean changedInformation) {
 		if (!displayedRewards) {
 			displayedRewards = currentSort.get() >= this.SORT[IInventory.slot(3, 5)];
 		}
-		if (changedInformations) {
+		if (changedInformation) {
 			if (this.displayedRewards) {
 				this.playSound();
 			}

@@ -11,6 +11,7 @@
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onLoad" />
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onEnable" />
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onDisable" />
+    <pattern value="org.bukkit.event.Event" hierarchically="true" method="getHandlerList" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="17" project-jdk-type="JavaSDK" />

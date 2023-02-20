@@ -4,18 +4,18 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.v1;
 
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -35,7 +35,17 @@ public abstract class AbstractInventory implements IInventory {
 		this.inventoryType = inventoryType;
 		this.title = title;
 		this.handle = Bukkit.createInventory(null, size,
-				ChatColor.stripColor(LegacyComponentSerializer.legacySection().serialize(title)));
+				LegacyComponentSerializer.legacySection().serialize(title));
+		this.listener = new InventoryListener();
+		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubePlugin.systemPlugin());
+	}
+
+	public AbstractInventory(final InventoryType inventoryType, final Component title,
+			final org.bukkit.event.inventory.InventoryType bukkitType) {
+		this.inventoryType = inventoryType;
+		this.title = title;
+		this.handle = Bukkit.createInventory(null, bukkitType,
+				LegacyComponentSerializer.legacySection().serialize(title));
 		this.listener = new InventoryListener();
 		Bukkit.getPluginManager().registerEvents(this.listener, DarkCubePlugin.systemPlugin());
 	}
@@ -51,6 +61,9 @@ public abstract class AbstractInventory implements IInventory {
 				this.destroy();
 			}
 		}
+	}
+
+	protected void inventoryClick(IInventoryClickEvent event) {
 	}
 
 	protected void destroy() {
@@ -82,8 +95,19 @@ public abstract class AbstractInventory implements IInventory {
 
 		@EventHandler
 		public void handle(InventoryCloseEvent event) {
-			if (AbstractInventory.this.isOpened(event.getPlayer())) {
-				AbstractInventory.this.handleClose(event.getPlayer());
+			if (isOpened(event.getPlayer())) {
+				handleClose(event.getPlayer());
+			}
+		}
+
+		@EventHandler
+		public void handle(InventoryClickEvent event) {
+			if (!(event.getWhoClicked() instanceof Player))
+				return;
+			if (isOpened(event.getWhoClicked())) {
+				IInventoryClickEvent e = new IInventoryClickEvent(event, AbstractInventory.this);
+				inventoryClick(e);
+				Bukkit.getPluginManager().callEvent(e);
 			}
 		}
 	}

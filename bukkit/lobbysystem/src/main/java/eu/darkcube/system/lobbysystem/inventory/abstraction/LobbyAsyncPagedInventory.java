@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
 import eu.darkcube.system.inventoryapi.v1.DefaultAsyncPagedInventory;
@@ -89,9 +88,9 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
 	}
 
 	@Override
-	protected final void asyncOfferAnimations(Collection<AnimationInformation> informations) {
+	protected final void asyncOfferAnimations(Collection<AnimationInformation> information) {
 		if (this.done()) {
-			this.asyncOfferAnimations0(informations);
+			this.asyncOfferAnimations0(information);
 		}
 	}
 

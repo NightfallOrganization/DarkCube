@@ -4,9 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -16,21 +20,15 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
-
 public class ListenerItemPickup extends Listener<PlayerPickupItemEvent> {
 	@Override
 	@EventHandler
 	public void handle(PlayerPickupItemEvent e) {
-		if(e.getItem().getItemStack().getType() != Material.WOOL) {
+		if (e.getItem().getItemStack().getType() != Material.WOOL) {
 			return;
 		}
 		Player p = e.getPlayer();
-		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		WBUser user = WBUser.getUser(p);
 		if (user.getTeam().getType() == TeamType.SPECTATOR) {
 			e.setCancelled(true);
 			return;
@@ -55,7 +53,8 @@ public class ListenerItemPickup extends Listener<PlayerPickupItemEvent> {
 			entity.setItemStack(item2);
 			entity.setPickupDelay(4);
 			if (tryadd - remaining > 0) {
-				inv.addItem(new ItemStack(Material.WOOL, tryadd - remaining, user.getTeam().getType().getWoolColorByte()));
+				inv.addItem(new ItemStack(Material.WOOL, tryadd - remaining,
+						user.getTeam().getType().getWoolColorByte()));
 				playSound(p);
 				WoolBattle.getInstance().getIngame().listenerDoubleJump.refresh(p);
 			}
@@ -63,7 +62,8 @@ public class ListenerItemPickup extends Listener<PlayerPickupItemEvent> {
 		}
 		if (freeSpace > 0) {
 			entity.remove();
-			inv.addItem(new ItemStack(Material.WOOL, tryadd, user.getTeam().getType().getWoolColorByte()));
+			inv.addItem(new ItemStack(Material.WOOL, tryadd,
+					user.getTeam().getType().getWoolColorByte()));
 			playSound(p);
 			WoolBattle.getInstance().getIngame().listenerDoubleJump.refresh(p);
 		}

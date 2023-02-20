@@ -4,21 +4,20 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener;
 
-import java.util.stream.Collectors;
-
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.translation.Message;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.User;
+import java.util.stream.Collectors;
 
 public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 
@@ -27,7 +26,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 	public void handle(AsyncPlayerChatEvent e) {
 		WoolBattle main = WoolBattle.getInstance();
 		Player p = e.getPlayer();
-		User user = main.getUserWrapper().getUser(p.getUniqueId());
+		WBUser user = WBUser.getUser(p);
 		String msg = e.getMessage();
 		boolean atall = false;
 		boolean replace = !main.getLobby().isEnabled();
@@ -37,8 +36,8 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 			boolean startsatteam = msg.startsWith(main.atteam);
 			atall = startsatall || user.getTeam().getUsers().size() == 1;
 			if (msg.length() >= main.atall.length() + 1) {
-				if ((startsatall && msg.substring(main.atall.length()).charAt(0) == ' ')
-						|| (startsatteam && msg.substring(main.atall.length()).charAt(0) == ' ')) {
+				if ((startsatall && msg.substring(main.atall.length()).charAt(0) == ' ') || (
+						startsatteam && msg.substring(main.atall.length()).charAt(0) == ' ')) {
 					msg = msg.replaceFirst(" ", "");
 				}
 			}
@@ -57,14 +56,16 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 		}
 		msg = getMessage(p, msg, atall, color, main, startsatall);
 		if (user.getTeam().getType().equals(TeamType.SPECTATOR)) {
-			main.sendMessageWithoutPrefix(msg, user.getTeam().getUsers().stream()
-					.map(u -> Bukkit.getPlayer(u.getUniqueId())).collect(Collectors.toSet()));
+			main.sendMessageWithoutPrefix(msg,
+					user.getTeam().getUsers().stream().map(u -> Bukkit.getPlayer(u.getUniqueId()))
+							.collect(Collectors.toSet()));
 			main.sendConsoleWithoutPrefix(msg);
 		} else {
-			for (User t : WoolBattle.getInstance().getUserWrapper().getUsers()) {
+			for (WBUser t : WBUser.onlineUsers()) {
 				String pmsg = msg;
 				if (atall && replace) {
-					pmsg = pmsg.replaceFirst(main.atall, Message.AT_ALL.getMessage(t));
+					pmsg = pmsg.replaceFirst(main.atall, LegacyComponentSerializer.legacySection()
+							.serialize(Message.AT_ALL.getMessage(t)));
 					t.getBukkitEntity().sendMessage(pmsg);
 				} else if (t.getTeam().getType().equals(user.getTeam().getType())) {
 					t.getBukkitEntity().sendMessage(pmsg);
@@ -74,9 +75,11 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 		}
 	}
 
-	private String getMessage(Player p, String msg, boolean atall, String color, WoolBattle main, boolean satall) {
-		return color + (atall && main.getIngame().isEnabled() ? main.atall : "") + color + p.getName() + ChatColor.RESET
-				+ ": " + (satall ? msg.substring(main.atall.length()) : msg);
+	private String getMessage(Player p, String msg, boolean atall, String color, WoolBattle main,
+			boolean satall) {
+		return color + (atall && main.getIngame().isEnabled() ? main.atall : "") + color
+				+ p.getName() + ChatColor.RESET + ": " + (satall ? msg.substring(
+				main.atall.length()) : msg);
 	}
 
 }

@@ -4,9 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.lobby;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,22 +17,40 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-
 public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
+	public static PermissionInfo getPermissionInfo(Player p) {
+		PermissionInfo pInfo = new PermissionInfo();
+		for (PermissionAttachmentInfo info : p.getEffectivePermissions()) {
+			if (info.getPermission().contains("fulljoin")) {
+				pInfo.hasPermission = true;
+				String[] split = info.getPermission().split("\\.");
+				int prio = 0;
+				try {
+					prio = Integer.parseInt(split[split.length - 1]);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				if (pInfo.priority < prio) {
+					pInfo.priority = prio;
+				}
+			}
+		}
+		return pInfo;
+	}
+
 	@Override
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handle(PlayerLoginEvent e) {
 		Player p = e.getPlayer();
 		PermissionInfo info = getPermissionInfo(p);
 
-		boolean full = WoolBattle.getInstance().getMaxPlayers() <= WoolBattle.getInstance().getUserWrapper().getUsers().size();
+		boolean full = WoolBattle.getInstance().getMaxPlayers() <= WBUser.onlineUsers().size();
 		boolean shouldKick = info.hasPermission && full;
 
 		Player weakestLink = null;
 		PermissionInfo weakestLinkInfo = null;
-		shouldKick: if (shouldKick) {
+		shouldKick:
+		if (shouldKick) {
 			for (Player o : Bukkit.getOnlinePlayers()) {
 				if (o != p) {
 					PermissionInfo oInfo = getPermissionInfo(o);
@@ -58,9 +78,9 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
 		if (full) {
 			e.disallow(Result.KICK_BANNED, "§cDieser Server ist voll!");
 		}
-//		if (Main.getInstance().getMaxPlayers() <= Main.getInstance().getUserWrapper().getUsers().size()) {
-//			e.disallow(Result.KICK_FULL, e.getKickMessage());
-//		}
+		//		if (Main.getInstance().getMaxPlayers() <= Main.getInstance().getUserWrapper().getUsers().size()) {
+		//			e.disallow(Result.KICK_FULL, e.getKickMessage());
+		//		}
 	}
 
 	public static class PermissionInfo implements Comparable<PermissionInfo> {
@@ -69,32 +89,13 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
 
 		@Override
 		public String toString() {
-			return "PermissionInfo [hasPermission=" + hasPermission + ", priority=" + priority + "]";
+			return "PermissionInfo [hasPermission=" + hasPermission + ", priority=" + priority
+					+ "]";
 		}
 
 		@Override
 		public int compareTo(PermissionInfo o) {
 			return hasPermission ? Integer.valueOf(priority).compareTo(o.priority) : -1;
 		}
-	}
-
-	public static PermissionInfo getPermissionInfo(Player p) {
-		PermissionInfo pInfo = new PermissionInfo();
-		for (PermissionAttachmentInfo info : p.getEffectivePermissions()) {
-			if (info.getPermission().contains("fulljoin")) {
-				pInfo.hasPermission = true;
-				String[] split = info.getPermission().split("\\.");
-				int prio = 0;
-				try {
-					prio = Integer.parseInt(split[split.length - 1]);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				if (pInfo.priority < prio) {
-					pInfo.priority = prio;
-				}
-			}
-		}
-		return pInfo;
 	}
 }

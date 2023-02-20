@@ -11,27 +11,27 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 
 public class EventPlayerKill extends Event implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	private User user;
-	private User killer;
+	private WBUser user;
+	private WBUser killer;
 	private boolean cancel;
 
-	public EventPlayerKill(User user, User killer) {
+	public EventPlayerKill(WBUser user, WBUser killer) {
 		this.user = user;
 		this.killer = killer;
 		cancel = false;
 	}
 
-	public User getKiller() {
+	public WBUser getKiller() {
 		return killer;
 	}
 
-	public User getUser() {
+	public WBUser getUser() {
 		return user;
 	}
 

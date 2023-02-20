@@ -4,13 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.team;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.google.gson.Gson;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -51,9 +51,9 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 		this.index = index(true);
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < this.index; i++) {
-			builder.append(ChatColor.DARK_BLUE.toString());
+			builder.append(ChatColor.DARK_BLUE);
 		}
-		builder.append(ChatColor.DARK_RED.toString());
+		builder.append(ChatColor.DARK_RED);
 		this.scoreboardTag = this.weight + "I" + index;
 		this.invisibleTag = builder.toString();
 		TYPES.add(this);
@@ -179,16 +179,13 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 			return false;
 		}
 		TeamType o = (TeamType) obj;
-		if (o.enabled == enabled && o.displayNameKey.equals(displayNameKey) && o.index == index
+		return o.enabled == enabled && o.displayNameKey.equals(displayNameKey) && o.index == index
 				&& o.invisibleTag.equals(invisibleTag) && o.maxPlayers == maxPlayers
 				&& o.namecolor == namecolor && o.scoreboardTag.equals(scoreboardTag)
-				&& o.weight == weight && o.woolcolor == woolcolor) {
-			return true;
-		}
-		return false;
+				&& o.weight == weight && o.woolcolor == woolcolor;
 	}
 
-	public static final TeamType byDisplayNameKey(String displayNameKey) {
+	public static TeamType byDisplayNameKey(String displayNameKey) {
 		for (TeamType type : TYPES) {
 			if (type.displayNameKey.equals(displayNameKey)) {
 				return type;
@@ -197,7 +194,7 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 		return null;
 	}
 
-	public static final TeamType deserialize(String json) {
+	public static TeamType deserialize(String json) {
 		for (TeamType type : TYPES) {
 			if (type.serialize().equals(json)) {
 				return type;
@@ -209,13 +206,13 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 		return type;
 	}
 
-	public static final TeamType[] validValues() {
+	public static TeamType[] validValues() {
 		Collection<TeamType> types = Arrays.asList(values());
-		types = types.stream().filter(t -> t.isEnabled()).collect(Collectors.toSet());
+		types = types.stream().filter(TeamType::isEnabled).collect(Collectors.toSet());
 		return types.toArray(new TeamType[0]);
 	}
 
-	public static final TeamType[] values() {
+	public static TeamType[] values() {
 		return TYPES.toArray(new TeamType[0]);
 	}
 
@@ -225,6 +222,6 @@ public class TeamType implements Comparable<TeamType>, Serializable {
 
 	@Override
 	public int compareTo(TeamType o) {
-		return -((Integer) o.getWeight()).compareTo(weight);
+		return -Integer.compare(o.getWeight(), weight);
 	}
 }

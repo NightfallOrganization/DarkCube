@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.miners.player;
 
 import eu.darkcube.system.BaseMessage;
@@ -42,6 +41,7 @@ public enum Message implements BaseMessage {
 		return KEY_PREFIX;
 	}
 
+	@Override
 	public String getKey() {
 		return key;
 	}

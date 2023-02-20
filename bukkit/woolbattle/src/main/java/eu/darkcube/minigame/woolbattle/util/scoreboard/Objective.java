@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.scoreboard.DisplaySlot;
 
 public class Objective {
@@ -17,8 +19,8 @@ public class Objective {
 		this.obj = obj;
 	}
 	
-	public void setDisplayName(String name) {
-		obj.setDisplayName(name);
+	public void setDisplayName(Component name) {
+		obj.setDisplayName(LegacyComponentSerializer.legacySection().serialize(name));
 	}
 	
 	public String getDisplayName() {

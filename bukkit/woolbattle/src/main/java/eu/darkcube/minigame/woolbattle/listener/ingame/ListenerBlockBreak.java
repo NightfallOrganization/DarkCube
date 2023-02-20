@@ -4,9 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive.ListenerDoubleJump;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -15,14 +21,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.game.Ingame;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.listener.ingame.standard.ListenerDoubleJump;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.user.User;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
-
 public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 
 	@SuppressWarnings("deprecation")
@@ -30,7 +28,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 	@EventHandler
 	public synchronized void handle(BlockBreakEvent e) {
 		Player p = e.getPlayer();
-		User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+		WBUser user = WBUser.getUser(p);
 		Block block = e.getBlock();
 		e.setExpToDrop(0);
 		if (!user.isTrollMode()) {
@@ -39,11 +37,11 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 				return;
 			}
 		} else {
-//			if (e.getBlock().getType() != Material.WOOL) {
+			//			if (e.getBlock().getType() != Material.WOOL) {
 			WoolBattle.getInstance().getIngame().placedBlocks.remove(e.getBlock());
 			e.getBlock().setType(Material.AIR);
 			return;
-//			}
+			//			}
 		}
 		Material type = block.getType();
 		if (type == Material.WOOL) {
@@ -63,16 +61,19 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 			ItemStack addItem = null;
 			if (remaining > 0) {
 				if (tryadd - remaining > 0) {
-					addItem = new ItemStack(Material.WOOL, tryadd - remaining, user.getTeam().getType().getWoolColorByte());
+					addItem = new ItemStack(Material.WOOL, tryadd - remaining,
+							user.getTeam().getType().getWoolColorByte());
 					shallAdd = true;
 				}
 			} else if (freeSpace > 0) {
-				addItem = new ItemStack(Material.WOOL, tryadd, user.getTeam().getType().getWoolColorByte());
+				addItem = new ItemStack(Material.WOOL, tryadd,
+						user.getTeam().getType().getWoolColorByte());
 				shallAdd = true;
 			}
 			if (shallAdd) {
 				p.getInventory().addItem(addItem);
-				if (ItemManager.countItems(Material.WOOL, p.getInventory()) >= ListenerDoubleJump.COST)
+				if (ItemManager.countItems(Material.WOOL, p.getInventory())
+						>= ListenerDoubleJump.COST)
 					ingame.listenerDoubleJump.refresh(p);
 				playSound(p);
 			}
