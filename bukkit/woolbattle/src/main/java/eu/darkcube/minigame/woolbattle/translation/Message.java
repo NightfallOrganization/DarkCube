@@ -100,6 +100,7 @@ public enum Message implements BaseMessage {
 		return key;
 	}
 
+	@Override
 	public final Component getMessage(Language language, Object... replacements) {
 		return getMessage(key, language, replacements);
 	}

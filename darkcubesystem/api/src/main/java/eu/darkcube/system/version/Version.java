@@ -37,6 +37,8 @@ public interface Version {
 
 		PluginCommand registerLegacy(Plugin plugin, Command command);
 
+		void unregister(String name);
+
 		void register(CommandExecutor command);
 
 		double[] getEntityBB(Entity entity);

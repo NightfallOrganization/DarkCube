@@ -4,12 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
+import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelectionWoolBattle;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.inventory.ItemStack;
@@ -27,10 +28,16 @@ public class InventoryGameServersSelection extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
-	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 5),
-				Item.GAME_PSERVER.getItem(this.user.getUser()));
-		super.insertFallbackItems();
+	protected void inventoryClick(IInventoryClickEvent event) {
+		event.setCancelled(true);
+		if (event.item() == null)
+			return;
+		String itemid = Item.getItemId(event.item());
+		if (itemid == null)
+			return;
+		if (itemid.equals(Item.GAMESERVER_SELECTION_WOOLBATTLE.getItemId())) {
+			user.setOpenInventory(new InventoryGameServerSelectionWoolBattle(user.getUser()));
+		}
 	}
 
 	@Override
@@ -38,6 +45,13 @@ public class InventoryGameServersSelection extends LobbyAsyncPagedInventory {
 		super.fillItems(items);
 		items.put(this.getPageSize() / 2,
 				Item.GAMESERVER_SELECTION_WOOLBATTLE.getItem(this.user.getUser()));
+	}
+
+	@Override
+	protected void insertFallbackItems() {
+		this.fallbackItems.put(IInventory.slot(1, 5),
+				Item.GAME_PSERVER.getItem(this.user.getUser()));
+		super.insertFallbackItems();
 	}
 
 }

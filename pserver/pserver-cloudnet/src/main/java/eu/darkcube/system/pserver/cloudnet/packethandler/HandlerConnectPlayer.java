@@ -8,7 +8,7 @@ package eu.darkcube.system.pserver.cloudnet.packethandler;
 
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.packetapi.PacketHandler;
-import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
 import eu.darkcube.system.pserver.common.packets.wn.PacketConnectPlayer;
 import eu.darkcube.system.pserver.common.packets.wn.PacketConnectPlayer.Response;
 
@@ -18,8 +18,7 @@ public class HandlerConnectPlayer implements PacketHandler<PacketConnectPlayer> 
 	@Override
 	public Packet handle(PacketConnectPlayer packet)
 	throws ExecutionException, InterruptedException {
-		return new Response(
-				PServerProvider.instance().pserver(packet.id()).get().connectPlayer(packet.player())
-						.get());
+		return new Response(NodePServerProvider.instance().pserver(packet.id()).get()
+				.connectPlayer(packet.player()).get());
 	}
 }

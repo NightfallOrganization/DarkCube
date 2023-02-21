@@ -100,14 +100,24 @@ public enum Language {
 					c = c.append(components.get(i));
 					String str = LegacyComponentSerializer.legacySection()
 							.serialize(Component.text(" ").style(getLastStyle(o)));
-					str = str.substring(0, str.length() - 1);
+					str = str.replace(" ", "");
+
 					formatted = str + formatted;
-					//					c = c.append(LegacyComponentSerializer.legacySection().deserialize(str + s[1]));
+					//					c = c.append(LegacyComponentSerializer.legacySection().deserialize(formatted));
+				} else {
+					break;
 				}
 			}
-			//			if (components.isEmpty()) {
-			c = LegacyComponentSerializer.legacySection().deserialize(formatted);
-			//			}
+			if (components.isEmpty()) {
+				c = LegacyComponentSerializer.legacySection().deserialize(formatted);
+			} else {
+				String str = LegacyComponentSerializer.legacySection()
+						.serialize(Component.text(" ").style(getLastStyle(c)));
+				str = str.replace(" ", "");
+
+				formatted = str + formatted;
+				c = c.append(LegacyComponentSerializer.legacySection().deserialize(formatted));
+			}
 			return c;
 		} else {
 			return LegacyComponentSerializer.legacySection().deserialize(

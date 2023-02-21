@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.item.meta;
 
 import org.bukkit.FireworkEffect;
@@ -19,11 +18,11 @@ public final class FireworkBuilderMeta implements BuilderMeta {
 	public FireworkBuilderMeta() {
 	}
 
-	public FireworkEffect getFireworkEffect() {
+	public FireworkEffect fireworkEffect() {
 		return fireworkEffect;
 	}
 
-	public FireworkBuilderMeta setFireworkEffect(FireworkEffect fireworkEffect) {
+	public FireworkBuilderMeta fireworkEffect(FireworkEffect fireworkEffect) {
 		this.fireworkEffect = fireworkEffect;
 		return this;
 	}

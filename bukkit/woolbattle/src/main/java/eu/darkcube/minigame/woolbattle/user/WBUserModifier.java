@@ -22,10 +22,12 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class WBUserModifier implements UserModifier {
 
 	static final Key USER = new Key(WoolBattle.getInstance(), "user");
+	private static final Logger logger = Logger.getLogger("WBUserModifier");
 	private static final Key DATA_VERSION = new Key(WoolBattle.getInstance(), "dataVersion");
 
 	@Override
@@ -49,6 +51,7 @@ public class WBUserModifier implements UserModifier {
 					.set(DATA_VERSION, PersistentDataTypes.INTEGER, dataVersion);
 		}
 		user.getMetaDataStorage().set(USER, u);
+		u.perks().reloadFromStorage();
 	}
 
 	@Override
@@ -57,6 +60,8 @@ public class WBUserModifier implements UserModifier {
 	}
 
 	private void migrateFrom0To1(UserData data, DefaultWBUser user) {
+		logger.info(
+				"[WoolBattle] Migrating user " + user.user().getName() + " from version 0 to 1");
 		PlayerPerks perksStorage = user.perksStorage();
 		perksStorage.perk(ActivationType.ACTIVE, 0, data.getPerks().getActivePerk1());
 		perksStorage.perkInvSlot(ActivationType.ACTIVE, 0, data.getPerks().getSlotActivePerk1());

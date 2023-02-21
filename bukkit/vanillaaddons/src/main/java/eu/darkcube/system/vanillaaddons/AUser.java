@@ -24,6 +24,11 @@ public class AUser {
 		this.user = user;
 	}
 
+	public static AUser user(User user) {
+		return user.getMetaDataStorage()
+				.get(new Key(VanillaAddons.getPlugin(VanillaAddons.class).getName(), "user"));
+	}
+
 	public InventoryType openInventory() {
 		return openInventory;
 	}
@@ -59,18 +64,13 @@ public class AUser {
 		return addons;
 	}
 
-	public static AUser user(User user) {
-		return user.getMetaDataStorage()
-				.get(new Key(VanillaAddons.getPlugin(VanillaAddons.class), "user"));
-	}
-
 	public static class Modifier implements UserModifier {
 		private final VanillaAddons addons;
 		private final Key auser;
 
 		public Modifier(VanillaAddons addons) {
 			this.addons = addons;
-			this.auser = new Key(addons, "user");
+			this.auser = new Key(addons.getName(), "user");
 		}
 
 		@Override

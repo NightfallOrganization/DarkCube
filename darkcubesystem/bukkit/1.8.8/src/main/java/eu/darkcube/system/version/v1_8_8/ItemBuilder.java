@@ -63,7 +63,7 @@ public class ItemBuilder extends AbstractItemBuilder {
 					.collect(Collectors.toList()) : new ArrayList<>());
 			damage(item.getDurability());
 			if (meta instanceof FireworkEffectMeta)
-				meta(FireworkBuilderMeta.class).setFireworkEffect(
+				meta(FireworkBuilderMeta.class).fireworkEffect(
 						((FireworkEffectMeta) meta).getEffect());
 			if (meta instanceof SkullMeta) {
 				GameProfile pp =
@@ -74,11 +74,11 @@ public class ItemBuilder extends AbstractItemBuilder {
 					Texture texture =
 							prop == null ? null : new Texture(prop.getValue(), prop.getSignature());
 					UserProfile up = new UserProfile(pp.getName(), pp.getId(), texture);
-					meta(SkullBuilderMeta.class).setOwningPlayer(up);
+					meta(SkullBuilderMeta.class).owningPlayer(up);
 				}
 			}
 			if (meta instanceof LeatherArmorMeta)
-				meta(LeatherArmorBuilderMeta.class).setColor(((LeatherArmorMeta) meta).getColor());
+				meta(LeatherArmorBuilderMeta.class).color(((LeatherArmorMeta) meta).getColor());
 			net.minecraft.server.v1_8_R3.ItemStack mci = CraftItemStack.asNMSCopy(item);
 			NBTTagCompound tag = mci.getTag();
 			if (tag != null) {
@@ -118,22 +118,21 @@ public class ItemBuilder extends AbstractItemBuilder {
 			for (BuilderMeta builderMeta : metas) {
 				if (builderMeta instanceof FireworkBuilderMeta) {
 					((FireworkEffectMeta) meta).setEffect(
-							((FireworkBuilderMeta) builderMeta).getFireworkEffect());
+							((FireworkBuilderMeta) builderMeta).fireworkEffect());
 				} else if (builderMeta instanceof SkullBuilderMeta) {
 					SkullBuilderMeta bmeta = (SkullBuilderMeta) builderMeta;
-					UserProfile owner = bmeta.getOwningPlayer();
-					Texture texture = owner.getTexture();
+					UserProfile owner = bmeta.owningPlayer();
+					Texture texture = owner.texture();
 					GameProfile profile = new GameProfile(
-							owner.getUniqueId() == null ? UUID.randomUUID() : owner.getUniqueId(),
-							owner.getName());
+							owner.uniqueId() == null ? UUID.randomUUID() : owner.uniqueId(),
+							owner.name());
 					if (texture != null)
 						profile.getProperties().put("textures",
-								new Property("textures", texture.getValue(),
-										texture.getSignature()));
+								new Property("textures", texture.value(), texture.signature()));
 					ReflectionUtils.setValue(meta, CraftMetaSkull$profile, profile);
 				} else if (builderMeta instanceof LeatherArmorBuilderMeta) {
 					((LeatherArmorMeta) meta).setColor(
-							((LeatherArmorBuilderMeta) builderMeta).getColor());
+							((LeatherArmorBuilderMeta) builderMeta).color());
 				} else {
 					throw new UnsupportedOperationException(
 							"Meta not supported for this mc version: " + builderMeta);

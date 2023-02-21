@@ -31,14 +31,16 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 	private final Supplier<Perk[]> values;
 	private final Function<Perk, String[]> toStringFunction;
 	private final Function<String, Perk> fromStringFunction;
+	private final Predicate<Perk> filter;
 	private final boolean single;
 
-	private PerkArgument(Supplier<Perk[]> teams, Predicate<Perk> filter,
+	private PerkArgument(Supplier<Perk[]> perks, Predicate<Perk> filter,
 			Function<Perk, String[]> toStringFunction, Function<String, Perk> fromStringFunction,
 			boolean single) {
+		this.filter = filter == null ? p -> true : filter;
 		this.single = single;
-		this.values = teams == null ? () -> WoolBattle.getInstance().perkRegistry().perks().values()
-				.toArray(new Perk[0]) : teams;
+		this.values = perks == null ? () -> WoolBattle.getInstance().perkRegistry().perks().values()
+				.toArray(new Perk[0]) : perks;
 		this.toStringFunction =
 				toStringFunction == null ? defaultToStringFunction() : toStringFunction;
 		this.fromStringFunction =
@@ -47,6 +49,10 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 
 	public static PerkArgument singlePerkArgument() {
 		return new PerkArgument(null, null, null, null, true);
+	}
+
+	public static PerkArgument singlePerkArgument(Predicate<Perk> filter) {
+		return new PerkArgument(null, filter, null, null, true);
 	}
 
 	public static PerkArgument perkArgument() {
@@ -67,7 +73,7 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 	}
 
 	private Perk[] values() {
-		return values.get();
+		return Arrays.stream(values.get()).filter(filter).toArray(Perk[]::new);
 	}
 
 	@Override

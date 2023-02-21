@@ -11,6 +11,7 @@ import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListen
 import eu.darkcube.minigame.woolbattle.perk.perks.active.SwitcherPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -52,11 +53,8 @@ public class ListenerSwitcher extends BasicPerkListener {
 				.asString().equals(SwitcherPerk.SWITCHER.getName())) {
 			e.setCancelled(true);
 			WBUser user = WBUser.getUser(hit);
-			if (user.getTeam().getType() != WBUser.getUser(p).getTeam().getType()) {
-				if (user.getTicksAfterLastHit() < 600) {
-					user.setTicksAfterLastHit(0);
-					user.setLastHit(WBUser.getUser(p));
-				}
+			if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30)
+					&& WoolBattle.getInstance().getIngame().attack(WBUser.getUser(p), user)) {
 				Location loc = p.getLocation();
 				p.teleport(hit);
 				hit.teleport(loc);
@@ -66,5 +64,4 @@ public class ListenerSwitcher extends BasicPerkListener {
 			}
 		}
 	}
-
 }

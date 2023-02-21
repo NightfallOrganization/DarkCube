@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -50,7 +49,6 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
 		}
 
 	}
-
 
 	public static class Sup implements Supplier<Collection<ServiceTask>> {
 

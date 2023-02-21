@@ -87,10 +87,7 @@ public class ListenerRonjasToiletSplash extends BasicPerkListener {
 		}
 		WBUser user = (WBUser) egg.getMetadata("source").get(0).value();
 		WBUser target = WBUser.getUser(t);
-		if (user.getTeam() != target.getTeam() || user.isTrollMode()) {
-			target.setLastHit(user);
-			target.setTicksAfterLastHit(0);
-		}
+		WoolBattle.getInstance().getIngame().attack(user, target);
 	}
 
 	private boolean isEggPerk(Egg egg) {

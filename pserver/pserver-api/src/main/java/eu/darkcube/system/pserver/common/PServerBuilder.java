@@ -47,7 +47,7 @@ public final class PServerBuilder {
 		return this;
 	}
 
-	public CompletableFuture<PServerExecutor> create() {
+	public CompletableFuture<? extends PServerExecutor> create() {
 		return PServerProvider.instance().createPServer(this);
 	}
 

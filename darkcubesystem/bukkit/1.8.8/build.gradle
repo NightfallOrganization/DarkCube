@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
-    implementation project(path: parent.parent.project('api').path, configuration: 'shadow')
+    implementation parent.parent.project('api')
     compileOnly libs.cloudnetDriver
 }
 

@@ -18,6 +18,7 @@ import eu.darkcube.system.pserver.plugin.listener.InactivityListener;
 import eu.darkcube.system.pserver.plugin.listener.UserCacheListener;
 import eu.darkcube.system.pserver.plugin.user.UserCache;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
+import eu.darkcube.system.pserver.plugin.util.OwnerCache;
 import eu.darkcube.system.util.Language;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class PServerPlugin extends DarkCubePlugin {
 	private static PServerPlugin instance;
 	private final LinkManager linkManager = new LinkManager();
 	private final Path workingDirectory;
+	private final OwnerCache ownerCache = new OwnerCache();
 
 	public PServerPlugin() {
 		super("pserver-features");
@@ -47,7 +49,7 @@ public class PServerPlugin extends DarkCubePlugin {
 		}
 	}
 
-	public static PServerPlugin getInstance() {
+	public static PServerPlugin instance() {
 		return instance;
 	}
 
@@ -57,8 +59,7 @@ public class PServerPlugin extends DarkCubePlugin {
 		linkManager.unregisterLinks();
 
 		UserManager.unregister();
-		//		DeprecatedUser.unregister();
-
+		ownerCache.unregister();
 		UserCache.unload();
 	}
 
@@ -100,10 +101,16 @@ public class PServerPlugin extends DarkCubePlugin {
 		new UserCacheListener();
 		new CommandBlockModifyListener();
 
+		ownerCache.register();
+
 		PServerProvider.instance().setPServerCommand(new PServerCommand());
 
 		this.linkManager.addLink(LuckPermsLink::new);
 		this.linkManager.addLink(WoolBattleLink::new);
+	}
+
+	public OwnerCache ownerCache() {
+		return ownerCache;
 	}
 
 	public Path getWorkingDirectory() {

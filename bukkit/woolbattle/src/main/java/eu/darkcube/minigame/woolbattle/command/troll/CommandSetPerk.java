@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.troll;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.PerkArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -13,6 +14,7 @@ import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
@@ -22,6 +24,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.builder.RequiredArgumentBuil
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
 
 public class CommandSetPerk extends WBCommandExecutor {
 	public CommandSetPerk() {
@@ -29,13 +32,20 @@ public class CommandSetPerk extends WBCommandExecutor {
 			RequiredArgumentBuilder<CommandSource, EntitySelector> b2 =
 					Commands.argument("players", EntityArgument.players());
 			for (ActivationType type : ActivationType.values()) {
+				Perk[] perkArray = WoolBattle.getInstance().perkRegistry().perks(type);
+				if (perkArray.length <= 1) {
+					continue;
+				}
+				List<Perk> perkList = Arrays.asList(perkArray);
 				b2.then(Commands.literal(type.name().toLowerCase())
 						.then(Commands.argument("perkSlot",
 										IntegerArgumentType.integer(1, type.maxCount()))
-								.then(Commands.argument("perk", PerkArgument.singlePerkArgument())
+								.then(Commands.argument("perk",
+												PerkArgument.singlePerkArgument(perkList::contains))
 										.executes(ctx -> {
 											int perkSlot =
-													IntegerArgumentType.getInteger(ctx, "perkSlot");
+													IntegerArgumentType.getInteger(ctx, "perkSlot")
+															- 1;
 											Perk perk = PerkArgument.getPerk(ctx, "perk");
 											Collection<Player> targetPlayers =
 													EntityArgument.getPlayers(ctx, "players");
@@ -47,7 +57,8 @@ public class CommandSetPerk extends WBCommandExecutor {
 												user.perks().reloadFromStorage();
 												ctx.getSource()
 														.sendMessage(Message.PERK_SET_FOR_PLAYER,
-																type.name().toLowerCase(), perkSlot,
+																type.name().toLowerCase(),
+																perkSlot + 1,
 																user.getTeamPlayerName(),
 																perk.perkName().getName()
 																		.toLowerCase());
@@ -55,7 +66,7 @@ public class CommandSetPerk extends WBCommandExecutor {
 											return 0;
 										}))));
 			}
-			b.then(b2);
+			b.then(b2.build());
 
 		});
 	}

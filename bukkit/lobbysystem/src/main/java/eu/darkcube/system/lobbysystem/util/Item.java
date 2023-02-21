@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.util;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -129,8 +128,11 @@ public enum Item {
 	}
 
 	public static String getItemId(ItemStack item) {
-		return ItemBuilder.item(item).persistentDataStorage()
-				.get(itemId, PersistentDataTypes.STRING);
+		return getItemId(ItemBuilder.item(item));
+	}
+
+	public static String getItemId(ItemBuilder item) {
+		return item.persistentDataStorage().get(itemId, PersistentDataTypes.STRING);
 	}
 
 	public static ItemBuilder setItemId(ItemBuilder b, String itemId) {

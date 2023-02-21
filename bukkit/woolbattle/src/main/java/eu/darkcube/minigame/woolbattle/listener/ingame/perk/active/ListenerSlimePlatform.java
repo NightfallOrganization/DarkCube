@@ -49,20 +49,15 @@ public class ListenerSlimePlatform extends BasicPerkListener {
 			block.getBlock().setType(Material.STAINED_CLAY);
 			block.getBlock().setData((byte) 13);
 			l.add(block.getBlock());
-			//Ingame.setBlockDamage(block.getBlock(), 0);
 			Ingame.setMetaData(block.getBlock(), "slime", l);
-			//WoolBattle.getInstance().getIngame().placedBlocks.add(block.getBlock());
 		}
 	}
 
 	private boolean setBlock2(Location block) {
 		if (block.getBlock().getType() == Material.STAINED_CLAY) {
 			block.getBlock().setType(Material.AIR);
-			//Ingame.setBlockDamage(block.getBlock(), 0);
 			Ingame.setMetaData(block.getBlock(), "slime", null);
 			return true;
-			//Ingame.setMetaData(block.getBlock(), "slime", true);
-			//WoolBattle.getInstance().getIngame().placedBlocks.add(block.getBlock());
 		}
 		return false;
 	}

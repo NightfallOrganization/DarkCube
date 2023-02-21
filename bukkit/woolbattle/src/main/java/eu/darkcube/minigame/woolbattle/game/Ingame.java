@@ -37,18 +37,21 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.material.Wool;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
@@ -92,6 +95,7 @@ public class Ingame extends GamePhase {
 	public final ListenerSafetyPlatform listenerSafetyPlatform;
 	public final ListenerWallGenerator listenerWallGenerator;
 	public final ListenerBlink listenerBlink;
+	public final ListenerFreezer listenerFreezer;
 	public final ListenerGrandpasClock listenerGrandpasClock;
 	public final ListenerGhost listenerGhost;
 	public final ListenerMinigun listenerMinigun;
@@ -99,6 +103,7 @@ public class Ingame extends GamePhase {
 	public final ListenerGrabber listenerGrabber;
 	public final ListenerBooster listenerBooster;
 	public final ListenerGrapplingHook listenerGrapplingHook;
+	public final ListenerArrowBomb listenerArrowBomb;
 	public final ListenerRope listenerRope;
 	public final ListenerSlimePlatform listenerSlimePlatform;
 	public final Scheduler schedulerResetWool;
@@ -151,7 +156,9 @@ public class Ingame extends GamePhase {
 		this.listenerBlink = new ListenerBlink();
 		this.listenerWallGenerator = new ListenerWallGenerator();
 		this.listenerGrandpasClock = new ListenerGrandpasClock();
+		this.listenerFreezer = new ListenerFreezer();
 		this.listenerGhost = new ListenerGhost();
+		this.listenerArrowBomb = new ListenerArrowBomb();
 		this.listenerMinigun = new ListenerMinigun();
 		this.listenerDeathMove = new ListenerDeathMove();
 		this.listenerGrabber = new ListenerGrabber();
@@ -258,6 +265,7 @@ public class Ingame extends GamePhase {
 				for (Block b : Ingame.this.breakedWool.keySet()) {
 					b.setType(Material.WOOL);
 					b.setData(Ingame.this.breakedWool.get(b));
+					placedBlocks.remove(b);
 				}
 				Ingame.this.breakedWool.clear();
 			}
@@ -318,7 +326,6 @@ public class Ingame extends GamePhase {
 		} else {
 			block.setMetadata(key, new FixedMetadataValue(WoolBattle.getInstance(), value));
 		}
-
 	}
 
 	public Team getLastTeam(WBUser user) {
@@ -344,9 +351,7 @@ public class Ingame extends GamePhase {
 		if (lifes == -1) {
 			int xtra = 0;
 			int playersize = Bukkit.getOnlinePlayers().size();
-			if (playersize < 3) {
-				xtra = 0;
-			} else {
+			if (playersize >= 3) {
 				playersize = 3;
 				xtra = new Random().nextInt(4);
 			}
@@ -382,14 +387,14 @@ public class Ingame extends GamePhase {
 				this.listenerWallGenerator, this.listenerGrandpasClock, this.listenerGhost,
 				this.listenerMinigun, this.listenerDeathMove, this.listenerGrabber,
 				this.listenerBooster, this.listenerGrapplingHook, this.listenerRope,
-				this.listenerSlimePlatform);
+				this.listenerSlimePlatform, this.listenerFreezer, this.listenerArrowBomb);
 
 		WBUser.onlineUsers().forEach(u -> {
 			this.loadScoreboardObjective(u);
 			u.perks().reloadFromStorage();
 			u.getBukkitEntity().closeInventory();
 			this.setPlayerItems(u);
-			u.setTicksAfterLastHit(1200);
+			u.resetTicksAfterLastHit();
 			u.getBukkitEntity().teleport(u.getTeam().getSpawn());
 		});
 
@@ -436,11 +441,45 @@ public class Ingame extends GamePhase {
 				this.listenerWallGenerator, this.listenerGrandpasClock, this.listenerGhost,
 				this.listenerMinigun, this.listenerDeathMove, this.listenerGrabber,
 				this.listenerBooster, this.listenerGrapplingHook, this.listenerRope,
-				this.listenerSlimePlatform);
+				this.listenerSlimePlatform, this.listenerFreezer, this.listenerArrowBomb);
 		for (Block b : this.placedBlocks) {
 			b.setType(Material.AIR);
 			Ingame.resetBlockDamage(b);
 		}
+	}
+
+	public boolean place(WBUser user, Block block) {
+		return this.place(user, block, 0);
+	}
+
+	public boolean place(WBUser user, Block block, int damage) {
+		return place(user, block, damage, true);
+	}
+
+	public boolean place(WBUser user, Block block, int damage, boolean useColor) {
+		return place(block, b -> {
+			block.setType(Material.WOOL);
+			if (useColor) {
+				BlockState state = block.getState();
+				Wool wool = (Wool) state.getData();
+				wool.setColor(user.getTeam().getType().getWoolColor());
+				state.setData(wool);
+				state.update(true);
+
+				//noinspection deprecation
+				block.setData(user.getTeam().getType().getWoolColorByte());
+			}
+			setBlockDamage(block, damage);
+		});
+	}
+
+	public boolean place(Block block, Consumer<Block> placer) {
+		if (block.getType() != Material.AIR) {
+			return false;
+		}
+		placedBlocks.add(block);
+		placer.accept(block);
+		return true;
 	}
 
 	public int getKillstreak(WBUser user) {
@@ -485,18 +524,19 @@ public class Ingame extends GamePhase {
 			user.getBukkitEntity().teleport(user.getTeam().getSpawn());
 			if (killer != null) {
 				user.setLastHit(null);
+				user.resetTicksAfterLastHit();
 				user.setSpawnProtectionTicks(Ingame.SPAWNPROTECTION_TICKS);
 			}
 			return;
 		}
-		if (killer != null) {
-			if (user.getTicksAfterLastHit() < 201) {
-				WoolBattle.getInstance()
-						.sendMessage(Message.PLAYER_WAS_KILLED_BY_PLAYER, user.getTeamPlayerName(),
-								killer.getTeamPlayerName());
-			} else if (user.getTicksAfterLastHit() <= 200) {
-				WoolBattle.getInstance().sendMessage(Message.PLAYER_DIED, user.getTeamPlayerName());
-			}
+		if (countAsDeath) {
+			//			if (killer != null) {
+			WoolBattle.getInstance()
+					.sendMessage(Message.PLAYER_WAS_KILLED_BY_PLAYER, user.getTeamPlayerName(),
+							killer.getTeamPlayerName());
+			//			} else if (user.getTicksAfterLastHit() <= TimeUnit.SECOND.toTicks(10)) {
+			//				WoolBattle.getInstance().sendMessage(Message.PLAYER_DIED, user.getTeamPlayerName());
+			//		}
 		}
 
 		Team userTeam = user.getTeam();
@@ -518,7 +558,6 @@ public class Ingame extends GamePhase {
 				user.getBukkitEntity().kickPlayer("Disconnected");
 			}
 			this.checkGameEnd();
-			CloudNetLink.update();
 			return;
 		}
 		if (countAsDeath) {
@@ -527,9 +566,9 @@ public class Ingame extends GamePhase {
 			}
 		}
 		user.getBukkitEntity().teleport(user.getTeam().getSpawn());
-		user.setTicksAfterLastHit((int) TimeUnit.SECOND.toTicks(60));
+		user.setLastHit(null);
+		user.resetTicksAfterLastHit();
 		user.setSpawnProtectionTicks(Ingame.SPAWNPROTECTION_TICKS);
-		CloudNetLink.update();
 	}
 
 	public void checkGameEnd() {
@@ -777,14 +816,19 @@ public class Ingame extends GamePhase {
 		if (user.isTrollMode() && user.getTeam().getType() == TeamType.SPECTATOR) {
 			return true;
 		}
-		if ((!this.isGlobalSpawnProtection && !target.hasSpawnProtection()
-				&& target.getTeam() != user.getTeam() && (!ListenerGhost.isGhost(user)
-				|| ignoreGhost)) || user.isTrollMode()) {
-			target.setLastHit(user);
-			target.setTicksAfterLastHit(0);
-			return true;
+		if (!user.isTrollMode()) {
+			if (isGlobalSpawnProtection)
+				return false;
+			if (target.hasSpawnProtection())
+				return false;
+			if (target.getTeam().equals(user.getTeam()))
+				return false;
+			if (ListenerGhost.isGhost(user) && !ignoreGhost)
+				return false;
 		}
-		return false;
+		target.setLastHit(user);
+		target.setTicksAfterLastHit(0);
+		return true;
 	}
 
 	public boolean attack(WBUser user, WBUser target) {

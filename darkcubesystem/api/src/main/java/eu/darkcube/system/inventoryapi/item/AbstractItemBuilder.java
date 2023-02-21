@@ -249,7 +249,7 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	@Override
 	public AbstractItemBuilder metas(Set<BuilderMeta> metas) {
 		this.metas.clear();
-		metas.addAll(metas.stream().map(BuilderMeta::clone).collect(Collectors.toSet()));
+		this.metas.addAll(metas.stream().map(BuilderMeta::clone).collect(Collectors.toSet()));
 		return this;
 	}
 

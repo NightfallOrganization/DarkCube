@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.item.meta;
 
 import org.bukkit.Color;
@@ -19,11 +18,11 @@ public final class LeatherArmorBuilderMeta implements BuilderMeta {
 		this.color = color;
 	}
 
-	public Color getColor() {
+	public Color color() {
 		return color;
 	}
 
-	public LeatherArmorBuilderMeta setColor(Color color) {
+	public LeatherArmorBuilderMeta color(Color color) {
 		this.color = color;
 		return this;
 	}

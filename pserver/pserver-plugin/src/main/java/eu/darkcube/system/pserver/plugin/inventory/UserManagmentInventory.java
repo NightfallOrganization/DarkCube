@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin.inventory;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -29,10 +28,10 @@ import java.util.UUID;
 public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 
 	public static final InventoryType TYPE = InventoryType.of("PServer_UserManagment");
-	public static final Key KEY = new Key(PServerPlugin.getInstance(), "KEY");
+	public static final Key KEY = new Key(PServerPlugin.instance(), "KEY");
 	public static final String KEY_VALUE = "UserManagmentInventoryUser";
-	public static final Key USER_UUID_KEY = new Key(PServerPlugin.getInstance(), "user-uuid");
-	public static final Key USER_NAME_KEY = new Key(PServerPlugin.getInstance(), "user-name");
+	public static final Key USER_UUID_KEY = new Key(PServerPlugin.instance(), "user-uuid");
+	public static final Key USER_NAME_KEY = new Key(PServerPlugin.instance(), "user-name");
 
 	private final UserManagmentInventoryListener listener;
 

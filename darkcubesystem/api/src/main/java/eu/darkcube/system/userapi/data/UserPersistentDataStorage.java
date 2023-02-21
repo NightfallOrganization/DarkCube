@@ -15,6 +15,7 @@ import eu.darkcube.system.userapi.packets.PacketUserPersistentDataSet;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.UnmodifiablePersistentDataStorage;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,12 +25,17 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 
 	private final BukkitUser user;
 	private final Map<Key, Object> caches = new HashMap<>();
-	private JsonDocument data = new JsonDocument();
 	private final Collection<@NotNull UpdateNotifier> updateNotifiers =
 			new CopyOnWriteArrayList<>();
+	private JsonDocument data = new JsonDocument();
 
 	public UserPersistentDataStorage(BukkitUser user) {
 		this.user = user;
+	}
+
+	@Override
+	public @UnmodifiableView PersistentDataStorage unmodifiable() {
+		return new UnmodifiablePersistentDataStorage(this);
 	}
 
 	@Override
@@ -75,11 +81,11 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 				t = type.deserialize(this.data, key.toString());
 			}
 			data.remove(key.toString());
-			new PacketUserPersistentDataRemove(user.getUniqueId(), key).sendAsync();
 			ret = t;
 		} finally {
 			user.unlock();
 		}
+		new PacketUserPersistentDataRemove(user.getUniqueId(), key).sendAsync();
 		notifyNotifiers();
 		return ret;
 	}
@@ -145,7 +151,7 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 	public void loadFromJsonDocument(JsonDocument document) {
 		try {
 			user.lock();
-			this.data.clear();
+			this.data = new JsonDocument(); // Clear broken????
 			this.caches.clear();
 			this.data.append(document);
 		} finally {
@@ -169,12 +175,6 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 		return Collections.unmodifiableCollection(updateNotifiers);
 	}
 
-	private void notifyNotifiers() {
-		for (UpdateNotifier updateNotifier : updateNotifiers) {
-			updateNotifier.notify(this);
-		}
-	}
-
 	@Override
 	public void addUpdateNotifier(UpdateNotifier notifier) {
 		updateNotifiers.add(notifier);
@@ -185,17 +185,9 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 		updateNotifiers.remove(notifier);
 	}
 
-	public void remove(Key key) {
-		try {
-			user.lock();
-			if (!data.contains(key.toString())) {
-				return;
-			}
-			data.remove(key.toString());
-			caches.remove(key);
-		} finally {
-			user.unlock();
+	private void notifyNotifiers() {
+		for (UpdateNotifier updateNotifier : updateNotifiers) {
+			updateNotifier.notify(this);
 		}
-		notifyNotifiers();
 	}
 }

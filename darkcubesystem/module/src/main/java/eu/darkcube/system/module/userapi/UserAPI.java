@@ -40,7 +40,9 @@ public class UserAPI {
 	public UserAPI() {
 		PacketAPI.getInstance().registerHandler(PacketUserPersistentDataSet.class, packet -> {
 			modifyUser(packet.getUniqueId(), user -> {
+				user.getStorage().lock.writeLock().lock();
 				user.getStorage().data.append(packet.getData());
+				user.getStorage().lock.writeLock().unlock();
 				new PacketUserPersistentDataUpdate(user.getUniqueId(),
 						user.getStorage().data.clone()).sendAsync();
 			});
@@ -59,7 +61,9 @@ public class UserAPI {
 			AtomicReference<JsonDocument> data = new AtomicReference<>();
 			modifyUser(packet.getUniqueId(), user -> {
 				name.set(user.getName());
+				user.getStorage().lock.readLock().lock();
 				data.set(user.getStorage().data.clone());
+				user.getStorage().lock.readLock().unlock();
 			});
 			return new Result(name.get(), data.get());
 		});

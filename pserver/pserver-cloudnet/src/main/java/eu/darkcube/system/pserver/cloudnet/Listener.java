@@ -8,7 +8,6 @@ package eu.darkcube.system.pserver.cloudnet;
 
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.service.ServiceEnvironmentType;
-import de.dytanic.cloudnet.driver.util.DefaultModuleHelper;
 import de.dytanic.cloudnet.event.service.CloudServicePreStartEvent;
 import de.dytanic.cloudnet.event.service.CloudServicePreStopEvent;
 import de.dytanic.cloudnet.service.ICloudService;
@@ -16,8 +15,11 @@ import eu.darkcube.system.pserver.common.ServiceInfoUtil;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class Listener {
 
@@ -58,8 +60,12 @@ public class Listener {
 
 	private void copy(ICloudService service) throws IOException {
 		Path file = this.getFile(service);
-		Files.delete(file);
-		DefaultModuleHelper.copyCurrentModuleInstanceFromClass(Listener.class, file);
+		URLConnection con =
+				getClass().getProtectionDomain().getCodeSource().getLocation().openConnection();
+		InputStream in = con.getInputStream();
+		Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
+		in.close();
+		//		DefaultModuleHelper.copyCurrentModuleInstanceFromClass(Listener.class, file);
 	}
 
 	private Path getFile(ICloudService service) throws IOException {

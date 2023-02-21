@@ -18,10 +18,10 @@ import java.util.function.Supplier;
 
 public class LocalPersistentDataStorage implements PersistentDataStorage {
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
-	private final JsonDocument data = new JsonDocument();
 	private final Map<Key, Object> cache = new HashMap<>();
 	private final Collection<@NotNull UpdateNotifier> updateNotifiers =
 			new CopyOnWriteArrayList<>();
+	private final JsonDocument data = new JsonDocument();
 
 	public void appendDocument(JsonDocument document) {
 		try {
@@ -199,19 +199,19 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 	public void clear() {
 		try {
 			lock.writeLock().lock();
-			data.clear();
+			clearData();
 			cache.clear();
-			notifyNotifiers();
 		} finally {
 			lock.writeLock().unlock();
 		}
+		notifyNotifiers();
 	}
 
 	@Override
 	public void loadFromJsonDocument(JsonDocument document) {
 		try {
 			lock.writeLock().lock();
-			data.clear();
+			clearData();
 			cache.clear();
 			data.append(document);
 		} finally {
@@ -243,6 +243,13 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
 	@Override
 	public void removeUpdateNotifier(UpdateNotifier notifier) {
 		updateNotifiers.remove(notifier);
+	}
+
+	private void clearData() {
+		//		data.clear() is broken with concurrentmodificationexception, bug with CloudNet
+		for (String key : new ArrayList<>(data.keys())) {
+			data.remove(key);
+		}
 	}
 
 	private void notifyNotifiers() {

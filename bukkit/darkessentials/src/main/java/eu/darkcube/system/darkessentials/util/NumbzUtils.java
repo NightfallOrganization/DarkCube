@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.darkessentials.util;
 
 import eu.darkcube.system.darkessentials.DarkEssentials;
@@ -104,8 +103,8 @@ public class NumbzUtils {
 		if (key == null || value == null)
 			return itemStack;
 		return ItemBuilder.item(itemStack).persistentDataStorage()
-				.iset(new Key(DarkEssentials.getInstance(), key), PersistentDataTypes.STRING, value)
-				.builder().build();
+				.iset(new Key(DarkEssentials.getInstance().getName(), key),
+						PersistentDataTypes.STRING, value).builder().build();
 		//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
 		//		NBTTagCompound tag = nmsItemStack.getTag();
 		//		if (tag == null)
@@ -119,7 +118,8 @@ public class NumbzUtils {
 		if (itemStack == null || key == null)
 			return "";
 		String tag = ItemBuilder.item(itemStack).persistentDataStorage()
-				.get(new Key(DarkEssentials.getInstance(), key), PersistentDataTypes.STRING);
+				.get(new Key(DarkEssentials.getInstance().getName(), key),
+						PersistentDataTypes.STRING);
 		return tag == null ? "" : tag;
 		//		net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
 		//		NBTTagCompound tag = nmsItemStack.getTag();

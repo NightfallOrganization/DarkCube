@@ -6,8 +6,8 @@
  */
 package eu.darkcube.system.pserver.plugin.link.luckperms;
 
-import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.pserver.plugin.PServerPlugin;
 import net.luckperms.api.context.ContextCalculator;
 import net.luckperms.api.context.ContextConsumer;
 import net.luckperms.api.context.ContextSet;
@@ -19,10 +19,9 @@ public class CustomContextCalculator implements ContextCalculator<Player> {
 
 	@Override
 	public void calculate(@NonNull Player target, @NonNull ContextConsumer consumer) {
-		consumer.accept("pserver", Boolean.toString(PServerProvider.getInstance().isPServer()));
-		if (PServerProvider.getInstance().isPServer()) {
-			PServerExecutor ps = PServerProvider.getInstance().getCurrentPServer();
-			if (ps.getOwners().contains(target.getUniqueId())) {
+		consumer.accept("pserver", Boolean.toString(PServerProvider.instance().isPServer()));
+		if (PServerProvider.instance().isPServer()) {
+			if (PServerPlugin.instance().ownerCache().owners().contains(target.getUniqueId())) {
 				consumer.accept("pserverowner", Boolean.toString(true));
 			} else {
 				consumer.accept("pserverowner", Boolean.toString(false));

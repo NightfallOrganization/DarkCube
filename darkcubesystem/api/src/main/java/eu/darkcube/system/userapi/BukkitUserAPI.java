@@ -121,6 +121,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		});
 	}
 
+	@Override
 	public AsyncWrapperUser getUser(UUID uuid) {
 		AtomicBoolean created = new AtomicBoolean(false);
 		BukkitUser bu = users.computeIfAbsent(uuid, uid -> {
@@ -153,6 +154,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		users.remove(user.getUniqueId());
 	}
 
+	@Override
 	public AsyncWrapperUser getIfLoaded(UUID uuid) {
 		BukkitUser bukkitUser = users.get(uuid);
 		return bukkitUser == null ? null : new AsyncWrapperUser(bukkitUser);

@@ -12,7 +12,6 @@ import eu.darkcube.minigame.woolbattle.perk.perks.active.RopePerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -48,12 +47,7 @@ public class ListenerRope extends BasicPerkListener {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void setBlock(Location block, WBUser user) {
-		if (block.getBlock().getType() == Material.AIR) {
-			block.getBlock().setType(Material.WOOL);
-			block.getBlock().setData(user.getTeam().getType().getWoolColorByte());
-			WoolBattle.getInstance().getIngame().placedBlocks.add(block.getBlock());
-		}
+		WoolBattle.getInstance().getIngame().place(user, block.getBlock());
 	}
 }

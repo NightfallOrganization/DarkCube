@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.item.meta;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -22,11 +21,11 @@ public final class SkullBuilderMeta implements BuilderMeta {
 		this.owningPlayer = owningPlayer;
 	}
 
-	public UserProfile getOwningPlayer() {
+	public UserProfile owningPlayer() {
 		return owningPlayer;
 	}
 
-	public SkullBuilderMeta setOwningPlayer(UserProfile owningPlayer) {
+	public SkullBuilderMeta owningPlayer(UserProfile owningPlayer) {
 		this.owningPlayer = owningPlayer;
 		return this;
 	}
@@ -51,15 +50,15 @@ public final class SkullBuilderMeta implements BuilderMeta {
 			this.texture = texture;
 		}
 
-		public Texture getTexture() {
+		public Texture texture() {
 			return texture;
 		}
 
-		public String getName() {
+		public String name() {
 			return name;
 		}
 
-		public UUID getUniqueId() {
+		public UUID uniqueId() {
 			return uuid;
 		}
 
@@ -80,7 +79,7 @@ public final class SkullBuilderMeta implements BuilderMeta {
 			 * @return The property value, likely to be base64 encoded
 			 */
 			@NotNull
-			public String getValue() {
+			public String value() {
 				return value;
 			}
 
@@ -88,14 +87,14 @@ public final class SkullBuilderMeta implements BuilderMeta {
 			 * @return A signature from Mojang for signed properties
 			 */
 			@Nullable
-			public String getSignature() {
+			public String signature() {
 				return signature;
 			}
 
 			/**
 			 * @return If this property has a signature or not
 			 */
-			public boolean isSigned() {
+			public boolean signed() {
 				return this.signature != null;
 			}
 

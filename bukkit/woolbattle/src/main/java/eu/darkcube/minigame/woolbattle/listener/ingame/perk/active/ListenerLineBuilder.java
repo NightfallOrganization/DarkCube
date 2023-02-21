@@ -16,9 +16,6 @@ import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.system.util.data.Key;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Wool;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -122,15 +119,7 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				}
 				Location next = line.getNextBlock(user.getBukkitEntity().getLocation());
 				line.addBlock(next);
-				if (next.getBlock().getType() == Material.AIR) {
-					next.getBlock().setType(Material.WOOL);
-					BlockState state = next.getBlock().getState();
-					Wool wool = (Wool) state.getData();
-					wool.setColor(user.getTeam().getType().getWoolColor());
-					state.setData(wool);
-					state.update(true);
-					WoolBattle.getInstance().getIngame().placedBlocks.add(next.getBlock());
-				}
+				WoolBattle.getInstance().getIngame().place(user, next.getBlock());
 				user.getBukkitEntity().addPotionEffect(
 						new PotionEffect(PotionEffectType.SLOW, 20, 10, false, false), true);
 			}

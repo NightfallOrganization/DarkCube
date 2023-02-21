@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin.user;
 
 import com.google.gson.Gson;
@@ -37,14 +36,11 @@ import java.util.function.Consumer;
 public class UserCache {
 
 	public static UserCache cache;
-
+	private final Path cacheFile;
+	private final GsonBuilder builder = new GsonBuilder();
 	private ConcurrentHashMap<UUID, Entry> byUUID = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, Entry> byName = new ConcurrentHashMap<>();
-
-	private final Path cacheFile;
 	private AtomicReference<Future<?>> saveFuture = new AtomicReference<>();
-
-	private final GsonBuilder builder = new GsonBuilder();
 	private AtomicReference<Gson> gson = new AtomicReference<>(new Gson());
 	private ExpiredUserCache expiredUserCache;
 
@@ -82,6 +78,21 @@ public class UserCache {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public static void load() {
+		cache = new UserCache(PServerPlugin.instance().getWorkingDirectory().resolve("usercache"),
+				PServerPlugin.instance().getWorkingDirectory().resolve("usercache_expired"));
+	}
+
+	public static void unload() {
+		cache.doUnload();
+		cache.byName.clear();
+		cache.byUUID.clear();
+	}
+
+	public static UserCache cache() {
+		return cache;
 	}
 
 	public void save() {
@@ -209,26 +220,21 @@ public class UserCache {
 		return name.toLowerCase(Locale.ROOT);
 	}
 
+	private Entry deserialize(String serialized) {
+		JsonObject object = gson.get().fromJson(serialized, JsonObject.class);
+		String name = object.get("name").getAsJsonPrimitive().getAsString();
+		UUID uuid = UUID.fromString(object.get("uuid").getAsJsonPrimitive().getAsString());
+		Instant expiresAt = Instant.ofEpochSecond(
+				object.get("expiresAtEpochSecond").getAsJsonPrimitive().getAsLong(),
+				object.get("expiresAtNano").getAsJsonPrimitive().getAsInt());
+		JsonObject extra = object.get("extra").getAsJsonObject();
+		return new Entry(name, uuid, expiresAt, extra);
+	}
+
 	public class ExpiredUserCache {
 
 		private final Path cacheFile;
 		ConcurrentHashMap<UUID, Entry> byUUID = new ConcurrentHashMap<>();
-
-		private void save() {
-			try {
-				BufferedWriter writer = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8,
-						StandardOpenOption.CREATE, StandardOpenOption.WRITE,
-						StandardOpenOption.TRUNCATE_EXISTING);
-				for (Entry entry : byUUID.values()) {
-					writer.write(entry.toString());
-					writer.newLine();
-				}
-				writer.flush();
-				writer.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
 
 		public ExpiredUserCache(Path cacheFile) {
 			this.cacheFile = cacheFile;
@@ -261,15 +267,30 @@ public class UserCache {
 			}
 		}
 
-	}
+		private void save() {
+			try {
+				BufferedWriter writer = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8,
+						StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+						StandardOpenOption.TRUNCATE_EXISTING);
+				for (Entry entry : byUUID.values()) {
+					writer.write(entry.toString());
+					writer.newLine();
+				}
+				writer.flush();
+				writer.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 
+	}
 
 	public class Entry {
 
 		public final String name;
 		public final UUID uuid;
-		public Instant expiresAt;
 		public final JsonObject extra;
+		public Instant expiresAt;
 
 		public Entry(String name, UUID uuid, Instant expiresAt, JsonObject extra) {
 			this.name = name;
@@ -279,19 +300,15 @@ public class UserCache {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof Entry && (name.equals(((Entry) obj).name) && uuid.equals(
-					((Entry) obj).uuid) && expiresAt.equals(((Entry) obj).expiresAt))
-					&& extra.equals(((Entry) obj).extra);
-		}
-
-		@Override
 		public int hashCode() {
 			return name.hashCode() + uuid.hashCode() + expiresAt.hashCode() + extra.hashCode();
 		}
 
-		public boolean isExpired() {
-			return expiresAt.isBefore(Instant.now());
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof Entry && (name.equals(((Entry) obj).name) && uuid.equals(
+					((Entry) obj).uuid) && expiresAt.equals(((Entry) obj).expiresAt))
+					&& extra.equals(((Entry) obj).extra);
 		}
 
 		@Override
@@ -304,32 +321,9 @@ public class UserCache {
 			object.add("extra", extra);
 			return gson.get().toJson(object);
 		}
-	}
 
-	private Entry deserialize(String serialized) {
-		JsonObject object = gson.get().fromJson(serialized, JsonObject.class);
-		String name = object.get("name").getAsJsonPrimitive().getAsString();
-		UUID uuid = UUID.fromString(object.get("uuid").getAsJsonPrimitive().getAsString());
-		Instant expiresAt = Instant.ofEpochSecond(
-				object.get("expiresAtEpochSecond").getAsJsonPrimitive().getAsLong(),
-				object.get("expiresAtNano").getAsJsonPrimitive().getAsInt());
-		JsonObject extra = object.get("extra").getAsJsonObject();
-		return new Entry(name, uuid, expiresAt, extra);
-	}
-
-	public static void load() {
-		cache = new UserCache(
-				PServerPlugin.getInstance().getWorkingDirectory().resolve("usercache"),
-				PServerPlugin.getInstance().getWorkingDirectory().resolve("usercache_expired"));
-	}
-
-	public static void unload() {
-		cache.doUnload();
-		cache.byName.clear();
-		cache.byUUID.clear();
-	}
-
-	public static UserCache cache() {
-		return cache;
+		public boolean isExpired() {
+			return expiresAt.isBefore(Instant.now());
+		}
 	}
 }

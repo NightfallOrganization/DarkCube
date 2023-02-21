@@ -6,9 +6,8 @@
  */
 package eu.darkcube.system;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.Key.Named;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.SynchronizedPersistentDataStorage;
 import org.bukkit.Bukkit;
@@ -23,11 +22,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 
-public abstract class Plugin extends JavaPlugin {
+public abstract class Plugin extends JavaPlugin implements Named {
 
-	private static final Database pluginPersistentData =
-			CloudNetDriver.getInstance().getDatabaseProvider()
-					.getDatabase("plugin_persistent_data");
 	private static HashMap<YamlConfiguration, File> fileFromConfig = new HashMap<>();
 	private static HashMap<String, YamlConfiguration> configFromName = new HashMap<>();
 	private final SynchronizedPersistentDataStorage storage;

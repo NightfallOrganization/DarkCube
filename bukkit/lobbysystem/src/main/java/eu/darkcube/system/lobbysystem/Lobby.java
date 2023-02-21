@@ -26,7 +26,6 @@ import eu.darkcube.system.lobbysystem.listener.*;
 import eu.darkcube.system.lobbysystem.npc.ConnectorNPC;
 import eu.darkcube.system.lobbysystem.npc.DailyRewardNPC;
 import eu.darkcube.system.lobbysystem.npc.WoolBattleNPC;
-import eu.darkcube.system.lobbysystem.pserver.PServerJoinOnStart;
 import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
@@ -54,12 +53,11 @@ public class Lobby extends Plugin {
 	private NPCPool npcPool;
 	private NPC woolbattleNpc;
 	private NPC dailyRewardNpc;
-	private PServerJoinOnStart pServerJoinOnStart;
 	private JaRManager jaRManager;
 	private HologramPool hologramPool;
 
 	public Lobby() {
-		super("lobby");
+		super("LobbySystem");
 		Lobby.instance = this;
 	}
 
@@ -78,7 +76,6 @@ public class Lobby extends Plugin {
 				.map(UserWrapper::fromUser).forEach(LobbyUser::stopJaR);
 		if (PServerSupport.isSupported()) {
 			SkullCache.unregister();
-			this.pServerJoinOnStart.unregister();
 		}
 		ConnectorNPC.clear();
 	}
@@ -194,10 +191,6 @@ public class Lobby extends Plugin {
 		new ListenerGrapplingHook();
 		new ListenerBoostPlate();
 		new ListenerWeather();
-		if (PServerSupport.isSupported()) {
-			new ListenerPServer();
-			this.pServerJoinOnStart = new PServerJoinOnStart();
-		}
 		new ListenerPhysics();
 		new ListenerBorder();
 
@@ -286,10 +279,6 @@ public class Lobby extends Plugin {
 		} else {
 			inv.setItem(8, Item.JUMPANDRUN_STOP.getItem(u));
 		}
-	}
-
-	public PServerJoinOnStart getPServerJoinOnStart() {
-		return this.pServerJoinOnStart;
 	}
 
 	public NPC getWoolBattleNPC() {

@@ -39,6 +39,8 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 			WBUser user = WBUser.getUser(p);
 			if (e.getEntityType() == EntityType.ARROW) {
 				Arrow arrow = (Arrow) e.getEntity();
+				if (arrow.hasMetadata("ignoreArrowShoot"))
+					return;
 
 				if (!p.getInventory().contains(Material.WOOL, 1)) {
 					Ingame.playSoundNotEnoughWool(user);
@@ -48,8 +50,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 				}
 
 				WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
-				ItemManager.removeItems(user, p.getInventory(), new ItemStack(Material.WOOL, 1,
-						user.getTeam().getType().getWoolColorByte()), 1);
+				ItemManager.removeItems(user, p.getInventory(), user.getSingleWoolItem(), 1);
 				if (user.perks().count(FastArrowPerk.FAST_ARROW) > 0) {
 					Vector vec = arrow.getVelocity().multiply(1.7);
 
@@ -124,8 +125,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 									}
 
 									int cost = perk.perk().cost();
-									ItemStack wool = new ItemStack(Material.WOOL, 1,
-											user.getTeam().getType().getWoolColorByte());
+									ItemStack wool = user.getSingleWoolItem();
 									if (cost < 0) {
 										wool.setAmount(-cost);
 										p.getInventory().addItem(wool);

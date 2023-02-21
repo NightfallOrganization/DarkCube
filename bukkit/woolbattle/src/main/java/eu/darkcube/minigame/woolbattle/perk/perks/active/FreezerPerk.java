@@ -15,7 +15,7 @@ public class FreezerPerk extends Perk {
 	public static final PerkName FREEZER = new PerkName("FREEZER");
 
 	public FreezerPerk() {
-		super(ActivationType.ACTIVE, FREEZER, 6, 8, Item.PERK_FREEZER,
+		super(ActivationType.ACTIVE, FREEZER, 6, 6, Item.PERK_FREEZER,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_FREEZER_COOLDOWN));
 	}

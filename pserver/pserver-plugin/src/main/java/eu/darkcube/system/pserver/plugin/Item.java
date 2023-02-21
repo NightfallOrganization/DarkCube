@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin;
 
 import eu.darkcube.system.BaseMessage;
@@ -29,7 +28,7 @@ public enum Item implements BaseMessage {
 
 	public static final String PREFIX = "ITEM_";
 	public static final String PREFIX_LORE = "LORE_";
-	public static final Key ITEMID_KEY = new Key(PServerPlugin.getInstance(), "itemid");
+	public static final Key ITEMID_KEY = new Key(PServerPlugin.instance(), "itemid");
 
 	private final String key;
 	private final boolean hasLore;

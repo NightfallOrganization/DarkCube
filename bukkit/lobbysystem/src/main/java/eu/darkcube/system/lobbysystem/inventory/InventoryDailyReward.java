@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class InventoryDailyReward extends LobbyAsyncPagedInventory {
-	public static final Key reward = new Key(Lobby.getInstance(), "reward");
+	public static final Key reward = new Key(Lobby.getInstance().getName(), "reward");
 	public static final InventoryType type_daily_reward = InventoryType.of("daily_reward");
 
 	private boolean displayedRewards = false;

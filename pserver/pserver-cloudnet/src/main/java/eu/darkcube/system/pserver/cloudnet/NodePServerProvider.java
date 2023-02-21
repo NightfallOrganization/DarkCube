@@ -11,6 +11,7 @@ import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
 import de.dytanic.cloudnet.driver.service.*;
 import de.dytanic.cloudnet.driver.template.TemplateStorage;
+import de.dytanic.cloudnet.service.EmptyGroupConfiguration;
 import de.dytanic.cloudnet.template.LocalTemplateStorage;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -39,19 +40,18 @@ public class NodePServerProvider extends PServerProvider {
 
 	public static final String pserverTaskName = "pserver";
 	private static NodePServerProvider instance;
-	private final Database pserverData;
-	private final SingleThreadExecutor executor = new SingleThreadExecutor();
-	private final ConcurrentMap<UniqueId, SoftReference<NodePServerExecutor>> weakpservers =
+	final ConcurrentMap<UniqueId, SoftReference<NodePServerExecutor>> weakpservers =
 			new ConcurrentHashMap<>();
-	private final ReferenceQueue<NodePServerExecutor> referenceQueue = new ReferenceQueue<>();
-	private final Map<UniqueId, NodePServerExecutor> pservers = new HashMap<>();
-	public ServiceTask pserverTask;
-	public ServiceTemplate globalTemplate;
-	public ServiceTemplate worldTemplate;
+	final ReferenceQueue<NodePServerExecutor> referenceQueue = new ReferenceQueue<>();
+	final Map<UniqueId, NodePServerExecutor> pservers = new HashMap<>();
+	final SingleThreadExecutor executor = new SingleThreadExecutor();
+	private final Database pserverData;
+	private ServiceTask pserverTask;
+	private ServiceTemplate globalTemplate;
+	private ServiceTemplate worldTemplate;
 	private TemplateStorage storage = CloudNetDriver.getInstance().getLocalTemplateStorage();
 
 	private NodePServerProvider() {
-
 		Thread th = new Thread(() -> {
 			while (true) {
 				try {
@@ -102,6 +102,19 @@ public class NodePServerProvider extends PServerProvider {
 						.getServiceTask(NodePServerProvider.pserverTaskName);
 			}
 		}
+		// Groups
+		{
+			if (!CloudNetDriver.getInstance().getGroupConfigurationProvider()
+					.isGroupConfigurationPresent("pserver-global")) {
+				CloudNetDriver.getInstance().getGroupConfigurationProvider()
+						.addGroupConfiguration(new EmptyGroupConfiguration("pserver-global"));
+			}
+			if (!CloudNetDriver.getInstance().getGroupConfigurationProvider()
+					.isGroupConfigurationPresent("pserver-world")) {
+				CloudNetDriver.getInstance().getGroupConfigurationProvider()
+						.addGroupConfiguration(new EmptyGroupConfiguration("pserver-world"));
+			}
+		}
 		// ServiceTemplates
 		{
 			String name = ".global";
@@ -136,6 +149,22 @@ public class NodePServerProvider extends PServerProvider {
 				weakpservers.put(id, new SoftReference<>(pservers.remove(id), referenceQueue));
 			}
 		});
+	}
+
+	ServiceTemplate worldTemplate() {
+		return worldTemplate;
+	}
+
+	ServiceTemplate globalTemplate() {
+		return globalTemplate;
+	}
+
+	ServiceTask pserverTask() {
+		return pserverTask;
+	}
+
+	TemplateStorage storage() {
+		return storage;
 	}
 
 	@Override
@@ -216,7 +245,7 @@ public class NodePServerProvider extends PServerProvider {
 			List<PServerExecutor> l = new ArrayList<>(pservers.values());
 			fut.complete(l);
 		});
-		return fut.thenApplyAsync(s -> s);
+		return fut;
 	}
 
 	@Override
@@ -237,7 +266,7 @@ public class NodePServerProvider extends PServerProvider {
 		return pserverData;
 	}
 
-	private static class SingleThreadExecutor extends Thread {
+	static class SingleThreadExecutor extends Thread {
 		private final Queue<Runnable> queue = new ConcurrentLinkedQueue<>();
 		private final Lock lock = new ReentrantLock();
 		private final Condition condition = lock.newCondition();

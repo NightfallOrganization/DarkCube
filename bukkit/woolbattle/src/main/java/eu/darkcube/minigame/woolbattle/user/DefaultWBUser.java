@@ -42,7 +42,7 @@ class DefaultWBUser implements WBUser {
 	private static final PersistentDataType<WoolSubtractDirection> TYPE_WOOL_SUBTRACT_DIRECTION =
 			PersistentDataTypes.enumType(WoolSubtractDirection.class);
 	private static final Key KEY_HEIGHT_DISPLAY =
-			new Key(WoolBattle.getInstance(), "heightDisplay");
+			new Key(WoolBattle.getInstance().getName(), "heightDisplay");
 	private static final PersistentDataType<HeightDisplay> TYPE_HEIGHT_DISPLAY =
 			new PersistentDataType<HeightDisplay>() {
 				@Override
@@ -57,12 +57,18 @@ class DefaultWBUser implements WBUser {
 					doc.append(key, JsonDocument.newDocument().append("enabled", data.enabled)
 							.append("maxDistance", data.maxDistance).append("color", data.color));
 				}
+
+				@Override
+				public HeightDisplay clone(HeightDisplay object) {
+					return object.clone();
+				}
 			};
 	private static final Key KEY_PARTICLES = new Key(WoolBattle.getInstance(), "particles");
 	private static final PersistentDataType<Boolean> TYPE_PARTICLES = PersistentDataTypes.BOOLEAN;
 	private static final Key KEY_PERKS = new Key(WoolBattle.getInstance(), "perks");
 	private static final PersistentDataType<PerkName> TYPE_PERK_NAME =
-			PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new);
+			PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new,
+					p -> p);
 	private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME =
 			PersistentDataTypes.list(TYPE_PERK_NAME);
 	private static final PersistentDataType<PlayerPerks> TYPE_PERKS =
@@ -102,6 +108,11 @@ class DefaultWBUser implements WBUser {
 					d.append("perks", docPerks).append("perkSlots", docPerkSlots);
 					doc.append(key, d);
 				}
+
+				@Override
+				public PlayerPerks clone(PlayerPerks object) {
+					return object.clone();
+				}
 			};
 	private static final PersistentDataType<int[]> TYPE_INT_ARRAY =
 			new PersistentDataType<int[]>() {
@@ -126,6 +137,11 @@ class DefaultWBUser implements WBUser {
 					for (int i : data)
 						ib.put(i);
 					doc.append(key, buf.array());
+				}
+
+				@Override
+				public int[] clone(int[] object) {
+					return object.clone();
 				}
 			};
 	private final User user;

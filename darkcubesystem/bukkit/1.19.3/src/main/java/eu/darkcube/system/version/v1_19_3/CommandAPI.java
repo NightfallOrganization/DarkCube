@@ -65,6 +65,13 @@ public class CommandAPI implements Version.CommandAPI {
 	}
 
 	@Override
+	public void unregister(String name) {
+		SimpleCommandMap commandMap = ((CraftServer) Bukkit.getServer()).getCommandMap();
+		final Map<String, org.bukkit.command.Command> knownCommands = commandMap.getKnownCommands();
+		knownCommands.remove(name);
+	}
+
+	@Override
 	public void register(CommandExecutor command) {
 		try {
 			final Constructor<PluginCommand> constructor =
@@ -76,6 +83,9 @@ public class CommandAPI implements Version.CommandAPI {
 						"Can't register command with whitespace in name!");
 			}
 			final String[] aliases = command.getAliases();
+			for (int i = 0; i < aliases.length; i++) {
+				aliases[i] = aliases[i].toLowerCase();
+			}
 			final PluginCommand plugincommand =
 					constructor.newInstance(name, DarkCubePlugin.systemPlugin());
 			plugincommand.setAliases(Arrays.asList(aliases));
@@ -87,7 +97,7 @@ public class CommandAPI implements Version.CommandAPI {
 			Method timingsOf = Class.forName("co.aikar.timings.Timings")
 					.getMethod("of", Plugin.class, String.class);
 			ftimings.set(plugincommand, timingsOf.invoke(null, DarkCubePlugin.systemPlugin(),
-					DarkCubePlugin.systemPlugin().getName() + ":" + command.getName()));
+					DarkCubePlugin.systemPlugin().getName() + ":" + name));
 			SimpleCommandMap commandMap = ((CraftServer) Bukkit.getServer()).getCommandMap();
 			final Map<String, org.bukkit.command.Command> knownCommands =
 					commandMap.getKnownCommands();
@@ -103,9 +113,9 @@ public class CommandAPI implements Version.CommandAPI {
 			for (String n : command.getNames()) {
 				this.checkAmbiguities(n, knownCommands, plugincommand);
 			}
-			for (final String n : command.getNames()) {
-				knownCommands.put(n.toLowerCase(), plugincommand);
-			}
+			//			for (final String n : command.getNames()) {
+			//				knownCommands.put(n.toLowerCase(), plugincommand);
+			//			}
 			if (command.getPermission() != null) {
 				if (Bukkit.getPluginManager().getPermission(command.getPermission()) == null) {
 					Bukkit.getPluginManager()
@@ -119,14 +129,14 @@ public class CommandAPI implements Version.CommandAPI {
 
 	@Override
 	public double[] getEntityBB(Entity entity) {
-		return new double[] {entity.getBoundingBox().getMinX(),
-				entity.getBoundingBox().getMinY(), entity.getBoundingBox().getMinZ(),
-				entity.getBoundingBox().getMaxX(), entity.getBoundingBox().getMaxY(),
-				entity.getBoundingBox().getMaxZ()};
+		return new double[] {entity.getBoundingBox().getMinX(), entity.getBoundingBox().getMinY(),
+				entity.getBoundingBox().getMinZ(), entity.getBoundingBox().getMaxX(),
+				entity.getBoundingBox().getMaxY(), entity.getBoundingBox().getMaxZ()};
 	}
 
 	private void checkAmbiguities(String registerName,
 			Map<String, org.bukkit.command.Command> knownCommands, PluginCommand command) {
+		registerName = registerName.toLowerCase();
 		if (knownCommands.containsKey(registerName)) {
 			org.bukkit.command.Command cmd = knownCommands.get(registerName);
 			if (cmd instanceof PluginCommand pcmd) {
@@ -135,8 +145,8 @@ public class CommandAPI implements Version.CommandAPI {
 					return;
 				}
 				Bukkit.getConsoleSender().sendMessage(
-						"§6Overriding command " + registerName + " from Plugin "
-								+ pcmd.getPlugin().getName() + "!");
+						"§6Overriding command " + registerName + " from Plugin " + pcmd.getPlugin()
+								.getName() + "!");
 			} else {
 				Bukkit.getConsoleSender().sendMessage(
 						"§6Overriding command " + registerName + " from type " + cmd.getClass()
@@ -150,8 +160,8 @@ public class CommandAPI implements Version.CommandAPI {
 		return args.length == 0 ? label : (label + " " + String.join(" ", args));
 	}
 
-	private void register(Map<String, org.bukkit.command.Command> known,
-			Plugin plugin, PluginCommand command) {
+	private void register(Map<String, org.bukkit.command.Command> known, Plugin plugin,
+			PluginCommand command) {
 		String name = command.getName().toLowerCase(Locale.ENGLISH);
 		String prefix = plugin.getName().toLowerCase(Locale.ENGLISH);
 		List<String> successfulNames = new ArrayList<>();
@@ -161,9 +171,8 @@ public class CommandAPI implements Version.CommandAPI {
 		}
 	}
 
-	private void register(Map<String, org.bukkit.command.Command> known, String name,
-			String prefix, boolean alias, org.bukkit.command.Command command,
-			List<String> successfulNames) {
+	private void register(Map<String, org.bukkit.command.Command> known, String name, String prefix,
+			boolean alias, org.bukkit.command.Command command, List<String> successfulNames) {
 		String key = prefix + ":" + name;
 		boolean work = false;
 		if (known.containsKey(key)) {
@@ -206,11 +215,9 @@ public class CommandAPI implements Version.CommandAPI {
 
 		@Override
 		public List<String> onTabComplete(@NotNull CommandSender sender,
-				org.bukkit.command.@NotNull Command command, @NotNull String label,
-				String[] args) {
+				org.bukkit.command.@NotNull Command command, @NotNull String label, String[] args) {
 			String commandLine = sjoin(label, args);
-			String commandLine2 =
-					sjoin(label, Arrays.copyOfRange(args, 0, args.length - 1)) + " ";
+			String commandLine2 = sjoin(label, Arrays.copyOfRange(args, 0, args.length - 1)) + " ";
 			List<Suggestion> completions =
 					eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().getCommands()
 							.getTabCompletions(sender, commandLine);
@@ -234,8 +241,7 @@ public class CommandAPI implements Version.CommandAPI {
 
 		@Override
 		public boolean onCommand(@NotNull CommandSender sender,
-				org.bukkit.command.@NotNull Command command, @NotNull String label,
-				String[] args) {
+				org.bukkit.command.@NotNull Command command, @NotNull String label, String[] args) {
 			String commandLine = sjoin(label, args);
 			eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().getCommands()
 					.executeCommand(sender, commandLine);

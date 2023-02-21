@@ -80,7 +80,6 @@ public class ListenerWallGenerator extends BasicPerkListener {
 
 			if (id0 >= ids.length) {
 				cancel();
-				return;
 			}
 		}
 
@@ -103,15 +102,9 @@ public class ListenerWallGenerator extends BasicPerkListener {
 			return loc;
 		}
 
-		@SuppressWarnings("deprecation")
 		private void setBlock(Location loc, WBUser user) {
-			if (loc.getBlock().getType() == Material.AIR && !WoolBattle.getInstance()
-					.getIngame().breakedWool.containsKey(loc.getBlock())) {
+			if (WoolBattle.getInstance().getIngame().place(user, loc.getBlock())) {
 				payForThePerk(perk);
-
-				loc.getBlock().setType(Material.WOOL);
-				loc.getBlock().setData(user.getTeam().getType().getWoolColorByte());
-				WoolBattle.getInstance().getIngame().placedBlocks.add(loc.getBlock());
 			}
 		}
 

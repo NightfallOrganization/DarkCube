@@ -83,6 +83,13 @@ public class PServerDatabase extends Database {
 		return executeStatement(cmd);
 	}
 
+	public boolean update(UniqueId pserver, UUID owner) {
+		if (!contains(owner, pserver)) {
+			return insert(owner, pserver);
+		}
+		return true;
+	}
+
 	public boolean delete(UniqueId pserver) {
 		String cmd = String.format(COMMANDS[3], pserver.toString());
 		return executeStatement(cmd);

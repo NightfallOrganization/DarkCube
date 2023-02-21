@@ -9,10 +9,7 @@ package eu.darkcube.system.lobbysystem.inventory.pserver;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.inventoryapi.v1.*;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
@@ -48,6 +45,23 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 				6 * 9, AsyncPagedInventory.box(3, 3, 4, 7), user);
 		this.listener = new Listener();
 		this.listener.register();
+	}
+
+	@Override
+	protected void inventoryClick(IInventoryClickEvent event) {
+		event.setCancelled(true);
+		if (event.item() == null)
+			return;
+		String itemid = Item.getItemId(event.item());
+		if (itemid == null)
+			return;
+		if (itemid.equals(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItemId())) {
+			user.setOpenInventory(new InventoryNewPServer(event.user()));
+		} else if (itemid.equals(ITEMID_EXISTING)) {
+			UniqueId pserverId = new UniqueId(event.item().persistentDataStorage()
+					.get(META_KEY_PSERVERID, PersistentDataTypes.STRING));
+			user.setOpenInventory(new InventoryPServerConfiguration(user.getUser(), pserverId));
+		}
 	}
 
 	@Override
@@ -91,7 +105,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 					Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
 					PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
 					PServerExecutor.State state =
-							ps == null ? PServerExecutor.State.OFFLINE : ps.state();
+							ps == null ? PServerExecutor.State.OFFLINE : ps.state().get();
 					Message mstate = state == PServerExecutor.State.OFFLINE
 							? Message.STATE_OFFLINE
 							: state == PServerExecutor.State.RUNNING
@@ -103,8 +117,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 													: null;
 					if (mstate == null)
 						throw new IllegalStateException();
-					item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(),
-							mstate.getMessage(user.getUser())));
+					item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(), mstate));
 				}
 
 				if (pserverId != null)

@@ -114,9 +114,10 @@ public class WoolBattle extends Plugin {
 		teams.add(WoolBattle.getInstance().getTeamManager().getSpectator());
 		for (Team t : teams) {
 			ScoreboardTeam team = sb.createTeam(t.getType().getScoreboardTag());
-			System.out.println(java.util.Arrays.toString(LegacyComponentSerializer.legacySection()
-					.serialize(Component.text("", t.getPrefixStyle())).toCharArray()));
-			team.setPrefix(Component.text("", t.getPrefixStyle()));
+			String s = LegacyComponentSerializer.legacySection()
+					.serialize(Component.text(" ", t.getPrefixStyle()));
+			s = s.replace(" ", "");
+			team.setPrefix(s);
 		}
 		for (ScoreboardObjective obj : ScoreboardObjective.values()) {
 			Objective o = sb.createObjective(obj.getKey(), "dummy");

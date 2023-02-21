@@ -26,12 +26,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.metadata.MetadataValue;
 
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityEvent> {
 
@@ -153,8 +151,7 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 							Location loc = target.getBukkitEntity().getLocation();
 
 							@SuppressWarnings("deprecation")
-							private Set<Block> execute(double width, double hstart, double height,
-									Predicate<Block> predicate) {
+							private Set<Block> execute(double width, double hstart, double height) {
 								width = Math.abs(width);
 								width--;
 								width /= 2;
@@ -165,9 +162,6 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 											Location l = this.loc.clone().add(xoff, yoff, zoff);
 											Block b = l.getBlock();
 											if (b.getType() == Material.WOOL) {
-												if (!predicate.test(b)) {
-													continue;
-												}
 												int dmg = Ingame.getBlockDamage(b);
 												if (dmg >= 2) {
 													Random r = new Random();
@@ -189,6 +183,7 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 																	Blocks.WOOL.fromLegacyData(
 																			b.getData()));
 													Ingame.setBlockDamage(b, dmg + 1);
+													block.k = false;
 													block.ticksLived = 1;
 													block.dropItem = false;
 													block.motX = x;
@@ -210,16 +205,16 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 							@Override
 							public void run() {
 								double width = 2;
-								double capsuleWidth = 3;
+								//								double capsuleWidth = 3;
 								double hstart = -1;
 								double height = 4;
 
-								Set<Block> s1 = this.execute(width, hstart, height, b -> true);
-								this.execute(capsuleWidth, hstart, height, b -> {
-									MetadataValue v = Ingame.getMetaData(b, "capsule");
-									boolean isCapsule = v != null && v.asBoolean();
-									return !s1.contains(b) && isCapsule;
-								});
+								Set<Block> s1 = this.execute(width, hstart, height);
+								//								this.execute(capsuleWidth, hstart, height, b -> {
+								//									MetadataValue v = Ingame.getMetaData(b, "capsule");
+								//									boolean isCapsule = v != null && v.asBoolean();
+								//									return !s1.contains(b) && isCapsule;
+								//								});
 
 							}
 						}.runTaskLater(3);

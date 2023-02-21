@@ -44,11 +44,15 @@ public class ScoreboardTeam {
 		team.setDisplayName(name);
 	}
 
-	public void setPrefix(Component prefix) {
-		String p = LegacyComponentSerializer.legacySection().serialize(prefix);
+	public void setPrefix(String prefix) {
+		String p = prefix;
 		if (p.length() > 16)
 			p = p.substring(0, 16);
 		team.setPrefix(p);
+	}
+
+	public void setPrefix(Component prefix) {
+		setPrefix(LegacyComponentSerializer.legacySection().serialize(prefix));
 	}
 
 	public void setSuffix(Component suffix) {

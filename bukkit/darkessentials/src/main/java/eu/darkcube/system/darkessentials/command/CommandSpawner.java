@@ -34,7 +34,8 @@ import java.util.Objects;
 public class CommandSpawner extends EssentialsCommand implements Listener {
 	private static final PersistentDataType<EntityType> entityType =
 			PersistentDataTypes.enumType(EntityType.class);
-	private static final Key spawnerType = new Key(DarkEssentials.getInstance(), "spawnerType");
+	private static final Key spawnerType =
+			new Key(DarkEssentials.getInstance().getName(), "spawnerType");
 
 	@SuppressWarnings("deprecation")
 	public CommandSpawner() {

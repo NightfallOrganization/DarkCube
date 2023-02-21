@@ -89,6 +89,12 @@ public class ConnectorNPC {
 					PersistentDataTypes.LOCATION.serialize(d, "location", data.location);
 					doc.append(key, d);
 				}
+
+				@Override
+				public ConnectorNPC clone(ConnectorNPC object) {
+					return new ConnectorNPC(object.taskName, object.id, object.location,
+							object.permissions);
+				}
 			});
 
 	private static final Collection<ServiceInfoSnapshot> services = ConcurrentHashMap.newKeySet();

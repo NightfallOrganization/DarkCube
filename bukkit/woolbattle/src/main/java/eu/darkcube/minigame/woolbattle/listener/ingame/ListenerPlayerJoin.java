@@ -33,7 +33,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		p.setItemOnCursor(null);
 		p.setSaturation(0);
 		e.setJoinMessage(null);
-		user.setTicksAfterLastHit(1200);
+		user.resetTicksAfterLastHit();
 		WoolBattle.getInstance().getTeamManager()
 				.setTeam(user, WoolBattle.getInstance().getTeamManager().getSpectator());
 		//		ingame.setSpectator(user);

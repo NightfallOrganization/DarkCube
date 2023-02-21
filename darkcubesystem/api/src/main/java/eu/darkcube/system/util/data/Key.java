@@ -7,7 +7,6 @@
 package eu.darkcube.system.util.data;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Objects;
 
@@ -16,8 +15,8 @@ public class Key {
 	private final @NotNull String plugin;
 	private final @NotNull String key;
 
-	public Key(@NotNull Plugin plugin, @NotNull String key) {
-		this.plugin = plugin.getName();
+	public Key(@NotNull Named named, @NotNull String key) {
+		this.plugin = named.getName();
 		this.key = key;
 	}
 
@@ -61,4 +60,7 @@ public class Key {
 		return plugin + ":" + key;
 	}
 
+	public interface Named {
+		String getName();
+	}
 }

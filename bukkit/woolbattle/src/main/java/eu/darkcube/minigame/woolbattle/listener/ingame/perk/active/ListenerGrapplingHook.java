@@ -73,18 +73,20 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 				|| hook.getLocation().subtract(0, 1, 0).getBlock().getType().isSolid()) {
 			if (!checkUsable(perk)) {
 				hook.remove();
-				event.setCancelled(true);
 				return;
 			}
+			payForThePerk(perk);
 			Location from = perk.owner().getBukkitEntity().getLocation();
 			Location to = hook.getLocation();
 			Vector v = to.toVector().subtract(from.toVector()).add(new Vector(0, 3, 0));
 			double multiplier = Math.pow(v.length(), 0.35);
-			v = v.normalize().multiply(new Vector(multiplier, multiplier * 1.1, multiplier));
+			v = v.normalize().multiply(new Vector(multiplier, multiplier * 0.9, multiplier));
+			if (v.getY() > 0) {
+				v = v.multiply(new Vector(1.2, 1.4, 1.2));
+			}
 			perk.owner().getBukkitEntity().setVelocity(v);
 			startCooldown(perk);
 			hook.remove();
-			event.setCancelled(true);
 		}
 	}
 

@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.commandapi.v3;
 
 import eu.darkcube.system.libs.com.mojang.brigadier.Command;
@@ -20,6 +19,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
 import eu.darkcube.system.libs.com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.command.CommandSender;
 
 import java.io.PrintWriter;
@@ -69,33 +69,47 @@ public class Commands {
 	}
 
 	public void unregisterByPrefix(String prefix) {
-		for (CommandEntry entry : commandEntries) {
+		for (CommandEntry entry : new HashSet<>(commandEntries)) {
 			if (!entry.executor.getPrefix().equals(prefix)) {
 				continue;
 			}
-			for (CommandEntry.OriginalCommandTree original : entry.nodes) {
-				unregister(dispatcher.getRoot(), original);
+			for (CommandEntry.OriginalCommandTree original : new HashSet<>(entry.nodes)) {
+				if (unregister(dispatcher.getRoot(), original)) {
+					VersionSupport.getVersion().commandApi().unregister(original.source.getName());
+					entry.nodes.remove(original);
+				}
+			}
+			if (entry.nodes.isEmpty()) {
+				commandEntries.remove(entry);
 			}
 		}
 	}
 
 	public void unregisterPrefixlessByPrefix(String prefix) {
-		for (CommandEntry entry : commandEntries) {
+		for (CommandEntry entry : new HashSet<>(commandEntries)) {
 			if (!entry.executor.getPrefix().equals(prefix)) {
 				continue;
 			}
-			for (CommandEntry.OriginalCommandTree original : entry.nodes) {
-				if (original.prefixless)
-					unregister(dispatcher.getRoot(), original);
+			for (CommandEntry.OriginalCommandTree original : new HashSet<>(entry.nodes)) {
+				if (original.prefixless) {
+					if (unregister(dispatcher.getRoot(), original)) {
+						VersionSupport.getVersion().commandApi()
+								.unregister(original.source.getName());
+						entry.nodes.remove(original);
+					}
+				}
+			}
+			if (entry.nodes.isEmpty()) {
+				commandEntries.remove(entry);
 			}
 		}
 	}
 
-	private void unregister(CommandNode<CommandSource> parent,
+	private boolean unregister(CommandNode<CommandSource> parent,
 			CommandEntry.OriginalCommandTree original) {
 		CommandNode<CommandSource> node = parent.getChild(original.source.getName());
 		if (node == null)
-			return;
+			return false;
 		for (CommandEntry.OriginalCommandTree o : original.children) {
 			unregister(node, o);
 		}
@@ -105,23 +119,18 @@ public class Commands {
 		}
 		if (ncommand == null && node.getChildren().isEmpty()) {
 			parent.getChildren().remove(node);
+			return true;
 		}
+		return false;
 	}
 
 	public void register(CommandExecutor executor) {
 		Collection<CommandEntry.OriginalCommandTree> nodes = new HashSet<>();
-		LiteralArgumentBuilder<CommandSource> builder = executor.builder();
-		LiteralCommandNode<CommandSource> node = dispatcher.register(builder);
-		nodes.add(new CommandEntry.OriginalCommandTree(node, true));
-		nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(
-				buildRedirect(executor.getPrefix() + ":" + executor.getName(), node)), false));
-
-		for (String name : executor.getAliases()) {
+		for (String name : executor.getNames()) {
 			nodes.add(new CommandEntry.OriginalCommandTree(
-					dispatcher.register(buildRedirect(name, node)), true));
-			nodes.add(new CommandEntry.OriginalCommandTree(
-					dispatcher.register(buildRedirect(executor.getPrefix() + ":" + name, node)),
-					false));
+					dispatcher.register(executor.builder(name)), true));
+			nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(
+					executor.builder(executor.getPrefix() + ":" + executor.getName())), false));
 		}
 		commandEntries.add(new CommandEntry(executor, nodes));
 	}
@@ -142,6 +151,8 @@ public class Commands {
 		return builder;
 	}
 
+	@SuppressWarnings("unused") // This inspection is not accurate, we use it in version specific
+	// code. IntelliJ just has some problems finding that code
 	public void executeCommand(CommandSender sender, String commandLine) {
 		CommandSource source = CommandSource.create(sender);
 		try {
@@ -178,7 +189,6 @@ public class Commands {
 		void parse(StringReader reader) throws CommandSyntaxException;
 	}
 
-
 	private static class CommandEntry {
 		private final CommandExecutor executor;
 		private final Collection<OriginalCommandTree> nodes;
@@ -186,6 +196,11 @@ public class Commands {
 		public CommandEntry(CommandExecutor executor, Collection<OriginalCommandTree> nodes) {
 			this.executor = executor;
 			this.nodes = nodes;
+		}
+
+		@Override
+		public String toString() {
+			return "CommandEntry{" + "executor=" + executor + ", nodes=" + nodes + '}';
 		}
 
 		private static class OriginalCommandTree {
@@ -202,6 +217,12 @@ public class Commands {
 				for (CommandNode<CommandSource> child : node.getChildren()) {
 					children.add(new OriginalCommandTree(child, false));
 				}
+			}
+
+			@Override
+			public String toString() {
+				return "OriginalCommandTree{" + "command=" + command + ", source=" + source
+						+ ", children=" + children + ", prefixless=" + prefixless + '}';
 			}
 		}
 	}

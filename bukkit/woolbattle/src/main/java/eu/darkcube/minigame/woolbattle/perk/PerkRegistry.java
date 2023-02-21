@@ -51,6 +51,7 @@ public class PerkRegistry {
 		register(new BowPerk());
 		register(new ArrowPerk());
 		register(new ShearsPerk());
+		register(new ArrowBombPerk());
 	}
 
 	public void register(Perk perk) {

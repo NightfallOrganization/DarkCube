@@ -92,7 +92,6 @@ public abstract class PerkListener implements Listener {
 		perk.cooldown(perk.perk().cooldown());
 		new Scheduler() {
 
-			int cd = perk.perk().cooldown();
 			int waited = 0;
 
 			@Override
@@ -100,13 +99,17 @@ public abstract class PerkListener implements Listener {
 				if (mayCountDown != null && !mayCountDown.getAsBoolean()) {
 					return;
 				}
+				if (perk.owner().perks().perk(perk.id()) == null) {
+					cancel();
+					return;
+				}
 				waited++;
 				waited = waited % 20;
 				if (waited != 0) {
 					return;
 				}
-				perk.cooldown(Math.max(0, --this.cd));
-				if (cd <= 0) {
+				perk.cooldown(perk.cooldown() - 1);
+				if (perk.cooldown() <= 0) {
 					cancel();
 				}
 			}

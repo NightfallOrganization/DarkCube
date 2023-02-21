@@ -13,7 +13,6 @@ import eu.darkcube.minigame.woolbattle.perk.perks.active.SafetyPlatformPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 public class ListenerSafetyPlatform extends BasicPerkListener {
 
@@ -54,12 +53,7 @@ public class ListenerSafetyPlatform extends BasicPerkListener {
 				&& z == r);
 	}
 
-	@SuppressWarnings("deprecation")
 	private void block(Location loc, WBUser u) {
-		if (loc.getBlock().getType() == Material.AIR) {
-			loc.getBlock().setType(Material.WOOL);
-			loc.getBlock().setData(u.getTeam().getType().getWoolColorByte());
-			WoolBattle.getInstance().getIngame().placedBlocks.add(loc.getBlock());
-		}
+		WoolBattle.getInstance().getIngame().place(u, loc.getBlock());
 	}
 }

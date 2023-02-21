@@ -32,7 +32,6 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 				}
 				if (user.getTicksAfterLastHit() <= 200) {
 					this.main.getIngame().kill(user);
-					user.setTicksAfterLastHit(201);
 				} else {
 					p.teleport(user.getTeam().getSpawn());
 				}

@@ -1,10 +1,17 @@
 {
-	"runtimeModule": true,
-	"group": "eu.darkcube.system.modules",
-	"name": "PServer",
-	"version": "1.0",
-	"author": "DasBabyPixel",
-	"description": "Cloud-PServer",
-	"main": "eu.darkcube.system.pserver.cloudnet.PServerModule",
-	"storesSensitiveData": true
+  "runtimeModule": true,
+  "group": "eu.darkcube.system.modules",
+  "name": "PServer",
+  "version": "1.0",
+  "author": "DasBabyPixel",
+  "description": "Cloud-PServer",
+  "main": "eu.darkcube.system.pserver.cloudnet.PServerModule",
+  "storesSensitiveData": true,
+  "dependencies": [
+    {
+      "group": "eu.darkcube.system.cloudnet.modules",
+      "name": "DarkCubeSystem",
+      "version": "1.1"
+    }
+  ]
 }

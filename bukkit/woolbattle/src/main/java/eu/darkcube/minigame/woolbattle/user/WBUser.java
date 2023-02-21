@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.user;
 
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.team.Team;
+import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -197,6 +198,10 @@ public interface WBUser {
 	 * @param ticks the number of ticks
 	 */
 	void setTicksAfterLastHit(int ticks);
+
+	default void resetTicksAfterLastHit() {
+		setTicksAfterLastHit((int) TimeUnit.SECOND.toTicks(60));
+	}
 
 	/**
 	 * @return the amount of kills this player made

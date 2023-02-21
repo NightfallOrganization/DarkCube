@@ -29,7 +29,6 @@ public class UserPerks {
 
 	public UserPerks(WBUser user) {
 		this.user = user;
-		reloadFromStorage();
 	}
 
 	public void reloadFromStorage() {
