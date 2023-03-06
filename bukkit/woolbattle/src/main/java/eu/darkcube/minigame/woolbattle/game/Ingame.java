@@ -264,6 +264,7 @@ public class Ingame extends GamePhase {
 			block.setType(Material.WOOL);
 			if (useColor) {
 				BlockState state = block.getState();
+				state.setType(Material.WOOL);
 				Wool wool = (Wool) state.getData();
 				wool.setColor(user.getTeam().getType().getWoolColor());
 				state.setData(wool);
