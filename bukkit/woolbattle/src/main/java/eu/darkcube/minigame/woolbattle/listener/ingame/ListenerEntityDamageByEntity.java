@@ -9,7 +9,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGhost;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -68,40 +67,26 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 				if (pearl.getShooter() instanceof Player) {
 					Player p = (Player) pearl.getShooter();
 					WBUser user = WBUser.getUser(p);
-					if (ListenerGhost.isGhost(target)) {
-						return;
+					if (target.projectileImmunityTicks() == 0) {
+						WoolBattle.getInstance().getIngame().attack(user, target);
 					}
-
-					if (!user.isTrollMode()) {
-						if (target.getUniqueId().equals(user.getUniqueId()) || user.getTeam()
-								.equals(target.getTeam())
-								|| user.getTeam().getType() == TeamType.SPECTATOR) {
-							e.setCancelled(true);
-							return;
-						}
-					}
-					WoolBattle.getInstance().getIngame().attack(user, target);
 				}
 			} else if (e.getDamager() instanceof Snowball) {
 				Snowball ball = (Snowball) e.getDamager();
 				if (ball.getShooter() instanceof Player) {
 					Player p = (Player) ball.getShooter();
 					WBUser user = WBUser.getUser(p);
-					if (ListenerGhost.isGhost(target)) {
-						return;
-					}
 
-					if (!user.isTrollMode()) {
-						if (target.getUniqueId().equals(user.getUniqueId()) || user.getTeam()
-								.equals(target.getTeam())
-								|| user.getTeam().getType() == TeamType.SPECTATOR) {
+					if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString()
+							.equals("minigun")) {
+						if (target.projectileImmunityTicks() > 0) {
 							e.setCancelled(true);
 							return;
 						}
-					}
-					if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString()
-							.equals("minigun")) {
-						WoolBattle.getInstance().getIngame().attack(user, target);
+						if (!WoolBattle.getInstance().getIngame().attack(user, target)) {
+							e.setCancelled(true);
+							return;
+						}
 						e.setCancelled(true);
 						target.getBukkitEntity().damage(0);
 
@@ -119,27 +104,17 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 					Player p = (Player) arrow.getShooter();
 					WBUser user = WBUser.getUser(p);
 
-					if (ListenerGhost.isGhost(target)) {
-						return;
-					}
-
-					if (!user.isTrollMode()) {
-						if (target.getUniqueId().equals(user.getUniqueId()) || user.getTeam()
-								.equals(target.getTeam())
-								|| user.getTeam().getType() == TeamType.SPECTATOR) {
-							e.setCancelled(true);
-							return;
-						}
-					}
-
 					e.setCancelled(true);
-					if (target.getTicksAfterLastHit() >= 11) {
-						if (target.hasSpawnProtection()) {
+					if (target.getTicksAfterLastHit() >= 10) {
+						if (target.projectileImmunityTicks() > 0) {
 							arrow.remove();
 							return;
 						}
 
-						WoolBattle.getInstance().getIngame().attack(user, target);
+						if (!WoolBattle.getInstance().getIngame().attack(user, target)) {
+							arrow.remove();
+							return;
+						}
 						target.getBukkitEntity().damage(0);
 						user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(),
 								Sound.SUCCESSFUL_HIT, 1, 0);
@@ -162,7 +137,7 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 											Location l = this.loc.clone().add(xoff, yoff, zoff);
 											Block b = l.getBlock();
 											if (b.getType() == Material.WOOL) {
-												int dmg = Ingame.getBlockDamage(b);
+												int dmg = ingame.getBlockDamage(b);
 												if (dmg >= 2) {
 													Random r = new Random();
 													double x = r.nextBoolean()
@@ -182,7 +157,7 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 																			+ .5,
 																	Blocks.WOOL.fromLegacyData(
 																			b.getData()));
-													Ingame.setBlockDamage(b, dmg + 1);
+													ingame.setBlockDamage(b, dmg + 1);
 													block.k = false;
 													block.ticksLived = 1;
 													block.dropItem = false;
@@ -192,7 +167,7 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
 													block.velocityChanged = true;
 													block.world.addEntity(block);
 												} else {
-													Ingame.setBlockDamage(b, dmg + 1);
+													ingame.setBlockDamage(b, dmg + 1);
 													res.add(b);
 												}
 											}

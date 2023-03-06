@@ -115,6 +115,56 @@ public interface WBUser {
 	void woolSubtractDirection(WoolSubtractDirection woolSubtractDirection);
 
 	/**
+	 * @return the amount of wool the player has at his disposal
+	 */
+	int woolCount();
+
+	/**
+	 * Gives the player wool
+	 *
+	 * @param count how much wool to add
+	 *
+	 * @return the actual amount of wool added, may be less than requested if the player's inventory
+	 * is full
+	 */
+	int addWool(int count);
+
+	/**
+	 * Gives the player wool
+	 *
+	 * @param count      how much wool to add
+	 * @param dropIfFull whether we should drop the wool in the world if the player's inventory is
+	 *                   full
+	 *
+	 * @return the amount of wool processed. This is all the wool that is put into the world,
+	 * inventory AND world, if dropping is requested
+	 */
+	int addWool(int count, boolean dropIfFull);
+
+	/**
+	 * Takes wool from the player
+	 *
+	 * @param count how much wool to remove
+	 *
+	 * @return the amount of wool removed. This may be less if the player has no more wool or if
+	 * somehow the removal was blocked.
+	 */
+	int removeWool(int count);
+
+	/**
+	 * Takes wool from the player
+	 *
+	 * @param count           how much wool to remove
+	 * @param updateInventory whether the inventory should be affected by this command. This is used
+	 *                        for dropping items where we want to update the wool count silently,
+	 *                        cuz the inventory is already up-to-date
+	 *
+	 * @return the amount of wool removed. This may be less if the player has no more wool or if
+	 * somehow the removal was blocked.
+	 */
+	int removeWool(int count, boolean updateInventory);
+
+	/**
 	 * @return the max amount of wool a player can carry
 	 */
 	int getMaxWoolSize();
@@ -166,7 +216,7 @@ public interface WBUser {
 	/**
 	 * Sets the open inventory for the player
 	 *
-	 * @param id the {@link InventoryId}
+	 * @param id the {@link IInventory}
 	 */
 	void setOpenInventory(IInventory id);
 
@@ -200,8 +250,18 @@ public interface WBUser {
 	void setTicksAfterLastHit(int ticks);
 
 	default void resetTicksAfterLastHit() {
-		setTicksAfterLastHit((int) TimeUnit.SECOND.toTicks(60));
+		setTicksAfterLastHit(TimeUnit.SECOND.itoTicks(60));
 	}
+
+	/**
+	 * @return the amount of ticks this user is immune against projectiles
+	 */
+	int projectileImmunityTicks();
+
+	/**
+	 * @param ticks the amount of ticks this user is immune against projectiles
+	 */
+	void projectileImmunityTicks(int ticks);
 
 	/**
 	 * @return the amount of kills this player made

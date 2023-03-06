@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerBlink;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class BlinkPerk extends Perk {
 		super(ActivationType.ACTIVE, BLINK, 15, 12, Item.PERK_BLINK,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_BLINK_COOLDOWN));
+		addListener(new ListenerBlink(this));
 	}
 }

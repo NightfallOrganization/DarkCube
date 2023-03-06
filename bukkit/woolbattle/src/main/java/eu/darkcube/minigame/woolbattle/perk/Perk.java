@@ -6,30 +6,60 @@
  */
 package eu.darkcube.minigame.woolbattle.perk;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
+import eu.darkcube.minigame.woolbattle.util.TimeUnit;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
+import org.bukkit.event.Listener;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Perk {
 
+	private final Collection<Listener> listeners = new ArrayList<>();
+	private final Collection<ConfiguredScheduler> schedulers = new ArrayList<>();
+
 	private final ActivationType activationType;
 	private final PerkName perkName;
-	private final int defaultCooldown;
+	private final Cooldown defaultCooldown;
 	private final int defaultCost;
 	private final CostType costType;
 	private final Item defaultItem;
 	private final UserPerkCreator perkCreator;
-	private int cooldown;
+	private final boolean autoCountdownCooldown;
+	private Cooldown cooldown;
 	private int cost;
 
-	public Perk(ActivationType activationType, PerkName perkName, int cooldown, int cost,
+	public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost,
+			Item defaultItem, UserPerkCreator perkCreator) {
+		this(activationType, perkName, new Cooldown(TimeUnit.SECOND, cooldownSeconds), cost,
+				defaultItem, perkCreator);
+	}
+
+	public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost,
+			CostType costType, Item defaultItem, UserPerkCreator perkCreator) {
+		this(activationType, perkName, new Cooldown(TimeUnit.SECOND, cooldownSeconds), cost,
+				costType, defaultItem, perkCreator);
+	}
+
+	public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown, int cost,
 			Item defaultItem, UserPerkCreator perkCreator) {
 		this(activationType, perkName, cooldown, cost, CostType.PER_ACTIVATION, defaultItem,
 				perkCreator);
 	}
 
-	public Perk(ActivationType activationType, PerkName perkName, int cooldown, int cost,
+	public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown, int cost,
 			CostType costType, Item defaultItem, UserPerkCreator perkCreator) {
+		this(activationType, perkName, cooldown, true, cost, costType, defaultItem, perkCreator);
+	}
+
+	public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown,
+			boolean autoCountdownCooldown, int cost, CostType costType, Item defaultItem,
+			UserPerkCreator perkCreator) {
 		this.activationType = activationType;
 		this.perkName = perkName;
 		this.defaultCooldown = cooldown;
@@ -37,12 +67,60 @@ public class Perk {
 		this.costType = costType;
 		this.cost = cost;
 		this.cooldown = cooldown;
+		this.autoCountdownCooldown = autoCountdownCooldown;
 		this.defaultItem = defaultItem;
 		this.perkCreator = perkCreator;
 	}
 
+	/**
+	 * Adds listeners for this perk. All listeners will be registered and unregistered when needed
+	 * for the perk to function (for example during ingame phase)
+	 *
+	 * @param listeners the listeners to add to this perk
+	 */
+	protected void addListener(Listener... listeners) {
+		this.listeners.addAll(Arrays.asList(listeners));
+	}
+
+	/**
+	 * Adds schedulers for this perk. All schedulers will be registered and unregistered when needed
+	 * for the perk to function (for example during ingame phase)
+	 *
+	 * @param schedulers the schedulers to add to this perk
+	 */
+	protected void addScheduler(ConfiguredScheduler... schedulers) {
+		this.schedulers.addAll(Arrays.asList(schedulers));
+	}
+
+	/**
+	 * This starts all the perk specific logic for this perk. This includes things like listeners,
+	 * schedulers, etc...
+	 *
+	 * @see #stopLogic()
+	 */
+	public void startLogic() {
+		WoolBattle.registerListeners(listeners.toArray(new Listener[0]));
+	}
+
+	/**
+	 * This stops all the perk specific logic for this perk. This includes things like listeners,
+	 * schedulers, etc...
+	 *
+	 * @see #startLogic()
+	 */
+	public void stopLogic() {
+		WoolBattle.unregisterListeners(listeners.toArray(new Listener[0]));
+	}
+
 	public UserPerkCreator perkCreator() {
 		return perkCreator;
+	}
+
+	/**
+	 * @return if the cooldown should automatically count down every tick
+	 */
+	public boolean autoCountdownCooldown() {
+		return autoCountdownCooldown;
 	}
 
 	public ActivationType activationType() {
@@ -65,11 +143,11 @@ public class Perk {
 		return cost;
 	}
 
-	public int cooldown() {
+	public Cooldown cooldown() {
 		return cooldown;
 	}
 
-	public void cooldown(int cooldown) {
+	public void cooldown(Cooldown cooldown) {
 		this.cooldown = cooldown;
 	}
 
@@ -77,7 +155,7 @@ public class Perk {
 		this.cost = cost;
 	}
 
-	public int defaultCooldown() {
+	public Cooldown defaultCooldown() {
 		return defaultCooldown;
 	}
 
@@ -107,6 +185,8 @@ public class Perk {
 		ACTIVE("active", 2, Item.PERKS_ACTIVE),
 		MISC("misc", 1, Item.PERKS_MISC),
 		PASSIVE("passive", 1, Item.PERKS_PASSIVE),
+
+		DOUBLE_JUMP("doubleJump", 1, null),
 
 		ARROW("arrow", 1, Item.DEFAULT_ARROW);
 		private final String type;
@@ -144,5 +224,27 @@ public class Perk {
 	 */
 	public interface UserPerkCreator {
 		UserPerk create(WBUser user, Perk perk, int id, int perkSlot);
+	}
+
+	public static final class Cooldown {
+		private final TimeUnit timeUnit;
+		private final double cooldown;
+
+		public Cooldown(TimeUnit timeUnit, double cooldown) {
+			this.timeUnit = timeUnit;
+			this.cooldown = cooldown;
+		}
+
+		public double cooldown() {
+			return cooldown;
+		}
+
+		public TimeUnit timeUnit() {
+			return timeUnit;
+		}
+
+		public int ticks() {
+			return timeUnit().itoTicks(cooldown);
+		}
 	}
 }

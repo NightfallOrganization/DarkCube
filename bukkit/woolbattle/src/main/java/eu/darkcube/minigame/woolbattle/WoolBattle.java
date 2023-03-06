@@ -365,7 +365,7 @@ public class WoolBattle extends Plugin {
 	}
 
 	public void setMap(WBUser user) {
-		if (this.getLobby().isEnabled()) {
+		if (this.getLobby().enabled()) {
 			Scoreboard sb = new Scoreboard(user);
 			ScoreboardTeam team = sb.getTeam(ObjectiveTeam.MAP.getKey());
 			Map m = this.getMap();

@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive.ListenerRocketJump;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
@@ -17,5 +18,6 @@ public class RocketJumpPerk extends Perk {
 	public RocketJumpPerk() {
 		super(ActivationType.PASSIVE, ROCKET_JUMP, 0, 0, Item.PERK_ROCKETJUMP,
 				(user, perk, id, perkSlot) -> new DefaultUserPerk(user, id, perkSlot, perk));
+		addListener(new ListenerRocketJump(this));
 	}
 }

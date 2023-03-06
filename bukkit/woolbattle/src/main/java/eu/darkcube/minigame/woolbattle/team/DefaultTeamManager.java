@@ -126,7 +126,7 @@ public class DefaultTeamManager implements TeamManager {
 			}
 		}
 		TEAM_BY_USER.put(user, team);
-		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+		if (WoolBattle.getInstance().getIngame().enabled()) {
 			WoolBattle.getInstance().getIngame().setPlayerItems(user);
 			WoolBattle.getInstance().getIngame().checkGameEnd();
 		}

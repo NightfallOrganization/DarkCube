@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGrandpasClock;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class GrandpasClockPerk extends Perk {
 		super(ActivationType.ACTIVE, GRANDPAS_CLOCK, 16, 18, Item.PERK_GRANDPAS_CLOCK,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_GRANDPAS_CLOCK_COOLDOWN));
+		addListener(new ListenerGrandpasClock(this));
 	}
 }

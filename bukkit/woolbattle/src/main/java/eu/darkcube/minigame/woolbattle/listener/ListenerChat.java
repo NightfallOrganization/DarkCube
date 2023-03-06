@@ -29,9 +29,9 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 		WBUser user = WBUser.getUser(p);
 		String msg = e.getMessage();
 		boolean atall = false;
-		boolean replace = !main.getLobby().isEnabled();
+		boolean replace = !main.getLobby().enabled();
 		boolean startsatall = false;
-		if (main.getIngame().isEnabled()) {
+		if (main.getIngame().enabled()) {
 			startsatall = msg.startsWith(main.atall);
 			boolean startsatteam = msg.startsWith(main.atteam);
 			atall = startsatall || user.getTeam().getUsers().size() == 1;
@@ -77,9 +77,8 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 
 	private String getMessage(Player p, String msg, boolean atall, String color, WoolBattle main,
 			boolean satall) {
-		return color + (atall && main.getIngame().isEnabled() ? main.atall : "") + color
-				+ p.getName() + ChatColor.RESET + ": " + (satall ? msg.substring(
-				main.atall.length()) : msg);
+		return color + (atall && main.getIngame().enabled() ? main.atall : "") + color + p.getName()
+				+ ChatColor.RESET + ": " + (satall ? msg.substring(main.atall.length()) : msg);
 	}
 
 }

@@ -6,19 +6,22 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerLineBuilder;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
+import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 
 public class LineBuilderPerk extends Perk {
 	public static final PerkName LINE_BUILDER = new PerkName("LINE_BUILDER");
 
 	public LineBuilderPerk() {
-		super(ActivationType.ACTIVE, LINE_BUILDER, 10, 2, CostType.PER_BLOCK,
-				Item.PERK_LINE_BUILDER,
+		super(ActivationType.ACTIVE, LINE_BUILDER, new Cooldown(TimeUnit.SECOND, 10), true, 2,
+				CostType.PER_BLOCK, Item.PERK_LINE_BUILDER,
 				(user, perk, id, perkSlot) -> new LineBuilderUserPerk(user, id, perkSlot, perk));
+		addListener(new ListenerLineBuilder(this));
 	}
 
 	public static class LineBuilderUserPerk extends CooldownUserPerk {
@@ -37,7 +40,7 @@ public class LineBuilderPerk extends Perk {
 		@Override
 		public void cooldown(int cooldown) {
 			super.cooldown(cooldown);
-			if (cooldown() >= perk().cooldown()) {
+			if (cooldown() >= perk().cooldown().ticks()) {
 				useCooldownItem = true;
 			} else if (cooldown == 0) {
 				useCooldownItem = false;

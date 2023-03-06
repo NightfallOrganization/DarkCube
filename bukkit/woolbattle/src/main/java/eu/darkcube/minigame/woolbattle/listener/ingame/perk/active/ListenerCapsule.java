@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.CapsulePerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Location;
@@ -16,8 +16,8 @@ import org.bukkit.entity.Player;
 
 public class ListenerCapsule extends BasicPerkListener {
 
-	public ListenerCapsule() {
-		super(CapsulePerk.CAPSULE);
+	public ListenerCapsule(Perk perk) {
+		super(perk);
 	}
 
 	@Override

@@ -109,7 +109,7 @@ public class Lobby extends GamePhase {
 			@Override
 			public void onChange(ObservableObject<Integer> instance, Integer oldValue,
 					Integer newValue) {
-				if (Lobby.this.isEnabled()) {
+				if (Lobby.this.enabled()) {
 					if (newValue <= 1) {
 						Bukkit.getOnlinePlayers().forEach(p -> {
 							p.setLevel(0);

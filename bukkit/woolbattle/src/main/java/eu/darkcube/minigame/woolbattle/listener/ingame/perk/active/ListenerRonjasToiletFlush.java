@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.RonjasToiletFlushPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -22,12 +23,12 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-public class ListenerRonjasToiletSplash extends BasicPerkListener {
+public class ListenerRonjasToiletFlush extends BasicPerkListener {
 
 	private static final double RANGE = 4;
 
-	public ListenerRonjasToiletSplash() {
-		super(RonjasToiletFlushPerk.RONJAS_TOILET_FLUSH);
+	public ListenerRonjasToiletFlush(Perk perk) {
+		super(perk);
 	}
 
 	@Override
@@ -87,6 +88,10 @@ public class ListenerRonjasToiletSplash extends BasicPerkListener {
 		}
 		WBUser user = (WBUser) egg.getMetadata("source").get(0).value();
 		WBUser target = WBUser.getUser(t);
+		if (target.projectileImmunityTicks() > 0) {
+			e.setCancelled(true);
+			return;
+		}
 		WoolBattle.getInstance().getIngame().attack(user, target);
 	}
 

@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.LineBuilderPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Line;
@@ -24,8 +24,8 @@ public class ListenerLineBuilder extends BasicPerkListener {
 	private static final Key DATA_SCHEDULER =
 			new Key(WoolBattle.getInstance(), "linebuilderScheduler");
 
-	public ListenerLineBuilder() {
-		super(LineBuilderPerk.LINE_BUILDER);
+	public ListenerLineBuilder(Perk perk) {
+		super(perk);
 	}
 
 	public static Location getNiceLocation(Location loc) {
@@ -104,8 +104,8 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				line = null;
 				return;
 			}
-			if (cooldownTicks > TimeUnit.SECOND.toUnit(TimeUnit.TICKS) * perk.perk().cooldown()) {
-				startCooldown(perk);
+			if (cooldownTicks > perk.perk().cooldown().ticks()) {
+				perk.cooldown(perk.perk().cooldown().ticks());
 				user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
 				cancel();
 				return;

@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.GrandpasClockPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -22,8 +22,8 @@ public class ListenerGrandpasClock extends BasicPerkListener {
 			new Key(WoolBattle.getInstance(), "grandpasClockOldPos");
 	private static final Key DATA_TICKER = new Key(WoolBattle.getInstance(), "grandpasClockTicker");
 
-	public ListenerGrandpasClock() {
-		super(GrandpasClockPerk.GRANDPAS_CLOCK);
+	public ListenerGrandpasClock(Perk perk) {
+		super(perk);
 	}
 
 	@Override

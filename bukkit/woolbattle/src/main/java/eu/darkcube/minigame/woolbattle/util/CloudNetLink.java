@@ -32,16 +32,16 @@ public class CloudNetLink {
 		try {
 			if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay) {
 				GameState current = GameState.UNKNOWN;
-				if (WoolBattle.getInstance().getLobby().isEnabled()) {
+				if (WoolBattle.getInstance().getLobby().enabled()) {
 					current = GameState.LOBBY;
-				} else if (WoolBattle.getInstance().getIngame().isEnabled()) {
+				} else if (WoolBattle.getInstance().getIngame().enabled()) {
 					current = GameState.INGAME;
-				} else if (WoolBattle.getInstance().getEndgame().isEnabled()) {
+				} else if (WoolBattle.getInstance().getEndgame().enabled()) {
 					current = GameState.STOPPING;
 				}
 				DarkCubeBukkit.gameState(current);
 				DarkCubeBukkit.playingPlayers()
-						.set(WoolBattle.getInstance().getLobby().isEnabled()
+						.set(WoolBattle.getInstance().getLobby().enabled()
 								? WBUser.onlineUsers().size()
 								: (int) WBUser.onlineUsers().stream()
 										.filter(u -> u.getTeam().canPlay()).count());

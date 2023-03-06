@@ -8,10 +8,7 @@ package eu.darkcube.minigame.woolbattle.perk;
 
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.*;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.ArrowPerk;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.BowPerk;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.EnderPearlPerk;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.ShearsPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.*;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.*;
 
 import java.util.Collections;
@@ -52,16 +49,21 @@ public class PerkRegistry {
 		register(new ArrowPerk());
 		register(new ShearsPerk());
 		register(new ArrowBombPerk());
+		register(new ProtectiveShieldPerk());
+		register(new DoubleJumpPerk());
+		register(new MinePerk());
+		register(new ElevatorPerk());
 	}
 
 	public void register(Perk perk) {
 		perks.put(perk.perkName(), perk);
+		cache1.remove(perk.activationType());
 	}
 
 	public Perk[] perks(ActivationType activationType) {
 		return cache1.computeIfAbsent(activationType,
 				n -> perks.values().stream().filter(p -> p.activationType() == n)
-						.toArray(Perk[]::new));
+						.toArray(Perk[]::new)).clone();
 	}
 
 	public Map<PerkName, Perk> perks() {

@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGrapplingHook;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class GrapplingHookPerk extends Perk {
 		super(ActivationType.ACTIVE, GRAPPLING_HOOK, 12, 12, Item.PERK_GRAPPLING_HOOK,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_GRAPPLING_HOOK_COOLDOWN));
+		addListener(new ListenerGrapplingHook(this));
 	}
 }

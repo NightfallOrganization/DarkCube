@@ -4,9 +4,16 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.event.perk.passive.EventEnderPearl;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import net.minecraft.server.v1_8_R3.EntityArrow;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,12 +24,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.ProjectileHitEvent;
-
-import eu.darkcube.minigame.woolbattle.game.Ingame;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import net.minecraft.server.v1_8_R3.EntityArrow;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class ListenerProjectileHit extends Listener<ProjectileHitEvent> {
 
@@ -47,7 +48,8 @@ public class ListenerProjectileHit extends Listener<ProjectileHitEvent> {
 					if (y != -1) {
 						Block b = e.getEntity().getWorld().getBlockAt((int) x, (int) y, (int) z);
 						if (b.getType() == Material.WOOL) {
-							Ingame.setBlockDamage(b, Ingame.getBlockDamage(b) + 1);
+							WoolBattle.getInstance().getIngame().setBlockDamage(b,
+									WoolBattle.getInstance().getIngame().getBlockDamage(b) + 1);
 						}
 					}
 					earrow.die();
@@ -60,12 +62,27 @@ public class ListenerProjectileHit extends Listener<ProjectileHitEvent> {
 				Block b1 = pearl.getLocation().getBlock();
 				Block b2 = pearl.getLocation().add(0, 1, 0).getBlock();
 				Block b3 = pearl.getLocation().add(0, 2, 0).getBlock();
-				if (checkTPUp(b3)) {
-					tp(p, setY(pearl, b3));
-				} else if (checkTPUp(b2)) {
-					tp(p, setY(pearl, b2));
-				} else if (checkTPUp(b1)) {
-					tp(p, setY(pearl, b1));
+				boolean elevate = checkTPUp(b1) || checkTPUp(b2) || checkTPUp(b3);
+
+				EventEnderPearl event = new EventEnderPearl(WBUser.getUser(p),
+						b1.getType() != Material.AIR || b2.getType() != Material.AIR
+								|| b3.getType() != Material.AIR, elevate);
+				Bukkit.getPluginManager().callEvent(event);
+				elevate = event.elevate();
+
+				if (event.canElevate() && elevate) {
+					Block block = b1;
+					for (int i = 0; i < 16 && block.getType() == Material.AIR; i++) {
+						block = block.getRelative(0, 1, 0);
+					}
+					if (block.getType() == Material.AIR) {
+						return;
+					}
+					do {
+						block = block.getRelative(0, 1, 0);
+					} while (block.getType() != Material.AIR
+							|| block.getRelative(0, 1, 0).getType() != Material.AIR);
+					tp(p, block.getLocation().add(0.5, 0.1, 0.5));
 				}
 			}
 		}
@@ -79,12 +96,6 @@ public class ListenerProjectileHit extends Listener<ProjectileHitEvent> {
 				p.teleport(loc);
 			}
 		}.runTask();
-	}
-
-	private Location setY(EnderPearl p, Block b) {
-		Location loc = p.getLocation();
-		loc.setY(b.getY() + 1);
-		return loc;
 	}
 
 	private boolean checkTPUp(Block b) {

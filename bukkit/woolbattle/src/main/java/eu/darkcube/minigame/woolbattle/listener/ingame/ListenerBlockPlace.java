@@ -13,6 +13,7 @@ import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,13 +39,12 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
 				e.setCancelled(true);
 				return;
 			}
+			if (e.getItemInHand().getType() == Material.WOOL) {
+				user.removeWool(1, false);
+			}
 		}
 		Block block = e.getBlock();
 		Ingame ingame = WoolBattle.getInstance().getIngame();
-		if (ingame.breakedWool.containsKey(block)) {
-			e.setCancelled(true);
-			return;
-		}
 		ingame.placedBlocks.add(block);
 	}
 }

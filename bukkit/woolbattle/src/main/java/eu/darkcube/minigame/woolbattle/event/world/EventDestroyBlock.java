@@ -4,8 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
-package eu.darkcube.minigame.woolbattle.event;
+package eu.darkcube.minigame.woolbattle.event.world;
 
 import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
@@ -13,21 +12,21 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 
 public class EventDestroyBlock extends BlockEvent implements Cancellable {
-	
+
 	private static final HandlerList handlers = new HandlerList();
 
 	private boolean cancel = false;
-	
+
 	public EventDestroyBlock(Block theBlock) {
 		super(theBlock);
 	}
 
-	@Override
-	public HandlerList getHandlers() {
+	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
-	public static HandlerList getHandlerList() {
+	@Override
+	public HandlerList getHandlers() {
 		return handlers;
 	}
 

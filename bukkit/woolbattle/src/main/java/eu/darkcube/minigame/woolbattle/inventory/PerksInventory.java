@@ -51,7 +51,7 @@ public class PerksInventory extends WoolBattlePagedInventory {
 		for (Perk.ActivationType type : Perk.ActivationType.values()) {
 			Perk[] perks = registry.perks(type);
 			for (int j = 0; j < type.maxCount(); j++) {
-				if (perks.length > 1) {
+				if (perks.length > type.maxCount()) {
 					ItemBuilder b = ItemBuilder.item(type.displayItem().getItem(user, j));
 					ItemManager.setId(b, PERKS_TYPE, String.valueOf(type.ordinal()));
 					ItemManager.setId(b, PERKS_TYPE_NUMBER, String.valueOf(j));

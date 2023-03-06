@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.misc.ListenerEnderpearl;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class EnderPearlPerk extends Perk {
 		super(ActivationType.MISC, ENDERPEARL, 5, 8, Item.DEFAULT_PEARL,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.DEFAULT_PEARL_COOLDOWN));
+		addListener(new ListenerEnderpearl(this));
 	}
 }

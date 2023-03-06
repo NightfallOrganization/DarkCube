@@ -7,7 +7,7 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.BlinkPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.RayTrace;
@@ -20,8 +20,8 @@ import java.util.List;
 
 public class ListenerBlink extends BasicPerkListener {
 
-	public ListenerBlink() {
-		super(BlinkPerk.BLINK);
+	public ListenerBlink(Perk perk) {
+		super(perk);
 	}
 
 	private static boolean teleport(WBUser user) {

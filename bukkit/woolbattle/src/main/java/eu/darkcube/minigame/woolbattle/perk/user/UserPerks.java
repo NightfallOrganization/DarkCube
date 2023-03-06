@@ -14,18 +14,17 @@ import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class UserPerks {
 	private static final AtomicInteger id = new AtomicInteger();
 
 	private final WBUser user;
 	private final Map<Integer, UserPerk> perks = new HashMap<>();
+	private final Map<ActivationType, Collection<UserPerk>> byType = new HashMap<>();
+	private final Map<PerkName, Collection<UserPerk>> byName = new HashMap<>();
 
 	public UserPerks(WBUser user) {
 		this.user = user;
@@ -33,6 +32,8 @@ public class UserPerks {
 
 	public void reloadFromStorage() {
 		perks.clear();
+		byType.clear();
+		byName.clear();
 		PlayerPerks p = user.perksStorage();
 		for (ActivationType type : ActivationType.values()) {
 			PerkName[] perks = p.perks(type);
@@ -51,13 +52,24 @@ public class UserPerks {
 				perk(perk, i);
 			}
 		}
+		for (Entry<ActivationType, Collection<UserPerk>> entry : new ArrayList<>(
+				byType.entrySet())) {
+			byType.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
+		}
+		for (Entry<PerkName, Collection<UserPerk>> entry : new ArrayList<>(byName.entrySet())) {
+			byName.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
+		}
 	}
 
-	public void perk(Perk perk, int perkSlot) {
+	private void perk(Perk perk, int perkSlot) {
 		int id = UserPerks.id.getAndIncrement();
 		UserPerk up;
 		perks.put(id, up = perk.perkCreator().create(user, perk, id, perkSlot));
-		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+		byType.computeIfAbsent(perk.activationType(), (a) -> new ArrayList<>());
+		byName.computeIfAbsent(perk.perkName(), (a) -> new ArrayList<>());
+		byType.get(perk.activationType()).add(up);
+		byName.get(perk.perkName()).add(up);
+		if (WoolBattle.getInstance().getIngame().enabled()) {
 			up.currentPerkItem().setItem();
 		}
 	}
@@ -72,21 +84,15 @@ public class UserPerks {
 	}
 
 	public Collection<UserPerk> perks(ActivationType type) {
-		return perks.values().stream().filter(p -> p.perk().activationType() == type)
-				.collect(Collectors.toList());
+		return byType.getOrDefault(type, Collections.emptyList());
 	}
 
 	public Collection<UserPerk> perks(PerkName perkName) {
-		return perks.values().stream().filter(p -> p.perk().perkName().equals(perkName))
-				.collect(Collectors.toList());
+		return byName.getOrDefault(perkName, Collections.emptyList());
 	}
 
 	public UserPerk perk(int id) {
 		return perks.get(id);
-	}
-
-	public void remove(int id) {
-		perks.remove(id);
 	}
 
 	public WBUser user() {

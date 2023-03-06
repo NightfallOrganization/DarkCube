@@ -7,14 +7,17 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.event.perk.active.EventGhostStateChange;
+import eu.darkcube.minigame.woolbattle.event.perk.passive.EventMayDoubleJump;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.GhostPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.system.util.data.Key;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -29,11 +32,12 @@ import org.bukkit.potion.PotionEffectType;
 
 public class ListenerGhost extends BasicPerkListener {
 
+	private static final Key DATA_GHOST_PERK = new Key(WoolBattle.getInstance(), "ghostPerk");
 	private static final Key DATA_GHOST_POS = new Key(WoolBattle.getInstance(), "ghostPos");
 	private static final Key DATA_GHOST_ATTACKS = new Key(WoolBattle.getInstance(), "ghostAttacks");
 
-	public ListenerGhost() {
-		super(GhostPerk.GHOST);
+	public ListenerGhost(Perk perk) {
+		super(perk);
 	}
 
 	public static void reset(WBUser user) {
@@ -49,11 +53,13 @@ public class ListenerGhost extends BasicPerkListener {
 		user.getBukkitEntity().teleport(loc);
 		user.user().getMetaDataStorage().remove(DATA_GHOST_POS);
 		user.user().getMetaDataStorage().remove(DATA_GHOST_ATTACKS);
+		UserPerk perk = user.user().getMetaDataStorage().remove(DATA_GHOST_PERK);
+		perk.cooldown(perk.perk().cooldown().ticks());
 		user.getBukkitEntity().setHealth(user.getBukkitEntity().getMaxHealth());
 		WoolBattle.getInstance().getIngame().setArmor(user);
 		ParticleEffect.MOB_APPEARANCE.display(0, 0, 0, 0, 1, user.getBukkitEntity().getLocation(),
 				user.getBukkitEntity());
-		WoolBattle.getInstance().getIngame().listenerDoubleJump.refresh(user.getBukkitEntity());
+		Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, false));
 	}
 
 	@Override
@@ -62,14 +68,17 @@ public class ListenerGhost extends BasicPerkListener {
 		if (isGhost(user)) {
 			return false;
 		}
+		payForThePerk(perk);
 		Player p = user.getBukkitEntity();
 		p.addPotionEffect(
 				new PotionEffect(PotionEffectType.INVISIBILITY, 10000000, 200, false, false));
 		user.user().getMetaDataStorage().set(DATA_GHOST_POS, p.getLocation());
+		user.user().getMetaDataStorage().set(DATA_GHOST_PERK, perk);
 		WoolBattle.getInstance().getIngame().setArmor(user);
 		p.setMaxHealth(20);
 
-		WoolBattle.getInstance().getIngame().listenerDoubleJump.refresh(p);
+		Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, true));
+
 		new Scheduler() {
 
 			@Override
@@ -87,13 +96,16 @@ public class ListenerGhost extends BasicPerkListener {
 			}
 
 		}.runTaskTimer(1);
-		return true;
+		return false;
 	}
 
-	@Override
-	protected void activated(UserPerk perk) {
-		payForThePerk(perk);
-		startCooldown(perk, () -> !isGhost(perk.owner()));
+	@EventHandler
+	public void handle(EventMayDoubleJump event) {
+		if (event.mayDoubleJump()) {
+			if (isGhost(event.user())) {
+				event.mayDoubleJump(false);
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -101,6 +113,7 @@ public class ListenerGhost extends BasicPerkListener {
 		WBUser user = WBUser.getUser(e.getPlayer());
 		user.user().getMetaDataStorage().remove(DATA_GHOST_POS);
 		user.user().getMetaDataStorage().remove(DATA_GHOST_ATTACKS);
+		user.user().getMetaDataStorage().remove(DATA_GHOST_PERK);
 	}
 
 	@EventHandler

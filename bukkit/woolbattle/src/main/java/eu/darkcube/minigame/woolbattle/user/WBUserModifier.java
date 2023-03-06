@@ -11,10 +11,7 @@ import eu.darkcube.minigame.woolbattle.mysql.MySQL;
 import eu.darkcube.minigame.woolbattle.old.UserData;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.ArrowPerk;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.BowPerk;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.EnderPearlPerk;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.ShearsPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.*;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.data.UserModifier;
 import eu.darkcube.system.util.data.Key;
@@ -46,6 +43,10 @@ public class WBUserModifier implements UserModifier {
 			}
 			dataVersion = 1;
 		}
+		if (dataVersion == 1) {
+			migrateFrom1To2(u);
+			dataVersion = 2;
+		}
 		if (oldDataVersion != dataVersion) {
 			user.getPersistentDataStorage()
 					.set(DATA_VERSION, PersistentDataTypes.INTEGER, dataVersion);
@@ -57,6 +58,15 @@ public class WBUserModifier implements UserModifier {
 	@Override
 	public void onUnload(User user) {
 		user.getMetaDataStorage().remove(USER);
+	}
+
+	private void migrateFrom1To2(DefaultWBUser user) {
+		logger.info(
+				"[WoolBattle] Migrating user " + user.user().getName() + " from version 1 to 2");
+		PlayerPerks perks = user.perksStorage();
+		perks.perk(ActivationType.DOUBLE_JUMP, 0, DoubleJumpPerk.DOUBLE_JUMP);
+		perks.perkInvSlot(ActivationType.DOUBLE_JUMP, 0, -1);
+		user.perksStorage(perks);
 	}
 
 	private void migrateFrom0To1(UserData data, DefaultWBUser user) {

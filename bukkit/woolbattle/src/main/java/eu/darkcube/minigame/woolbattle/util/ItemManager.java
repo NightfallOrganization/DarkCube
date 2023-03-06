@@ -28,30 +28,9 @@ public class ItemManager {
 
 	public static final Key ITEM_ID = new Key(WoolBattle.getInstance(), "itemId");
 
-	public static int countItems(ItemStack item, Inventory inv) {
-		int i = 1;
-		for (; inv.contains(item, i); i++) {
-		}
-		if (inv instanceof PlayerInventory) {
-			PlayerInventory t = (PlayerInventory) inv;
-			List<ItemStack> items = new ArrayList<>();
-			items.add(t.getHolder().getItemOnCursor());
-			items.add(t.getBoots());
-			items.add(t.getChestplate());
-			items.add(t.getLeggings());
-			items.add(t.getHelmet());
-			for (ItemStack s : items) {
-				if (item.equals(s)) {
-					i += s.getAmount();
-				}
-			}
-		}
-		return i - 1;
-	}
-
 	public static void removeItems(WBUser user, Inventory invToRemoveFrom, ItemStack itemToRemove,
 			int count) {
-		if (WoolBattle.getInstance().getIngame().isEnabled()
+		if (WoolBattle.getInstance().getIngame().enabled()
 				&& itemToRemove.getType() == Material.WOOL
 				&& user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
 			Map<Integer, ItemStack> leftOver = new HashMap<>();

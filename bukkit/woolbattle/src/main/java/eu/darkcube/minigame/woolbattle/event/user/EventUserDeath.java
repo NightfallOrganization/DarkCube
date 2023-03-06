@@ -4,34 +4,25 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
-package eu.darkcube.minigame.woolbattle.event;
-
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+package eu.darkcube.minigame.woolbattle.event.user;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import org.bukkit.event.HandlerList;
 
-public class EventPlayerDeath extends Event {
+public class EventUserDeath extends UserEvent {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	private WBUser user;
-
-	public EventPlayerDeath(WBUser user) {
-		this.user = user;
+	public EventUserDeath(WBUser user) {
+		super(user);
 	}
 
-	public WBUser getUser() {
-		return user;
+	public static HandlerList getHandlerList() {
+		return handlers;
 	}
 
 	@Override
 	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 }

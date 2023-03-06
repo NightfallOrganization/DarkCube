@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.GrapplingHookPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -17,6 +17,7 @@ import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,8 +29,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ListenerGrapplingHook extends BasicPerkListener {
 	private final Handle handle = new Handle();
 
-	public ListenerGrapplingHook() {
-		super(GrapplingHookPerk.GRAPPLING_HOOK);
+	public ListenerGrapplingHook(Perk perk) {
+		super(perk);
 	}
 
 	@Override
@@ -75,7 +76,6 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 				hook.remove();
 				return;
 			}
-			payForThePerk(perk);
 			Location from = perk.owner().getBukkitEntity().getLocation();
 			Location to = hook.getLocation();
 			Vector v = to.toVector().subtract(from.toVector()).add(new Vector(0, 3, 0));
@@ -85,8 +85,22 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 				v = v.multiply(new Vector(1.2, 1.4, 1.2));
 			}
 			perk.owner().getBukkitEntity().setVelocity(v);
-			startCooldown(perk);
 			hook.remove();
+			activated(perk);
+		}
+	}
+
+	@EventHandler
+	public void handle(EntityDamageByEntityEvent event) {
+		if (event.getDamager() instanceof FishHook) {
+			if (!event.getDamager().hasMetadata("perk"))
+				return;
+			Object operk = event.getDamager().getMetadata("perk").get(0).value();
+			if (operk instanceof UserPerk) {
+				if (((UserPerk) operk).perk().equals(perk())) {
+					event.setCancelled(true);
+				}
+			}
 		}
 	}
 

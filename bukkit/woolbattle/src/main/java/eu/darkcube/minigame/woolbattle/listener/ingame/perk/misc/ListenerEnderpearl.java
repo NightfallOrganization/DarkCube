@@ -8,14 +8,14 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.misc;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.EnderPearlPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class ListenerEnderpearl extends BasicPerkListener {
-	public ListenerEnderpearl() {
-		super(EnderPearlPerk.ENDERPEARL);
+	public ListenerEnderpearl(Perk perk) {
+		super(perk);
 	}
 
 	@Override

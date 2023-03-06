@@ -4,43 +4,34 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
-package eu.darkcube.minigame.woolbattle.event;
-
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
+package eu.darkcube.minigame.woolbattle.event.user;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.HandlerList;
 
-public class EventPlayerKill extends Event implements Cancellable {
+public class EventUserKill extends UserEvent implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
-
-	private WBUser user;
 	private WBUser killer;
 	private boolean cancel;
 
-	public EventPlayerKill(WBUser user, WBUser killer) {
-		this.user = user;
+	public EventUserKill(WBUser user, WBUser killer) {
+		super(user);
 		this.killer = killer;
 		cancel = false;
 	}
 
-	public WBUser getKiller() {
-		return killer;
+	public static HandlerList getHandlerList() {
+		return handlers;
 	}
 
-	public WBUser getUser() {
-		return user;
+	public WBUser killer() {
+		return killer;
 	}
 
 	@Override
 	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 

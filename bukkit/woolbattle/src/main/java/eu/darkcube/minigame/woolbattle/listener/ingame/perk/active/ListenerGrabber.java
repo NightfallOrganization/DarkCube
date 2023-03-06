@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.GrabberPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -26,8 +27,8 @@ public class ListenerGrabber extends BasicPerkListener {
 	private static final Key DATA_SCHEDULER = new Key(WoolBattle.getInstance(), "grabberScheduler");
 	private static final Key DATA_PERK = new Key(WoolBattle.getInstance(), "grabberPerk");
 
-	public ListenerGrabber() {
-		super(GrabberPerk.GRABBER);
+	public ListenerGrabber(Perk perk) {
+		super(perk);
 	}
 
 	public static boolean hasTarget(WBUser user) {
@@ -40,10 +41,10 @@ public class ListenerGrabber extends BasicPerkListener {
 		}
 		WBUser grabbed = user.user().getMetaDataStorage().remove(DATA_GRABBED);
 		user.user().getMetaDataStorage().<Scheduler>remove(DATA_SCHEDULER).cancel();
-		UserPerk perk = user.user().getMetaDataStorage().<UserPerk>remove(DATA_PERK);
+		UserPerk perk = user.user().getMetaDataStorage().remove(DATA_PERK);
 		perk.currentPerkItem().setItem();
 		grabbed.getBukkitEntity().teleport(user.getBukkitEntity());
-		startCooldown(perk);
+		perk.cooldown(perk.perk().cooldown().ticks());
 		return true;
 	}
 
@@ -68,17 +69,12 @@ public class ListenerGrabber extends BasicPerkListener {
 		payForThePerk(perk);
 		user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler() {
 			{
-				runTaskLater(TimeUnit.SECOND.toTicks(5));
-			}
-
-			@Override
-			public void cancel() {
-				super.cancel();
+				runTaskLater(TimeUnit.SECOND.itoTicks(5));
 			}
 
 			@Override
 			public void run() {
-				startCooldown(perk);
+				perk.cooldown(perk.perk().cooldown().ticks());
 				user.user().getMetaDataStorage().remove(DATA_GRABBED);
 				user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
 				user.user().getMetaDataStorage().<UserPerk>remove(DATA_PERK).currentPerkItem()
@@ -89,14 +85,15 @@ public class ListenerGrabber extends BasicPerkListener {
 		Egg egg = p.getWorld().spawn(p.getEyeLocation(), Egg.class);
 		egg.setShooter(p);
 		egg.setVelocity(p.getLocation().getDirection().multiply(1.5));
-		egg.setMetadata("type", new FixedMetadataValue(WoolBattle.getInstance(), "grabber"));
+		egg.setMetadata("perk",
+				new FixedMetadataValue(WoolBattle.getInstance(), GrabberPerk.GRABBER));
 		user.user().getMetaDataStorage().set(DATA_PERK, perk);
 		return false;
 	}
 
 	@Override
 	protected void activated(UserPerk perk) {
-		startCooldown(perk);
+		perk.cooldown(perk.perk().cooldown().ticks());
 	}
 
 	@EventHandler
@@ -104,11 +101,15 @@ public class ListenerGrabber extends BasicPerkListener {
 		if (e.getDamager() instanceof Egg && e.getEntity() instanceof Player
 				&& ((Egg) e.getDamager()).getShooter() instanceof Player) {
 			Egg egg = (Egg) e.getDamager();
-			if (egg.hasMetadata("type") && egg.getMetadata("type").get(0).asString()
-					.equals("grabber")) {
+			if (egg.hasMetadata("perk") && egg.getMetadata("perk").get(0).value()
+					.equals(GrabberPerk.GRABBER)) {
 				WoolBattle wb = WoolBattle.getInstance();
 				Player target = (Player) e.getEntity();
 				WBUser targetUser = WBUser.getUser(target);
+				if (targetUser.projectileImmunityTicks() > 0) {
+					e.setCancelled(true);
+					return;
+				}
 				Player p = (Player) egg.getShooter();
 				WBUser user = WBUser.getUser(p);
 				if (wb.getIngame().attack(user, targetUser) || (

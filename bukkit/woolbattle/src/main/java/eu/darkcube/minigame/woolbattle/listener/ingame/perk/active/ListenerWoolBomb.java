@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.WoolBombPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -21,8 +22,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class ListenerWoolBomb extends BasicPerkListener {
 
-	public ListenerWoolBomb() {
-		super(WoolBombPerk.WOOL_BOMB);
+	public ListenerWoolBomb(Perk perk) {
+		super(perk);
 	}
 
 	@Override

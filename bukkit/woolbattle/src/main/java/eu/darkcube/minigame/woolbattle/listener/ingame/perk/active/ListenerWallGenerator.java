@@ -7,9 +7,8 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.WallGeneratorPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -23,8 +22,8 @@ public class ListenerWallGenerator extends BasicPerkListener {
 	private static final int[][] ids =
 			{{-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}};
 
-	public ListenerWallGenerator() {
-		super(WallGeneratorPerk.WALL_GENERATOR);
+	public ListenerWallGenerator(Perk perk) {
+		super(perk);
 	}
 
 	@Override
@@ -34,7 +33,7 @@ public class ListenerWallGenerator extends BasicPerkListener {
 	}
 
 	private void deny(WBUser user, UserPerk perk) {
-		Ingame.playSoundNotEnoughWool(user);
+		WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(user);
 		setItem(perk);
 	}
 

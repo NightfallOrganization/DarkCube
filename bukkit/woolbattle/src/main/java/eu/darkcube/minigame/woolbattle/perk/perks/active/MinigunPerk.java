@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerMinigun;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class MinigunPerk extends Perk {
 		super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_MINIGUN_COOLDOWN));
+		addListener(new ListenerMinigun(this));
 	}
 }

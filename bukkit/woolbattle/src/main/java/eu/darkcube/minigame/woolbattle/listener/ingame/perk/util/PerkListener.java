@@ -6,39 +6,35 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.util;
 
-import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public abstract class PerkListener implements Listener {
 
-	// to add a new Perk you need to add perk type, lore for the perk, perk item,
-	// perk item lore, and then add the effect
-	// lastly register unregister your listener in
-	// eu.darkcube.minigame.woolbattle.game.Ingame
+	private final Perk perk;
+
+	public PerkListener(Perk perk) {
+		this.perk = perk;
+	}
 
 	/**
 	 * @param perk the perk to check
 	 *
 	 * @return if the given perk is usable
 	 */
-	protected static boolean checkUsable(UserPerk perk) {
+	public static boolean checkUsable(UserPerk perk) {
 		WBUser user = perk.owner();
-		Player p = user.getBukkitEntity();
-		if (!p.getInventory().contains(Material.WOOL, perk.perk().cost()) || perk.cooldown() > 0) {
-			Ingame.playSoundNotEnoughWool(user);
+		if (user.woolCount() < perk.perk().cost() || perk.cooldown() > 0) {
+			WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(user);
 			new Scheduler(perk.currentPerkItem()::setItem).runTask();
 			return false;
 		}
@@ -56,7 +52,7 @@ public abstract class PerkListener implements Listener {
 	 *
 	 * @return if the checks are successful
 	 */
-	protected static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk,
+	public static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk,
 			Consumer<UserPerk> itemMatchRunnable) {
 		ItemBuilder builder = ItemBuilder.item(usedItem);
 		if (!builder.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
@@ -73,48 +69,16 @@ public abstract class PerkListener implements Listener {
 		return checkUsable(userPerk);
 	}
 
-	protected static void payForThePerk(UserPerk perk) {
-		ItemManager.removeItems(perk.owner(), perk.owner().getBukkitEntity().getInventory(),
-				perk.owner().getSingleWoolItem(), perk.perk().cost());
+	public static void payForThePerk(UserPerk perk) {
+		payForThePerk(perk.owner(), perk.perk());
 	}
 
-	protected static void payForThePerk(WBUser user, Perk perk) {
-		ItemManager.removeItems(user, user.getBukkitEntity().getInventory(),
-				user.getSingleWoolItem(), perk.cost());
+	public static void payForThePerk(WBUser user, Perk perk) {
+		user.removeWool(perk.cost());
 	}
 
-	protected static void startCooldown(UserPerk perk) {
-		startCooldown(perk, null);
-	}
-
-	protected static void startCooldown(UserPerk perk, BooleanSupplier mayCountDown) {
-		// if error add a check for 0 cooldown
-		perk.cooldown(perk.perk().cooldown());
-		new Scheduler() {
-
-			int waited = 0;
-
-			@Override
-			public void run() {
-				if (mayCountDown != null && !mayCountDown.getAsBoolean()) {
-					return;
-				}
-				if (perk.owner().perks().perk(perk.id()) == null) {
-					cancel();
-					return;
-				}
-				waited++;
-				waited = waited % 20;
-				if (waited != 0) {
-					return;
-				}
-				perk.cooldown(perk.cooldown() - 1);
-				if (perk.cooldown() <= 0) {
-					cancel();
-				}
-			}
-
-		}.runTaskTimer(1);
+	public Perk perk() {
+		return perk;
 	}
 
 }

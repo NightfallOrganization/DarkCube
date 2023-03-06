@@ -79,6 +79,17 @@ public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventor
 		super.insertArrowItems();
 	}
 
+	@Override
+	protected void insertFallbackItems() {
+		fallbackItems.put(IInventory.slot(2, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
+		fallbackItems.put(IInventory.slot(3, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
+		fallbackItems.put(IInventory.slot(4, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
+		fallbackItems.put(IInventory.slot(2, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
+		fallbackItems.put(IInventory.slot(3, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
+		fallbackItems.put(IInventory.slot(4, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
+		super.insertFallbackItems();
+	}
+
 	protected void insertDefaultItems0() {
 		super.insertDefaultItems();
 	}

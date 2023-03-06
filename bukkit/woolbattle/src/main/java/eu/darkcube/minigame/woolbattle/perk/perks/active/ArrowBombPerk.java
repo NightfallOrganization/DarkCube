@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerArrowBomb;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class ArrowBombPerk extends Perk {
 		super(ActivationType.ACTIVE, ARROW_BOMB, 9, 7, Item.PERK_ARROW_BOMB,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_ARROW_BOMB_COOLDOWN));
+		addListener(new ListenerArrowBomb(this));
 	}
 }

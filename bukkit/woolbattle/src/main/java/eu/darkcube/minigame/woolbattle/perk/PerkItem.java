@@ -38,6 +38,8 @@ public class PerkItem {
 	 */
 	public void setItem() {
 		ItemStack item = calculateItem();
+		if (item == null)
+			return;
 		int slot = perk.slot();
 		if (slot == 100) {
 			perk.owner().user().asPlayer().getOpenInventory().setCursor(item);
@@ -49,9 +51,15 @@ public class PerkItem {
 	}
 
 	public ItemStack calculateItem() {
-		ItemBuilder b = ItemBuilder.item(itemSupplier.get().getItem(perk.owner()));
-		if (perk.cooldown() > 0) {
-			b.amount(perk.cooldown());
+		Item item = itemSupplier.get();
+		if (item == null)
+			return null;
+		ItemBuilder b = ItemBuilder.item(item.getItem(perk.owner()));
+		int cd = (perk.cooldown() + 19) / 20;
+		if (cd > 0) {
+			b.amount(cd);
+		} else if (perk.cooldown() == 0) {
+			b.glow(true);
 		}
 		b.persistentDataStorage().set(KEY_PERK_ID, TYPE_PERK_ID, perk.id());
 		return b.build();

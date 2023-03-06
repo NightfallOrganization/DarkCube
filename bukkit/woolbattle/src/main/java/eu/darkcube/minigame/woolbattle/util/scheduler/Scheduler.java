@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
 public class Scheduler implements Runnable {
@@ -16,10 +15,11 @@ public class Scheduler implements Runnable {
 	public Scheduler() {
 		run = this;
 	}
+
 	public Scheduler(Runnable run) {
 		this.run = run;
 	}
-	
+
 	public void cancel() {
 		if (!isCancelled())
 			task.cancel();
@@ -55,5 +55,11 @@ public class Scheduler implements Runnable {
 	@Override
 	public void run() {
 		run.run();
+	}
+
+	public interface ConfiguredScheduler {
+		void start();
+
+		void stop();
 	}
 }

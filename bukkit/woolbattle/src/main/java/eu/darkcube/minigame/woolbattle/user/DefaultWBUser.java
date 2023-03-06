@@ -8,6 +8,9 @@ package eu.darkcube.minigame.woolbattle.user;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserAddWool;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserRemoveWool;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserWoolCountUpdate;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -16,16 +19,20 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
+import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.Internal;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.nio.ByteBuffer;
@@ -152,7 +159,9 @@ class DefaultWBUser implements WBUser {
 	private int deaths;
 	private WBUser lastHit;
 	private int ticksAfterLastHit;
+	private int projectileImmunityTicks;
 	private UserPerks perks;
+	private int woolCount;
 
 	public DefaultWBUser(User user) {
 		this.user = user;
@@ -263,6 +272,89 @@ class DefaultWBUser implements WBUser {
 	}
 
 	@Override
+	public int woolCount() {
+		return woolCount;
+	}
+
+	@Override
+	public int addWool(int count) {
+		return addWool(count, false);
+	}
+
+	@Override
+	public int addWool(int count, boolean dropIfFull) {
+		if (count == 0)
+			return 0;
+		int maxAdd = getMaxWoolSize() - woolCount;
+		if (maxAdd < 0) {
+			removeWool(-maxAdd);
+		}
+		EventUserAddWool event = new EventUserAddWool(this, count, dropIfFull);
+		Bukkit.getPluginManager().callEvent(event);
+		maxAdd = getMaxWoolSize() - woolCount; // we do this again in case some idiot tries to
+		// change the woolcount in the EventHandler
+		if (maxAdd < 0) {
+			removeWool(-maxAdd);
+			maxAdd = 0;
+		}
+		int addCount = Math.min(event.amount(), maxAdd);
+		int dropCount = event.amount() - addCount;
+		if (event.isCancelled())
+			return 0;
+		int added = 0;
+		ItemStack item = getSingleWoolItem();
+		Inventory inv = getBukkitEntity().getInventory();
+		while (addCount > 0) {
+			ItemStack i = item.clone();
+			i.setAmount(Math.min(64, addCount));
+			addCount -= 64;
+			added += i.getAmount();
+			inv.addItem(i);
+		}
+		woolCount += added;
+		EventUserWoolCountUpdate eventUserWoolCountUpdate =
+				new EventUserWoolCountUpdate(this, woolCount);
+		Bukkit.getPluginManager().callEvent(eventUserWoolCountUpdate);
+		if (event.dropRemaining()) {
+			while (dropCount > 0) {
+				ItemStack i = item.clone();
+				i.setAmount(Math.min(64, dropCount));
+				dropCount -= 64;
+				added += i.getAmount();
+				getBukkitEntity().getWorld()
+						.dropItemNaturally(getBukkitEntity().getLocation().add(0, 0.5, 0), i);
+			}
+		}
+		return added;
+	}
+
+	@Override
+	public int removeWool(int count) {
+		return removeWool(count, true);
+	}
+
+	@Override
+	public int removeWool(int count, boolean updateInventory) {
+		if (count == 0)
+			return 0;
+		EventUserRemoveWool event = new EventUserRemoveWool(this, count);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled())
+			return 0;
+		int removeCount = Math.min(woolCount, event.amount());
+		woolCount -= removeCount;
+		if (updateInventory) {
+			ItemStack singleItem = getSingleWoolItem();
+			ItemManager.removeItems(this, getBukkitEntity().getInventory(), singleItem,
+					removeCount);
+		}
+		EventUserWoolCountUpdate eventUserWoolCountUpdate =
+				new EventUserWoolCountUpdate(this, woolCount);
+		Bukkit.getPluginManager().callEvent(eventUserWoolCountUpdate);
+		return removeCount;
+	}
+
+	@Override
 	public int getMaxWoolSize() {
 		return 64 * 3 * (1 + perkCount(ExtraWoolPerk.EXTRA_WOOL));
 	}
@@ -344,6 +436,16 @@ class DefaultWBUser implements WBUser {
 	}
 
 	@Override
+	public int projectileImmunityTicks() {
+		return projectileImmunityTicks;
+	}
+
+	@Override
+	public void projectileImmunityTicks(int projectileImmunityTicks) {
+		this.projectileImmunityTicks = projectileImmunityTicks;
+	}
+
+	@Override
 	public int getKills() {
 		return kills;
 	}
@@ -369,6 +471,11 @@ class DefaultWBUser implements WBUser {
 	@Override
 	public double getKD() {
 		return getDeaths() != 0 ? (double) getKills() / (double) getDeaths() : getKills();
+	}
+
+	@Internal
+	public void woolCount(int woolCount) {
+		this.woolCount = woolCount;
 	}
 
 	private int perkCount(@SuppressWarnings("SameParameterValue") PerkName perk) {

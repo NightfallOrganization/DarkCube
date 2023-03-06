@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerSafetyPlatform;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
@@ -18,5 +19,6 @@ public class SafetyPlatformPerk extends Perk {
 		super(ActivationType.ACTIVE, SAFETY_PLATFORM, 25, 24, Item.PERK_SAFETY_PLATFORM,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
 						Item.PERK_SAFETY_PLATFORM_COOLDOWN));
+		addListener(new ListenerSafetyPlatform(this));
 	}
 }

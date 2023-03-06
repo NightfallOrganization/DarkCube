@@ -4,8 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
-package eu.darkcube.minigame.woolbattle.event;
+package eu.darkcube.minigame.woolbattle.event.world;
 
 import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
@@ -26,24 +25,24 @@ public class EventDamageBlock extends BlockEvent implements Cancellable {
 		this.newDamage = newDamage;
 	}
 
-	public int getNewDamage() {
-		return newDamage;
+	public static HandlerList getHandlerList() {
+		return handlers;
 	}
 
-	public int getOldDamage() {
-		return oldDamage;
+	public int getNewDamage() {
+		return newDamage;
 	}
 
 	public void setNewDamage(int newDamage) {
 		this.newDamage = newDamage;
 	}
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
+	public int getOldDamage() {
+		return oldDamage;
 	}
 
-	public static HandlerList getHandlerList() {
+	@Override
+	public HandlerList getHandlers() {
 		return handlers;
 	}
 

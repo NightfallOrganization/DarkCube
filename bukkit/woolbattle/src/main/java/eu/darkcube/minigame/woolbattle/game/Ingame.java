@@ -7,14 +7,14 @@
 package eu.darkcube.minigame.woolbattle.game;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.event.EventDamageBlock;
-import eu.darkcube.minigame.woolbattle.event.EventDestroyBlock;
-import eu.darkcube.minigame.woolbattle.event.EventPlayerDeath;
-import eu.darkcube.minigame.woolbattle.event.EventPlayerKill;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserDeath;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserKill;
+import eu.darkcube.minigame.woolbattle.event.world.EventDamageBlock;
+import eu.darkcube.minigame.woolbattle.event.world.EventDestroyBlock;
+import eu.darkcube.minigame.woolbattle.game.ingame.*;
 import eu.darkcube.minigame.woolbattle.listener.ingame.*;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.*;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.misc.ListenerEnderpearl;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive.ListenerDoubleJump;
+import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGhost;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
@@ -25,307 +25,153 @@ import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.*;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerHeightDisplay;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.data.BasicMetaDataStorage;
+import eu.darkcube.system.util.data.Key;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Wool;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
 
 	public static int MAX_BLOCK_ARROW_HITS =
 			WoolBattle.getInstance().getConfig("config").getInt("maxblockarrowhits");
-
 	public static int SPAWNPROTECTION_TICKS =
 			WoolBattle.getInstance().getConfig("config").getInt("spawnprotectionticks");
-
 	public static int SPAWNPROTECTION_TICKS_GLOBAL =
 			WoolBattle.getInstance().getConfig("config").getInt("spawnprotectionticksglobal");
-	public final ListenerBlockBreak listenerBlockBreak;
-	public final ListenerBlockPlace listenerBlockPlace;
-	public final ListenerItemDrop listenerItemDrop;
-	public final ListenerItemPickup listenerItemPickup;
-	public final ListenerBlockCanBuild listenerBlockCanBuild;
-	public final ListenerPlayerJoin listenerPlayerJoin;
-	public final ListenerPlayerQuit listenerPlayerQuit;
-	public final ListenerPlayerLogin listenerPlayerLogin;
-	public final ListenerEntityDamageByEntity listenerEntityDamageByEntity;
-	public final ListenerDoubleJump listenerDoubleJump;
-	public final ListenerEntityDamage listenerEntityDamage;
-	public final ListenerChangeBlock listenerChangeBlock;
-	public final ListenerProjectileHit listenerProjectileHit;
-	public final ListenerProjectileLaunch listenerProjectileLaunch;
-	public final ListenerInventoryClick listenerInventoryClick;
-	public final ListenerInventoryDrag listenerInventoryDrag;
-	public final ListenerCapsule listenerCapsule;
-	public final ListenerSwitcher listenerSwitcher;
-	public final ListenerInteract listenerInteract;
-	public final ListenerGameModeChange listenerGameModeChange;
-	public final ListenerPlayerMove listenerPlayerMove;
-	public final ListenerEntitySpawn listenerEntitySpawn;
-	public final ListenerWoolBomb listenerWoolBomb;
-	public final ListenerTNTEntityDamageByEntity listenerTNTEntityDamageByEntity;
-	public final ListenerExplode listenerExplode;
-	public final ListenerLineBuilder listenerLineBuilder;
-	public final ListenerRonjasToiletSplash listenerRonjasToiletSplash;
-	public final ListenerEnderpearl listenerEnderpearl;
-	public final ListenerSafetyPlatform listenerSafetyPlatform;
-	public final ListenerWallGenerator listenerWallGenerator;
-	public final ListenerBlink listenerBlink;
-	public final ListenerFreezer listenerFreezer;
-	public final ListenerGrandpasClock listenerGrandpasClock;
-	public final ListenerGhost listenerGhost;
-	public final ListenerMinigun listenerMinigun;
-	public final ListenerDeathMove listenerDeathMove;
-	public final ListenerGrabber listenerGrabber;
-	public final ListenerBooster listenerBooster;
-	public final ListenerGrapplingHook listenerGrapplingHook;
-	public final ListenerArrowBomb listenerArrowBomb;
-	public final ListenerRope listenerRope;
-	public final ListenerSlimePlatform listenerSlimePlatform;
-	public final Scheduler schedulerResetWool;
-	public final Scheduler schedulerResetSpawnProtetion;
-	public final Scheduler schedulerParticles;
-	public final Scheduler schedulerGlobalSpawnProtection;
-	public final Scheduler schedulerTick;
-	public final SchedulerHeightDisplay schedulerHeightDisplay;
 	public final Map<WBUser, Team> lastTeam = new HashMap<>();
 	public Set<Block> placedBlocks = new HashSet<>();
-	public Map<Arrow, WBUser> arrows = new HashMap<>();
-	public Map<Block, Byte> breakedWool = new HashMap<>();
+	public Map<Block, DyeColor> breakedWool = new HashMap<>();
 	public Map<WBUser, Integer> killstreak = new HashMap<>();
 	public int killsFor1Life = 5;
-	// public final Scheduler schedulerDeathTimer;
 	public boolean isGlobalSpawnProtection = false;
 	public Team winner;
 	private boolean startingIngame = false;
 
 	public Ingame() {
-		this.listenerItemPickup = new ListenerItemPickup();
-		this.listenerItemDrop = new ListenerItemDrop();
-		this.listenerBlockBreak = new ListenerBlockBreak();
-		this.listenerBlockPlace = new ListenerBlockPlace();
-		this.listenerBlockCanBuild = new ListenerBlockCanBuild();
-		this.listenerPlayerJoin = new ListenerPlayerJoin();
-		this.listenerPlayerQuit = new ListenerPlayerQuit();
-		this.listenerPlayerLogin = new ListenerPlayerLogin();
-		this.listenerEntityDamageByEntity = new ListenerEntityDamageByEntity();
-		this.listenerDoubleJump = new ListenerDoubleJump();
-		this.listenerEntityDamage = new ListenerEntityDamage();
-		this.listenerChangeBlock = new ListenerChangeBlock();
-		this.listenerProjectileHit = new ListenerProjectileHit();
-		this.listenerProjectileLaunch = new ListenerProjectileLaunch();
-		this.listenerInventoryClick = new ListenerInventoryClick();
-		this.listenerInventoryDrag = new ListenerInventoryDrag();
-		this.listenerCapsule = new ListenerCapsule();
-		this.listenerSwitcher = new ListenerSwitcher();
-		this.listenerInteract = new ListenerInteract();
-		this.listenerGameModeChange = new ListenerGameModeChange();
-		this.listenerPlayerMove = new ListenerPlayerMove();
-		this.listenerEntitySpawn = new ListenerEntitySpawn();
-		this.listenerTNTEntityDamageByEntity = new ListenerTNTEntityDamageByEntity();
-		this.listenerWoolBomb = new ListenerWoolBomb();
-		this.listenerExplode = new ListenerExplode();
-		this.listenerLineBuilder = new ListenerLineBuilder();
-		this.listenerRonjasToiletSplash = new ListenerRonjasToiletSplash();
-		this.listenerEnderpearl = new ListenerEnderpearl();
-		this.listenerSafetyPlatform = new ListenerSafetyPlatform();
-		this.listenerBlink = new ListenerBlink();
-		this.listenerWallGenerator = new ListenerWallGenerator();
-		this.listenerGrandpasClock = new ListenerGrandpasClock();
-		this.listenerFreezer = new ListenerFreezer();
-		this.listenerGhost = new ListenerGhost();
-		this.listenerArrowBomb = new ListenerArrowBomb();
-		this.listenerMinigun = new ListenerMinigun();
-		this.listenerDeathMove = new ListenerDeathMove();
-		this.listenerGrabber = new ListenerGrabber();
-		this.listenerBooster = new ListenerBooster();
-		this.listenerGrapplingHook = new ListenerGrapplingHook();
-		this.listenerRope = new ListenerRope();
-		this.listenerSlimePlatform = new ListenerSlimePlatform();
+		addListener(new ListenerItemPickup(), new ListenerItemDrop(), new ListenerBlockBreak(),
+				new ListenerBlockPlace(), new ListenerBlockCanBuild(), new ListenerPlayerJoin(),
+				new ListenerPlayerQuit(), new ListenerPlayerLogin(),
+				new ListenerEntityDamageByEntity(), new ListenerEntityDamage(),
+				new ListenerChangeBlock(), new ListenerProjectileHit(),
+				new ListenerProjectileLaunch(), new ListenerInventoryClick(),
+				new ListenerInventoryDrag(), new ListenerInteract(), new ListenerPlayerMove(),
+				new ListenerEntitySpawn(), new ListenerExplode(), new ListenerDeathMove());
 
-		this.schedulerParticles = new Scheduler() {
+		addScheduler(new SchedulerParticles(), new SchedulerSpawnProtection(this),
+				new SchedulerResetWool(breakedWool, placedBlocks), new SchedulerHeightDisplay(),
+				new SchedulerTick(), new SchedulerPerkCooldown());
 
-			@Override
-			public void run() {
-				for (Arrow arrow : Ingame.this.arrows.keySet()) {
-					Location loc = arrow.getLocation();
-					loc.add(arrow.getVelocity().multiply(10));
-					for (int x = -1; x < 2; x++) {
-						for (int z = -1; z < 2; z++) {
-							Location l = arrow.getLocation();
-							l.add(x * 16, 0, z * 16);
-							l.getChunk().load();
-						}
-					}
-					if (arrow.getShooter() instanceof Player) {
-						if (arrow.isDead() || arrow.isOnGround() || !arrow.isValid()
-								|| !((Player) arrow.getShooter()).isOnline() || !arrow.getLocation()
-								.getChunk().isLoaded()) {
-							arrow.remove();
-							Ingame.this.arrows.remove(arrow);
-							break;
-						}
-						WBUser user = WBUser.getUser(((Player) arrow.getShooter()));
-						ParticleEffect.BLOCK_CRACK.display(
-								new ParticleEffect.BlockData(Material.WOOL,
-										user.getTeam().getType().getWoolColorByte()), 0, 0, 0, 1, 8,
-								arrow.getLocation(), Bukkit.getOnlinePlayers().stream()
-										.map(UserAPI.getInstance()::getUser).map(User::asPlayer)
-										.collect(Collectors.toList()));
-					}
-				}
-			}
-
-		};
-		this.schedulerGlobalSpawnProtection = new Scheduler() {
-
-			public int protectionTicks = Ingame.SPAWNPROTECTION_TICKS_GLOBAL;
-
-			@Override
-			public void cancel() {
-				if (!this.isCancelled()) {
-					Ingame.this.isGlobalSpawnProtection = false;
-					Ingame.this.schedulerResetSpawnProtetion.runTaskTimer(1);
-					super.cancel();
-				}
-			}
-
-			@Override
-			public void run() {
-				if (this.protectionTicks - 1 <= 0 || Ingame.SPAWNPROTECTION_TICKS_GLOBAL == 0) {
-					this.protectionTicks = Ingame.SPAWNPROTECTION_TICKS_GLOBAL;
-					this.cancel();
-					return;
-				}
-				Ingame.this.isGlobalSpawnProtection = true;
-				this.protectionTicks--;
-				for (WBUser user : WBUser.onlineUsers()) {
-					user.getBukkitEntity().setExp((float) this.protectionTicks
-							/ (float) Ingame.SPAWNPROTECTION_TICKS_GLOBAL);
-				}
-			}
-
-		};
-		this.schedulerTick = new Scheduler() {
-
-			@Override
-			public void run() {
-				for (WBUser user : WBUser.onlineUsers()) {
-					if (user.getTeam().getType() != TeamType.SPECTATOR) {
-						if (user.getTicksAfterLastHit() < 1200)
-							user.setTicksAfterLastHit(user.getTicksAfterLastHit() + 1);
-					}
-				}
-			}
-
-		};
-		this.schedulerResetSpawnProtetion = new Scheduler() {
-
-			@Override
-			public void run() {
-				for (WBUser user : WBUser.onlineUsers()) {
-					if (Ingame.SPAWNPROTECTION_TICKS != 0) {
-						if (user.getSpawnProtectionTicks() > 0) {
-							user.setSpawnProtectionTicks(user.getSpawnProtectionTicks() - 1);
-						}
-					}
-				}
-			}
-
-		};
-		this.schedulerResetWool = new Scheduler() {
-
-			@SuppressWarnings("deprecation")
-			@Override
-			public synchronized void run() {
-				for (Block b : Ingame.this.breakedWool.keySet()) {
-					b.setType(Material.WOOL);
-					b.setData(Ingame.this.breakedWool.get(b));
-					placedBlocks.remove(b);
-				}
-				Ingame.this.breakedWool.clear();
-			}
-
-		};
-		this.schedulerHeightDisplay = new SchedulerHeightDisplay();
 	}
 
-	public static int getBlockDamage(Block block) {
-		MetadataValue v;
-		return ((v = Ingame.getMetaData(block, "arrowDamage")) == null) ? 0 : v.asInt();
-	}
-
-	public static MetadataValue getMetaData(Block block, String key) {
-		if (block.getMetadata(key).size() > 0) {
-			return block.getMetadata(key).get(0);
+	public static <T> T getMetaData(Block block, String key, T defaultValue) {
+		if (block.hasMetadata("WoolBattleMetaStorage")) {
+			BasicMetaDataStorage storage =
+					(BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0)
+							.value();
+			return storage.getOr(new Key(WoolBattle.getInstance(), key), defaultValue);
 		}
-		return null;
+		return defaultValue;
 	}
 
-	public static void resetBlockDamage(Block block) {
-		block.removeMetadata("arrowDamage", WoolBattle.getInstance());
+	public static void setMetaData(Block block, String key, Object value) {
+		BasicMetaDataStorage storage;
+		boolean has = block.hasMetadata("WoolBattleMetaStorage");
+		if (has) {
+			storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0)
+					.value();
+		} else {
+			storage = new BasicMetaDataStorage();
+		}
+		Key k = new Key(WoolBattle.getInstance(), key);
+		if (value == null) {
+			if (storage.has(k)) {
+				storage.remove(k);
+			}
+		} else {
+			storage.set(k, value);
+		}
+		if (storage.data.isEmpty()) {
+			if (has) {
+				block.removeMetadata("WoolBattleMetaStorage", WoolBattle.getInstance());
+			}
+		} else {
+			if (!has) {
+				block.setMetadata("WoolBattleMetaStorage",
+						new FixedMetadataValue(WoolBattle.getInstance(), storage));
+			}
+		}
 	}
 
-	public static void playSoundNotEnoughWool(WBUser user) {
+	public int getBlockDamage(Block block) {
+		return getMetaData(block, "arrowDamage", 0);
+	}
+
+	public void resetBlockDamage(Block block) {
+		setMetaData(block, "arrowDamage", null);
+	}
+
+	public void playSoundNotEnoughWool(WBUser user) {
 		user.getBukkitEntity()
 				.playSound(user.getBukkitEntity().getLocation(), Sound.VILLAGER_NO, 1, 1);
 	}
 
-	@SuppressWarnings("deprecation")
-	public static void setBlockDamage(Block block, int damage) {
-		EventDamageBlock damageBlock =
-				new EventDamageBlock(block, Ingame.getBlockDamage(block), damage);
+	public void setBlockDamage(Block block, int damage) {
+		EventDamageBlock damageBlock = new EventDamageBlock(block, getBlockDamage(block), damage);
 		if (damageBlock.isCancelled()) {
 			return;
 		}
 		if (damage >= Ingame.MAX_BLOCK_ARROW_HITS) {
-			EventDestroyBlock destroyBlock = new EventDestroyBlock(block);
-			if (!destroyBlock.isCancelled()) {
-				Ingame ingame = WoolBattle.getInstance().getIngame();
-				if (ingame.placedBlocks.contains(block)) {
-					ingame.placedBlocks.remove(block);
-				} else {
-					ingame.breakedWool.put(block, block.getData());
-				}
-				block.setType(Material.AIR);
-				Ingame.resetBlockDamage(block);
+			if (destroy(block)) {
 				return;
 			}
 		}
-		// block.setMetadata("arrowDamage", new FixedMetadataValue(Main.getInstance(), damage));
 		Ingame.setMetaData(block, "arrowDamage", damage);
 	}
 
-	public static void setMetaData(Block block, String key, Object value) {
-		if (value == null) {
-			block.removeMetadata(key, WoolBattle.getInstance());
-		} else {
-			block.setMetadata(key, new FixedMetadataValue(WoolBattle.getInstance(), value));
+	public boolean destroy(Block block) {
+		return destroy(block, false);
+	}
+
+	public boolean destroy(Block block, boolean force) {
+		if (!force && !placedBlocks.contains(block))
+			return false;
+		EventDestroyBlock destroyBlock = new EventDestroyBlock(block);
+		if (force || !destroyBlock.isCancelled()) {
+			Ingame ingame = WoolBattle.getInstance().getIngame();
+			if (ingame.placedBlocks.contains(block)) {
+				ingame.placedBlocks.remove(block);
+			} else if (block.getType() == Material.WOOL) {
+				ingame.breakedWool.put(block, ((Wool) block.getState().getData()).getColor());
+			}
+
+			if (block.hasMetadata("WoolBattleMetaStorage")) {
+				block.removeMetadata("WoolBattleMetaStorage", WoolBattle.getInstance());
+			}
+			block.setType(Material.AIR);
+			return true;
 		}
+		return false;
 	}
 
 	public Team getLastTeam(WBUser user) {
@@ -337,7 +183,6 @@ public class Ingame extends GamePhase {
 		this.startingIngame = true;
 		CloudNetLink.update();
 		this.splitPlayersToTeams();
-		// Main.getInstance().getSchedulers().clear();
 		int lifes = -1;
 		if (!WoolBattle.getInstance().getLobby().VOTES_LIFES.isEmpty()) {
 			Collection<Integer> list = WoolBattle.getInstance().getLobby().VOTES_LIFES.values();
@@ -364,30 +209,11 @@ public class Ingame extends GamePhase {
 			team.setLifes(lifes);
 		}
 
-		this.listenerDoubleJump.cooldown.clear();
-		this.listenerPlayerMove.ghostBlockFixCount.clear();
-
-		if (this.placedBlocks != null)
-			for (Block b : this.placedBlocks) {
-				b.setType(Material.AIR);
-				Ingame.resetBlockDamage(b);
+		if (this.placedBlocks != null) {
+			for (Block b : new ArrayList<>(this.placedBlocks)) {
+				destroy(b);
 			}
-
-		WoolBattle.registerListeners(this.listenerBlockBreak, this.listenerBlockPlace,
-				this.listenerItemDrop, this.listenerItemPickup, this.listenerBlockCanBuild,
-				this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerLogin,
-				this.listenerEntityDamageByEntity, this.listenerDoubleJump,
-				this.listenerEntityDamage, this.listenerChangeBlock, this.listenerProjectileHit,
-				this.listenerProjectileLaunch, this.listenerInventoryClick,
-				this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcher,
-				this.listenerInteract, this.listenerGameModeChange, this.listenerPlayerMove,
-				this.listenerEntitySpawn, this.listenerEnderpearl, this.listenerSafetyPlatform,
-				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerExplode,
-				this.listenerLineBuilder, this.listenerRonjasToiletSplash, this.listenerBlink,
-				this.listenerWallGenerator, this.listenerGrandpasClock, this.listenerGhost,
-				this.listenerMinigun, this.listenerDeathMove, this.listenerGrabber,
-				this.listenerBooster, this.listenerGrapplingHook, this.listenerRope,
-				this.listenerSlimePlatform, this.listenerFreezer, this.listenerArrowBomb);
+		}
 
 		WBUser.onlineUsers().forEach(u -> {
 			this.loadScoreboardObjective(u);
@@ -400,13 +226,6 @@ public class Ingame extends GamePhase {
 
 		this.isGlobalSpawnProtection = true;
 
-		this.schedulerResetWool.runTaskTimer(16);
-		this.schedulerParticles.runTaskTimer(1);
-		// This one also starts the normal spawnprotection scheduler
-		this.schedulerGlobalSpawnProtection.runTaskTimer(1);
-		this.schedulerTick.runTaskTimer(1);
-		this.schedulerHeightDisplay.start();
-
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			for (Player t : Bukkit.getOnlinePlayers()) {
 				if (p != t) {
@@ -416,35 +235,19 @@ public class Ingame extends GamePhase {
 				}
 			}
 		}
+		WoolBattle.getInstance().perkRegistry().perks().values().forEach(Perk::startLogic);
 		this.startingIngame = false;
 	}
 
 	@Override
 	public void onDisable() {
-		this.schedulerGlobalSpawnProtection.cancel();
-		this.schedulerResetSpawnProtetion.cancel();
-		this.schedulerParticles.cancel();
-		this.schedulerResetWool.cancel();
-		this.schedulerTick.cancel();
-		this.schedulerHeightDisplay.stop();
-		WoolBattle.unregisterListeners(this.listenerBlockBreak, this.listenerBlockPlace,
-				this.listenerItemDrop, this.listenerItemPickup, this.listenerBlockCanBuild,
-				this.listenerPlayerJoin, this.listenerPlayerQuit, this.listenerPlayerLogin,
-				this.listenerEntityDamageByEntity, this.listenerDoubleJump,
-				this.listenerEntityDamage, this.listenerChangeBlock, this.listenerProjectileHit,
-				this.listenerProjectileLaunch, this.listenerInventoryClick,
-				this.listenerInventoryDrag, this.listenerCapsule, this.listenerSwitcher,
-				this.listenerInteract, this.listenerGameModeChange, this.listenerPlayerMove,
-				this.listenerEntitySpawn, this.listenerEnderpearl, this.listenerSafetyPlatform,
-				this.listenerTNTEntityDamageByEntity, this.listenerWoolBomb, this.listenerExplode,
-				this.listenerLineBuilder, this.listenerRonjasToiletSplash, this.listenerBlink,
-				this.listenerWallGenerator, this.listenerGrandpasClock, this.listenerGhost,
-				this.listenerMinigun, this.listenerDeathMove, this.listenerGrabber,
-				this.listenerBooster, this.listenerGrapplingHook, this.listenerRope,
-				this.listenerSlimePlatform, this.listenerFreezer, this.listenerArrowBomb);
-		for (Block b : this.placedBlocks) {
-			b.setType(Material.AIR);
-			Ingame.resetBlockDamage(b);
+
+		WoolBattle.getInstance().perkRegistry().perks().values().forEach(Perk::stopLogic);
+
+		if (this.placedBlocks != null) {
+			for (Block b : new ArrayList<>(this.placedBlocks)) {
+				destroy(b);
+			}
 		}
 	}
 
@@ -465,16 +268,17 @@ public class Ingame extends GamePhase {
 				wool.setColor(user.getTeam().getType().getWoolColor());
 				state.setData(wool);
 				state.update(true);
-
-				//noinspection deprecation
-				block.setData(user.getTeam().getType().getWoolColorByte());
 			}
 			setBlockDamage(block, damage);
 		});
 	}
 
 	public boolean place(Block block, Consumer<Block> placer) {
-		if (block.getType() != Material.AIR) {
+		return place(block, type -> type == Material.AIR, placer);
+	}
+
+	public boolean place(Block block, Predicate<Material> predicate, Consumer<Block> placer) {
+		if (!predicate.test(block.getType())) {
 			return false;
 		}
 		placedBlocks.add(block);
@@ -492,12 +296,12 @@ public class Ingame extends GamePhase {
 
 	public void kill(WBUser user, boolean leaving) {
 		final WBUser killer = user.getLastHit();
-		EventPlayerDeath pe1 = new EventPlayerDeath(user);
+		EventUserDeath pe1 = new EventUserDeath(user);
 		Bukkit.getPluginManager().callEvent(pe1);
 		final boolean countAsDeath = killer != null && user.getTicksAfterLastHit() <= 200;
 		if (countAsDeath) {
 			this.killstreak.remove(user);
-			EventPlayerKill pe2 = new EventPlayerKill(user, killer);
+			EventUserKill pe2 = new EventUserKill(user, killer);
 			Bukkit.getPluginManager().callEvent(pe2);
 			if (!pe2.isCancelled()) {
 				killer.setKills(killer.getKills() + 1);
@@ -530,13 +334,9 @@ public class Ingame extends GamePhase {
 			return;
 		}
 		if (countAsDeath) {
-			//			if (killer != null) {
 			WoolBattle.getInstance()
 					.sendMessage(Message.PLAYER_WAS_KILLED_BY_PLAYER, user.getTeamPlayerName(),
 							killer.getTeamPlayerName());
-			//			} else if (user.getTicksAfterLastHit() <= TimeUnit.SECOND.toTicks(10)) {
-			//				WoolBattle.getInstance().sendMessage(Message.PLAYER_DIED, user.getTeamPlayerName());
-			//		}
 		}
 
 		Team userTeam = user.getTeam();
@@ -627,9 +427,6 @@ public class Ingame extends GamePhase {
 	// p.spigot().setCollidesWithEntities(false);
 	// p.setAllowFlight(true);
 	// p.teleport(Main.getInstance().getMap().getSpawn(TeamType.SPECTATOR.getDisplayNameKey()));
-	// p.getInventory().clear();
-	// p.getInventory().setArmorContents(new ItemStack[4]);
-	// p.getInventory().setItem(0, Item.TELEPORT_COMPASS.getItem(user));
 	// }
 
 	public boolean revive(WBUser target) {
@@ -640,7 +437,7 @@ public class Ingame extends GamePhase {
 		return true;
 	}
 
-	public synchronized void splitPlayersToTeams() {
+	private void splitPlayersToTeams() {
 		Collection<? extends Team> teams = WoolBattle.getInstance().getTeamManager().getTeams();
 		int chosenCount = 0;
 		for (Team team : teams) {
@@ -678,7 +475,8 @@ public class Ingame extends GamePhase {
 				}
 			}
 		}
-		int max = teams.stream().findAny().get().getType().getMaxPlayers();
+		int max = Objects.requireNonNull(teams.stream().findAny().orElse(null)).getType()
+				.getMaxPlayers();
 		for (int i = 0; i < max; i++) {
 			for (Team team : teams) {
 				if (team.getUsers().size() == i) {
@@ -720,7 +518,7 @@ public class Ingame extends GamePhase {
 	}
 
 	public void setPlayerItems(WBUser user) {
-		if (!this.isEnabled()) {
+		if (!this.enabled()) {
 			return;
 		}
 		if (user.getTeam().getType() == TeamType.SPECTATOR) {
@@ -730,7 +528,7 @@ public class Ingame extends GamePhase {
 
 		CraftPlayer p = user.getBukkitEntity();
 		InventoryView v = p.getOpenInventory();
-		int woolCount = ItemManager.countItems(Material.WOOL, p.getInventory());
+		int woolCount = user.woolCount();
 		v.getBottomInventory().clear();
 		v.getTopInventory().clear();
 		v.setCursor(new ItemStack(Material.AIR));
@@ -759,8 +557,7 @@ public class Ingame extends GamePhase {
 		}
 
 		for (int i = 0; i < woolCount; i++) {
-			p.getInventory().addItem(ItemBuilder.item(Material.WOOL)
-					.damage(user.getTeam().getType().getWoolColorByte()).build());
+			p.getInventory().addItem(user.getSingleWoolItem());
 		}
 		p.getHandle().updateInventory(p.getHandle().activeContainer);
 		p.getHandle().collidesWithEntities = true;

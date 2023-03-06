@@ -10,7 +10,6 @@ import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
-import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -25,14 +24,8 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 
 	private final Handle handle = new Handle();
 
-	private final Perk perk;
-
-	public BasicPerkListener(PerkName perkName) {
-		this(WoolBattle.getInstance().perkRegistry().perks().get(perkName));
-	}
-
 	public BasicPerkListener(Perk perk) {
-		this.perk = perk;
+		super(perk);
 	}
 
 	@Override
@@ -43,10 +36,6 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	@Override
 	public void unregistered() {
 		WoolBattle.unregisterListeners(this.handle);
-	}
-
-	public Perk perk() {
-		return perk;
 	}
 
 	/**
@@ -90,7 +79,7 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	 */
 	protected void activated(UserPerk perk) {
 		payForThePerk(perk);
-		startCooldown(perk);
+		perk.cooldown(perk.perk().cooldown().ticks());
 	}
 
 	protected boolean mayActivate() {

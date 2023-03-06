@@ -21,7 +21,7 @@ public class SetLifesCommand extends PServerExecutor {
 	public SetLifesCommand() {
 		super("setlifes", new String[0], b -> b.then(
 				Commands.argument("lifes", IntegerArgumentType.integer(0, 999)).requires(source -> {
-					return WoolBattle.getInstance().getLobby().isEnabled();
+					return WoolBattle.getInstance().getLobby().enabled();
 				}).executes(context -> {
 					int lifes = IntegerArgumentType.getInteger(context, "lifes");
 					WoolBattle.getInstance().baseLifes = lifes;
@@ -29,7 +29,7 @@ public class SetLifesCommand extends PServerExecutor {
 					return 0;
 				})).then(Commands.argument("team", TeamArgument.teamArgument(TeamType::isEnabled))
 				.then(Commands.argument("lifes", IntegerArgumentType.integer(0, 999))
-						.requires(source -> WoolBattle.getInstance().getIngame().isEnabled())
+						.requires(source -> WoolBattle.getInstance().getIngame().enabled())
 						.executes(context -> {
 							TeamType type = TeamArgument.getTeam(context, "team");
 							int lifes = IntegerArgumentType.getInteger(context, "lifes");

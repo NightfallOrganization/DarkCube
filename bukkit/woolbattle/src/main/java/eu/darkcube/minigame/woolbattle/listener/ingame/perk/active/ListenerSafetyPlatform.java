@@ -7,24 +7,23 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.SafetyPlatformPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Location;
 
 public class ListenerSafetyPlatform extends BasicPerkListener {
 
-	public ListenerSafetyPlatform() {
-		super(SafetyPlatformPerk.SAFETY_PLATFORM);
+	public ListenerSafetyPlatform(Perk perk) {
+		super(perk);
 	}
 
 	@Override
 	protected boolean activateRight(UserPerk perk) {
 		boolean suc = setBlocks(perk.owner());
 		if (!suc)
-			Ingame.playSoundNotEnoughWool(perk.owner());
+			WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(perk.owner());
 		return suc;
 	}
 

@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.MinigunPerk;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -26,8 +26,8 @@ public class ListenerMinigun extends BasicPerkListener {
 
 	private static final Key DATA_SCHEDULER = new Key(WoolBattle.getInstance(), "minigunScheduler");
 
-	public ListenerMinigun() {
-		super(MinigunPerk.MINIGUN);
+	public ListenerMinigun(Perk perk) {
+		super(perk);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class ListenerMinigun extends BasicPerkListener {
 
 			@Override
 			public void cancel() {
-				startCooldown(perk);
+				perk.cooldown(perk.perk().cooldown().ticks());
 				super.cancel();
 			}
 

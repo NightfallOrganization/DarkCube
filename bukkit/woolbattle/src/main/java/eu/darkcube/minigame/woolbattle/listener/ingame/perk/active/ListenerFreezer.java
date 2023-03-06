@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.FreezerPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -22,8 +23,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class ListenerFreezer extends BasicPerkListener {
-	public ListenerFreezer() {
-		super(FreezerPerk.FREEZER);
+	public ListenerFreezer(Perk perk) {
+		super(perk);
 	}
 
 	@Override
@@ -52,9 +53,11 @@ public class ListenerFreezer extends BasicPerkListener {
 				.asString().equals(FreezerPerk.FREEZER.getName())) {
 			event.setCancelled(true);
 			WBUser user = WBUser.getUser(hit);
+			if (user.projectileImmunityTicks() > 0)
+				return;
 			if (user.getTeam().getType() != WBUser.getUser(p).getTeam().getType()) {
 				user.getBukkitEntity().addPotionEffect(
-						new PotionEffect(PotionEffectType.SLOW, (int) TimeUnit.SECOND.toTicks(3), 6,
+						new PotionEffect(PotionEffectType.SLOW, TimeUnit.SECOND.itoTicks(3), 6,
 								true, false), true);
 			}
 		}

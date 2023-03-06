@@ -45,14 +45,14 @@ public interface UserPerk {
 	int slot();
 
 	/**
-	 * @return the current cooldown for this perk
+	 * @return the current cooldown in ticks for this perk
 	 */
 	int cooldown();
 
 	/**
 	 * Sets the cooldown for this user's perk. This will also automatically count down
 	 *
-	 * @param cooldown the cooldown
+	 * @param cooldown the cooldown in ticks
 	 */
 	void cooldown(int cooldown);
 

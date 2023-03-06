@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.listener.ingame.perk.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.SwitcherPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -23,8 +24,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class ListenerSwitcher extends BasicPerkListener {
 
-	public ListenerSwitcher() {
-		super(SwitcherPerk.SWITCHER);
+	public ListenerSwitcher(Perk perk) {
+		super(perk);
 	}
 
 	@Override
@@ -53,15 +54,16 @@ public class ListenerSwitcher extends BasicPerkListener {
 				.asString().equals(SwitcherPerk.SWITCHER.getName())) {
 			e.setCancelled(true);
 			WBUser user = WBUser.getUser(hit);
-			if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30)
-					&& WoolBattle.getInstance().getIngame().attack(WBUser.getUser(p), user)) {
-				Location loc = p.getLocation();
-				p.teleport(hit);
-				hit.teleport(loc);
+			if (user.projectileImmunityTicks() > 0)
+				return;
+			if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30))
+				WoolBattle.getInstance().getIngame().attack(WBUser.getUser(p), user);
+			Location loc = p.getLocation();
+			p.teleport(hit);
+			hit.teleport(loc);
 
-				p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1.8F);
-				hit.playSound(hit.getLocation(), Sound.ITEM_PICKUP, 1, 1.8F);
-			}
+			p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1.8F);
+			hit.playSound(hit.getLocation(), Sound.ITEM_PICKUP, 1, 1.8F);
 		}
 	}
 }

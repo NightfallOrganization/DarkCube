@@ -21,6 +21,10 @@ public class DefaultUserPerk implements UserPerk {
 	private int slot;
 	private int cooldown;
 
+	public DefaultUserPerk(final WBUser owner, final Perk perk, final int id, final int perkSlot) {
+		this(owner, id, perkSlot, perk);
+	}
+
 	public DefaultUserPerk(final WBUser owner, final int id, final int perkSlot, final Perk perk) {
 		this.id = id;
 		this.perkSlot = perkSlot;
@@ -62,10 +66,10 @@ public class DefaultUserPerk implements UserPerk {
 	public void slot(int slot) {
 		int oldValue = this.slot;
 		slotSilent(slot);
-		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+		if (WoolBattle.getInstance().getIngame().enabled()) {
 			if (oldValue == 100) {
 				owner().getBukkitEntity().getOpenInventory().setCursor(null);
-			} else {
+			} else if (oldValue != -1 /* -1 for no slot set */) {
 				owner().getBukkitEntity().getOpenInventory().setItem(oldValue, null);
 			}
 			currentPerkItem().setItem();
@@ -84,8 +88,8 @@ public class DefaultUserPerk implements UserPerk {
 
 	@Override
 	public void cooldown(int cooldown) {
-		this.cooldown = Math.min(cooldown, perk.cooldown());
-		if (WoolBattle.getInstance().getIngame().isEnabled()) {
+		this.cooldown = Math.min(cooldown, perk.cooldown().ticks());
+		if (WoolBattle.getInstance().getIngame().enabled()) {
 			currentPerkItem().setItem();
 		}
 	}

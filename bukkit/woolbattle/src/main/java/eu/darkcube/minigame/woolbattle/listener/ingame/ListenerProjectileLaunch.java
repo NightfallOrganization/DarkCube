@@ -7,7 +7,6 @@
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.ArrowRainPerk;
@@ -43,14 +42,17 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 					return;
 
 				if (!p.getInventory().contains(Material.WOOL, 1)) {
-					Ingame.playSoundNotEnoughWool(user);
+					WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(user);
 					arrow.remove();
 					e.setCancelled(true);
 					return;
 				}
 
-				WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
-				ItemManager.removeItems(user, p.getInventory(), user.getSingleWoolItem(), 1);
+				user.removeWool(1);
+				arrow.setVelocity(arrow.getVelocity()); // This is the fix for a server client
+				// de-sync problem. We just need to send the velocity packet for the arrow again.
+				// Might change this in the future to use actual packets or to modify the nms
+				// class, but like what's the point lol?
 				if (user.perks().count(FastArrowPerk.FAST_ARROW) > 0) {
 					Vector vec = arrow.getVelocity().multiply(1.7);
 
@@ -102,8 +104,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 						} else {
 							ItemManager.removeItems(user, p.getInventory(), wool, cost);
 						}
-
-						perk.cooldown(perk.perk().cooldown() + arrowCount);
+						perk.cooldown(perk.perk().cooldown().ticks() + arrowCount);
 
 						this.shootArrows(user, 20F / arrowCount, arrowCount / 2, arrow);
 						this.shootArrows(user, -20F / arrowCount, arrowCount / 2, arrow);
@@ -112,7 +113,7 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 							perk.cooldown(perk.cooldown() - 1);
 							return;
 						}
-						perk.cooldown(perk.perk().cooldown());
+						perk.cooldown(perk.perk().cooldown().ticks());
 						new Scheduler() {
 							@Override
 							public void run() {
@@ -162,7 +163,6 @@ public class ListenerProjectileLaunch extends Listener<ProjectileLaunchEvent> {
 			vec = l.getDirection();
 			vec.multiply(original.getVelocity().length());
 			arrow.setVelocity(vec);
-			WoolBattle.getInstance().getIngame().arrows.put(arrow, user);
 		}
 	}
 
