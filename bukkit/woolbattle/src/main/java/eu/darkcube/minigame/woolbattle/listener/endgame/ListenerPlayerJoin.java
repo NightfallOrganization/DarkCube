@@ -17,7 +17,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 	@Override
 	@EventHandler
 	public void handle(PlayerJoinEvent e) {
-		WoolBattle main = WoolBattle.getInstance();
+		WoolBattle main = WoolBattle.instance();
 		Player p = e.getPlayer();
 		WBUser user = WBUser.getUser(p);
 		main.getEndgame().setPlayerItems(user);

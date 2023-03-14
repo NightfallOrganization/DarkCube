@@ -8,16 +8,16 @@ package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive.ListenerDoubleJump;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
+import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 
 public class DoubleJumpPerk extends Perk {
 	public static final PerkName DOUBLE_JUMP = new PerkName("DOUBLE_JUMP");
 
 	public DoubleJumpPerk() {
-		super(ActivationType.DOUBLE_JUMP, DOUBLE_JUMP, new Cooldown(TimeUnit.TICKS, 63), 5, null,
+		super(ActivationType.DOUBLE_JUMP, DOUBLE_JUMP, new Cooldown(Unit.TICKS, 63), 5, null,
 				DoubleJumpUserPerk::new);
 		addListener(new ListenerDoubleJump(this));
 	}
@@ -30,9 +30,9 @@ public class DoubleJumpPerk extends Perk {
 
 		@Override
 		public void cooldown(int cooldown) {
-			float max = perk().cooldown().ticks();
-			float cur = cooldown;
-			owner().getBukkitEntity().setFoodLevel(7 + (Math.round((max - cur) / max * 13)));
+			float max = perk().cooldown().cooldown();
+			owner().getBukkitEntity()
+					.setFoodLevel(7 + (Math.round((max - (float) cooldown) / max * 13)));
 			if (cooldown <= 0 && cooldown() > 0) {
 				owner().getBukkitEntity().setAllowFlight(true);
 			}

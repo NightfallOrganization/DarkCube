@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive;
 
-import eu.darkcube.minigame.woolbattle.event.perk.EventDoubleJump;
+import eu.darkcube.minigame.woolbattle.event.perk.other.DoubleJumpEvent;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.PerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
@@ -20,7 +20,7 @@ public class ListenerLongJump extends PerkListener {
 	}
 
 	@EventHandler
-	public void handle(EventDoubleJump event) {
+	public void handle(DoubleJumpEvent event) {
 		for (UserPerk ignored : event.user().perks().perks(perk().perkName())) {
 			Vector velocity = event.velocity();
 			double y = velocity.getY();

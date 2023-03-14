@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class SettingsHeightDisplayColorInventory extends WoolBattlePagedInventory {
 	public static final InventoryType TYPE =
 			InventoryType.of("woolbattle-settings-height-display-color");
-	private static final Key COLOR = new Key(WoolBattle.getInstance(), "heightDisplayColor");
+	private static final Key COLOR = new Key(WoolBattle.instance(), "heightDisplayColor");
 	private static final PersistentDataType<ChatColor> COLOR_TYPE =
 			PersistentDataTypes.enumType(ChatColor.class);
 	private final Scheduler scheduler;

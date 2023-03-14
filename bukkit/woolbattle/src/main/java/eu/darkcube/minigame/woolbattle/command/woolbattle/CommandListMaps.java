@@ -17,7 +17,7 @@ public class CommandListMaps extends WBCommandExecutor {
 	public CommandListMaps() {
 		super("listMaps", b -> b.executes(ctx -> {
 			Component c = Component.empty();
-			Collection<? extends Map> maps = WoolBattle.getInstance().getMapManager().getMaps();
+			Collection<? extends Map> maps = WoolBattle.instance().getMapManager().getMaps();
 			if (maps.isEmpty()) {
 				c = Component.text("Es sind keine Maps erstellt");
 			} else {

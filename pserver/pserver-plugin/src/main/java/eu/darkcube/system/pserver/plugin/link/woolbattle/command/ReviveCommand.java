@@ -18,7 +18,7 @@ public class ReviveCommand extends PServerExecutor {
 		super("revive", new String[0], b -> b.then(
 				Commands.argument("player", EntityArgument.player()).executes(context -> {
 					WBUser user = WBUser.getUser(EntityArgument.getPlayer(context, "player"));
-					if (WoolBattle.getInstance().getIngame().revive(user)) {
+					if (WoolBattle.instance().getIngame().revive(user)) {
 						context.getSource().sendMessage(Message.WOOLBATTLE_REVIVED_PLAYER,
 								user.getTeamPlayerName());
 					} else {

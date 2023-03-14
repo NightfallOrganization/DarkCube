@@ -48,6 +48,6 @@ public class ListenerRope extends BasicPerkListener {
 	}
 
 	private void setBlock(Location block, WBUser user) {
-		WoolBattle.getInstance().getIngame().place(user, block.getBlock());
+		WoolBattle.instance().getIngame().place(user, block.getBlock());
 	}
 }

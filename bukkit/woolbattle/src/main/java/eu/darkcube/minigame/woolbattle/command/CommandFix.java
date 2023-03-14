@@ -11,10 +11,10 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 
 public class CommandFix extends WBCommandExecutor {
 	public CommandFix() {
-		super("fix", b -> b.requires(s -> WoolBattle.getInstance().getIngame().enabled())
-				.executes(ctx -> {
+		super("fix",
+				b -> b.requires(s -> WoolBattle.instance().getIngame().enabled()).executes(ctx -> {
 					WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
-					WoolBattle.getInstance().getIngame().setPlayerItems(user);
+					WoolBattle.instance().getIngame().setPlayerItems(user);
 					return 0;
 				}));
 	}

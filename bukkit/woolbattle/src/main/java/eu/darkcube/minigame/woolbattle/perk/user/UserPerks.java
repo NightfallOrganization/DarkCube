@@ -38,11 +38,10 @@ public class UserPerks {
 		for (ActivationType type : ActivationType.values()) {
 			PerkName[] perks = p.perks(type);
 			for (int i = 0; i < perks.length; i++) {
-				Perk perk = WoolBattle.getInstance().perkRegistry().perks().get(perks[i]);
+				Perk perk = WoolBattle.instance().perkRegistry().perks().get(perks[i]);
 				if (perk == null) {
 					List<PerkName> listPerks = Arrays.asList(perks);
-					perk = java.util.Arrays.stream(
-									WoolBattle.getInstance().perkRegistry().perks(type))
+					perk = java.util.Arrays.stream(WoolBattle.instance().perkRegistry().perks(type))
 							.filter(pe -> !listPerks.contains(pe.perkName())).findAny()
 							.orElseThrow(Error::new);
 					p.perk(type, i, perk.perkName());
@@ -69,7 +68,7 @@ public class UserPerks {
 		byName.computeIfAbsent(perk.perkName(), (a) -> new ArrayList<>());
 		byType.get(perk.activationType()).add(up);
 		byName.get(perk.perkName()).add(up);
-		if (WoolBattle.getInstance().getIngame().enabled()) {
+		if (WoolBattle.instance().getIngame().enabled()) {
 			up.currentPerkItem().setItem();
 		}
 	}

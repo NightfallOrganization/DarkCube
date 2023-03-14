@@ -28,7 +28,7 @@ public class PerkSelector {
 	}
 
 	public Collection<Perk> selectAll() {
-		return new ArrayList<>(WoolBattle.getInstance().perkRegistry().perks().values());
+		return new ArrayList<>(WoolBattle.instance().perkRegistry().perks().values());
 	}
 
 	public Perk selectOne() {

@@ -22,7 +22,7 @@ public class CommandDisable extends WBCommandExecutor {
 						.color(NamedTextColor.RED));
 			} else {
 				map.disable();
-				WoolBattle.getInstance().getLobby().recalculateMap();
+				WoolBattle.instance().getLobby().recalculateMap();
 				ctx.getSource().sendMessage(
 						Component.text("Du hast die Map '" + map.getName() + "' deaktiviert!")
 								.color(NamedTextColor.GREEN));

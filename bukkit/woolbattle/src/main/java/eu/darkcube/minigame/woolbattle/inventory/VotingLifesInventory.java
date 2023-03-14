@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class VotingLifesInventory extends WoolBattlePagedInventory {
 	public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-lifes");
-	private static final Key LIFES = new Key(WoolBattle.getInstance(), "voting-lifes");
+	private static final Key LIFES = new Key(WoolBattle.instance(), "voting-lifes");
 
 	public VotingLifesInventory(WBUser user) {
 		super(TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);
@@ -37,7 +37,7 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
 		if (stringLifes == null)
 			return;
 		int lifes = Integer.parseInt(stringLifes);
-		WoolBattle.getInstance().getLobby().VOTES_LIFES.put(user, lifes);
+		WoolBattle.instance().getLobby().VOTES_LIFES.put(user, lifes);
 		user.user().sendMessage(Message.VOTED_LIFES, lifes);
 		recalculate();
 	}
@@ -60,8 +60,8 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
 		ItemBuilder builder = ItemBuilder.item(Item.LOBBY_VOTING_LIFES_ENTRY.getItem(user, lifes));
 		ItemManager.setId(builder, LIFES, String.valueOf(lifes));
 		int lifeVotes = -1;
-		if (WoolBattle.getInstance().getLobby().VOTES_LIFES.containsKey(user)) {
-			lifeVotes = WoolBattle.getInstance().getLobby().VOTES_LIFES.get(user);
+		if (WoolBattle.instance().getLobby().VOTES_LIFES.containsKey(user)) {
+			lifeVotes = WoolBattle.instance().getLobby().VOTES_LIFES.get(user);
 		}
 		if (lifeVotes == lifes) {
 			builder.glow(true);

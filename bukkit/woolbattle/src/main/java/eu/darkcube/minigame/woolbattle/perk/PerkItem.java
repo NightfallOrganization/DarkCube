@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 public class PerkItem {
 
-	public static final Key KEY_PERK_ID = new Key(WoolBattle.getInstance(), "perkId");
+	public static final Key KEY_PERK_ID = new Key(WoolBattle.instance(), "perkId");
 	public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
 
 	private final Supplier<Item> itemSupplier;

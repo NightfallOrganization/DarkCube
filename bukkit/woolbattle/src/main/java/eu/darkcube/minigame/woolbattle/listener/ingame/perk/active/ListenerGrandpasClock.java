@@ -18,9 +18,8 @@ import org.bukkit.Sound;
 
 public class ListenerGrandpasClock extends BasicPerkListener {
 
-	private static final Key DATA_OLD_POS =
-			new Key(WoolBattle.getInstance(), "grandpasClockOldPos");
-	private static final Key DATA_TICKER = new Key(WoolBattle.getInstance(), "grandpasClockTicker");
+	private static final Key DATA_OLD_POS = new Key(WoolBattle.instance(), "grandpasClockOldPos");
+	private static final Key DATA_TICKER = new Key(WoolBattle.instance(), "grandpasClockTicker");
 
 	public ListenerGrandpasClock(Perk perk) {
 		super(perk);

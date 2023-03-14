@@ -26,7 +26,7 @@ import java.util.UUID;
 
 public class CompassTeleportInventory extends WoolBattlePagedInventory {
 	public static final InventoryType TYPE = InventoryType.of("woolbattle-compass-teleport");
-	private static final Key USER = new Key(WoolBattle.getInstance(), "tpUserId");
+	private static final Key USER = new Key(WoolBattle.instance(), "tpUserId");
 
 	public CompassTeleportInventory(WBUser user) {
 		super(TYPE, Message.INVENTORY_COMPASS.getMessage(user), user);

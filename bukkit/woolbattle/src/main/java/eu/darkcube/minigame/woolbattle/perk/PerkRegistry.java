@@ -53,6 +53,7 @@ public class PerkRegistry {
 		register(new DoubleJumpPerk());
 		register(new MinePerk());
 		register(new ElevatorPerk());
+		register(new ReflectorPerk());
 	}
 
 	public void register(Perk perk) {

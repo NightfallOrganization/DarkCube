@@ -35,12 +35,12 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 	@Override
 	@EventHandler
 	public void handle(PlayerJoinEvent e) {
-		Lobby lobby = WoolBattle.getInstance().getLobby();
+		Lobby lobby = WoolBattle.instance().getLobby();
 		Player p = e.getPlayer();
 		WBUser user = WBUser.getUser(p);
 		CloudNetLink.update();
-		WoolBattle.getInstance().getTeamManager()
-				.setTeam(user, WoolBattle.getInstance().getTeamManager().getSpectator());
+		WoolBattle.instance().getTeamManager()
+				.setTeam(user, WoolBattle.instance().getTeamManager().getSpectator());
 		Scoreboard sb = new Scoreboard();
 		WoolBattle.initScoreboard(sb, user);
 		lobby.getScoreboardByUser().put(user, sb);
@@ -49,7 +49,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 
 		Objective obj = sb.getObjective(ScoreboardObjective.LOBBY.getKey());
 		int minPlayerCount =
-				WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+				WoolBattle.instance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
 		ScoreboardTeam needed = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
 		for (int i = 0; i < ObjectiveTeam.values().length; i++) {
 			ObjectiveTeam ot = ObjectiveTeam.values()[i];
@@ -62,16 +62,16 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		}
 
 		needed.setSuffix(text(minPlayerCount));
-		WoolBattle.getInstance().setMap(user);
-		WoolBattle.getInstance().setOnline(user);
-		WoolBattle.getInstance().setEpGlitch(user);
+		WoolBattle.instance().setMap(user);
+		WoolBattle.instance().setOnline(user);
+		WoolBattle.instance().setEpGlitch(user);
 
 		obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
 		WBUser.onlineUsers().forEach(t -> {
 			if (e.getJoinMessage() != null)
 				lobby.reloadUsers(t);
-			WoolBattle.getInstance().setOnline(t);
+			WoolBattle.instance().setOnline(t);
 		});
 
 		if (e.getJoinMessage() != null) {
@@ -102,7 +102,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
 		if (e.getJoinMessage() != null) {
 			lobby.setTimer(Math.max(lobby.getTimer(), 300));
 
-			WoolBattle.getInstance().sendMessage(Message.PLAYER_JOINED, user.getTeamPlayerName());
+			WoolBattle.instance().sendMessage(Message.PLAYER_JOINED, user.getTeamPlayerName());
 
 			e.setJoinMessage(null);
 		} else {

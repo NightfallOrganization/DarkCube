@@ -27,7 +27,7 @@ public class CommandSetTeam extends CommandExecutor {
 								Player player = EntityArgument.getPlayer(context, "player");
 								WBUser user = WBUser.getUser(player);
 								TeamType type = TeamArgument.getTeam(context, "team");
-								Team team = WoolBattle.getInstance().getTeamManager().getTeam(type);
+								Team team = WoolBattle.instance().getTeamManager().getTeam(type);
 								user.setTeam(team);
 								context.getSource().sendMessage(Component.text("Team gesetzt!"));
 								return 0;

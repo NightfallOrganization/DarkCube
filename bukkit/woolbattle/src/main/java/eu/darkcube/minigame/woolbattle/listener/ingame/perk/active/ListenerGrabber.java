@@ -23,9 +23,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class ListenerGrabber extends BasicPerkListener {
 
-	private static final Key DATA_GRABBED = new Key(WoolBattle.getInstance(), "grabberGrabbed");
-	private static final Key DATA_SCHEDULER = new Key(WoolBattle.getInstance(), "grabberScheduler");
-	private static final Key DATA_PERK = new Key(WoolBattle.getInstance(), "grabberPerk");
+	private static final Key DATA_GRABBED = new Key(WoolBattle.instance(), "grabberGrabbed");
+	private static final Key DATA_SCHEDULER = new Key(WoolBattle.instance(), "grabberScheduler");
+	private static final Key DATA_PERK = new Key(WoolBattle.instance(), "grabberPerk");
 
 	public ListenerGrabber(Perk perk) {
 		super(perk);
@@ -44,7 +44,7 @@ public class ListenerGrabber extends BasicPerkListener {
 		UserPerk perk = user.user().getMetaDataStorage().remove(DATA_PERK);
 		perk.currentPerkItem().setItem();
 		grabbed.getBukkitEntity().teleport(user.getBukkitEntity());
-		perk.cooldown(perk.perk().cooldown().ticks());
+		perk.cooldown(perk.perk().cooldown().cooldown());
 		return true;
 	}
 
@@ -74,7 +74,7 @@ public class ListenerGrabber extends BasicPerkListener {
 
 			@Override
 			public void run() {
-				perk.cooldown(perk.perk().cooldown().ticks());
+				perk.cooldown(perk.perk().cooldown().cooldown());
 				user.user().getMetaDataStorage().remove(DATA_GRABBED);
 				user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
 				user.user().getMetaDataStorage().<UserPerk>remove(DATA_PERK).currentPerkItem()
@@ -85,15 +85,14 @@ public class ListenerGrabber extends BasicPerkListener {
 		Egg egg = p.getWorld().spawn(p.getEyeLocation(), Egg.class);
 		egg.setShooter(p);
 		egg.setVelocity(p.getLocation().getDirection().multiply(1.5));
-		egg.setMetadata("perk",
-				new FixedMetadataValue(WoolBattle.getInstance(), GrabberPerk.GRABBER));
+		egg.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), GrabberPerk.GRABBER));
 		user.user().getMetaDataStorage().set(DATA_PERK, perk);
 		return false;
 	}
 
 	@Override
 	protected void activated(UserPerk perk) {
-		perk.cooldown(perk.perk().cooldown().ticks());
+		perk.cooldown(perk.perk().cooldown().cooldown());
 	}
 
 	@EventHandler
@@ -103,7 +102,7 @@ public class ListenerGrabber extends BasicPerkListener {
 			Egg egg = (Egg) e.getDamager();
 			if (egg.hasMetadata("perk") && egg.getMetadata("perk").get(0).value()
 					.equals(GrabberPerk.GRABBER)) {
-				WoolBattle wb = WoolBattle.getInstance();
+				WoolBattle wb = WoolBattle.instance();
 				Player target = (Player) e.getEntity();
 				WBUser targetUser = WBUser.getUser(target);
 				if (targetUser.projectileImmunityTicks() > 0) {

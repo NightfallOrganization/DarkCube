@@ -32,12 +32,12 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 				return;
 			}
 		} else {
-			WoolBattle.getInstance().getIngame().destroy(block, true);
+			WoolBattle.instance().getIngame().destroy(block, true);
 			return;
 		}
 		Material type = block.getType();
 		if (type == Material.WOOL) {
-			WoolBattle.getInstance().getIngame().destroy(block, true);
+			WoolBattle.instance().getIngame().destroy(block, true);
 			int tryadd = user.getWoolBreakAmount();
 			int added = user.addWool(tryadd);
 			if (added != 0) {
@@ -45,7 +45,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 			}
 			return;
 		}
-		if (!WoolBattle.getInstance().getIngame().placedBlocks.contains(block)) {
+		if (!WoolBattle.instance().getIngame().placedBlocks.contains(block)) {
 			e.setCancelled(true);
 		}
 	}

@@ -34,7 +34,7 @@ public abstract class PerkListener implements Listener {
 	public static boolean checkUsable(UserPerk perk) {
 		WBUser user = perk.owner();
 		if (user.woolCount() < perk.perk().cost() || perk.cooldown() > 0) {
-			WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(user);
+			WoolBattle.instance().getIngame().playSoundNotEnoughWool(user);
 			new Scheduler(perk.currentPerkItem()::setItem).runTask();
 			return false;
 		}
@@ -58,6 +58,7 @@ public abstract class PerkListener implements Listener {
 		if (!builder.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
 			return false;
 		}
+		@SuppressWarnings("DataFlowIssue")
 		int perkId =
 				builder.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
 		UserPerk userPerk = user.perks().perk(perkId);

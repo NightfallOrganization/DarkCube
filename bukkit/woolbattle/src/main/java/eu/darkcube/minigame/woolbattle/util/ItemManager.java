@@ -17,21 +17,17 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ItemManager {
 
-	public static final Key ITEM_ID = new Key(WoolBattle.getInstance(), "itemId");
+	public static final Key ITEM_ID = new Key(WoolBattle.instance(), "itemId");
 
 	public static void removeItems(WBUser user, Inventory invToRemoveFrom, ItemStack itemToRemove,
 			int count) {
-		if (WoolBattle.getInstance().getIngame().enabled()
-				&& itemToRemove.getType() == Material.WOOL
+		if (WoolBattle.instance().getIngame().enabled() && itemToRemove.getType() == Material.WOOL
 				&& user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
 			Map<Integer, ItemStack> leftOver = new HashMap<>();
 			itemToRemove = new ItemStack(itemToRemove);
@@ -84,28 +80,6 @@ public class ItemManager {
 		return -1;
 	}
 
-	public static int countItems(Material item, Inventory inv) {
-		int i = 1;
-		for (; inv.contains(item, i); i++) {
-		}
-		if (inv instanceof PlayerInventory) {
-			PlayerInventory t = (PlayerInventory) inv;
-			List<ItemStack> items = new ArrayList<>();
-			items.add(t.getHolder().getItemOnCursor());
-			items.add(t.getBoots());
-			items.add(t.getChestplate());
-			items.add(t.getLeggings());
-			items.add(t.getHelmet());
-			for (ItemStack s : items) {
-				if (s != null)
-					if (s.getType() == item) {
-						i += s.getAmount();
-					}
-			}
-		}
-		return i - 1;
-	}
-
 	public static ItemStack getItem(Item item, WBUser user, Object... replacements) {
 		return ItemManager.getItem(item, user, replacements, new Object[0]);
 	}
@@ -123,10 +97,6 @@ public class ItemManager {
 					language, loreReplacements));
 		}
 		return builder.build();
-	}
-
-	public static ItemBuilder setItemId(ItemBuilder b, String itemId) {
-		return ItemManager.setId(b, ITEM_ID, itemId);
 	}
 
 	public static ItemBuilder setId(ItemBuilder b, Key key, String id) {
@@ -161,5 +131,4 @@ public class ItemManager {
 	public static Component getDisplayName(Item item, Language language, Object... replacements) {
 		return Message.getMessage(ItemManager.getItemId(item), language, replacements);
 	}
-
 }

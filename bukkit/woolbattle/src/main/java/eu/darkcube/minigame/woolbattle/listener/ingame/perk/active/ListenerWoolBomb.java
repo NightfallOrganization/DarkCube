@@ -30,9 +30,9 @@ public class ListenerWoolBomb extends BasicPerkListener {
 	protected boolean activate(UserPerk perk) {
 		Player p = perk.owner().getBukkitEntity();
 		Snowball bomb = p.launchProjectile(Snowball.class);
-		bomb.setMetadata("source", new FixedMetadataValue(WoolBattle.getInstance(), perk.owner()));
+		bomb.setMetadata("source", new FixedMetadataValue(WoolBattle.instance(), perk.owner()));
 		bomb.setMetadata("perk",
-				new FixedMetadataValue(WoolBattle.getInstance(), perk.perk().perkName().getName()));
+				new FixedMetadataValue(WoolBattle.instance(), perk.perk().perkName().getName()));
 		return true;
 	}
 
@@ -53,8 +53,8 @@ public class ListenerWoolBomb extends BasicPerkListener {
 			WBUser user = (WBUser) bomb.getMetadata("source").get(0).value();
 			TNTPrimed tnt = bomb.getWorld().spawn(bomb.getLocation(), TNTPrimed.class);
 
-			tnt.setMetadata("boost", new FixedMetadataValue(WoolBattle.getInstance(), 3));
-			tnt.setMetadata("source", new FixedMetadataValue(WoolBattle.getInstance(), user));
+			tnt.setMetadata("boost", new FixedMetadataValue(WoolBattle.instance(), 3));
+			tnt.setMetadata("source", new FixedMetadataValue(WoolBattle.instance(), user));
 			tnt.setFuseTicks(10);
 			tnt.setYield(4f);
 		}

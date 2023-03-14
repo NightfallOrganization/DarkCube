@@ -25,7 +25,7 @@ public class CommandSetSpawn extends WBCommandExecutor {
 						loc = Locations.getNiceLocation(loc);
 						p.teleport(loc);
 					}
-					WoolBattle.getInstance().getLobby().setSpawn(loc);
+					WoolBattle.instance().getLobby().setSpawn(loc);
 					p.sendMessage("§aDer LobbySpawn wurde umgesetzt!");
 					return 0;
 				})));

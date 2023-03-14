@@ -22,7 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 public class ListenerLineBuilder extends BasicPerkListener {
 
 	private static final Key DATA_SCHEDULER =
-			new Key(WoolBattle.getInstance(), "linebuilderScheduler");
+			new Key(WoolBattle.instance(), "linebuilderScheduler");
 
 	public ListenerLineBuilder(Perk perk) {
 		super(perk);
@@ -104,8 +104,8 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				line = null;
 				return;
 			}
-			if (cooldownTicks > perk.perk().cooldown().ticks()) {
-				perk.cooldown(perk.perk().cooldown().ticks());
+			if (cooldownTicks > perk.perk().cooldown().cooldown()) {
+				perk.cooldown(perk.perk().cooldown().cooldown());
 				user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
 				cancel();
 				return;
@@ -119,7 +119,7 @@ public class ListenerLineBuilder extends BasicPerkListener {
 				}
 				Location next = line.getNextBlock(user.getBukkitEntity().getLocation());
 				line.addBlock(next);
-				WoolBattle.getInstance().getIngame().place(user, next.getBlock());
+				WoolBattle.instance().getIngame().place(user, next.getBlock());
 				user.getBukkitEntity().addPotionEffect(
 						new PotionEffect(PotionEffectType.SLOW, 20, 10, false, false), true);
 			}

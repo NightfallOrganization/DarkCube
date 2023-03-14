@@ -93,7 +93,7 @@ class DefaultTeam implements Team {
 	public void setLifes(int lifes) {
 		this.lifes = lifes;
 		WBUser.onlineUsers()
-				.forEach(u -> WoolBattle.getInstance().getIngame().reloadScoreboardLifes(u));
+				.forEach(u -> WoolBattle.instance().getIngame().reloadScoreboardLifes(u));
 	}
 
 	@Override
@@ -108,11 +108,11 @@ class DefaultTeam implements Team {
 
 	@Override
 	public Location getSpawn() {
-		return getSpawn(WoolBattle.getInstance().getMap());
+		return getSpawn(WoolBattle.instance().getMap());
 	}
 
 	@Override
 	public void setSpawn(Location location) {
-		setSpawn(WoolBattle.getInstance().getMap(), location);
+		setSpawn(WoolBattle.instance().getMap(), location);
 	}
 }

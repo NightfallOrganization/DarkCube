@@ -45,11 +45,11 @@ import java.util.UUID;
 class DefaultWBUser implements WBUser {
 
 	private static final Key KEY_WOOL_SUBTRACT_DIRECTION =
-			new Key(WoolBattle.getInstance(), "woolSubtractDirection");
+			new Key(WoolBattle.instance(), "woolSubtractDirection");
 	private static final PersistentDataType<WoolSubtractDirection> TYPE_WOOL_SUBTRACT_DIRECTION =
 			PersistentDataTypes.enumType(WoolSubtractDirection.class);
 	private static final Key KEY_HEIGHT_DISPLAY =
-			new Key(WoolBattle.getInstance().getName(), "heightDisplay");
+			new Key(WoolBattle.instance().getName(), "heightDisplay");
 	private static final PersistentDataType<HeightDisplay> TYPE_HEIGHT_DISPLAY =
 			new PersistentDataType<HeightDisplay>() {
 				@Override
@@ -70,14 +70,44 @@ class DefaultWBUser implements WBUser {
 					return object.clone();
 				}
 			};
-	private static final Key KEY_PARTICLES = new Key(WoolBattle.getInstance(), "particles");
+	private static final Key KEY_PARTICLES = new Key(WoolBattle.instance(), "particles");
 	private static final PersistentDataType<Boolean> TYPE_PARTICLES = PersistentDataTypes.BOOLEAN;
-	private static final Key KEY_PERKS = new Key(WoolBattle.getInstance(), "perks");
+	private static final Key KEY_PERKS = new Key(WoolBattle.instance(), "perks");
 	private static final PersistentDataType<PerkName> TYPE_PERK_NAME =
 			PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new,
 					p -> p);
 	private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME =
 			PersistentDataTypes.list(TYPE_PERK_NAME);
+	private static final PersistentDataType<int[]> TYPE_INT_ARRAY =
+			new PersistentDataType<int[]>() {
+				@Override
+				public int[] deserialize(JsonDocument doc, String key) {
+					byte[] bytes = doc.getBinary(key);
+					IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
+					int len = buf.get();
+					int[] ar = new int[len];
+					for (int i = 0; buf.remaining() > 0; i++) {
+						ar[i] = buf.get();
+					}
+					return ar;
+				}
+
+				@Override
+				public void serialize(JsonDocument doc, String key, int[] data) {
+					ByteBuffer buf =
+							ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
+					IntBuffer ib = buf.asIntBuffer();
+					ib.put(data.length);
+					for (int i : data)
+						ib.put(i);
+					doc.append(key, buf.array());
+				}
+
+				@Override
+				public int[] clone(int[] object) {
+					return object.clone();
+				}
+			};
 	private static final PersistentDataType<PlayerPerks> TYPE_PERKS =
 			new PersistentDataType<PlayerPerks>() {
 				@Override
@@ -118,36 +148,6 @@ class DefaultWBUser implements WBUser {
 
 				@Override
 				public PlayerPerks clone(PlayerPerks object) {
-					return object.clone();
-				}
-			};
-	private static final PersistentDataType<int[]> TYPE_INT_ARRAY =
-			new PersistentDataType<int[]>() {
-				@Override
-				public int[] deserialize(JsonDocument doc, String key) {
-					byte[] bytes = doc.getBinary(key);
-					IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
-					int len = buf.get();
-					int[] ar = new int[len];
-					for (int i = 0; buf.remaining() > 0; i++) {
-						ar[i] = buf.get();
-					}
-					return ar;
-				}
-
-				@Override
-				public void serialize(JsonDocument doc, String key, int[] data) {
-					ByteBuffer buf =
-							ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
-					IntBuffer ib = buf.asIntBuffer();
-					ib.put(data.length);
-					for (int i : data)
-						ib.put(i);
-					doc.append(key, buf.array());
-				}
-
-				@Override
-				public int[] clone(int[] object) {
 					return object.clone();
 				}
 			};
@@ -212,12 +212,12 @@ class DefaultWBUser implements WBUser {
 
 	@Override
 	public Team getTeam() {
-		return WoolBattle.getInstance().getTeamManager().getTeam(this);
+		return WoolBattle.instance().getTeamManager().getTeam(this);
 	}
 
 	@Override
 	public void setTeam(Team team) {
-		WoolBattle.getInstance().getTeamManager().setTeam(this, team);
+		WoolBattle.instance().getTeamManager().setTeam(this, team);
 	}
 
 	@Override
@@ -389,7 +389,7 @@ class DefaultWBUser implements WBUser {
 	@Override
 	public void setTrollMode(boolean trollmode) {
 		this.trollmode = trollmode;
-		WoolBattle.getInstance()
+		WoolBattle.instance()
 				.sendMessage("§aTrollmode " + (trollmode ? "§aAn" : "§cAus"), getBukkitEntity());
 	}
 

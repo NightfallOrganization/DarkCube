@@ -33,7 +33,7 @@ public class ListenerWallGenerator extends BasicPerkListener {
 	}
 
 	private void deny(WBUser user, UserPerk perk) {
-		WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(user);
+		WoolBattle.instance().getIngame().playSoundNotEnoughWool(user);
 		setItem(perk);
 	}
 
@@ -102,7 +102,7 @@ public class ListenerWallGenerator extends BasicPerkListener {
 		}
 
 		private void setBlock(Location loc, WBUser user) {
-			if (WoolBattle.getInstance().getIngame().place(user, loc.getBlock())) {
+			if (WoolBattle.instance().getIngame().place(user, loc.getBlock())) {
 				payForThePerk(perk);
 			}
 		}

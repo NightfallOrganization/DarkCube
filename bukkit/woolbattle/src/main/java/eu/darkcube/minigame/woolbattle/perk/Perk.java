@@ -7,11 +7,11 @@
 package eu.darkcube.minigame.woolbattle.perk;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
 import org.bukkit.event.Listener;
 
@@ -36,13 +36,13 @@ public class Perk {
 
 	public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost,
 			Item defaultItem, UserPerkCreator perkCreator) {
-		this(activationType, perkName, new Cooldown(TimeUnit.SECOND, cooldownSeconds), cost,
+		this(activationType, perkName, new Cooldown(Unit.TICKS, cooldownSeconds * 20), cost,
 				defaultItem, perkCreator);
 	}
 
 	public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost,
 			CostType costType, Item defaultItem, UserPerkCreator perkCreator) {
-		this(activationType, perkName, new Cooldown(TimeUnit.SECOND, cooldownSeconds), cost,
+		this(activationType, perkName, new Cooldown(Unit.TICKS, cooldownSeconds * 20), cost,
 				costType, defaultItem, perkCreator);
 	}
 
@@ -177,7 +177,7 @@ public class Perk {
 	 * existing system and helps with code reuse. This may also help for the future to make them
 	 * changeable
 	 */
-	public enum ActivationType implements Comparable<ActivationType> {
+	public enum ActivationType {
 		// Order is important here, as the inventory will be filled in that order for new players
 		PRIMARY_WEAPON("primaryWeapon", 1, Item.DEFAULT_BOW),
 		SECONDARY_WEAPON("secondaryWeapon", 1, Item.DEFAULT_SHEARS),
@@ -227,24 +227,37 @@ public class Perk {
 	}
 
 	public static final class Cooldown {
-		private final TimeUnit timeUnit;
-		private final double cooldown;
+		private final Unit unit;
+		private final int cooldown;
 
-		public Cooldown(TimeUnit timeUnit, double cooldown) {
-			this.timeUnit = timeUnit;
+		public Cooldown(Unit unit, int cooldown) {
+			this.unit = unit;
 			this.cooldown = cooldown;
 		}
 
-		public double cooldown() {
+		public Unit unit() {
+			return unit;
+		}
+
+		public int cooldown() {
 			return cooldown;
 		}
 
-		public TimeUnit timeUnit() {
-			return timeUnit;
-		}
+		public enum Unit {
+			TICKS {
+				@Override
+				public int itemCount(int cooldown) {
+					return cooldown / 20 + 1;
+				}
+			}, ACTIVATIONS {
+				@Override
+				public int itemCount(int cooldown) {
+					return cooldown;
+				}
+			},
+			;
 
-		public int ticks() {
-			return timeUnit().itoTicks(cooldown);
+			public abstract int itemCount(int cooldown);
 		}
 	}
 }

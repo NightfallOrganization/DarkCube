@@ -40,10 +40,10 @@ public class SetTeamCommand extends PServerExecutor {
 
 	private static void setTeam(CommandSource source, Collection<Player> players,
 			TeamType teamtype) {
-		Team team = WoolBattle.getInstance().getTeamManager().getTeam(teamtype);
+		Team team = WoolBattle.instance().getTeamManager().getTeam(teamtype);
 		for (Player player : players) {
 			WBUser user = WBUser.getUser(player);
-			WoolBattle.getInstance().getTeamManager().setTeam(user, team);
+			WoolBattle.instance().getTeamManager().setTeam(user, team);
 		}
 		if (players.size() == 1) {
 			source.sendMessage(Message.WOOLBATTLE_SETTEAM_TEAM_SINGLE,

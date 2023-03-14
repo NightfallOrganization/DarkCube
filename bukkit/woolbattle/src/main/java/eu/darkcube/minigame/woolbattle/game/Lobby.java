@@ -116,7 +116,7 @@ public class Lobby extends GamePhase {
 							p.setExp(0);
 						});
 						Lobby.this.disable();
-						WoolBattle.getInstance().getIngame().enable();
+						WoolBattle.instance().getIngame().enable();
 						return;
 					}
 					AtomicDouble exp = new AtomicDouble(
@@ -177,7 +177,7 @@ public class Lobby extends GamePhase {
 			public void run() {
 				if (Lobby.this.MAX_PLAYER_COUNT == 0 && !this.announced) {
 					this.announced = true;
-					WoolBattle.getInstance()
+					WoolBattle.instance()
 							.sendConsole("It does not seem that any teams have been set up");
 				} else if (Lobby.this.MAX_PLAYER_COUNT != 0) {
 					final int online = Bukkit.getOnlinePlayers().size();
@@ -205,8 +205,8 @@ public class Lobby extends GamePhase {
 	@Override
 	public void onEnable() {
 		CloudNetLink.update();
-		WoolBattle.getInstance().reloadConfig("config");
-		WoolBattle.getInstance().baseLifes = null;
+		WoolBattle.instance().reloadConfig("config");
+		WoolBattle.instance().baseLifes = null;
 		//		Main.getInstance().getSchedulers().clear();
 		this.setTimer(60 * 20);
 		this.VOTES_LIFES.clear();
@@ -223,11 +223,11 @@ public class Lobby extends GamePhase {
 		});
 		WBUser.onlineUsers().forEach(this::reloadUsers);
 		this.MIN_PLAYER_COUNT =
-				WoolBattle.getInstance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
-		this.deathline = WoolBattle.getInstance().getConfig("spawns").getInt("lobbydeathline");
+				WoolBattle.instance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+		this.deathline = WoolBattle.instance().getConfig("spawns").getInt("lobbydeathline");
 
 		int i = 0;
-		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
+		for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
 			if (team.getType().isEnabled())
 				i += team.getType().getMaxPlayers();
 		}
@@ -259,20 +259,20 @@ public class Lobby extends GamePhase {
 		eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(
 				this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled())
 						.collect(Collectors.toList()),
-				WoolBattle.getInstance().getMapManager().getMaps().stream()
+				WoolBattle.instance().getMapManager().getMaps().stream()
 						.filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
-						.collect(Collectors.toSet()), WoolBattle.getInstance().getMap());
+						.collect(Collectors.toSet()), WoolBattle.instance().getMap());
 		if (map != null)
 			if (!map.isEnabled())
 				map = null;
-		WoolBattle.getInstance().setMap(map);
+		WoolBattle.instance().setMap(map);
 	}
 
 	public void recalculateEpGlitch() {
 		boolean glitch =
 				Vote.calculateWinner(this.VOTES_EP_GLITCH.values(), Arrays.asList(true, false),
 						false);
-		WoolBattle.getInstance().setEpGlitch(glitch);
+		WoolBattle.instance().setEpGlitch(glitch);
 	}
 
 	public void loadScoreboard(WBUser user) {
@@ -320,7 +320,7 @@ public class Lobby extends GamePhase {
 	public Location getSpawn() {
 		if (this.spawn == null)
 			this.spawn = Locations.deserialize(
-					WoolBattle.getInstance().getConfig("spawns").getString("lobby"),
+					WoolBattle.instance().getConfig("spawns").getString("lobby"),
 					Locations.DEFAULT_LOCATION);
 		assert this.spawn != null;
 		return this.spawn.clone();
@@ -328,9 +328,9 @@ public class Lobby extends GamePhase {
 
 	public void setSpawn(Location spawn) {
 		this.spawn = spawn;
-		YamlConfiguration cfg = WoolBattle.getInstance().getConfig("spawns");
+		YamlConfiguration cfg = WoolBattle.instance().getConfig("spawns");
 		cfg.set("lobby", Locations.serialize(spawn));
-		WoolBattle.getInstance().saveConfig(cfg);
+		WoolBattle.instance().saveConfig(cfg);
 	}
 
 	public Map<WBUser, Scoreboard> getScoreboardByUser() {

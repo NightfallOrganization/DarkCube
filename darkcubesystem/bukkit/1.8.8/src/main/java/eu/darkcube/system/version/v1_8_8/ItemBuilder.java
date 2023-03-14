@@ -16,6 +16,7 @@ import eu.darkcube.system.inventoryapi.item.meta.LeatherArmorBuilderMeta;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.util.ReflectionUtils;
 import eu.darkcube.system.util.ReflectionUtils.PackageType;
@@ -31,9 +32,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ItemBuilder extends AbstractItemBuilder {
@@ -105,8 +104,12 @@ public class ItemBuilder extends AbstractItemBuilder {
 				meta.addEnchant(e.getKey(), e.getValue(), true);
 			}
 			meta.addItemFlags(flags.toArray(new ItemFlag[0]));
-			meta.setLore(lore.stream().map(LegacyComponentSerializer.legacySection()::serialize)
-					.collect(Collectors.toList()));
+			List<String> lore = new ArrayList<>();
+			for (Component loreComponent : this.lore) {
+				String l = LegacyComponentSerializer.legacySection().serialize(loreComponent);
+				lore.addAll(Arrays.asList(l.split("\\R")));
+			}
+			meta.setLore(lore);
 			if (glow) {
 				if (enchantments.isEmpty()) {
 					meta.addEnchant(material == Material.BOW

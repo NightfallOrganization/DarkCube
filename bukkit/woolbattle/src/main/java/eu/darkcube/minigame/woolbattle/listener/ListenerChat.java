@@ -24,7 +24,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 	@Override
 	@EventHandler
 	public void handle(AsyncPlayerChatEvent e) {
-		WoolBattle main = WoolBattle.getInstance();
+		WoolBattle main = WoolBattle.instance();
 		Player p = e.getPlayer();
 		WBUser user = WBUser.getUser(p);
 		String msg = e.getMessage();

@@ -23,9 +23,9 @@ import java.util.Map;
 
 public class PerksInventory extends WoolBattlePagedInventory {
 	public static final InventoryType TYPE = InventoryType.of("woolbattle-perks");
-	private static final Key PERKS_TYPE = new Key(WoolBattle.getInstance(), "perks-type");
+	private static final Key PERKS_TYPE = new Key(WoolBattle.instance(), "perks-type");
 	private static final Key PERKS_TYPE_NUMBER =
-			new Key(WoolBattle.getInstance(), "perks-type-number");
+			new Key(WoolBattle.instance(), "perks-type-number");
 
 	public PerksInventory(WBUser user) {
 		super(TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
@@ -46,7 +46,7 @@ public class PerksInventory extends WoolBattlePagedInventory {
 
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
-		PerkRegistry registry = WoolBattle.getInstance().perkRegistry();
+		PerkRegistry registry = WoolBattle.instance().perkRegistry();
 		int i = 0;
 		for (Perk.ActivationType type : Perk.ActivationType.values()) {
 			Perk[] perks = registry.perks(type);

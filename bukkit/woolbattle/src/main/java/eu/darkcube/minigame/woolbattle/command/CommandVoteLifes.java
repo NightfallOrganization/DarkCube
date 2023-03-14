@@ -18,7 +18,7 @@ public class CommandVoteLifes extends WBCommandExecutor {
 				Commands.argument("lifes", IntegerArgumentType.integer(3, 30)).executes(ctx -> {
 					WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
 					int lifes = IntegerArgumentType.getInteger(ctx, "lifes");
-					WoolBattle.getInstance().getLobby().VOTES_LIFES.put(user, lifes);
+					WoolBattle.instance().getLobby().VOTES_LIFES.put(user, lifes);
 					user.user().sendMessage(Message.VOTED_LIFES, lifes);
 					return 0;
 				})));

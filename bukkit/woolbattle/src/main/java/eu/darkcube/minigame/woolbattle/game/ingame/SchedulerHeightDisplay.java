@@ -21,7 +21,7 @@ public class SchedulerHeightDisplay extends Scheduler implements ConfiguredSched
 
 		HeightDisplay display = user.heightDisplay();
 		if (display.isEnabled()) {
-			int deathHeight = WoolBattle.getInstance().getMap().getDeathHeight();
+			int deathHeight = WoolBattle.instance().getMap().getDeathHeight();
 			int currentHeight = user.getBukkitEntity().getLocation().getBlockY();
 			int diff = (diff = currentHeight - deathHeight) < 0 ? 0 : diff;
 

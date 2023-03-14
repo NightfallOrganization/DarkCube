@@ -10,7 +10,6 @@ import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.PerkArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 
@@ -24,7 +23,7 @@ public class CommandSetPerkCooldown extends WBCommandExecutor {
 							Collection<Perk> perks = PerkArgument.getPerkTypes(ctx, "perks");
 							int cooldown = IntegerArgumentType.getInteger(ctx, "cooldown");
 							for (Perk perk : perks) {
-								perk.cooldown(new Perk.Cooldown(TimeUnit.SECOND, cooldown));
+								perk.cooldown(new Perk.Cooldown(perk.cooldown().unit(), cooldown));
 								ctx.getSource().sendMessage(Message.PERK_COOLDOWN_SET,
 										perk.perkName().getName().toLowerCase(), cooldown);
 							}

@@ -30,8 +30,8 @@ public class ListenerFreezer extends BasicPerkListener {
 	@Override
 	protected boolean activateRight(UserPerk perk) {
 		Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
-		snowball.setMetadata("perk", new FixedMetadataValue(WoolBattle.getInstance(),
-				perk.perk().perkName().toString()));
+		snowball.setMetadata("perk",
+				new FixedMetadataValue(WoolBattle.instance(), perk.perk().perkName().toString()));
 		return true;
 	}
 

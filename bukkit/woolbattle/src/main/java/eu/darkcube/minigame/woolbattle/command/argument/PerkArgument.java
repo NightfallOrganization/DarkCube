@@ -39,7 +39,7 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 			boolean single) {
 		this.filter = filter == null ? p -> true : filter;
 		this.single = single;
-		this.values = perks == null ? () -> WoolBattle.getInstance().perkRegistry().perks().values()
+		this.values = perks == null ? () -> WoolBattle.instance().perkRegistry().perks().values()
 				.toArray(new Perk[0]) : perks;
 		this.toStringFunction =
 				toStringFunction == null ? defaultToStringFunction() : toStringFunction;

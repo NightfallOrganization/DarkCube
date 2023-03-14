@@ -21,7 +21,7 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
 			WBUser user = WBUser.getUser(p);
-			Ingame ingame = WoolBattle.getInstance().getIngame();
+			Ingame ingame = WoolBattle.instance().getIngame();
 			if (ingame.isGlobalSpawnProtection || user.hasSpawnProtection()) {
 				e.setCancelled(true);
 				return;
@@ -33,7 +33,7 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
 					e.setCancelled(true);
 					break;
 				case SUFFOCATION:
-					if (WoolBattle.getInstance().isEpGlitch()) {
+					if (WoolBattle.instance().isEpGlitch()) {
 						int ticks = user.getTicksAfterLastHit();
 						if (ticks < 200) {
 							ticks += 60;

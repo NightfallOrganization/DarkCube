@@ -23,9 +23,9 @@ import java.util.logging.Logger;
 
 public class WBUserModifier implements UserModifier {
 
-	static final Key USER = new Key(WoolBattle.getInstance(), "user");
+	static final Key USER = new Key(WoolBattle.instance(), "user");
 	private static final Logger logger = Logger.getLogger("WBUserModifier");
-	private static final Key DATA_VERSION = new Key(WoolBattle.getInstance(), "dataVersion");
+	private static final Key DATA_VERSION = new Key(WoolBattle.instance(), "dataVersion");
 
 	@Override
 	public void onLoad(User user) {

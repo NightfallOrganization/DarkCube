@@ -32,9 +32,9 @@ import org.bukkit.potion.PotionEffectType;
 
 public class ListenerGhost extends BasicPerkListener {
 
-	private static final Key DATA_GHOST_PERK = new Key(WoolBattle.getInstance(), "ghostPerk");
-	private static final Key DATA_GHOST_POS = new Key(WoolBattle.getInstance(), "ghostPos");
-	private static final Key DATA_GHOST_ATTACKS = new Key(WoolBattle.getInstance(), "ghostAttacks");
+	private static final Key DATA_GHOST_PERK = new Key(WoolBattle.instance(), "ghostPerk");
+	private static final Key DATA_GHOST_POS = new Key(WoolBattle.instance(), "ghostPos");
+	private static final Key DATA_GHOST_ATTACKS = new Key(WoolBattle.instance(), "ghostAttacks");
 
 	public ListenerGhost(Perk perk) {
 		super(perk);
@@ -54,9 +54,9 @@ public class ListenerGhost extends BasicPerkListener {
 		user.user().getMetaDataStorage().remove(DATA_GHOST_POS);
 		user.user().getMetaDataStorage().remove(DATA_GHOST_ATTACKS);
 		UserPerk perk = user.user().getMetaDataStorage().remove(DATA_GHOST_PERK);
-		perk.cooldown(perk.perk().cooldown().ticks());
+		perk.cooldown(perk.perk().cooldown().cooldown());
 		user.getBukkitEntity().setHealth(user.getBukkitEntity().getMaxHealth());
-		WoolBattle.getInstance().getIngame().setArmor(user);
+		WoolBattle.instance().getIngame().setArmor(user);
 		ParticleEffect.MOB_APPEARANCE.display(0, 0, 0, 0, 1, user.getBukkitEntity().getLocation(),
 				user.getBukkitEntity());
 		Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, false));
@@ -74,7 +74,7 @@ public class ListenerGhost extends BasicPerkListener {
 				new PotionEffect(PotionEffectType.INVISIBILITY, 10000000, 200, false, false));
 		user.user().getMetaDataStorage().set(DATA_GHOST_POS, p.getLocation());
 		user.user().getMetaDataStorage().set(DATA_GHOST_PERK, perk);
-		WoolBattle.getInstance().getIngame().setArmor(user);
+		WoolBattle.instance().getIngame().setArmor(user);
 		p.setMaxHealth(20);
 
 		Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, true));
@@ -142,7 +142,7 @@ public class ListenerGhost extends BasicPerkListener {
 			if (isGhost(user)) {
 				Player p = user.getBukkitEntity();
 				if (p.getNoDamageTicks() == 0) {
-					if (WoolBattle.getInstance().getIngame().attack(attacker, user, true)) {
+					if (WoolBattle.instance().getIngame().attack(attacker, user, true)) {
 						if (!user.user().getMetaDataStorage().has(DATA_GHOST_ATTACKS)) {
 							user.user().getMetaDataStorage().set(DATA_GHOST_ATTACKS, 1);
 							p.setHealth(p.getMaxHealth() / 2);

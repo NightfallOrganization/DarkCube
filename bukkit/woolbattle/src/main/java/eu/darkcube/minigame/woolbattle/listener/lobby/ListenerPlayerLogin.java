@@ -44,7 +44,7 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
 		Player p = e.getPlayer();
 		PermissionInfo info = getPermissionInfo(p);
 
-		boolean full = WoolBattle.getInstance().getMaxPlayers() <= WBUser.onlineUsers().size();
+		boolean full = WoolBattle.instance().getMaxPlayers() <= WBUser.onlineUsers().size();
 		boolean shouldKick = info.hasPermission && full;
 
 		Player weakestLink = null;

@@ -29,12 +29,12 @@ import java.util.Map;
 
 public class TeamsInventory extends WoolBattlePagedInventory {
 	public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
-	private static final Key TEAM = new Key(WoolBattle.getInstance(), "teamId");
+	private static final Key TEAM = new Key(WoolBattle.instance(), "teamId");
 	private final TeamsListener listener = new TeamsListener();
 
 	public TeamsInventory(WBUser user) {
 		super(TYPE, Message.INVENTORY_TEAMS.getMessage(user), user);
-		Bukkit.getPluginManager().registerEvents(listener, WoolBattle.getInstance());
+		Bukkit.getPluginManager().registerEvents(listener, WoolBattle.instance());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class TeamsInventory extends WoolBattlePagedInventory {
 		String teamId = ItemManager.getId(event.item(), TEAM);
 		if (teamId == null)
 			return;
-		Team team = WoolBattle.getInstance().getTeamManager().getTeam(teamId);
+		Team team = WoolBattle.instance().getTeamManager().getTeam(teamId);
 		if (team.equals(user.getTeam())) {
 			user.user().sendMessage(Message.ALREADY_IN_TEAM);
 			return;
@@ -62,7 +62,7 @@ public class TeamsInventory extends WoolBattlePagedInventory {
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		int i = 0;
-		for (Team team : WoolBattle.getInstance().getTeamManager().getTeams()) {
+		for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
 			ItemBuilder b = ItemBuilder.item(Material.WOOL);
 			b.displayname(team.getName(user.user()));
 			b.damage(team.getType().getWoolColorByte());

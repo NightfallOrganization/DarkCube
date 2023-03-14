@@ -22,7 +22,7 @@ public class CommandEnable extends WBCommandExecutor {
 						.color(NamedTextColor.RED));
 			} else {
 				map.enable();
-				WoolBattle.getInstance().getLobby().recalculateMap();
+				WoolBattle.instance().getLobby().recalculateMap();
 				ctx.getSource().sendMessage(
 						Component.text("Du hast die Map '" + map.getName() + "' aktiviert!")
 								.color(NamedTextColor.GREEN));

@@ -34,9 +34,9 @@ public class ListenerRonjasToiletFlush extends BasicPerkListener {
 	@Override
 	protected boolean activateRight(UserPerk perk) {
 		Egg egg = perk.owner().getBukkitEntity().launchProjectile(Egg.class);
-		egg.setMetadata("source", new FixedMetadataValue(WoolBattle.getInstance(), perk.owner()));
+		egg.setMetadata("source", new FixedMetadataValue(WoolBattle.instance(), perk.owner()));
 		egg.setMetadata("perk",
-				new FixedMetadataValue(WoolBattle.getInstance(), perk.perk().perkName().getName()));
+				new FixedMetadataValue(WoolBattle.instance(), perk.perk().perkName().getName()));
 		return true;
 	}
 
@@ -92,7 +92,7 @@ public class ListenerRonjasToiletFlush extends BasicPerkListener {
 			e.setCancelled(true);
 			return;
 		}
-		WoolBattle.getInstance().getIngame().attack(user, target);
+		WoolBattle.instance().getIngame().attack(user, target);
 	}
 
 	private boolean isEggPerk(Egg egg) {

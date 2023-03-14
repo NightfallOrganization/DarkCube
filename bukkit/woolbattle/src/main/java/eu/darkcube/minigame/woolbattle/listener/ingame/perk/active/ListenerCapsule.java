@@ -40,11 +40,11 @@ public class ListenerCapsule extends BasicPerkListener {
 	}
 
 	private void setBlock(WBUser user, Location block) {
-		WoolBattle.getInstance().getIngame().place(user, block.getBlock(), 2, false);
+		WoolBattle.instance().getIngame().place(user, block.getBlock(), 2, false);
 	}
 
 	private void setBlock2(WBUser user, Location block) {
-		WoolBattle.getInstance().getIngame().place(user, block.getBlock(), 0, false);
+		WoolBattle.instance().getIngame().place(user, block.getBlock(), 0, false);
 	}
 
 }

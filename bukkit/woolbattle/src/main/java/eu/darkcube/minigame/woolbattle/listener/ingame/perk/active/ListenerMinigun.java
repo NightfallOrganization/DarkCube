@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class ListenerMinigun extends BasicPerkListener {
 
-	private static final Key DATA_SCHEDULER = new Key(WoolBattle.getInstance(), "minigunScheduler");
+	private static final Key DATA_SCHEDULER = new Key(WoolBattle.instance(), "minigunScheduler");
 
 	public ListenerMinigun(Perk perk) {
 		super(perk);
@@ -45,7 +45,7 @@ public class ListenerMinigun extends BasicPerkListener {
 
 			@Override
 			public void cancel() {
-				perk.cooldown(perk.perk().cooldown().ticks());
+				perk.cooldown(perk.perk().cooldown().cooldown());
 				super.cancel();
 			}
 
@@ -65,7 +65,7 @@ public class ListenerMinigun extends BasicPerkListener {
 				Snowball s = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
 				s.setShooter(p);
 				s.setVelocity(p.getLocation().getDirection().multiply(2.5));
-				s.setMetadata("type", new FixedMetadataValue(WoolBattle.getInstance(), "minigun"));
+				s.setMetadata("type", new FixedMetadataValue(WoolBattle.instance(), "minigun"));
 				payForThePerk(perk);
 			}
 		});

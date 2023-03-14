@@ -32,7 +32,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
 		double y = mid.getY();
 		double z = mid.getZ();
 		for (Block b : e.blockList()) {
-			if (WoolBattle.getInstance().getIngame().destroy(b)) {
+			if (WoolBattle.instance().getIngame().destroy(b)) {
 				@SuppressWarnings("deprecation")
 				FallingBlock block = b.getWorld()
 						.spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(),
@@ -55,7 +55,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
 		double y = mid.getY();
 		double z = mid.getZ();
 		for (Block b : event.blockList()) {
-			if (WoolBattle.getInstance().getIngame().destroy(b)) {
+			if (WoolBattle.instance().getIngame().destroy(b)) {
 				@SuppressWarnings("deprecation")
 				FallingBlock block = b.getWorld()
 						.spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(),
@@ -138,7 +138,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
 				velocity.setY(1 + (velocity.getY() * strengthY / 5));
 				velocity.setZ(velocity.getZ() * strengthZ);
 				p.setVelocity(velocity);
-				WoolBattle.getInstance().getIngame().attack(attacker, user);
+				WoolBattle.instance().getIngame().attack(attacker, user);
 			}
 		} else if (event.getDamager().getType() == EntityType.SNOWBALL) {
 			Snowball bomb = (Snowball) event.getDamager();

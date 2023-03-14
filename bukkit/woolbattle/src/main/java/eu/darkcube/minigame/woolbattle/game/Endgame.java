@@ -40,7 +40,7 @@ public class Endgame extends GamePhase {
 	@Override
 	public void onEnable() {
 		CloudNetLink.update();
-		final WoolBattle main = WoolBattle.getInstance();
+		final WoolBattle main = WoolBattle.instance();
 		//		main.getSchedulers().clear();
 
 		WoolBattle.registerListeners(this.listenerPlayerJoin);

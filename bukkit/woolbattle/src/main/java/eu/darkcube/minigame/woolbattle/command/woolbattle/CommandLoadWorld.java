@@ -22,14 +22,14 @@ public class CommandLoadWorld extends WBCommandExecutor {
 		super("loadWorld",
 				b -> b.then(Commands.argument("world", StringArgument.string()).executes(ctx -> {
 					String worldName = StringArgument.getString(ctx, "world");
-					if (!new File(WoolBattle.getInstance().getServer().getWorldContainer(),
+					if (!new File(WoolBattle.instance().getServer().getWorldContainer(),
 							worldName).exists() && !new File(
-							WoolBattle.getInstance().getServer().getWorldContainer().getParent(),
+							WoolBattle.instance().getServer().getWorldContainer().getParent(),
 							worldName).exists()) {
 						ctx.getSource().sendMessage(Component.text("Diese Welt existiert nicht"));
 						return 0;
 					}
-					YamlConfiguration cfg = WoolBattle.getInstance().getConfig("worlds");
+					YamlConfiguration cfg = WoolBattle.instance().getConfig("worlds");
 					List<String> worlds = cfg.getStringList("worlds");
 					if (worlds.contains(worldName)) {
 						ctx.getSource().sendMessage(Component.text("Diese Welt existiert bereits"));
@@ -37,7 +37,7 @@ public class CommandLoadWorld extends WBCommandExecutor {
 					}
 					worlds.add(worldName);
 					cfg.set("worlds", worlds);
-					WoolBattle.getInstance().saveConfig(cfg);
+					WoolBattle.instance().saveConfig(cfg);
 					VoidWorldPlugin.instance().loadWorld(worldName);
 					ctx.getSource().sendMessage(Component.text("Welt geladen"));
 					return 0;

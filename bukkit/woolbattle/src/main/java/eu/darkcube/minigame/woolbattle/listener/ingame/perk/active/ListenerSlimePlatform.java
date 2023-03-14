@@ -47,7 +47,7 @@ public class ListenerSlimePlatform extends BasicPerkListener {
 	@SuppressWarnings("deprecation")
 	private void setBlock(Location block, ArrayList<Block> l) {
 		if (block.getBlock().getType() == Material.AIR) {
-			WoolBattle.getInstance().getIngame().place(block.getBlock(), b -> {
+			WoolBattle.instance().getIngame().place(block.getBlock(), b -> {
 				BlockState state = b.getState();
 				state.setType(Material.STAINED_CLAY);
 				state.setData(Material.STAINED_CLAY.getNewData((byte) 13));
@@ -60,7 +60,7 @@ public class ListenerSlimePlatform extends BasicPerkListener {
 
 	private boolean setBlock2(Location block) {
 		if (Ingame.getMetaData(block.getBlock(), "slime", null) != null) {
-			WoolBattle.getInstance().getIngame().destroy(block.getBlock());
+			WoolBattle.instance().getIngame().destroy(block.getBlock());
 			return true;
 		}
 		return false;

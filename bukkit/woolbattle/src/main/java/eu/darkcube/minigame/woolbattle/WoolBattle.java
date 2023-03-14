@@ -109,9 +109,8 @@ public class WoolBattle extends Plugin {
 
 	public static void initScoreboard(Scoreboard sb, WBUser owner) {
 		// Spectator is not included in "Team"
-		Collection<Team> teams =
-				new HashSet<>(WoolBattle.getInstance().getTeamManager().getTeams());
-		teams.add(WoolBattle.getInstance().getTeamManager().getSpectator());
+		Collection<Team> teams = new HashSet<>(WoolBattle.instance().getTeamManager().getTeams());
+		teams.add(WoolBattle.instance().getTeamManager().getSpectator());
 		for (Team t : teams) {
 			ScoreboardTeam team = sb.createTeam(t.getType().getScoreboardTag());
 			String s = LegacyComponentSerializer.legacySection()
@@ -130,7 +129,7 @@ public class WoolBattle extends Plugin {
 		}
 	}
 
-	public static WoolBattle getInstance() {
+	public static WoolBattle instance() {
 		return WoolBattle.instance;
 	}
 
@@ -139,8 +138,8 @@ public class WoolBattle extends Plugin {
 			if (l instanceof RegisterNotifyListener) {
 				((RegisterNotifyListener) l).registered();
 			}
-			WoolBattle.getInstance().getServer().getPluginManager()
-					.registerEvents(l, WoolBattle.getInstance());
+			WoolBattle.instance().getServer().getPluginManager()
+					.registerEvents(l, WoolBattle.instance());
 		}
 	}
 
@@ -352,7 +351,7 @@ public class WoolBattle extends Plugin {
 			public void run() {
 				CloudNetLink.update();
 			}
-		}.runTaskTimerAsynchronously(WoolBattle.getInstance(), 10, 10);
+		}.runTaskTimerAsynchronously(WoolBattle.instance(), 10, 10);
 	}
 
 	public Map getMap() {

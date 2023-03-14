@@ -49,7 +49,7 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 	protected boolean activateRight(UserPerk perk) {
 		FishHook hook = perk.owner().getBukkitEntity().launchProjectile(FishHook.class);
 		hook.setVelocity(hook.getVelocity().multiply(1.5));
-		hook.setMetadata("perk", new FixedMetadataValue(WoolBattle.getInstance(), perk));
+		hook.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), perk));
 		return false;
 	}
 
@@ -126,8 +126,8 @@ public class ListenerGrapplingHook extends BasicPerkListener {
 				return;
 			}
 			UserPerk userPerk = refUserPerk.get();
-			event.getEntity().setMetadata("perk",
-					new FixedMetadataValue(WoolBattle.getInstance(), userPerk));
+			event.getEntity()
+					.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), userPerk));
 			event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(1.5));
 		}
 	}

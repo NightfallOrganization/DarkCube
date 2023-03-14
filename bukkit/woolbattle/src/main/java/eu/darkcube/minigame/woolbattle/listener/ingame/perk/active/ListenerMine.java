@@ -49,7 +49,7 @@ public class ListenerMine extends BasicPerkListener {
 		new Scheduler(userPerk.currentPerkItem()::setItem).runTask();
 		event.setCancelled(true);
 		activated(userPerk);
-		WoolBattle.getInstance().getIngame()
+		WoolBattle.instance().getIngame()
 				.place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
 					new Scheduler(() -> b.setType(Material.STONE_PLATE)).runTask();
 					Ingame.setMetaData(b, "perk", userPerk);
@@ -73,7 +73,7 @@ public class ListenerMine extends BasicPerkListener {
 		if (!perk.perk().perkName().equals(MinePerk.MINE))
 			return;
 		event.setCancelled(true);
-		WoolBattle.getInstance().getIngame().destroy(block);
+		WoolBattle.instance().getIngame().destroy(block);
 		block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
 
 		new Scheduler(() -> {
@@ -82,7 +82,7 @@ public class ListenerMine extends BasicPerkListener {
 
 			Vector velocity = playerLoc.subtract(blockLoc).normalize();
 			velocity.multiply(Math.pow(playerLoc.distance(blockLoc), 0.4) / 6);
-			if (WoolBattle.getInstance().getIngame().attack(perk.owner(), user)) {
+			if (WoolBattle.instance().getIngame().attack(perk.owner(), user)) {
 				p.damage(0);
 			}
 			velocity.setY(1.3);

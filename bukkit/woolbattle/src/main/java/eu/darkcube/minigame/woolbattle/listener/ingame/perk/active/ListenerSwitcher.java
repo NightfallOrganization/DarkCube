@@ -32,7 +32,7 @@ public class ListenerSwitcher extends BasicPerkListener {
 	protected boolean activateRight(UserPerk perk) {
 		Snowball ball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
 		ball.setMetadata("perk",
-				new FixedMetadataValue(WoolBattle.getInstance(), perk.perk().perkName().getName()));
+				new FixedMetadataValue(WoolBattle.instance(), perk.perk().perkName().getName()));
 		return true;
 	}
 
@@ -57,7 +57,7 @@ public class ListenerSwitcher extends BasicPerkListener {
 			if (user.projectileImmunityTicks() > 0)
 				return;
 			if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30))
-				WoolBattle.getInstance().getIngame().attack(WBUser.getUser(p), user);
+				WoolBattle.instance().getIngame().attack(WBUser.getUser(p), user);
 			Location loc = p.getLocation();
 			p.teleport(hit);
 			hit.teleport(loc);

@@ -23,14 +23,14 @@ public class CommandRevive extends CommandExecutor {
 				Commands.argument("player", EntityArgument.player()).executes(context -> {
 					Player p = EntityArgument.getPlayer(context, "player");
 					WBUser user = WBUser.getUser(p);
-					Ingame ingame = WoolBattle.getInstance().getIngame();
+					Ingame ingame = WoolBattle.instance().getIngame();
 					if (!ingame.lastTeam.containsKey(user)) {
 						context.getSource().sendMessage(
 								Component.text("Konnte team für spieler nicht finden!"));
 						return 0;
 					}
 					Team team = ingame.lastTeam.get(user);
-					WoolBattle.getInstance().getTeamManager().setTeam(user, team);
+					WoolBattle.instance().getTeamManager().setTeam(user, team);
 					context.getSource().sendMessage(Component.text("Spieler wiederbelebt!"));
 					return 0;
 				})));

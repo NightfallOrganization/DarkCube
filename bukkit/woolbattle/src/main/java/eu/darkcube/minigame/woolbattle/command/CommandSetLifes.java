@@ -21,15 +21,15 @@ public class CommandSetLifes extends CommandExecutor {
 	public CommandSetLifes() {
 		super("woolbattle", "setlifes", "woolbattle.command.setlifes", new String[0], b -> b.then(
 				Commands.argument("lifes", IntegerArgumentType.integer(0, 99)).executes(context -> {
-					WoolBattle.getInstance().baseLifes =
+					WoolBattle.instance().baseLifes =
 							IntegerArgumentType.getInteger(context, "lifes");
 					context.getSource().sendMessage(Message.CHANGED_LIFES.getServerMessage(
-							WoolBattle.getInstance().baseLifes));
+							WoolBattle.instance().baseLifes));
 					return 0;
 				})).then(Commands.argument("team", TeamArgument.teamArgument(TeamType::isEnabled))
 				.then(Commands.argument("lifes", IntegerArgumentType.integer(0, 99))
 						.executes(context -> {
-							Team team = WoolBattle.getInstance().getTeamManager()
+							Team team = WoolBattle.instance().getTeamManager()
 									.getTeam(TeamArgument.getTeam(context, "team"));
 							team.setLifes(IntegerArgumentType.getInteger(context, "lifes"));
 							context.getSource().sendMessage(Component.text("Leben gesetzt!"));

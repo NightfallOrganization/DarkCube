@@ -32,7 +32,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 		if (itemId == null) {
 			return;
 		}
-		if (WoolBattle.getInstance().getLobby().enabled() && e.getHotbarButton() != -1) {
+		if (WoolBattle.instance().getLobby().enabled() && e.getHotbarButton() != -1) {
 			e.setCancelled(true);
 		}
 

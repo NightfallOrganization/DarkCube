@@ -44,7 +44,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
 		} else if (itemId.equals(Item.GENERAL_VOTING_AGAINST.getItemId())) {
 			vote = false;
 		}
-		Vote<Boolean> old = WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
+		Vote<Boolean> old = WoolBattle.instance().getLobby().VOTES_EP_GLITCH.get(user);
 		if (old != null) {
 			if (old.vote == vote) {
 				user.user().sendMessage(Message.ALREADY_VOTED_FOR_THIS);
@@ -52,9 +52,9 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
 			}
 		}
 		if (vote != null) {
-			WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.put(user,
+			WoolBattle.instance().getLobby().VOTES_EP_GLITCH.put(user,
 					new Vote<>(System.currentTimeMillis(), vote));
-			WoolBattle.getInstance().getLobby().recalculateEpGlitch();
+			WoolBattle.instance().getLobby().recalculateEpGlitch();
 			user.user().sendMessage(
 					vote ? Message.VOTED_FOR_EP_GLITCH : Message.VOTED_AGAINST_EP_GLITCH);
 			recalculate();
@@ -65,7 +65,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
 	protected void fillItems(Map<Integer, ItemStack> items) {
 		ItemBuilder b1 = item(Item.GENERAL_VOTING_FOR.getItem(user));
 		ItemBuilder b2 = item(Item.GENERAL_VOTING_AGAINST.getItem(user));
-		Vote<Boolean> vote = WoolBattle.getInstance().getLobby().VOTES_EP_GLITCH.get(user);
+		Vote<Boolean> vote = WoolBattle.instance().getLobby().VOTES_EP_GLITCH.get(user);
 		if (vote != null) {
 			if (vote.vote) {
 				b1.glow(true);

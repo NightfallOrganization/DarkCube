@@ -6,8 +6,8 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame.perk.passive;
 
-import eu.darkcube.minigame.woolbattle.event.perk.EventDoubleJump;
 import eu.darkcube.minigame.woolbattle.event.perk.active.EventGhostStateChange;
+import eu.darkcube.minigame.woolbattle.event.perk.other.DoubleJumpEvent;
 import eu.darkcube.minigame.woolbattle.event.perk.passive.EventMayDoubleJump;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserWoolCountUpdate;
 import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.PerkListener;
@@ -44,11 +44,11 @@ public class ListenerDoubleJump extends PerkListener {
 
 		UserPerk perk = refresh(user);
 		if (perk != null && e.isFlying()) {
-			perk.cooldown(perk.perk().cooldown().ticks());
+			perk.cooldown(perk.perk().cooldown().cooldown());
 			Vector velo =
 					p.getLocation().getDirection().setY(0).normalize().multiply(0.11).setY(1.05);
 
-			EventDoubleJump event = new EventDoubleJump(user, velo);
+			DoubleJumpEvent event = new DoubleJumpEvent(user, velo);
 			Bukkit.getPluginManager().callEvent(event);
 
 			p.setVelocity(event.velocity());

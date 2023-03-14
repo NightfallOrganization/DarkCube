@@ -4,26 +4,24 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.map;
-
-import java.util.HashMap;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.util.Locations;
 import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
+import org.bukkit.Location;
+import org.bukkit.Material;
+
+import java.util.HashMap;
 
 public class DefaultMap implements Map, Serializable {
 
+	private final java.util.Map<String, Location> spawns;
 	private String name;
 	private int deathHeight;
 	private boolean enabled;
 	private MaterialAndId icon;
-	private final java.util.Map<String, Location> spawns;
 
 	DefaultMap() {
 		spawns = null;
@@ -52,24 +50,9 @@ public class DefaultMap implements Map, Serializable {
 	}
 
 	@Override
-	public void setDeathHeight(int height) {
-		this.deathHeight = height;
-		save();
-	}
-
-	@Override
 	public void setIcon(MaterialAndId icon) {
 		this.icon = icon;
 		save();
-	}
-
-	@Override
-	public void delete() {
-		WoolBattle.getInstance().getMapManager().deleteMap(this);
-	}
-
-	private void save() {
-		WoolBattle.getInstance().getMapManager().saveMaps();
 	}
 
 	@Override
@@ -82,6 +65,11 @@ public class DefaultMap implements Map, Serializable {
 	public void disable() {
 		enabled = false;
 		save();
+	}
+
+	@Override
+	public void delete() {
+		WoolBattle.instance().getMapManager().deleteMap(this);
 	}
 
 	@Override
@@ -106,5 +94,15 @@ public class DefaultMap implements Map, Serializable {
 	@Override
 	public String serialize() {
 		return Serializable.super.serialize();
+	}
+
+	@Override
+	public void setDeathHeight(int height) {
+		this.deathHeight = height;
+		save();
+	}
+
+	private void save() {
+		WoolBattle.instance().getMapManager().saveMaps();
 	}
 }

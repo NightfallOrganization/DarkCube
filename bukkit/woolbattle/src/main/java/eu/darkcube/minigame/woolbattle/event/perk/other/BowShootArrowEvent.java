@@ -4,32 +4,29 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.minigame.woolbattle.event.perk;
+package eu.darkcube.minigame.woolbattle.event.perk.other;
 
 import eu.darkcube.minigame.woolbattle.event.user.UserEvent;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import org.bukkit.entity.Arrow;
 import org.bukkit.event.HandlerList;
-import org.bukkit.util.Vector;
 
-public class EventDoubleJump extends UserEvent {
+public class BowShootArrowEvent extends UserEvent {
 	private static final HandlerList handlers = new HandlerList();
-	private Vector velocity;
 
-	public EventDoubleJump(WBUser user, Vector velocity) {
+	private final Arrow arrow;
+
+	public BowShootArrowEvent(WBUser user, Arrow arrow) {
 		super(user);
-		this.velocity = velocity;
+		this.arrow = arrow;
 	}
 
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
-	public Vector velocity() {
-		return velocity.clone();
-	}
-
-	public void velocity(Vector velocity) {
-		this.velocity = velocity;
+	public Arrow arrow() {
+		return arrow;
 	}
 
 	@Override

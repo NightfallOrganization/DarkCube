@@ -8,7 +8,6 @@ package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
 import eu.darkcube.minigame.woolbattle.command.argument.PerkArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
-import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -30,7 +29,8 @@ public class TrollCommand extends PServerExecutor {
 									int cooldown =
 											IntegerArgumentType.getInteger(context, "cooldown");
 									for (Perk perk : perks) {
-										perk.cooldown(new Perk.Cooldown(TimeUnit.SECOND, cooldown));
+										perk.cooldown(new Perk.Cooldown(perk.cooldown().unit(),
+												cooldown));
 									}
 									if (perks.size() == 1) {
 										source.sendMessage(

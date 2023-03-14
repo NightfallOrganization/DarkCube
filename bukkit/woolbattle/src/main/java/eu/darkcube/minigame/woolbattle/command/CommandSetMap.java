@@ -18,11 +18,11 @@ public class CommandSetMap extends WBCommandExecutor {
 		super("setMap",
 				b -> b.then(Commands.argument("map", MapArgument.mapArgument()).executes(ctx -> {
 					Map map = MapArgument.getMap(ctx, "map");
-					WoolBattle.getInstance().baseMap = map;
-					if (WoolBattle.getInstance().getLobby().enabled()) {
-						WBUser.onlineUsers().forEach(WoolBattle.getInstance()::setMap);
-					} else if (WoolBattle.getInstance().getIngame().enabled()) {
-						WoolBattle.getInstance().setMap(map);
+					WoolBattle.instance().baseMap = map;
+					if (WoolBattle.instance().getLobby().enabled()) {
+						WBUser.onlineUsers().forEach(WoolBattle.instance()::setMap);
+					} else if (WoolBattle.instance().getIngame().enabled()) {
+						WoolBattle.instance().setMap(map);
 						for (WBUser user : WBUser.onlineUsers()) {
 							user.getBukkitEntity().teleport(user.getTeam().getSpawn());
 						}

@@ -79,7 +79,7 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 	 */
 	protected void activated(UserPerk perk) {
 		payForThePerk(perk);
-		perk.cooldown(perk.perk().cooldown().ticks());
+		perk.cooldown(perk.perk().cooldown().cooldown());
 	}
 
 	protected boolean mayActivate() {
@@ -117,7 +117,5 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 			}
 			activated(userPerk);
 		}
-
 	}
-
 }

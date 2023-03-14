@@ -44,7 +44,7 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
 			}
 		}
 		Block block = e.getBlock();
-		Ingame ingame = WoolBattle.getInstance().getIngame();
+		Ingame ingame = WoolBattle.instance().getIngame();
 		ingame.placedBlocks.add(block);
 	}
 }

@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 
-	private WoolBattle main = WoolBattle.getInstance();
+	private WoolBattle main = WoolBattle.instance();
 
 	@Override
 	@EventHandler

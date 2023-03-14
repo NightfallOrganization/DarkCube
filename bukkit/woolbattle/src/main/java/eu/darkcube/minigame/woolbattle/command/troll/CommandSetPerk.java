@@ -32,7 +32,7 @@ public class CommandSetPerk extends WBCommandExecutor {
 			RequiredArgumentBuilder<CommandSource, EntitySelector> b2 =
 					Commands.argument("players", EntityArgument.players());
 			for (ActivationType type : ActivationType.values()) {
-				Perk[] perkArray = WoolBattle.getInstance().perkRegistry().perks(type);
+				Perk[] perkArray = WoolBattle.instance().perkRegistry().perks(type);
 				if (perkArray.length <= 1) {
 					continue;
 				}

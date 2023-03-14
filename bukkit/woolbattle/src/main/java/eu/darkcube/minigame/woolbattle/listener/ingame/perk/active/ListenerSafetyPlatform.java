@@ -23,7 +23,7 @@ public class ListenerSafetyPlatform extends BasicPerkListener {
 	protected boolean activateRight(UserPerk perk) {
 		boolean suc = setBlocks(perk.owner());
 		if (!suc)
-			WoolBattle.getInstance().getIngame().playSoundNotEnoughWool(perk.owner());
+			WoolBattle.instance().getIngame().playSoundNotEnoughWool(perk.owner());
 		return suc;
 	}
 
@@ -53,6 +53,6 @@ public class ListenerSafetyPlatform extends BasicPerkListener {
 	}
 
 	private void block(Location loc, WBUser u) {
-		WoolBattle.getInstance().getIngame().place(u, loc.getBlock());
+		WoolBattle.instance().getIngame().place(u, loc.getBlock());
 	}
 }

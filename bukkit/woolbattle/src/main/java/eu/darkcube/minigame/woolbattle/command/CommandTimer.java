@@ -6,16 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 
 public class CommandTimer extends WBCommandExecutor {
 
@@ -25,7 +19,7 @@ public class CommandTimer extends WBCommandExecutor {
 		super("timer", b -> b.then(
 				Commands.argument("time", IntegerArgumentType.integer(0)).executes(ctx -> {
 					int time = IntegerArgumentType.getInteger(ctx, "time");
-					WoolBattle.getInstance().getLobby().setOverrideTimer(time);
+					WoolBattle.instance().getLobby().setOverrideTimer(time);
 					ctx.getSource().sendMessage(Message.TIMER_CHANGED, time);
 					return 0;
 				})));

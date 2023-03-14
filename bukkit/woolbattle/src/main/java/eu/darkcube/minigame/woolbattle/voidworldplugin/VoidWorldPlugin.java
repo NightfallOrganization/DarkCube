@@ -53,7 +53,7 @@ public class VoidWorldPlugin implements Plugin {
 	}
 
 	public final void loadWorlds() {
-		for (String world : WoolBattle.getInstance().getConfig("worlds").getStringList("worlds")) {
+		for (String world : WoolBattle.instance().getConfig("worlds").getStringList("worlds")) {
 			this.loadWorld(world);
 		}
 	}

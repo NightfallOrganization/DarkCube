@@ -141,8 +141,8 @@ public class DefaultPlayerPerks implements PlayerPerks {
 				} else { // Fallback
 
 					PerkName name = null;
-					for (Map.Entry<PerkName, Perk> e : WoolBattle.getInstance().perkRegistry()
-							.perks().entrySet()) {
+					for (Map.Entry<PerkName, Perk> e : WoolBattle.instance().perkRegistry().perks()
+							.entrySet()) {
 						if (e.getValue().activationType() == type) {
 							name = e.getKey();
 							if (perksUsed.contains(name))

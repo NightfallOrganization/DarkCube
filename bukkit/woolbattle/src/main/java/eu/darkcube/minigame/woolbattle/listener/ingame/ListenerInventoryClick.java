@@ -114,7 +114,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 						if (id == idHotbar) {
 							tue(idHotbar, idItem, idCursor, id);
 						} else if (id == idCursor) {
-							WoolBattle.getInstance().sendConsole(
+							WoolBattle.instance().sendConsole(
 									"Player " + p.getName() + " had slot error. Values:");
 							System.out.println("Slot: " + slot);
 							System.out.println("Tag: " + id);
