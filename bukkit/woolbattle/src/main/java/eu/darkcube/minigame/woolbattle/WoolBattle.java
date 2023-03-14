@@ -104,6 +104,7 @@ public class WoolBattle extends Plugin {
 	public WoolBattle() {
 		super("woolbattle");
 		WoolBattle.instance = this;
+		
 		System.setProperty("file.encoding", "UTF-8");
 	}
 
