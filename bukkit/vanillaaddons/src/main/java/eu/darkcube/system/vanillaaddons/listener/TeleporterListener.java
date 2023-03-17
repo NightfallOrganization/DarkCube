@@ -17,6 +17,7 @@ import eu.darkcube.system.vanillaaddons.util.BlockLocation;
 import eu.darkcube.system.vanillaaddons.util.Item;
 import eu.darkcube.system.vanillaaddons.util.Item.Data;
 import eu.darkcube.system.vanillaaddons.util.Teleporter;
+import eu.darkcube.system.vanillaaddons.util.Teleporter.TeleportAccess;
 import eu.darkcube.system.vanillaaddons.util.Teleporters;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -48,6 +49,42 @@ public class TeleporterListener implements Listener {
 
 	public TeleporterListener(VanillaAddons addons) {
 		this.addons = addons;
+	}
+
+	public static boolean remove(VanillaAddons addons, Block block) {
+		BlockLocation loc = new BlockLocation(block.getWorld().getKey(), block.getX(), block.getY(),
+				block.getZ());
+		boolean changed = false;
+		for (Teleporter teleporter : new ArrayList<>(addons.teleporters(block.getWorld()))) {
+			if (!teleporter.block().equals(loc)) {
+				continue;
+			}
+			addons.teleporters(block.getWorld()).remove(teleporter);
+			Location drop = block.getLocation().add(0.5, 0.5, 0.5);
+			block.getWorld().dropItemNaturally(drop, Item.TELEPORTER.item());
+			block.setType(Material.AIR);
+			changed = true;
+		}
+		return changed;
+	}
+
+	public static void loadTeleporters(VanillaAddons addons, World world) {
+		PersistentDataContainer container = world.getPersistentDataContainer();
+		if (container.has(Teleporter.teleporters)) {
+			addons.teleporters()
+					.put(world, container.get(Teleporter.teleporters, Teleporter.TELEPORTERS));
+			for (Teleporter teleporter : addons.teleporters().get(world).teleporters) {
+				teleporter.spawn();
+			}
+		}
+	}
+
+	public static void saveTeleporters(VanillaAddons addons, World world) {
+		PersistentDataContainer container = world.getPersistentDataContainer();
+		Teleporters teleporters = addons.teleporters().get(world);
+		if (teleporters != null) {
+			container.set(Teleporter.teleporters, Teleporter.TELEPORTERS, teleporters);
+		}
 	}
 
 	@EventHandler
@@ -106,6 +143,7 @@ public class TeleporterListener implements Listener {
 				Teleporter teleporter = meta.getPersistentDataContainer()
 						.get(new NamespacedKey("vanillaaddons", "teleporter"),
 								Teleporter.TELEPORTER);
+				//noinspection DataFlowIssue
 				Bukkit.getPlayer(user.user().getUniqueId()).closeInventory(Reason.TELEPORT);
 				//noinspection DataFlowIssue
 				Bukkit.getPlayer(user.user().getUniqueId()).teleportAsync(
@@ -135,23 +173,6 @@ public class TeleporterListener implements Listener {
 		}
 	}
 
-	public static boolean remove(VanillaAddons addons, Block block) {
-		BlockLocation loc = new BlockLocation(block.getWorld().getKey(), block.getX(), block.getY(),
-				block.getZ());
-		boolean changed = false;
-		for (Teleporter teleporter : new ArrayList<>(addons.teleporters(block.getWorld()))) {
-			if (!teleporter.block().equals(loc)) {
-				continue;
-			}
-			addons.teleporters(block.getWorld()).remove(teleporter);
-			Location drop = block.getLocation().add(0.5, 0.5, 0.5);
-			block.getWorld().dropItemNaturally(drop, Item.TELEPORTER.item());
-			block.setType(Material.AIR);
-			changed = true;
-		}
-		return changed;
-	}
-
 	@EventHandler
 	public void handle(BlockPlaceEvent event) {
 		if (!event.canBuild())
@@ -172,7 +193,7 @@ public class TeleporterListener implements Listener {
 			Block block = event.getBlockPlaced();
 			Teleporter teleporter = new Teleporter(Material.ENDER_EYE, "Teleporter",
 					new BlockLocation(block.getWorld().getKey(), block.getX(), block.getY(),
-							block.getZ()));
+							block.getZ()), TeleportAccess.PUBLIC, p.getUniqueId());
 			addons.teleporters(block.getWorld()).add(teleporter);
 			new BukkitRunnable() {
 				@Override
@@ -207,24 +228,5 @@ public class TeleporterListener implements Listener {
 	@EventHandler
 	public void handle(WorldSaveEvent event) {
 		saveTeleporters(addons, event.getWorld());
-	}
-
-	public static void loadTeleporters(VanillaAddons addons, World world) {
-		PersistentDataContainer container = world.getPersistentDataContainer();
-		if (container.has(Teleporter.teleporters)) {
-			addons.teleporters()
-					.put(world, container.get(Teleporter.teleporters, Teleporter.TELEPORTERS));
-			for (Teleporter teleporter : addons.teleporters().get(world).teleporters) {
-				teleporter.spawn();
-			}
-		}
-	}
-
-	public static void saveTeleporters(VanillaAddons addons, World world) {
-		PersistentDataContainer container = world.getPersistentDataContainer();
-		Teleporters teleporters = addons.teleporters().get(world);
-		if (teleporters != null) {
-			container.set(Teleporter.teleporters, Teleporter.TELEPORTERS, teleporters);
-		}
 	}
 }

@@ -19,8 +19,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VanillaAddons extends DarkCubePlugin {
 	private Map<World, Teleporters> teleporters = new HashMap<>();
@@ -29,6 +32,15 @@ public class VanillaAddons extends DarkCubePlugin {
 
 	public VanillaAddons() {
 		super("vanillaaddons");
+	}
+
+	@Override
+	public void onDisable() {
+		for (World world : Bukkit.getWorlds()) {
+			TeleporterListener.saveTeleporters(this, world);
+		}
+		UserAPI.getInstance().removeModifier(userModifier);
+		Recipe.unregisterAll(this);
 	}
 
 	@Override
@@ -48,15 +60,14 @@ public class VanillaAddons extends DarkCubePlugin {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			Recipe.giveAll(this, player);
 		}
-	}
-
-	@Override
-	public void onDisable() {
-		for (World world : Bukkit.getWorlds()) {
-			TeleporterListener.saveTeleporters(this, world);
-		}
-		UserAPI.getInstance().removeModifier(userModifier);
-		Recipe.unregisterAll(this);
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (World world : Bukkit.getWorlds()) {
+					TeleporterListener.saveTeleporters(VanillaAddons.this, world);
+				}
+			}
+		}.runTaskTimer(this, 30 * 20, 30 * 20);
 	}
 
 	public List<Teleporter> teleporters(World world) {

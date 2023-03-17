@@ -16,12 +16,8 @@ public abstract class AbstractInventory<T, Data> implements Inventory<Data> {
 	private Data data;
 
 	@Override
-	public void init(Data data) {
+	public final void init(Data data) {
 		this.data = data;
-	}
-
-	public Data data() {
-		return data;
 	}
 
 	@Override
@@ -37,6 +33,10 @@ public abstract class AbstractInventory<T, Data> implements Inventory<Data> {
 	@Override
 	public final void close(AUser user) {
 		closeInventory(user, guis.remove(user));
+	}
+
+	public final Data data() {
+		return data;
 	}
 
 	protected abstract T openInventory(AUser user);
