@@ -58,7 +58,9 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
 					insertFallbackItems();
 					updateSlots.add(IInventory.slot(3, 4));
 				} else if (type == 1) {
-					
+					user.openInventory(TeleporterRenameInventory.TYPE, data());
+				} else if (type == 2) {
+
 				}
 			}
 

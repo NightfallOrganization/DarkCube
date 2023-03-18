@@ -29,9 +29,15 @@ public class VanillaAddons extends DarkCubePlugin {
 	private Map<World, Teleporters> teleporters = new HashMap<>();
 	private InventoryRegistry inventoryRegistry;
 	private UserModifier userModifier;
+	private static VanillaAddons instance = null;
 
 	public VanillaAddons() {
 		super("vanillaaddons");
+		instance = this;
+	}
+
+	public static VanillaAddons instance() {
+		return instance;
 	}
 
 	@Override
