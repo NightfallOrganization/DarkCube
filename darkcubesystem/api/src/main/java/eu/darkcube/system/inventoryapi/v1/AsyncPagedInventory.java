@@ -127,6 +127,20 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 	protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
 		Map<Integer, ItemStack> items = new HashMap<>();
 		this.fillItems(items);
+
+		final int page = this.getPage();
+		final int skip = (page - 1) * this.pageSize;
+		for (Entry<Integer, ItemStack> e : this.items.entrySet()) {
+			int slot = e.getKey();
+			slot -= skip;
+			if (slot >= this.PAGE_SLOTS.length || slot < 0) {
+				// Slot is out of page range
+				continue;
+			}
+			this.updateSlots.add(this.PAGE_SLOTS[slot]);
+		}
+		this.items.clear();
+
 		this.items.putAll(items);
 		this.calculatePageItems();
 	}

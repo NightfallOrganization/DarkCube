@@ -17,13 +17,14 @@ public class InventoryRegistry {
 	private final Map<InventoryType, Supplier<Inventory<?>>> registry = new HashMap<>();
 
 	public InventoryRegistry() {
-		register(TeleporterInventory.TYPE, TeleporterInventory::new);
-		register(TeleportersInventory.TYPE, TeleportersInventory::new);
-		register(TeleporterRenameInventory.TYPE, TeleporterRenameInventory::new);
 	}
 
 	public void register(InventoryType type, Supplier<Inventory<?>> supplier) {
 		registry.put(type, supplier);
+	}
+
+	public void unregister(InventoryType type) {
+		registry.remove(type);
 	}
 
 	public <Data> Inventory<Data> newInventory(InventoryType type, Data data) {

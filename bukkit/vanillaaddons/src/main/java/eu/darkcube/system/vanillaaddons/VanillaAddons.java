@@ -11,56 +11,56 @@ import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.data.UserModifier;
 import eu.darkcube.system.vanillaaddons.AUser.Modifier;
 import eu.darkcube.system.vanillaaddons.inventory.InventoryRegistry;
-import eu.darkcube.system.vanillaaddons.listener.*;
-import eu.darkcube.system.vanillaaddons.util.Recipe;
-import eu.darkcube.system.vanillaaddons.util.Teleporter;
-import eu.darkcube.system.vanillaaddons.util.Teleporters;
+import eu.darkcube.system.vanillaaddons.listener.ArmorListener;
+import eu.darkcube.system.vanillaaddons.listener.InventoryListener;
+import eu.darkcube.system.vanillaaddons.module.ModuleManager;
+import eu.darkcube.system.vanillaaddons.module.modules.flightchestplate.FlightChestplateModule;
+import eu.darkcube.system.vanillaaddons.module.modules.recipes.RecipesModule;
+import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule;
+import eu.darkcube.system.vanillaaddons.module.modules.worldmechanics.WorldMechanicsModule;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
-import java.util.*;
-
 public class VanillaAddons extends DarkCubePlugin {
-	private Map<World, Teleporters> teleporters = new HashMap<>();
 	private InventoryRegistry inventoryRegistry;
 	private UserModifier userModifier;
+	private final ModuleManager moduleManager = new ModuleManager();
+	private static VanillaAddons instance = null;
+
+	public VanillaAddons() {
+		instance = this;
+	}
+
+	public static VanillaAddons instance() {
+		return instance;
+	}
 
 	@Override
-	public void onEnable() {
-		inventoryRegistry = new InventoryRegistry();
-		Recipe.registerAll(this);
-		UserAPI.getInstance().addModifier(userModifier = new Modifier(this));
-		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new InventoryListener(this), this);
-		pm.registerEvents(new CreeperListener(), this);
-		pm.registerEvents(new FarmlandListener(), this);
-		pm.registerEvents(new TeleporterListener(this), this);
-		pm.registerEvents(new RecipeListener(this), this);
-		for (World world : Bukkit.getWorlds()) {
-			TeleporterListener.loadTeleporters(this, world);
-		}
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			Recipe.giveAll(this, player);
-		}
+	public void onLoad() {
+		moduleManager.addModule(new RecipesModule(this));
+		moduleManager.addModule(new FlightChestplateModule(this));
+		moduleManager.addModule(new TeleporterModule(this));
+		moduleManager.addModule(new WorldMechanicsModule(this));
 	}
 
 	@Override
 	public void onDisable() {
-		for (World world : Bukkit.getWorlds()) {
-			TeleporterListener.saveTeleporters(this, world);
-		}
+		moduleManager.disableAll();
 		UserAPI.getInstance().removeModifier(userModifier);
-		Recipe.unregisterAll(this);
 	}
 
-	public List<Teleporter> teleporters(World world) {
-		return teleporters.computeIfAbsent(world, k -> new Teleporters()).teleporters;
+	@Override
+	public void onEnable() {
+		inventoryRegistry = new InventoryRegistry();
+		UserAPI.getInstance().addModifier(userModifier = new Modifier(this));
+		PluginManager pm = Bukkit.getPluginManager();
+		pm.registerEvents(new InventoryListener(), this);
+		pm.registerEvents(new ArmorListener(), this);
+		moduleManager.enableAll();
 	}
 
-	public Map<World, Teleporters> teleporters() {
-		return teleporters;
+	public ModuleManager moduleManager() {
+		return moduleManager;
 	}
 
 	public InventoryRegistry inventoryRegistry() {

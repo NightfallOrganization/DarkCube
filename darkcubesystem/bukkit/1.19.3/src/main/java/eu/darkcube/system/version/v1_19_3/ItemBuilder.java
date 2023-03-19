@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.version.v1_19_3;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
@@ -18,12 +17,17 @@ import eu.darkcube.system.inventoryapi.item.meta.LeatherArmorBuilderMeta;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
+import eu.darkcube.system.util.data.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
@@ -32,9 +36,10 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class ItemBuilder extends AbstractItemBuilder {
-
+	private static final Logger LOGGER = Logger.getLogger("ItemBuilder");
 	private static final NamespacedKey persistentDataKey =
 			new NamespacedKey(DarkCubePlugin.systemPlugin(), "persistentDataStorage");
 
@@ -49,9 +54,29 @@ public class ItemBuilder extends AbstractItemBuilder {
 			unbreakable(meta.isUnbreakable());
 			if (meta.hasDisplayName())
 				displayname(AdventureUtils.convert(meta.displayName()));
-			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
+			for (Map.Entry<Enchantment, Integer> e : meta.getEnchants().entrySet()) {
 				enchant(e.getKey(), e.getValue());
 			}
+
+			if (meta.getAttributeModifiers() != null)
+				meta.getAttributeModifiers().forEach((attribute, attributeModifier) -> {
+					eu.darkcube.system.inventoryapi.item.attribute.Attribute sa =
+							new eu.darkcube.system.inventoryapi.item.attribute.Attribute(
+									new Key(attribute.key().namespace(), attribute.key().value()));
+					eu.darkcube.system.inventoryapi.item.attribute.Operation so =
+							eu.darkcube.system.inventoryapi.item.attribute.Operation.values()[attributeModifier.getOperation()
+									.ordinal()];
+					eu.darkcube.system.inventoryapi.item.EquipmentSlot ses =
+							attributeModifier.getSlot() == null
+									? null
+									: eu.darkcube.system.inventoryapi.item.EquipmentSlot.valueOf(
+											attributeModifier.getSlot().name());
+					attributeModifier(sa,
+							new eu.darkcube.system.inventoryapi.item.attribute.AttributeModifier(
+									attributeModifier.getUniqueId(), attributeModifier.getName(),
+									attributeModifier.getAmount(), so, ses));
+				});
+
 			setFlags(meta.getItemFlags());
 			if (meta.lore() != null)
 				lore(AdventureUtils.convert2(Objects.requireNonNull(meta.lore())));
@@ -66,7 +91,8 @@ public class ItemBuilder extends AbstractItemBuilder {
 							pp.getProperties().stream().filter(p -> p.getName().equals("textures"))
 									.findFirst().orElse(null);
 					Texture texture =
-							prop == null ? null : new Texture(prop.getValue(), prop.getSignature());
+							prop == null ? null : new Texture(prop.getValue(),
+									prop.getSignature());
 					UserProfile up = new UserProfile(pp.getName(), pp.getId(), texture);
 					meta(SkullBuilderMeta.class).setOwningPlayer(up);
 				}
@@ -87,24 +113,47 @@ public class ItemBuilder extends AbstractItemBuilder {
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			meta.setUnbreakable(unbreakable);
+			Component prefix = Component.empty().decoration(TextDecoration.ITALIC, false);
 			if (displayname != null) {
-				meta.displayName(Component.empty().decoration(TextDecoration.ITALIC, false)
-						.append(AdventureUtils.convert(displayname)));
+				meta.displayName(prefix.append(AdventureUtils.convert(displayname)));
 			}
 			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
 				meta.addEnchant(e.getKey(), e.getValue(), true);
 			}
+
 			meta.addItemFlags(flags.toArray(new ItemFlag[0]));
-			meta.lore(AdventureUtils.convert1(lore));
+			meta.lore(lore.stream().map(AdventureUtils::convert).map(prefix::append).toList());
 			if (glow) {
 				if (enchantments.isEmpty()) {
 					meta.addEnchant(item.getType() == Material.BOW
 									// Intellij inspection is dumb...
-									? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1,
+									? Enchantment.PROTECTION_ENVIRONMENTAL :
+									Enchantment.ARROW_INFINITE, 1,
 							true);
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				}
 			}
+			attributeModifiers.forEach((attribute, modifier) -> {
+				Attribute ba = null;
+				for (Attribute value : Attribute.values()) {
+					if (value.key().toString().equals(attribute.attribute().toString())) {
+						ba = value;
+						break;
+					}
+				}
+				if (ba == null) {
+					LOGGER.warning("Unknown attribute: " + attribute.attribute().toString());
+				} else {
+					Operation operation = Operation.values()[modifier.operation().ordinal()];
+					EquipmentSlot equipmentSlot = modifier.equipmentSlot() == null
+							? null
+							: EquipmentSlot.valueOf(modifier.equipmentSlot().name());
+					AttributeModifier bam =
+							new AttributeModifier(modifier.uniqueId(), modifier.name(),
+									modifier.amount(), operation, equipmentSlot);
+					meta.addAttributeModifier(ba, bam);
+				}
+			});
 			if (meta instanceof Damageable dmeta) {
 				dmeta.setDamage(damage);
 			}
@@ -119,9 +168,11 @@ public class ItemBuilder extends AbstractItemBuilder {
 					PlayerProfile profile = Bukkit.getServer().createProfileExact(
 							owner.getUniqueId() == null ? UUID.randomUUID() : owner.getUniqueId(),
 							owner.getName());
-					profile.clearProperties();
-					profile.setProperty(new ProfileProperty("textures", texture.getValue(),
-							texture.getSignature()));
+					if (texture != null) {
+						profile.clearProperties();
+						profile.setProperty(new ProfileProperty("textures", texture.getValue(),
+								texture.getSignature()));
+					}
 					smeta.setPlayerProfile(profile);
 				} else if (builderMeta instanceof LeatherArmorBuilderMeta) {
 					((LeatherArmorMeta) meta).setColor(
@@ -145,7 +196,8 @@ public class ItemBuilder extends AbstractItemBuilder {
 		AbstractItemBuilder builder =
 				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
 						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
-						.material(material).unbreakable(unbreakable).metas(metas);
+						.material(material).unbreakable(unbreakable).metas(metas)
+						.attributeModifiers(attributeModifiers);
 		builder.persistentDataStorage().getData().append(storage.getData());
 		return builder;
 	}

@@ -7,12 +7,15 @@
 
 package de.dasbabypixel.prefixplugin;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedDataManager;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.event.EventBus;
+import net.luckperms.api.event.group.GroupDataRecalculateEvent;
+import net.luckperms.api.event.user.UserDataRecalculateEvent;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -29,15 +32,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.cacheddata.CachedDataManager;
-import net.luckperms.api.cacheddata.CachedMetaData;
-import net.luckperms.api.event.EventBus;
-import net.luckperms.api.event.group.GroupDataRecalculateEvent;
-import net.luckperms.api.event.user.UserDataRecalculateEvent;
-import net.luckperms.api.model.group.Group;
-import net.luckperms.api.model.user.User;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public abstract class IScoreboardManager implements Listener {
 
@@ -231,7 +230,6 @@ public abstract class IScoreboardManager implements Listener {
 		for (String key : names.keySet()) {
 			if (key.equalsIgnoreCase(e.getPlayer().getName())) {
 				e.getPlayer().setPlayerListName(names.get(key).toString());
-				e.getPlayer().setCustomName(names.get(key).toString());
 			}
 		}
 	}
@@ -289,28 +287,27 @@ public abstract class IScoreboardManager implements Listener {
 	String colorSafe(String msg, String format, Player p) {
 		format = replacePlaceHolders(p, format);
 		format = format.replace(">>", "»");
-		String c = msg;
 
-		String result = "";
-		int length = c.length();
+		StringBuilder result = new StringBuilder();
+		int length = msg.length();
 		for (int index = length - 1; index > -1; index--) {
-			char section = c.charAt(index);
+			char section = msg.charAt(index);
 			String toAdd = String.valueOf(section);
 			if (section == CONSOLE_CHAR.charAt(0) && index < length - 1) {
-				char code = c.charAt(index + 1);
+				char code = msg.charAt(index + 1);
 				ChatColor color = ChatColor.getByChar(code);
 				if (color != null) {
-					toAdd += getLastColorsForCloudNet(c.substring(0, index));
+					toAdd += getLastColorsForCloudNet(msg.substring(0, index));
 				}
 			}
-			result = toAdd + result;
+			result.insert(0, toAdd);
 		}
 
-		format = format.replace("%message%", result);
+		format = format.replace("%message%", result.toString());
 		format = format.replace("%", "%%");
 		format = translateAlternateColorCodesForCloudNet('§', format);
-		result = format.replace('┃', '|');
-		return result;
+		result = new StringBuilder(format.replace('┃', '|'));
+		return result.toString();
 	}
 
 	String getChatMessage(Player p, String message) {
@@ -407,19 +404,13 @@ public abstract class IScoreboardManager implements Listener {
 			for (Scoreboard sb : SCOREBOARD_BY_UUID.values()) {
 				Team team = sb.getTeam(tag.toString());
 				if (team != null) {
+					//noinspection JavaReflectionMemberAccess
 					Method method = Team.class.getMethod("setColor", ChatColor.class);
 					method.invoke(team, ChatColor.getByChar(code));
 				}
 			}
-		} catch (IllegalAccessException ex) {
-			ex.printStackTrace();
-		} catch (IllegalArgumentException ex) {
-			ex.printStackTrace();
-		} catch (InvocationTargetException ex) {
-			ex.printStackTrace();
-		} catch (NoSuchMethodException ex) {
-			ex.printStackTrace();
-		} catch (SecurityException ex) {
+		} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException |
+				NoSuchMethodException | SecurityException ex) {
 			ex.printStackTrace();
 		}
 	}

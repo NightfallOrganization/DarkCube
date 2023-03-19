@@ -33,11 +33,15 @@ public class AUser {
 	}
 
 	public <Data> void openInventory(InventoryType openInventory, Data data) {
+		if (openingInventory && openInventory == null)
+			return;
 		this.openInventory = openInventory;
 		if (openInventory != null) {
 			openingInventory = true;
 			if (this.openInventoryHandle != null) {
-				this.openInventoryHandle.close(this);
+				Inventory<?> h = openInventoryHandle;
+				this.openInventoryHandle = null;
+				h.close(this);
 			}
 			this.openInventoryHandle = addons.inventoryRegistry().newInventory(openInventory, data);
 			this.openInventoryHandle.open(this);

@@ -137,6 +137,16 @@ public class BukkitUserAPI extends AbstractUserAPI {
 	}
 
 	@Override
+	public User getUser(Player player) {
+		User user = getUser(player.getUniqueId());
+		users.computeIfPresent(player.getUniqueId(), (uuid, bukkitUser) -> {
+			bukkitUser.player = player;
+			return bukkitUser;
+		});
+		return user;
+	}
+
+	@Override
 	public void loadedUsersForEach(Consumer<? super User> consumer) {
 		users.values().stream().map(AsyncWrapperUser::new).forEach(consumer);
 	}
@@ -167,6 +177,7 @@ public class BukkitUserAPI extends AbstractUserAPI {
 		PacketQueryUser.Result result =
 				new PacketQueryUser(uuid).sendQuery().cast(PacketQueryUser.Result.class);
 		BukkitUser user = new BukkitUser(uuid, result.getName());
+		user.player = Bukkit.getPlayer(uuid);
 		user.getPersistentDataStorage().set(result.getData());
 		return user;
 	}

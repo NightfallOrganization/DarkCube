@@ -26,7 +26,7 @@ public class AddonsAsyncPagedInventory extends AsyncPagedInventory {
 
 	public AddonsAsyncPagedInventory(InventoryType inventoryType, Component title,
 			BooleanSupplier instant) {
-		this(inventoryType, title, 6 * 9, AsyncPagedInventory.box(3, 2, 5, 8), instant);
+		this(inventoryType, title, 5 * 9, AsyncPagedInventory.box(2, 2, 4, 8), instant);
 	}
 
 	public AddonsAsyncPagedInventory(InventoryType inventoryType, Component title, int size,
@@ -49,7 +49,6 @@ public class AddonsAsyncPagedInventory extends AsyncPagedInventory {
 
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
-
 	}
 
 	protected void playSound() {
