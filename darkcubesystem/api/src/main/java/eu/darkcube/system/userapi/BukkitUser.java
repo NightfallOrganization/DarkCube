@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.userapi;
 
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
@@ -16,7 +15,6 @@ import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -32,12 +30,12 @@ public class BukkitUser implements User {
 	private final BasicMetaDataStorage metaDataStorage;
 	private final UserPersistentDataStorage persistentDataStorage;
 	private volatile String name;
-	private volatile Player player;
+	public Player player;
 	private volatile boolean loaded = false;
 	private volatile long lastAccess = System.currentTimeMillis();
 
 	public BukkitUser(UUID uuid, String name) {
-		this.player = Bukkit.getPlayer(uuid);
+		this.player = null;
 		this.uuid = uuid;
 		this.name = name;
 		this.metaDataStorage = new BasicMetaDataStorage();
@@ -79,9 +77,6 @@ public class BukkitUser implements User {
 
 	@Override
 	public Player asPlayer() {
-		if (player == null || !player.isOnline()) {
-			player = Bukkit.getPlayer(uuid);
-		}
 		return player;
 	}
 

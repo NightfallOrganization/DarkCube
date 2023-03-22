@@ -62,7 +62,7 @@ public enum Messages implements BaseMessage {
 
 	static {
 		for (Messages message : values()) {
-			MESSAGES.put(message.getKey(), message);
+			MESSAGES.put(message.key(), message);
 		}
 	}
 
@@ -73,13 +73,13 @@ public enum Messages implements BaseMessage {
 	}
 
 	@Override
-	public String getKey() {
+	public String key() {
 		return key;
 	}
 
 	@Override
 	public String toString() {
-		return getKey();
+		return key();
 	}
 
 	public static class MessageWrapper implements Message {

@@ -74,8 +74,7 @@ public enum Language {
 		List<Component> components = new ArrayList<>();
 		for (int i = 0; i < replacements.length; i++) {
 			if (replacements[i] instanceof BaseMessage) {
-				BaseMessage message = (BaseMessage) replacements[i];
-				replacements[i] = message.getMessage(this);
+				replacements[i] = ((BaseMessage) replacements[i]).getMessage(this, new String[0]);
 			}
 			if (replacements[i] instanceof ComponentLike) {
 				ComponentLike componentLike = (ComponentLike) replacements[i];
@@ -88,7 +87,8 @@ public enum Language {
 		}
 		if (this.bundle.containsKey(key)) {
 			String formatted =
-					String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
+					String.format(this.locale, this.bundle.getObject(key).toString(),
+							replacements);
 			formatted = ChatColor.translateAlternateColorCodes('&', formatted);
 			Component c = Component.empty();
 			for (int i = 0; i < components.size(); i++) {

@@ -66,7 +66,7 @@ public enum Item implements BaseMessage {
 	}
 
 	@Override
-	public String getKey() {
+	public String key() {
 		return key;
 	}
 
@@ -84,12 +84,12 @@ public enum Item implements BaseMessage {
 		if (hasLore()) {
 			b.lore(getLore(user, loreArgs));
 		}
-		b.persistentDataStorage().set(ITEMID_KEY, PersistentDataTypes.STRING, getKey());
+		b.persistentDataStorage().set(ITEMID_KEY, PersistentDataTypes.STRING, key());
 		return b.build();
 	}
 
 	public boolean equals(ItemStack item) {
-		return hasItemId(item) && getKey().equals(getItemId(item));
+		return hasItemId(item) && key().equals(getItemId(item));
 	}
 
 	public Component getLore(User user, Object... args) {

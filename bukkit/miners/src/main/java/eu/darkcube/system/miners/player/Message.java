@@ -42,7 +42,7 @@ public enum Message implements BaseMessage {
 	}
 
 	@Override
-	public String getKey() {
+	public String key() {
 		return key;
 	}
 }

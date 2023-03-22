@@ -4,12 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.inventoryapi.item;
 
+import com.google.common.collect.Multimap;
+import eu.darkcube.system.inventoryapi.item.attribute.Attribute;
+import eu.darkcube.system.inventoryapi.item.attribute.AttributeModifier;
 import eu.darkcube.system.inventoryapi.item.meta.BuilderMeta;
-import eu.darkcube.system.version.VersionSupport;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -50,6 +52,24 @@ public interface ItemBuilder {
 
 	ItemBuilder amount(int amount);
 
+	boolean canBeRepairedBy(ItemBuilder item);
+
+	Multimap<Attribute, AttributeModifier> attributeModifiers();
+
+	Multimap<Attribute, AttributeModifier> attributeModifiers(EquipmentSlot slot);
+
+	Collection<AttributeModifier> attributeModifiers(Attribute attribute);
+
+	ItemBuilder attributeModifier(Attribute attribute, AttributeModifier modifier);
+
+	ItemBuilder attributeModifiers(Multimap<Attribute, AttributeModifier> attributeModifiers);
+
+	ItemBuilder removeAttributeModifiers(EquipmentSlot slot);
+
+	ItemBuilder removeAttributeModifiers(Attribute attribute);
+
+	ItemBuilder removeAttributeModifiers(Attribute attribute, AttributeModifier modifier);
+
 	int amount();
 
 	ItemBuilder damage(int damage);
@@ -57,6 +77,8 @@ public interface ItemBuilder {
 	int damage();
 
 	ItemBuilder enchant(Enchantment enchant, int level);
+
+	ItemBuilder enchant(Map<Enchantment, Integer> enchantments);
 
 	ItemBuilder enchantments(Map<Enchantment, Integer> enchantments);
 
@@ -72,7 +94,23 @@ public interface ItemBuilder {
 	@Deprecated
 	ItemBuilder displayname(String displayname);
 
+	/**
+	 * Displayname via this method will not start italic
+	 *
+	 * @param displayname the displayname
+	 *
+	 * @return this builder
+	 */
 	ItemBuilder displayname(Component displayname);
+
+	/**
+	 * Displayname via this method will start italic
+	 *
+	 * @param displayname the displayname
+	 *
+	 * @return this builder
+	 */
+	ItemBuilder displaynameRaw(Component displayname);
 
 	Component displayname();
 
@@ -139,6 +177,10 @@ public interface ItemBuilder {
 	ItemStack build();
 
 	ItemBuilder clone();
+
+	int repairCost();
+
+	ItemBuilder repairCost(int repairCost);
 
 	//	/** Contains NBT Tags Methods */
 	//	public static class Unsafe {
@@ -233,7 +275,8 @@ public interface ItemBuilder {
 	//		}
 	//
 	//		/**
-	//		 * This Class contains highly sensitive NMS Code that should not be touched unless you want
+	//		 * This Class contains highly sensitive NMS Code that should not be touched unless you
+	//		 want
 	//		 * to break the ItemBuilder
 	//		 */
 	//		private static class ReflectionUtils {
@@ -385,7 +428,8 @@ public interface ItemBuilder {
 	//				try {
 	//					return Class.forName("net.minecraft.server." + ver + ".NBTTagCompound")
 	//							.getConstructor().newInstance();
-	//				} catch (ClassNotFoundException | IllegalAccessException | InstantiationException |
+	//				} catch (ClassNotFoundException | IllegalAccessException |
+	//				InstantiationException |
 	//						InvocationTargetException | NoSuchMethodException ex) {
 	//					throw new RuntimeException(ex);
 	//				}
@@ -416,7 +460,8 @@ public interface ItemBuilder {
 	//			public Object getItemAsNMSStack(ItemStack item) {
 	//				try {
 	//					Method m =
-	//							this.getCraftItemStackClass().getMethod("asNMSCopy", ItemStack.class);
+	//							this.getCraftItemStackClass().getMethod("asNMSCopy", ItemStack
+	//							.class);
 	//					return m.invoke(null, item);
 	//				} catch (NoSuchMethodException | IllegalAccessException |
 	//						InvocationTargetException ex) {

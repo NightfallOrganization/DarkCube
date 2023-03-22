@@ -74,9 +74,10 @@ public class PServerPlugin extends DarkCubePlugin {
 			Language.ENGLISH.registerLookup(getClassLoader(), "messages_en.properties",
 					Message.KEY_MODIFIER);
 
-			List<String> messageKeys = Arrays.stream(Message.values()).map(Message::getKey)
+			List<String> messageKeys = Arrays.stream(Message.values()).map(Message::key)
 					.collect(Collectors.toList());
-			Arrays.stream(Item.values()).map(Item::getMessageKeys).forEach(messageKeys::addAll);
+			Arrays.stream(Item.values()).map(Item::getMessageKeys)
+					.forEach(messageKeys::addAll);
 
 			Language.validateEntries(messageKeys.toArray(new String[0]), Message.KEY_MODIFIER);
 		} catch (IOException ex) {

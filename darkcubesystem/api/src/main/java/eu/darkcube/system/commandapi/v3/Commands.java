@@ -24,10 +24,7 @@ import org.bukkit.command.CommandSender;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -100,6 +97,17 @@ public class Commands {
 				}
 			}
 			if (entry.nodes.isEmpty()) {
+				commandEntries.remove(entry);
+			}
+		}
+	}
+
+	public void unregister(CommandExecutor command) {
+		for (CommandEntry entry : new ArrayList<>(commandEntries)) {
+			if (entry.executor.equals(command)) {
+				for (CommandEntry.OriginalCommandTree original : entry.nodes) {
+					unregister(dispatcher.getRoot(), original);
+				}
 				commandEntries.remove(entry);
 			}
 		}

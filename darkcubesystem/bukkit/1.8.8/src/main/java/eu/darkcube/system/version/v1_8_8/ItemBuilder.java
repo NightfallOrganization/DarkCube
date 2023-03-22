@@ -71,7 +71,8 @@ public class ItemBuilder extends AbstractItemBuilder {
 					Property prop = pp.getProperties().containsKey("textures") ? pp.getProperties()
 							.get("textures").stream().findFirst().orElse(null) : null;
 					Texture texture =
-							prop == null ? null : new Texture(prop.getValue(), prop.getSignature());
+							prop == null ? null : new Texture(prop.getValue(),
+									prop.getSignature());
 					UserProfile up = new UserProfile(pp.getName(), pp.getId(), texture);
 					meta(SkullBuilderMeta.class).owningPlayer(up);
 				}
@@ -87,6 +88,31 @@ public class ItemBuilder extends AbstractItemBuilder {
 				}
 			}
 		}
+	}
+
+	@Override
+	public int repairCost() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public AbstractItemBuilder repairCost(int repairCost) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public AbstractItemBuilder clone() {
+		AbstractItemBuilder builder =
+				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
+						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
+						.material(material).unbreakable(unbreakable).metas(metas);
+		builder.persistentDataStorage().getData().append(storage.getData());
+		return builder;
+	}
+
+	@Override
+	public boolean canBeRepairedBy(eu.darkcube.system.inventoryapi.item.ItemBuilder item) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -151,15 +177,5 @@ public class ItemBuilder extends AbstractItemBuilder {
 			throw new IllegalArgumentException("Item without Meta: " + material);
 		}
 		return item;
-	}
-
-	@Override
-	public AbstractItemBuilder clone() {
-		AbstractItemBuilder builder =
-				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
-						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
-						.material(material).unbreakable(unbreakable).metas(metas);
-		builder.persistentDataStorage().loadFromJsonDocument(storage.storeToJsonDocument());
-		return builder;
 	}
 }

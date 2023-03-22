@@ -4,15 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package de.dasbabypixel.prefixplugin;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedDataManager;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.event.EventBus;
+import net.luckperms.api.event.group.GroupDataRecalculateEvent;
+import net.luckperms.api.event.user.UserDataRecalculateEvent;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -29,15 +31,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.cacheddata.CachedDataManager;
-import net.luckperms.api.cacheddata.CachedMetaData;
-import net.luckperms.api.event.EventBus;
-import net.luckperms.api.event.group.GroupDataRecalculateEvent;
-import net.luckperms.api.event.user.UserDataRecalculateEvent;
-import net.luckperms.api.model.group.Group;
-import net.luckperms.api.model.user.User;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public abstract class IScoreboardManager implements Listener {
 
@@ -48,33 +46,13 @@ public abstract class IScoreboardManager implements Listener {
 	private final Map<UUID, String> SUFFIX_BY_UUID = new HashMap<>();
 
 	private final Map<UUID, Scoreboard> SCOREBOARD_BY_UUID = new HashMap<>();
-
+	public Map<String, Object> names = null;
 	private String JOIN_MESSAGE = main.cfg.getString("joinmessage");
 	private String QUIT_MESSAGE = main.cfg.getString("quitmessage");
 	private String CHAT_FORMAT = main.cfg.getString("chatformat");
-
 	private boolean LP_PREFIX_ENABLED = main.cfg.getBoolean("luckpermsprefix");
 	private boolean LP_SUFFIX_ENABLED = main.cfg.getBoolean("luckpermssuffix");
-
 	private String CONSOLE_CHAR = main.cfg.getString("console-color-char");
-
-	public Map<String, Object> names = null;
-
-	public void setLuckPermsPrefixEnabled(boolean luckPermsPrefixEnabled) {
-		LP_PREFIX_ENABLED = luckPermsPrefixEnabled;
-	}
-
-	public void setLuckPermsSuffixEnabled(boolean luckPermsSuffixEnabled) {
-		LP_SUFFIX_ENABLED = luckPermsSuffixEnabled;
-	}
-
-	public boolean isLuckPermsPrefixEnabled() {
-		return LP_PREFIX_ENABLED;
-	}
-
-	public boolean isLuckPermsSuffixEnabled() {
-		return LP_SUFFIX_ENABLED;
-	}
 
 	public IScoreboardManager() {
 		EventBus bus = api.getEventBus();
@@ -99,13 +77,30 @@ public abstract class IScoreboardManager implements Listener {
 			String newPrefix = getPrefix(uuid);
 			String newSuffix = getSuffix(uuid);
 			if (!newPrefix.equals(oldPrefix) || !newSuffix.equals(oldSuffix)) {
-				ReloadSinglePrefixEvent e = new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+				ReloadSinglePrefixEvent e = new ReloadSinglePrefixEvent(uuid, newPrefix,
+						newSuffix);
 				Bukkit.getPluginManager().callEvent(e);
 				setPrefix(uuid, e.getNewPrefix());
 				setSuffix(uuid, e.getNewSuffix());
 			}
 		});
 
+	}
+
+	public boolean isLuckPermsPrefixEnabled() {
+		return LP_PREFIX_ENABLED;
+	}
+
+	public void setLuckPermsPrefixEnabled(boolean luckPermsPrefixEnabled) {
+		LP_PREFIX_ENABLED = luckPermsPrefixEnabled;
+	}
+
+	public boolean isLuckPermsSuffixEnabled() {
+		return LP_SUFFIX_ENABLED;
+	}
+
+	public void setLuckPermsSuffixEnabled(boolean luckPermsSuffixEnabled) {
+		LP_SUFFIX_ENABLED = luckPermsSuffixEnabled;
 	}
 
 	public synchronized void reload() {
@@ -170,12 +165,14 @@ public abstract class IScoreboardManager implements Listener {
 		String newPrefix = getPrefix(uuid);
 		String newSuffix = getSuffix(uuid);
 		if (!newPrefix.equals(oldPrefix)) {
-			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix, oldSuffix);
+			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix,
+					oldSuffix);
 			Bukkit.getPluginManager().callEvent(event);
 			setPrefix(uuid, event.getNewPrefix());
 		}
 		if (!newSuffix.equals(oldSuffix)) {
-			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix,
+					newSuffix);
 			Bukkit.getPluginManager().callEvent(event);
 			setSuffix(uuid, event.getNewSuffix());
 		}
@@ -186,7 +183,8 @@ public abstract class IScoreboardManager implements Listener {
 		Player p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
 
-		if (p.getScoreboard() == null || p.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
+		if (p.getScoreboard() == null || p.getScoreboard()
+				.equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
 			p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		}
 
@@ -215,7 +213,8 @@ public abstract class IScoreboardManager implements Listener {
 		String newPrefix = getPrefix(uuid);
 		String newSuffix = getSuffix(uuid);
 		if (!newPrefix.equals(oldPrefix) || !newSuffix.equals(oldSuffix)) {
-			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix,
+					newSuffix);
 			Bukkit.getPluginManager().callEvent(event);
 			setPrefix(uuid, event.getNewPrefix());
 			setSuffix(uuid, event.getNewSuffix());
@@ -231,7 +230,6 @@ public abstract class IScoreboardManager implements Listener {
 		for (String key : names.keySet()) {
 			if (key.equalsIgnoreCase(e.getPlayer().getName())) {
 				e.getPlayer().setPlayerListName(names.get(key).toString());
-				e.getPlayer().setCustomName(names.get(key).toString());
 			}
 		}
 	}
@@ -270,47 +268,43 @@ public abstract class IScoreboardManager implements Listener {
 		SUFFIX_BY_UUID.remove(p.getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onChat(AsyncPlayerChatEvent e) {
-
-		if (!e.isCancelled()) {
-			String msg = getChatMessage(e.getPlayer(), e.getMessage());
-			for (Player all : Bukkit.getOnlinePlayers()) {
-				all.sendMessage(msg);
-			}
-
-			msg = colorSafe(e.getMessage(), CHAT_FORMAT, e.getPlayer());
-			e.setFormat(msg);
-			Bukkit.getConsoleSender().sendMessage(msg);
-			e.setCancelled(true);
+		String msg = getChatMessage(e.getPlayer(), e.getMessage());
+		for (Player all : Bukkit.getOnlinePlayers()) {
+			all.sendMessage(msg);
 		}
+
+		msg = colorSafe(e.getMessage(), CHAT_FORMAT, e.getPlayer());
+		e.setFormat(msg);
+		Bukkit.getConsoleSender().sendMessage(msg);
+		e.setCancelled(true);
 	}
 
 	String colorSafe(String msg, String format, Player p) {
 		format = replacePlaceHolders(p, format);
 		format = format.replace(">>", "»");
-		String c = msg;
 
-		String result = "";
-		int length = c.length();
+		StringBuilder result = new StringBuilder();
+		int length = msg.length();
 		for (int index = length - 1; index > -1; index--) {
-			char section = c.charAt(index);
+			char section = msg.charAt(index);
 			String toAdd = String.valueOf(section);
 			if (section == CONSOLE_CHAR.charAt(0) && index < length - 1) {
-				char code = c.charAt(index + 1);
+				char code = msg.charAt(index + 1);
 				ChatColor color = ChatColor.getByChar(code);
 				if (color != null) {
-					toAdd += getLastColorsForCloudNet(c.substring(0, index));
+					toAdd += getLastColorsForCloudNet(msg.substring(0, index));
 				}
 			}
-			result = toAdd + result;
+			result.insert(0, toAdd);
 		}
 
-		format = format.replace("%message%", result);
+		format = format.replace("%message%", result.toString());
 		format = format.replace("%", "%%");
 		format = translateAlternateColorCodesForCloudNet('§', format);
-		result = format.replace('┃', '|');
-		return result;
+		result = new StringBuilder(format.replace('┃', '|'));
+		return result.toString();
 	}
 
 	String getChatMessage(Player p, String message) {
@@ -407,19 +401,13 @@ public abstract class IScoreboardManager implements Listener {
 			for (Scoreboard sb : SCOREBOARD_BY_UUID.values()) {
 				Team team = sb.getTeam(tag.toString());
 				if (team != null) {
+					//noinspection JavaReflectionMemberAccess
 					Method method = Team.class.getMethod("setColor", ChatColor.class);
 					method.invoke(team, ChatColor.getByChar(code));
 				}
 			}
-		} catch (IllegalAccessException ex) {
-			ex.printStackTrace();
-		} catch (IllegalArgumentException ex) {
-			ex.printStackTrace();
-		} catch (InvocationTargetException ex) {
-			ex.printStackTrace();
-		} catch (NoSuchMethodException ex) {
-			ex.printStackTrace();
-		} catch (SecurityException ex) {
+		} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException |
+				NoSuchMethodException | SecurityException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -475,7 +463,7 @@ public abstract class IScoreboardManager implements Listener {
 			if (prefix == null)
 				prefix = "";
 			PREFIX_BY_UUID.put(uuid, ChatColor.translateAlternateColorCodes('&', prefix));
-//			setPrefix(uuid, ChatColor.translateAlternateColorCodes('&', prefix));
+			//			setPrefix(uuid, ChatColor.translateAlternateColorCodes('&', prefix));
 		}
 	}
 
@@ -485,7 +473,7 @@ public abstract class IScoreboardManager implements Listener {
 			if (suffix == null)
 				suffix = "";
 			SUFFIX_BY_UUID.put(uuid, ChatColor.translateAlternateColorCodes('&', suffix));
-//			setSuffix(uuid, ChatColor.translateAlternateColorCodes('&', suffix));
+			//			setSuffix(uuid, ChatColor.translateAlternateColorCodes('&', suffix));
 		}
 	}
 
@@ -499,9 +487,9 @@ public abstract class IScoreboardManager implements Listener {
 
 	/*
 	 * ContextSet getContext(Player p) { return getContext(p.getUniqueId()); }
-	 * 
+	 *
 	 * ContextSet getContext(UUID uuid) { return getContext(getUser(uuid)); }
-	 * 
+	 *
 	 * ContextSet getContext(User user) { ContextManager manager =
 	 * api.getContextManager(); return
 	 * manager.getContext(user).orElseGet(manager::getStaticContext); }
@@ -510,7 +498,8 @@ public abstract class IScoreboardManager implements Listener {
 	String translateAlternateColorCodesForCloudNet(char altColorChar, String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();
 		for (int i = 0; i < b.length - 1; i++) {
-			if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
+			if (b[i] == altColorChar
+					&& "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
 				b[i] = CONSOLE_CHAR.charAt(0);
 				b[i + 1] = Character.toLowerCase(b[i + 1]);
 			}

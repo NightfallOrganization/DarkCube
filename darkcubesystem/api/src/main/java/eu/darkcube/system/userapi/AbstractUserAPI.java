@@ -17,7 +17,7 @@ public abstract class AbstractUserAPI extends UserAPI {
 	protected final ConcurrentLinkedDeque<UserModifier> modifiers = new ConcurrentLinkedDeque<>();
 
 	@Override
-	public final User getUser(Player player) {
+	public User getUser(Player player) {
 		return getUser(player.getUniqueId());
 	}
 

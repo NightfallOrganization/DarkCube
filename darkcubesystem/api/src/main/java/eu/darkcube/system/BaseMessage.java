@@ -41,7 +41,7 @@ public interface BaseMessage {
 		});
 	}
 
-	String getKey();
+	String key();
 
 	default Component getMessage(CommandSender sender, Object... args) {
 		return getMessage(new BukkitCommandExecutor(sender), args);

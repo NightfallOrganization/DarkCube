@@ -8,17 +8,11 @@ package eu.darkcube.system.vanillaaddons.listener;
 
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.vanillaaddons.AUser;
-import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class InventoryListener implements Listener {
-	private final VanillaAddons addons;
-
-	public InventoryListener(VanillaAddons addons) {
-		this.addons = addons;
-	}
 
 	@EventHandler
 	public void handle(InventoryCloseEvent event) {

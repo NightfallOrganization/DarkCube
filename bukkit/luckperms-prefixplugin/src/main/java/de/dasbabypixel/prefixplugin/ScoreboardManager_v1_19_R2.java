@@ -4,13 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.vanillaaddons.util;
+package de.dasbabypixel.prefixplugin;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Teleporters {
-
-	public final List<Teleporter> teleporters = new ArrayList<>();
-
+public class ScoreboardManager_v1_19_R2 extends ScoreboardManager_v1_16_R3 {
 }
