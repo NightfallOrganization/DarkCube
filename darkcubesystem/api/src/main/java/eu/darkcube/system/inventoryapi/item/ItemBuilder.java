@@ -52,6 +52,8 @@ public interface ItemBuilder {
 
 	ItemBuilder amount(int amount);
 
+	boolean canBeRepairedBy(ItemBuilder item);
+
 	Multimap<Attribute, AttributeModifier> attributeModifiers();
 
 	Multimap<Attribute, AttributeModifier> attributeModifiers(EquipmentSlot slot);
@@ -76,6 +78,8 @@ public interface ItemBuilder {
 
 	ItemBuilder enchant(Enchantment enchant, int level);
 
+	ItemBuilder enchant(Map<Enchantment, Integer> enchantments);
+
 	ItemBuilder enchantments(Map<Enchantment, Integer> enchantments);
 
 	Map<Enchantment, Integer> enchantments();
@@ -90,7 +94,23 @@ public interface ItemBuilder {
 	@Deprecated
 	ItemBuilder displayname(String displayname);
 
+	/**
+	 * Displayname via this method will not start italic
+	 *
+	 * @param displayname the displayname
+	 *
+	 * @return this builder
+	 */
 	ItemBuilder displayname(Component displayname);
+
+	/**
+	 * Displayname via this method will start italic
+	 *
+	 * @param displayname the displayname
+	 *
+	 * @return this builder
+	 */
+	ItemBuilder displaynameRaw(Component displayname);
 
 	Component displayname();
 
@@ -157,6 +177,10 @@ public interface ItemBuilder {
 	ItemStack build();
 
 	ItemBuilder clone();
+
+	int repairCost();
+
+	ItemBuilder repairCost(int repairCost);
 
 	//	/** Contains NBT Tags Methods */
 	//	public static class Unsafe {

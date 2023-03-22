@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.commandapi.v3;
 
 import eu.darkcube.system.version.VersionSupport;
@@ -36,6 +35,10 @@ public class CommandAPI {
 	public void register(CommandExecutor command) {
 		commands.register(command);
 		this.pluginRegisterCommand(command);
+	}
+
+	public void unregister(CommandExecutor command) {
+		commands.unregister(command);
 	}
 
 	public void unregisterByPrefix(String prefix) {

@@ -15,6 +15,7 @@ import eu.darkcube.system.inventoryapi.item.attribute.Attribute;
 import eu.darkcube.system.inventoryapi.item.attribute.AttributeModifier;
 import eu.darkcube.system.inventoryapi.item.meta.BuilderMeta;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextDecoration;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -37,6 +38,7 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	protected ArrayList<ItemFlag> flags = new ArrayList<>();
 	protected boolean unbreakable = false;
 	protected boolean glow = false;
+	protected int repairCost = 0;
 	protected LinkedHashMultimap<Attribute, AttributeModifier> attributeModifiers =
 			LinkedHashMultimap.create();
 
@@ -50,6 +52,12 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	@Override
 	public AbstractItemBuilder material(Material material) {
 		this.material = material;
+		return this;
+	}
+
+	@Override
+	public AbstractItemBuilder amount(int amount) {
+		this.amount = amount;
 		return this;
 	}
 
@@ -143,12 +151,6 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	}
 
 	@Override
-	public AbstractItemBuilder amount(int amount) {
-		this.amount = amount;
-		return this;
-	}
-
-	@Override
 	public int amount() {
 		return amount;
 	}
@@ -171,7 +173,14 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	}
 
 	@Override
+	public AbstractItemBuilder enchant(Map<Enchantment, Integer> enchantments) {
+		this.enchantments.putAll(enchantments);
+		return this;
+	}
+
+	@Override
 	public AbstractItemBuilder enchantments(Map<Enchantment, Integer> enchantments) {
+		this.enchantments.clear();
 		this.enchantments.putAll(enchantments);
 		return this;
 	}
@@ -192,6 +201,14 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 
 	@Override
 	public AbstractItemBuilder displayname(Component displayname) {
+		this.displayname = displayname == null
+				? null
+				: Component.empty().decoration(TextDecoration.ITALIC, false).append(displayname);
+		return this;
+	}
+
+	@Override
+	public AbstractItemBuilder displaynameRaw(Component displayname) {
 		this.displayname = displayname;
 		return this;
 	}
@@ -203,25 +220,26 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 
 	@Override
 	public AbstractItemBuilder lore(Component line) {
-		lore.add(line);
+		lore.add(Component.empty().decoration(TextDecoration.ITALIC, false).append(line));
 		return this;
 	}
 
 	@Override
 	public AbstractItemBuilder lore(Collection<Component> lore) {
-		this.lore.addAll(lore);
+		for (Component component : lore) {
+			lore(component);
+		}
 		return this;
 	}
 
 	@Override
 	public AbstractItemBuilder lore(Component... lines) {
-		lore.addAll(Arrays.asList(lines));
-		return this;
+		return lore(Arrays.asList(lines));
 	}
 
 	@Override
 	public AbstractItemBuilder lore(Component line, int index) {
-		lore.add(index, line);
+		lore.add(index, Component.empty().decoration(TextDecoration.ITALIC, false).append(line));
 		return this;
 	}
 
@@ -349,6 +367,17 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	public AbstractItemBuilder metas(Set<BuilderMeta> metas) {
 		this.metas.clear();
 		this.metas.addAll(metas.stream().map(BuilderMeta::clone).collect(Collectors.toSet()));
+		return this;
+	}
+
+	@Override
+	public int repairCost() {
+		return repairCost;
+	}
+
+	@Override
+	public AbstractItemBuilder repairCost(int repairCost) {
+		this.repairCost = repairCost;
 		return this;
 	}
 

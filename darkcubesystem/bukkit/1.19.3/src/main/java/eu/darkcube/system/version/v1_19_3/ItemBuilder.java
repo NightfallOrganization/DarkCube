@@ -11,21 +11,17 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.BuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.LeatherArmorBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.inventoryapi.item.meta.*;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
 import eu.darkcube.system.util.data.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -33,7 +29,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -42,23 +40,38 @@ public class ItemBuilder extends AbstractItemBuilder {
 	private static final Logger LOGGER = Logger.getLogger("ItemBuilder");
 	private static final NamespacedKey persistentDataKey =
 			new NamespacedKey(DarkCubePlugin.systemPlugin(), "persistentDataStorage");
+	private final ItemStack item;
 
 	public ItemBuilder() {
+		this.item = null;
 	}
 
 	public ItemBuilder(ItemStack item) {
+		ItemStack original = item;
+		item = item.clone();
+		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
+		this.item = item;
 		material(item.getType());
 		amount(item.getAmount());
+		item.setAmount(1);
+
+		repairCost(nms.getBaseRepairCost());
+
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			unbreakable(meta.isUnbreakable());
-			if (meta.hasDisplayName())
-				displayname(AdventureUtils.convert(meta.displayName()));
-			for (Map.Entry<Enchantment, Integer> e : meta.getEnchants().entrySet()) {
+			meta.setUnbreakable(false);
+			if (meta.hasDisplayName()) {
+				displayname = AdventureUtils.convert(meta.displayName());
+				meta.displayName(null);
+			}
+			for (Map.Entry<Enchantment, Integer> e : new ArrayList<>(
+					meta.getEnchants().entrySet())) {
 				enchant(e.getKey(), e.getValue());
+				meta.removeEnchant(e.getKey());
 			}
 
-			if (meta.getAttributeModifiers() != null)
+			if (meta.getAttributeModifiers() != null) {
 				meta.getAttributeModifiers().forEach((attribute, attributeModifier) -> {
 					eu.darkcube.system.inventoryapi.item.attribute.Attribute sa =
 							new eu.darkcube.system.inventoryapi.item.attribute.Attribute(
@@ -76,14 +89,29 @@ public class ItemBuilder extends AbstractItemBuilder {
 									attributeModifier.getUniqueId(), attributeModifier.getName(),
 									attributeModifier.getAmount(), so, ses));
 				});
+				meta.setAttributeModifiers(null);
+			}
 
 			setFlags(meta.getItemFlags());
-			if (meta.lore() != null)
-				lore(AdventureUtils.convert2(Objects.requireNonNull(meta.lore())));
-			if (meta instanceof Damageable dmeta)
+			meta.removeItemFlags(ItemFlag.values());
+			if (meta.lore() != null) {
+				lore.addAll(AdventureUtils.convert2(Objects.requireNonNull(meta.lore())));
+				meta.lore(new ArrayList<>());
+			}
+			if (meta instanceof Damageable dmeta) {
 				damage(dmeta.getDamage());
-			if (meta instanceof FireworkEffectMeta fmeta)
+				dmeta.setDamage(0);
+			}
+			if (meta instanceof FireworkEffectMeta fmeta) {
 				meta(FireworkBuilderMeta.class).setFireworkEffect(fmeta.getEffect());
+				fmeta.setEffect(null);
+			}
+			if (meta instanceof EnchantmentStorageMeta emeta) {
+				meta(EnchantmentStorageBuilderMeta.class).enchantments(emeta.getStoredEnchants());
+				for (Enchantment enchantment : emeta.getStoredEnchants().keySet()) {
+					emeta.removeStoredEnchant(enchantment);
+				}
+			}
 			if (meta instanceof SkullMeta smeta) {
 				PlayerProfile pp = smeta.getPlayerProfile();
 				if (pp != null) {
@@ -96,33 +124,59 @@ public class ItemBuilder extends AbstractItemBuilder {
 					UserProfile up = new UserProfile(pp.getName(), pp.getId(), texture);
 					meta(SkullBuilderMeta.class).setOwningPlayer(up);
 				}
+				smeta.setOwningPlayer(null);
 			}
-			if (meta instanceof LeatherArmorMeta lmeta)
+			if (meta instanceof LeatherArmorMeta lmeta) {
 				meta(LeatherArmorBuilderMeta.class).setColor(lmeta.getColor());
+				lmeta.setColor(null);
+			}
 			if (meta.getPersistentDataContainer().has(persistentDataKey)) {
 				storage.getData().append(JsonDocument.newDocument(meta.getPersistentDataContainer()
 						.get(persistentDataKey, PersistentDataType.STRING)));
+				meta.getPersistentDataContainer().remove(persistentDataKey);
 			}
+			this.item.setItemMeta(meta);
+		}
+		ItemStack b = build();
+		if (!original.equals(b)) {
+			LOGGER.severe("Failed to clone item correctly: ");
+			LOGGER.severe(" - " + original);
+			LOGGER.severe(" - " + b);
 		}
 	}
 
 	@Override
+	public boolean canBeRepairedBy(eu.darkcube.system.inventoryapi.item.ItemBuilder ingredient) {
+		ItemStack item = build();
+		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
+		return nms.getItem().isValidRepairItem(nms, CraftItemStack.asNMSCopy(ingredient.build()));
+	}
+
+	@Override
 	public ItemStack build() {
-		ItemStack item = new ItemStack(material);
+		//		ItemStack item = new ItemStack(material);
+		ItemStack item = this.item == null ? new ItemStack(material) : this.item.clone();
+
+		item.setType(material);
+
+		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
+		nms.setRepairCost(repairCost);
+		item = nms.asBukkitMirror();
+
 		item.setAmount(amount);
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
 			meta.setUnbreakable(unbreakable);
-			Component prefix = Component.empty().decoration(TextDecoration.ITALIC, false);
 			if (displayname != null) {
-				meta.displayName(prefix.append(AdventureUtils.convert(displayname)));
+				meta.displayName(AdventureUtils.convert(displayname));
 			}
 			for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
 				meta.addEnchant(e.getKey(), e.getValue(), true);
 			}
 
 			meta.addItemFlags(flags.toArray(new ItemFlag[0]));
-			meta.lore(lore.stream().map(AdventureUtils::convert).map(prefix::append).toList());
+			if (!lore.isEmpty())
+				meta.lore(lore.stream().map(AdventureUtils::convert).toList());
 			if (glow) {
 				if (enchantments.isEmpty()) {
 					meta.addEnchant(item.getType() == Material.BOW
@@ -177,28 +231,35 @@ public class ItemBuilder extends AbstractItemBuilder {
 				} else if (builderMeta instanceof LeatherArmorBuilderMeta) {
 					((LeatherArmorMeta) meta).setColor(
 							((LeatherArmorBuilderMeta) builderMeta).getColor());
+				} else if (builderMeta instanceof EnchantmentStorageBuilderMeta emeta) {
+					for (Entry<Enchantment, Integer> entry : emeta.enchantments().entrySet()) {
+						((EnchantmentStorageMeta) meta).addStoredEnchant(entry.getKey(),
+								entry.getValue(), true);
+					}
 				} else {
 					throw new UnsupportedOperationException(
 							"Meta not supported for this mc version: " + builderMeta);
 				}
 			}
-			meta.getPersistentDataContainer()
-					.set(persistentDataKey, PersistentDataType.STRING, storage.getData().toJson());
+			if (!storage.getData().isEmpty())
+				meta.getPersistentDataContainer().set(persistentDataKey, PersistentDataType.STRING,
+						storage.getData().toJson());
 			item.setItemMeta(meta);
-		} else {
-			throw new IllegalArgumentException("Item without Meta: " + material);
 		}
 		return item;
 	}
 
 	@Override
 	public AbstractItemBuilder clone() {
-		AbstractItemBuilder builder =
-				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
-						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
-						.material(material).unbreakable(unbreakable).metas(metas)
-						.attributeModifiers(attributeModifiers);
-		builder.persistentDataStorage().getData().append(storage.getData());
-		return builder;
+		return new ItemBuilder(build());
+		//		ItemBuilder builder = new ItemBuilder();
+		//		builder.repairCost(repairCost).amount(amount).damage(damage).displayname
+		//		(displayname)
+		//				.enchantments(enchantments).flag(flags).glow(glow).lore(lore).material
+		//				(material)
+		//				.unbreakable(unbreakable).metas(metas).attributeModifiers
+		//				(attributeModifiers);
+		//		builder.persistentDataStorage().getData().append(storage.getData());
+		//		return builder;
 	}
 }

@@ -6,15 +6,12 @@
  */
 package eu.darkcube.system.util;
 
+import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.ComponentLike;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
-import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.ComponentSerializer;
-import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;
@@ -71,6 +68,9 @@ public enum Language {
 	public Component getMessage(String key, Object... replacements) {
 		List<Component> components = new ArrayList<>();
 		for (int i = 0; i < replacements.length; i++) {
+			if (replacements[i] instanceof BaseMessage) {
+				replacements[i] = ((BaseMessage) replacements[i]).getMessage(this, new String[0]);
+			}
 			if (replacements[i] instanceof ComponentLike) {
 				ComponentLike componentLike = (ComponentLike) replacements[i];
 				replacements[i] = (Formattable) (formatter, flags, width, precision) -> {
@@ -82,7 +82,8 @@ public enum Language {
 		}
 		if (this.bundle.containsKey(key)) {
 			String formatted =
-					String.format(this.locale, this.bundle.getObject(key).toString(), replacements);
+					String.format(this.locale, this.bundle.getObject(key).toString(),
+							replacements);
 			formatted = ChatColor.translateAlternateColorCodes('&', formatted);
 			Component c = Component.text().asComponent();
 			for (int i = 0; i < components.size(); i++) {
@@ -94,7 +95,8 @@ public enum Language {
 					String str = LegacyComponentSerializer.legacySection()
 							.serialize(Component.text(" ").style(getLastStyle(o)));
 					str = str.substring(0, str.length() - 1);
-					c = c.append(LegacyComponentSerializer.legacySection().deserialize(str + s[1]));
+					c =
+							c.append(LegacyComponentSerializer.legacySection().deserialize(str + s[1]));
 				}
 			}
 			if (components.isEmpty()) {

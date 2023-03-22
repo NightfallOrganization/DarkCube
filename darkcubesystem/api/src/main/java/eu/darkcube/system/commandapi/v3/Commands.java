@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.commandapi.v3;
 
 import eu.darkcube.system.libs.com.mojang.brigadier.Command;
@@ -24,10 +23,7 @@ import org.bukkit.command.CommandSender;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -87,6 +83,17 @@ public class Commands {
 			for (CommandEntry.OriginalCommandTree original : entry.nodes) {
 				if (original.prefixless)
 					unregister(dispatcher.getRoot(), original);
+			}
+		}
+	}
+
+	public void unregister(CommandExecutor command) {
+		for (CommandEntry entry : new ArrayList<>(commandEntries)) {
+			if (entry.executor.equals(command)) {
+				for (CommandEntry.OriginalCommandTree original : entry.nodes) {
+					unregister(dispatcher.getRoot(), original);
+				}
+				commandEntries.remove(entry);
 			}
 		}
 	}
@@ -177,7 +184,6 @@ public class Commands {
 	public interface IParser {
 		void parse(StringReader reader) throws CommandSyntaxException;
 	}
-
 
 	private static class CommandEntry {
 		private final CommandExecutor executor;

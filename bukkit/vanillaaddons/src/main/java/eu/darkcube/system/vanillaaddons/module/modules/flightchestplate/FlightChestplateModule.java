@@ -46,13 +46,12 @@ public class FlightChestplateModule implements Listener, Module {
 	private static final int MAX_SPEED = 20;
 	private static final float MIN_FLY_SPEED = 0.02F;
 	private static final float MAX_FLY_SPEED = 0.1F;
-	private final VanillaAddons addons;
 	public final NamespacedKey STORAGE_KEY;
+	private final VanillaAddons addons;
 	private final Key SPEED_KEY;
 	private final Recipe recipe = new Recipe(Item.FLIGHT_CHESTPLATE,
 			Recipe.shaped("flight_chestplate", 0, "eee", "ene", "eee").i('e', Material.ELYTRA)
 					.i('n', Material.NETHERITE_BLOCK));
-	;
 
 	public FlightChestplateModule(VanillaAddons addons) {
 		this.addons = addons;

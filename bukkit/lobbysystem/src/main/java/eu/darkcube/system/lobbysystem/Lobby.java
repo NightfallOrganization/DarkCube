@@ -106,7 +106,7 @@ public class Lobby extends Plugin {
 		}
 		List<String> languageEntries = new ArrayList<>();
 		languageEntries.addAll(
-				Arrays.stream(Message.values()).map(Message::getKey).collect(Collectors.toList()));
+				Arrays.stream(Message.values()).map(Message::key).collect(Collectors.toList()));
 		languageEntries.addAll(
 				Arrays.stream(Item.values()).map(i -> Message.PREFIX_ITEM + i.getKey())
 						.collect(Collectors.toList()));
@@ -209,7 +209,8 @@ public class Lobby extends Plugin {
 					return;
 				}
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					ParticleEffect.FIREWORKS_SPARK.display(20, 20, 20, 0F, 200, p.getLocation(), p);
+					ParticleEffect.FIREWORKS_SPARK.display(20, 20, 20, 0F, 200, p.getLocation(),
+							p);
 					ParticleEffect.SNOW_SHOVEL.display(20, 20, 20, 0F, 100, p.getLocation(), p);
 				}
 			}

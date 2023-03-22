@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.commandapi.v3;
 
 import com.google.common.base.Objects;
@@ -63,7 +62,7 @@ public enum Messages implements BaseMessage {
 
 	static {
 		for (Messages message : values()) {
-			MESSAGES.put(message.getKey(), message);
+			MESSAGES.put(message.key(), message);
 		}
 	}
 
@@ -73,13 +72,13 @@ public enum Messages implements BaseMessage {
 		this.key = key;
 	}
 
-	public String getKey() {
+	public String key() {
 		return key;
 	}
 
 	@Override
 	public String toString() {
-		return getKey();
+		return key();
 	}
 
 	public static class MessageWrapper implements Message {

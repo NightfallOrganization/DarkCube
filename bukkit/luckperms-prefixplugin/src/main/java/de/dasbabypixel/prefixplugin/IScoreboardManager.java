@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package de.dasbabypixel.prefixplugin;
 
 import net.luckperms.api.LuckPerms;
@@ -47,33 +46,13 @@ public abstract class IScoreboardManager implements Listener {
 	private final Map<UUID, String> SUFFIX_BY_UUID = new HashMap<>();
 
 	private final Map<UUID, Scoreboard> SCOREBOARD_BY_UUID = new HashMap<>();
-
+	public Map<String, Object> names = null;
 	private String JOIN_MESSAGE = main.cfg.getString("joinmessage");
 	private String QUIT_MESSAGE = main.cfg.getString("quitmessage");
 	private String CHAT_FORMAT = main.cfg.getString("chatformat");
-
 	private boolean LP_PREFIX_ENABLED = main.cfg.getBoolean("luckpermsprefix");
 	private boolean LP_SUFFIX_ENABLED = main.cfg.getBoolean("luckpermssuffix");
-
 	private String CONSOLE_CHAR = main.cfg.getString("console-color-char");
-
-	public Map<String, Object> names = null;
-
-	public void setLuckPermsPrefixEnabled(boolean luckPermsPrefixEnabled) {
-		LP_PREFIX_ENABLED = luckPermsPrefixEnabled;
-	}
-
-	public void setLuckPermsSuffixEnabled(boolean luckPermsSuffixEnabled) {
-		LP_SUFFIX_ENABLED = luckPermsSuffixEnabled;
-	}
-
-	public boolean isLuckPermsPrefixEnabled() {
-		return LP_PREFIX_ENABLED;
-	}
-
-	public boolean isLuckPermsSuffixEnabled() {
-		return LP_SUFFIX_ENABLED;
-	}
 
 	public IScoreboardManager() {
 		EventBus bus = api.getEventBus();
@@ -98,13 +77,30 @@ public abstract class IScoreboardManager implements Listener {
 			String newPrefix = getPrefix(uuid);
 			String newSuffix = getSuffix(uuid);
 			if (!newPrefix.equals(oldPrefix) || !newSuffix.equals(oldSuffix)) {
-				ReloadSinglePrefixEvent e = new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+				ReloadSinglePrefixEvent e = new ReloadSinglePrefixEvent(uuid, newPrefix,
+						newSuffix);
 				Bukkit.getPluginManager().callEvent(e);
 				setPrefix(uuid, e.getNewPrefix());
 				setSuffix(uuid, e.getNewSuffix());
 			}
 		});
 
+	}
+
+	public boolean isLuckPermsPrefixEnabled() {
+		return LP_PREFIX_ENABLED;
+	}
+
+	public void setLuckPermsPrefixEnabled(boolean luckPermsPrefixEnabled) {
+		LP_PREFIX_ENABLED = luckPermsPrefixEnabled;
+	}
+
+	public boolean isLuckPermsSuffixEnabled() {
+		return LP_SUFFIX_ENABLED;
+	}
+
+	public void setLuckPermsSuffixEnabled(boolean luckPermsSuffixEnabled) {
+		LP_SUFFIX_ENABLED = luckPermsSuffixEnabled;
 	}
 
 	public synchronized void reload() {
@@ -169,12 +165,14 @@ public abstract class IScoreboardManager implements Listener {
 		String newPrefix = getPrefix(uuid);
 		String newSuffix = getSuffix(uuid);
 		if (!newPrefix.equals(oldPrefix)) {
-			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix, oldSuffix);
+			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix,
+					oldSuffix);
 			Bukkit.getPluginManager().callEvent(event);
 			setPrefix(uuid, event.getNewPrefix());
 		}
 		if (!newSuffix.equals(oldSuffix)) {
-			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix,
+					newSuffix);
 			Bukkit.getPluginManager().callEvent(event);
 			setSuffix(uuid, event.getNewSuffix());
 		}
@@ -185,7 +183,8 @@ public abstract class IScoreboardManager implements Listener {
 		Player p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
 
-		if (p.getScoreboard() == null || p.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
+		if (p.getScoreboard() == null || p.getScoreboard()
+				.equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
 			p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 		}
 
@@ -214,7 +213,8 @@ public abstract class IScoreboardManager implements Listener {
 		String newPrefix = getPrefix(uuid);
 		String newSuffix = getSuffix(uuid);
 		if (!newPrefix.equals(oldPrefix) || !newSuffix.equals(oldSuffix)) {
-			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+			ReloadSinglePrefixEvent event = new ReloadSinglePrefixEvent(uuid, newPrefix,
+					newSuffix);
 			Bukkit.getPluginManager().callEvent(event);
 			setPrefix(uuid, event.getNewPrefix());
 			setSuffix(uuid, event.getNewSuffix());
@@ -268,20 +268,17 @@ public abstract class IScoreboardManager implements Listener {
 		SUFFIX_BY_UUID.remove(p.getUniqueId());
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onChat(AsyncPlayerChatEvent e) {
-
-		if (!e.isCancelled()) {
-			String msg = getChatMessage(e.getPlayer(), e.getMessage());
-			for (Player all : Bukkit.getOnlinePlayers()) {
-				all.sendMessage(msg);
-			}
-
-			msg = colorSafe(e.getMessage(), CHAT_FORMAT, e.getPlayer());
-			e.setFormat(msg);
-			Bukkit.getConsoleSender().sendMessage(msg);
-			e.setCancelled(true);
+		String msg = getChatMessage(e.getPlayer(), e.getMessage());
+		for (Player all : Bukkit.getOnlinePlayers()) {
+			all.sendMessage(msg);
 		}
+
+		msg = colorSafe(e.getMessage(), CHAT_FORMAT, e.getPlayer());
+		e.setFormat(msg);
+		Bukkit.getConsoleSender().sendMessage(msg);
+		e.setCancelled(true);
 	}
 
 	String colorSafe(String msg, String format, Player p) {
@@ -466,7 +463,7 @@ public abstract class IScoreboardManager implements Listener {
 			if (prefix == null)
 				prefix = "";
 			PREFIX_BY_UUID.put(uuid, ChatColor.translateAlternateColorCodes('&', prefix));
-//			setPrefix(uuid, ChatColor.translateAlternateColorCodes('&', prefix));
+			//			setPrefix(uuid, ChatColor.translateAlternateColorCodes('&', prefix));
 		}
 	}
 
@@ -476,7 +473,7 @@ public abstract class IScoreboardManager implements Listener {
 			if (suffix == null)
 				suffix = "";
 			SUFFIX_BY_UUID.put(uuid, ChatColor.translateAlternateColorCodes('&', suffix));
-//			setSuffix(uuid, ChatColor.translateAlternateColorCodes('&', suffix));
+			//			setSuffix(uuid, ChatColor.translateAlternateColorCodes('&', suffix));
 		}
 	}
 
@@ -490,9 +487,9 @@ public abstract class IScoreboardManager implements Listener {
 
 	/*
 	 * ContextSet getContext(Player p) { return getContext(p.getUniqueId()); }
-	 * 
+	 *
 	 * ContextSet getContext(UUID uuid) { return getContext(getUser(uuid)); }
-	 * 
+	 *
 	 * ContextSet getContext(User user) { ContextManager manager =
 	 * api.getContextManager(); return
 	 * manager.getContext(user).orElseGet(manager::getStaticContext); }
@@ -501,7 +498,8 @@ public abstract class IScoreboardManager implements Listener {
 	String translateAlternateColorCodesForCloudNet(char altColorChar, String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();
 		for (int i = 0; i < b.length - 1; i++) {
-			if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
+			if (b[i] == altColorChar
+					&& "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
 				b[i] = CONSOLE_CHAR.charAt(0);
 				b[i + 1] = Character.toLowerCase(b[i + 1]);
 			}

@@ -4,18 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.commandapi.v3;
 
 import com.avaje.ebean.validation.NotNull;
+import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
+import eu.darkcube.system.commandapi.v3.arguments.EntityAnchorArgument.Type;
 import eu.darkcube.system.libs.com.mojang.brigadier.LiteralMessage;
 import eu.darkcube.system.libs.com.mojang.brigadier.Message;
 import eu.darkcube.system.libs.com.mojang.brigadier.ResultConsumer;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import eu.darkcube.system.BaseMessage;
-import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
-import eu.darkcube.system.commandapi.v3.arguments.EntityAnchorArgument.Type;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -98,8 +97,9 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
 		if (sender instanceof Entity) {
 			entity = (Entity) sender;
 			pos = Vector3d.position(entity.getLocation());
-			displayName = entity.getCustomName();
-			rotation = new Vector2f(entity.getLocation().getYaw(), entity.getLocation().getPitch());
+			displayName = entity instanceof Player ? name : entity.getCustomName();
+			rotation = new Vector2f(entity.getLocation().getYaw(),
+					entity.getLocation().getPitch());
 			world = entity.getWorld();
 		} else if (sender instanceof BlockCommandSender) {
 			BlockCommandSender b = (BlockCommandSender) sender;
