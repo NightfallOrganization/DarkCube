@@ -104,7 +104,7 @@ public class WoolBattle extends Plugin {
 	public WoolBattle() {
 		super("woolbattle");
 		WoolBattle.instance = this;
-		
+
 		System.setProperty("file.encoding", "UTF-8");
 	}
 
@@ -168,7 +168,7 @@ public class WoolBattle extends Plugin {
 			ex.printStackTrace();
 		}
 		List<String> languageEntries = new ArrayList<>();
-		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey)
+		languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::key)
 				.collect(Collectors.toList()));
 		languageEntries.addAll(
 				Arrays.asList(Item.values()).stream().map(i -> Message.ITEM_PREFIX + i.getKey())

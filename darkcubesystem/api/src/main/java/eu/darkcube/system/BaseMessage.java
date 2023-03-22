@@ -61,8 +61,7 @@ public interface BaseMessage {
 	}
 
 	default Component getMessage(Language language, String[] prefixes, Object... args) {
-		return language.getMessage(getPrefixModifier() + String.join("", prefixes) + getKey(),
-				args);
+		return language.getMessage(getPrefixModifier() + String.join("", prefixes) + key(), args);
 	}
 
 	default Component getMessage(ICommandExecutor executor, String[] prefixes, Object... args) {

@@ -60,8 +60,7 @@ public class TeleporterTrustedListInventory
 				} else if (type == 1) {
 					if (event.bukkitEvent().getClick() != ClickType.RIGHT)
 						return;
-					UUID target =
-							item.meta(SkullBuilderMeta.class).getOwningPlayer().getUniqueId();
+					UUID target = item.meta(SkullBuilderMeta.class).owningPlayer().uniqueId();
 					data().trustedList().remove(target);
 					TeleporterListener.saveTeleporters(VanillaAddons.instance(),
 							data().block().block().getWorld());
@@ -78,8 +77,7 @@ public class TeleporterTrustedListInventory
 							? "Unbekannter Spieler"
 							: op.getName() : "Unbekannter Spieler";
 					items.put(id++, ItemBuilder.item(Material.PLAYER_HEAD)
-							.meta(new SkullBuilderMeta().setOwningPlayer(
-									new UserProfile(name, uuid)))
+							.meta(new SkullBuilderMeta().owningPlayer(new UserProfile(name, uuid)))
 							.displayname(Component.text(name).color(TextColor.color(255, 0, 0)))
 							.lore(Component.text("Rechtsklick um Spieler Zugriff zu entfernen")
 											.color(TextColor.color(120, 120, 120)),

@@ -7,11 +7,13 @@
 package eu.darkcube.minigame.woolbattle.inventory;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.system.inventoryapi.v1.*;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventory {
 	protected final WBUser user;
@@ -38,6 +40,42 @@ public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventor
 	protected final void asyncOfferAnimations(Collection<AnimationInformation> information) {
 		if (done()) {
 			super.asyncOfferAnimations(information);
+		}
+	}
+
+	@Override
+	protected void calculateArrows() {
+		boolean oldEmpty = enabledArrows.isEmpty();
+		for (PageArrow arrow : new HashSet<>(this.enabledArrows)) {
+			this.hideArrow(arrow);
+		}
+		final int page = this.getPage();
+		final int maxSlot = this.items.keySet().stream().mapToInt(i -> i).max().orElse(0);
+		final int maxPage = maxSlot / this.pageSize + 1;
+		if (maxPage > page) {
+			this.showArrow(PageArrow.NEXT);
+		}
+		if (page > 1) {
+			this.showArrow(PageArrow.PREVIOUS);
+		}
+		if (oldEmpty != enabledArrows.isEmpty()) {
+			if (!enabledArrows.isEmpty()) {
+				staticItems.put(IInventory.slot(2, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
+				staticItems.put(IInventory.slot(3, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
+				staticItems.put(IInventory.slot(4, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
+				staticItems.put(IInventory.slot(2, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
+				staticItems.put(IInventory.slot(3, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
+				staticItems.put(IInventory.slot(4, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
+			} else {
+				for (int slot : arrowSlots.get(PageArrow.PREVIOUS)) {
+					staticItems.remove(slot);
+				}
+				for (int slot : arrowSlots.get(PageArrow.NEXT)) {
+					staticItems.remove(slot);
+				}
+			}
+			updateSlots.addAll(Arrays.asList(arrowSlots.get(PageArrow.PREVIOUS)));
+			updateSlots.addAll(Arrays.asList(arrowSlots.get(PageArrow.NEXT)));
 		}
 	}
 
@@ -81,12 +119,6 @@ public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventor
 
 	@Override
 	protected void insertFallbackItems() {
-		fallbackItems.put(IInventory.slot(2, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
-		fallbackItems.put(IInventory.slot(3, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
-		fallbackItems.put(IInventory.slot(4, 1), Item.PREV_PAGE_UNUSABLE.getItem(user));
-		fallbackItems.put(IInventory.slot(2, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
-		fallbackItems.put(IInventory.slot(3, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
-		fallbackItems.put(IInventory.slot(4, 9), Item.NEXT_PAGE_UNUSABLE.getItem(user));
 		super.insertFallbackItems();
 	}
 

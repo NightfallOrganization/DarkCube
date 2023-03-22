@@ -102,12 +102,12 @@ public class ItemBuilder extends AbstractItemBuilder {
 
 	@Override
 	public AbstractItemBuilder clone() {
-		AbstractItemBuilder builder =
-				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
-						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
-						.material(material).unbreakable(unbreakable).metas(metas);
-		builder.persistentDataStorage().getData().append(storage.getData());
-		return builder;
+		//		AbstractItemBuilder builder =
+		//				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
+		//						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
+		//						.material(material).unbreakable(unbreakable).metas(metas);
+		//		builder.persistentDataStorage().getData().append(storage.getData());
+		return new ItemBuilder(build());
 	}
 
 	@Override

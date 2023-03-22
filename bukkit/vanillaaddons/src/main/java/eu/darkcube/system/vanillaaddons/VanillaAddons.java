@@ -27,11 +27,7 @@ import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModu
 import eu.darkcube.system.vanillaaddons.module.modules.worldmechanics.WorldMechanicsModule;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.io.IOException;
 import java.util.function.Function;
 
@@ -40,27 +36,9 @@ public class VanillaAddons extends DarkCubePlugin {
 	private final ModuleManager moduleManager = new ModuleManager();
 	private InventoryRegistry inventoryRegistry;
 	private UserModifier userModifier;
-	private static VanillaAddons instance = null;
 
 	public VanillaAddons() {
 		super("vanillaaddons");
-		instance = this;
-	}
-
-	public static VanillaAddons instance() {
-		return instance;
-	}
-
-	@Override
-	public void onDisable() {
-		for (World world : Bukkit.getWorlds()) {
-			TeleporterListener.saveTeleporters(this, world);
-		}
-		UserAPI.getInstance().removeModifier(userModifier);
-		Recipe.unregisterAll(this);
-	}
-
-	public VanillaAddons() {
 		instance = this;
 	}
 

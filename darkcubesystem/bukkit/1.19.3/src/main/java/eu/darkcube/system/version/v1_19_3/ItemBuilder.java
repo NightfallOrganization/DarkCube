@@ -223,9 +223,10 @@ public class ItemBuilder extends AbstractItemBuilder {
 					PlayerProfile profile = Bukkit.getServer().createProfileExact(
 							owner.uniqueId() == null ? UUID.randomUUID() : owner.uniqueId(),
 							owner.name());
-					if (texture != null) {profile.clearProperties();
-					profile.setProperty(
-							new ProfileProperty("textures", texture.value(), texture.signature()));
+					if (texture != null) {
+						profile.clearProperties();
+						profile.setProperty(new ProfileProperty("textures", texture.value(),
+								texture.signature()));
 					}
 					smeta.setPlayerProfile(profile);
 				} else if (builderMeta instanceof LeatherArmorBuilderMeta) {
@@ -241,7 +242,7 @@ public class ItemBuilder extends AbstractItemBuilder {
 							"Meta not supported for this mc version: " + builderMeta);
 				}
 			}
-			if (!storage.getData().isEmpty())
+			if (!storage.storeToJsonDocument().isEmpty())
 				meta.getPersistentDataContainer().set(persistentDataKey, PersistentDataType.STRING,
 						storage.storeToJsonDocument().toJson());
 			item.setItemMeta(meta);
