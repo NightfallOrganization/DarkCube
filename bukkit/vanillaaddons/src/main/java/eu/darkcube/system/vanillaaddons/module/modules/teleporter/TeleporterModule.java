@@ -14,10 +14,10 @@ import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.inventory.InventoryRegistry;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import eu.darkcube.system.vanillaaddons.module.modules.recipes.Recipe;
+import eu.darkcube.system.vanillaaddons.module.modules.teleporter.Teleporter.TeleportAccess;
 import eu.darkcube.system.vanillaaddons.util.BlockLocation;
 import eu.darkcube.system.vanillaaddons.util.Item;
 import eu.darkcube.system.vanillaaddons.util.Item.Data;
-import eu.darkcube.system.vanillaaddons.module.modules.teleporter.Teleporter.TeleportAccess;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -39,18 +39,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
 public class TeleporterModule implements Module {
-	private Map<World, Teleporters> teleporters = new HashMap<>();
 	private final VanillaAddons addons;
 	private final TeleporterListener listener = new TeleporterListener();
 	private final Recipe recipe = new Recipe(Item.TELEPORTER,
 			Recipe.shaped("teleporter", 3, "bab", "ada", "bcb").i('a', Material.BLAZE_ROD)
 					.i('b', Material.OBSIDIAN).i('c', Material.NETHERITE_INGOT)
 					.i('d', Material.ENDER_EYE));
+	private Map<World, Teleporters> teleporters = new HashMap<>();
 
 	public TeleporterModule(VanillaAddons addons) {
 		this.addons = addons;
@@ -121,11 +122,33 @@ public class TeleporterModule implements Module {
 		public static void loadTeleporters(VanillaAddons addons, World world) {
 			PersistentDataContainer container = world.getPersistentDataContainer();
 			if (container.has(Teleporter.teleporters)) {
-				addons.moduleManager().module(TeleporterModule.class).teleporters()
-						.put(world, container.get(Teleporter.teleporters, Teleporter.TELEPORTERS));
-				for (Teleporter teleporter : addons.moduleManager().module(TeleporterModule.class)
-						.teleporters().get(world).teleporters) {
-					teleporter.spawn();
+				int dataVersion = 0;
+				if (container.has(Teleporter.teleportersDataVersion)) {
+					dataVersion = container.get(Teleporter.teleportersDataVersion,
+							PersistentDataType.INTEGER);
+				}
+				if (dataVersion == 0) {
+					dataVersion = 1;
+					container.set(Teleporter.teleportersDataVersion, PersistentDataType.INTEGER,
+							dataVersion);
+					TeleportersOld teleporters =
+							container.get(Teleporter.teleporters, OldTeleporter.TELEPORTERS);
+					Teleporters newTeleporters = new Teleporters();
+					teleporters.teleporters.stream()
+							.map(old -> new Teleporter(new ItemStack(old.icon), old.name,
+									old.block,
+									old.access, old.owner))
+							.forEach(newTeleporters.teleporters::add);
+					container.set(Teleporter.teleporters, Teleporter.TELEPORTERS, newTeleporters);
+				}
+
+				if (dataVersion == 1) {
+					addons.moduleManager().module(TeleporterModule.class).teleporters().put(world,
+							container.get(Teleporter.teleporters, Teleporter.TELEPORTERS));
+					for (Teleporter teleporter : addons.moduleManager()
+							.module(TeleporterModule.class).teleporters().get(world).teleporters) {
+						teleporter.spawn();
+					}
 				}
 			}
 		}
@@ -181,6 +204,7 @@ public class TeleporterModule implements Module {
 		public void handle(InventoryClickEvent event) {
 			AUser user =
 					AUser.user(UserAPI.getInstance().getUser(event.getWhoClicked().getUniqueId()));
+
 			if (TeleportersInventory.TYPE.equals(user.openInventory())) {
 				if (event.getCurrentItem() == null)
 					return;
@@ -239,9 +263,11 @@ public class TeleporterModule implements Module {
 						!= Item.TELEPORTER)
 					continue;
 				Block block = event.getBlockPlaced();
-				Teleporter teleporter = new Teleporter(Material.ENDER_EYE, "Teleporter",
-						new BlockLocation(block.getWorld().getKey(), block.getX(), block.getY(),
-								block.getZ()), TeleportAccess.PUBLIC, p.getUniqueId());
+				Teleporter teleporter =
+						new Teleporter(new ItemStack(Material.ENDER_EYE), "Teleporter",
+								new BlockLocation(block.getWorld().getKey(), block.getX(),
+										block.getY(), block.getZ()), TeleportAccess.PUBLIC,
+								p.getUniqueId());
 				teleporters(block.getWorld()).add(teleporter);
 				new BukkitRunnable() {
 					@Override

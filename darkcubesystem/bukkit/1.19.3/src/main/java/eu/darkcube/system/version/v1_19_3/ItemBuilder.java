@@ -15,6 +15,7 @@ import eu.darkcube.system.inventoryapi.item.meta.*;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
 import eu.darkcube.system.util.data.Key;
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -47,17 +48,18 @@ public class ItemBuilder extends AbstractItemBuilder {
 	}
 
 	public ItemBuilder(ItemStack item) {
-		ItemStack original = item;
+		this.item = item.clone();
 		item = item.clone();
+		item.setItemMeta(item.getItemMeta());
+		this.item.setAmount(1);
 		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
-		this.item = item;
 		material(item.getType());
 		amount(item.getAmount());
-		item.setAmount(1);
 
 		repairCost(nms.getBaseRepairCost());
 
-		ItemMeta meta = item.getItemMeta();
+		ItemMeta meta = this.item.getItemMeta();
+
 		if (meta != null) {
 			unbreakable(meta.isUnbreakable());
 			meta.setUnbreakable(false);
@@ -139,10 +141,13 @@ public class ItemBuilder extends AbstractItemBuilder {
 			this.item.setItemMeta(meta);
 		}
 		ItemStack b = build();
-		if (!original.equals(b)) {
+		if (!item.equals(b)) {
 			LOGGER.severe("Failed to clone item correctly: ");
-			LOGGER.severe(" - " + original);
-			LOGGER.severe(" - " + b);
+			LOGGER.severe(" - " + CraftItemStack.asNMSCopy(item).save(new CompoundTag()));
+			LOGGER.severe(" - " + net.minecraft.world.item.ItemStack.of(
+							CraftItemStack.asNMSCopy(item).save(new CompoundTag()))
+					.save(new CompoundTag()));
+			LOGGER.severe(" - " + CraftItemStack.asNMSCopy(b).save(new CompoundTag()));
 		}
 	}
 
@@ -158,7 +163,8 @@ public class ItemBuilder extends AbstractItemBuilder {
 		//		ItemStack item = new ItemStack(material);
 		ItemStack item = this.item == null ? new ItemStack(material) : this.item.clone();
 
-		item.setType(material);
+		if (material != item.getType())
+			item.setType(material);
 
 		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
 		nms.setRepairCost(repairCost);

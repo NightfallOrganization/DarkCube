@@ -16,19 +16,24 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.RespawnAnchor;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Teleporter {
 
 	public static final NamespacedKey teleporters =
 			new NamespacedKey("vanillaaddons", "teleporters");
+	public static final NamespacedKey teleportersDataVersion =
+			new NamespacedKey("vanillaaddons", "teleporters_data_version");
 	private static final Gson gson = new GsonBuilder().create();
 	public static final PersistentDataType<byte[], Teleporters> TELEPORTERS =
 			new PersistentDataType<>() {
@@ -86,16 +91,16 @@ public class Teleporter {
 							getComplexType());
 				}
 			};
-	private Material icon;
+	private byte[] icon;
 	private String name;
 	private BlockLocation block;
 	private TeleportAccess access;
 	private UUID owner;
 	private LinkedHashSet<UUID> trustedList;
 
-	public Teleporter(Material icon, String name, BlockLocation block, TeleportAccess access,
+	public Teleporter(ItemStack icon, String name, BlockLocation block, TeleportAccess access,
 			UUID owner) {
-		this.icon = icon;
+		this.icon = icon.serializeAsBytes();
 		this.name = name;
 		this.block = block;
 		this.access = access;
@@ -135,8 +140,8 @@ public class Teleporter {
 		this.access = access;
 	}
 
-	public void icon(Material icon) {
-		this.icon = icon;
+	public void icon(ItemStack icon) {
+		this.icon = icon.serializeAsBytes();
 	}
 
 	public void block(BlockLocation block) {
@@ -159,13 +164,13 @@ public class Teleporter {
 		this.name = name;
 	}
 
-	public Material icon() {
-		return icon;
+	public ItemStack icon() {
+		return ItemStack.deserializeBytes(icon);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(icon, name, block);
+		return Objects.hash(Arrays.hashCode(icon), name, block);
 	}
 
 	@Override

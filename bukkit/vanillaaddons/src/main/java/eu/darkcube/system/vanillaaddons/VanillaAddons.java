@@ -83,6 +83,7 @@ public class VanillaAddons extends DarkCubePlugin {
 		pm.registerEvents(new InventoryListener(), this);
 		pm.registerEvents(new ArmorListener(), this);
 		moduleManager.enableAll();
+
 	}
 
 	public ModuleManager moduleManager() {

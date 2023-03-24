@@ -19,8 +19,8 @@ import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.inventory.AbstractInventory;
 import eu.darkcube.system.vanillaaddons.inventory.AddonsAsyncPagedInventory;
-import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule.TeleporterListener;
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.Teleporter.TeleportAccess;
+import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule.TeleporterListener;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -62,7 +62,7 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
 							if (!user.user().getUniqueId().equals(data().owner()))
 								return;
 							//noinspection DataFlowIssue
-							data().icon(event.bukkitEvent().getCursor().getType());
+							data().icon(event.bukkitEvent().getCursor());
 							TeleporterListener.saveTeleporters(VanillaAddons.instance(),
 									data().block().block().getWorld());
 							insertFallbackItems();

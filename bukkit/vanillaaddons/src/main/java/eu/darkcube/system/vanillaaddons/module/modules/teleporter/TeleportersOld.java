@@ -9,8 +9,8 @@ package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Teleporters {
+public class TeleportersOld {
 
-	public final List<Teleporter> teleporters = new ArrayList<>();
+	public final List<OldTeleporter> teleporters = new ArrayList<>();
 
 }
