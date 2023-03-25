@@ -17,7 +17,7 @@ public class OnlinetimeModule extends CommandExecutor implements Module {
 	private static final Message ONLINETIME = new Message("COMMAND_ONLINETIME");
 
 	public OnlinetimeModule() {
-		super("vanillaaddons", "onlimetime", new String[] {"ontime"}, b -> b.executes(ctx -> {
+		super("vanillaaddons", "onlinetime", new String[] {"ontime"}, b -> b.executes(ctx -> {
 			Player player = ctx.getSource().asPlayer();
 			int totalSecs = player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20;// 36
 			int days = totalSecs / 86400;

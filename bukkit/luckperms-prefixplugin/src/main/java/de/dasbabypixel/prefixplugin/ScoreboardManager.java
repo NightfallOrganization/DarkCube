@@ -6,6 +6,7 @@
  */
 package de.dasbabypixel.prefixplugin;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 class ScoreboardManager {
@@ -29,7 +30,9 @@ class ScoreboardManager {
 		}
 		if (clazz != null) {
 			try {
-				main.setScoreboardManager(clazz.getConstructor().newInstance());
+				Constructor<? extends IScoreboardManager> c = clazz.getDeclaredConstructor();
+				c.setAccessible(true);
+				main.setScoreboardManager(c.newInstance());
 				main.getServer().getPluginManager()
 						.registerEvents(main.getScoreboardManager(), main);
 			} catch (InstantiationException | IllegalAccessException ignored) {
