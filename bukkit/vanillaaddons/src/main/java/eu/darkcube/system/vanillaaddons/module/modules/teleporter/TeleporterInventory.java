@@ -33,7 +33,7 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
 	@Override
 	protected AddonsAsyncPagedInventory openInventory(AUser user) {
 		Teleporter teleporter = data();
-		final Key KEY_TYPE = new Key(user.addons(), "teleInvType");
+		final Key KEY_TYPE = new Key(user.addons(), "teleporter_inventory_type");
 		AddonsAsyncPagedInventory i =
 				new AddonsAsyncPagedInventory(TYPE, data().dname(), () -> true) {
 

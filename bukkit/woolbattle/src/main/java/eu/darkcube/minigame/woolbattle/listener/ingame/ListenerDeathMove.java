@@ -8,7 +8,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGhost;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.entity.Player;
@@ -26,15 +25,7 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 		WBUser user = WBUser.getUser(p);
 		if (user.getTeam().getType() != TeamType.SPECTATOR) {
 			if (p.getLocation().getY() <= this.main.getMap().getDeathHeight()) {
-				if (ListenerGhost.isGhost(user)) {
-					ListenerGhost.reset(user);
-					return;
-				}
-				if (user.getTicksAfterLastHit() <= 200) {
-					this.main.getIngame().kill(user);
-				} else {
-					p.teleport(user.getTeam().getSpawn());
-				}
+				this.main.getIngame().kill(user);
 			}
 			return;
 		}

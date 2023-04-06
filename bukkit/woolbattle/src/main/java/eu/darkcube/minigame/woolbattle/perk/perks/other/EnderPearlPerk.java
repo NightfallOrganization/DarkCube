@@ -8,9 +8,9 @@ package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.perk.passive.EventEnderPearl;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;

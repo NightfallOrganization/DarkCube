@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="5">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="de.dytanic.cloudnet.driver.event.EventListener" />
       <item index="1" class="java.lang.String" itemvalue="de.dytanic.cloudnet.driver.module.ModuleTask" />
-      <item index="2" class="java.lang.String" itemvalue="eu.darkcube.system.annotations.Api" />
-      <item index="3" class="java.lang.String" itemvalue="net.md_5.bungee.event.EventHandler" />
-      <item index="4" class="java.lang.String" itemvalue="org.bukkit.event.EventHandler" />
+      <item index="2" class="java.lang.String" itemvalue="net.md_5.bungee.event.EventHandler" />
+      <item index="3" class="java.lang.String" itemvalue="org.bukkit.event.EventHandler" />
     </list>
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onLoad" />
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onEnable" />
@@ -59,4 +58,7 @@
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="17" project-jdk-type="JavaSDK" />
+  <component name="PropertiesSeparatorManager">
+    <file url="file://$PROJECT_DIR$/bukkit/woolbattle/src/main/resources/messages" separator="\u005f" />
+  </component>
 </project>

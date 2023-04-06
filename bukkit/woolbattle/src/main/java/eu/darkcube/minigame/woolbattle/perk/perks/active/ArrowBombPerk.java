@@ -7,9 +7,9 @@
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.perks.other.ArrowPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
@@ -82,7 +82,7 @@ public class ArrowBombPerk extends Perk {
 						.spawnArrow(snowball.getLocation(), dir, .9F, 0);
 				arrow.setMetadata("noParticles",
 						new FixedMetadataValue(WoolBattle.instance(), true));
-				ArrowPerk.claimArrow(arrow, user, 3);
+				ArrowPerk.claimArrow(arrow, user, 3, 2);
 			}
 		}
 
@@ -92,7 +92,7 @@ public class ArrowBombPerk extends Perk {
 				Snowball snowball = (Snowball) event.getDamager();
 				if (!snowball.hasMetadata("perk"))
 					return;
-				if (snowball.getMetadata("perk").get(0).value().equals(ArrowBombPerk.ARROW_BOMB)) {
+				if (snowball.getMetadata("perk").get(0).value().equals(perk().perkName())) {
 					event.setCancelled(true);
 				}
 			}

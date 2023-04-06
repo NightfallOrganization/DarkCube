@@ -8,12 +8,14 @@ package eu.darkcube.minigame.woolbattle.event.perk.passive;
 
 import eu.darkcube.minigame.woolbattle.event.user.UserEvent;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
-public class EventMayDoubleJump extends UserEvent {
+public class EventMayDoubleJump extends UserEvent implements Cancellable {
 	private static final HandlerList handlers = new HandlerList();
 	private final UserPerk ownerPerk;
 	private boolean mayDoubleJump;
+	private boolean cancel;
 
 	public EventMayDoubleJump(UserPerk ownerPerk, boolean mayDoubleJump) {
 		super(ownerPerk.owner());
@@ -40,5 +42,15 @@ public class EventMayDoubleJump extends UserEvent {
 	@Override
 	public HandlerList getHandlers() {
 		return handlers;
+	}
+
+	@Override
+	public boolean isCancelled() {
+		return cancel;
+	}
+
+	@Override
+	public void setCancelled(boolean cancel) {
+		this.cancel = cancel;
 	}
 }

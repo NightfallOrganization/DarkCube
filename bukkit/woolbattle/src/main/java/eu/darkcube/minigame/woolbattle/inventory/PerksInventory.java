@@ -22,10 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 public class PerksInventory extends WoolBattlePagedInventory {
-	public static final InventoryType TYPE = InventoryType.of("woolbattle-perks");
-	private static final Key PERKS_TYPE = new Key(WoolBattle.instance(), "perks-type");
+	public static final InventoryType TYPE = InventoryType.of("woolbattle_perks");
+	private static final Key PERKS_TYPE = new Key(WoolBattle.instance(), "perks_type");
 	private static final Key PERKS_TYPE_NUMBER =
-			new Key(WoolBattle.instance(), "perks-type-number");
+			new Key(WoolBattle.instance(), "perks_type_number");
 
 	public PerksInventory(WBUser user) {
 		super(TYPE, Message.INVENTORY_PERKS.getMessage(user), user);

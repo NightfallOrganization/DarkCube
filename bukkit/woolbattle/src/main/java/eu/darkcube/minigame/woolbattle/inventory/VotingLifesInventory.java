@@ -21,8 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 public class VotingLifesInventory extends WoolBattlePagedInventory {
-	public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-lifes");
-	private static final Key LIFES = new Key(WoolBattle.instance(), "voting-lifes");
+	public static final InventoryType TYPE = InventoryType.of("woolbattle_voting_lifes");
+	private static final Key LIFES = new Key(WoolBattle.instance(), "voting_lifes");
 
 	public VotingLifesInventory(WBUser user) {
 		super(TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);

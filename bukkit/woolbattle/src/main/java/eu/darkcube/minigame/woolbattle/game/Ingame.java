@@ -7,13 +7,14 @@
 package eu.darkcube.minigame.woolbattle.game;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.event.user.EventUserDeath;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserAttackUser;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserKill;
+import eu.darkcube.minigame.woolbattle.event.user.EventUserMayAttack;
+import eu.darkcube.minigame.woolbattle.event.user.UserArmorSetEvent;
 import eu.darkcube.minigame.woolbattle.event.world.EventDamageBlock;
 import eu.darkcube.minigame.woolbattle.event.world.EventDestroyBlock;
 import eu.darkcube.minigame.woolbattle.game.ingame.*;
 import eu.darkcube.minigame.woolbattle.listener.ingame.*;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.active.ListenerGhost;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -73,10 +74,9 @@ public class Ingame extends GamePhase {
 				new ListenerBlockPlace(), new ListenerBlockCanBuild(), new ListenerPlayerJoin(),
 				new ListenerPlayerQuit(), new ListenerPlayerLogin(),
 				new ListenerEntityDamageByEntity(), new ListenerEntityDamage(),
-				new ListenerChangeBlock(), new ListenerProjectileHit(),
-				new ListenerInventoryClick(), new ListenerInventoryDrag(), new ListenerInteract(),
-				new ListenerPlayerMove(), new ListenerEntitySpawn(), new ListenerExplode(),
-				new ListenerDeathMove());
+				new ListenerChangeBlock(), new ListenerInventoryClick(),
+				new ListenerInventoryDrag(), new ListenerInteract(), new ListenerPlayerMove(),
+				new ListenerEntitySpawn(), new ListenerExplode(), new ListenerDeathMove());
 
 		addScheduler(new SchedulerParticles(), new SchedulerSpawnProtection(this),
 				new SchedulerResetWool(breakedWool, placedBlocks), new SchedulerHeightDisplay(),
@@ -124,11 +124,11 @@ public class Ingame extends GamePhase {
 	}
 
 	public int getBlockDamage(Block block) {
-		return getMetaData(block, "arrowDamage", 0);
+		return getMetaData(block, "arrow_damage", 0);
 	}
 
 	public void resetBlockDamage(Block block) {
-		setMetaData(block, "arrowDamage", null);
+		setMetaData(block, "arrow_damage", null);
 	}
 
 	public void playSoundNotEnoughWool(WBUser user) {
@@ -146,7 +146,7 @@ public class Ingame extends GamePhase {
 				return;
 			}
 		}
-		Ingame.setMetaData(block, "arrowDamage", damage);
+		Ingame.setMetaData(block, "arrow_damage", damage);
 	}
 
 	public boolean destroy(Block block) {
@@ -297,28 +297,27 @@ public class Ingame extends GamePhase {
 
 	public void kill(WBUser user, boolean leaving) {
 		final WBUser killer = user.getLastHit();
-		EventUserDeath pe1 = new EventUserDeath(user);
-		Bukkit.getPluginManager().callEvent(pe1);
-		final boolean countAsDeath = killer != null && user.getTicksAfterLastHit() <= 200;
+		boolean countAsDeath = killer != null && user.getTicksAfterLastHit() <= 200;
+		EventUserKill pe2 = new EventUserKill(user, countAsDeath ? killer : null);
+		Bukkit.getPluginManager().callEvent(pe2);
+		if (pe2.isCancelled()) {
+			return;
+		}
 		if (countAsDeath) {
 			this.killstreak.remove(user);
-			EventUserKill pe2 = new EventUserKill(user, killer);
-			Bukkit.getPluginManager().callEvent(pe2);
-			if (!pe2.isCancelled()) {
-				killer.setKills(killer.getKills() + 1);
-				user.setDeaths(user.getDeaths() + 1);
-				this.killstreak.put(killer, this.getKillstreak(killer) + 1);
-				int killstreak = this.getKillstreak(killer);
-				if (killstreak > 0 && killstreak % this.killsFor1Life == 0) {
-					new Scheduler(() -> WoolBattle.instance()
-							.sendMessage(Message.KILLSTREAK, killer.getTeamPlayerName(),
-									Integer.toString(killstreak))).runTask();
-					killer.getTeam().setLifes(killer.getTeam().getLifes() + 1);
-				}
-				StatsLink.addKill(killer);
-				StatsLink.addDeath(user);
-				StatsLink.updateKillElo(killer, user);
+			killer.setKills(killer.getKills() + 1);
+			user.setDeaths(user.getDeaths() + 1);
+			this.killstreak.put(killer, this.getKillstreak(killer) + 1);
+			int killstreak = this.getKillstreak(killer);
+			if (killstreak > 0 && killstreak % this.killsFor1Life == 0) {
+				new Scheduler(() -> WoolBattle.instance()
+						.sendMessage(Message.KILLSTREAK, killer.getTeamPlayerName(),
+								killstreak)).runTask();
+				killer.getTeam().setLifes(killer.getTeam().getLifes() + 1);
 			}
+			StatsLink.addKill(killer);
+			StatsLink.addDeath(user);
+			StatsLink.updateKillElo(killer, user);
 		}
 
 		if (leaving) {
@@ -494,27 +493,29 @@ public class Ingame extends GamePhase {
 
 	public void setArmor(WBUser user) {
 		Player p = user.getBukkitEntity();
-		Color color = user.getTeam().getType().getWoolColor().getColor();
-		if (ListenerGhost.isGhost(user)) {
-			color = Color.WHITE;
-		}
+		UserArmorSetEvent event =
+				new UserArmorSetEvent(user, user.getTeam().getType().getWoolColor().getColor());
+		Bukkit.getPluginManager().callEvent(event);
+		Color color = event.color();
 		ItemStack boots = Item.ARMOR_LEATHER_BOOTS.getItem(user);
 		LeatherArmorMeta meta = (LeatherArmorMeta) boots.getItemMeta();
 		meta.setColor(color);
-
-		boots.setItemMeta(meta.clone());
+		boots.setItemMeta(meta);
 
 		ItemStack leggings = Item.ARMOR_LEATHER_LEGGINGS.getItem(user);
-		meta.setDisplayName(leggings.getItemMeta().getDisplayName());
-		leggings.setItemMeta(meta.clone());
+		meta = (LeatherArmorMeta) leggings.getItemMeta();
+		meta.setColor(color);
+		leggings.setItemMeta(meta);
 
 		ItemStack chest = Item.ARMOR_LEATHER_CHESTPLATE.getItem(user);
-		meta.setDisplayName(chest.getItemMeta().getDisplayName());
-		chest.setItemMeta(meta.clone());
+		meta = (LeatherArmorMeta) chest.getItemMeta();
+		meta.setColor(color);
+		chest.setItemMeta(meta);
 
 		ItemStack helmet = Item.ARMOR_LEATHER_HELMET.getItem(user);
-		meta.setDisplayName(helmet.getItemMeta().getDisplayName());
-		helmet.setItemMeta(meta.clone());
+		meta = (LeatherArmorMeta) helmet.getItemMeta();
+		meta.setColor(color);
+		helmet.setItemMeta(meta);
 		p.getInventory().setArmorContents(new ItemStack[] {boots, leggings, chest, helmet});
 	}
 
@@ -610,38 +611,30 @@ public class Ingame extends GamePhase {
 										+ "&r" + llifes + "&4" + Characters.HEART + " ")));
 	}
 
-	public boolean canAttack(WBUser user, WBUser target, boolean ignoreGhost) {
-		if (user.isTrollMode() && !user.getTeam().canPlay()) {
-			return true;
-		}
+	public boolean canAttack(WBUser user, WBUser target) {
 		if (!user.isTrollMode()) {
 			if (isGlobalSpawnProtection)
 				return false;
 			if (target.hasSpawnProtection())
 				return false;
+			if (!user.getTeam().canPlay())
+				return false;
 			if (target.getTeam().equals(user.getTeam()))
 				return false;
-			return !ListenerGhost.isGhost(user) || ignoreGhost;
-		}
-		return true;
-	}
-
-	public boolean attack(WBUser user, WBUser target, boolean ignoreGhost) {
-		if (!canAttack(user, target, ignoreGhost))
-			return false;
-		if (user.getTeam().canPlay()) {
-			target.setLastHit(user);
-			target.setTicksAfterLastHit(0);
+			EventUserMayAttack mayAttack = new EventUserMayAttack(target, true);
+			Bukkit.getPluginManager().callEvent(mayAttack);
+			return mayAttack.mayAttack();
+			//			return !ListenerGhost.isGhost(user) || ignoreGhost;
 		}
 		return true;
 	}
 
 	public boolean attack(WBUser user, WBUser target) {
-		return this.attack(user, target, false);
+		if (!canAttack(user, target))
+			return false;
+		Bukkit.getPluginManager().callEvent(new EventUserAttackUser(user, target));
+		target.setLastHit(user);
+		target.setTicksAfterLastHit(0);
+		return true;
 	}
-
-	public boolean canAttack(WBUser user, WBUser target) {
-		return canAttack(user, target, false);
-	}
-
 }
