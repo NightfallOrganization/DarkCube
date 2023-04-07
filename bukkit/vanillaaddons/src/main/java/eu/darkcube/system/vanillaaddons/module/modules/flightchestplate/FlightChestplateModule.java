@@ -30,6 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.ItemStack;
@@ -204,6 +205,23 @@ public class FlightChestplateModule implements Listener, Module {
 
 	@EventHandler
 	public void handle(PlayerJoinEvent event) {
+		if (event.getPlayer().getPersistentDataContainer()
+				.has(STORAGE_KEY, PersistentDataType.BYTE)) {
+			int speed = 0;
+			ItemBuilder item = event.getPlayer().getInventory().getChestplate() == null
+					? null
+					: ItemBuilder.item(event.getPlayer().getInventory().getChestplate());
+			if (item == null) {
+				event.getPlayer().getPersistentDataContainer().remove(STORAGE_KEY);
+			} else if (item.persistentDataStorage().has(SPEED_KEY)) {
+				speed = item.persistentDataStorage().get(SPEED_KEY, PersistentDataTypes.INTEGER);
+			}
+			update(event.getPlayer(), speed);
+		}
+	}
+
+	@EventHandler
+	public void handle(PlayerChangedWorldEvent event) {
 		if (event.getPlayer().getPersistentDataContainer()
 				.has(STORAGE_KEY, PersistentDataType.BYTE)) {
 			int speed = 0;
