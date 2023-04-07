@@ -31,28 +31,26 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public abstract class IScoreboardManager implements Listener {
 
-	private static final LuckPerms api = LuckPermsProvider.get();
-	private static Main main = Main.getPlugin();
+	protected static final LuckPerms api = LuckPermsProvider.get();
+	protected static PrefixPluginBukkit main = PrefixPluginBukkit.instance();
 
-	private final Map<UUID, String> PREFIX_BY_UUID = new HashMap<>();
-	private final Map<UUID, String> SUFFIX_BY_UUID = new HashMap<>();
+	protected final Map<UUID, String> PREFIX_BY_UUID = new HashMap<>();
+	protected final Map<UUID, String> SUFFIX_BY_UUID = new HashMap<>();
 
-	private final Map<UUID, Scoreboard> SCOREBOARD_BY_UUID = new HashMap<>();
+	protected final Map<UUID, Scoreboard> SCOREBOARD_BY_UUID = new HashMap<>();
 	public Map<String, Object> names = null;
-	private String JOIN_MESSAGE = main.cfg.getString("joinmessage");
-	private String QUIT_MESSAGE = main.cfg.getString("quitmessage");
-	private String CHAT_FORMAT = main.cfg.getString("chatformat");
-	private boolean LP_PREFIX_ENABLED = main.cfg.getBoolean("luckpermsprefix");
-	private boolean LP_SUFFIX_ENABLED = main.cfg.getBoolean("luckpermssuffix");
-	private String CONSOLE_CHAR = main.cfg.getString("console-color-char");
+	protected String JOIN_MESSAGE = main.cfg.getString("joinmessage");
+	protected String QUIT_MESSAGE = main.cfg.getString("quitmessage");
+	protected String CHAT_FORMAT = main.cfg.getString("chatformat");
+	protected boolean LP_PREFIX_ENABLED = main.cfg.getBoolean("luckpermsprefix");
+	protected boolean LP_SUFFIX_ENABLED = main.cfg.getBoolean("luckpermssuffix");
+	protected String CONSOLE_CHAR = main.cfg.getString("console-color-char");
 
 	public IScoreboardManager() {
 		EventBus bus = api.getEventBus();
@@ -65,26 +63,30 @@ public abstract class IScoreboardManager implements Listener {
 			}.runTask(main);
 		});
 		bus.subscribe(main, UserDataRecalculateEvent.class, event -> {
-			User user = event.getUser();
-			UUID uuid = user.getUniqueId();
-			if (!SCOREBOARD_BY_UUID.containsKey(uuid)) {
-				return;
-			}
-			String oldPrefix = getPrefix(uuid);
-			String oldSuffix = getSuffix(uuid);
-			reloadLuckpermsPrefix(uuid);
-			reloadLuckpermsSuffix(uuid);
-			String newPrefix = getPrefix(uuid);
-			String newSuffix = getSuffix(uuid);
-			if (!newPrefix.equals(oldPrefix) || !newSuffix.equals(oldSuffix)) {
-				ReloadSinglePrefixEvent e = new ReloadSinglePrefixEvent(uuid, newPrefix,
-						newSuffix);
-				Bukkit.getPluginManager().callEvent(e);
-				setPrefix(uuid, e.getNewPrefix());
-				setSuffix(uuid, e.getNewSuffix());
-			}
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					User user = event.getUser();
+					UUID uuid = user.getUniqueId();
+					if (!SCOREBOARD_BY_UUID.containsKey(uuid)) {
+						return;
+					}
+					String oldPrefix = getPrefix(uuid);
+					String oldSuffix = getSuffix(uuid);
+					reloadLuckpermsPrefix(uuid);
+					reloadLuckpermsSuffix(uuid);
+					String newPrefix = getPrefix(uuid);
+					String newSuffix = getSuffix(uuid);
+					if (!newPrefix.equals(oldPrefix) || !newSuffix.equals(oldSuffix)) {
+						ReloadSinglePrefixEvent e =
+								new ReloadSinglePrefixEvent(uuid, newPrefix, newSuffix);
+						Bukkit.getPluginManager().callEvent(e);
+						setPrefix(uuid, e.getNewPrefix());
+						setSuffix(uuid, e.getNewSuffix());
+					}
+				}
+			}.runTask(main);
 		});
-
 	}
 
 	public boolean isLuckPermsPrefixEnabled() {
@@ -103,7 +105,7 @@ public abstract class IScoreboardManager implements Listener {
 		LP_SUFFIX_ENABLED = luckPermsSuffixEnabled;
 	}
 
-	public synchronized void reload() {
+	public void reload() {
 		ReloadPrefixPluginEvent event = new ReloadPrefixPluginEvent();
 		Bukkit.getPluginManager().callEvent(event);
 
@@ -220,7 +222,7 @@ public abstract class IScoreboardManager implements Listener {
 			setSuffix(uuid, event.getNewSuffix());
 		}
 		msg = replacePlaceHolders(p, msg);
-		if (msg != null) {
+		if (msg != null && !msg.isEmpty()) {
 			for (Player all : Bukkit.getOnlinePlayers()) {
 				all.sendMessage(msg);
 			}
@@ -281,7 +283,7 @@ public abstract class IScoreboardManager implements Listener {
 		e.setCancelled(true);
 	}
 
-	String colorSafe(String msg, String format, Player p) {
+	protected String colorSafe(String msg, String format, Player p) {
 		format = replacePlaceHolders(p, format);
 		format = format.replace(">>", "»");
 
@@ -307,7 +309,7 @@ public abstract class IScoreboardManager implements Listener {
 		return result.toString();
 	}
 
-	String getChatMessage(Player p, String message) {
+	protected String getChatMessage(Player p, String message) {
 		String msg = CHAT_FORMAT;
 		msg = replacePlaceHolders(p, msg);
 		msg = msg.replace(">>", "»");
@@ -317,7 +319,7 @@ public abstract class IScoreboardManager implements Listener {
 		return msg;
 	}
 
-	String replacePlaceHolders(Player p, String msg) {
+	protected String replacePlaceHolders(Player p, String msg) {
 		if (msg == null)
 			return null;
 		String text = msg;
@@ -334,12 +336,12 @@ public abstract class IScoreboardManager implements Listener {
 		return text;
 	}
 
-	void loadPlayers(Scoreboard sb) {
+	protected void loadPlayers(Scoreboard sb) {
 		for (Player p : Bukkit.getOnlinePlayers())
 			loadPlayer(sb, p);
 	}
 
-	void loadPlayer(Scoreboard sb, Player p) {
+	protected void loadPlayer(Scoreboard sb, Player p) {
 		UUID uuid = p.getUniqueId();
 		String teamname = ScoreboardTag.getScoreboardTag(uuid).toString();
 		if (sb.getTeam(teamname) == null) {
@@ -357,74 +359,47 @@ public abstract class IScoreboardManager implements Listener {
 			sb.getTeam(teamname).addEntry(p.getName());
 	}
 
-	CachedDataManager getCachedData(Group group) {
+	protected CachedDataManager getCachedData(Group group) {
 		return group.getCachedData();
 	}
 
-	CachedDataManager getCachedData(UUID uuid) {
+	protected CachedDataManager getCachedData(UUID uuid) {
 		return getCachedData(getUser(uuid));
 	}
 
-	CachedDataManager getCachedData(Player p) {
+	protected CachedDataManager getCachedData(Player p) {
 		return getCachedData(getUser(p));
 	}
 
-	CachedDataManager getCachedData(User user) {
+	protected CachedDataManager getCachedData(User user) {
 		return user.getCachedData();
 	}
 
-	User getUser(Player p) {
+	protected User getUser(Player p) {
 		return getUser(p.getUniqueId());
 	}
 
-	User getUser(UUID uuid) {
+	protected User getUser(UUID uuid) {
 		return api.getUserManager().getUser(uuid);
 	}
 
-	String getPrefix(UUID uuid) {
+	protected String getPrefix(UUID uuid) {
 		return PREFIX_BY_UUID.getOrDefault(uuid, "");
 	}
 
-	String getSuffix(UUID uuid) {
+	protected String getSuffix(UUID uuid) {
 		return SUFFIX_BY_UUID.getOrDefault(uuid, "");
 	}
 
-	void setPrefixAfter1_13(UUID uuid, String prefix) {
-		char code = 'f';
-		for (int i = 0; i < prefix.length(); i++) {
-			if (prefix.charAt(i) == 167) {
-				code = prefix.charAt(i + 1);
-			}
-		}
-		try {
-			ScoreboardTag tag = ScoreboardTag.getScoreboardTag(uuid);
-			for (Scoreboard sb : SCOREBOARD_BY_UUID.values()) {
-				Team team = sb.getTeam(tag.toString());
-				if (team != null) {
-					//noinspection JavaReflectionMemberAccess
-					Method method = Team.class.getMethod("setColor", ChatColor.class);
-					method.invoke(team, ChatColor.getByChar(code));
-				}
-			}
-		} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException |
-				NoSuchMethodException | SecurityException ex) {
-			ex.printStackTrace();
-		}
+	protected void setPrefix(Team team, String prefix) {
+		team.setPrefix(shorten(prefix, 16));
 	}
 
-	private void setPrefix(Team team, String prefix) {
-		if (team != null) {
-			team.setPrefix(shorten(prefix, 16));
-		}
+	protected void setSuffix(Team team, String prefix) {
+		team.setSuffix(shorten(prefix, 16));
 	}
 
-	private void setSuffix(Team team, String prefix) {
-		if (team != null) {
-			team.setSuffix(shorten(prefix, 16));
-		}
-	}
-
-	void setPrefix(UUID uuid, String prefix) {
+	protected void setPrefix(UUID uuid, String prefix) {
 		PREFIX_BY_UUID.put(uuid, prefix);
 		ScoreboardTag tag = ScoreboardTag.getScoreboardTag(uuid);
 		for (Scoreboard sb : SCOREBOARD_BY_UUID.values()) {
@@ -432,14 +407,14 @@ public abstract class IScoreboardManager implements Listener {
 		}
 	}
 
-	private String shorten(String text, int length) {
+	protected String shorten(String text, int length) {
 		if (text.length() > length) {
 			text = text.substring(0, length);
 		}
 		return text;
 	}
 
-	void setSuffix(UUID uuid, String suffix) {
+	protected void setSuffix(UUID uuid, String suffix) {
 		SUFFIX_BY_UUID.put(uuid, suffix);
 		ScoreboardTag tag = ScoreboardTag.getScoreboardTag(uuid);
 		for (Scoreboard sb : SCOREBOARD_BY_UUID.values()) {
@@ -457,7 +432,7 @@ public abstract class IScoreboardManager implements Listener {
 	 * getCachedData(uuid)); }
 	 */
 
-	void reloadLuckpermsPrefix(UUID uuid) {
+	protected void reloadLuckpermsPrefix(UUID uuid) {
 		if (isLuckPermsPrefixEnabled()) {
 			String prefix = getMetaData(uuid).getPrefix();
 			if (prefix == null)
@@ -467,7 +442,7 @@ public abstract class IScoreboardManager implements Listener {
 		}
 	}
 
-	void reloadLuckpermsSuffix(UUID uuid) {
+	protected void reloadLuckpermsSuffix(UUID uuid) {
 		if (isLuckPermsSuffixEnabled()) {
 			String suffix = getMetaData(uuid).getSuffix();
 			if (suffix == null)
@@ -477,11 +452,11 @@ public abstract class IScoreboardManager implements Listener {
 		}
 	}
 
-	CachedMetaData getMetaData(UUID uuid) {
+	protected CachedMetaData getMetaData(UUID uuid) {
 		return getMetaData(getUser(uuid));
 	}
 
-	CachedMetaData getMetaData(User user) {
+	protected CachedMetaData getMetaData(User user) {
 		return getCachedData(user).getMetaData();
 	}
 
@@ -495,7 +470,8 @@ public abstract class IScoreboardManager implements Listener {
 	 * manager.getContext(user).orElseGet(manager::getStaticContext); }
 	 */
 
-	String translateAlternateColorCodesForCloudNet(char altColorChar, String textToTranslate) {
+	protected String translateAlternateColorCodesForCloudNet(char altColorChar,
+			String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();
 		for (int i = 0; i < b.length - 1; i++) {
 			if (b[i] == altColorChar
@@ -507,7 +483,7 @@ public abstract class IScoreboardManager implements Listener {
 		return new String(b).replace('┃', '|');
 	}
 
-	String getLastColorsForCloudNet(String input) {
+	protected String getLastColorsForCloudNet(String input) {
 		String result = CONSOLE_CHAR.charAt(0) + "7";
 		int length = input.length();
 
