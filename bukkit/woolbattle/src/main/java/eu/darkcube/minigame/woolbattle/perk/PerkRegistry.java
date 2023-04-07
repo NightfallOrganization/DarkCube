@@ -56,6 +56,7 @@ public class PerkRegistry {
 		register(new ReflectorPerk());
 		register(new ScampPerk());
 		register(new SpiderPerk());
+		register(new HookArrowPerk());
 	}
 
 	public void register(Perk perk) {

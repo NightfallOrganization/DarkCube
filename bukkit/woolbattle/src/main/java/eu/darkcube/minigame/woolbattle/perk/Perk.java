@@ -17,8 +17,11 @@ import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 public class Perk {
+
+	public static final Logger logger = Logger.getLogger("Perk");
 
 	private final Collection<Listener> listeners = new ArrayList<>();
 	private final Collection<ConfiguredScheduler> schedulers = new ArrayList<>();

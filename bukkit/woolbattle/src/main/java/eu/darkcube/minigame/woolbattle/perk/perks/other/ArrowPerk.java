@@ -164,6 +164,9 @@ public class ArrowPerk extends Perk {
 			}
 			if (!WoolBattle.instance().getIngame().attack(shooter, user)) {
 				arrow.remove();
+				logger.warning(
+						"Inconsistent behaviour for ArrowPerk. This might mess up some logic for "
+								+ "other perks");
 				return;
 			}
 			user.getBukkitEntity().damage(0);
