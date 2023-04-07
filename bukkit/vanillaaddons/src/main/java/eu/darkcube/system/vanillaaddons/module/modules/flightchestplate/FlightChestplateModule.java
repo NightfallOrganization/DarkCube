@@ -17,6 +17,7 @@ import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.event.ArmorEquipEvent;
+import eu.darkcube.system.vanillaaddons.event.ArmorEquipEvent.ArmorType;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import eu.darkcube.system.vanillaaddons.module.modules.recipes.Recipe;
 import eu.darkcube.system.vanillaaddons.util.Item;
@@ -155,6 +156,8 @@ public class FlightChestplateModule implements Listener, Module {
 
 	@EventHandler
 	public void handle(ArmorEquipEvent event) {
+		if (event.getType() != ArmorType.CHESTPLATE)
+			return;
 		ItemStack newItem = event.getNewArmorPiece();
 		if (newItem != null) {
 			ItemBuilder item = ItemBuilder.item(newItem);
