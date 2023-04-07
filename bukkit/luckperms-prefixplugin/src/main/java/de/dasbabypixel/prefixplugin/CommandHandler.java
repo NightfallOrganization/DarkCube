@@ -4,13 +4,9 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package de.dasbabypixel.prefixplugin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.base.Joiner;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -18,14 +14,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import com.google.common.base.Joiner;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 class CommandHandler implements TabExecutor {
 
-	private Main main = Main.getPlugin();
+	private PrefixPluginBukkit main = PrefixPluginBukkit.instance();
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias,
+			String[] args) {
 		return new ArrayList<>();
 	}
 
@@ -38,9 +37,10 @@ class CommandHandler implements TabExecutor {
 			}
 			long millis = System.currentTimeMillis();
 			sender.sendMessage(ChatColor.GREEN + "Reloading PrefixSystem...");
-			Main.getPlugin().getScoreboardManager().reload();
+			main.getScoreboardManager().reload();
 			sender.sendMessage(
-					ChatColor.GREEN + "Reload complete! (Took " + (System.currentTimeMillis() - millis) + "ms)");
+					ChatColor.GREEN + "Reload complete! (Took " + (System.currentTimeMillis()
+							- millis) + "ms)");
 			return true;
 		} else if (cmdname.equals("addname")) {
 			if (args.length >= 2) {
@@ -50,7 +50,7 @@ class CommandHandler implements TabExecutor {
 				main.getScoreboardManager().names.put(playername, name);
 				sender.sendMessage("New name for " + playername + ": " + name);
 				main.cfg.set("names", main.getScoreboardManager().names);
-				Main.getPlugin().saveConfig();
+				main.saveConfig();
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (p.getName().equalsIgnoreCase(playername)) {
 						p.setCustomName(name);
@@ -70,7 +70,7 @@ class CommandHandler implements TabExecutor {
 				main.getScoreboardManager().names.remove(playername);
 				sender.sendMessage("Playername removed!");
 				main.cfg.set("names", main.getScoreboardManager().names);
-				Main.getPlugin().saveConfig();
+				main.saveConfig();
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (p.getName().equalsIgnoreCase(playername)) {
 						p.setCustomName(p.getName());
@@ -82,7 +82,8 @@ class CommandHandler implements TabExecutor {
 			return false;
 		} else if (cmdname.equals("listnames")) {
 			for (String playername : main.getScoreboardManager().names.keySet()) {
-				sender.sendMessage(playername + ": " + main.getScoreboardManager().names.get(playername));
+				sender.sendMessage(
+						playername + ": " + main.getScoreboardManager().names.get(playername));
 			}
 			return true;
 		}
