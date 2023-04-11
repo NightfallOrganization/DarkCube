@@ -19,6 +19,7 @@ import eu.darkcube.system.vanillaaddons.module.modules.anvilmechanics.AnvilMecha
 import eu.darkcube.system.vanillaaddons.module.modules.colors.ColorsModule;
 import eu.darkcube.system.vanillaaddons.module.modules.deathchests.DeathChestsModule;
 import eu.darkcube.system.vanillaaddons.module.modules.flightchestplate.FlightChestplateModule;
+import eu.darkcube.system.vanillaaddons.module.modules.loommechanics.LoomMechanics;
 import eu.darkcube.system.vanillaaddons.module.modules.messaging.MessagingModule;
 import eu.darkcube.system.vanillaaddons.module.modules.onlinetime.OnlinetimeModule;
 import eu.darkcube.system.vanillaaddons.module.modules.recipes.RecipesModule;
@@ -67,6 +68,7 @@ public class VanillaAddons extends DarkCubePlugin {
 		moduleManager.addModule(new RTPModule());
 		moduleManager.addModule(new OnlinetimeModule());
 		moduleManager.addModule(new DeathChestsModule(this));
+		moduleManager.addModule(new LoomMechanics(this));
 	}
 
 	@Override
