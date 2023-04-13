@@ -91,7 +91,7 @@ public enum Item {
 	PERK_ROPE_COOLDOWN(item(VINE)),
 	PERK_STOMPER(item(DIAMOND_BOOTS)),
 	PERK_HOOK_ARROW(item(REDSTONE_TORCH_ON)),
-	PERK_HOOK_ARROW_COOLDOWN(item(REDSTONE_TORCH_OFF)),
+	PERK_HOOK_ARROW_COOLDOWN(item(REDSTONE_TORCH_ON)),
 	DEFAULT_BOW(
 			item(BOW).enchant(Enchantment.ARROW_INFINITE, 1).enchant(Enchantment.ARROW_KNOCKBACK
 							, 2)
@@ -120,7 +120,13 @@ public enum Item {
 	PERK_SCAMP(item(GOLD_INGOT)),
 	PERK_SPIDER(item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52)),
 	PERK_SPIDER_COOLDOWN(
-			item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52));
+			item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52)),
+	PERK_DRAW_ARROW(item(TORCH)),
+	PERK_DRAW_ARROW_COOLDOWN(item(TORCH)),
+	PERK_FREEZE_ARROW(item(ARROW)),
+	PERK_FREEZE_ARROW_COOLDOWN(item(ARROW)),
+	PERK_BERSERKER(item(DIAMOND_SWORD)),
+	;
 
 	private final ItemBuilder builder;
 

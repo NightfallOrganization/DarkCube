@@ -21,29 +21,28 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class HookArrowPerk extends Perk {
+public class DrawArrowPerk extends Perk {
+	public static final PerkName HOOK_ARROW = new PerkName("DRAW_ARROW");
 
-	public static final PerkName HOOK_ARROW = new PerkName("HOOK_ARROW");
-
-	public HookArrowPerk() {
+	public DrawArrowPerk() {
 		super(ActivationType.PASSIVE, HOOK_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 8,
-				CostType.PER_ACTIVATION, Item.PERK_HOOK_ARROW,
+				CostType.PER_ACTIVATION, Item.PERK_DRAW_ARROW,
 				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_HOOK_ARROW_COOLDOWN));
-		addListener(new HookArrowListener());
+						Item.PERK_DRAW_ARROW_COOLDOWN));
+		addListener(new DrawArrowListener());
 	}
 
-	public class HookArrowListener implements Listener {
+	public class DrawArrowListener implements Listener {
 		@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 		public void handle(BowArrowHitPlayerEvent event) {
-			if (event.arrow().hasMetadata("hookArrow")) {
+			if (event.arrow().hasMetadata("drawArrow")) {
 				int removed = event.shooter().removeWool(cost());
 				if (removed < cost()) {
 					event.shooter().addWool(removed);
 					return;
 				}
-				event.target().getBukkitEntity()
-						.teleport(event.shooter().getBukkitEntity(), TeleportCause.PLUGIN);
+				event.shooter().getBukkitEntity()
+						.teleport(event.target().getBukkitEntity(), TeleportCause.PLUGIN);
 			}
 		}
 
@@ -52,7 +51,7 @@ public class HookArrowPerk extends Perk {
 			for (UserPerk perk : event.user().perks().perks(perkName())) {
 				if (perk.cooldown() == 0) {
 					perk.cooldown(cooldown().cooldown());
-					event.arrow().setMetadata("hookArrow",
+					event.arrow().setMetadata("drawArrow",
 							new FixedMetadataValue(WoolBattle.instance(), perk));
 					break;
 				}

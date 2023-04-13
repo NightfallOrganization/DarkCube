@@ -55,14 +55,22 @@ public class PerkItem {
 		if (item == null)
 			return null;
 		ItemBuilder b = ItemBuilder.item(item.getItem(perk.owner()));
-		int cd = (perk.cooldown() + 19) / 20;
-		if (cd > 0) {
-			b.amount(cd);
-		} else if (perk.cooldown() == 0) {
+		int amt = itemAmount();
+		if (amt > 0) {
+			b.amount(Math.min(amt, 65));
+		} else if (amt == 0) {
 			b.glow(true);
 		}
 		b.persistentDataStorage().set(KEY_PERK_ID, TYPE_PERK_ID, perk.id());
+		modify(b);
 		return b.build();
+	}
+
+	protected void modify(ItemBuilder item) {
+	}
+
+	protected int itemAmount() {
+		return (perk.cooldown() + 19) / 20;
 	}
 
 	private void updateInventory(int slot, ItemStack item) {

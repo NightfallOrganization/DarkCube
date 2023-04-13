@@ -128,8 +128,9 @@ public class SpiderPerk extends Perk {
 							user.getBukkitEntity().setAllowFlight(true);
 							user.getBukkitEntity().setFlying(true);
 							user.getBukkitEntity().setFlySpeed(0.05F);
-							user.getBukkitEntity()
-									.setVelocity(user.getBukkitEntity().getVelocity().setY(.3));
+							//							user.getBukkitEntity()
+							//									.setVelocity(user.getBukkitEntity
+							//									().getVelocity().setY(.3));
 						}
 					} else if (isClimbing(user)) {
 						interrupt(user);

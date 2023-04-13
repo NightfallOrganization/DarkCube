@@ -613,6 +613,8 @@ public class Ingame extends GamePhase {
 
 	public boolean canAttack(WBUser user, WBUser target) {
 		if (!user.isTrollMode()) {
+			if (target.getTicksAfterLastHit() < 10)
+				return false;
 			if (isGlobalSpawnProtection)
 				return false;
 			if (target.hasSpawnProtection())
