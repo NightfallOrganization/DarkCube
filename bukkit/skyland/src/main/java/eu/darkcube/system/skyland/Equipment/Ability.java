@@ -1,5 +1,6 @@
 package eu.darkcube.system.skyland.Equipment;
 
-public interface Ability {
+public enum Ability {
+
 
 }

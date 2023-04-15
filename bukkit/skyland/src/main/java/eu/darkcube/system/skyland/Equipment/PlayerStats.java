@@ -29,7 +29,6 @@ public class PlayerStats {
     @Override
     public String toString() {
 
-        //todo
         return type + "``" + menge;
     }
 

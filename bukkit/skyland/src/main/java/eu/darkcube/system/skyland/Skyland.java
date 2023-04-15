@@ -7,14 +7,12 @@
 
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.skyland.Listener.DamageListener;
+import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
-import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class Skyland extends JavaPlugin {
@@ -48,7 +46,7 @@ public class Skyland extends JavaPlugin {
 		}
 		*/
 
-		DamageListener damageListener = new DamageListener(this);
+		SkylandListener damageListener = new SkylandListener(this);
 		instance.getServer().getPluginManager().registerEvents(damageListener, instance);
 
 		instance.getCommand("gm").setExecutor(new GM());
@@ -80,5 +78,9 @@ public class Skyland extends JavaPlugin {
 		}
 		System.out.println("No SkylandPlayer found for player " + player.getName());
 		return null;
+	}
+
+	public void addSkylandPlayer(SkylandPlayer p){
+		players.add(p);
 	}
 }

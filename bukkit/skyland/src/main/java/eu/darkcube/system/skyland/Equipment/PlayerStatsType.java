@@ -2,16 +2,15 @@ package eu.darkcube.system.skyland.Equipment;
 
 public enum PlayerStatsType {
 
-    STRENGHT("Strenght"),
+    STRENGHT,
+    ARMOR,
+    DAMAGE,
+
 
     ;
 
 
-    private String name;
 
-    PlayerStatsType(String name){
-        this.name = name;
-    }
 
 
 }
