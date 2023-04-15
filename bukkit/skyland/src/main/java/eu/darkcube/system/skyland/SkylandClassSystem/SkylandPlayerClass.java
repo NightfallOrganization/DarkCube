@@ -1,66 +1,64 @@
+/*
+ * Copyright (c) 2023. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
 package eu.darkcube.system.skyland.SkylandClassSystem;
 
-import eu.darkcube.system.skyland.Equipment.Equipment;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
-import eu.darkcube.system.skyland.Equipment.PlayerStatsType;
-import eu.darkcube.system.skyland.SkylandClassSystem.SkylandClassTemplate;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class SkylandPlayerClass {
 
-    SkylandPlayer skylandPlayer;
-    SkylandClassTemplate sClass;
-    int lvl;
-    LinkedList<PlayerStats> baseStats;
+	SkylandPlayer skylandPlayer;
+	SkylandClassTemplate sClass;
+	int lvl;
+	LinkedList<PlayerStats> baseStats;
 
+	public SkylandPlayerClass(SkylandPlayer skylandPlayer, SkylandClassTemplate sClass, int lvl,
+			LinkedList<PlayerStats> baseStats) {
+		this.skylandPlayer = skylandPlayer;
+		this.sClass = sClass;
+		this.lvl = lvl;
+		this.baseStats = baseStats;
+	}
 
-    public SkylandPlayerClass(SkylandPlayer skylandPlayer, SkylandClassTemplate sClass, int lvl, LinkedList<PlayerStats> baseStats) {
-        this.skylandPlayer = skylandPlayer;
-        this.sClass = sClass;
-        this.lvl = lvl;
-        this.baseStats = baseStats;
-    }
+	@Override
+	public String toString() {
 
-    @Override
-    public String toString() {
+		String out = sClass.toString() + "´´´´";
 
-        String out = sClass.toString() + "´´´´";
+		for (PlayerStats ps : baseStats) {
 
-        for (PlayerStats ps: baseStats){
+			out = out + "´´";
 
-            out = out + "´´";
+		}
+		out = out.substring(0, out.length() - 3);
+		out = out + "´´´´";
+		out = out + lvl;
 
-        }
-        out = out.substring(0, out.length()-3);
-        out = out + "´´´´";
-        out = out + lvl;
+		return out;
+	}
 
-        return out;
-    }
+	public SkylandPlayerClass parseString(String s, SkylandPlayer sp) {
 
-    public SkylandPlayerClass parseString(String s, SkylandPlayer sp){
+		SkylandClassTemplate template;
+		LinkedList<PlayerStats> pStat = new LinkedList<>();
+		int lvl;
 
+		String[] temp = s.split("´´´´");
+		template = SkylandClassTemplate.valueOf(temp[0]);
+		for (String str : temp[1].split("´´")) {
+			pStat.add(PlayerStats.parseString(str));
+		}
+		lvl = Integer.parseInt(temp[2]);
 
-        SkylandClassTemplate template;
-        LinkedList<PlayerStats> pStat = new LinkedList<>();
-        int lvl;
+		return new SkylandPlayerClass(sp, template, lvl, pStat);
+	}
 
-
-        String[] temp = s.split("´´´´");
-        template = SkylandClassTemplate.valueOf(temp[0]);
-        for (String str :temp[1].split("´´")){
-            pStat.add(PlayerStats.parseString(str));
-        }
-        lvl = Integer.parseInt(temp[2]);
-
-        return new SkylandPlayerClass(sp,template , lvl, pStat);
-    }
-
-    public SkylandClassTemplate getsClass() {
-        return sClass;
-    }
+	public SkylandClassTemplate getsClass() {
+		return sClass;
+	}
 }

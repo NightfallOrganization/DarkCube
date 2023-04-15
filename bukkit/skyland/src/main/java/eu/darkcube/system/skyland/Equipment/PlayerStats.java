@@ -1,39 +1,46 @@
+/*
+ * Copyright (c) 2023. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
 package eu.darkcube.system.skyland.Equipment;
 
 public class PlayerStats {
 
-    PlayerStatsType type;
-    int menge;
+	PlayerStatsType type;
+	int menge;
 
-    public PlayerStats(PlayerStatsType type, int menge) {
-        this.type = type;
-        this.menge = menge;
-    }
+	public PlayerStats(PlayerStatsType type, int menge) {
+		this.type = type;
+		this.menge = menge;
+	}
 
-    public PlayerStatsType getType() {
-        return type;
-    }
+	public static PlayerStats parseString(String s) {
 
-    public int getMenge() {
-        return menge;
-    }
+		return new PlayerStats(PlayerStatsType.valueOf(s.split("``")[0]),
+				Integer.parseInt(s.split("``")[1]));
+	}
 
-    public void setMenge(int menge) {
-        this.menge = menge;
-    }
+	public PlayerStatsType getType() {
+		return type;
+	}
 
-    public void setType(PlayerStatsType type) {
-        this.type = type;
-    }
+	public void setType(PlayerStatsType type) {
+		this.type = type;
+	}
 
-    @Override
-    public String toString() {
+	public int getMenge() {
+		return menge;
+	}
 
-        return type + "``" + menge;
-    }
+	public void setMenge(int menge) {
+		this.menge = menge;
+	}
 
-    public static PlayerStats parseString(String s){
+	@Override
+	public String toString() {
 
-        return new PlayerStats(PlayerStatsType.valueOf(s.split("``")[0]), Integer.parseInt(s.split("``")[1]));
-    }
+		return type + "``" + menge;
+	}
 }
