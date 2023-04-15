@@ -1,5 +1,6 @@
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.skyland.inventoryUI.InventoryUI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandExecutor;
@@ -11,6 +12,15 @@ import org.bukkit.command.Command;
 public class Feed implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        if (args.length >= 2){
+            //todo test cmd
+
+            InventoryUI inventoryUI = new InventoryUI();
+            inventoryUI.openInv((Player) sender, 18);
+
+        }
+
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");

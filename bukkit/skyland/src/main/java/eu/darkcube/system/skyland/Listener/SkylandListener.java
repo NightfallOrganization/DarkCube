@@ -80,14 +80,14 @@ public class SkylandListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-
+        e.getPlayer().sendMessage("welcome");
         e.getPlayer().setMetadata("spawnProt", new FixedMetadataValue(Skyland.getInstance(), true));//todo 9
 
         if(e.getPlayer().getMetadata("spawnProt").isEmpty()){
             e.getPlayer().sendMessage("no meta");
         }else {
             e.getPlayer().sendMessage(e.getPlayer().getMetadata("spawnProt").get(0).asString());
-            e.getPlayer().sendMessage(e.getPlayer().getMetadata("spawnProt").get(1).asString());
+            //e.getPlayer().sendMessage(e.getPlayer().getMetadata("spawnProt").get(1).asString());
         }
 
         if(e.getPlayer().getMetadata("skylandPlayer").isEmpty()){

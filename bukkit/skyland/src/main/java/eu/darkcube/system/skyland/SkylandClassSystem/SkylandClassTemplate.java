@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 public enum SkylandClassTemplate {
 
+    ARCHER
     ;
 
     LinkedList<EquipmentType> allowedEquip;

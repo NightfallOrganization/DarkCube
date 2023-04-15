@@ -47,7 +47,7 @@ public class Skyland extends JavaPlugin {
 		*/
 
 		SkylandListener damageListener = new SkylandListener(this);
-		instance.getServer().getPluginManager().registerEvents(damageListener, instance);
+		Bukkit.getPluginManager().registerEvents(damageListener, instance);
 
 		instance.getCommand("gm").setExecutor(new GM());
 		instance.getCommand("heal").setExecutor(new Heal());
@@ -67,6 +67,7 @@ public class Skyland extends JavaPlugin {
 		TrainingStand trainingStand = new TrainingStand();
 		instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
 		Bukkit.getPluginManager().registerEvents(trainingStand, this);
+
 
 	}
 
