@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.bauserver;
 
 import org.bukkit.Bukkit;
@@ -17,6 +16,9 @@ import eu.darkcube.system.bauserver.listener.WorldEventListener;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 
 public class Main extends Plugin {
+	public Main() {
+		super("bauserver");
+	}
 
 	@Override
 	public void onEnable() {

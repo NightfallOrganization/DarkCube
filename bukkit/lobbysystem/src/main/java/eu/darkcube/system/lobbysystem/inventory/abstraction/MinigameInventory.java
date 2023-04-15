@@ -1,25 +1,24 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
+import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.lobbysystem.util.MinigameServerSortingInfo;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.GameState;
 import eu.darkcube.system.util.data.Key;
@@ -33,11 +32,8 @@ import java.util.*;
 
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 	public static final Key minigameServer = new Key(Lobby.getInstance(), "minigameserver");
-
 	private boolean done = false;
-
 	private Item minigameItem;
-
 	private Listener listener = new Listener();
 
 	public MinigameInventory(Component title, Item minigameItem, InventoryType type, User user) {
@@ -62,12 +58,12 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 		super.destroy();
 	}
 
-	protected void destroy0() {}
+	protected void destroy0() {
+	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
-		super.fillItems(items);
 
 		Collection<ServiceInfoSnapshot> servers = new HashSet<>();
 		this.getCloudTasks().forEach(task -> servers.addAll(
@@ -76,10 +72,10 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 		Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
 		for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
 			try {
-				GameState state = GameState.fromString(
-						server.getProperty(BridgeServiceProperty.STATE).orElse(null));
+				GameState state =
+						server.getProperty(DarkCubeServiceProperty.GAME_STATE).orElse(null);
 				if (state == null || state == GameState.UNKNOWN)
-					throw new NullPointerException();
+					continue;
 				if (state == GameState.STOPPING) {
 					continue;
 				}
@@ -89,49 +85,45 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 			}
 		}
 		List<ItemSortingInfo> itemSortingInfos = new ArrayList<>();
-		for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-			String extraText = server.getProperty(BridgeServiceProperty.EXTRA).orElse(null);
+		for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
 
-			int online = server.getProperty(BridgeServiceProperty.ONLINE_COUNT).orElse(-1);
-			int maxPlayers = server.getProperty(BridgeServiceProperty.MAX_PLAYERS).orElse(-1);
-			try {
-				JsonObject json = new Gson().fromJson(extraText, JsonObject.class);
-				if (json == null)
-					continue;
-				online = json.getAsJsonPrimitive("online").getAsInt();
-				maxPlayers = json.getAsJsonPrimitive("max").getAsInt();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			int playingPlayers =
+					server.getProperty(DarkCubeServiceProperty.PLAYING_PLAYERS).orElse(-1);
+			int maxPlayingPlayers =
+					server.getProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS).orElse(-1);
+
 			GameState state = states.get(server);
-			String motd = server.getProperty(BridgeServiceProperty.MOTD).orElse(null);
-			if (motd == null || motd.contains("§cLoading...")) {
+			String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
+			if (motd == null || motd.toLowerCase().contains("loading") || state == null) {
 				servers.remove(server);
 				states.remove(server);
 				continue;
 			}
 			ItemBuilder builder = ItemBuilder.item(Material.STAINED_CLAY);
-			builder.amount(online);
+			builder.amount(playingPlayers);
 			builder.displayname(motd);
-			builder.lore("§7Spieler: " + online + "/" + maxPlayers);
+			builder.lore("§7Spieler: " + playingPlayers + "/" + maxPlayingPlayers);
 			if (state == GameState.LOBBY) {
-				if (online == 0) {
+				if (playingPlayers == 0) {
 					builder.damage(DyeColor.GRAY.getWoolData());
 				} else {
 					builder.damage(DyeColor.LIME.getWoolData());
 				}
+				builder.lore(
+						Message.GAMESERVER_STATE.getMessage(user.getUser(), Message.STATE_LOBBY));
 			} else if (state == GameState.INGAME) {
 				builder.damage(DyeColor.ORANGE.getWoolData());
-			} else if (state == GameState.STOPPING) {
-				builder.damage(DyeColor.RED.getWoolData());
-			} else if (state == GameState.UNKNOWN) {
-				builder.damage(DyeColor.RED.getWoolData());
+				builder.lore(
+						Message.GAMESERVER_STATE.getMessage(user.getUser(), Message.STATE_INGAME));
+			} else {
+				throw new IllegalStateException();
 			}
 			ItemStack item = builder.build();
 			item = ItemBuilder.item(item).persistentDataStorage()
 					.iset(minigameServer, PersistentDataTypes.STRING,
 							server.getServiceId().getUniqueId().toString()).builder().build();
-			ItemSortingInfo info = new ItemSortingInfo(item, online, maxPlayers, state);
+			ItemSortingInfo info =
+					new ItemSortingInfo(item, playingPlayers, maxPlayingPlayers, state);
 			itemSortingInfos.add(info);
 		}
 
@@ -152,52 +144,19 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 	protected static class ItemSortingInfo implements Comparable<ItemSortingInfo> {
 
 		private ItemStack item;
-
-		private int onPlayers;
-
-		private int maxPlayers;
-
-		private GameState state;
+		private MinigameServerSortingInfo minigame;
 
 		public ItemSortingInfo(ItemStack item, int onPlayers, int maxPlayers, GameState state) {
 			super();
 			this.item = item;
-			this.onPlayers = onPlayers;
-			this.maxPlayers = maxPlayers;
-			this.state = state;
+			this.minigame = new MinigameServerSortingInfo(onPlayers, maxPlayers, state);
 		}
 
 		@Override
 		public int compareTo(@NotNull ItemSortingInfo other) {
-			int amt = 0;
-			switch (this.state) {
-				case LOBBY:
-					if (other.state != GameState.LOBBY)
-						return -1;
-					amt = Integer.compare(other.onPlayers, this.onPlayers);
-					break;
-				case INGAME:
-					if (other.state == GameState.LOBBY)
-						return 1;
-					if (other.state != GameState.INGAME)
-						return -1;
-					amt = Integer.compare(other.onPlayers, this.onPlayers);
-					break;
-				default:
-					if (other.state != GameState.UNKNOWN)
-						return 1;
-					amt = Integer.compare(other.onPlayers, this.onPlayers);
-					break;
-			}
+			int amt = minigame.compareTo(other.minigame);
 			if (amt == 0) {
-				amt = Integer.compare(other.onPlayers, this.onPlayers);
-				if (amt != 0) {
-					return amt;
-				}
-				amt = Integer.compare(this.maxPlayers, other.maxPlayers);
-				if (amt == 0) {
-					amt = this.getDisplay().orElse("").compareTo(other.getDisplay().orElse(""));
-				}
+				amt = this.getDisplay().orElse("").compareTo(other.getDisplay().orElse(""));
 			}
 			return amt;
 		}
@@ -214,7 +173,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 		}
 
 	}
-
 
 	public class Listener {
 

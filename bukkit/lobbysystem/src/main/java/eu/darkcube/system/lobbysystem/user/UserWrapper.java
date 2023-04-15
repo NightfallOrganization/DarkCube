@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -10,12 +10,10 @@ package eu.darkcube.system.lobbysystem.user;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.data.UserModifier;
 import eu.darkcube.system.util.data.Key;
-import org.bukkit.Bukkit;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -66,8 +64,6 @@ public class UserWrapper implements UserModifier {
 	@Override
 	public void onLoad(User user) {
 		user.getMetaDataStorage().set(key, new LobbyUser(user));
-		Bukkit.getPluginManager()
-				.callEvent(new EventGadgetSelect(fromUser(user), fromUser(user).getGadget()));
 	}
 
 	@Override

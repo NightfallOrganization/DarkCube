@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.command.argument;
 
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -24,7 +23,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class TeamArgument implements ArgumentType<TeamType> {
 	private static final DynamicCommandExceptionType INVALID_ENUM =
@@ -37,7 +35,7 @@ public class TeamArgument implements ArgumentType<TeamType> {
 	private TeamArgument(Supplier<TeamType[]> teams, Predicate<TeamType> filter,
 			Function<TeamType, String[]> toStringFunction,
 			Function<String, TeamType> fromStringFunction) {
-		this.values = teams == null ? () -> TeamType.values() : teams;
+		this.values = teams == null ? TeamType::values : teams;
 		this.filter = filter == null ? t -> true : filter;
 		this.toStringFunction =
 				toStringFunction == null ? defaultToStringFunction() : toStringFunction;
@@ -58,8 +56,7 @@ public class TeamArgument implements ArgumentType<TeamType> {
 	}
 
 	private TeamType[] values() {
-		return Arrays.asList(values.get()).stream().filter(filter).collect(Collectors.toList())
-				.toArray(new TeamType[0]);
+		return Arrays.stream(values.get()).filter(filter).toArray(TeamType[]::new);
 	}
 
 	@Override
@@ -67,7 +64,7 @@ public class TeamArgument implements ArgumentType<TeamType> {
 		int cursor = reader.getCursor();
 		String in = reader.readUnquotedString();
 		TeamType type = fromStringFunction.apply(in);
-		if (type == null) {
+		if (type == null || type.isDeleted()) {
 			reader.setCursor(cursor);
 			throw INVALID_ENUM.createWithContext(reader, in);
 		}
@@ -84,7 +81,7 @@ public class TeamArgument implements ArgumentType<TeamType> {
 		return ISuggestionProvider.suggest(suggestions, builder);
 	}
 
-	private final Function<String, TeamType> defaultFromStringFunction() {
+	private Function<String, TeamType> defaultFromStringFunction() {
 		final Map<String, TeamType> map = new HashMap<>();
 		for (TeamType t : values()) {
 			String[] arr = toStringFunction.apply(t);
@@ -99,7 +96,7 @@ public class TeamArgument implements ArgumentType<TeamType> {
 		return map::get;
 	}
 
-	private final Function<TeamType, String[]> defaultToStringFunction() {
+	private Function<TeamType, String[]> defaultToStringFunction() {
 		final Map<TeamType, String[]> map = new HashMap<>();
 		for (TeamType t : values()) {
 			map.put(t, new String[] {t.getDisplayNameKey()});

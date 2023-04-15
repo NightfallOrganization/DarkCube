@@ -1,24 +1,47 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet.database;
 
-import java.sql.*;
-import java.util.*;
+import de.dytanic.cloudnet.CloudNet;
+import de.dytanic.cloudnet.database.AbstractDatabaseProvider;
+import de.dytanic.cloudnet.database.sql.SQLDatabaseProvider;
+import eu.darkcube.system.pserver.cloudnet.PServerModule;
+import eu.darkcube.system.pserver.common.UniqueId;
 
-import de.dytanic.cloudnet.*;
-import de.dytanic.cloudnet.database.*;
-import de.dytanic.cloudnet.database.sql.*;
-import eu.darkcube.system.pserver.cloudnet.*;
-import eu.darkcube.system.pserver.common.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
 
 public class PServerDatabase extends Database {
 
 	private static final String[] COMMANDS;
+
+	static {
+		COMMANDS = new String[9];
+		//@formatter:off
+		COMMANDS[0] =
+					"CREATE TABLE IF NOT EXISTS pserver (" +
+					"`ID` INT NOT NULL AUTO_INCREMENT," +
+					"`PLAYER` VARCHAR(36) NOT NULL," +
+					"`SERVER` TEXT NOT NULL," +
+					"PRIMARY KEY (`ID`)" + ")";
+		COMMANDS[1] = "INSERT INTO `pserver`(`ID`, `PLAYER`, `SERVER`) VALUES (0,'%s','%s')";
+		COMMANDS[2] = "SELECT * FROM `pserver` WHERE `PLAYER`='%s' AND `SERVER`='%s'";
+		COMMANDS[3] = "DELETE FROM `pserver` WHERE `SERVER`='%s'";
+		COMMANDS[4] = "DELETE FROM `pserver` WHERE `SERVER`='%s' AND `PLAYER`='%s'";
+		COMMANDS[5] = "SELECT * FROM `pserver` WHERE `SERVER`='%s'";
+		COMMANDS[6] = "SELECT DISTINCT `SERVER` FROM `pserver` WHERE 1";
+		COMMANDS[7] = "SELECT `SERVER` FROM `pserver` WHERE `PLAYER`='%s'";
+		COMMANDS[8] = "SELECT `PLAYER` FROM `pserver` WHERE `SERVER`='%s'";
+		//@formatter:on
+	}
 
 	public PServerDatabase() {
 		reload();
@@ -30,12 +53,13 @@ public class PServerDatabase extends Database {
 
 	private Connection getConnection() {
 		try {
-			SQLDatabaseProvider provider = ((SQLDatabaseProvider) CloudNet.getInstance()
-					.getServicesRegistry()
-					.getService(AbstractDatabaseProvider.class, PServerModule.getInstance().sqlDatabase));
+			SQLDatabaseProvider provider =
+					((SQLDatabaseProvider) CloudNet.getInstance().getServicesRegistry()
+							.getService(AbstractDatabaseProvider.class,
+									PServerModule.getInstance().sqlDatabase));
 			try {
 				return provider.getConnection();
-			} catch (Exception ex) {
+			} catch (Exception ignored) {
 			}
 			provider.init();
 			return provider.getConnection();
@@ -44,13 +68,19 @@ public class PServerDatabase extends Database {
 		}
 	}
 
-	public boolean update(PServer pserver) {
-		boolean success = true;
-		UniqueId id = pserver.getId();
-		for (UUID owner : pserver.getOwners()) {
-			success &= update(id, owner);
-		}
-		return success;
+	public boolean contains(UniqueId pserver) {
+		String cmd = String.format(COMMANDS[5], pserver.toString());
+		return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::first));
+	}
+
+	public boolean contains(UUID owner, UniqueId pserver) {
+		String cmd = String.format(COMMANDS[2], owner.toString(), pserver.toString());
+		return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::first));
+	}
+
+	private boolean insert(UUID owner, UniqueId pserver) {
+		String cmd = String.format(COMMANDS[1], owner.toString(), pserver.toString());
+		return executeStatement(cmd);
 	}
 
 	public boolean update(UniqueId pserver, UUID owner) {
@@ -58,21 +88,6 @@ public class PServerDatabase extends Database {
 			return insert(owner, pserver);
 		}
 		return true;
-	}
-
-	public boolean contains(UniqueId pserver) {
-		String cmd = String.format(COMMANDS[5], pserver.toString());
-		return executeQuery(cmd, r -> r.first());
-	}
-
-	public boolean contains(UUID owner, UniqueId pserver) {
-		String cmd = String.format(COMMANDS[2], owner.toString(), pserver.toString());
-		return executeQuery(cmd, r -> r.first());
-	}
-
-	private boolean insert(UUID owner, UniqueId pserver) {
-		String cmd = String.format(COMMANDS[1], owner.toString(), pserver.toString());
-		return executeStatement(cmd);
 	}
 
 	public boolean delete(UniqueId pserver) {
@@ -146,27 +161,7 @@ public class PServerDatabase extends Database {
 		return false;
 	}
 
-	static {
-		COMMANDS = new String[9];
-		//@formatter:off
-		COMMANDS[0] = 
-					"CREATE TABLE IF NOT EXISTS pserver (" + 
-					"`ID` INT NOT NULL AUTO_INCREMENT," +
-					"`PLAYER` VARCHAR(36) NOT NULL," + 
-					"`SERVER` TEXT NOT NULL," + 
-					"PRIMARY KEY (`ID`)" + ")";
-		COMMANDS[1] = "INSERT INTO `pserver`(`ID`, `PLAYER`, `SERVER`) VALUES (0,'%s','%s')";
-		COMMANDS[2] = "SELECT * FROM `pserver` WHERE `PLAYER`='%s' AND `SERVER`='%s'";
-		COMMANDS[3] = "DELETE FROM `pserver` WHERE `SERVER`='%s'";
-		COMMANDS[4] = "DELETE FROM `pserver` WHERE `SERVER`='%s' AND `PLAYER`='%s'";
-		COMMANDS[5] = "SELECT * FROM `pserver` WHERE `SERVER`='%s'";
-		COMMANDS[6] = "SELECT DISTINCT `SERVER` FROM `pserver` WHERE 1";
-		COMMANDS[7] = "SELECT `SERVER` FROM `pserver` WHERE `PLAYER`='%s'";
-		COMMANDS[8] = "SELECT `PLAYER` FROM `pserver` WHERE `SERVER`='%s'";
-		//@formatter:on
-	}
-
-	private static interface ExceptionalFunction<T, Q> {
+	private interface ExceptionalFunction<T, Q> {
 		Q apply(T t) throws Exception;
 	}
 }

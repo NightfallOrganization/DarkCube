@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.command.argument;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
@@ -43,7 +42,7 @@ public class MapArgument implements ArgumentType<Map> {
 	public Map parse(StringReader reader) throws CommandSyntaxException {
 		int cursor = reader.getCursor();
 		String in = reader.readUnquotedString();
-		Map map = WoolBattle.getInstance().getMapManager().getMap(in);
+		Map map = WoolBattle.instance().getMapManager().getMap(in);
 		if (map == null) {
 			reader.setCursor(cursor);
 			throw INVALID_ENUM.createWithContext(reader, in);
@@ -62,6 +61,6 @@ public class MapArgument implements ArgumentType<Map> {
 	}
 
 	private Map[] maps() {
-		return WoolBattle.getInstance().getMapManager().getMaps().toArray(new Map[0]);
+		return WoolBattle.instance().getMapManager().getMaps().toArray(new Map[0]);
 	}
 }

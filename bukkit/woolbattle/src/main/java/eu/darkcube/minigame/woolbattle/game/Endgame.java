@@ -1,32 +1,27 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.game;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerBlockBreak;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerEntityDamage;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerPlayerJoin;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerPlayerQuit;
-import eu.darkcube.minigame.woolbattle.mysql.MySQL;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Endgame extends GamePhase {
 
@@ -45,8 +40,8 @@ public class Endgame extends GamePhase {
 	@Override
 	public void onEnable() {
 		CloudNetLink.update();
-		final WoolBattle main = WoolBattle.getInstance();
-//		main.getSchedulers().clear();
+		final WoolBattle main = WoolBattle.instance();
+		//		main.getSchedulers().clear();
 
 		WoolBattle.registerListeners(this.listenerPlayerJoin);
 		WoolBattle.registerListeners(this.listenerPlayerQuit);
@@ -54,19 +49,16 @@ public class Endgame extends GamePhase {
 		WoolBattle.registerListeners(this.listenerEntityDamage);
 
 		Team winner = main.getIngame().winner;
-		main.getUserWrapper().getUsers().forEach(u -> {
+		WBUser.onlineUsers().forEach(u -> {
 			u.getBukkitEntity().teleport(main.getLobby().getSpawn());
 			u.getBukkitEntity().setAllowFlight(false);
 			this.setPlayerItems(u);
-			MySQL.saveUserData(u);
 		});
-		main.sendMessage(Message.TEAM_HAS_WON, user -> {
-			return new String[] { winner.getName(user) };
-		});
-		User mostKills = this.getPlayerWithMostKills();
-		main.sendMessage(Message.PLAYER_HAS_MOST_KILLS, user -> {
-			return new String[] { mostKills.getTeamPlayerName(), Integer.toString(mostKills.getKills()) };
-		});
+		main.sendMessage(Message.TEAM_HAS_WON, user -> new Object[] {winner.getName(user)});
+		WBUser mostKills = this.getPlayerWithMostKills();
+		main.sendMessage(Message.PLAYER_HAS_MOST_KILLS,
+				user -> new Object[] {mostKills.getTeamPlayerName(),
+						Integer.toString(mostKills.getKills())});
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			for (Player t : Bukkit.getOnlinePlayers()) {
 				if (!p.canSee(t))
@@ -74,25 +66,14 @@ public class Endgame extends GamePhase {
 			}
 		}
 
-		List<User> users = main.getUserWrapper().getUsers().stream().filter(u -> u.getKills() != 0)
+		List<WBUser> users = WBUser.onlineUsers().stream().filter(u -> u.getKills() != 0)
+				.sorted((o1, o2) -> Double.compare(o2.getKD(), o1.getKD()))
 				.collect(Collectors.toList());
-
-		Collections.sort(users, new Comparator<User>() {
-			@Override
-			public int compare(User o1, User o2) {
-				if (o1.getKD() > o2.getKD()) {
-					return -1;
-				}
-				if (o1.getKD() < o2.getKD()) {
-					return 1;
-				}
-				return 0;
-			}
-		});
 
 		int players = users.size();
 		if (players >= 1) {
-			main.sendMessage(Message.STATS_PLACE_1, "1", this.val(users.get(0).getKD()), users.get(0).getTeamPlayerName());
+			main.sendMessage(Message.STATS_PLACE_1, "1", this.val(users.get(0).getKD()),
+					users.get(0).getTeamPlayerName());
 			if (players >= 2) {
 				main.sendMessage(Message.STATS_PLACE_2, "2", this.val(users.get(1).getKD()),
 						users.get(1).getTeamPlayerName());
@@ -101,7 +82,8 @@ public class Endgame extends GamePhase {
 							users.get(2).getTeamPlayerName());
 					if (players >= 4) {
 						for (int i = 3; i < 4; i++) {
-							main.sendMessage(Message.STATS_PLACE_TH, Integer.toString(i + 1), this.val(users.get(i).getKD()),
+							main.sendMessage(Message.STATS_PLACE_TH, Integer.toString(i + 1),
+									this.val(users.get(i).getKD()),
 									users.get(i).getTeamPlayerName());
 						}
 					}
@@ -127,44 +109,10 @@ public class Endgame extends GamePhase {
 					Endgame.this.disable();
 					this.cancel();
 					Bukkit.shutdown();
-//					Main.getInstance().getLobby().enable();
+					//					Main.getInstance().getLobby().enable();
 				}
 			}
 		}.runTaskTimer(1);
-	}
-
-	private String val(double d) {
-		return String.format("%1.2f", d);
-	}
-
-	public User getPlayerWithMostKills() {
-		User result = null;
-		int kills = -1;
-		for (User player : WoolBattle.getInstance().getUserWrapper().getUsers()) {
-			if (player.getKills() > kills) {
-				kills = player.getKills();
-				result = player;
-			}
-		}
-		return result;
-	}
-
-	public User getPlayerWithBestKD() {
-
-		User result = null;
-		double kd = -1;
-		for (User player : WoolBattle.getInstance().getUserWrapper().getUsers()) {
-			if (player.getKD() > kd) {
-				kd = player.getKD();
-				result = player;
-			}
-		}
-		return result;
-	}
-
-	public void setPlayerItems(User user) {
-		user.getBukkitEntity().getInventory().clear();
-		user.getBukkitEntity().getInventory().setArmorContents(new ItemStack[4]);
 	}
 
 	@Override
@@ -173,6 +121,39 @@ public class Endgame extends GamePhase {
 		WoolBattle.unregisterListeners(this.listenerPlayerQuit);
 		WoolBattle.unregisterListeners(this.listenerBlockBreak);
 		WoolBattle.unregisterListeners(this.listenerEntityDamage);
+	}
+
+	private String val(double d) {
+		return String.format("%1.2f", d);
+	}
+
+	public WBUser getPlayerWithMostKills() {
+		WBUser result = null;
+		int kills = -1;
+		for (WBUser player : WBUser.onlineUsers()) {
+			if (player.getKills() > kills) {
+				kills = player.getKills();
+				result = player;
+			}
+		}
+		return result;
+	}
+
+	public WBUser getPlayerWithBestKD() {
+		WBUser result = null;
+		double kd = -1;
+		for (WBUser player : WBUser.onlineUsers()) {
+			if (player.getKD() > kd) {
+				kd = player.getKD();
+				result = player;
+			}
+		}
+		return result;
+	}
+
+	public void setPlayerItems(WBUser user) {
+		user.getBukkitEntity().getInventory().clear();
+		user.getBukkitEntity().getInventory().setArmorContents(new ItemStack[4]);
 	}
 
 }

@@ -1,9 +1,11 @@
-apply plugin: 'java-library'
+plugins {
+    id 'java-library'
+}
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    implementation project(':pserver:pserver-api')
-    implementation project(':bukkit:darkcubesystem')
-    implementation project(':bukkit:woolbattle')
-    implementation luckperms
+    compileOnly project(':pserver:pserver-bukkit')
+    compileOnly project(':darkcubesystem:bukkit')
+    compileOnly project(':bukkit:woolbattle')
+    compileOnly libs.luckperms
 }

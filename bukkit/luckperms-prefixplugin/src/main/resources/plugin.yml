@@ -1,10 +1,11 @@
-main: de.dasbabypixel.prefixplugin.Main
+main: de.dasbabypixel.prefixplugin.PrefixPluginBukkit
 name: PrefixPlugin
 version: 1.2
 author: DasBabyPixel
-softdepend: [LuckPerms, DarkPerms, System]
+softdepend: [ LuckPerms, DarkPerms, System ]
+api-version: 1.13
 
-commands: 
+commands:
   reloadprefixes:
     permission: prefixplugin.reloadprefixes
     usage: /reloadprefixes

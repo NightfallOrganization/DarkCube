@@ -1,18 +1,15 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerHeightDisplay;
+import eu.darkcube.minigame.woolbattle.listener.Listener;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.BoundingBox;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,9 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.util.BoundingBox;
+import java.util.*;
 
 public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 
@@ -33,7 +28,7 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 	@Override
 	@EventHandler
 	public void handle(PlayerMoveEvent e) {
-		WoolBattle.getInstance().getIngame().schedulerHeightDisplay.display(e.getPlayer());
+		SchedulerHeightDisplay.display(WBUser.getUser(e.getPlayer()));
 
 		if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
 			return;
@@ -56,14 +51,15 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 					if (box.collides(pbox)) {
 						p.sendBlockChange(r.getLocation(), r.getType(), r.getData());
 					}
-						if (box.collides(pbox) && (box.collidesVertically(pbox) || r.getType() != Material.WOOL)) {
-							if (to.getY() % 1 != 0 && r.getLocation().getBlockY() == to.getBlockY()) {
-								flawless = false;
-							}
-							if (this.ghostBlockFixCount.getOrDefault(p, 0) > 5) {
-								blocksToCheck.add(r.getLocation());
-							}
+					if (box.collides(pbox) && (box.collidesVertically(pbox)
+							|| r.getType() != Material.WOOL)) {
+						if (to.getY() % 1 != 0 && r.getLocation().getBlockY() == to.getBlockY()) {
+							flawless = false;
 						}
+						if (this.ghostBlockFixCount.getOrDefault(p, 0) > 5) {
+							blocksToCheck.add(r.getLocation());
+						}
+					}
 				}
 			}
 		}
@@ -87,7 +83,8 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 				}
 			}
 			if (y != -1) {
-				Location loc = new Location(to.getWorld(), to.getX(), y, to.getZ(), to.getYaw(), to.getPitch());
+				Location loc = new Location(to.getWorld(), to.getX(), y, to.getZ(), to.getYaw(),
+						to.getPitch());
 				p.teleport(loc);
 			}
 		}

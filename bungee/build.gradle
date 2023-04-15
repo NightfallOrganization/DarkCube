@@ -2,6 +2,6 @@ subprojects {
     apply plugin: 'java'
 	
 	dependencies {
-		implementation bungee
+		implementation libs.bungee
 	}
 }

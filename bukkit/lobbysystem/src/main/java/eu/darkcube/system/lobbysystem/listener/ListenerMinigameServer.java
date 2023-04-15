@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class ListenerMinigameServer extends BaseListener {
@@ -34,8 +35,8 @@ public class ListenerMinigameServer extends BaseListener {
 			return;
 		}
 		p.closeInventory();
-		UUIDManager.getManager().getPlayerExecutor(p.getUniqueId()).connect(
+		UUIDManager.getManager().getPlayerExecutor(p.getUniqueId()).connect(Objects.requireNonNull(
 				CloudNetDriver.getInstance().getCloudServiceProvider()
-						.getCloudService(UUID.fromString(itemid)).getServiceId().getName());
+						.getCloudService(UUID.fromString(itemid))).getServiceId().getName());
 	}
 }

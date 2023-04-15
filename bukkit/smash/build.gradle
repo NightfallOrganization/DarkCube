@@ -1,6 +1,6 @@
 dependencies {
-    implementation project(':bukkit:darkcubesystem')
-	implementation 'com.comphenix.protocol:ProtocolLib:4.8.0'
-	implementation 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
-    implementation cloudnetDriver
+    implementation project(':darkcubesystem')
+    implementation 'com.comphenix.protocol:ProtocolLib:4.8.0'
+    implementation 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
+    implementation libs.cloudnetDriver
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -27,11 +27,11 @@ public class WoolBattleNPC {
 						(npc1, player) -> npc1.metadata()
 								.queue(MetadataModifier.EntityMetadata.SKIN_LAYERS, true).send())
 				.usePlayerProfiles(false).build(Lobby.getInstance().getNpcPool());
-		new NPCKnockbackThread(npc).start();
+		new NPCKnockbackThread(npc).runTaskTimer(Lobby.getInstance(), 5, 5);
 		return npc;
 	}
 
-	private static class WoolBattleSkin extends Profile.Property {
+	public static class WoolBattleSkin extends Profile.Property {
 
 		public WoolBattleSkin() {
 			super("textures",

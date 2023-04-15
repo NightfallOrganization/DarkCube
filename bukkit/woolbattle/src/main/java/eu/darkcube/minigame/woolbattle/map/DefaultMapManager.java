@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.map;
+
+import com.google.common.reflect.TypeToken;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import com.google.common.reflect.TypeToken;
-
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
 
 public class DefaultMapManager implements MapManager {
 
@@ -33,21 +30,7 @@ public class DefaultMapManager implements MapManager {
 	}
 
 	public DefaultMapManager() {
-		this(WoolBattle.getInstance().getConfig("spawns").getString("maps"));
-	}
-
-	@Override
-	public void deleteMap(Map map) {
-		MAPS.remove(map.getName());
-		saveMaps();
-	}
-
-	@Override
-	public void saveMaps() {
-		String json = GsonSerializer.gson.toJson(MAPS);
-		YamlConfiguration cfg = WoolBattle.getInstance().getConfig("spawns");
-		cfg.set("maps", json);
-		WoolBattle.getInstance().saveConfig(cfg);
+		this(WoolBattle.instance().getConfig("spawns").getString("maps"));
 	}
 
 	@Override
@@ -69,5 +52,19 @@ public class DefaultMapManager implements MapManager {
 	@Override
 	public Collection<? extends Map> getMaps() {
 		return Collections.unmodifiableCollection(MAPS.values());
+	}
+
+	@Override
+	public void deleteMap(Map map) {
+		MAPS.remove(map.getName());
+		saveMaps();
+	}
+
+	@Override
+	public void saveMaps() {
+		String json = GsonSerializer.gson.toJson(MAPS);
+		YamlConfiguration cfg = WoolBattle.instance().getConfig("spawns");
+		cfg.set("maps", json);
+		WoolBattle.instance().saveConfig(cfg);
 	}
 }

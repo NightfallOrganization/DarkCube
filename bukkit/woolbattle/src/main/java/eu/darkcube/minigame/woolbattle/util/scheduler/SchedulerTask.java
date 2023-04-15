@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
@@ -27,7 +26,7 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
 		this.repeat = repeat;
 		this.delay = delay;
 		this.lastExecution = MinecraftServer.currentTick + delay - repeat;
-		WoolBattle.getInstance().getSchedulers().add(this);
+		WoolBattle.instance().getSchedulers().add(this);
 	}
 
 	SchedulerTask(Scheduler scheduler, long delay, Integer weight) {
@@ -61,7 +60,7 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
 	}
 
 	public final void cancel() {
-		WoolBattle.getInstance().getSchedulers().remove(this);
+		WoolBattle.instance().getSchedulers().remove(this);
 		scheduler = null;
 		delay = 0;
 		repeat = 0;

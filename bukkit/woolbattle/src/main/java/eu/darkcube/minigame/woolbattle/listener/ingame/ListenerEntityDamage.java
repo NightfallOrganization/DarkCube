@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.listener.ingame;
-
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
 	@Override
@@ -22,31 +20,31 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
 	public void handle(EntityDamageEvent e) {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
-			User user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
-			Ingame ingame = WoolBattle.getInstance().getIngame();
+			WBUser user = WBUser.getUser(p);
+			Ingame ingame = WoolBattle.instance().getIngame();
 			if (ingame.isGlobalSpawnProtection || user.hasSpawnProtection()) {
 				e.setCancelled(true);
 				return;
 			}
 			e.setDamage(0);
 			switch (e.getCause()) {
-			case FALL:
-			case STARVATION:
-				e.setCancelled(true);
-				break;
-			case SUFFOCATION:
-				if (WoolBattle.getInstance().isEpGlitch()) {
-					int ticks = user.getTicksAfterLastHit();
-					if (ticks < 200) {
-						ticks += 60;
-						user.setTicksAfterLastHit(ticks);
-					}
+				case FALL:
+				case STARVATION:
+					e.setCancelled(true);
 					break;
-				}
-				e.setCancelled(true);
-				break;
-			default:
-				break;
+				case SUFFOCATION:
+					if (WoolBattle.instance().isEpGlitch()) {
+						int ticks = user.getTicksAfterLastHit();
+						if (ticks < 200) {
+							ticks += 60;
+							user.setTicksAfterLastHit(ticks);
+						}
+						break;
+					}
+					e.setCancelled(true);
+					break;
+				default:
+					break;
 			}
 		}
 	}

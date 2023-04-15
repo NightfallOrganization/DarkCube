@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,20 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import java.lang.reflect.Type;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
+import eu.darkcube.system.lobbysystem.parser.Locations;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
-import eu.darkcube.system.lobbysystem.parser.Locations;
+
+import java.lang.reflect.Type;
 
 public class Border implements Serializable {
 
@@ -65,7 +58,7 @@ public class Border implements Serializable {
 	public boolean isInside(Location o) {
 		boolean inside = false;
 		if (this.loc.getWorld() != o.getWorld())
-			return true;
+			return false;
 		switch (this.shape) {
 			case CIRCLE:
 				inside = this.loc.distance(o) < this.radius;

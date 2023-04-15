@@ -1,26 +1,22 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.event.EventListener;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.inventoryapi.v1.*;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
@@ -33,6 +29,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
@@ -51,7 +48,26 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 	}
 
 	@Override
+	protected void inventoryClick(IInventoryClickEvent event) {
+		event.setCancelled(true);
+		if (event.item() == null)
+			return;
+		String itemid = Item.getItemId(event.item());
+		if (itemid == null)
+			return;
+		if (itemid.equals(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItemId())) {
+			user.setOpenInventory(new InventoryNewPServer(event.user()));
+		} else if (itemid.equals(ITEMID_EXISTING)) {
+			UniqueId pserverId = new UniqueId(event.item().persistentDataStorage()
+					.get(META_KEY_PSERVERID, PersistentDataTypes.STRING));
+			user.setOpenInventory(new InventoryPServerConfiguration(user.getUser(), pserverId));
+		}
+	}
+
+	@Override
 	protected void fillItems(Map<Integer, ItemStack> items) {
+		if (!user.getUser().isLoaded())
+			return;
 		super.fillItems(items);
 		Player p = user.getUser().asPlayer();
 		if (p == null)
@@ -71,47 +87,53 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 		}
 		final int pagesize = this.getPageSize();
 
-		Collection<UniqueId> col =
-				PServerProvider.getInstance().getPServerIDs(user.getUser().getUniqueId());
-		pservercount = Math.max(pservercount, col.size());
-		Iterator<UniqueId> it = col.iterator();
+		try {
+			Collection<UniqueId> col =
+					PServerProvider.instance().pservers(user.getUser().getUniqueId()).get();
+			pservercount = Math.max(pservercount, col.size());
+			Iterator<UniqueId> it = col.iterator();
 
-		for (int slot = 0; slot < pservercount; slot++) {
-			UniqueId pserverId = it.hasNext() ? it.next() : null;
-			ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
+			for (int slot = 0; slot < pservercount; slot++) {
+				UniqueId pserverId = it.hasNext() ? it.next() : null;
+				ItemBuilder item =
+						PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
 
-			if (item == null) {
-				item = ItemBuilder.item(
-						Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
-			} else {
-				Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
-				PServer ps = PServerProvider.getInstance().getPServer(pserverId);
-				PServer.State state = ps == null ? PServer.State.OFFLINE : ps.getState();
-				Message mstate = state == PServer.State.OFFLINE
-						? Message.STATE_OFFLINE
-						: state == PServer.State.RUNNING
-								? Message.STATE_RUNNING
-								: state == PServer.State.STARTING
-										? Message.STATE_STARTING
-										: state == PServer.State.STOPPING
-												? Message.STATE_STOPPING
-												: null;
-				if (mstate == null)
-					throw new IllegalStateException();
-				item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(),
-						mstate.getMessage(user.getUser())));
+				if (item == null) {
+					item = ItemBuilder.item(
+							Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
+				} else {
+					Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
+					PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
+					PServerExecutor.State state =
+							ps == null ? PServerExecutor.State.OFFLINE : ps.state().get();
+					Message mstate = state == PServerExecutor.State.OFFLINE
+							? Message.STATE_OFFLINE
+							: state == PServerExecutor.State.RUNNING
+									? Message.STATE_RUNNING
+									: state == PServerExecutor.State.STARTING
+											? Message.STATE_STARTING
+											: state == PServerExecutor.State.STOPPING
+													? Message.STATE_STOPPING
+													: null;
+					if (mstate == null)
+						throw new IllegalStateException();
+					item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(), mstate));
+				}
+
+				if (pserverId != null)
+					item.persistentDataStorage()
+							.set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING,
+									pserverId.toString());
+
+				items.put(slot, item.build());
 			}
-
-			if (pserverId != null)
-				item.persistentDataStorage()
-						.set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING,
-								pserverId.toString());
-
-			items.put(slot, item.build());
-		}
-		for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize;
-				slot < pagesize; slot++) {
-			items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
+			for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize;
+			     slot < pagesize; slot++) {
+				items.put(slot,
+						Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

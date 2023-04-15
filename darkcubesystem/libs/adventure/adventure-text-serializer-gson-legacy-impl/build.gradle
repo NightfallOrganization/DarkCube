@@ -1,0 +1,8 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api parent.project('adventure-text-serializer-gson')
+    api parent.project('adventure-nbt')
+}

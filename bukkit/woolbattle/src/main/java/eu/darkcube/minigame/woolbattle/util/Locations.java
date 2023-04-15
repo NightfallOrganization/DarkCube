@@ -1,15 +1,12 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -18,17 +15,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Locations extends Parser {
 
 	public static final float F360 = 360f;
 	public static final float F180 = 180f;
-	public static final Location DEFAULT_LOCATION = deserialize(
-			WoolBattle.getInstance().getConfig("spawns").getString("defaultLocation"), null);
+	public static final Location DEFAULT_LOCATION =
+			deserialize(WoolBattle.instance().getConfig("spawns").getString("defaultLocation"),
+					null);
 
 	public static Set<Block> getBlocksInLine(Location start, Vector direction, int range) {
-		BlockIterator it = new BlockIterator(start.getWorld(), start.toVector(), direction, 1, range);
+		BlockIterator it =
+				new BlockIterator(start.getWorld(), start.toVector(), direction, 1, range);
 		Block last = null;
 		Set<Block> b = new HashSet<>();
 		while (it.hasNext()) {
@@ -148,8 +148,9 @@ public class Locations extends Parser {
 		float yaw = loc.getYaw();
 		float pitch = loc.getPitch();
 		StringBuilder builder = new StringBuilder();
-		builder.append(x).append(":").append(y).append(":").append(z).append(":").append(yaw).append(":").append(pitch)
-				.append(":").append(loc.getWorld() != null ? loc.getWorld().getName() : "null").append(":")
+		builder.append(x).append(":").append(y).append(":").append(z).append(":").append(yaw)
+				.append(":").append(pitch).append(":")
+				.append(loc.getWorld() != null ? loc.getWorld().getName() : "null").append(":")
 				.append(ignoreDirection);
 		return builder.toString();
 	}

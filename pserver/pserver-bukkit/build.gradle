@@ -1,8 +1,10 @@
-apply plugin: 'java-library'
+plugins {
+    id 'java-library'
+}
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     compileOnlyApi project(':pserver:pserver-api')
-    compileOnlyApi project(':bukkit:darkcubesystem')
-    compileOnlyApi cloudnetWrapper
+    compileOnlyApi project(':darkcubesystem')
+    compileOnlyApi libs.cloudnetWrapper
 }

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.util;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
@@ -12,11 +11,11 @@ import de.dytanic.cloudnet.driver.event.EventListener;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudOfflinePlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.pserver.bukkit.event.PServerAddEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerAddOwnerEvent;
-import eu.darkcube.system.pserver.bukkit.event.PServerRemoveEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerRemoveOwnerEvent;
-import eu.darkcube.system.pserver.common.PServer;
+import eu.darkcube.system.pserver.bukkit.event.PServerStartEvent;
+import eu.darkcube.system.pserver.bukkit.event.PServerStopEvent;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.util.ReflectionUtils;
@@ -34,11 +33,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class SkullCache implements Listener {
 
-	public static Map<UUID, Object> cache = new HashMap<>();
 	private static final Method asNMSCopy = ReflectionUtils.getMethod(
 			ReflectionUtils.getClass("CraftItemStack",
 					ReflectionUtils.PackageType.CRAFTBUKKIT_INVENTORY), "asNMSCopy",
@@ -47,6 +46,8 @@ public class SkullCache implements Listener {
 			ReflectionUtils.getClass("CraftItemStack",
 					ReflectionUtils.PackageType.CRAFTBUKKIT_INVENTORY), "asBukkitCopy",
 			asNMSCopy.getReturnType());
+	public static Map<UUID, Object> cache = new HashMap<>();
+	private static SkullCache sc = new SkullCache();
 
 	public static void loadToCache(UUID ownerUUID, String ownerName) {
 		if (SkullCache.cache.containsKey(ownerUUID)) {
@@ -69,8 +70,6 @@ public class SkullCache implements Listener {
 				SkullCache.cache.get(ownerUUID));
 	}
 
-	private static SkullCache sc = new SkullCache();
-
 	public static void register() {
 		CloudNetDriver.getInstance().getEventManager().registerListener(SkullCache.sc);
 		Bukkit.getPluginManager().registerEvents(SkullCache.sc, Lobby.getInstance());
@@ -79,20 +78,27 @@ public class SkullCache implements Listener {
 			IPlayerManager pm = CloudNetDriver.getInstance().getServicesRegistry()
 					.getFirstService(IPlayerManager.class);
 			Map<UUID, String> players = new HashMap<>();
-			PServerProvider.getInstance().getPServers().forEach(ps -> {
-				ps.getOwners().forEach(owner -> {
-					// loadToCache(owner, pm.getOfflinePlayer(owner).getName());
-					players.put(owner, pm.getOfflinePlayer(owner).getName());
-				});
-			});
+			try {
+				for (PServerExecutor ps : PServerProvider.instance().pservers().get()) {
+					for (UUID owner : ps.owners().get()) {
+						players.put(owner, pm.getOfflinePlayer(owner).getName());
+					}
+				}
+				//						.forEach(ps -> {
+				//					ps.getOwners().forEach(owner -> {
+				//						// loadToCache(owner, pm.getOfflinePlayer(owner).getName());
+				//						players.put(owner, pm.getOfflinePlayer(owner).getName());
+				//					});
+				//				});
+			} catch (InterruptedException | ExecutionException e) {
+				throw new RuntimeException(e);
+			}
 			Bukkit.getOnlinePlayers().forEach(p -> {
 				if (!players.containsKey(p.getUniqueId())) {
 					players.put(p.getUniqueId(), p.getName());
 				}
 			});
-			players.entrySet().forEach(e -> {
-				SkullCache.loadToCache(e.getKey(), e.getValue());
-			});
+			players.forEach(SkullCache::loadToCache);
 		});
 	}
 
@@ -111,40 +117,65 @@ public class SkullCache implements Listener {
 	@EventHandler
 	public void handle(PlayerQuitEvent e) {
 		AsyncExecutor.service().submit(() -> {
-			Set<UUID> uuids = new HashSet<>();
-			PServerProvider.getInstance().getPServers().stream().map(PServer::getOwners)
-					.forEach(uuids::addAll);
-			uuids.addAll(Bukkit.getOnlinePlayers().stream().filter(s -> !s.equals(e.getPlayer()))
-					.map(Player::getUniqueId).collect(Collectors.toList()));
-			if (!uuids.contains(e.getPlayer().getUniqueId())) {
-				SkullCache.unloadFromCache(e.getPlayer().getUniqueId());
+			try {
+				Set<UUID> uuids = new HashSet<>();
+				PServerProvider.instance().pservers().get().stream().map(PServerExecutor::owners)
+						.map(f -> {
+							try {
+								return f.get();
+							} catch (InterruptedException | ExecutionException ex) {
+								throw new RuntimeException(ex);
+							}
+						}).forEach(uuids::addAll);
+				uuids.addAll(
+						Bukkit.getOnlinePlayers().stream().filter(s -> !s.equals(e.getPlayer()))
+								.map(Player::getUniqueId).collect(Collectors.toList()));
+				if (!uuids.contains(e.getPlayer().getUniqueId())) {
+					SkullCache.unloadFromCache(e.getPlayer().getUniqueId());
+				}
+			} catch (InterruptedException | ExecutionException ex) {
+				throw new RuntimeException(ex);
 			}
 		});
 	}
 
 	@EventListener
-	public void handle(PServerAddEvent e) {
+	public void handle(PServerStartEvent e) {
 		AsyncExecutor.service().submit(() -> {
 			IPlayerManager pm = CloudNetDriver.getInstance().getServicesRegistry()
 					.getFirstService(IPlayerManager.class);
-			for (UUID owner : e.getPServer().getOwners()) {
-				SkullCache.loadToCache(owner, pm.getOfflinePlayer(owner).getName());
+			try {
+				for (UUID owner : e.pserver().owners().get()) {
+					SkullCache.loadToCache(owner, pm.getOfflinePlayer(owner).getName());
+				}
+			} catch (InterruptedException | ExecutionException ex) {
+				throw new RuntimeException(ex);
 			}
 		});
 	}
 
 	@EventListener
-	public void handle(PServerRemoveEvent e) {
+	public void handle(PServerStopEvent e) {
 		AsyncExecutor.service().submit(() -> {
 			Set<UUID> uuids = new HashSet<>();
-			PServerProvider.getInstance().getPServers().stream().filter(ps -> ps != e.getPServer())
-					.map(PServer::getOwners).forEach(uuids::addAll);
-			uuids.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId)
-					.collect(Collectors.toList()));
-			for (UUID owner : e.getPServer().getOwners()) {
-				if (!uuids.contains(owner)) {
-					SkullCache.unloadFromCache(owner);
+			try {
+				PServerProvider.instance().pservers().get().stream().filter(ps -> ps != e.pserver())
+						.map(PServerExecutor::owners).map(f -> {
+							try {
+								return f.get();
+							} catch (InterruptedException | ExecutionException ex) {
+								throw new RuntimeException(ex);
+							}
+						}).forEach(uuids::addAll);
+				uuids.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId)
+						.collect(Collectors.toList()));
+				for (UUID owner : e.pserver().owners().get()) {
+					if (!uuids.contains(owner)) {
+						SkullCache.unloadFromCache(owner);
+					}
 				}
+			} catch (InterruptedException | ExecutionException ex) {
+				throw new RuntimeException(ex);
 			}
 		});
 	}
@@ -164,12 +195,22 @@ public class SkullCache implements Listener {
 	public void handle(PServerRemoveOwnerEvent e) {
 		AsyncExecutor.service().submit(() -> {
 			Set<UUID> uuids = new HashSet<>();
-			PServerProvider.getInstance().getPServers().stream().filter(ps -> ps != e.getPServer())
-					.map(PServer::getOwners).forEach(uuids::addAll);
-			uuids.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId)
-					.collect(Collectors.toList()));
-			if (!uuids.contains(e.getOwner())) {
-				SkullCache.unloadFromCache(e.getOwner());
+			try {
+				PServerProvider.instance().pservers().get().stream().filter(ps -> ps != e.pserver())
+						.map(PServerExecutor::owners).map(f -> {
+							try {
+								return f.get();
+							} catch (InterruptedException | ExecutionException ex) {
+								throw new RuntimeException(ex);
+							}
+						}).forEach(uuids::addAll);
+				uuids.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId)
+						.collect(Collectors.toList()));
+				if (!uuids.contains(e.getOwner())) {
+					SkullCache.unloadFromCache(e.getOwner());
+				}
+			} catch (InterruptedException | ExecutionException ex) {
+				throw new RuntimeException(ex);
 			}
 		});
 	}

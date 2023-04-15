@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.parser;
 
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-
 public class Locations extends Parser {
 
-	public static final Location DEFAULT = new Location(Bukkit.getWorlds().get(0), -927.5, 28, -755.5, -180, 0);
+	public static final Location DEFAULT =
+			new Location(Bukkit.getWorlds().get(0), -927.5, 28, -755.5, -180, 0);
 
 	public static final float F360 = 360f;
 
@@ -23,11 +23,9 @@ public class Locations extends Parser {
 		Location l = loc.clone();
 		l.setYaw(Locations.getNiceY(l.getYaw()));
 		l.setPitch(Locations.getNiceY(l.getPitch()));
-		l.setX(l.getBlockX());
-		l.setY(l.getBlockY());
-		l.setZ(l.getBlockZ());
-		l.setX(l.getX() + 0.5);
-		l.setZ(l.getZ() + 0.5);
+		l.setX(getNiceCoord(l.getX()));
+		l.setY(getNiceCoord(l.getY()));
+		l.setZ(getNiceCoord(l.getZ()));
 		return l;
 	}
 
@@ -49,6 +47,12 @@ public class Locations extends Parser {
 			}
 		}
 		return y;
+	}
+
+	private static double getNiceCoord(double coord) {
+		coord *= 2;
+		coord = Math.round(coord);
+		return coord /= 2;
 	}
 
 	public static Location deserialize(String location, Location oldLoc) {
@@ -89,18 +93,8 @@ public class Locations extends Parser {
 		float yaw = loc.getYaw();
 		float pitch = loc.getPitch();
 		StringBuilder builder = new StringBuilder();
-		builder.append(x)
-				.append(":")
-				.append(y)
-				.append(":")
-				.append(z)
-				.append(":")
-				.append(yaw)
-				.append(":")
-				.append(pitch)
-				.append(":")
-				.append(loc.getWorld().getName())
-				.append(":")
+		builder.append(x).append(":").append(y).append(":").append(z).append(":").append(yaw)
+				.append(":").append(pitch).append(":").append(loc.getWorld().getName()).append(":")
 				.append(ignoreDirection);
 		return builder.toString();
 	}
@@ -125,13 +119,9 @@ public class Locations extends Parser {
 	}
 
 	public static JsonDocument toDocument(Location loc, boolean ignoreDirection) {
-		return new JsonDocument().append("x", loc.getX())
-				.append("y", loc.getY())
-				.append("z", loc.getZ())
-				.append("yaw", loc.getYaw())
-				.append("pit", loc.getPitch())
-				.append("wor", loc.getWorld().getName())
-				.append("igd", ignoreDirection);
+		return new JsonDocument().append("x", loc.getX()).append("y", loc.getY())
+				.append("z", loc.getZ()).append("yaw", loc.getYaw()).append("pit", loc.getPitch())
+				.append("wor", loc.getWorld().getName()).append("igd", ignoreDirection);
 	}
 
 	public static Location fromDocument(JsonDocument doc, Location oldLoc) {

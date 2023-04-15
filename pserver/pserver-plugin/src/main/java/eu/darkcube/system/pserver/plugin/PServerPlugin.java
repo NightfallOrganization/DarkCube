@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin;
 
 import eu.darkcube.system.DarkCubePlugin;
@@ -19,27 +18,27 @@ import eu.darkcube.system.pserver.plugin.listener.InactivityListener;
 import eu.darkcube.system.pserver.plugin.listener.UserCacheListener;
 import eu.darkcube.system.pserver.plugin.user.UserCache;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
+import eu.darkcube.system.pserver.plugin.util.OwnerCache;
 import eu.darkcube.system.util.Language;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PServerPlugin extends DarkCubePlugin {
 
-	private static PServerPlugin instance;
-
 	public static final String COMMAND_PREFIX = "pserver";
-
+	private static PServerPlugin instance;
 	private final LinkManager linkManager = new LinkManager();
 	private final Path workingDirectory;
+	private final OwnerCache ownerCache = new OwnerCache();
 
 	public PServerPlugin() {
+		super("pserver-features");
 		instance = this;
 		workingDirectory = Paths.get("pserver");
 		try {
@@ -50,25 +49,41 @@ public class PServerPlugin extends DarkCubePlugin {
 		}
 	}
 
+	public static PServerPlugin instance() {
+		return instance;
+	}
+
+	@Override
+	public void onDisable() {
+
+		linkManager.unregisterLinks();
+
+		UserManager.unregister();
+		ownerCache.unregister();
+		UserCache.unload();
+	}
+
 	@Override
 	public void onEnable() {
 
 		UserCache.load();
 
 		try {
-			Language.GERMAN.registerLookup(getClassLoader(), "messages_de.properties", Message.KEY_MODIFIER);
-			Language.ENGLISH.registerLookup(getClassLoader(), "messages_en.properties", Message.KEY_MODIFIER);
+			Language.GERMAN.registerLookup(getClassLoader(), "messages_de.properties",
+					Message.KEY_MODIFIER);
+			Language.ENGLISH.registerLookup(getClassLoader(), "messages_en.properties",
+					Message.KEY_MODIFIER);
 
-			List<String> messageKeys = new ArrayList<>();
-			messageKeys.addAll(Arrays.asList(Message.values()).stream().map(Message::getKey).collect(Collectors.toList()));
-			Arrays.asList(Item.values()).stream().map(Item::getMessageKeys).forEach(messageKeys::addAll);
+			List<String> messageKeys = Arrays.stream(Message.values()).map(Message::key)
+					.collect(Collectors.toList());
+			Arrays.stream(Item.values()).map(Item::getMessageKeys)
+					.forEach(messageKeys::addAll);
 
 			Language.validateEntries(messageKeys.toArray(new String[0]), Message.KEY_MODIFIER);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 
-//		DeprecatedUser.register();
 		UserManager.register();
 
 		CommandAPI api = CommandAPI.getInstance();
@@ -80,35 +95,26 @@ public class PServerPlugin extends DarkCubePlugin {
 		api.register(new KillCommand());
 		api.register(new CommandsCommand());
 		api.register(new EffectCommand());
-		api.register(new UsersCommand());
+		//		api.register(new UsersCommand());
 		api.register(new CommandBlockCommand());
 
 		new InactivityListener();
 		new UserCacheListener();
 		new CommandBlockModifyListener();
 
-		PServerProvider.getInstance().setPServerCommand(new PServerCommand());
+		ownerCache.register();
+
+		PServerProvider.instance().setPServerCommand(new PServerCommand());
 
 		this.linkManager.addLink(LuckPermsLink::new);
 		this.linkManager.addLink(WoolBattleLink::new);
 	}
 
-	@Override
-	public void onDisable() {
-
-		linkManager.unregisterLinks();
-
-		UserManager.unregister();
-//		DeprecatedUser.unregister();
-
-		UserCache.unload();
+	public OwnerCache ownerCache() {
+		return ownerCache;
 	}
 
 	public Path getWorkingDirectory() {
 		return workingDirectory;
-	}
-
-	public static PServerPlugin getInstance() {
-		return instance;
 	}
 }

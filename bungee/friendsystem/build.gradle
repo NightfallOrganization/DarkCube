@@ -1,4 +1,4 @@
 dependencies {
-    implementation cloudnetDriver
-    implementation cloudnetBridge
+    implementation libs.cloudnetDriver
+    implementation libs.cloudnetBridge
 }

@@ -1,25 +1,22 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
+import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.pserver.cloudnet.NodePServerExecutor;
 import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
-import eu.darkcube.system.pserver.common.PServer.State;
-import eu.darkcube.system.pserver.common.packet.Packet;
-import eu.darkcube.system.pserver.common.packet.PacketHandler;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeSetRunning;
+import eu.darkcube.system.pserver.common.packets.wn.PacketSetRunning;
 
-public class HandlerSetRunning implements PacketHandler<PacketWrapperNodeSetRunning> {
-
+public class HandlerSetRunning implements PacketHandler<PacketSetRunning> {
 	@Override
-	public Packet handle(PacketWrapperNodeSetRunning packet) {
-		NodePServerProvider.getInstance().getPServerOptional(packet.getId()).ifPresent(ps -> {
-			ps.setState(State.RUNNING);
-		});
+	public Packet handle(PacketSetRunning packet) throws Throwable {
+		NodePServerProvider.instance().pserver(packet.id())
+				.thenAccept(NodePServerExecutor::setRunning);
 		return null;
 	}
 }

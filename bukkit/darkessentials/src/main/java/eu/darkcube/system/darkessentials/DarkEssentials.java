@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -40,6 +40,10 @@ public class DarkEssentials extends Plugin {
 
 	public static FileConfiguration config;
 	public static String colorFail, colorConfirm, colorValue;
+
+	public DarkEssentials() {
+		super("darkessentials");
+	}
 
 	public static DarkEssentials getInstance() {
 		return DarkEssentials.getPlugin(DarkEssentials.class);

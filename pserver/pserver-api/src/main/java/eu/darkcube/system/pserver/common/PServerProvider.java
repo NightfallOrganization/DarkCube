@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.common;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.BiFunction;
-
-import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.driver.service.ServiceTask;
 import de.dytanic.cloudnet.driver.service.ServiceTemplate;
-import eu.darkcube.system.pserver.common.packet.PServerSerializable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 public abstract class PServerProvider {
 
@@ -26,60 +23,75 @@ public abstract class PServerProvider {
 		instance = this;
 	}
 
-	public abstract void setPServerCommand(BiFunction<Object, String[], Boolean> command)
-			throws IllegalStateException;
+	public static @NotNull PServerProvider instance() {
+		return instance;
+	}
 
 	/**
-	 * @return true if this Server is a {@link PServer}
+	 * @return the template prefix for pservers. This is {@code "pserver"}.
+	 */
+	public static @NotNull String templatePrefix() {
+		return "pserver";
+	}
+
+	/**
+	 * @param pserver the pserver
+	 *
+	 * @return a {@link ServiceTemplate} for the given pserver
+	 */
+	public static @NotNull ServiceTemplate template(@NotNull UniqueId pserver) {
+		return new ServiceTemplate(templatePrefix(), pserver.toString(),
+				ServiceTemplate.LOCAL_STORAGE);
+	}
+
+	public abstract void setPServerCommand(BiFunction<Object, String[], Boolean> command)
+	throws IllegalStateException;
+
+	/**
+	 * @return true if this Server is a {@link PServerExecutor}
 	 */
 	public abstract boolean isPServer();
 
 	/**
-	 * @return the current {@link PServer}, if this is a {@link PServer}. Otherwise
-	 *         {@link IllegalStateException}
-	 * @throws IllegalStateException
+	 * @return the current {@link PServerExecutor}, if this is a {@link PServerExecutor}. Otherwise
+	 * throws {@link IllegalStateException}
+	 *
+	 * @throws IllegalStateException if this server is no a pserver
+	 * @see #isPServer()
 	 */
-	public abstract PServer getCurrentPServer() throws IllegalStateException;
+	public abstract @NotNull PServerExecutor currentPServer() throws IllegalStateException;
 
-	public abstract PServer getPServer(UniqueId pserver);
+	/**
+	 * This will get a {@link PServerExecutor} instance.
+	 *
+	 * @param pserver the id of the pserver
+	 *
+	 * @return the pserver with the id
+	 */
+	public abstract @NotNull CompletableFuture<@Nullable ? extends PServerExecutor> pserver(
+			@NotNull UniqueId pserver);
 
-	public abstract JsonDocument getPServerData(UniqueId pserver);
+	/**
+	 * @param pserver the pserver id
+	 *
+	 * @return whether the pserver is loaded
+	 */
+	public abstract @NotNull CompletableFuture<@NotNull Boolean> pserverExists(
+			@NotNull UniqueId pserver);
 
-	public abstract ITask<Void> setPServerData(UniqueId pserver, JsonDocument data);
+	public abstract CompletableFuture<? extends PServerExecutor> createPServer(
+			PServerBuilder builder);
 
-	public abstract PServer createPServer(PServerSerializable configuration);
+	/**
+	 * @return all running pservers
+	 */
+	public abstract CompletableFuture<Collection<? extends PServerExecutor>> pservers();
 
-	//public abstract PServer createPServer(PServerSerializable configuration, ServiceTask task);
+	/**
+	 * @param owner a player
+	 *
+	 * @return all pservers the player is owner of
+	 */
+	public abstract CompletableFuture<Collection<UniqueId>> pservers(UUID owner);
 
-	public Optional<? extends PServer> getPServerOptional(UniqueId pserver) {
-		return Optional.ofNullable(getPServer(pserver));
-	}
-
-	public abstract Collection<? extends PServer> getPServers();
-
-	public abstract Collection<UniqueId> getPServerIDs(UUID owner);
-
-	public abstract Collection<UUID> getOwners(UniqueId pserver);
-
-	public abstract ITask<Void> delete(UniqueId pserver);
-
-	public abstract ITask<Void> clearOwners(UniqueId id);
-
-	public abstract ITask<Void> addOwner(UniqueId id, UUID owner);
-
-	public abstract ITask<Void> removeOwner(UniqueId id, UUID owner);
-
-	public abstract String newName();
-
-	public static PServerProvider getInstance() {
-		return instance;
-	}
-
-	public static String getTemplatePrefix() {
-		return "pserver";
-	}
-
-	public static ServiceTemplate getTemplate(UniqueId pserver) {
-		return new ServiceTemplate(getTemplatePrefix(), pserver.toString(), "local");
-	}
 }

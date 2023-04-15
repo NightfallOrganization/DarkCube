@@ -2,9 +2,8 @@ main: eu.darkcube.system.lobbysystem.Lobby
 version: 1.0
 author: DasBabyPixel
 name: LobbySystem
-depend: [System]
-softdepend: [PServer]
-permissions: 
+depend: [ System, PServer ]
+permissions:
   system.npc.knockback.ignore:
     default: false
     description: Disables NPC knockback

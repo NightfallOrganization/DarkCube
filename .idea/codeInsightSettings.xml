@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaProjectCodeInsightSettings">
+    <excluded-names>
+      <name>com.avaje.ebean.validation.NotNull</name>
+      <name>com.viaversion.viaversion.libs.kyori.adventure.*</name>
+      <name>java.awt.*</name>
+      <name>javax.annotation.Nullable</name>
+      <name>org.checkerframework.checker.nullness.qual.Nullable</name>
+    </excluded-names>
+  </component>
+</project>

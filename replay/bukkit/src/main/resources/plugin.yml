@@ -1,0 +1,4 @@
+name: ReplaySystem
+version: 1.0
+author: DasBabyPixel
+main: eu.darkcube.system.replay.bukkit.BukkitReplayPlugin

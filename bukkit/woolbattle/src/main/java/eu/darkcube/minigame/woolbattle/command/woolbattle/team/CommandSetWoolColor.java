@@ -1,58 +1,64 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
-import java.util.List;
-
-import org.bukkit.DyeColor;
-import org.bukkit.command.CommandSender;
-
-import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.command.CommandArgument;
+import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.minigame.woolbattle.util.ColorUtil;
-import eu.darkcube.system.commandapi.Command;
-import eu.darkcube.system.commandapi.SpacedCommand.SubCommand;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.DyeColor;
 
-public class CommandSetWoolColor extends SubCommand {
-
+public class CommandSetWoolColor extends WBCommandExecutor {
 	public CommandSetWoolColor() {
-		super(WoolBattle.getInstance(), "setWoolColor", new Command[0], "Setzt die Wollfarbe", CommandArgument.WOOL_COLOR);
+		super("setWoolColor", b -> b.then(Commands.argument("woolColor",
+				EnumArgument.enumArgument(DyeColor.values(),
+						c -> new String[] {c.name().toLowerCase()})).executes(ctx -> {
+			TeamType team = TeamArgument.getTeam(ctx, "team");
+			DyeColor woolColor = EnumArgument.getEnumArgument(ctx, "woolColor", DyeColor.class);
+			team.setWoolColor(woolColor);
+			ctx.getSource().sendMessage(LegacyComponentSerializer.legacySection().deserialize(
+					"§7Du hast die Wollfarbe des Teams " + team.getDisplayNameKey() + " zu "
+							+ woolColor.name() + "§7 geändert."));
+			return 0;
+		})));
 	}
-
-	@Override
-	public List<String> onTabComplete(String[] args) {
-		if (args.length == 1) {
-			return Arrays.toSortedStringList(DyeColor.values(), args[0]);
-		}
-		return super.onTabComplete(args);
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length == 1) {
-			TeamType team = TeamType.byDisplayNameKey(getSpaced());
-			if (team == null || team.isDeleted()) {
-				sender.sendMessage("§cEs konnte kein Team mit dem Namen '" + getSpaced() + "' gefunden werden.");
-				return true;
-			}
-			DyeColor dyeColor = DyeColor.getByData(ColorUtil.byDyeColor(args[0]));
-			if (dyeColor == null) {
-				sender.sendMessage("§cBitte gib eine gültige Wollfarbe an!");
-				return true;
-			}
-			team.setWoolColor(dyeColor);
-			sender.sendMessage("§7Du hast die Wollfarbe des Teams " + team.getDisplayNameKey() + " zu "
-					+ dyeColor.name() + "§7 geändert.");
-			return true;
-		}
-		return false;
-	}
+	//	public CommandSetWoolColor() {
+	//		super(WoolBattle.getInstance(), "setWoolColor", new Command[0], "Setzt die Wollfarbe", CommandArgument.WOOL_COLOR);
+	//	}
+	//
+	//	@Override
+	//	public List<String> onTabComplete(String[] args) {
+	//		if (args.length == 1) {
+	//			return Arrays.toSortedStringList(DyeColor.values(), args[0]);
+	//		}
+	//		return super.onTabComplete(args);
+	//	}
+	//
+	//	@SuppressWarnings("deprecation")
+	//	@Override
+	//	public boolean execute(CommandSender sender, String[] args) {
+	//		if (args.length == 1) {
+	//			TeamType team = TeamType.byDisplayNameKey(getSpaced());
+	//			if (team == null || team.isDeleted()) {
+	//				sender.sendMessage("§cEs konnte kein Team mit dem Namen '" + getSpaced() + "' gefunden werden.");
+	//				return true;
+	//			}
+	//			DyeColor dyeColor = DyeColor.getByData(ColorUtil.byDyeColor(args[0]));
+	//			if (dyeColor == null) {
+	//				sender.sendMessage("§cBitte gib eine gültige Wollfarbe an!");
+	//				return true;
+	//			}
+	//			team.setWoolColor(dyeColor);
+	//			sender.sendMessage("§7Du hast die Wollfarbe des Teams " + team.getDisplayNameKey() + " zu "
+	//					+ dyeColor.name() + "§7 geändert.");
+	//			return true;
+	//		}
+	//		return false;
+	//	}
 }

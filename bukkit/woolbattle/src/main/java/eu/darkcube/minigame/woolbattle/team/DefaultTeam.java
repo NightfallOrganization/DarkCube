@@ -1,23 +1,25 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.team;
-
-import java.util.Collection;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.system.commandapi.v3.ILanguagedCommandExecutor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.util.AdventureSupport;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+
+import java.util.Collection;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 class DefaultTeam implements Team {
 
@@ -51,10 +53,14 @@ class DefaultTeam implements Team {
 	}
 
 	@Override
-	public String getName(User user) {
-		return getPrefix()
-//		return Message.getMessage(getType().getDisplayNameKey(), user.getLanguage())
-				+ Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey(), user.getLanguage());
+	public Component getName(ILanguagedCommandExecutor executor) {
+		return Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey(),
+				executor.getLanguage()).style(getPrefixStyle());
+	}
+
+	@Override
+	public Style getPrefixStyle() {
+		return AdventureSupport.convert(ChatColor.getByChar(getType().getNameColor()));
 	}
 
 	@Override
@@ -63,14 +69,14 @@ class DefaultTeam implements Team {
 	}
 
 	@Override
-	public Collection<? extends User> getUsers() {
-		return WoolBattle.getInstance().getUserWrapper().getUsers().stream().filter(user -> user.getTeam().equals(this))
+	public Collection<? extends WBUser> getUsers() {
+		return WBUser.onlineUsers().stream().filter(user -> user.getTeam().equals(this))
 				.collect(Collectors.toSet());
 	}
 
 	@Override
 	public boolean contains(UUID user) {
-		for (User u : getUsers()) {
+		for (WBUser u : getUsers()) {
 			if (u.getUniqueId().equals(user)) {
 				return true;
 			}
@@ -79,25 +85,20 @@ class DefaultTeam implements Team {
 	}
 
 	@Override
-	public void setLifes(int lifes) {
-		this.lifes = lifes;
-		WoolBattle m = WoolBattle.getInstance();
-		m.getUserWrapper().getUsers().forEach(u -> m.getIngame().reloadScoreboardLifes(u));
-	}
-
-	@Override
 	public int getLifes() {
 		return lifes;
 	}
 
 	@Override
-	public void setSpawn(Map map, Location location) {
-		map.setSpawn(getType().getDisplayNameKey(), location);
+	public void setLifes(int lifes) {
+		this.lifes = lifes;
+		WBUser.onlineUsers()
+				.forEach(u -> WoolBattle.instance().getIngame().reloadScoreboardLifes(u));
 	}
 
 	@Override
-	public void setSpawn(Location location) {
-		setSpawn(WoolBattle.getInstance().getMap(), location);
+	public void setSpawn(Map map, Location location) {
+		map.setSpawn(getType().getDisplayNameKey(), location);
 	}
 
 	@Override
@@ -107,11 +108,11 @@ class DefaultTeam implements Team {
 
 	@Override
 	public Location getSpawn() {
-		return getSpawn(WoolBattle.getInstance().getMap());
+		return getSpawn(WoolBattle.instance().getMap());
 	}
 
 	@Override
-	public String getPrefix() {
-		return ChatColor.getByChar(getType().getNameColor()).toString();
+	public void setSpawn(Location location) {
+		setSpawn(WoolBattle.instance().getMap(), location);
 	}
 }

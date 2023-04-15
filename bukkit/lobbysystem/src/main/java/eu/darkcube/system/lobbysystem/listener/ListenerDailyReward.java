@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -45,8 +45,7 @@ public class ListenerDailyReward extends BaseListener {
 			}
 		}
 
-		int cubes = minCubes + new Random().nextInt(maxCubes - minCubes + 1);
-		return cubes;
+		return minCubes + new Random().nextInt(maxCubes - minCubes + 1);
 	}
 
 	@EventHandler
@@ -60,11 +59,11 @@ public class ListenerDailyReward extends BaseListener {
 		if (item == null) {
 			return;
 		}
-		int id = ItemBuilder.item(item).persistentDataStorage()
-				.get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
-		if (id == 0) {
+		if (!ItemBuilder.item(item).persistentDataStorage().has(InventoryDailyReward.reward)) {
 			return;
 		}
+		int id = ItemBuilder.item(item).persistentDataStorage()
+				.get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
 
 		Set<Integer> used = user.getRewardSlotsUsed();
 		// used.clear();

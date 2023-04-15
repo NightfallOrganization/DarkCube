@@ -1,29 +1,24 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.cloudnet.packethandler;
 
-import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
-import eu.darkcube.system.pserver.common.packet.Packet;
-import eu.darkcube.system.pserver.common.packet.PacketHandler;
-import eu.darkcube.system.pserver.common.packet.packets.PacketNodeWrapperActionConfirm;
-import eu.darkcube.system.pserver.common.packet.packets.PacketWrapperNodeAddOwner;
+import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.pserver.common.packets.wn.PacketAddOwner;
+import eu.darkcube.system.pserver.common.packets.wn.PacketAddOwner.Response;
 
-public class HandlerAddOwner implements PacketHandler<PacketWrapperNodeAddOwner> {
+import java.util.concurrent.ExecutionException;
 
+public class HandlerAddOwner implements PacketHandler<PacketAddOwner> {
 	@Override
-	public Packet handle(PacketWrapperNodeAddOwner packet) {
-//		if (NodePServerProvider.getInstance().isPServer(packet.getId())) {
-//			NodePServer ps = NodePServerProvider.getInstance().getPServer(packet.getId());
-//			ps.addOwner(packet.getOwner());
-//			return new PacketNodeWrapperActionConfirm();
-//		}
-//		return new PacketNodeWrapperPServerNotFound(packet.getId());
-		NodePServerProvider.getInstance().addOwner(packet.getId(), packet.getOwner());
-		return new PacketNodeWrapperActionConfirm();
+	public Packet handle(PacketAddOwner packet) throws ExecutionException, InterruptedException {
+		return new Response(
+				PServerProvider.instance().pserver(packet.id()).get().addOwner(packet.owner())
+						.get());
 	}
 }

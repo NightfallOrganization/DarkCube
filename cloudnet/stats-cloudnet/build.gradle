@@ -1,5 +1,13 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+tasks.shadowJar.archiveClassifier.set('')
+tasks.jar.archiveClassifier.set('pure')
+tasks.build.dependsOn(tasks.shadowJar)
+
 dependencies {
     implementation project(':bukkit:statsapi')
-    implementation cloudnet
-    implementation "mysql:mysql-connector-java:5.1.47"
+    compileOnly libs.cloudnet
+    compileOnly "mysql:mysql-connector-java:5.1.47"
 }

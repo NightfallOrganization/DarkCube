@@ -1,0 +1,10 @@
+{
+  "runtimeModule": true,
+  "group": "eu.darkcube.system.modules",
+  "name": "ReplaySystem",
+  "version": "1.0",
+  "author": "DasBabyPixel",
+  "description": "ReplaySystem",
+  "main": "eu.darkcube.system.replay.module.ReplayModule",
+  "storesSensitiveData": true
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,11 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.gadget.listener;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.gadget.Gadget;
+import eu.darkcube.system.lobbysystem.listener.BaseListener;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
+import eu.darkcube.system.lobbysystem.user.UserWrapper;
+import eu.darkcube.system.lobbysystem.util.Border;
+import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.ReflectionUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -20,32 +24,20 @@ import org.bukkit.entity.Bat;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.entity.*;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.event.EventGadgetSelect;
-import eu.darkcube.system.lobbysystem.gadget.Gadget;
-import eu.darkcube.system.lobbysystem.listener.BaseListener;
-import eu.darkcube.system.lobbysystem.user.LobbyUser;
-import eu.darkcube.system.lobbysystem.user.UserWrapper;
-import eu.darkcube.system.lobbysystem.util.Border;
-import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.userapi.UserAPI;
+
+import java.util.*;
 
 public class ListenerHookArrow extends BaseListener {
 
+	private final Map<UUID, Collection<Bat>> bats = new HashMap<>();
 	private Collection<UUID> cooldownPlayers = new HashSet<>();
-	private Map<UUID, Collection<Bat>> bats = new HashMap<>();
 	private Map<UUID, Collection<BukkitRunnable>> pullTaskByUUID = new HashMap<>();
 
 	@EventHandler
@@ -57,8 +49,8 @@ public class ListenerHookArrow extends BaseListener {
 			LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
 			if (user.getGadget() == Gadget.HOOK_ARROW) {
 				if (this.cooldownPlayers.contains(p.getUniqueId())) {
-					p.getInventory().setItem(35,
-							Item.GADGET_HOOK_ARROW_ARROW.getItem(user.getUser()));
+					p.getInventory()
+							.setItem(35, Item.GADGET_HOOK_ARROW_ARROW.getItem(user.getUser()));
 					this.cooldownPlayers.remove(p.getUniqueId());
 					this.pullEntityToLocation(p, projectile);
 					p.playSound(p.getLocation(), Sound.MAGMACUBE_JUMP, 10.0F, 1.0F);
@@ -106,20 +98,24 @@ public class ListenerHookArrow extends BaseListener {
 					@Override
 					public void run() {
 						final Bat bat = p.getWorld().spawn(p.getEyeLocation(), Bat.class);
-						// TODO: Removed, idk what it does anymore
-						// ((CraftBat) bat).getHandle().b(true);
-						bat.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100000,
-								100000, true, false));
-						bat.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100000, 100000,
-								true, false));
-
+						Object handle = ReflectionUtils.invokeMethod(bat,
+								ReflectionUtils.getMethod(bat.getClass(), "getHandle"));
+						ReflectionUtils.invokeMethod(handle,
+								ReflectionUtils.getMethod(handle.getClass(), "b", boolean.class),
+								true);
+						bat.addPotionEffect(
+								new PotionEffect(PotionEffectType.INVISIBILITY, 100000, 100000,
+										true, false));
+						bat.addPotionEffect(
+								new PotionEffect(PotionEffectType.SLOW, 100000, 100000, true,
+										false));
 						bat.setLeashHolder(projectile);
 						if (!ListenerHookArrow.this.bats.containsKey(p.getUniqueId())) {
 							ListenerHookArrow.this.bats.put(p.getUniqueId(), new HashSet<>());
 						}
 						ListenerHookArrow.this.bats.get(p.getUniqueId()).add(bat);
 						new BukkitRunnable() {
-							Border border = Lobby.getInstance().getDataManager().getBorder();
+							final Border border = Lobby.getInstance().getDataManager().getBorder();
 
 							@Override
 							public void run() {
@@ -127,8 +123,9 @@ public class ListenerHookArrow extends BaseListener {
 										&& bat.isLeashed()) {
 									if (this.border.isOutside(projectile)) {
 										projectile.remove();
-										p.getInventory().setItem(35, Item.GADGET_HOOK_ARROW_ARROW
-												.getItem(user.getUser()));
+										p.getInventory().setItem(35,
+												Item.GADGET_HOOK_ARROW_ARROW.getItem(
+														user.getUser()));
 										p.setAllowFlight(true);
 										this.cancel();
 										return;
@@ -150,7 +147,9 @@ public class ListenerHookArrow extends BaseListener {
 								}
 								projectile.remove();
 								super.cancel();
-							};
+							}
+
+							;
 						}.runTaskTimer(Lobby.getInstance(), 1L, 1L);
 					}
 				}.runTaskLater(Lobby.getInstance(), 5);
@@ -182,32 +181,9 @@ public class ListenerHookArrow extends BaseListener {
 			e.setCancelled(true);
 	}
 
-	@EventHandler
-	public void handle(EventGadgetSelect e) {
-		LobbyUser user = e.getUser();
-		Player p = user.getUser().asPlayer();
-		Gadget g = user.getGadget();
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (p != null) {
-					if (e.getGadget() == Gadget.HOOK_ARROW) {
-						p.getInventory().setItem(35,
-								Item.GADGET_HOOK_ARROW_ARROW.getItem(user.getUser()));
-					} else {
-						if (g == Gadget.HOOK_ARROW) {
-							p.getInventory().setItem(35, new ItemStack(Material.AIR));
-						}
-					}
-				}
-			}
-		}.runTask(Lobby.getInstance());
-	}
-
 	private void pullEntityToLocation(Player p, Projectile projectile) {
 		Location location = projectile.getLocation();
-		if (this.pullTaskByUUID.get(p.getUniqueId()) == null)
-			this.pullTaskByUUID.put(p.getUniqueId(), new HashSet<>());
+		this.pullTaskByUUID.computeIfAbsent(p.getUniqueId(), k -> new HashSet<>());
 		BukkitRunnable runnable = new BukkitRunnable() {
 
 			private int count = 0;

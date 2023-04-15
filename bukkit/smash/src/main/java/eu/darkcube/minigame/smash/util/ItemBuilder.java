@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.smash.util;
 
 import java.util.ArrayList;
@@ -29,16 +28,12 @@ import com.google.gson.Gson;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 /**
- * 
- * ItemBuilder - API Class to create a {@link org.bukkit.inventory.ItemStack}
- * with just one line of Code
- * 
- * @version 1.8
- * 
+ * ItemBuilder - API Class to create a {@link org.bukkit.inventory.ItemStack} with just one line of
+ * Code
+ *
  * @author Acquized
- * 
+ * @version 1.8
  * @contributor Kev575
- * 
  */
 
 public class ItemBuilder {
@@ -105,8 +100,7 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * Initalizes the ItemBuilder with {@link org.bukkit.Material}, Amount and
-	 * Displayname
+	 * Initalizes the ItemBuilder with {@link org.bukkit.Material}, Amount and Displayname
 	 */
 
 	public ItemBuilder(Material material, int amount, String displayname) {
@@ -197,8 +191,8 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * Initalizes the ItemBuilder with a
-	 * {@link org.bukkit.configuration.file.FileConfiguration} ItemStack in Path
+	 * Initalizes the ItemBuilder with a {@link org.bukkit.configuration.file.FileConfiguration}
+	 * ItemStack in Path
 	 */
 
 	public ItemBuilder(FileConfiguration cfg, String path) {
@@ -208,10 +202,8 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Initalizes the ItemBuilder with an already existing
 	 * {@link cc.acquized.itembuilder.api.ItemBuilder}
-	 * 
 	 */
 
 	public ItemBuilder(ItemBuilder builder) {
@@ -234,7 +226,8 @@ public class ItemBuilder {
 
 		this.damage = builder.damage;
 
-		this.enchantments = new HashMap<>(builder.enchantments != null ? builder.enchantments : new HashMap<>());
+		this.enchantments = new HashMap<>(
+				builder.enchantments != null ? builder.enchantments : new HashMap<>());
 
 		this.unbreakable = builder.unbreakable;
 
@@ -247,11 +240,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the Amount of the ItemStack
-	 * 
+	 *
 	 * @param amount Amount for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setAmount(int amount) {
@@ -266,11 +257,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the {@link org.bukkit.material.MaterialData} of the ItemStack
-	 * 
+	 *
 	 * @param data MaterialData for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setData(MaterialData data) {
@@ -284,13 +273,11 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the Damage of the ItemStack
-	 * 
+	 *
 	 * @param damage Damage for the ItemStack
-	 * 
+	 *
 	 * @deprecated Use {@code ItemBuilder#durability}
-	 * 
 	 */
 
 	@Deprecated
@@ -304,11 +291,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the Durability (Damage) of the ItemStack
-	 * 
+	 *
 	 * @param damage Damage for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setDurability(short damage) {
@@ -320,11 +305,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the {@link org.bukkit.Material} of the ItemStack
-	 * 
+	 *
 	 * @param material Material for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setMaterial(Material material) {
@@ -338,11 +321,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the {@link org.bukkit.inventory.meta.ItemMeta} of the ItemStack
-	 * 
+	 *
 	 * @param meta Meta for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setMeta(ItemMeta meta) {
@@ -356,13 +337,10 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds a {@link org.bukkit.enchantments.Enchantment} to the ItemStack
-	 * 
+	 *
 	 * @param enchant Enchantment for the ItemStack
-	 * 
 	 * @param level   Level of the Enchantment
-	 * 
 	 */
 
 	public ItemBuilder addEnchant(Enchantment enchant, int level) {
@@ -376,11 +354,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds a list of {@link org.bukkit.enchantments.Enchantment} to the ItemStack
-	 * 
+	 *
 	 * @param enchantments Map containing Enchantment and Level for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder addEnchant(Map<Enchantment, Integer> enchantments) {
@@ -394,9 +370,7 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Clears all enchants of the ItemStack
-	 *
 	 */
 	public ItemBuilder clearEnchants() {
 
@@ -407,29 +381,26 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the Displayname of the ItemStack
-	 * 
+	 *
 	 * @param displayname Displayname for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setDisplayName(String displayname) {
 
 		Validate.notNull(displayname, "The Displayname is null.");
 
-		this.displayname = andSymbol ? ChatColor.translateAlternateColorCodes('&', displayname) : displayname;
+		this.displayname =
+				andSymbol ? ChatColor.translateAlternateColorCodes('&', displayname) : displayname;
 
 		return this;
 
 	}
 
 	/**
-	 * 
 	 * Adds a Line to the Lore of the ItemStack
-	 * 
+	 *
 	 * @param line Line of the Lore for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder addLore(String line) {
@@ -443,11 +414,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the Lore of the ItemStack
-	 * 
+	 *
 	 * @param lore List containing String as Lines for the ItemStack Lore
-	 * 
 	 */
 
 	public ItemBuilder setLore(List<String> lore) {
@@ -461,13 +430,11 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds one or more Lines to the Lore of the ItemStack
-	 * 
+	 *
 	 * @param lines One or more Strings for the ItemStack Lore
-	 * 
+	 *
 	 * @deprecated Use {@code ItemBuilder#lore}
-	 * 
 	 */
 
 	@Deprecated
@@ -487,11 +454,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds one or more Lines to the Lore of the ItemStack
-	 * 
+	 *
 	 * @param lines One or more Strings for the ItemStack Lore
-	 * 
 	 */
 
 	public ItemBuilder addLore(String... lines) {
@@ -513,13 +478,10 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds a String at a specified position in the Lore of the ItemStack
-	 * 
+	 *
 	 * @param line  Line of the Lore for the ItemStack
-	 * 
 	 * @param index Position in the Lore for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder setLore(String line, int index) {
@@ -533,11 +495,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds a {@link org.bukkit.inventory.ItemFlag} to the ItemStack
-	 * 
+	 *
 	 * @param flag ItemFlag for the ItemStack
-	 * 
 	 */
 
 	public ItemBuilder addFlag(ItemFlag flag) {
@@ -551,11 +511,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Adds more than one {@link org.bukkit.inventory.ItemFlag} to the ItemStack
-	 * 
+	 *
 	 * @param flags List containing all ItemFlags
-	 * 
 	 */
 
 	public ItemBuilder addFlag(List<ItemFlag> flags) {
@@ -569,11 +527,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Makes or removes the Unbreakable Flag from the ItemStack
-	 * 
+	 *
 	 * @param unbreakable If it should be unbreakable
-	 * 
 	 */
 
 	public ItemBuilder setUnbreakable(boolean unbreakable) {
@@ -597,13 +553,11 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Sets the Skin for the Skull
-	 * 
+	 *
 	 * @param user Username of the Skull
-	 * 
+	 *
 	 * @deprecated Make it yourself - This Meta destroys the already setted Metas
-	 * 
 	 */
 
 	@Deprecated
@@ -635,35 +589,25 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Toggles replacement of the '&' Characters in Strings
-	 * 
+	 *
 	 * @deprecated Use {@code ItemBuilder#toggleReplaceAndSymbol}
-	 * 
 	 */
 
 	@Deprecated
-
 	public ItemBuilder replaceAndSymbol() {
-
 		replaceAndSymbol(!andSymbol);
-
 		return this;
-
 	}
 
 	/**
-	 * 
 	 * Enables / Disables replacement of the '&' Character in Strings
-	 * 
+	 *
 	 * @param replace Determinates if it should be replaced or not
-	 * 
 	 */
 
 	public ItemBuilder replaceAndSymbol(boolean replace) {
-
 		andSymbol = replace;
-
 		return this;
 
 	}
@@ -671,27 +615,19 @@ public class ItemBuilder {
 	/** Toggles replacement of the '&' Character in Strings */
 
 	public ItemBuilder toggleReplaceAndSymbol() {
-
 		replaceAndSymbol(!andSymbol);
-
 		return this;
-
 	}
 
 	/**
-	 * 
 	 * Allows / Disallows Stack Sizes under 1 and above 64
-	 * 
+	 *
 	 * @param allow Determinates if it should be allowed or not
-	 * 
 	 */
 
 	public ItemBuilder unsafeStackSize(boolean allow) {
-
 		this.unsafeStackSize = allow;
-
 		return this;
-
 	}
 
 	/** Toggles allowment of stack sizes under 1 and above 64 */
@@ -729,11 +665,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Returns the Damage
-	 * 
+	 *
 	 * @deprecated Use {@code ItemBuilder#getDurability}
-	 * 
 	 */
 
 	@Deprecated
@@ -801,11 +735,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Returns all Lores
-	 * 
+	 *
 	 * @deprecated Use {@code ItemBuilder#getLores}
-	 * 
 	 */
 
 	@Deprecated
@@ -817,13 +749,10 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Converts the Item to a ConfigStack and writes it to path
-	 * 
+	 *
 	 * @param cfg  Configuration File to which it should be writed
-	 * 
 	 * @param path Path to which the ConfigStack should be writed
-	 * 
 	 */
 
 	public ItemBuilder toConfig(FileConfiguration cfg, String path) {
@@ -835,13 +764,10 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Converts back the ConfigStack to a ItemBuilder
-	 * 
+	 *
 	 * @param cfg  Configuration File from which it should be read
-	 * 
 	 * @param path Path from which the ConfigStack should be read
-	 * 
 	 */
 
 	public ItemBuilder fromConfig(FileConfiguration cfg, String path) {
@@ -851,15 +777,11 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Converts the Item to a ConfigStack and writes it to path
-	 * 
+	 *
 	 * @param cfg     Configuration File to which it should be writed
-	 * 
 	 * @param path    Path to which the ConfigStack should be writed
-	 * 
 	 * @param builder Which ItemBuilder should be writed
-	 * 
 	 */
 
 	public static void toConfig(FileConfiguration cfg, String path, ItemBuilder builder) {
@@ -869,11 +791,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Converts the ItemBuilder to a JsonItemBuilder
-	 * 
+	 *
 	 * @return The ItemBuilder as JSON String
-	 * 
 	 */
 
 	public String toJson() {
@@ -883,13 +803,11 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Converts the ItemBuilder to a JsonItemBuilder
-	 * 
+	 *
 	 * @param builder Which ItemBuilder should be converted
-	 * 
+	 *
 	 * @return The ItemBuilder as JSON String
-	 * 
 	 */
 
 	public static String toJson(ItemBuilder builder) {
@@ -899,11 +817,9 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Converts the JsonItemBuilder back to a ItemBuilder
-	 * 
+	 *
 	 * @param json Which JsonItemBuilder should be converted
-	 * 
 	 */
 
 	public static ItemBuilder fromJson(String json) {
@@ -913,13 +829,10 @@ public class ItemBuilder {
 	}
 
 	/**
-	 * 
 	 * Applies the currently ItemBuilder to the JSONItemBuilder
-	 * 
+	 *
 	 * @param json      Already existing JsonItemBuilder
-	 * 
 	 * @param overwrite Should the JsonItemBuilder used now
-	 * 
 	 */
 
 	public ItemBuilder applyJson(String json, boolean overwrite) {
@@ -978,7 +891,7 @@ public class ItemBuilder {
 
 		item.setDurability(damage);
 
-//		meta = meta == null ? item.getItemMeta() : meta;
+		//		meta = meta == null ? item.getItemMeta() : meta;
 		meta = item.getItemMeta();
 
 		if (data != null) {
@@ -1019,15 +932,16 @@ public class ItemBuilder {
 
 			item.setItemMeta(meta);
 
-			net.minecraft.server.v1_8_R3.ItemStack itemNMS = org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
-					.asNMSCopy(item);
-			net.minecraft.server.v1_8_R3.NBTTagCompound compound = itemNMS.hasTag() ? itemNMS.getTag()
-					: new NBTTagCompound();
+			net.minecraft.server.v1_8_R3.ItemStack itemNMS =
+					org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack.asNMSCopy(item);
+			net.minecraft.server.v1_8_R3.NBTTagCompound compound =
+					itemNMS.hasTag() ? itemNMS.getTag() : new NBTTagCompound();
 
 			compound.setInt("Unbreakable", unbreakable ? 1 : 0);
 			itemNMS.setTag(compound);
 			item.setItemMeta(
-					org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack.asBukkitCopy(itemNMS).getItemMeta());
+					org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack.asBukkitCopy(itemNMS)
+							.getItemMeta());
 
 		}
 
@@ -1056,13 +970,10 @@ public class ItemBuilder {
 		}
 
 		/**
-		 * 
 		 * Sets a NBT Tag {@code String} into the NBT Tag Compound of the Item
-		 * 
+		 *
 		 * @param key   The Name on which the NBT Tag should be saved
-		 * 
 		 * @param value The Value that should be saved
-		 * 
 		 */
 
 		public Unsafe setString(String key, String value) {
@@ -1082,13 +993,10 @@ public class ItemBuilder {
 		}
 
 		/**
-		 * 
 		 * Sets a NBT Tag {@code Integer} into the NBT Tag Compound of the Item
-		 * 
+		 *
 		 * @param key   The Name on which the NBT Tag should be savbed
-		 * 
 		 * @param value The Value that should be saved
-		 * 
 		 */
 
 		public Unsafe setInt(String key, int value) {
@@ -1108,13 +1016,10 @@ public class ItemBuilder {
 		}
 
 		/**
-		 * 
 		 * Sets a NBT Tag {@code Double} into the NBT Tag Compound of the Item
-		 * 
+		 *
 		 * @param key   The Name on which the NBT Tag should be savbed
-		 * 
 		 * @param value The Value that should be saved
-		 * 
 		 */
 
 		public Unsafe setDouble(String key, double value) {
@@ -1134,13 +1039,10 @@ public class ItemBuilder {
 		}
 
 		/**
-		 * 
 		 * Sets a NBT Tag {@code Boolean} into the NBT Tag Compound of the Item
-		 * 
+		 *
 		 * @param key   The Name on which the NBT Tag should be savbed
-		 * 
 		 * @param value The Value that should be saved
-		 * 
 		 */
 
 		public Unsafe setBoolean(String key, boolean value) {
@@ -1176,8 +1078,8 @@ public class ItemBuilder {
 		}
 
 		/**
-		 * This Class contains highly sensitive NMS Code that should not be touched
-		 * unless you want to break the ItemBuilder
+		 * This Class contains highly sensitive NMS Code that should not be touched unless you want
+		 * to break the ItemBuilder
 		 */
 
 		public class ReflectionUtils {
@@ -1339,7 +1241,8 @@ public class ItemBuilder {
 
 			}
 
-			public NBTTagCompound getNBTTagCompound(net.minecraft.server.v1_8_R3.ItemStack nmsStack) {
+			public NBTTagCompound getNBTTagCompound(
+					net.minecraft.server.v1_8_R3.ItemStack nmsStack) {
 
 				return nmsStack.getTag();
 

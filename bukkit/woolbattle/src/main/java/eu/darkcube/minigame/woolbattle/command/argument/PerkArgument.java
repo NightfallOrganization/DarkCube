@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.perk.PerkType;
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
 import eu.darkcube.system.commandapi.v3.Messages;
@@ -25,72 +25,83 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class PerkArgument implements ArgumentType<PerkTypeSelector> {
+public class PerkArgument implements ArgumentType<PerkSelector> {
 	private static final DynamicCommandExceptionType INVALID_ENUM =
 			Messages.INVALID_ENUM.newDynamicCommandExceptionType();
-	private final Supplier<PerkType[]> values;
-	private final Function<PerkType, String[]> toStringFunction;
-	private final Function<String, PerkType> fromStringFunction;
+	private final Supplier<Perk[]> values;
+	private final Function<Perk, String[]> toStringFunction;
+	private final Function<String, Perk> fromStringFunction;
+	private final Predicate<Perk> filter;
+	private final boolean single;
 
-	private PerkArgument(Supplier<PerkType[]> teams, Predicate<PerkType> filter,
-			Function<PerkType, String[]> toStringFunction,
-			Function<String, PerkType> fromStringFunction, boolean single) {
-		this.values = teams == null ? () -> PerkType.values() : teams;
+	private PerkArgument(Supplier<Perk[]> perks, Predicate<Perk> filter,
+			Function<Perk, String[]> toStringFunction, Function<String, Perk> fromStringFunction,
+			boolean single) {
+		this.filter = filter == null ? p -> true : filter;
+		this.single = single;
+		this.values = perks == null ? () -> WoolBattle.instance().perkRegistry().perks().values()
+				.toArray(new Perk[0]) : perks;
 		this.toStringFunction =
 				toStringFunction == null ? defaultToStringFunction() : toStringFunction;
 		this.fromStringFunction =
 				fromStringFunction == null ? defaultFromStringFunction() : fromStringFunction;
 	}
 
-	public static PerkArgument perkArgument() {
+	public static PerkArgument singlePerkArgument() {
 		return new PerkArgument(null, null, null, null, true);
 	}
 
-	public static PerkArgument perkArgument(Predicate<PerkType> filter) {
+	public static PerkArgument singlePerkArgument(Predicate<Perk> filter) {
 		return new PerkArgument(null, filter, null, null, true);
 	}
 
-	public static Collection<PerkType> getPerkTypes(CommandContext<CommandSource> context,
+	public static PerkArgument perkArgument() {
+		return new PerkArgument(null, null, null, null, false);
+	}
+
+	public static PerkArgument perkArgument(Predicate<Perk> filter) {
+		return new PerkArgument(null, filter, null, null, false);
+	}
+
+	public static Collection<Perk> getPerkTypes(CommandContext<CommandSource> context,
 			String name) {
-		return context.getArgument(name, PerkTypeSelector.class).select();
+		return context.getArgument(name, PerkSelector.class).select();
 	}
 
-	private PerkType[] values() {
-		return values.get();
+	public static Perk getPerk(CommandContext<CommandSource> context, String name) {
+		return context.getArgument(name, PerkSelector.class).selectOne();
 	}
 
-	public Function<PerkType, String[]> getToStringFunction() {
-		return toStringFunction;
-	}
-
-	public Function<String, PerkType> getFromStringFunction() {
-		return fromStringFunction;
+	private Perk[] values() {
+		return Arrays.stream(values.get()).filter(filter).toArray(Perk[]::new);
 	}
 
 	@Override
-	public PerkTypeSelector parse(StringReader reader) throws CommandSyntaxException {
+	public PerkSelector parse(StringReader reader) throws CommandSyntaxException {
 		int cursor = reader.getCursor();
 		reader.skipWhitespace();
 		String in = read(reader);
-		if (in.equals("*")) {
-			return new PerkTypeSelector(true, null);
-		}
-		PerkType type = fromStringFunction.apply(in);
+		if (!single)
+			if (in.equals("*")) {
+				return new PerkSelector(true, null);
+			}
+		Perk type = fromStringFunction.apply(in);
 		if (type == null) {
 			reader.setCursor(cursor);
 			throw INVALID_ENUM.createWithContext(reader, in);
 		}
-		return new PerkTypeSelector(false, type);
+		return new PerkSelector(false, type);
 	}
 
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
 			SuggestionsBuilder builder) {
 		List<String> suggestions = new ArrayList<>();
-		for (PerkType t : values()) {
+		for (Perk t : values()) {
 			suggestions.addAll(Arrays.asList(toStringFunction.apply(t)));
 		}
-		suggestions.add("*");
+		if (!single)
+			suggestions.add("*");
 		return ISuggestionProvider.suggest(suggestions, builder);
 	}
 
@@ -104,9 +115,9 @@ public class PerkArgument implements ArgumentType<PerkTypeSelector> {
 		return b.toString();
 	}
 
-	private final Function<String, PerkType> defaultFromStringFunction() {
-		final Map<String, PerkType> map = new HashMap<>();
-		for (PerkType t : values()) {
+	private Function<String, Perk> defaultFromStringFunction() {
+		final Map<String, Perk> map = new HashMap<>();
+		for (Perk t : values()) {
 			String[] arr = toStringFunction.apply(t);
 			for (String s : arr) {
 				if (map.containsKey(s)) {
@@ -119,10 +130,10 @@ public class PerkArgument implements ArgumentType<PerkTypeSelector> {
 		return map::get;
 	}
 
-	private final Function<PerkType, String[]> defaultToStringFunction() {
-		final Map<PerkType, String[]> map = new HashMap<>();
-		for (PerkType t : values()) {
-			map.put(t, new String[] {t.getPerkName().getName()});
+	private Function<Perk, String[]> defaultToStringFunction() {
+		final Map<Perk, String[]> map = new HashMap<>();
+		for (Perk t : values()) {
+			map.put(t, new String[] {t.perkName().getName()});
 		}
 		return map::get;
 	}

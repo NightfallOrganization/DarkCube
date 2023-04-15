@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package de.dytanic.cloudnet.ext.database.mysql;
 
 import java.sql.Connection;
@@ -17,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
+
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariDataSource;
 import de.dytanic.cloudnet.common.concurrent.IThrowableCallback;
@@ -203,7 +203,7 @@ public final class MySQLDatabaseProvider extends SQLDatabaseProvider {
 	// }
 	private static final long NEW_CREATION_DELAY = 600000L;
 
-	protected final HikariDataSource hikariDataSource = new HikariDataSource();
+	private final HikariDataSource hikariDataSource = new HikariDataSource();
 
 	private final JsonDocument config;
 
@@ -214,25 +214,23 @@ public final class MySQLDatabaseProvider extends SQLDatabaseProvider {
 		this.config = config;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean init() {
-		this.addresses = (List<MySQLConnectionEndpoint>) this.config.get("addresses",
-				CloudNetMySQLDatabaseModule.TYPE);
+		this.addresses = this.config.get("addresses", CloudNetMySQLDatabaseModule.TYPE);
 		MySQLConnectionEndpoint endpoint =
 				this.addresses.get((new Random()).nextInt(this.addresses.size()));
-		this.hikariDataSource.setJdbcUrl("jdbc:mysql://" + endpoint.getAddress().getHost() + ":"
-				+ endpoint.getAddress().getPort() + "/" + endpoint.getDatabase()
-				+ String.format("?useSSL=%b&trustServerCertificate=%b",
-						new Object[] {Boolean.valueOf(endpoint.isUseSsl()),
-								Boolean.valueOf(endpoint.isUseSsl())}));
+		this.hikariDataSource.setJdbcUrl(
+				"jdbc:mysql://" + endpoint.getAddress().getHost() + ":" + endpoint.getAddress()
+						.getPort() + "/" + endpoint.getDatabase() + String.format(
+						"?useSSL=%b&trustServerCertificate=%b", endpoint.isUseSsl(),
+						endpoint.isUseSsl()));
 		this.hikariDataSource.setUsername(this.config.getString("username"));
 		this.hikariDataSource.setPassword(this.config.getString("password"));
 		this.hikariDataSource.setDriverClassName("com.mysql.jdbc.Driver");
 		int maxPoolSize = this.config.getInt("connectionMaxPoolSize");
 		this.hikariDataSource.setMaximumPoolSize(maxPoolSize);
-		this.hikariDataSource
-				.setMinimumIdle(Math.min(maxPoolSize, this.config.getInt("connectionMinPoolSize")));
+		this.hikariDataSource.setMinimumIdle(
+				Math.min(maxPoolSize, this.config.getInt("connectionMinPoolSize")));
 		this.hikariDataSource.setConnectionTimeout(this.config.getInt("connectionTimeout"));
 		this.hikariDataSource.setValidationTimeout(this.config.getInt("validationTimeout"));
 		this.hikariDataSource.validate();
@@ -244,8 +242,7 @@ public final class MySQLDatabaseProvider extends SQLDatabaseProvider {
 		Preconditions.checkNotNull(name);
 		removedOutdatedEntries();
 		if (!this.cachedDatabaseInstances.contains(name))
-			this.cachedDatabaseInstances.add(name,
-					Long.valueOf(System.currentTimeMillis() + NEW_CREATION_DELAY),
+			this.cachedDatabaseInstances.add(name, System.currentTimeMillis() + NEW_CREATION_DELAY,
 					new MySQLDatabase(this, name, this.executorService));
 		return this.cachedDatabaseInstances.getSecond(name);
 	}
@@ -261,11 +258,9 @@ public final class MySQLDatabaseProvider extends SQLDatabaseProvider {
 					PreparedStatement preparedStatement =
 							connection.prepareStatement("DROP TABLE " + name);
 					try {
-						boolean bool = (preparedStatement.executeUpdate() != -1) ? true : false;
-						if (preparedStatement != null)
-							preparedStatement.close();
-						if (connection != null)
-							connection.close();
+						boolean bool = preparedStatement.executeUpdate() != -1;
+						preparedStatement.close();
+						connection.close();
 						return bool;
 					} catch (Throwable throwable) {
 						if (preparedStatement != null)

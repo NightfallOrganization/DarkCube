@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem;
 
+import com.github.unldenis.hologram.HologramPool;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
-import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
+import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
@@ -23,9 +23,9 @@ import eu.darkcube.system.lobbysystem.gadget.listener.ListenerGrapplingHook;
 import eu.darkcube.system.lobbysystem.gadget.listener.ListenerHookArrow;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaRManager;
 import eu.darkcube.system.lobbysystem.listener.*;
+import eu.darkcube.system.lobbysystem.npc.ConnectorNPC;
 import eu.darkcube.system.lobbysystem.npc.DailyRewardNPC;
 import eu.darkcube.system.lobbysystem.npc.WoolBattleNPC;
-import eu.darkcube.system.lobbysystem.pserver.PServerJoinOnStart;
 import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
@@ -53,10 +53,11 @@ public class Lobby extends Plugin {
 	private NPCPool npcPool;
 	private NPC woolbattleNpc;
 	private NPC dailyRewardNpc;
-	private PServerJoinOnStart pServerJoinOnStart;
 	private JaRManager jaRManager;
+	private HologramPool hologramPool;
 
 	public Lobby() {
+		super("LobbySystem");
 		Lobby.instance = this;
 	}
 
@@ -71,11 +72,12 @@ public class Lobby extends Plugin {
 
 	@Override
 	public void onDisable() {
-
+		Bukkit.getOnlinePlayers().stream().map(UserAPI.getInstance()::getUser)
+				.map(UserWrapper::fromUser).forEach(LobbyUser::stopJaR);
 		if (PServerSupport.isSupported()) {
 			SkullCache.unregister();
-			this.pServerJoinOnStart.unregister();
 		}
+		ConnectorNPC.clear();
 	}
 
 	@Override
@@ -83,6 +85,7 @@ public class Lobby extends Plugin {
 		this.npcPool =
 				NPCPool.builder(this).spawnDistance(50).actionDistance(45).tabListRemoveTicks(40L)
 						.build();
+		this.hologramPool = new HologramPool(this, 50, 0, 0);
 
 		UserWrapper userWrapper = new UserWrapper();
 		UserAPI.getInstance().addModifier(userWrapper);
@@ -101,7 +104,7 @@ public class Lobby extends Plugin {
 		}
 		List<String> languageEntries = new ArrayList<>();
 		languageEntries.addAll(
-				Arrays.stream(Message.values()).map(Message::getKey).collect(Collectors.toList()));
+				Arrays.stream(Message.values()).map(Message::key).collect(Collectors.toList()));
 		languageEntries.addAll(
 				Arrays.stream(Item.values()).map(i -> Message.PREFIX_ITEM + i.getKey())
 						.collect(Collectors.toList()));
@@ -138,14 +141,16 @@ public class Lobby extends Plugin {
 						ServiceTask serviceTask =
 								CloudNetDriver.getInstance().getServiceTaskProvider()
 										.getServiceTask(task);
+						assert serviceTask != null;
 						Collection<ServiceInfoSnapshot> services =
 								CloudNetDriver.getInstance().getCloudServiceProvider()
 										.getCloudServices(serviceTask.getName());
 
 						int freeServices = 0;
 						for (ServiceInfoSnapshot service : services) {
-							GameState state = GameState.fromString(
-									service.getProperty(BridgeServiceProperty.STATE).orElse(null));
+							GameState state =
+									service.getProperty(DarkCubeServiceProperty.GAME_STATE)
+											.orElse(null);
 							if (state == GameState.LOBBY || state == GameState.UNKNOWN) {
 								freeServices++;
 							}
@@ -154,6 +159,7 @@ public class Lobby extends Plugin {
 							ServiceInfoSnapshot snap =
 									CloudNetDriver.getInstance().getCloudServiceFactory()
 											.createCloudService(serviceTask);
+							assert snap != null;
 							CloudNetDriver.getInstance().getCloudServiceProvider(snap)
 									.setCloudServiceLifeCycle(ServiceLifeCycle.RUNNING);
 						}
@@ -175,6 +181,7 @@ public class Lobby extends Plugin {
 		new ListenerInteract();
 		new ListenerLobbySwitcher();
 		new ListenerWoolBattleNPC();
+		new ListenerConnectorNPC();
 		new ListenerMinigameServer();
 		new ListenerItemDropPickup();
 		new ListenerFish();
@@ -184,10 +191,6 @@ public class Lobby extends Plugin {
 		new ListenerGrapplingHook();
 		new ListenerBoostPlate();
 		new ListenerWeather();
-		if (PServerSupport.isSupported()) {
-			new ListenerPServer();
-			this.pServerJoinOnStart = new PServerJoinOnStart();
-		}
 		new ListenerPhysics();
 		new ListenerBorder();
 
@@ -201,7 +204,8 @@ public class Lobby extends Plugin {
 					return;
 				}
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					ParticleEffect.FIREWORKS_SPARK.display(20, 20, 20, 0F, 200, p.getLocation(), p);
+					ParticleEffect.FIREWORKS_SPARK.display(20, 20, 20, 0F, 200, p.getLocation(),
+							p);
 					ParticleEffect.SNOW_SHOVEL.display(20, 20, 20, 0F, 100, p.getLocation(), p);
 				}
 			}
@@ -210,6 +214,12 @@ public class Lobby extends Plugin {
 			world.setStorm(getDataManager().isWinter());
 			world.setThundering(false);
 		}
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				ConnectorNPC.load();
+			}
+		}.runTask(this);
 	}
 
 	public void savePlayer(LobbyUser user) {
@@ -225,8 +235,7 @@ public class Lobby extends Plugin {
 		DataManager dataManager = getDataManager();
 		Location spawn = dataManager.getSpawn();
 		p.setGameMode(GameMode.SURVIVAL);
-		if (!p.getAllowFlight())
-			p.setAllowFlight(true);
+		p.setAllowFlight(user.getCurrentJaR() == null);
 		p.setCompassTarget(spawn.getBlock().getLocation());
 		p.setExhaustion(0);
 		p.setSaturation(0);
@@ -238,7 +247,7 @@ public class Lobby extends Plugin {
 		p.setFoodLevel(20);
 		p.setExp(1);
 		PlayerInventory inv = p.getInventory();
-		inv.setHeldItemSlot(user.getSelectedSlot());
+		inv.setHeldItemSlot(Math.max(Math.min(user.getSelectedSlot(), 8), 0));
 
 		Location l = user.getLastPosition();
 		if (!dataManager.getBorder().isInside(l)) {
@@ -254,22 +263,23 @@ public class Lobby extends Plugin {
 		User u = user.getUser();
 		PlayerInventory inv = p.getInventory();
 		inv.clear();
-		inv.setItem(0, Item.INVENTORY_COMPASS.getItem(u));
-		inv.setItem(1, Item.INVENTORY_SETTINGS.getItem(u));
-		inv.setItem(4, Item.byGadget(user.getGadget()).getItem(u));
-		try {
-			if (PServerSupport.isSupported()) {
-				inv.setItem(6, Item.PSERVER_MAIN_ITEM.getItem(u));
+		if (user.getCurrentJaR() == null) {
+			inv.setItem(0, Item.INVENTORY_COMPASS.getItem(u));
+			inv.setItem(1, Item.INVENTORY_SETTINGS.getItem(u));
+			inv.setItem(4, Item.byGadget(user.getGadget()).getItem(u));
+			user.getGadget().fillExtraItems(user);
+			try {
+				if (PServerSupport.isSupported()) {
+					inv.setItem(6, Item.PSERVER_MAIN_ITEM.getItem(u));
+				}
+			} catch (Exception ignored) {
 			}
-		} catch (Exception ex) {
+
+			inv.setItem(7, Item.INVENTORY_GADGET.getItem(u));
+			inv.setItem(8, Item.INVENTORY_LOBBY_SWITCHER.getItem(u));
+		} else {
+			inv.setItem(8, Item.JUMPANDRUN_STOP.getItem(u));
 		}
-
-		inv.setItem(7, Item.INVENTORY_GADGET.getItem(u));
-		inv.setItem(8, Item.INVENTORY_LOBBY_SWITCHER.getItem(u));
-	}
-
-	public PServerJoinOnStart getPServerJoinOnStart() {
-		return this.pServerJoinOnStart;
 	}
 
 	public NPC getWoolBattleNPC() {
@@ -282,6 +292,10 @@ public class Lobby extends Plugin {
 
 	public DataManager getDataManager() {
 		return this.dataManager;
+	}
+
+	public HologramPool getHologramPool() {
+		return hologramPool;
 	}
 
 	public JaRManager getJaRManager() {

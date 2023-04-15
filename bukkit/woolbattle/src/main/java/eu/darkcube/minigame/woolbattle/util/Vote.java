@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.minigame.woolbattle.util;
 
 import java.math.BigInteger;
@@ -21,7 +20,7 @@ public class Vote<T> {
 		this.vote = vote;
 	}
 
-	public static final <T> T calculateWinner(Collection<Vote<T>> list, Collection<? extends T> possibles,
+	public static <T> T calculateWinner(Collection<Vote<T>> list, Collection<? extends T> possibles,
 			T defaultObject) {
 		long votes = 0;
 		T object = null;
@@ -29,19 +28,17 @@ public class Vote<T> {
 		for (T t : possibles) {
 			long nextVotes = list.stream().filter(vote -> vote.vote.equals(t)).count();
 			BigInteger nextTime = BigInteger.valueOf(0);
-			list.stream().mapToLong(vote -> vote.time).forEach(i -> nextTime.add(BigInteger.valueOf(i)));
+			list.stream().mapToLong(vote -> vote.time)
+					.forEach(i -> nextTime.add(BigInteger.valueOf(i)));
 			if (nextVotes != 0) {
 				if (nextVotes > votes) {
 					object = t;
 					votes = nextVotes;
 					time = nextTime;
-					continue;
 				} else if (nextVotes == votes) {
-					if (time.compareTo(nextTime) == 1) {
+					if (time.compareTo(nextTime) > 0) {
 						object = t;
-						votes = nextVotes;
 						time = nextTime;
-						continue;
 					}
 				}
 			}

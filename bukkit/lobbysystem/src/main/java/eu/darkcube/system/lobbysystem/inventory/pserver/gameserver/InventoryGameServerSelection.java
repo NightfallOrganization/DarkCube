@@ -1,21 +1,27 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import com.google.gson.JsonObject;
+import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceTask;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.inventory.InventoryLoading;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
+import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerConfiguration;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.pserver.common.PServerBuilder;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
+import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -23,16 +29,16 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInventory {
 
 	public static final String ITEMID = "pserver_gameserver";
-	public static final Key GAMESERVER_META_KEY =
-			new Key(Lobby.getInstance(), "pserver.gameserver");
-	public static final String SLOT = "slot";
-	public static final String SERVICETASK = "serviceTask";
+	public static final Key SLOT = new Key(Lobby.getInstance(), "pserver.gameserver.slot");
+	public static final Key SERVICETASK =
+			new Key(Lobby.getInstance(), "pserver.gameserver.serviceTask");
 	protected final int[] itemSort;
 	private final Item item;
 	private final Supplier<Collection<ServiceTask>> supplier;
@@ -60,6 +66,35 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 	}
 
 	@Override
+	protected void inventoryClick(IInventoryClickEvent event) {
+		event.setCancelled(true);
+		if (event.item() == null)
+			return;
+		String itemid = Item.getItemId(event.item());
+		if (itemid == null)
+			return;
+		if (itemid.equals(ITEMID)) {
+			user.setOpenInventory(new InventoryLoading(getTitle(), user.getUser(), lobbyUser -> {
+				ServiceTask serviceTask = CloudNetDriver.getInstance().getServiceTaskProvider()
+						.getServiceTask(event.item().persistentDataStorage()
+								.get(SERVICETASK, PersistentDataTypes.STRING));
+				if (serviceTask == null)
+					return InventoryGameServerSelection.this;
+				try {
+					PServerExecutor ps =
+							new PServerBuilder().type(Type.GAMEMODE).taskName(serviceTask.getName())
+									.accessLevel(AccessLevel.PUBLIC).create().get();
+					ps.addOwner(user.getUser().getUniqueId()).get();
+					Thread.sleep(1000);
+					return new InventoryPServerConfiguration(user.getUser(), ps.id());
+				} catch (InterruptedException | ExecutionException e) {
+					throw new RuntimeException(e);
+				}
+			}));
+		}
+	}
+
+	@Override
 	protected boolean done() {
 		return super.done() && this.done;
 	}
@@ -70,11 +105,9 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 		Collection<ServiceTask> serviceTasks = this.supplier.get();
 		for (ServiceTask serviceTask : serviceTasks) {
 			ItemBuilder b = this.toItemFunction.apply(this.auser, serviceTask);
-			JsonObject data = new JsonObject();
-			data.addProperty(InventoryGameServerSelection.SLOT, slot);
-			data.addProperty(InventoryGameServerSelection.SERVICETASK, serviceTask.getName());
-			b.persistentDataStorage().set(InventoryGameServerSelection.GAMESERVER_META_KEY,
-					PersistentDataTypes.STRING, data.toString());
+			b.persistentDataStorage()
+					.set(SERVICETASK, PersistentDataTypes.STRING, serviceTask.getName());
+			b.persistentDataStorage().set(SLOT, PersistentDataTypes.INTEGER, slot);
 			Item.setItemId(b, InventoryGameServerSelection.ITEMID);
 			items.put(this.itemSort[slot % this.itemSort.length] + this.itemSort.length * (slot
 					/ this.itemSort.length), b.build());

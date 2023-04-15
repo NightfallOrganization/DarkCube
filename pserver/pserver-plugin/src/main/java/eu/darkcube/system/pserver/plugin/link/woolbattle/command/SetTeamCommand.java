@@ -1,17 +1,16 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.user.User;
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
@@ -41,10 +40,10 @@ public class SetTeamCommand extends PServerExecutor {
 
 	private static void setTeam(CommandSource source, Collection<Player> players,
 			TeamType teamtype) {
-		Team team = WoolBattle.getInstance().getTeamManager().getTeam(teamtype);
+		Team team = WoolBattle.instance().getTeamManager().getTeam(teamtype);
 		for (Player player : players) {
-			User user = WoolBattle.getInstance().getUserWrapper().getUser(player.getUniqueId());
-			WoolBattle.getInstance().getTeamManager().setTeam(user, team);
+			WBUser user = WBUser.getUser(player);
+			WoolBattle.instance().getTeamManager().setTeam(user, team);
 		}
 		if (players.size() == 1) {
 			source.sendMessage(Message.WOOLBATTLE_SETTEAM_TEAM_SINGLE,

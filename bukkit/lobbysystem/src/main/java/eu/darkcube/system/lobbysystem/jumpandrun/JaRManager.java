@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.jumpandrun;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
+import eu.darkcube.system.lobbysystem.user.LobbyUser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JaRManager {
 
@@ -54,17 +54,21 @@ public class JaRManager {
 		return this.regions;
 	}
 
-	public JaR createJaR(Player player) {
-		return new JaR(this, player);
+	public JaR startJaR(LobbyUser user) {
+		JaR jar = new JaR(this, user);
+		if (jar.getCurrentBlock() != null)
+			user.getUser().asPlayer().teleport(jar.getCurrentBlock().getLocation().add(0.5, 1, 0.5)
+					.setDirection(jar.getCurrentDirection()));
+		return jar;
 	}
 
-	public void startJaR(Player player) {
-		JaR jar = createJaR(player);
-		Block cur = jar.getCurrentBlock();
-		if (cur == null) {
-			return;
-		}
-		player.teleport(cur.getLocation().add(0.5, 1, 0.5));
-	}
+	//	public void startJaR(Player player) {
+	//		JaR jar = createJaR(player);
+	//		Block cur = jar.getCurrentBlock();
+	//		if (cur == null) {
+	//			return;
+	//		}
+	//		player.teleport(cur.getLocation().add(0.5, 1, 0.5).setDirection(jar.getCurrentDirection()));
+	//	}
 
 }

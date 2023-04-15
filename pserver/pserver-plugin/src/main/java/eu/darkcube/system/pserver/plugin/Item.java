@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2022. [DarkCube]
+ * Copyright (c) 2022-2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.pserver.plugin;
 
 import eu.darkcube.system.BaseMessage;
@@ -29,7 +28,7 @@ public enum Item implements BaseMessage {
 
 	public static final String PREFIX = "ITEM_";
 	public static final String PREFIX_LORE = "LORE_";
-	public static final Key ITEMID_KEY = new Key(PServerPlugin.getInstance(), "itemid");
+	public static final Key ITEMID_KEY = new Key(PServerPlugin.instance(), "itemid");
 
 	private final String key;
 	private final boolean hasLore;
@@ -67,7 +66,7 @@ public enum Item implements BaseMessage {
 	}
 
 	@Override
-	public String getKey() {
+	public String key() {
 		return key;
 	}
 
@@ -85,12 +84,12 @@ public enum Item implements BaseMessage {
 		if (hasLore()) {
 			b.lore(getLore(user, loreArgs));
 		}
-		b.persistentDataStorage().set(ITEMID_KEY, PersistentDataTypes.STRING, getKey());
+		b.persistentDataStorage().set(ITEMID_KEY, PersistentDataTypes.STRING, key());
 		return b.build();
 	}
 
 	public boolean equals(ItemStack item) {
-		return hasItemId(item) && getKey().equals(getItemId(item));
+		return hasItemId(item) && key().equals(getItemId(item));
 	}
 
 	public Component getLore(User user, Object... args) {

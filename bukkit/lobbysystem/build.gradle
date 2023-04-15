@@ -1,10 +1,11 @@
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id "com.github.johnrengelman.shadow"
 }
 
 tasks {
     shadowJar {
         archiveClassifier.set("")
+        relocate('com.github.unldenis.hologram', 'eu.darkcube.system.libs.lobbysystem.com.github.unldenis.hologram')
     }
     build {
         dependsOn(shadowJar)
@@ -13,13 +14,14 @@ tasks {
 
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    compileOnly project(':bukkit:darkcubesystem')
+    compileOnly project(':darkcubesystem')
+    compileOnly project(':darkcubesystem:bukkit')
     compileOnly project(':pserver:pserver-bukkit')
     compileOnly project(':pserver:pserver-api')
     api project(':common:labymod-emotes')
+    implementation 'com.github.unldenis:Hologram-Lib:efaed21'
     compileOnly 'org.jetbrains:annotations:23.1.0'
-    compileOnly cloudnetDriver
-    compileOnly cloudnetWrapper
-    compileOnly cloudnetBridge
-    compileOnly luckperms
+//    compileOnly libs.cloudnetDriver
+    compileOnly libs.cloudnetBridge
+    compileOnly libs.luckperms
 }
