@@ -88,24 +88,22 @@ public class BerserkerPerk extends Perk {
 		public void handle(PlayerHitPlayerEvent event) {
 			for (UserPerk perk : event.attacker().perks().perks(perkName())) {
 				if (WoolBattle.instance().getIngame().attack(event.attacker(), event.target())) {
-					boolean far = event.attacker().getBukkitEntity().getLocation()
-							.distanceSquared(event.target().getBukkitEntity().getLocation())
+					boolean far = event.target().getBukkitEntity().getLocation()
+							.distanceSquared(event.attacker().getBukkitEntity().getLocation())
 							> 200 * 200;
-					double d0 = far
+					double x = far
 							? (Math.random() - Math.random())
-							: event.attacker().getBukkitEntity().getLocation().getX()
-									- event.target().getBukkitEntity().getLocation().getX();
-					double d1;
-
-					for (d1 = far
+							: event.target().getBukkitEntity().getLocation().getX()
+									- event.attacker().getBukkitEntity().getLocation().getX();
+					double z = far
 							? Math.random() - Math.random()
-							: event.attacker().getBukkitEntity().getLocation().getZ()
-									- event.target().getBukkitEntity().getLocation().getZ();
-					     d0 * d0 + d1 * d1 < 1.0E-4D;
-					     d1 = (Math.random() - Math.random()) * 0.01D) {
-						d0 = (Math.random() - Math.random()) * 0.01D;
+							: event.target().getBukkitEntity().getLocation().getZ()
+									- event.attacker().getBukkitEntity().getLocation().getZ();
+					while (x * x + z * z < 1.0E-4D) {
+						x = (Math.random() - Math.random()) * 0.01D;
+						z = (Math.random() - Math.random()) * 0.01D;
 					}
-					Vector add = new Vector(d0, 0, d1).normalize().multiply(-1);
+					Vector add = new Vector(x, 0, z).normalize();
 					int combo = event.attacker().user().getMetaDataStorage()
 							.getOr(BerserkerPerk.combo, 0) + 1;
 					if (combo > 9)
@@ -116,10 +114,16 @@ public class BerserkerPerk extends Perk {
 					double mul = Math.pow(combo, 0.4) * kb * 1.7;
 					add.multiply(mul);
 					add.multiply(.7);
+					if (add.getX() >= 4) {
+						add = add.multiply(3.98 / add.getX());
+					}
+					if (add.getZ() >= 4) {
+						add = add.multiply(3.98 / add.getZ());
+					}
 					add.setY(0.40001);
 
-					event.target().getBukkitEntity().setVelocity(add);
 					event.target().getBukkitEntity().damage(0);
+					event.target().getBukkitEntity().setVelocity(add);
 					event.setCancelled(true);
 					perk.currentPerkItem().setItem();
 				}

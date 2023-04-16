@@ -41,8 +41,10 @@ public class DrawArrowPerk extends Perk {
 					event.shooter().addWool(removed);
 					return;
 				}
-				event.shooter().getBukkitEntity()
-						.teleport(event.target().getBukkitEntity(), TeleportCause.PLUGIN);
+				event.shooter().getBukkitEntity().teleport(
+						event.target().getBukkitEntity().getLocation().setDirection(
+								event.shooter().getBukkitEntity().getLocation().getDirection()),
+						TeleportCause.PLUGIN);
 			}
 		}
 

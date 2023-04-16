@@ -7,6 +7,7 @@
 package eu.darkcube.minigame.woolbattle.perk;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -70,7 +71,9 @@ public class PerkItem {
 	}
 
 	protected int itemAmount() {
-		return (perk.cooldown() + 19) / 20;
+		return perk.perk().cooldown().unit() == Unit.TICKS
+				? (perk.cooldown() + 19) / 20
+				: perk.cooldown();
 	}
 
 	private void updateInventory(int slot, ItemStack item) {
