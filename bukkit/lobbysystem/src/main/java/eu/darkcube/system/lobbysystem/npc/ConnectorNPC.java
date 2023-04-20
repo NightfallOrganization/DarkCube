@@ -396,7 +396,7 @@ public class ConnectorNPC {
 		private void query() {
 			Collection<ServiceInfoSnapshot> servers =
 					services.stream().filter(s -> s.getServiceId().getTaskName().equals(taskName))
-							.collect(Collectors.toList());
+							.collect(Collectors.toSet());
 			Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
 			for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
 				try {
@@ -418,9 +418,10 @@ public class ConnectorNPC {
 						server.getProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS).orElse(-1);
 
 				GameState state = states.get(server);
-				String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
+				String motd =
+						server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
 				if (motd == null || motd.toLowerCase().contains("loading") || (
-						state != GameState.LOBBY && !server.getProperty(
+						state != GameState.INGAME && server.getProperty(
 								DarkCubeServiceProperty.AUTOCONFIGURED).orElse(false))) {
 					servers.remove(server);
 					states.remove(server);

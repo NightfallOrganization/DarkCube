@@ -6,6 +6,8 @@
  */
 package eu.darkcube.minigame.woolbattle.game;
 
+import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
+import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserDeath;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserKill;
@@ -31,6 +33,7 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.Key;
 import org.bukkit.*;
@@ -182,6 +185,17 @@ public class Ingame extends GamePhase {
 	public void onEnable() {
 		this.startingIngame = true;
 		CloudNetLink.update();
+
+		if (!PServerProvider.instance().isPServer()) {
+			String taskName = Wrapper.getInstance().getServiceId().getTaskName();
+			Wrapper.getInstance().getServiceTaskProvider().getServiceTaskAsync(taskName).onComplete(
+					task -> Wrapper.getInstance().getCloudServiceFactory()
+							.createCloudServiceAsync(task).onComplete(
+									snap -> Wrapper.getInstance().getCloudServiceProvider(snap)
+											.setCloudServiceLifeCycleAsync(
+													ServiceLifeCycle.RUNNING)));
+		}
+
 		this.splitPlayersToTeams();
 		int lifes = -1;
 		if (!WoolBattle.instance().getLobby().VOTES_LIFES.isEmpty()) {
