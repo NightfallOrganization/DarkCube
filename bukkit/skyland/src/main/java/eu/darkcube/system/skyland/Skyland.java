@@ -9,6 +9,7 @@ package eu.darkcube.system.skyland;
 
 import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
+import eu.darkcube.system.skyland.inventoryUI.AllInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,13 +49,14 @@ public class Skyland extends JavaPlugin {
 
 		SkylandListener damageListener = new SkylandListener(this);
 		Bukkit.getPluginManager().registerEvents(damageListener, instance);
+		Bukkit.getPluginManager().registerEvents(AllInventory.getInstance(), instance);
 
 		instance.getCommand("gm").setExecutor(new GM());
 		instance.getCommand("heal").setExecutor(new Heal());
 		instance.getCommand("day").setExecutor(new Day());
 		instance.getCommand("night").setExecutor(new Night());
 		instance.getCommand("fly").setExecutor(new Fly());
-		instance.getCommand("feed").setExecutor(new Feed());
+		instance.getCommand("test").setExecutor(new Feed());
 		instance.getCommand("max").setExecutor(new Max());
 		instance.getCommand("god").setExecutor(new God());
 		instance.getCommand("trash").setExecutor(new Trash());
@@ -73,8 +75,10 @@ public class Skyland extends JavaPlugin {
 
 	public SkylandPlayer getSkylandPlayers(Player player) {
 		for (SkylandPlayer sp : players){
-			if (player.equals(sp.getPlayer())){
-				return sp;
+			if (sp != null) {
+				if (player.equals(sp.getPlayer())){
+					return sp;
+				}
 			}
 		}
 		System.out.println("No SkylandPlayer found for player " + player.getName());
@@ -83,5 +87,8 @@ public class Skyland extends JavaPlugin {
 
 	public void addSkylandPlayer(SkylandPlayer p){
 		players.add(p);
+		if (p == null) {
+			System.out.println("p was null!");
+		}
 	}
 }

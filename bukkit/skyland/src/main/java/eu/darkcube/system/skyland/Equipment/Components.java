@@ -25,6 +25,9 @@ public class Components {
 	}
 
 	public PlayerStats[] getPStats() {
+		return PlayerStats.mergePstats(materialType.getStats(), compType.getStats());
+
+		/*
 		HashMap<PlayerStatsType, Integer> out = new HashMap<>();
 		for (PlayerStats p : materialType.getStats()) {
 			if (out.containsKey(p.getType())) {
@@ -48,6 +51,10 @@ public class Components {
 			i.getAndIncrement();
 		});
 		return fout;
+
+		 */
+
+
 	}
 
 	@Override

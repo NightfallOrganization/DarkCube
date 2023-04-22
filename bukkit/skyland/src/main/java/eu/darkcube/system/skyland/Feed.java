@@ -7,26 +7,45 @@
 
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.skyland.Listener.SkylandListener;
+import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.skyland.inventoryUI.InventoryUI;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import eu.darkcube.system.skyland.inventoryUI.UIitemStack;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.command.Command;
+
+import java.util.Objects;
 
 public class Feed implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (args.length >= 2){
+
             //todo test cmd
-
-            InventoryUI inventoryUI = new InventoryUI();
-            inventoryUI.openInv((Player) sender, 18);
-
+        if (args.length > 0){
+            Player p = (Player) sender;
+            if (Objects.equals(args[0], "0")){
+                UINewClassSelect cs = new UINewClassSelect(p);
+                cs.openInv();
+            }else if(args[0].equals("data")){
+                p.sendMessage(Skyland.getInstance().getSkylandPlayers(p).toString());
+            }else if(args[0].equals("clear")){
+                p.getPersistentDataContainer().remove(new NamespacedKey(Skyland.getInstance(), "SkylandPlayer"));
+            }
+        }else {
+            InventoryUI inventoryUI = new InventoryUI(6, "\uEff1", (Player) sender);
+            inventoryUI.setInvSlot(new UIitemStack(true, new ItemStack(Material.DIAMOND_SWORD)), 0, 5);
+            inventoryUI.openInv();
         }
+
+
+
+
 
 
         if (!(sender instanceof Player)) {
@@ -34,7 +53,7 @@ public class Feed implements CommandExecutor {
             return false;
         }
 
-
+        /*
         if(!command.getName().equalsIgnoreCase("feed") || (args.length > 1)) {
 
             sender.sendMessage("§7Unbekannter Befehl. Nutze §b/feed (Person) 1§7, um dich oder andere zu füttern");
@@ -63,6 +82,9 @@ public class Feed implements CommandExecutor {
 
         sender.sendMessage("§7Unbekannter Befehl. Nutze §b/feed (Person) 1§7, um dich oder andere zu füttern");
         return false;
+
+             */
+        return true;
     }
 
 

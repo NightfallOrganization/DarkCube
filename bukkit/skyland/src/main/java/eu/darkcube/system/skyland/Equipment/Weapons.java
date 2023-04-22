@@ -36,6 +36,7 @@ public class Weapons extends Equipments implements Weapon {
 		//itemStack.getItemMeta().getPersistentDataContainer().set(namespacedKey,
 		// PersistentDataType.STRING, "test");
 
+
 		if (itemStack.getItemMeta().getPersistentDataContainer()
 				.has(namespacedKey, PersistentDataType.STRING)) {
 			System.out.println("Key found");

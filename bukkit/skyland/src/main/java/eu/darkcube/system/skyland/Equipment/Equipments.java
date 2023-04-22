@@ -39,7 +39,6 @@ public class Equipments implements Equipment {
 		meta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING,
 				toString());
 		model.setItemMeta(meta);
-		//todo color weapon stack
 		model.getItemMeta()
 				.setDisplayName(rarity.getPrefix() + model.getItemMeta().getDisplayName());
 		setModelLore();
@@ -170,6 +169,7 @@ public class Equipments implements Equipment {
 
 	@Override
 	public PlayerStats[] getStats() {
+
 
 		HashMap<PlayerStatsType, Integer> temp = new HashMap<>();
 

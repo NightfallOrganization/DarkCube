@@ -7,29 +7,76 @@
 package eu.darkcube.system.skyland.inventoryUI;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
 
 public class InventoryUI {
 
 	UIitemStack[][] inv;
 	String name;
+	Player p;
 
-	public InventoryUI() {
+	Inventory inventory;
+	public InventoryUI(int row, String name, Player p) {
+		inv = new UIitemStack[row][9];
+		this.name = name;
+		for (int i = 0; i<inv.length; i++) {
+			for (int j = 0; j<inv[i].length; j++){
+				inv[i][j] = new UIitemStack(false, new ItemStack(Material.AIR));
+			}
+		}
+		this.p = p;
+		inventory = Bukkit.createInventory(p, inv.length * 9, name);
+
+		AllInventory.getInstance().getAllCustomInvs().add(this);
 
 	}
 
-	public void openInv(Player p, int size) {
-		//Inventory inventory = Bukkit.createInventory(p, inv.length*inv[0].length, name);
-		Inventory inventory = Bukkit.createInventory(p, size, "name");
+	public void openInv() {
+		p.openInventory(inventory);
+	}
 
-		for (UIitemStack[] row : inv) {
-			for (UIitemStack uiis : row) {
-				inventory.addItem(uiis.getItemStack());
+	public void setInvSlot(UIitemStack us, int x, int y){
+		if (x < inv.length){
+			if (y < 9){
+				inv[x][y] = us;
+				inventory.setItem(x*9+y, us.getItemStack());
+			}else {
+				System.out.println("y out of bounds at setInvSlot() in UIinventory");
 			}
+		}else {
+			System.out.println("x out of bounds at setInvSlot() in UIinventory");
 		}
 
-		p.openInventory(inventory);
+
+	}
+	public void setInvSlot(UIitemStack us, int slot){
+		setInvSlot(us, slot/9, slot%9);
+	}
+
+	public void invClickEvent(InventoryClickEvent e){
+
+		e.setCancelled(inv[e.getSlot()/9][e.getSlot()%9].isUnmoveble());
+
+	}
+
+	public void invDragEvent(InventoryDragEvent e){
+		//todo
+	}
+
+	public void invCloseEvent(InventoryCloseEvent e){
+		AllInventory.getInstance().removeInv(inventory);
+	}
+
+	public Inventory getInventory() {
+		return inventory;
 	}
 
 }

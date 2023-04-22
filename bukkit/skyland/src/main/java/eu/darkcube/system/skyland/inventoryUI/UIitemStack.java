@@ -9,10 +9,19 @@ package eu.darkcube.system.skyland.inventoryUI;
 import org.bukkit.inventory.ItemStack;
 
 public class UIitemStack {
-	boolean canMove;
+	boolean isUnmoveble;
 	ItemStack itemStack;
+
+	public UIitemStack(boolean isUnmoveble, ItemStack itemStack) {
+		this.isUnmoveble = isUnmoveble;
+		this.itemStack = itemStack;
+	}
 
 	public ItemStack getItemStack() {
 		return itemStack;
+	}
+
+	public boolean isUnmoveble() {
+		return isUnmoveble;
 	}
 }

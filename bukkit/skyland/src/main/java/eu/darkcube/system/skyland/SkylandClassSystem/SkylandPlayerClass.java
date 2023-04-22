@@ -9,16 +9,17 @@ package eu.darkcube.system.skyland.SkylandClassSystem;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class SkylandPlayerClass {
 
 	SkylandPlayer skylandPlayer;
 	SkylandClassTemplate sClass;
 	int lvl;
-	LinkedList<PlayerStats> baseStats;
+	List<PlayerStats> baseStats;
 
 	public SkylandPlayerClass(SkylandPlayer skylandPlayer, SkylandClassTemplate sClass, int lvl,
-			LinkedList<PlayerStats> baseStats) {
+			List<PlayerStats> baseStats) {
 		this.skylandPlayer = skylandPlayer;
 		this.sClass = sClass;
 		this.lvl = lvl;
@@ -42,7 +43,7 @@ public class SkylandPlayerClass {
 		return out;
 	}
 
-	public SkylandPlayerClass parseString(String s, SkylandPlayer sp) {
+	public static SkylandPlayerClass parseString(String s, SkylandPlayer sp) {
 
 		SkylandClassTemplate template;
 		LinkedList<PlayerStats> pStat = new LinkedList<>();

@@ -6,6 +6,12 @@
  */
 package eu.darkcube.system.skyland.Equipment;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class PlayerStats {
 
 	PlayerStatsType type;
@@ -42,5 +48,59 @@ public class PlayerStats {
 	public String toString() {
 
 		return type + "``" + menge;
+	}
+
+	public static int getStatSum(PlayerStats[] ps,PlayerStatsType pst){
+		int out = 0;
+		for(PlayerStats playerStats : ps){
+			if (playerStats.getType().equals(pst)){
+				out+= playerStats.getMenge();
+			}
+		}
+		return out;
+	}
+
+	public static PlayerStats[] mergePstats(List<PlayerStats> ps) {
+		HashMap<PlayerStatsType, Integer> out = new HashMap<>();
+		for (PlayerStats p : ps) {
+			if (out.containsKey(p.getType())) {
+				out.put(p.getType(), out.get(p.getType()) + p.getMenge());
+			} else {
+				out.put(p.getType(), p.getMenge());
+			}
+		}
+
+		PlayerStats[] fout = new PlayerStats[out.keySet().size()];
+		AtomicInteger i = new AtomicInteger();
+		out.forEach((playerStatsType, integer) -> {
+			fout[i.get()] = new PlayerStats(playerStatsType, integer);
+			i.getAndIncrement();
+		});
+		return fout;
+	}
+
+	public static PlayerStats[] mergePstats(PlayerStats[] s, PlayerStats[] t) {
+
+		ArrayList<PlayerStats> ps = new ArrayList<>();
+
+		ps.addAll(List.of(s));
+		ps.addAll(List.of(t));
+
+		HashMap<PlayerStatsType, Integer> out = new HashMap<>();
+		for (PlayerStats p : ps) {
+			if (out.containsKey(p.getType())) {
+				out.put(p.getType(), out.get(p.getType()) + p.getMenge());
+			} else {
+				out.put(p.getType(), p.getMenge());
+			}
+		}
+
+		PlayerStats[] fout = new PlayerStats[out.keySet().size()];
+		AtomicInteger i = new AtomicInteger();
+		out.forEach((playerStatsType, integer) -> {
+			fout[i.get()] = new PlayerStats(playerStatsType, integer);
+			i.getAndIncrement();
+		});
+		return fout;
 	}
 }

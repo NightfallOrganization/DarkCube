@@ -12,34 +12,42 @@ import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandClassTemplate;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandEntity;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
+import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
+import eu.darkcube.system.userapi.UserAPI;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 
 public class SkylandListener implements Listener {
 
 	Skyland skyland;
+	NamespacedKey skylandPlayer = new NamespacedKey(Skyland.getInstance(), "SkylandPlayer");
 
 	public SkylandListener(Skyland skyland) {
 		this.skyland = skyland;
 	}
 
-	public int calculateDmgAfterDefense(SkylandEntity e1, SkylandEntity e2) {
 
-		PlayerStats[] e1Stats = e1.getStats();
-		PlayerStats[] e2Stats = e2.getStats();
 
-		int dmgE1 = 0;
-		//int dmgE2 = 0;
+	public int calculateDmgAfterDefense(SkylandEntity attacker, SkylandEntity defender) {
 
-		//int armorE1 = 0;
+		PlayerStats[] e1Stats = attacker.getStats();
+		PlayerStats[] e2Stats = defender.getStats();
+
+		int dmgE1 = attacker.getAttackDmg();
+
 		int armorE2 = 0;
 
 		for (PlayerStats ps : e2Stats) {
@@ -47,9 +55,6 @@ public class SkylandListener implements Listener {
 				armorE2 += ps.getMenge();
 			}
 		}
-
-		dmgE1 = e1.getAttackDmg();
-		//todo get the dmg val
 
 		return dmgE1 / (1 + (armorE2 / 100));
 	}
@@ -91,41 +96,49 @@ public class SkylandListener implements Listener {
 			//e.getPlayer().sendMessage(e.getPlayer().getMetadata("spawnProt").get(1).asString());
 		}
 
-		if (e.getPlayer().getMetadata("skylandPlayer").isEmpty()) {
-			e.getPlayer().sendMessage("Welcome to Skyland!");
-			e.getPlayer().sendMessage("Please choose a Class.");
-
-			int i = 1;
-			for (SkylandClassTemplate sct : SkylandClassTemplate.values()) {
-				e.getPlayer().sendMessage(i + ": " + sct.toString());
-			}
-			e.getPlayer().setMetadata("selectingClass",
-					new FixedMetadataValue(Skyland.getInstance(), true));
+		if (e.getPlayer().getPersistentDataContainer().has(skylandPlayer)) {
+			e.getPlayer().sendMessage("Welcome back to Skyland!");
+			e.getPlayer().sendMessage("loaded: " + e.getPlayer().getPersistentDataContainer().get(skylandPlayer, PersistentDataType.STRING));//todo rem
+			SkylandPlayer skp = SkylandPlayer.parseFromString(
+					e.getPlayer().getPersistentDataContainer().get(skylandPlayer, PersistentDataType.STRING), e.getPlayer());
+			Skyland.getInstance().addSkylandPlayer(skp);
+			System.out.println("curr" + skp.toString());//todo rem
 
 			//todo make player select a class
 		} else {
-			e.getPlayer().sendMessage("Welcome back to Skyland!");
-			Skyland.getInstance().addSkylandPlayer(SkylandPlayer.parseFromString(
-					e.getPlayer().getMetadata("skylandPlayer").get(0).asString()));
+			e.getPlayer().sendMessage("Welcome to Skyland!");
+			SkylandPlayer skp = new SkylandPlayer(e.getPlayer());
+			e.getPlayer().getPersistentDataContainer().set(skylandPlayer, PersistentDataType.STRING, skp.toString());
+			Skyland.getInstance().addSkylandPlayer(skp);
+			e.getPlayer().sendMessage("Please choose a Class.");//todo either per command or per npc or both
+			UINewClassSelect ncls = new UINewClassSelect(e.getPlayer());
+			ncls.openInv();
 
 		}
 	}
 
 	@EventHandler
-	public void onMessageSend(PlayerChatEvent e) {
+	public void onPlayerLeave(PlayerQuitEvent e){
+		e.getPlayer().getPersistentDataContainer().remove(skylandPlayer);
+		e.getPlayer().getPersistentDataContainer().set(skylandPlayer, PersistentDataType.STRING, Skyland.getInstance().getSkylandPlayers(e.getPlayer()).toString());
+	}
+
+	@EventHandler
+	public void onMessageSend(AsyncChatEvent e) {
+
+		/*
 		List<MetadataValue> mv = e.getPlayer().getMetadata("selectingClass");
 		if (!mv.isEmpty()) {
 			if (mv.get(0).asBoolean()) {
 				int nr;
 				try {
-					nr = Integer.parseInt(e.getMessage());
+					nr = Integer.parseInt(e.message().toString());
 					nr--;
 					if (SkylandClassTemplate.values().length > nr) {
 						e.getPlayer().sendMessage(
 								"you selected: " + SkylandClassTemplate.values()[nr].toString());
 						e.getPlayer().setMetadata("selectingClass",
 								new FixedMetadataValue(Skyland.getInstance(), false));
-						//todo initialize the skylandplayerclass and save it ot the meta data
 					} else {
 						e.getPlayer().sendMessage("invalid choice");
 					}
@@ -135,6 +148,17 @@ public class SkylandListener implements Listener {
 
 			}
 		}
+
+		 */
 	}
+
+	public void onDuraDmg(PlayerItemDamageEvent e){
+
+		e.setCancelled(true);
+
+		//todo change the dura of stuff
+	}
+
+
 
 }
