@@ -7,68 +7,38 @@
 package eu.darkcube.system.skyland.SkylandClassSystem;
 
 import eu.darkcube.system.skyland.Equipment.*;
+import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.skyland.staticval.Globals;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SkylandPlayer implements SkylandEntity {
 
+	private static final Key MONEY_KEY = new Key(Skyland.getInstance(), "money");
 	private final User user;
 	private final ArrayList<SkylandPlayerClass> skylandPlayerClasses = new ArrayList<>();
 	private SkylandPlayerClass activeClass;
-	private int money = 0;
 	//todo
 
 	public SkylandPlayer(User user) {
 		this.user = user;
+		user.getPersistentDataStorage().setIfNotPresent(MONEY_KEY, PersistentDataTypes.BIGINTEGER, BigInteger.ZERO);
 	}
 
-	public static SkylandPlayer parseFromString(String s, Player p) {
-		SkylandPlayer out = new SkylandPlayer(p);
 
-		String[] in = s.split("-");
-		out.setMoney(Integer.parseInt(in[1]));
-		System.out.println("money " + out.getMoney());//todo
-		for (int i = 4; i < in.length; i++) {
-			out.getSkylandPlayerClasses().add(SkylandPlayerClass.parseString(in[i], out));
-		}
-
-		if (Integer.parseInt(in[3]) >= 0) {
-			out.setActiveClass(out.getSkylandPlayerClasses().get(Integer.parseInt(in[3])));
-		}
-
-		return out;
-	}
-
-	@Override
-	public String toString() {
-
-		String out = "money: -" + money + "- " + "active class: ";
-		for (int i = 0; i < skylandPlayerClasses.size(); i++) {
-			if (skylandPlayerClasses.get(i).equals(activeClass)) {
-				out += "-" + i + "-";
-				break;
-			}
-		}
-
-		if (skylandPlayerClasses.size() == 0) {
-			out += "-" + -1 + "-";
-		}
-
-		for (SkylandPlayerClass skylandPlayerClass : skylandPlayerClasses) {
-			out += skylandPlayerClass.toString() + "-";
-		}
-		System.out.println("toString out: " + out);
-		return out;
-	}
 
 	public List<Equipment> getEquipment() {
 		ArrayList<Equipment> out = new ArrayList<>();
-		for (ItemStack i : player.getEquipment().getArmorContents()) {
+		for (ItemStack i : getPlayer().getEquipment().getArmorContents()) {
 			Equipments equipments = Equipments.loadFromItem(i);
 			if (equipments != null) {
 				if (activeClass.getsClass().allowedEquip.contains(equipments.getEquipmentType())) {
@@ -78,19 +48,20 @@ public class SkylandPlayer implements SkylandEntity {
 			}
 		}
 
-		Equipments equipments = Equipments.loadFromItem(player.getInventory().getItemInMainHand());
+		Equipments equipments = Equipments.loadFromItem(getPlayer().getInventory().getItemInMainHand());
 		if (equipments != null) {
 			if (activeClass.getsClass().allowedEquip.contains(equipments.getEquipmentType())) {
 				out.add(equipments);
 			}
 		}
+
 		//todo get from inv need duckness for additional slot
 		return out;
 	}
 
 	public Weapon getActiveWeapon() {
 		//returns null if there isnt a weapon in the main hand
-		Weapons equipments = Weapons.loadFromItem(player.getInventory().getItemInMainHand());
+		Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
 		if (equipments != null) {
 			if (activeClass.getsClass().allowedEquip.contains(equipments.getEquipmentType())) {
 				return equipments;
@@ -143,11 +114,11 @@ public class SkylandPlayer implements SkylandEntity {
 		this.activeClass = activeClass;
 	}
 
-	public int getMoney() {
-		return money;
+	public BigInteger getMoney() {
+		return user.getPersistentDataStorage().get(MONEY_KEY, PersistentDataTypes.BIGINTEGER);
 	}
 
-	public void setMoney(int money) {
-		this.money = money;
+	public void setMoney(BigInteger money) {
+		user.getPersistentDataStorage().set(MONEY_KEY, PersistentDataTypes.BIGINTEGER, money);
 	}
 }

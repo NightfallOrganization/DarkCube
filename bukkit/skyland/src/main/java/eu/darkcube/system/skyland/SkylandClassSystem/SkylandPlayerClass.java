@@ -6,7 +6,9 @@
  */
 package eu.darkcube.system.skyland.SkylandClassSystem;
 
+import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
+import eu.darkcube.system.util.data.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,25 @@ public class
 
 SkylandPlayerClass {
 
+	public static final PersistentDataType<SkylandPlayerClass> TYPE = new PersistentDataType<SkylandPlayerClass>() {
+		@Override
+		public SkylandPlayerClass deserialize(
+				de.dytanic.cloudnet.common.document.gson.JsonDocument doc, String key) {
+			return null;
+		}
+
+		@Override
+		public void serialize(de.dytanic.cloudnet.common.document.gson.JsonDocument doc,
+				String key,
+				SkylandPlayerClass data) {
+
+		}
+
+		@Override
+		public SkylandPlayerClass clone(SkylandPlayerClass object) {
+			return null;
+		}
+	}
 	SkylandClassTemplate sClass;
 	int lvl;
 	List<PlayerStats> baseStats;
@@ -25,40 +46,9 @@ SkylandPlayerClass {
 		this.baseStats = baseStats;
 	}
 
-	public static SkylandPlayerClass parseString(String s, SkylandPlayer sp) {
-
-		SkylandClassTemplate template;
-		ArrayList<PlayerStats> pStat = new ArrayList<>();
-		int lvl;
-
-		String[] temp = s.split("´´´´");
-		template = SkylandClassTemplate.valueOf(temp[0]);
-		for (String str : temp[1].split("´´")) {
-			pStat.add(PlayerStats.parseString(str));
-		}
-		lvl = Integer.parseInt(temp[2]);
-
-		return new SkylandPlayerClass(template, lvl, pStat);
-	}
-
-	@Override
-	public String toString() {
-
-		String out = sClass.toString() + "´´´´";
-
-		for (PlayerStats ps : baseStats) {
-
-			out = out + "´´";
-
-		}
-		out = out.substring(0, out.length() - 3);
-		out = out + "´´´´";
-		out = out + lvl;
-
-		return out;
-	}
-
 	public SkylandClassTemplate getsClass() {
 		return sClass;
 	}
+
+
 }

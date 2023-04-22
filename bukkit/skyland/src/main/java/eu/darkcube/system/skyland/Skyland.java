@@ -68,15 +68,4 @@ public class Skyland extends DarkCubePlugin {
 
 	}
 
-	public SkylandPlayer getSkylandPlayers(Player player) {
-		for (SkylandPlayer sp : players) {
-			if (sp != null) {
-				if (player.equals(sp.getPlayer())) {
-					return sp;
-				}
-			}
-		}
-		System.out.println("No SkylandPlayer found for player " + player.getName());
-		return null;
-	}
 }
