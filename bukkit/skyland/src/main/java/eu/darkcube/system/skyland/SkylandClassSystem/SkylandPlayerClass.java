@@ -9,7 +9,6 @@ package eu.darkcube.system.skyland.SkylandClassSystem;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class
@@ -20,11 +19,26 @@ SkylandPlayerClass {
 	int lvl;
 	List<PlayerStats> baseStats;
 
-	public SkylandPlayerClass(SkylandPlayer skylandPlayer, SkylandClassTemplate sClass, int lvl,
-			List<PlayerStats> baseStats) {
+	public SkylandPlayerClass(SkylandClassTemplate sClass, int lvl, List<PlayerStats> baseStats) {
 		this.sClass = sClass;
 		this.lvl = lvl;
 		this.baseStats = baseStats;
+	}
+
+	public static SkylandPlayerClass parseString(String s, SkylandPlayer sp) {
+
+		SkylandClassTemplate template;
+		ArrayList<PlayerStats> pStat = new ArrayList<>();
+		int lvl;
+
+		String[] temp = s.split("´´´´");
+		template = SkylandClassTemplate.valueOf(temp[0]);
+		for (String str : temp[1].split("´´")) {
+			pStat.add(PlayerStats.parseString(str));
+		}
+		lvl = Integer.parseInt(temp[2]);
+
+		return new SkylandPlayerClass(template, lvl, pStat);
 	}
 
 	@Override
@@ -42,22 +56,6 @@ SkylandPlayerClass {
 		out = out + lvl;
 
 		return out;
-	}
-
-	public static SkylandPlayerClass parseString(String s, SkylandPlayer sp) {
-
-		SkylandClassTemplate template;
-		ArrayList<PlayerStats> pStat = new ArrayList<>();
-		int lvl;
-
-		String[] temp = s.split("´´´´");
-		template = SkylandClassTemplate.valueOf(temp[0]);
-		for (String str : temp[1].split("´´")) {
-			pStat.add(PlayerStats.parseString(str));
-		}
-		lvl = Integer.parseInt(temp[2]);
-
-		return new SkylandPlayerClass(sp, template, lvl, pStat);
 	}
 
 	public SkylandClassTemplate getsClass() {
