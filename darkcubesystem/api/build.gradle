@@ -10,6 +10,6 @@ java {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     compileOnly libs.viaversion
-    compileOnly libs.cloudnetDriver
+    compileOnlyApi libs.cloudnetDriver
     api parent.project('libs')
 }
