@@ -4,25 +4,21 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
 import eu.darkcube.system.skyland.inventoryUI.AllInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
+public class Skyland extends DarkCubePlugin {
 
-public class Skyland extends JavaPlugin {
-
-
-	ArrayList<SkylandPlayer> players = new ArrayList<>();
 	private static Skyland instance;
 
 	public Skyland() {
+		super("skyland");
 		instance = this;
 	}
 
@@ -70,25 +66,17 @@ public class Skyland extends JavaPlugin {
 		instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
 		Bukkit.getPluginManager().registerEvents(trainingStand, this);
 
-
 	}
 
 	public SkylandPlayer getSkylandPlayers(Player player) {
-		for (SkylandPlayer sp : players){
+		for (SkylandPlayer sp : players) {
 			if (sp != null) {
-				if (player.equals(sp.getPlayer())){
+				if (player.equals(sp.getPlayer())) {
 					return sp;
 				}
 			}
 		}
 		System.out.println("No SkylandPlayer found for player " + player.getName());
 		return null;
-	}
-
-	public void addSkylandPlayer(SkylandPlayer p){
-		players.add(p);
-		if (p == null) {
-			System.out.println("p was null!");
-		}
 	}
 }

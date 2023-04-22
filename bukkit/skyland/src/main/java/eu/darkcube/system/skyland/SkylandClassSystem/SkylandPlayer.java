@@ -9,8 +9,6 @@ package eu.darkcube.system.skyland.SkylandClassSystem;
 import eu.darkcube.system.skyland.Equipment.*;
 import eu.darkcube.system.skyland.staticval.Globals;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.data.UserModifier;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,15 +17,14 @@ import java.util.List;
 
 public class SkylandPlayer implements SkylandEntity {
 
-	ArrayList<SkylandPlayerClass> skylandPlayerClasses = new ArrayList<>();
-	SkylandPlayerClass activeClass;
-	Player player;
-	int money = 0;
+	private final User user;
+	private final ArrayList<SkylandPlayerClass> skylandPlayerClasses = new ArrayList<>();
+	private SkylandPlayerClass activeClass;
+	private int money = 0;
 	//todo
 
-	public SkylandPlayer(Player p) {
-		player = p;
-		//todo
+	public SkylandPlayer(User user) {
+		this.user = user;
 	}
 
 	public static SkylandPlayer parseFromString(String s, Player p) {
@@ -35,12 +32,12 @@ public class SkylandPlayer implements SkylandEntity {
 
 		String[] in = s.split("-");
 		out.setMoney(Integer.parseInt(in[1]));
-		System.out.println("money "+ out.getMoney());//todo
+		System.out.println("money " + out.getMoney());//todo
 		for (int i = 4; i < in.length; i++) {
 			out.getSkylandPlayerClasses().add(SkylandPlayerClass.parseString(in[i], out));
 		}
 
-		if (Integer.parseInt(in[3]) >= 0){
+		if (Integer.parseInt(in[3]) >= 0) {
 			out.setActiveClass(out.getSkylandPlayerClasses().get(Integer.parseInt(in[3])));
 		}
 
@@ -50,28 +47,23 @@ public class SkylandPlayer implements SkylandEntity {
 	@Override
 	public String toString() {
 
-		String out = "money: -" + money + "- " +  "active class: ";
+		String out = "money: -" + money + "- " + "active class: ";
 		for (int i = 0; i < skylandPlayerClasses.size(); i++) {
-			if (skylandPlayerClasses.get(i).equals(activeClass)){
-				out += "-" + i +"-";
+			if (skylandPlayerClasses.get(i).equals(activeClass)) {
+				out += "-" + i + "-";
 				break;
 			}
 		}
 
-		if (skylandPlayerClasses.size() == 0){
-			out += "-" + -1 +"-";
+		if (skylandPlayerClasses.size() == 0) {
+			out += "-" + -1 + "-";
 		}
 
 		for (SkylandPlayerClass skylandPlayerClass : skylandPlayerClasses) {
-			out+= skylandPlayerClass.toString() + "-";
+			out += skylandPlayerClass.toString() + "-";
 		}
 		System.out.println("toString out: " + out);
 		return out;
-	}
-
-
-	public Player getPlayer() {
-		return player;
 	}
 
 	public List<Equipment> getEquipment() {
@@ -114,7 +106,6 @@ public class SkylandPlayer implements SkylandEntity {
 
 		getEquipment(); //todo calc
 
-
 		return new PlayerStats[0];
 	}
 
@@ -132,23 +123,31 @@ public class SkylandPlayer implements SkylandEntity {
 		return getActiveWeapon().getDamage() * (1 + (strength * Globals.strengthDmgMult / 100));
 	}
 
-	public ArrayList<SkylandPlayerClass> getSkylandPlayerClasses() {
-		return skylandPlayerClasses;
+	public User getUser() {
+		return user;
 	}
 
-	public void setActiveClass(SkylandPlayerClass activeClass) {
-		this.activeClass = activeClass;
+	public Player getPlayer() {
+		return user.asPlayer();
+	}
+
+	public ArrayList<SkylandPlayerClass> getSkylandPlayerClasses() {
+		return skylandPlayerClasses;
 	}
 
 	public SkylandPlayerClass getActiveClass() {
 		return activeClass;
 	}
 
-	public void setMoney(int money) {
-		this.money = money;
+	public void setActiveClass(SkylandPlayerClass activeClass) {
+		this.activeClass = activeClass;
 	}
 
 	public int getMoney() {
 		return money;
+	}
+
+	public void setMoney(int money) {
+		this.money = money;
 	}
 }
