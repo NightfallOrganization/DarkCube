@@ -22,6 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -39,7 +40,8 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 			@Override
 			protected void fillItems(Map<Integer, ItemStack> items) {
 				int i = 0;
-				for (Entry<World, Teleporters> e : user.addons().moduleManager().module(TeleporterModule.class).teleporters().entrySet()) {
+				for (Entry<World, Teleporters> e : user.addons().moduleManager()
+						.module(TeleporterModule.class).teleporters().entrySet()) {
 					for (Teleporter t : e.getValue().teleporters) {
 						if (t == data())
 							continue;
@@ -49,6 +51,9 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 									&& !t.trustedList().contains(user.user().getUniqueId())))
 								continue;
 						ItemStack item = ItemBuilder.item(t.icon()).displayname(t.dname())
+								.flag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS,
+										ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON,
+										ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_UNBREAKABLE)
 								.lore(Component.join(JoinConfiguration.separator(
 												Component.text().content(", ")
 														.color(TextColor.color(80, 80, 80))
@@ -106,7 +111,7 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 			protected void insertArrowItems() {
 				super.insertArrowItems();
 				arrowItem.put(PageArrow.PREVIOUS, ItemBuilder.item(Material.ARROW)
-						.displayname(Component.text("Previous " + "Page")).build());
+						.displayname(Component.text("Previous Page")).build());
 				arrowItem.put(PageArrow.NEXT,
 						ItemBuilder.item(Material.ARROW).displayname(Component.text("Next Page"))
 								.build());

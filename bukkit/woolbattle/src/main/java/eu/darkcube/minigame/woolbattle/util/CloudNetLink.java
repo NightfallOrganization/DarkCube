@@ -10,12 +10,14 @@ import de.dytanic.cloudnet.ext.bridge.server.BridgeServerHelper;
 import de.dytanic.cloudnet.wrapper.Wrapper;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.util.GameState;
 
 public class CloudNetLink {
 
 	public static boolean shouldDisplay = true;
+	private static boolean fullyLoaded = false;
 	private static boolean isCloudnet;
 
 	static {
@@ -23,6 +25,11 @@ public class CloudNetLink {
 			Wrapper.getInstance().getServiceId();
 			CloudNetLink.isCloudnet = true;
 			DarkCubeBukkit.autoConfigure(false);
+			new Scheduler(() -> {
+				fullyLoaded = true;
+				update();
+				System.out.println("Fully loaded!");
+			}).runTask();
 		} catch (Exception ex) {
 			CloudNetLink.isCloudnet = false;
 		}
@@ -30,7 +37,7 @@ public class CloudNetLink {
 
 	public static void update() {
 		try {
-			if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay) {
+			if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay && fullyLoaded) {
 				GameState current = GameState.UNKNOWN;
 				if (WoolBattle.instance().getLobby().enabled()) {
 					current = GameState.LOBBY;

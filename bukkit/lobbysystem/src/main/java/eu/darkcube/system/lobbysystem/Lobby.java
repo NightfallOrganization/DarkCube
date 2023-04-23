@@ -7,11 +7,6 @@
 package eu.darkcube.system.lobbysystem;
 
 import com.github.unldenis.hologram.HologramPool;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
-import de.dytanic.cloudnet.driver.service.ServiceTask;
-import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.libs.com.github.juliarn.npc.NPC;
@@ -32,7 +27,6 @@ import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.*;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.GameState;
 import eu.darkcube.system.util.Language;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -42,7 +36,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -131,44 +124,45 @@ public class Lobby extends Plugin {
 			world.setFullTime(6000);
 		}
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				for (String task : getDataManager().getWoolBattleTasks()) {
-					if (CloudNetDriver.getInstance().getServiceTaskProvider()
-							.isServiceTaskPresent(task)) {
-						ServiceTask serviceTask =
-								CloudNetDriver.getInstance().getServiceTaskProvider()
-										.getServiceTask(task);
-						assert serviceTask != null;
-						Collection<ServiceInfoSnapshot> services =
-								CloudNetDriver.getInstance().getCloudServiceProvider()
-										.getCloudServices(serviceTask.getName());
-
-						int freeServices = 0;
-						for (ServiceInfoSnapshot service : services) {
-							GameState state =
-									service.getProperty(DarkCubeServiceProperty.GAME_STATE)
-											.orElse(null);
-							if (state == GameState.LOBBY || state == GameState.UNKNOWN) {
-								freeServices++;
-							}
-						}
-						if (freeServices < serviceTask.getMinServiceCount()) {
-							ServiceInfoSnapshot snap =
-									CloudNetDriver.getInstance().getCloudServiceFactory()
-											.createCloudService(serviceTask);
-							assert snap != null;
-							CloudNetDriver.getInstance().getCloudServiceProvider(snap)
-									.setCloudServiceLifeCycle(ServiceLifeCycle.RUNNING);
-						}
-					} else {
-						Lobby.this.sendMessage("§cCould not find service task named " + task);
-					}
-				}
-			}
-		}.runTaskTimerAsynchronously(this, 30 * 20, 30 * 20);
+		//		new BukkitRunnable() {
+		//
+		//			@Override
+		//			public void run() {
+		//				for (String task : getDataManager().getWoolBattleTasks()) {
+		//					if (CloudNetDriver.getInstance().getServiceTaskProvider()
+		//							.isServiceTaskPresent(task)) {
+		//						ServiceTask serviceTask =
+		//								CloudNetDriver.getInstance().getServiceTaskProvider()
+		//										.getServiceTask(task);
+		//						assert serviceTask != null;
+		//						Collection<ServiceInfoSnapshot> services =
+		//								CloudNetDriver.getInstance().getCloudServiceProvider()
+		//										.getCloudServices(serviceTask.getName());
+		//
+		//						int freeServices = 0;
+		//						for (ServiceInfoSnapshot service : services) {
+		//							GameState state =
+		//									service.getProperty(DarkCubeServiceProperty.GAME_STATE)
+		//											.orElse(null);
+		//							if (state == GameState.LOBBY || state == GameState.UNKNOWN) {
+		//								freeServices++;
+		//							}
+		//						}
+		//						if (freeServices < serviceTask.getMinServiceCount()) {
+		//							ServiceInfoSnapshot snap =
+		//									CloudNetDriver.getInstance().getCloudServiceFactory()
+		//											.createCloudService(serviceTask);
+		//							assert snap != null;
+		//							CloudNetDriver.getInstance().getCloudServiceProvider(snap)
+		//									.setCloudServiceLifeCycle(ServiceLifeCycle.RUNNING);
+		//						}
+		//					} else {
+		//						Lobby.this.sendMessage("§cCould not find service task named " +
+		//						task);
+		//					}
+		//				}
+		//			}
+		//		}.runTaskTimerAsynchronously(this, 30 * 20, 30 * 20);
 
 		new ListenerJoin();
 		new ListenerScoreboard();

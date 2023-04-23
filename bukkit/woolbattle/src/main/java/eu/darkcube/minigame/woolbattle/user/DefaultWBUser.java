@@ -227,7 +227,8 @@ class DefaultWBUser implements WBUser {
 
 	@Override
 	public PlayerPerks perksStorage() {
-		return user.getPersistentDataStorage().get(KEY_PERKS, TYPE_PERKS).clone();
+		return user.getPersistentDataStorage().get(KEY_PERKS, TYPE_PERKS, DefaultPlayerPerks::new)
+				.clone();
 	}
 
 	@Override
