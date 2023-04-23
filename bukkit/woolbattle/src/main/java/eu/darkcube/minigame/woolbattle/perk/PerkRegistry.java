@@ -60,6 +60,7 @@ public class PerkRegistry {
 		register(new DrawArrowPerk());
 		register(new FreezeArrowPerk());
 		register(new BerserkerPerk());
+		register(new StomperPerk());
 	}
 
 	public void register(Perk perk) {
