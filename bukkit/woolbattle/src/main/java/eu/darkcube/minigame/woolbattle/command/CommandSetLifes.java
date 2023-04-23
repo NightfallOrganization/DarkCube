@@ -20,21 +20,27 @@ public class CommandSetLifes extends CommandExecutor {
 
 	public CommandSetLifes() {
 		super("woolbattle", "setlifes", "woolbattle.command.setlifes", new String[0], b -> b.then(
-				Commands.argument("lifes", IntegerArgumentType.integer(0, 99)).executes(context -> {
-					WoolBattle.instance().baseLifes =
-							IntegerArgumentType.getInteger(context, "lifes");
-					context.getSource().sendMessage(Message.CHANGED_LIFES.getServerMessage(
-							WoolBattle.instance().baseLifes));
-					return 0;
-				})).then(Commands.argument("team", TeamArgument.teamArgument(TeamType::isEnabled))
-				.then(Commands.argument("lifes", IntegerArgumentType.integer(0, 99))
-						.executes(context -> {
-							Team team = WoolBattle.instance().getTeamManager()
-									.getTeam(TeamArgument.getTeam(context, "team"));
-							team.setLifes(IntegerArgumentType.getInteger(context, "lifes"));
-							context.getSource().sendMessage(Component.text("Leben gesetzt!"));
-							return 0;
-						}))));
+						Commands.argument("lifes", IntegerArgumentType.integer(0, 99))
+								.requires(source -> WoolBattle.instance().getLobby().enabled())
+								.executes(context -> {
+									WoolBattle.instance().baseLifes =
+											IntegerArgumentType.getInteger(context, "lifes");
+									context.getSource().sendMessage(Message.CHANGED_LIFES.getServerMessage(
+											WoolBattle.instance().baseLifes));
+									return 0;
+								}))
+				.then(Commands.argument("team", TeamArgument.teamArgument(TeamType::isEnabled))
+						.requires(source -> WoolBattle.instance().getIngame().enabled())
+						.then(Commands.argument("lifes", IntegerArgumentType.integer(0, 99))
+								.executes(context -> {
+									Team team = WoolBattle.instance().getTeamManager()
+											.getTeam(TeamArgument.getTeam(context, "team"));
+									team.setLifes(IntegerArgumentType.getInteger(context, "lifes"
+									));
+									context.getSource()
+											.sendMessage(Component.text("Leben gesetzt!"));
+									return 0;
+								}))));
 	}
 
 }

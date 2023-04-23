@@ -64,7 +64,7 @@ public class TeamArgument implements ArgumentType<TeamType> {
 		int cursor = reader.getCursor();
 		String in = reader.readUnquotedString();
 		TeamType type = fromStringFunction.apply(in);
-		if (type == null || type.isDeleted()) {
+		if (type == null) {
 			reader.setCursor(cursor);
 			throw INVALID_ENUM.createWithContext(reader, in);
 		}
