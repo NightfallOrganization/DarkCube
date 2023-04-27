@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.skyland.Equipment;
 
+import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.skyland.Skyland;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -20,65 +21,70 @@ public class Equipments implements Equipment {
 
 	static NamespacedKey namespacedKey = new NamespacedKey(Skyland.getInstance(), "EquipInfo");
 	int haltbarkeit = 0;
-	ItemStack model;
+	transient ItemStack model;
 	Rarity rarity;
-	int lvl;
 	ArrayList<Components> components;
 	EquipmentType equipmentType;
-	String seperator = "**";//todo implement
 
-	public Equipments(int haltbarkeit, ItemStack model, Rarity rarity, int lvl,
+	protected Equipments(int haltbarkeit, ItemStack model, Rarity rarity,
 			ArrayList<Components> components, EquipmentType equipmentType) {
+		//todo make sure saveMetaData is called on Creation
 		this.haltbarkeit = haltbarkeit;
 		this.model = model;
 		this.rarity = rarity;
-		this.lvl = lvl;
 		this.components = components;
 		this.equipmentType = equipmentType;
-		ItemMeta meta = model.getItemMeta();
-		meta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING,
-				toString());
-		model.setItemMeta(meta);
-		model.getItemMeta()
-				.setDisplayName(rarity.getPrefix() + model.getItemMeta().getDisplayName());
 		setModelLore();
 	}
 
+	public void saveMetaData() {
+		ItemMeta meta = model.getItemMeta();
+		meta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING,
+				toString());
+
+		//meta.setDisplayName(rarity.getPrefix() + model.getItemMeta().getDisplayName());
+		model.setItemMeta(meta);
+		System.out.println("meta set");
+		if (model.getItemMeta() == null){
+			System.out.println("meta is null");
+		}
+	}
+
+	public static Equipments createEquipent(int haltbarkeit, ItemStack model, Rarity rarity,
+			ArrayList<Components> components, EquipmentType equipmentType) {
+		Equipments eq = new Equipments(haltbarkeit, model, rarity, components, equipmentType);
+
+		eq.saveMetaData();
+		return eq;
+	}
+
 	public static Equipments loadFromItem(ItemStack itemStack) {
+		if (itemStack != null) {
+			if (itemStack.getItemMeta().getPersistentDataContainer()
+					.has(namespacedKey, PersistentDataType.STRING)) {
+				System.out.println("Key found");
+				String s = itemStack.getItemMeta().getPersistentDataContainer()
+						.get(namespacedKey, PersistentDataType.STRING);
+				Gson gson = new Gson();
 
-		//itemStack.getItemMeta().getPersistentDataContainer().set(namespacedKey,
-		// PersistentDataType.STRING, "test");
+				Equipments eq = gson.fromJson(s, Equipments.class);
+				eq.setModel(itemStack);
+				eq.setModelLore();
+				return eq;
 
-		if (itemStack.getItemMeta().getPersistentDataContainer()
-				.has(namespacedKey, PersistentDataType.STRING)) {
-			System.out.println("Key found");
-			String s = itemStack.getItemMeta().getPersistentDataContainer()
-					.get(namespacedKey, PersistentDataType.STRING);
-
-			String[] temp = s.split(",");
-			ArrayList<Components> comps = new ArrayList<>();
-			for (int i = 8; i < temp.length; i++) {
-
-				if (temp[i] != null) {
-					if (Components.parseFromString(temp[i]) == null) {
-						System.out.println("parse is null!!");
-					}
-					comps.add(Components.parseFromString(temp[i]));
-					System.out.println("test: " + (temp[i]));
-				}
-
+			} else {
+				System.out.println("itemStack is null");
+				return null;
 			}
 
-			return new Equipments(Integer.parseInt(temp[1]), itemStack, Rarity.valueOf(temp[3]),
-					Integer.parseInt(temp[5]), comps, EquipmentType.valueOf(temp[7]));
+			//itemStack.getItemMeta().getPersistentDataContainer().set(namespacedKey,
+			// PersistentDataType.STRING, "test");
+
 		}
-		System.out.println("key vaL: " + itemStack.getItemMeta().getPersistentDataContainer()
-				.get(namespacedKey, PersistentDataType.STRING));
-		System.out.println("nenene null warum");
 		return null;
 	}
 
-	private ArrayList<String> setModelLore() {
+	protected ArrayList<String> setModelLore() {
 		ArrayList<String> out = new ArrayList<>();
 		out.add("");
 		out.add("§7§m      §7« §bStats §7»§m      ");
@@ -95,7 +101,7 @@ public class Equipments implements Equipment {
 		out.add("");
 		out.add("§7§m      §7« §dReqir §7»§7§m      ");
 		out.add("");
-		out.add("Level §a" + lvl);
+		out.add("Level §a" + getLvl());
 		out.add("Rarity " + rarity.getPrefix() + rarity);
 
         /*out.add("");
@@ -109,20 +115,7 @@ public class Equipments implements Equipment {
 	//this method converts this class into a string to save on an item
 	@Override
 	public String toString() {
-		String out =
-				"Equipments{" + "haltbarkeit=," + haltbarkeit + ", rarity=," + rarity + ", lvl=,"
-						+ lvl + ", equipmentType=," + equipmentType;
-
-		for (Components c : components) {
-			if (c != null) {
-				out = out + "," + c;
-
-			}
-
-		}
-
-		System.out.println(out);
-		return out;
+		return new Gson().toJson(this);
 	}
 
 	//todo to string and parse from string
@@ -159,17 +152,19 @@ public class Equipments implements Equipment {
 
 	@Override
 	public int getLvl() {
-		return lvl;
+		int highestLvl = 0;
+		for (Components c:components) {
+			if (highestLvl< c.getMaterialType().getLvlReq()){
+				highestLvl = c.getMaterialType().getLvlReq();
+			}
+		}
+		return highestLvl;
 	}
 
-	@Override
-	public void setLvl(int lvl) {
-		this.lvl = lvl;
-	}
+
 
 	@Override
 	public PlayerStats[] getStats() {
-
 
 		HashMap<PlayerStatsType, Integer> temp = new HashMap<>();
 

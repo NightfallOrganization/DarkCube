@@ -15,7 +15,9 @@ import java.util.Random;
 
 public enum Materials {
 
-	DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 10)}, Rarity.RARE,
+	DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.ARMOR, 100)}, Rarity.RARE,
+			new ItemStack(Material.DIAMOND_AXE), 10, 40),
+	TESTING_IRON(new PlayerStats[] {new PlayerStats(PlayerStatsType.DAMAGE, 10)}, Rarity.RARE,
 			new ItemStack(Material.DIAMOND_AXE), 10, 40),//beispiel
 
 	;
@@ -55,5 +57,9 @@ public enum Materials {
 
 	public PlayerStats[] getStats() {
 		return stats;
+	}
+
+	public int getLvlReq() {
+		return lvlReq;
 	}
 }

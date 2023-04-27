@@ -12,22 +12,30 @@ import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandClassTemplate;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandEntity;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.userapi.UserAPI;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.Title.Times;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.*;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
+import javax.swing.text.html.HTML.Tag;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class SkylandListener implements Listener {
@@ -43,37 +51,56 @@ public class SkylandListener implements Listener {
 
 	public int calculateDmgAfterDefense(SkylandEntity attacker, SkylandEntity defender) {
 
-		PlayerStats[] e1Stats = attacker.getStats();
 		PlayerStats[] e2Stats = defender.getStats();
 
 		int dmgE1 = attacker.getAttackDmg();
+		System.out.println("attack pre mitigation: " + dmgE1);
 
 		int armorE2 = 0;
 
 		for (PlayerStats ps : e2Stats) {
+			System.out.println(ps.getType() + ": " + ps.getMenge());
 			if (ps.getType() == PlayerStatsType.ARMOR) {
 				armorE2 += ps.getMenge();
 			}
 		}
-
+		System.out.println("armor: " + armorE2);
+		System.out.println("attack post mitigation: " + dmgE1 / (1 + (armorE2 / 100)));
 		return dmgE1 / (1 + (armorE2 / 100));
 	}
 
 	@EventHandler
-	public void handleDmg(EntityDamageEvent e) {
-		if (e.getEntity() instanceof Player) {
-			Player p = ((Player) e.getEntity());
+	public void handleDmg(EntityDamageByEntityEvent e) {
+
+
+
+		if (e.getEntity() instanceof Player p) {
+
+			p.sendMessage("you got hit by a entity");//todo remove debug
 
 			if (e.getEntity().getMetadata("spawnProt").isEmpty()) {
 				System.out.println("No Spawn prot meta found for: " + p.getUniqueId().toString());
 			} else {
 				if (p.getMetadata("spawnProt").get(0).asBoolean()) {
+					p.sendMessage("spawn prot true");//todo remove debug
 					e.setCancelled(true);
 				} else {
-					SkylandPlayer sp = Skyland.getInstance().getSkylandPlayers(p);
+					p.sendMessage("spawn prot false");//todo remove debug
 
-					//todo dmg claculation
+					SkylandPlayer sp = SkylandPlayerModifier.getSkylandPlayer(p);
 					int dmg = 0;
+
+					if (e.getDamager() instanceof Player p2){
+						p2.sendMessage("you are skp");//todo remove debug
+
+						SkylandPlayer sp2 = SkylandPlayerModifier.getSkylandPlayer(p2);
+						dmg = calculateDmgAfterDefense(sp2, sp);
+
+
+					}else {
+						//todo dmg calc for skyland entities
+					}
+
 
 					e.setDamage(dmg);
 
@@ -87,7 +114,7 @@ public class SkylandListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		e.getPlayer().sendMessage("welcome");
 		e.getPlayer().setMetadata("spawnProt",
-				new FixedMetadataValue(Skyland.getInstance(), true));//todo 9
+				new FixedMetadataValue(Skyland.getInstance(), false));//todo set to true just false to debug
 
 		if (e.getPlayer().getMetadata("spawnProt").isEmpty()) {
 			e.getPlayer().sendMessage("no meta");
@@ -96,31 +123,24 @@ public class SkylandListener implements Listener {
 			//e.getPlayer().sendMessage(e.getPlayer().getMetadata("spawnProt").get(1).asString());
 		}
 
-		if (e.getPlayer().getPersistentDataContainer().has(skylandPlayer)) {
-			e.getPlayer().sendMessage("Welcome back to Skyland!");
-			e.getPlayer().sendMessage("loaded: " + e.getPlayer().getPersistentDataContainer().get(skylandPlayer, PersistentDataType.STRING));//todo rem
-			SkylandPlayer skp = SkylandPlayer.parseFromString(
-					e.getPlayer().getPersistentDataContainer().get(skylandPlayer, PersistentDataType.STRING), e.getPlayer());
-			Skyland.getInstance().addSkylandPlayer(skp);
-			System.out.println("curr" + skp.toString());//todo rem
+		SkylandPlayer skp = SkylandPlayerModifier.getSkylandPlayer(e.getPlayer());
 
-			//todo make player select a class
-		} else {
-			e.getPlayer().sendMessage("Welcome to Skyland!");
-			SkylandPlayer skp = new SkylandPlayer(e.getPlayer());
-			e.getPlayer().getPersistentDataContainer().set(skylandPlayer, PersistentDataType.STRING, skp.toString());
-			Skyland.getInstance().addSkylandPlayer(skp);
-			e.getPlayer().sendMessage("Please choose a Class.");//todo either per command or per npc or both
-			UINewClassSelect ncls = new UINewClassSelect(e.getPlayer());
-			ncls.openInv();
+		if (!skp.hastActiveClass()){
+
+			UINewClassSelect uiNewClassSelect = new UINewClassSelect(e.getPlayer());
+			uiNewClassSelect.openInv();
+
+			//todo create command to open inv with instructions
+
 
 		}
+
+		//todo if player joined make him choose class
 	}
 
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e){
-		e.getPlayer().getPersistentDataContainer().remove(skylandPlayer);
-		e.getPlayer().getPersistentDataContainer().set(skylandPlayer, PersistentDataType.STRING, Skyland.getInstance().getSkylandPlayers(e.getPlayer()).toString());
+
 	}
 
 	@EventHandler
@@ -152,11 +172,34 @@ public class SkylandListener implements Listener {
 		 */
 	}
 
+	@EventHandler
 	public void onDuraDmg(PlayerItemDamageEvent e){
 
 		e.setCancelled(true);
 
 		//todo change the dura of stuff
+	}
+
+	@EventHandler
+	public void onScrollEvent(PlayerItemHeldEvent e){
+		 String text = "Ⳮ⳯⳰⳱";
+		 text = text + switch (e.getNewSlot()) {
+			case 0 -> "Ⲓ";
+			case 1 -> "Ⲕ";
+			case 2 -> "⳥";
+			case 3 -> "⳦";
+			case 4 -> "⳧";
+			case 5 -> "⳨";
+			case 6 -> "⳩";
+			case 7 -> "⳪";
+			case 8 -> "Ⳬ";
+			default -> "";
+		};
+
+		e.getPlayer().showTitle(Title.title(Component.text(text).
+				color(TextColor.color(0x4e, 0x5c, 0x24)), Component.text(""), Times.times(
+				Duration.of(0, ChronoUnit.SECONDS), Duration.of(10, ChronoUnit.SECONDS),Duration.of(0, ChronoUnit.SECONDS))));
+
 	}
 
 

@@ -7,10 +7,19 @@
 
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.skyland.Equipment.*;
 import eu.darkcube.system.skyland.Listener.SkylandListener;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerClass;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
+import eu.darkcube.system.skyland.inventoryUI.SelectActiveClass;
 import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.skyland.inventoryUI.InventoryUI;
 import eu.darkcube.system.skyland.inventoryUI.UIitemStack;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.Title.Times;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
@@ -19,7 +28,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.command.Command;
 
-import java.util.Objects;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 public class Feed implements CommandExecutor {
 
@@ -32,10 +43,44 @@ public class Feed implements CommandExecutor {
             if (Objects.equals(args[0], "0")){
                 UINewClassSelect cs = new UINewClassSelect(p);
                 cs.openInv();
+            }else if(args[0].equals("1")){
+                SelectActiveClass cs = new SelectActiveClass(p);
+                cs.openInv();
             }else if(args[0].equals("data")){
-                p.sendMessage(Skyland.getInstance().getSkylandPlayers(p).toString());
+                p.sendMessage(SkylandPlayerModifier.getSkylandPlayer(p).toString());
             }else if(args[0].equals("clear")){
-                p.getPersistentDataContainer().remove(new NamespacedKey(Skyland.getInstance(), "SkylandPlayer"));
+                SkylandPlayerModifier.getSkylandPlayer(p).resetData();
+            }else if(args[0].equals("gui")){
+                if (args.length>1){
+                    p.showTitle(Title.title(Component.text(args[1]).
+                            color(TextColor.color(0x4e, 0x5c, 0x24)), Component.text(""), Times.times(
+                            Duration.of(0, ChronoUnit.SECONDS), Duration.of(10, ChronoUnit.SECONDS),Duration.of(0, ChronoUnit.SECONDS))));
+                    //p.sendTitle(args[1], "", 0, 100000, 0);
+                }else {
+                    p.sendTitle("\uEff1", "", 0, 100000, 0);
+
+
+
+                }
+
+            }else if(args[0].equals("weapon")){
+                Weapons weapons = Weapons.createEquipent(1000, new ItemStack(Material.STRING), Rarity.RARE, 0,
+                        new ArrayList<>(List.of(new Components[] {
+                                new Components(Materials.DRAGON_SCALE, ComponentTypes.AXE), new Components(Materials.TESTING_IRON, ComponentTypes.AXE)})), EquipmentType.AXE, Ability.TEST);
+                p.getInventory().setItemInMainHand(weapons.getModel());
+            }else if(args[0].equals("armor")){
+                Equipments eq = Equipments.createEquipent(1000, new ItemStack(Material.LEATHER_CHESTPLATE), Rarity.RARE,
+                        new ArrayList<>(List.of(new Components[] {
+                                new Components(Materials.DRAGON_SCALE, ComponentTypes.AXE)})), EquipmentType.AXE);
+                p.getInventory().setItemInMainHand(eq.getModel());
+            }else if(args[0].equals("lvl")){
+                if (args.length > 1){
+                    SkylandPlayer skp = SkylandPlayerModifier.getSkylandPlayer(p);
+                    List<SkylandPlayerClass> skpc = skp.getSkylandPlayerClasses();
+                    skpc.get(skp.getActiveClassID()).setLvl(
+                            Integer.parseInt(args[1]));
+                    skp.setSkylandPlayerClasses(skpc);
+                }
             }
         }else {
             InventoryUI inventoryUI = new InventoryUI(6, "\uEff1", (Player) sender);

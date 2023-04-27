@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.skyland.Equipment;
 
+import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.skyland.Skyland;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -16,14 +17,29 @@ import java.util.ArrayList;
 public class Weapons extends Equipments implements Weapon {
 
 	static NamespacedKey namespacedKey = new NamespacedKey(Skyland.getInstance(), "EquipInfo");
-	Ability ability;
+	//todo add ability
+	//Ability ability;
 
-	public Weapons(int haltbarkeit, ItemStack model, Rarity rarity, int lvl,
+	private Weapons(int haltbarkeit, ItemStack model, Rarity rarity,
 			ArrayList<Components> components, EquipmentType equipmentType, Ability ability) {
-		super(haltbarkeit, model, rarity, lvl, components, equipmentType);
+		super(haltbarkeit, model, rarity, components, equipmentType);
+		//this.ability = ability;
 
-		this.ability = ability;
 
+	}
+
+
+	public static Weapons createEquipent(int haltbarkeit, ItemStack model, Rarity rarity, int lvl,
+			ArrayList<Components> components, EquipmentType equipmentType, Ability ability){
+		Weapons eq = new Weapons(haltbarkeit, model, rarity, components, equipmentType, ability);
+
+		eq.saveMetaData();
+		return eq;
+	}
+
+	private int zuweisungPlusHaltbarkeit(int haltbarkeit, Ability ability){
+		//this.ability = ability;
+		return haltbarkeit;
 	}
 
 /*    public Weapons(ItemStack itemStack) {
@@ -35,31 +51,21 @@ public class Weapons extends Equipments implements Weapon {
 
 		//itemStack.getItemMeta().getPersistentDataContainer().set(namespacedKey,
 		// PersistentDataType.STRING, "test");
-
+		if (itemStack.getItemMeta() == null ){
+			System.out.println("item meta is null?! why though");
+			return null;
+		}
 
 		if (itemStack.getItemMeta().getPersistentDataContainer()
 				.has(namespacedKey, PersistentDataType.STRING)) {
 			System.out.println("Key found");
 			String s = itemStack.getItemMeta().getPersistentDataContainer()
 					.get(namespacedKey, PersistentDataType.STRING);
-
-			String[] temp = s.split(",");
-			ArrayList<Components> comps = new ArrayList<>();
-			for (int i = 8; i < temp.length; i++) {
-
-				if (temp[i] != null) {
-					if (Components.parseFromString(temp[i]) == null) {
-						System.out.println("parse is null!!");
-					}
-					comps.add(Components.parseFromString(temp[i]));
-					System.out.println("test: " + (temp[i]));
-				}
-
-			}
-
-			return new Weapons(Integer.parseInt(temp[1]), itemStack, Rarity.valueOf(temp[3]),
-					Integer.parseInt(temp[5]), comps, EquipmentType.valueOf(temp[7]),
-					Ability.valueOf(temp[9]));
+			Gson gson = new Gson();
+			Weapons weapons = new Gson().fromJson(s, Weapons.class);
+			weapons.setModel(itemStack);
+			weapons.setModelLore();
+			return weapons;
 		}
 		System.out.println("key vaL: " + itemStack.getItemMeta().getPersistentDataContainer()
 				.get(namespacedKey, PersistentDataType.STRING));
@@ -75,6 +81,7 @@ public class Weapons extends Equipments implements Weapon {
 
 			for (PlayerStats ps : c.getPStats()) {
 				if (ps.getType() == PlayerStatsType.DAMAGE) {
+					System.out.println("dmg: " + ps.getMenge());
 					out += ps.getMenge();
 				}
 			}
@@ -83,27 +90,14 @@ public class Weapons extends Equipments implements Weapon {
 		return out;
 	}
 
-	@Override
-	public Ability getAbility() {
-		return ability;
-	}
+	//@Override
+	//public Ability getAbility() {
+	//	return ability;
+	//}
 
 	//this method converts this class into a string to save on an item
 	@Override
 	public String toString() {
-		String out =
-				"Weapon{" + "haltbarkeit=," + haltbarkeit + ", rarity=," + rarity + ", lvl=," + lvl
-						+ ", equipmentType=," + equipmentType + ", Ability =," + ability.toString();
-
-		for (Components c : components) {
-			if (c != null) {
-				out = out + "," + c;
-
-			}
-
-		}
-
-		System.out.println(out);
-		return out;
+		return new Gson().toJson(this);
 	}
 }

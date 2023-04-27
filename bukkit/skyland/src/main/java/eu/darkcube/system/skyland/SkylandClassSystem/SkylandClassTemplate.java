@@ -10,21 +10,28 @@ import eu.darkcube.system.skyland.Equipment.EquipmentType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.LinkedList;
 
 public enum SkylandClassTemplate {
 
-	ARCHER, WARRIOR;
+	ARCHER(new EquipmentType[] {EquipmentType.AXE}), WARRIOR(new EquipmentType[] {EquipmentType.AXE});
 
-	LinkedList<EquipmentType> allowedEquip;
+	EquipmentType[] allowedEquip;
 
-	public LinkedList<EquipmentType> getAllowedEquip() {
+	SkylandClassTemplate(EquipmentType[] allowedEquip) {
+		this.allowedEquip = allowedEquip;
+	}
+
+	public EquipmentType[] getAllowedEquip() {
 		return allowedEquip;
 	}
 	public ItemStack getDisplay(){
 		ItemStack out = new ItemStack(Material.DIAMOND_SWORD);
-		out.getItemMeta().setDisplayName(this.name());
+		ItemMeta re = out.getItemMeta();
+		re.setDisplayName(this.name());
+		out.setItemMeta(re);
 
 		//todo
 		return out;

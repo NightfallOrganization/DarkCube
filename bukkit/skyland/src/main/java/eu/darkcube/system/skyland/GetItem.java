@@ -55,7 +55,7 @@ public class GetItem implements CommandExecutor {
 			ArrayList<Components> comps = new ArrayList<>();
 			comps.add(new Components(Materials.DRAGON_SCALE, ComponentTypes.AXE));
 			comps.add(new Components(Materials.DRAGON_SCALE, ComponentTypes.AXE));
-			inventory.setItem(13, new Equipments(1, new ItemStack(Material.DIAMOND_SWORD), Rarity.RARE, 10, comps, EquipmentType.HELMET).getModel());
+			inventory.setItem(13, Equipments.createEquipent(1, new ItemStack(Material.DIAMOND_SWORD), Rarity.RARE,  comps, EquipmentType.HELMET).getModel());
 			if(player.getInventory().getItemInMainHand().getItemMeta() != null){
 				Equipments equipments = Equipments.loadFromItem(player.getInventory().getItemInMainHand());
 				if (equipments.getModel() != null){

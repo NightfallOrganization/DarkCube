@@ -25,6 +25,7 @@ public class AllInventory implements Listener {
 		if (instance == null){
 			instance = new AllInventory();
 		}
+
 		return instance;
 	}
 
@@ -47,9 +48,10 @@ public class AllInventory implements Listener {
 
 	@EventHandler
 	public void invClickEvent(InventoryClickEvent e){
+		e.getInventory();
 		for (InventoryUI invUI:allCustomInvs) {
 			if(invUI.getInventory().equals(e.getClickedInventory())){
-				invUI.invClickEvent(e);
+				boolean isToBeClosed = invUI.invClickEvent(e);
 			}
 
 		}

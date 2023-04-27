@@ -4,11 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.skyland.Equipment;
+package eu.darkcube.system.skyland.skillsandability;
 
-public interface Weapon extends Equipment {
+public abstract class Skills {
 
-	int getDamage();
+	//todo
 
-	//Ability getAbility(); todo uncommewnt
 }

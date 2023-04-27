@@ -24,33 +24,46 @@ import java.util.List;
 public class SkylandPlayer implements SkylandEntity {
 
 	private static final Key MONEY_KEY = new Key(Skyland.getInstance(), "money");
+	private static final Key ACTIVE_CLASS_KEY = new Key(Skyland.getInstance(), "active_class_key");
+	private static final Key SKYLAND_PLAYER_CLASSES = new Key(Skyland.getInstance(), "skyland_player_classes");
+
+	public static final PersistentDataType<List<SkylandPlayerClass>> skylandClassList = PersistentDataTypes.list(SkylandPlayerClass.TYPE);
 	private final User user;
-	private final ArrayList<SkylandPlayerClass> skylandPlayerClasses = new ArrayList<>();
-	private SkylandPlayerClass activeClass;
 	//todo
 
 	public SkylandPlayer(User user) {
 		this.user = user;
 		user.getPersistentDataStorage().setIfNotPresent(MONEY_KEY, PersistentDataTypes.BIGINTEGER, BigInteger.ZERO);
+		user.getPersistentDataStorage().setIfNotPresent(SKYLAND_PLAYER_CLASSES, skylandClassList, new ArrayList<>());
+
 	}
 
 
+	public boolean contains(EquipmentType[] collection, EquipmentType target){
+		for (EquipmentType eq : collection){
+			if (eq.equals(target)){
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	public List<Equipment> getEquipment() {
 		ArrayList<Equipment> out = new ArrayList<>();
 		for (ItemStack i : getPlayer().getEquipment().getArmorContents()) {
 			Equipments equipments = Equipments.loadFromItem(i);
 			if (equipments != null) {
-				if (activeClass.getsClass().allowedEquip.contains(equipments.getEquipmentType())) {
+				if (getActiveClass().isEqUsable(equipments)) {
 					out.add(equipments);
 				}
 
 			}
 		}
 
-		Equipments equipments = Equipments.loadFromItem(getPlayer().getInventory().getItemInMainHand());
+		Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
 		if (equipments != null) {
-			if (activeClass.getsClass().allowedEquip.contains(equipments.getEquipmentType())) {
+			if (getActiveClass().isEqUsable(equipments)) {
 				out.add(equipments);
 			}
 		}
@@ -61,23 +74,38 @@ public class SkylandPlayer implements SkylandEntity {
 
 	public Weapon getActiveWeapon() {
 		//returns null if there isnt a weapon in the main hand
-		Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
-		if (equipments != null) {
-			if (activeClass.getsClass().allowedEquip.contains(equipments.getEquipmentType())) {
-				return equipments;
+		System.out.println("loading from main hand");
+
+		if (getPlayer().getInventory().getItemInMainHand().getItemMeta() != null){
+
+			Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
+			if (equipments != null) {
+				if (getActiveClass().isEqUsable(equipments)) {
+					System.out.println("allowed to use this weapon");
+					return equipments;
+				}else {
+					System.out.println("not allowed to use this weapon");
+				}
 			}
+		}else {
+			System.out.println("item meta of active weapon is null");
 		}
+
 		return null;
 	}
 
 	@Override
 	public PlayerStats[] getStats() {
+
 		ArrayList<PlayerStats> playerStats = new ArrayList<>();
 		//playerStats.add(activeClass);
 
-		getEquipment(); //todo calc
+		for (Equipment eq:getEquipment()) {
+			playerStats.addAll(List.of(eq.getStats()));
+		}
 
-		return new PlayerStats[0];
+
+		return PlayerStats.mergePstats(playerStats);
 	}
 
 	@Override
@@ -90,8 +118,14 @@ public class SkylandPlayer implements SkylandEntity {
 			}
 		}
 
+		if (getActiveWeapon() != null){
+			return getActiveWeapon().getDamage() * (1 + (strength * Globals.strengthDmgMult / 100));
+		}else {
+			System.out.println("no weapon found default dmg = 1");
+			return 1;
+		}
 		//here strength effectiveness is calculated
-		return getActiveWeapon().getDamage() * (1 + (strength * Globals.strengthDmgMult / 100));
+
 	}
 
 	public User getUser() {
@@ -102,16 +136,34 @@ public class SkylandPlayer implements SkylandEntity {
 		return user.asPlayer();
 	}
 
-	public ArrayList<SkylandPlayerClass> getSkylandPlayerClasses() {
-		return skylandPlayerClasses;
+	public List<SkylandPlayerClass> getSkylandPlayerClasses() {
+		return user.getPersistentDataStorage().get(SKYLAND_PLAYER_CLASSES, skylandClassList);
 	}
 
 	public SkylandPlayerClass getActiveClass() {
-		return activeClass;
+		return getSkylandPlayerClasses().get(user.getPersistentDataStorage().get(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER));
+	}
+/*
+	public void setActiveClass(SkylandPlayerClass activeClass) {
+		for (int i = 0; i < getSkylandPlayerClasses().size(); i++) {
+			if (getSkylandPlayerClasses().get(i).equals(activeClass)){
+				user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, i);
+				return;
+			}
+		}
+		user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, 0);
+		System.out.println("active class not found");
 	}
 
-	public void setActiveClass(SkylandPlayerClass activeClass) {
-		this.activeClass = activeClass;
+ */
+	public void setActiveClass(int activeClass) {
+		user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, activeClass);
+
+	}
+
+
+	public void setSkylandPlayerClasses(List<SkylandPlayerClass> classes){
+		user.getPersistentDataStorage().set(SKYLAND_PLAYER_CLASSES, skylandClassList, classes);
 	}
 
 	public BigInteger getMoney() {
@@ -121,4 +173,27 @@ public class SkylandPlayer implements SkylandEntity {
 	public void setMoney(BigInteger money) {
 		user.getPersistentDataStorage().set(MONEY_KEY, PersistentDataTypes.BIGINTEGER, money);
 	}
+
+	@Override
+	public String toString() {
+		return "SkylandPlayer{" + "user=" + user +
+				"activeClass=" + getActiveClass().getsClass() +
+				"Money=" + getMoney() +
+				'}';
+	}
+
+	public boolean hastActiveClass(){
+		return user.getPersistentDataStorage().has(ACTIVE_CLASS_KEY);
+	}
+
+	public int getActiveClassID(){
+		return user.getPersistentDataStorage().get(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER);
+	}
+	public void resetData(){
+		user.getPersistentDataStorage().remove(ACTIVE_CLASS_KEY, SkylandPlayerClass.TYPE);
+		setSkylandPlayerClasses(new ArrayList<>());
+
+
+	}
+
 }

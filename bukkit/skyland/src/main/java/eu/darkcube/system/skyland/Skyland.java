@@ -9,7 +9,9 @@ package eu.darkcube.system.skyland;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryUI.AllInventory;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -42,6 +44,8 @@ public class Skyland extends DarkCubePlugin {
 			throw new RuntimeException(e);
 		}
 		*/
+
+		UserAPI.getInstance().addModifier(new SkylandPlayerModifier());
 
 		SkylandListener damageListener = new SkylandListener(this);
 		Bukkit.getPluginManager().registerEvents(damageListener, instance);

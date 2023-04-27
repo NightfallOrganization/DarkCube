@@ -20,7 +20,7 @@ public class Components {
 	}
 
 	public static Components parseFromString(String s) {
-		String[] temp = s.split("\\*\\*");
+		String[] temp = s.split("\\\\");
 		return new Components(Materials.valueOf(temp[1]), ComponentTypes.valueOf(temp[3]));
 	}
 
@@ -59,7 +59,18 @@ public class Components {
 
 	@Override
 	public String toString() {
-		return "Components{" + "type=**" + materialType + "** compType=**" + compType + "**" + '}';
+		return "Components{" + "type=\\\\" + materialType + "\\\\ compType=\\\\" + compType + "\\\\" + '}';
 	}
 
+	public int lvl(){
+		return materialType.getLvlReq();
+	}
+
+	public ComponentTypes getCompType() {
+		return compType;
+	}
+
+	public Materials getMaterialType() {
+		return materialType;
+	}
 }

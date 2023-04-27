@@ -15,8 +15,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-
 public class InventoryUI {
 
 	UIitemStack[][] inv;
@@ -61,18 +59,20 @@ public class InventoryUI {
 		setInvSlot(us, slot/9, slot%9);
 	}
 
-	public void invClickEvent(InventoryClickEvent e){
-
+	public boolean invClickEvent(InventoryClickEvent e){
 		e.setCancelled(inv[e.getSlot()/9][e.getSlot()%9].isUnmoveble());
 
+		return false;
 	}
 
-	public void invDragEvent(InventoryDragEvent e){
+	public boolean invDragEvent(InventoryDragEvent e){
 		//todo
+		return false;
 	}
 
-	public void invCloseEvent(InventoryCloseEvent e){
-		AllInventory.getInstance().removeInv(inventory);
+	public boolean invCloseEvent(InventoryCloseEvent e){
+
+		return true;
 	}
 
 	public Inventory getInventory() {

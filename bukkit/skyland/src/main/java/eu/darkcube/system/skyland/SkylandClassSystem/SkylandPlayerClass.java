@@ -6,7 +6,10 @@
  */
 package eu.darkcube.system.skyland.SkylandClassSystem;
 
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.system.skyland.Equipment.Equipment;
+import eu.darkcube.system.skyland.Equipment.EquipmentType;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
 import eu.darkcube.system.util.data.PersistentDataType;
 
@@ -19,23 +22,21 @@ SkylandPlayerClass {
 
 	public static final PersistentDataType<SkylandPlayerClass> TYPE = new PersistentDataType<SkylandPlayerClass>() {
 		@Override
-		public SkylandPlayerClass deserialize(
-				de.dytanic.cloudnet.common.document.gson.JsonDocument doc, String key) {
-			return null;
+		public SkylandPlayerClass deserialize(JsonDocument doc, String key) {
+			return doc.get(key, SkylandPlayerClass.class);
 		}
 
 		@Override
-		public void serialize(de.dytanic.cloudnet.common.document.gson.JsonDocument doc,
-				String key,
-				SkylandPlayerClass data) {
+		public void serialize(JsonDocument doc, String key, SkylandPlayerClass data) {
+			doc.append(key, data);
 
 		}
 
 		@Override
 		public SkylandPlayerClass clone(SkylandPlayerClass object) {
-			return null;
+			return new SkylandPlayerClass(object.getsClass(), object.getLvl(), new ArrayList<>(object.getBaseStats()));
 		}
-	}
+	};
 	SkylandClassTemplate sClass;
 	int lvl;
 	List<PlayerStats> baseStats;
@@ -50,5 +51,38 @@ SkylandPlayerClass {
 		return sClass;
 	}
 
+	public int getLvl() {
+		return lvl;
+	}
 
+	public List<PlayerStats> getBaseStats() {
+		return baseStats;
+	}
+
+	@Override
+	public String toString() {
+		return "SkylandPlayerClass{" + "sClass=" + getsClass() + ", lvl=" + getLvl() + ", baseStats="
+				+ getBaseStats().toString() + '}';
+	}
+
+	public boolean isEqUsable(Equipment eq){
+		boolean isAllowedType = false;
+		boolean isLvl = false;
+		for (EquipmentType equipmentType:getsClass().getAllowedEquip()) {
+			if (eq.getEquipmentType().equals(equipmentType)){
+				isAllowedType=true;
+			}
+		}
+
+		if (lvl >= eq.getLvl()){
+			isLvl = true;
+		}
+
+		return isLvl&&isAllowedType;
+
+	}
+
+	public void setLvl(int lvl) {
+		this.lvl = lvl;
+	}
 }

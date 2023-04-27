@@ -4,11 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.skyland.Equipment;
+package eu.darkcube.system.skyland.inventoryUI;
 
-public interface Weapon extends Equipment {
+import org.bukkit.entity.Player;
 
-	int getDamage();
+public class UICrafting extends InventoryUI{
+	public UICrafting(int row, String name, Player p) {
+		super(row, name, p);
+	}
 
-	//Ability getAbility(); todo uncommewnt
+
+
+
+
 }

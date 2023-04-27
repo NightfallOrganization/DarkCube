@@ -18,6 +18,7 @@ public class SkylandPlayerModifier implements UserModifier {
 
 	@Override
 	public void onLoad(User user) {
+		System.out.println(user.getName() + " was looded with modifier!");
 		user.getMetaDataStorage().set(SKYLAND_PLAYER, new SkylandPlayer(user));
 	}
 
@@ -33,4 +34,6 @@ public class SkylandPlayerModifier implements UserModifier {
 	public static SkylandPlayer getSkylandPlayer(Player player){
 		return getSkylandPlayer(UserAPI.getInstance().getUser(player));
 	}
+
+
 }

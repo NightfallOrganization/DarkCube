@@ -6,14 +6,15 @@
  */
 package eu.darkcube.system.skyland.inventoryUI;
 
-import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandClassTemplate;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerClass;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UINewClassSelect extends InventoryUI {
 	public UINewClassSelect(Player p) {
@@ -25,19 +26,26 @@ public class UINewClassSelect extends InventoryUI {
 	}
 
 	@Override
-	public void invClickEvent(InventoryClickEvent e) {
+	public boolean invClickEvent(InventoryClickEvent e) {
+
+		super.invClickEvent(e);
 		if (e.getSlot() < SkylandClassTemplate.values().length) {
-			inventory.close();
 			e.getWhoClicked()
 					.sendMessage("You chose " + SkylandClassTemplate.values()[e.getSlot()]);
-			SkylandPlayer skp =
-					Skyland.getInstance().getSkylandPlayers((Player) e.getWhoClicked());
+			SkylandPlayer skp = SkylandPlayerModifier.getSkylandPlayer((Player) e.getWhoClicked());
 			SkylandPlayerClass skpc =
 					new SkylandPlayerClass(SkylandClassTemplate.values()[e.getSlot()], 1,
 							new ArrayList<>());
-			skp.getSkylandPlayerClasses().add(skpc);
-			skp.setActiveClass(skpc);
+			List<SkylandPlayerClass> classes = skp.getSkylandPlayerClasses();
+			classes.add(skpc);
+			skp.setSkylandPlayerClasses(classes);
+			skp.setActiveClass(skp.getSkylandPlayerClasses().size()-1);
+			inventory.close();
+			return true;
 		}
-		super.invClickEvent(e);
+
+		return false;
 	}
+
+
 }
