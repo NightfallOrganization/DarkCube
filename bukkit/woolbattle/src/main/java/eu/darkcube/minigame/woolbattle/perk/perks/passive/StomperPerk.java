@@ -32,6 +32,7 @@ import java.util.HashSet;
 public class StomperPerk extends Perk {
 	public static final PerkName STOMPER = new PerkName("STOMPER");
 	private static final Key active = new Key(WoolBattle.instance(), "perk_stomper_active");
+	private static final Key startPos = new Key(WoolBattle.instance(), "perk_stomper_start_pos");
 
 	public StomperPerk() {
 		super(ActivationType.PASSIVE, STOMPER, new Cooldown(Unit.ACTIVATIONS, 0), 10,
@@ -73,6 +74,7 @@ public class StomperPerk extends Perk {
 				double y = Math.sin(theta + radius) * 0.3 + 0.3;
 				center.add(x, y, z);
 				ParticleEffect.REDSTONE.display(new OrdinaryColor(230, 230, 230), center, 50);
+				//				ParticleEffect.REDSTONE.display(0, 0, 0, 1, 1, center, 50);
 				center.subtract(x, y, z);
 			}
 			for (WBUser target : WBUser.onlineUsers()) {
@@ -98,7 +100,7 @@ public class StomperPerk extends Perk {
 				v.setY(v.getY() + 0.2);
 				if (v.length() != 0) {
 					v.normalize();
-					v.multiply(Math.pow(maxRadius - radius, 0.3));
+					v.multiply(Math.pow(maxRadius - radius + 0.1, 0.3));
 					if (target.getBukkitEntity().isOnGround())
 						v.multiply(1.5);
 					target.getBukkitEntity().setVelocity(v);
@@ -121,11 +123,12 @@ public class StomperPerk extends Perk {
 								.getType() == Material.AIR)
 					continue;
 				int removed;
+				double starty = user.user().getMetaDataStorage().remove(startPos);
+				int size = user.user().getMetaDataStorage().remove(active);
 				if ((removed = user.removeWool(cost())) != cost()) {
 					user.addWool(removed);
 					continue;
 				}
-				int size = user.user().getMetaDataStorage().remove(active);
 				double rad = size * 5;
 				new ShockwaveScheduler(user, user.getBukkitEntity().getLocation(),
 						rad).runTaskTimer(1);
@@ -150,6 +153,8 @@ public class StomperPerk extends Perk {
 			size += event.user().perks().perks(perkName()).size();
 			if (size > 0) {
 				event.user().user().getMetaDataStorage().set(active, size);
+				event.user().user().getMetaDataStorage()
+						.set(startPos, event.user().getBukkitEntity().getLocation().getY());
 			}
 		}
 	}
