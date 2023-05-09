@@ -7,30 +7,24 @@
 package eu.darkcube.system.skyland;
 
 import eu.darkcube.system.DarkCubePlugin;
+import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.skyland.Listener.SkylandListener;
-import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
-import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryUI.AllInventory;
 import eu.darkcube.system.skyland.mobs.CustomMob;
 import eu.darkcube.system.skyland.mobs.FollowingMob;
 import eu.darkcube.system.skyland.worldGen.CustomChunkGenerator;
-import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
 
 public class Skyland extends DarkCubePlugin {
 
-	ArrayList<CustomMob> mobs = new ArrayList<>();
-
 	private static Skyland instance;
+	ArrayList<CustomMob> mobs = new ArrayList<>();
 
 	public Skyland() {
 		super("skyland");
@@ -60,8 +54,6 @@ public class Skyland extends DarkCubePlugin {
 		}
 		*/
 
-
-
 		SkylandListener damageListener = new SkylandListener(this);
 		Bukkit.getPluginManager().registerEvents(damageListener, instance);
 		Bukkit.getPluginManager().registerEvents(AllInventory.getInstance(), instance);
@@ -81,6 +73,9 @@ public class Skyland extends DarkCubePlugin {
 		instance.getCommand("createworld").setExecutor(new CreateWorld());
 		instance.getCommand("getitem").setExecutor(new GetItem());
 		instance.getCommand("getgui").setExecutor(new GetGUI());
+
+		CommandAPI.getInstance().register(new SkylandGeneratorCommand(this));
+
 		TrainingStand trainingStand = new TrainingStand();
 		instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
 		Bukkit.getPluginManager().registerEvents(trainingStand, this);
@@ -88,28 +83,35 @@ public class Skyland extends DarkCubePlugin {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (CustomMob cm : mobs){
+				for (CustomMob cm : mobs) {
 					cm.aiTick();
 				}
 			}
 		}.runTaskTimer(this, 20, 1);
 
+	}
 
+	@Override
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+		System.out.println("custom gen loaded!!");
+		return new CustomChunkGenerator();
 	}
 
 	public ArrayList<CustomMob> getMobs() {
 		return mobs;
 	}
-	public CustomMob getCustomMob(Mob mob){
-		for (CustomMob customMob : mobs){
-			if (mob.equals(customMob.getMob())){
+
+	public CustomMob getCustomMob(Mob mob) {
+		for (CustomMob customMob : mobs) {
+			if (mob.equals(customMob.getMob())) {
 				return customMob;
 			}
 		}
 
-		if (mob.getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
-			int id = mob.getPersistentDataContainer().get(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER);
-			if (id == 0){
+		if (mob.getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())) {
+			int id = mob.getPersistentDataContainer()
+					.get(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER);
+			if (id == 0) {
 				return new FollowingMob(mob);
 			}
 		}
@@ -117,10 +119,10 @@ public class Skyland extends DarkCubePlugin {
 		return null;
 	}
 
-	public void removeCustomMob(Mob m){
-		for (CustomMob cm: mobs) {
+	public void removeCustomMob(Mob m) {
+		for (CustomMob cm : mobs) {
 
-			if (cm.getMob().equals(m)){
+			if (cm.getMob().equals(m)) {
 				mobs.remove(cm);
 				System.out.println("mob removed");
 				return;
@@ -129,11 +131,5 @@ public class Skyland extends DarkCubePlugin {
 		}
 
 		System.out.println("no mob removed");
-	}
-
-	@Override
-	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-		System.out.println("custom gen loaded!!");
-		return new CustomChunkGenerator();
 	}
 }

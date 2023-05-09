@@ -45,6 +45,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		EntityOptions.registerOptions();
 		PacketAPI.init();
 		CommandAPI.init(this);
+		BukkitUserAPI.init();
 		linkManager.addLink(LuckPermsLink::new);
 		linkManager.addLink(CloudNetLink::new);
 	}
@@ -59,7 +60,6 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		BukkitUserAPI.init();
 		Bukkit.getPluginManager().registerEvents(this, this);
 		AdventureSupport.audienceProvider(); // Initializes adventure
 		linkManager.enableLinks();
