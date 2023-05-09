@@ -6,21 +6,15 @@
  */
 package eu.darkcube.system.skyland.worldGen;
 
-import eu.darkcube.system.Plugin;
-import eu.darkcube.system.skyland.Skyland;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Sign;
+import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
-import org.bukkit.util.noise.NoiseGenerator;
-import org.bukkit.util.noise.PerlinNoiseGenerator;
-import org.bukkit.util.noise.SimplexNoiseGenerator;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,15 +126,15 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	@Override
 	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
 		ArrayList<BlockPopulator> out = new ArrayList<>();
-		out.add(new BiomePopulator());
 		out.add(new TreePopulators());
-		out.add(new LootGen());
+		out.add(new LootChestPopulator());
 		return out;
 	}
 
-
-
-
+	@Override
+	public @Nullable BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
+		return new eu.darkcube.system.skyland.worldGen.BiomeProvider();
+	}
 }
 
 

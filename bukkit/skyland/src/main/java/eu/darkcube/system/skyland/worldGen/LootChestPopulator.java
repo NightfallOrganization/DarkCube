@@ -6,8 +6,6 @@
  */
 package eu.darkcube.system.skyland.worldGen;
 
-import eu.darkcube.system.skyland.Equipment.Rarity;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.generator.BlockPopulator;
@@ -18,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
-public class LootGen extends BlockPopulator {
+public class LootChestPopulator extends BlockPopulator {
 
 	@Override
 	public void populate(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX,
@@ -37,6 +35,7 @@ public class LootGen extends BlockPopulator {
 
 			if(limitedRegion.getType(x, y, z).isSolid()) {
 				limitedRegion.setType(x, y + 1, z, Material.CHEST);
+				//todo choose chest rarity and set loot table
 				Chest chest =
 						(Chest) limitedRegion.getBlockState(x, y+1, z);
 
