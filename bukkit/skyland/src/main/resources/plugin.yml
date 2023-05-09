@@ -16,8 +16,5 @@ commands:
   god:
   trash:
   world:
-  loadworld:
-  unloadworld:
-  createworld:
   getitem:
   getgui:
