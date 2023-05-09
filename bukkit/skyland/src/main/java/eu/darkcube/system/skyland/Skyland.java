@@ -69,9 +69,6 @@ public class Skyland extends DarkCubePlugin {
 		instance.getCommand("god").setExecutor(new God());
 		instance.getCommand("trash").setExecutor(new Trash());
 		instance.getCommand("world").setExecutor(new WorldX());
-		instance.getCommand("loadworld").setExecutor(new Loadworld());
-		instance.getCommand("unloadworld").setExecutor(new UnloadWorld());
-		instance.getCommand("createworld").setExecutor(new CreateWorld());
 		instance.getCommand("getitem").setExecutor(new GetItem());
 		instance.getCommand("getgui").setExecutor(new GetGUI());
 
