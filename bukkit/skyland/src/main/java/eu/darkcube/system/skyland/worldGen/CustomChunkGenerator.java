@@ -132,10 +132,13 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	@Override
 	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
 		ArrayList<BlockPopulator> out = new ArrayList<>();
+		out.add(new BiomePopulator());
 		out.add(new TreePopulators());
 		out.add(new LootGen());
 		return out;
 	}
+
+
 
 
 }
