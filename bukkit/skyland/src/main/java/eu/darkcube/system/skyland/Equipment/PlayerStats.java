@@ -6,6 +6,11 @@
  */
 package eu.darkcube.system.skyland.Equipment;
 
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerClass;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +19,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlayerStats {
 
-	PlayerStatsType type;
+	public static final PersistentDataType<List<PlayerStats>> TYPEARRAY = PersistentDataTypes.list(PlayerStats.TYPE);
+	public static final PersistentDataType<PlayerStats> TYPE = new PersistentDataType<PlayerStats>() {
+
+		@Override
+		public PlayerStats deserialize(JsonDocument doc, String key) {
+			return doc.get(key, PlayerStats.class);
+		}
+
+		@Override
+		public void serialize(JsonDocument doc, String key, PlayerStats data) {
+			doc.append(key, data);
+		}
+
+		@Override
+		public PlayerStats clone(PlayerStats object) {
+			return new PlayerStats(object.getType(), object.getMenge());
+		}
+	};
+
+
+		PlayerStatsType type;
 	int menge;
 
 	public PlayerStats(PlayerStatsType type, int menge) {

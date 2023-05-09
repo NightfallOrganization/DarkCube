@@ -6,11 +6,16 @@
  */
 package eu.darkcube.system.skyland.Equipment;
 
+import eu.darkcube.system.skyland.Skyland;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public enum Materials {
@@ -21,6 +26,8 @@ public enum Materials {
 			new ItemStack(Material.DIAMOND_AXE), 10, 40),//beispiel
 
 	;
+
+	NamespacedKey namespacedKey = new NamespacedKey(Skyland.getInstance(), "materialID");
 
 	private PlayerStats[] stats;
 	private Rarity rarity;
@@ -35,6 +42,13 @@ public enum Materials {
 		this.model.setDurability((short) durability);
 		this.lvlReq = lvlReq;
 
+		ItemMeta im = model.getItemMeta();
+		im.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, toString());
+		im.setDisplayName(toString());
+		model.setItemMeta(im);
+		setModelLore();
+
+
 /*        if(!getMaterials().containsKey(rarity)){
             getMaterials().put(rarity, new ArrayList<>());
         }
@@ -43,17 +57,63 @@ public enum Materials {
 
 	}
 
+
+	protected ArrayList<String> setModelLore() {
+		ArrayList<String> out = new ArrayList<>();
+		out.add("");
+		out.add("§7§m      §7« §bStats §7»§m      ");
+		out.add("");
+
+		for (PlayerStats pl : getStats()) {
+			if (pl.getMenge() > 0) {
+				out.add(pl.getType() + " §a+" + pl.getMenge());
+			} else {
+				out.add(pl.getType() + " §c-" + pl.getMenge());
+			}
+
+		}
+		out.add("");
+		out.add("§7§m      §7« §dReqir §7»§7§m      ");
+		out.add("");
+		out.add("Level §a" + lvlReq);
+		out.add("Rarity " + rarity.getPrefix() + rarity);
+
+        /*out.add("");
+        out.add("§7§m      §7« §eSmith §7»§7§m      ");
+        out.add("");*/
+
+		model.setLore(out);
+		return out;
+	}
+
+
 /*    public static HashMap<Rarity, ArrayList<Materials>> getMaterials() {
         return materials;
     }*/
 
-	public static Materials getRandomMaterial(HashMap<Rarity, ArrayList<Materials>> materials) {
-		Rarity r = Rarity.rollRarity(materials);
-		ArrayList<Materials> materials1 = materials.get(r);
+	public static Materials getRandomMaterial(List<Materials> materials){
+		int totalWeight = 0;
+		for (Materials m : materials) {
+			totalWeight += m.getRarity().getWeight();
+		}
+
+		System.out.println("total weight: " + totalWeight);
+
 		Random random = new Random();
-		int i = random.nextInt(materials1.size());
-		return materials1.get(i);
+		int roll = random.nextInt(totalWeight);
+		System.out.println("roll: " + roll);
+		for (Materials m: materials) {
+			if (roll <= m.getRarity().getWeight()) {
+				return m;
+			}
+			System.out.println("roll now: " + roll);
+			roll = roll - m.getRarity().getWeight();
+		}
+
+		//this should never occur
+		return null;
 	}
+
 
 	public PlayerStats[] getStats() {
 		return stats;
@@ -61,5 +121,13 @@ public enum Materials {
 
 	public int getLvlReq() {
 		return lvlReq;
+	}
+
+	public Rarity getRarity() {
+		return rarity;
+	}
+
+	public ItemStack getModel() {
+		return model;
 	}
 }

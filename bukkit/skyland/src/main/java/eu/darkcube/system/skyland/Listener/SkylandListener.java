@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.skyland.Listener;
 
+import eu.darkcube.system.skyland.Equipment.Materials;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
 import eu.darkcube.system.skyland.Equipment.PlayerStatsType;
 import eu.darkcube.system.skyland.Skyland;
@@ -14,13 +15,18 @@ import eu.darkcube.system.skyland.SkylandClassSystem.SkylandEntity;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
+import eu.darkcube.system.skyland.mobs.CustomMob;
+import eu.darkcube.system.skyland.mobs.FollowingMob;
 import eu.darkcube.system.userapi.UserAPI;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
@@ -28,10 +34,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import javax.swing.text.html.HTML.Tag;
 import java.time.Duration;
@@ -40,14 +50,13 @@ import java.util.List;
 
 public class SkylandListener implements Listener {
 
+	boolean userAPI = false;
 	Skyland skyland;
 	NamespacedKey skylandPlayer = new NamespacedKey(Skyland.getInstance(), "SkylandPlayer");
 
 	public SkylandListener(Skyland skyland) {
 		this.skyland = skyland;
 	}
-
-
 
 	public int calculateDmgAfterDefense(SkylandEntity attacker, SkylandEntity defender) {
 
@@ -69,52 +78,120 @@ public class SkylandListener implements Listener {
 		return dmgE1 / (1 + (armorE2 / 100));
 	}
 
+
 	@EventHandler
 	public void handleDmg(EntityDamageByEntityEvent e) {
 
+		if (e.getDamager() instanceof Player attacker) {
 
+			SkylandPlayer attackerSkp = SkylandPlayerModifier.getSkylandPlayer(attacker);
+			int dmg = attackerSkp.getAttackDmg();
 
-		if (e.getEntity() instanceof Player p) {
+			if (e.getEntity() instanceof Player defender) {
 
-			p.sendMessage("you got hit by a entity");//todo remove debug
+				SkylandPlayer defenderSkp = SkylandPlayerModifier.getSkylandPlayer(defender);
+				dmg = calculateDmgAfterDefense(attackerSkp, defenderSkp);
 
-			if (e.getEntity().getMetadata("spawnProt").isEmpty()) {
-				System.out.println("No Spawn prot meta found for: " + p.getUniqueId().toString());
 			} else {
-				if (p.getMetadata("spawnProt").get(0).asBoolean()) {
-					p.sendMessage("spawn prot true");//todo remove debug
-					e.setCancelled(true);
-				} else {
-					p.sendMessage("spawn prot false");//todo remove debug
+				if (e.getEntity().getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
 
-					SkylandPlayer sp = SkylandPlayerModifier.getSkylandPlayer(p);
-					int dmg = 0;
-
-					if (e.getDamager() instanceof Player p2){
-						p2.sendMessage("you are skp");//todo remove debug
-
-						SkylandPlayer sp2 = SkylandPlayerModifier.getSkylandPlayer(p2);
-						dmg = calculateDmgAfterDefense(sp2, sp);
-
-
+					if (Skyland.getInstance().getCustomMob((Mob) e.getEntity()) instanceof FollowingMob fm){
+						attacker.sendMessage("you hit skyland entity!");
+						dmg = calculateDmgAfterDefense(attackerSkp, fm);
+						fm.setTargetE(attacker);
 					}else {
-						//todo dmg calc for skyland entities
+
 					}
-
-
-					e.setDamage(dmg);
 
 				}
 			}
+
+			e.setDamage(dmg);
+
+		}else if (e.getDamager() instanceof Mob mob){
+			int dmg = 0;
+
+			if (e.getEntity().getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
+				CustomMob customMob = Skyland.getInstance().getCustomMob(mob);
+				dmg = customMob.getAttackDmg();
+
+				if (e.getEntity() instanceof Player p){
+					SkylandPlayer skp = SkylandPlayerModifier.getSkylandPlayer(p);
+
+					dmg = calculateDmgAfterDefense(customMob, skp);
+
+				}else if (e.getEntity().getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
+
+					if (e.getEntity() instanceof Mob mob1){
+						CustomMob cm2 = Skyland.getInstance().getCustomMob(mob1);
+
+						dmg = calculateDmgAfterDefense(customMob, cm2);
+					}
+
+
+				}
+
+
+			}
+
+			e.setDamage(dmg);
 
 		}
 	}
 
 	@EventHandler
+	public void onEntitySpawn(EntitySpawnEvent e){
+		//e.setCancelled(true);
+		//todo debug statement
+	}
+
+	@EventHandler
+	public void onDeath(EntityDeathEvent e){
+		System.out.println("entity died");
+		//todo add custom drops
+		if (e.getEntity() instanceof Mob mob){
+			System.out.println("mob died");
+			e.getDrops().removeAll(e.getDrops());
+
+			Materials drop = Materials.getRandomMaterial(Skyland.getInstance().getCustomMob(mob).getLootTable());
+			System.out.println("drop: " + drop.toString());
+			e.getDrops().add(drop.getModel());
+
+			Skyland.getInstance().removeCustomMob(mob);
+		}
+	}
+	@EventHandler
+	public void onEntityDmg(EntityDamageEvent e){
+		//todo add different dmg calcs
+		if (!e.getCause().equals(DamageCause.ENTITY_ATTACK)){
+			if (e.getEntity() instanceof Player p){
+
+				//todo
+			}
+		}
+	}
+
+	@EventHandler
+	public void onMobLoad(ChunkLoadEvent cle){
+		for (Entity e : cle.getChunk().getEntities()){
+			if (e instanceof Mob mob){
+				Skyland.getInstance().getCustomMob(mob);
+			}
+		}
+	}
+
+	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
+
+		if (!userAPI){
+			userAPI = true;
+			UserAPI.getInstance().addModifier(new SkylandPlayerModifier());
+		}
+
+
 		e.getPlayer().sendMessage("welcome");
-		e.getPlayer().setMetadata("spawnProt",
-				new FixedMetadataValue(Skyland.getInstance(), false));//todo set to true just false to debug
+		e.getPlayer().setMetadata("spawnProt", new FixedMetadataValue(Skyland.getInstance(),
+				false));//todo set to true just false to debug
 
 		if (e.getPlayer().getMetadata("spawnProt").isEmpty()) {
 			e.getPlayer().sendMessage("no meta");
@@ -125,21 +202,39 @@ public class SkylandListener implements Listener {
 
 		SkylandPlayer skp = SkylandPlayerModifier.getSkylandPlayer(e.getPlayer());
 
-		if (!skp.hastActiveClass()){
+		if (!skp.hastActiveClass()) {
 
 			UINewClassSelect uiNewClassSelect = new UINewClassSelect(e.getPlayer());
 			uiNewClassSelect.openInv();
 
 			//todo create command to open inv with instructions
 
-
 		}
+
+		BukkitScheduler scheduler = Bukkit.getScheduler();
+
+		scheduler.runTaskTimer(Skyland.getInstance(), () -> {
+			String text = switch (e.getPlayer().getInventory().getHeldItemSlot()) {
+				case 0 -> "Ⲓ";
+				case 1 -> "Ⲕ";
+				case 2 -> "⳥";
+				case 3 -> "⳦";
+				case 4 -> "⳧";
+				case 5 -> "⳨";
+				case 6 -> "⳩";
+				case 7 -> "⳪";
+				case 8 -> "Ⳬ";
+				default -> "";
+			};
+			e.getPlayer()
+					.sendActionBar(Component.text(text).color(TextColor.color(0x4e, 0x5c, 0x24)));
+		}, 1L /*<-- the initial delay */, 0L /*<-- the interval */);//times in ticks
 
 		//todo if player joined make him choose class
 	}
 
 	@EventHandler
-	public void onPlayerLeave(PlayerQuitEvent e){
+	public void onPlayerLeave(PlayerQuitEvent e) {
 
 	}
 
@@ -173,7 +268,7 @@ public class SkylandListener implements Listener {
 	}
 
 	@EventHandler
-	public void onDuraDmg(PlayerItemDamageEvent e){
+	public void onDuraDmg(PlayerItemDamageEvent e) {
 
 		e.setCancelled(true);
 
@@ -181,27 +276,14 @@ public class SkylandListener implements Listener {
 	}
 
 	@EventHandler
-	public void onScrollEvent(PlayerItemHeldEvent e){
-		 String text = "Ⳮ⳯⳰⳱";
-		 text = text + switch (e.getNewSlot()) {
-			case 0 -> "Ⲓ";
-			case 1 -> "Ⲕ";
-			case 2 -> "⳥";
-			case 3 -> "⳦";
-			case 4 -> "⳧";
-			case 5 -> "⳨";
-			case 6 -> "⳩";
-			case 7 -> "⳪";
-			case 8 -> "Ⳬ";
-			default -> "";
-		};
+	public void onScrollEvent(PlayerItemHeldEvent e) {
+		//String text = "Ⳮ⳯⳰⳱";
 
-		e.getPlayer().showTitle(Title.title(Component.text(text).
-				color(TextColor.color(0x4e, 0x5c, 0x24)), Component.text(""), Times.times(
-				Duration.of(0, ChronoUnit.SECONDS), Duration.of(10, ChronoUnit.SECONDS),Duration.of(0, ChronoUnit.SECONDS))));
+		//e.getPlayer().showTitle(Title.title(Component.text(""), Component.text(text)color
+		// (TextColor.color(0x4e, 0x5c, 0x24)), Times.times(
+		//		Duration.of(0, ChronoUnit.SECONDS), Duration.of(10, ChronoUnit.SECONDS),Duration
+		//		.of(0, ChronoUnit.SECONDS))));
 
 	}
-
-
 
 }

@@ -11,11 +11,24 @@ import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryUI.AllInventory;
+import eu.darkcube.system.skyland.mobs.CustomMob;
+import eu.darkcube.system.skyland.mobs.FollowingMob;
+import eu.darkcube.system.skyland.worldGen.CustomChunkGenerator;
 import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
+
+import java.util.ArrayList;
 
 public class Skyland extends DarkCubePlugin {
+
+	ArrayList<CustomMob> mobs = new ArrayList<>();
 
 	private static Skyland instance;
 
@@ -35,6 +48,8 @@ public class Skyland extends DarkCubePlugin {
 
 	@Override
 	public void onEnable() {
+
+
 /*		try {
 			Language.GERMAN.registerLookup(getClassLoader(), "messages_de.properties",
 					s -> Message.PREFIX + s);
@@ -45,7 +60,7 @@ public class Skyland extends DarkCubePlugin {
 		}
 		*/
 
-		UserAPI.getInstance().addModifier(new SkylandPlayerModifier());
+
 
 		SkylandListener damageListener = new SkylandListener(this);
 		Bukkit.getPluginManager().registerEvents(damageListener, instance);
@@ -70,6 +85,55 @@ public class Skyland extends DarkCubePlugin {
 		instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
 		Bukkit.getPluginManager().registerEvents(trainingStand, this);
 
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (CustomMob cm : mobs){
+					cm.aiTick();
+				}
+			}
+		}.runTaskTimer(this, 20, 1);
+
+
 	}
 
+	public ArrayList<CustomMob> getMobs() {
+		return mobs;
+	}
+	public CustomMob getCustomMob(Mob mob){
+		for (CustomMob customMob : mobs){
+			if (mob.equals(customMob.getMob())){
+				return customMob;
+			}
+		}
+
+		if (mob.getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
+			int id = mob.getPersistentDataContainer().get(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER);
+			if (id == 0){
+				return new FollowingMob(mob);
+			}
+		}
+
+		return null;
+	}
+
+	public void removeCustomMob(Mob m){
+		for (CustomMob cm: mobs) {
+
+			if (cm.getMob().equals(m)){
+				mobs.remove(cm);
+				System.out.println("mob removed");
+				return;
+			}
+
+		}
+
+		System.out.println("no mob removed");
+	}
+
+	@Override
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+		System.out.println("custom gen loaded!!");
+		return new CustomChunkGenerator();
+	}
 }

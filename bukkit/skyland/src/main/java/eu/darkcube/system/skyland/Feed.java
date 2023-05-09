@@ -16,6 +16,7 @@ import eu.darkcube.system.skyland.inventoryUI.SelectActiveClass;
 import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.skyland.inventoryUI.InventoryUI;
 import eu.darkcube.system.skyland.inventoryUI.UIitemStack;
+import eu.darkcube.system.skyland.mobs.CustomZombie;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
@@ -25,6 +26,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.command.Command;
 
@@ -51,10 +53,10 @@ public class Feed implements CommandExecutor {
             }else if(args[0].equals("clear")){
                 SkylandPlayerModifier.getSkylandPlayer(p).resetData();
             }else if(args[0].equals("gui")){
-                if (args.length>1){
-                    p.showTitle(Title.title(Component.text(args[1]).
+                if (args.length>2){
+                    p.showTitle(Title.title(Component.text(args[2]).
                             color(TextColor.color(0x4e, 0x5c, 0x24)), Component.text(""), Times.times(
-                            Duration.of(0, ChronoUnit.SECONDS), Duration.of(10, ChronoUnit.SECONDS),Duration.of(0, ChronoUnit.SECONDS))));
+                            Duration.of(0, ChronoUnit.SECONDS), Duration.of(Long.parseLong(args[1]), ChronoUnit.SECONDS),Duration.of(0, ChronoUnit.SECONDS))));
                     //p.sendTitle(args[1], "", 0, 100000, 0);
                 }else {
                     p.sendTitle("\uEff1", "", 0, 100000, 0);
@@ -81,6 +83,8 @@ public class Feed implements CommandExecutor {
                             Integer.parseInt(args[1]));
                     skp.setSkylandPlayerClasses(skpc);
                 }
+            }else if(args[0].equals("mob")){
+                CustomZombie customZombie = new CustomZombie(p.getLocation());
             }
         }else {
             InventoryUI inventoryUI = new InventoryUI(6, "\uEff1", (Player) sender);
