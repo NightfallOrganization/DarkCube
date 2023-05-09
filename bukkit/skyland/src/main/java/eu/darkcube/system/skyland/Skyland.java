@@ -15,11 +15,9 @@ import eu.darkcube.system.skyland.mobs.FollowingMob;
 import eu.darkcube.system.skyland.worldGen.CustomChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
 
@@ -39,7 +37,8 @@ public class Skyland extends DarkCubePlugin {
 
 	@Override
 	public void onDisable() {
-		System.out.println("disable");
+		CommandAPI.getInstance().unregisterByPrefix("skyland");
+		SkylandGeneratorCommand.deleteCustomWorlds(this);
 	}
 
 	@Override
@@ -95,7 +94,6 @@ public class Skyland extends DarkCubePlugin {
 
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-		System.out.println("custom gen loaded!!");
 		return new CustomChunkGenerator();
 	}
 
@@ -133,11 +131,5 @@ public class Skyland extends DarkCubePlugin {
 		}
 
 		System.out.println("no mob removed");
-	}
-
-	@Override
-	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-		System.out.println("custom gen loaded!!");
-		return new CustomChunkGenerator();
 	}
 }
