@@ -36,7 +36,7 @@ import javax.imageio.ImageIO;
 public class SebUtil {
 
 	public static Random random = new Random();
-	public static final String IMAGE_URL = "/res/map_data/provinces.png";
+	public static final String IMAGE_URL = "/resources/biomes.png";
 
 
 	protected static int[][] pixels;
@@ -71,7 +71,7 @@ public class SebUtil {
 	 */
 
 
-	private static int[][] convertTo3DWithoutUsingGetRGB(BufferedImage image) {
+	public static int[][] convertTo3DWithoutUsingGetRGB(BufferedImage image) {
 
 		final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 		width = image.getWidth();
@@ -114,7 +114,7 @@ public class SebUtil {
 		return result;
 	}
 
-	private static Set<Integer> getUniqueColors(int[][] pixels) {
+	public static Set<Integer> getUniqueColors(int[][] pixels) {
 		Set<Integer> out = new TreeSet<Integer>();
 		for (int i = 0; i < pixels.length; i++) {
 			for (int j = 0; j < pixels[i].length; j++) {

@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.skyland;
 
+import SkylandUtil.SebUtil;
 import eu.darkcube.system.skyland.Equipment.*;
 import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayer;
@@ -17,6 +18,7 @@ import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.skyland.inventoryUI.InventoryUI;
 import eu.darkcube.system.skyland.inventoryUI.UIitemStack;
 import eu.darkcube.system.skyland.mobs.CustomZombie;
+import eu.darkcube.system.skyland.worldGen.SkylandBiomes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
@@ -34,7 +36,11 @@ import org.bukkit.command.Command;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.BlockVector;
+import org.checkerframework.common.reflection.qual.GetClass;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -109,6 +115,26 @@ public class Feed implements CommandExecutor {
                 StructureManager structureManager = Skyland.getInstance().getServer().getStructureManager();
                 structureManager.loadStructure(new NamespacedKey(Skyland.getInstance(), "test"));
                 p.sendMessage("struc loaded");
+            }else if (args[0].equals("pic")){
+                p.sendMessage("display pic");
+                if (args.length == 3){
+                    p.sendMessage("Color: " + SkylandBiomes.getColor(Integer.parseInt(args[1]),
+                            Integer.parseInt(args[2])));
+                    return true;
+                }
+                try {
+                    System.out.println("test");
+                    int[][] colors = SebUtil.convertTo3DWithoutUsingGetRGB(ImageIO.read(new File("biomes.png")));
+                    for (int[] pixels : colors){
+                        String out = "";
+                        for (int pixel : pixels){
+                            out += pixel + ", ";
+                        }
+                        System.out.println(out);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
 

@@ -178,7 +178,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 		BiomeGenModifiers biomeGenModifier = biomes.getBiomeGenModifiers();
 
-		int details =  (int) ((details.noise(x,z, biomeGenModifier.detailsFrequency,
+		int details =  (int) ((this.details.noise(x,z, biomeGenModifier.detailsFrequency,
 				biomeGenModifier.detailsAmplitude,
 				true)) * biomeGenModifier.maxDetailsHeight + biomeGenModifier.minDetailsHeight) / biomeGenModifier.detailsImpact;
 
@@ -186,7 +186,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		return baseNoise + details;
 	}
 	public int getFinalTopY(int x, int z) {
-		int iterpolRad = 3;
+		int iterpolRad = 5;
 
 		int sum = 0;
 		for (int dx = -iterpolRad; dx <= iterpolRad; dx++)  {
