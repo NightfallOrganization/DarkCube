@@ -37,7 +37,6 @@ public class CustomZombie {
 		FollowingMob fm = new FollowingMob(zombie, 5, new PlayerStats[] {new PlayerStats(
 				PlayerStatsType.ARMOR, 100)}, 1, true);
 		System.out.println("following mob ai added");
-		System.out.println(new Gson().toJson(Skyland.getInstance().getMobs()));
 
 		/*
 		new BukkitRunnable() {

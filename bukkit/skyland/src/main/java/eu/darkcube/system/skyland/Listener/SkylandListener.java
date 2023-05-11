@@ -24,7 +24,12 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Biome;
+import org.bukkit.block.structure.Mirror;
+import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -42,11 +47,14 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.structure.Structure;
+import org.bukkit.structure.StructureManager;
 
 import javax.swing.text.html.HTML.Tag;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Random;
 
 public class SkylandListener implements Listener {
 
@@ -140,7 +148,35 @@ public class SkylandListener implements Listener {
 	}
 
 	@EventHandler
+	public void onChunkLoad(ChunkLoadEvent e){
+		NamespacedKey nk = new NamespacedKey(Skyland.getInstance(), "test3");
+		if (e.getChunk().getPersistentDataContainer().has(nk)){
+			return;
+		}
+		StructureManager structureManager = Skyland.getInstance().getServer().getStructureManager();
+		Structure structure = structureManager.getStructure(new NamespacedKey(Skyland.getInstance(), "test"));
+		if (structure == null){
+			structureManager.loadStructure(new NamespacedKey(Skyland.getInstance(), "test"));
+			structure = structureManager.getStructure(new NamespacedKey(Skyland.getInstance(), "test"));
+		}
+		if (e.getWorld().getName().equals("world")){
+			return;
+		}
+
+		Random random = new Random();
+		e.getChunk().getPersistentDataContainer().set(nk, PersistentDataType.STRING, "");
+		int x = random.nextInt(16) + e.getChunk().getX() * 16;
+		int z = random.nextInt(16) + e.getChunk().getZ() * 16;
+		structure.place(new Location(e.getWorld(), x, 200 , z), true, StructureRotation.NONE, Mirror.NONE, -1, 1, new Random());
+
+
+
+	}
+
+	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e){
+		Biome biome = e.getLocation().getBlock().getBiome();
+
 		//e.setCancelled(true);
 		//todo debug statement
 	}
@@ -153,11 +189,16 @@ public class SkylandListener implements Listener {
 			System.out.println("mob died");
 			e.getDrops().removeAll(e.getDrops());
 
-			Materials drop = Materials.getRandomMaterial(Skyland.getInstance().getCustomMob(mob).getLootTable());
-			System.out.println("drop: " + drop.toString());
-			e.getDrops().add(drop.getModel());
+			if (mob.getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
 
-			Skyland.getInstance().removeCustomMob(mob);
+				Materials drop = Materials.getRandomMaterial(Skyland.getInstance().getCustomMob(mob).getLootTable());
+				System.out.println("drop: " + drop.toString());
+				e.getDrops().add(drop.getModel());
+
+				Skyland.getInstance().removeCustomMob(mob);
+			}
+
+
 		}
 	}
 	@EventHandler

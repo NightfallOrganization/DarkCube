@@ -187,4 +187,5 @@ public class FollowingMob implements CustomMob{
 	public void setStats(PlayerStats[] stats) {
 		mob.getPersistentDataContainer().set(statsKey, PersistentDataType.STRING, new Gson().toJson(stats));
 	}
+
 }

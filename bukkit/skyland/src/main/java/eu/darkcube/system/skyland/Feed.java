@@ -23,13 +23,19 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.structure.Mirror;
+import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.command.Command;
+import org.bukkit.structure.Structure;
+import org.bukkit.structure.StructureManager;
+import org.bukkit.util.BlockVector;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -85,7 +91,28 @@ public class Feed implements CommandExecutor {
                 }
             }else if(args[0].equals("mob")){
                 CustomZombie customZombie = new CustomZombie(p.getLocation());
+            }else if(args[0].equals("copy")){
+                StructureManager structureManager = Skyland.getInstance().getServer().getStructureManager();
+                Structure structure = structureManager.createStructure();
+                structure.fill(((Player) sender).getLocation(), new BlockVector(5, 5, 5), false);
+
+                structureManager.registerStructure(new NamespacedKey(Skyland.getInstance(), "test"), structure);
+                structureManager.saveStructure(new NamespacedKey(Skyland.getInstance(), "test"));
+                p.sendMessage("structure saved");
+
+            }else if(args[0].equals("paste")){
+                StructureManager structureManager = Skyland.getInstance().getServer().getStructureManager();
+                structureManager.getStructure(new NamespacedKey(Skyland.getInstance(), "test"))
+                        .place(((Player) sender).getLocation(), true, StructureRotation.NONE, Mirror.NONE, -1, 1, new Random());
+                p.sendMessage("structure pasted");
+            }else if(args[0].equals("load")){
+                StructureManager structureManager = Skyland.getInstance().getServer().getStructureManager();
+                structureManager.loadStructure(new NamespacedKey(Skyland.getInstance(), "test"));
+                p.sendMessage("struc loaded");
             }
+
+
+
         }else {
             InventoryUI inventoryUI = new InventoryUI(6, "\uEff1", (Player) sender);
             inventoryUI.setInvSlot(new UIitemStack(true, new ItemStack(Material.DIAMOND_SWORD)), 0, 5);
@@ -135,6 +162,8 @@ public class Feed implements CommandExecutor {
              */
         return true;
     }
+
+
 
 
 }
