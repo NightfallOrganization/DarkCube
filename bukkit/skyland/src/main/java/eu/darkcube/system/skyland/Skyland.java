@@ -8,23 +8,33 @@ package eu.darkcube.system.skyland;
 
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.skyland.Listener.SkylandListener;
 import eu.darkcube.system.skyland.inventoryUI.AllInventory;
 import eu.darkcube.system.skyland.mobs.CustomMob;
 import eu.darkcube.system.skyland.mobs.FollowingMob;
 import eu.darkcube.system.skyland.worldGen.CustomChunkGenerator;
+import eu.darkcube.system.skyland.worldGen.Structures.SkylandStructure;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Skyland extends DarkCubePlugin {
 
 	private static Skyland instance;
 	ArrayList<CustomMob> mobs = new ArrayList<>();
+	List<SkylandStructure> structures = new ArrayList<>();
+
+	CustomChunkGenerator customChunkGenerator;
 
 	public Skyland() {
 		super("skyland");
@@ -35,14 +45,48 @@ public class Skyland extends DarkCubePlugin {
 		return instance;
 	}
 
+
 	@Override
 	public void onDisable() {
+
+
+		for (SkylandStructure skylandStructure : structures){
+			saveStructure(skylandStructure);
+		}
+
 		CommandAPI.getInstance().unregisterByPrefix("skyland");
 		SkylandGeneratorCommand.deleteCustomWorlds(this);
 	}
 
 	@Override
 	public void onEnable() {
+
+
+		File file = new File("skyland");
+		if (!file.exists()){
+			file.mkdirs();
+		}
+
+		file = new File("skyland/structures");
+		if (!file.exists()){
+			file.mkdirs();
+		}
+
+		Gson gson = new Gson();
+
+		for (File f: file.listFiles()){
+			try {
+				FileInputStream fileInputStream = new FileInputStream(f);
+				String content = Files.readString(f.toPath(), StandardCharsets.UTF_8);
+				fileInputStream.close();
+				structures.add(gson.fromJson(content, SkylandStructure.class));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
+		}
+
+
 
 
 /*		try {
@@ -89,9 +133,12 @@ public class Skyland extends DarkCubePlugin {
 
 	}
 
+
+
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-		return new CustomChunkGenerator();
+		customChunkGenerator = new CustomChunkGenerator();
+		return customChunkGenerator;
 	}
 
 	public ArrayList<CustomMob> getMobs() {
@@ -128,5 +175,26 @@ public class Skyland extends DarkCubePlugin {
 		}
 
 		System.out.println("no mob removed");
+	}
+
+	public CustomChunkGenerator getCustomChunkGenerator() {
+		return customChunkGenerator;
+	}
+
+	public List<SkylandStructure> getStructures() {
+		return structures;
+	}
+
+	public void saveStructure(SkylandStructure skylandStructure){
+		File file = new File("skyland/structures/" + skylandStructure.getNamespacedKey().getKey());
+		Gson gson = new Gson();
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(gson.toJson(skylandStructure));
+			writer.close();
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -17,6 +17,9 @@ import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.skyland.mobs.CustomMob;
 import eu.darkcube.system.skyland.mobs.FollowingMob;
+import eu.darkcube.system.skyland.worldGen.SkylandBiomes;
+import eu.darkcube.system.skyland.worldGen.Structures.SkylandStructure;
+import eu.darkcube.system.skyland.worldGen.Structures.SkylandStructureModifiers;
 import eu.darkcube.system.userapi.UserAPI;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
@@ -49,6 +52,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
+import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 import javax.swing.text.html.HTML.Tag;
 import java.time.Duration;
@@ -61,9 +65,11 @@ public class SkylandListener implements Listener {
 	boolean userAPI = false;
 	Skyland skyland;
 	NamespacedKey skylandPlayer = new NamespacedKey(Skyland.getInstance(), "SkylandPlayer");
+	SimplexOctaveGenerator structureGen = new SimplexOctaveGenerator(new Random(12452), 8);
 
 	public SkylandListener(Skyland skyland) {
 		this.skyland = skyland;
+		structureGen.setScale(0.1D);
 	}
 
 	public int calculateDmgAfterDefense(SkylandEntity attacker, SkylandEntity defender) {
@@ -149,25 +155,53 @@ public class SkylandListener implements Listener {
 
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent e){
-		NamespacedKey nk = new NamespacedKey(Skyland.getInstance(), "test3");
+		NamespacedKey nk = new NamespacedKey(Skyland.getInstance(), "test");
 		if (e.getChunk().getPersistentDataContainer().has(nk)){
 			return;
 		}
-		StructureManager structureManager = Skyland.getInstance().getServer().getStructureManager();
-		Structure structure = structureManager.getStructure(new NamespacedKey(Skyland.getInstance(), "test"));
-		if (structure == null){
-			structureManager.loadStructure(new NamespacedKey(Skyland.getInstance(), "test"));
-			structure = structureManager.getStructure(new NamespacedKey(Skyland.getInstance(), "test"));
-		}
+
+
+
 		if (e.getWorld().getName().equals("world")){
 			return;
 		}
+		for (SkylandStructure skylandStructure : Skyland.getInstance().getStructures()){
 
-		Random random = new Random();
-		e.getChunk().getPersistentDataContainer().set(nk, PersistentDataType.STRING, "");
-		int x = random.nextInt(16) + e.getChunk().getX() * 16;
-		int z = random.nextInt(16) + e.getChunk().getZ() * 16;
-		structure.place(new Location(e.getWorld(), x, 200 , z), true, StructureRotation.NONE, Mirror.NONE, -1, 1, new Random());
+			if (skylandStructure.getStructure() != null){
+				//todo make sure to see if there is space
+				//for (int x = 0; x < 16; x++) {
+				//	for (int z = 0; x < 16; x++) {
+						//todo
+				//	}
+				//}
+				e.getChunk().getPersistentDataContainer().set(nk, PersistentDataType.STRING, "");
+
+				Random random = new Random();
+				int x = random.nextInt(16) + e.getChunk().getX() * 16;
+				int z = random.nextInt(16) + e.getChunk().getZ() * 16;
+				SkylandStructureModifiers mod = skylandStructure.getModifier(SkylandBiomes.getBiome(x, z));
+
+
+				if (mod != null && skylandStructure.shouldPlace(x, z)){
+					int roll = random.nextInt(0, mod.getRarity());
+					if (roll == 0){
+
+						int y = Skyland.getInstance().getCustomChunkGenerator().getFinalTopY(x, z);
+						skylandStructure.getStructure().place(new Location(e.getWorld(), x, y+1 , z), true, StructureRotation.NONE, Mirror.NONE, -1, 1, new Random());
+
+
+					}
+				}
+
+
+
+
+
+			}
+
+
+		}
+
 
 
 

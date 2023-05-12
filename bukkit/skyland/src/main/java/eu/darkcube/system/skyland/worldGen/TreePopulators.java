@@ -32,11 +32,12 @@ public class TreePopulators extends BlockPopulator {
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				double roll =(islandGen.noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5D, 0.5D, true)
-								+ 1) ;
+
+				double roll = (islandGen.noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5D, 0.5D, true) + 1);
 				int treeFreq = 2; // tree everey treeFreq block
 
-				if (((int)(roll * treeFreq)) % treeFreq == 0){
+				if (((int) (roll * treeFreq)) % treeFreq == 0
+						&& SkylandBiomes.getBiomeIntensity(chunkX * 16 + x, chunkZ * 16 + z) > 2) {
 
 					int y = worldInfo.getMaxHeight()-10;
 					while(limitedRegion.getType(chunkX * 16 + x,y, chunkZ * 16 + z).isAir() && y > limitedRegion.getWorld()

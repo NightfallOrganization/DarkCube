@@ -114,15 +114,7 @@ public enum SkylandBiomes {
 		return biomeGenModifiers;
 	}
 
-	static final int[][] colors;
-
-	static {
-		try {
-			colors = SebUtil.convertTo3DWithoutUsingGetRGB(ImageIO.read(new File("biomes.png")));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	static int[][] colors = null;
 
 	static int[][] intensity = null;
 
@@ -173,6 +165,13 @@ public enum SkylandBiomes {
 		if (intensity == null) {
 			calcIntensity();
 		}
-		return intensity[x][y];
+
+		biomeGen.setScale(0.002D);
+		biomeGen2.setScale(0.002D);
+
+		int test = (int) ((biomeGen.noise(x, z, 0.2D, 0.5D, true) + 1) * colors.length / 2);
+		int test2 = (int) ((biomeGen2.noise(x, z, 0.2D, 0.5D, true) + 1) * colors[0].length / 2);
+
+		return intensity[test][test2];
 	}
 }

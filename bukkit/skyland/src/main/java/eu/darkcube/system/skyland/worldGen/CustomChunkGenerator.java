@@ -48,6 +48,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 			int chunkZ, @NotNull ChunkData chunkData) {
 
 
+
 		//test end
 
 		for (int x = 0; x < 16; x++) {
@@ -56,7 +57,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 				int islandGenHeight = getIslandHeight(chunkX * 16 + x, chunkZ * 16 + z);
 				SkylandBiomes skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
 
-				if (islandGenHeight < 35) {
+				if (isIsland(chunkX * 16 + x, chunkZ * 16 + z)) {
 
 					/*
 					//int currentHeight = (int) ((generator.noise(chunkX * 16 + x, chunkZ * 16 +
@@ -171,6 +172,15 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		 */
 	}
 
+	public boolean isIsland(int x, int z){
+		boolean isVoidIslands = true;
+		if (getIslandThiccness(x, z) < 35 || !isVoidIslands) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public int getRawTopY(int x, int z, SkylandBiomes biomes) {
 
 		int baseNoise = (int) ((generator.noise(x, z, biomes.getBiomeGenModifiers().terrainFrequency, biomes.getBiomeGenModifiers().terrainAmplitude,
@@ -194,7 +204,15 @@ public class CustomChunkGenerator extends ChunkGenerator {
 				sum += getRawTopY(x, z, SkylandBiomes.getBiome(x + dx, z + dz));
 			}
 		}
-		return sum / ((iterpolRad*2+1) * (iterpolRad*2+1));
+		int out = sum / ((iterpolRad*2+1) * (iterpolRad*2+1));
+
+		int islandGenHeight = getIslandThiccness(x, z);
+
+		if (islandGenHeight >= 29){
+			out = (int) (out - 0.67*(islandGenHeight-35) - 0.67*6);
+		}
+
+		return out;
 	}
 
 	public int getCurrentHeightTemp(SkylandBiomes skylandBiomes, int x, int z){
@@ -225,6 +243,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		return currentHeight;
 	}
 
+
 	public int getCurrentHeight(int x, int z){
 
 
@@ -240,11 +259,18 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 
 
+	public int getIslandIntensity(int x, int z){
+		return getIslandThiccness(x, z) -35;
+	}
 
-
-
-
-	public int getIslandHeight(int x, int z){
+	/**
+	 * This method uses the given x and z value to generate the island's thiccness (or existance) at this point.
+	 * This method only concerns itself with primary terrain generation. (Not spikes)
+	 * @param x
+	 * @param z
+	 * @return
+	 */
+	public int getIslandThiccness(int x, int z){
 		int islandGenHeight =
 				(int) ((islandThiccnessNoise.noise(x/2, z/2, 0.5D, 0.5D, true)
 						+ 1) * 50D);
@@ -261,7 +287,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	@Override
 	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
 		ArrayList<BlockPopulator> out = new ArrayList<>();
-		//out.add(new TreePopulators());
+		out.add(new TreePopulators());
 		out.add(new LootChestPopulator());
 
 		return out;
