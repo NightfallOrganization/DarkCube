@@ -25,8 +25,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.command.CommandExecutor;
@@ -52,7 +52,8 @@ import java.util.*;
 
 public class Feed implements CommandExecutor {
 
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	@SuppressWarnings("deprecation")
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
 		//todo test cmd
 		if (args.length > 0) {

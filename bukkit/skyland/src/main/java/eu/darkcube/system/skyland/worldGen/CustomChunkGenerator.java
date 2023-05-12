@@ -54,7 +54,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 
-				int islandGenHeight = getIslandHeight(chunkX * 16 + x, chunkZ * 16 + z);
+				int islandGenHeight = getIslandThiccness(chunkX * 16 + x, chunkZ * 16 + z);
 				SkylandBiomes skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
 
 				if (isIsland(chunkX * 16 + x, chunkZ * 16 + z)) {
@@ -234,7 +234,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 
 
-		int islandGenHeight = getIslandHeight(x, z);
+		int islandGenHeight = getIslandThiccness(x, z);
 
 		if (islandGenHeight >= 29){
 			currentHeight = (int) (currentHeight - 0.67*(islandGenHeight-35) - 0.67*6);
@@ -299,6 +299,15 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	public @Nullable BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
 		return biomeProvider;
 	}
+
+
+	public boolean shouldGenerateObject(SimplexOctaveGenerator generator, int x, int z, int rarity, int minIntensity) {
+		double roll = (generator.noise(x, z, 0.5D, 0.5D, true) + 1);
+		return ((int) (roll * rarity)) % rarity == 0
+				&& SkylandBiomes.getBiomeIntensity(x, z) > minIntensity;
+	}
+
+
 }
 
 
