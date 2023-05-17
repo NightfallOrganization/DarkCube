@@ -7,7 +7,6 @@
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.event.perk.other.DoubleJumpEvent;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -24,6 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
@@ -31,6 +31,8 @@ import java.util.HashSet;
 
 public class StomperPerk extends Perk {
 	public static final PerkName STOMPER = new PerkName("STOMPER");
+	private static final Key wasOnGround =
+			new Key(WoolBattle.instance(), "perk_stomper_was_on_ground");
 	private static final Key active = new Key(WoolBattle.instance(), "perk_stomper_active");
 	private static final Key startPos = new Key(WoolBattle.instance(), "perk_stomper_start_pos");
 
@@ -86,7 +88,9 @@ public class StomperPerk extends Perk {
 					continue;
 				if (target.getBukkitEntity().getLocation().distance(center) > radius)
 					continue;
-				if (Math.abs(target.getBukkitEntity().getLocation().getY() - center.getY()) > 1.5)
+				if (target.getBukkitEntity().getLocation().distance(center) < radius - 2)
+					continue;
+				if (Math.abs(target.getBukkitEntity().getLocation().getY() - center.getY()) > 2.5)
 					continue;
 				if (!WoolBattle.instance().getIngame().attack(user, target))
 					continue;
@@ -114,6 +118,10 @@ public class StomperPerk extends Perk {
 		@Override
 		public void run() {
 			for (WBUser user : WBUser.onlineUsers()) {
+				if (user.perks().count(STOMPER) == 0)
+					continue;
+				if (user.getBukkitEntity().isOnGround())
+					user.user().getMetaDataStorage().set(wasOnGround, true);
 				if (!user.getTeam().canPlay())
 					continue;
 				if (!user.user().getMetaDataStorage().has(active))
@@ -123,13 +131,16 @@ public class StomperPerk extends Perk {
 								.getType() == Material.AIR)
 					continue;
 				int removed;
+				user.user().getMetaDataStorage().remove(active);
 				double starty = user.user().getMetaDataStorage().remove(startPos);
-				int size = user.user().getMetaDataStorage().remove(active);
+				double diff = starty - user.getBukkitEntity().getLocation().getY();
+				if (diff < 2)
+					continue;
 				if ((removed = user.removeWool(cost())) != cost()) {
 					user.addWool(removed);
 					continue;
 				}
-				double rad = size * 5;
+				double rad = Math.pow(diff, 0.6);
 				new ShockwaveScheduler(user, user.getBukkitEntity().getLocation(),
 						rad).runTaskTimer(1);
 			}
@@ -147,14 +158,24 @@ public class StomperPerk extends Perk {
 	}
 
 	public class StomperListener implements Listener {
-		@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-		public void handle(DoubleJumpEvent event) {
-			int size = event.user().user().getMetaDataStorage().getOr(active, 0);
-			size += event.user().perks().perks(perkName()).size();
-			if (size > 0) {
-				event.user().user().getMetaDataStorage().set(active, size);
-				event.user().user().getMetaDataStorage()
-						.set(startPos, event.user().getBukkitEntity().getLocation().getY());
+
+		@EventHandler(priority = EventPriority.HIGHEST)
+		public void handle(PlayerMoveEvent event) {
+			WBUser user = WBUser.getUser(event.getPlayer());
+			if (!user.getTeam().canPlay())
+				return;
+			if (user.perks().count(perkName()) == 0)
+				return;
+			if (!user.user().getMetaDataStorage().has(active)) {
+				boolean og = user.user().getMetaDataStorage().has(wasOnGround) && user.user()
+						.getMetaDataStorage().<Boolean>remove(wasOnGround);
+				if (!og && event.getFrom().subtract(0, 0.95, 0).getBlock().getType()
+						== Material.AIR)
+					return;
+			}
+			if (event.getFrom().getY() - event.getTo().getY() < 0) {
+				user.user().getMetaDataStorage().set(active, true);
+				user.user().getMetaDataStorage().set(startPos, event.getTo().getY());
 			}
 		}
 	}
