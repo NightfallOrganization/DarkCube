@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.darkessentials;
 
 import com.google.gson.Gson;
@@ -22,10 +21,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.Legacy
 import eu.darkcube.system.libs.net.kyori.adventure.title.Title;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -106,7 +102,8 @@ public class DarkEssentials extends Plugin {
 	}
 
 	public static boolean sendMessageAndReturnTrue(String message, CommandSender... senders) {
-		DarkEssentials.getPlugin(DarkEssentials.class).sendMessage(message, Arrays.asList(senders));
+		DarkEssentials.getPlugin(DarkEssentials.class).sendMessage(message,
+				Arrays.asList(senders));
 		return true;
 	}
 
@@ -162,6 +159,7 @@ public class DarkEssentials extends Plugin {
 
 	@Override
 	public void onEnable() {
+		createConfig("worlds");
 		try {
 			Language.ENGLISH.registerLookup(getClass().getClassLoader(), "messages_en.properties",
 					k -> Message.getPrefix() + k);
@@ -278,6 +276,7 @@ public class DarkEssentials extends Plugin {
 		CommandAPI.enable(this, new CommandSpeed());
 		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandXp());
 		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandSpawner());
+		eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().register(new CommandLoadWorld());
 		CommandAPI.enable(this, new CommandFly());
 		CommandAPI.enable(this, new CommandPing());
 		CommandAPI.enable(this, new CommandRepair());
@@ -303,6 +302,9 @@ public class DarkEssentials extends Plugin {
 			CommandAPI.enable(this, new CommandWarpEdit());
 		}
 
+		List<String> worlds = getConfig("worlds").getStringList("worlds");
+		for (String world : worlds) {
+			new WorldCreator(world).createWorld();
+		}
 	}
-
 }
