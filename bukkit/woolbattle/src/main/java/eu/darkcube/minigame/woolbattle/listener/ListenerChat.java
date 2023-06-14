@@ -28,10 +28,11 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 		Player p = e.getPlayer();
 		WBUser user = WBUser.getUser(p);
 		String msg = e.getMessage();
-		boolean atall = false;
+		boolean atall = true;
 		boolean replace = !main.getLobby().enabled();
 		boolean startsatall = false;
 		if (main.getIngame().enabled()) {
+			atall = false;
 			startsatall = msg.startsWith(main.atall);
 			boolean startsatteam = msg.startsWith(main.atteam);
 			atall = startsatall || user.getTeam().getUsers().size() == 1;
@@ -55,7 +56,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
 			return;
 		}
 		msg = getMessage(p, msg, atall, color, main, startsatall);
-		if (user.getTeam().getType().equals(TeamType.SPECTATOR)) {
+		if (main.getIngame().enabled() && user.getTeam().getType().equals(TeamType.SPECTATOR)) {
 			main.sendMessageWithoutPrefix(msg,
 					user.getTeam().getUsers().stream().map(u -> Bukkit.getPlayer(u.getUniqueId()))
 							.collect(Collectors.toSet()));
