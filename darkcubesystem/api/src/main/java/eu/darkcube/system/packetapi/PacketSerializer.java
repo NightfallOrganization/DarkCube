@@ -23,8 +23,7 @@ public class PacketSerializer {
 	public static Class<? extends Packet> getClass(JsonDocument doc) {
 		try {
 			return (Class<? extends Packet>) Class.forName(doc.getString("packetClass"));
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
+		} catch (ClassNotFoundException ignored) {
 		}
 		return null;
 	}

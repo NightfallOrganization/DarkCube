@@ -23,6 +23,7 @@ import eu.darkcube.system.vanillaaddons.module.modules.teleporter.Teleporter.Tel
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule.TeleporterListener;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
@@ -33,7 +34,7 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
 	@Override
 	protected AddonsAsyncPagedInventory openInventory(AUser user) {
 		Teleporter teleporter = data();
-		final Key KEY_TYPE = new Key(user.addons(), "teleInvType");
+		final Key KEY_TYPE = new Key(user.addons(), "teleporter_inventory_type");
 		AddonsAsyncPagedInventory i =
 				new AddonsAsyncPagedInventory(TYPE, data().dname(), () -> true) {
 
@@ -91,6 +92,9 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
 										Component.text("Icon").color(TextColor.color(120, 120,
 												120)))
 								.lore(Component.translatable(teleporter.icon().translationKey()))
+								.flag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS,
+										ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON,
+										ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_UNBREAKABLE)
 								.persistentDataStorage()
 								.iset(KEY_TYPE, PersistentDataTypes.INTEGER, 0).builder().build();
 						ItemStack name = ItemBuilder.item(Material.NAME_TAG).displayname(

@@ -17,8 +17,11 @@ import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 public class Perk {
+
+	public static final Logger logger = Logger.getLogger("Perk");
 
 	private final Collection<Listener> listeners = new ArrayList<>();
 	private final Collection<ConfiguredScheduler> schedulers = new ArrayList<>();
@@ -83,7 +86,8 @@ public class Perk {
 	}
 
 	/**
-	 * Adds schedulers for this perk. All schedulers will be registered and unregistered when needed
+	 * Adds schedulers for this perk. All schedulers will be registered and unregistered when
+	 * needed
 	 * for the perk to function (for example during ingame phase)
 	 *
 	 * @param schedulers the schedulers to add to this perk
@@ -100,6 +104,7 @@ public class Perk {
 	 */
 	public void startLogic() {
 		WoolBattle.registerListeners(listeners.toArray(new Listener[0]));
+		schedulers.forEach(ConfiguredScheduler::start);
 	}
 
 	/**
@@ -109,6 +114,7 @@ public class Perk {
 	 * @see #startLogic()
 	 */
 	public void stopLogic() {
+		schedulers.forEach(ConfiguredScheduler::stop);
 		WoolBattle.unregisterListeners(listeners.toArray(new Listener[0]));
 	}
 
@@ -168,7 +174,8 @@ public class Perk {
 	}
 
 	/**
-	 * This is the class for all perk types. May need renaming in the future, {@code ActivationType}
+	 * This is the class for all perk types. May need renaming in the future, {@code
+	 * ActivationType}
 	 * is not quite accurate.<br><br>
 	 * <p>
 	 * {@link ActivationType#PRIMARY_WEAPON PRIMARY_WEAPON},
@@ -219,7 +226,8 @@ public class Perk {
 	}
 
 	/**
-	 * Functional interface for creating new instances of {@link UserPerk}s. Every {@link Perk perk}
+	 * Functional interface for creating new instances of {@link UserPerk}s. Every {@link Perk
+	 * perk}
 	 * must have one.
 	 */
 	public interface UserPerkCreator {
@@ -243,19 +251,19 @@ public class Perk {
 			return cooldown;
 		}
 
-		public enum Unit {
-			TICKS {
+		public static abstract class Unit {
+			public static final Unit TICKS = new Unit() {
 				@Override
 				public int itemCount(int cooldown) {
 					return cooldown / 20 + 1;
 				}
-			}, ACTIVATIONS {
+			};
+			public static final Unit ACTIVATIONS = new Unit() {
 				@Override
 				public int itemCount(int cooldown) {
 					return cooldown;
 				}
-			},
-			;
+			};
 
 			public abstract int itemCount(int cooldown);
 		}

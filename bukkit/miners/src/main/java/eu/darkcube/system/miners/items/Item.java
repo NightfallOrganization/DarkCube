@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package eu.darkcube.system.miners.items;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -59,7 +58,8 @@ public enum Item {
 		//		return lore.equals("")
 		//				? itemBuilder.displayname(getName(lang)).amount(amount).build()
 		//				: itemBuilder.displayname(getName(lang))
-		//						.lores(Arrays.asList(getLore(lang).split("\n"))).amount(amount).build();
+		//						.lores(Arrays.asList(getLore(lang).split("\n"))).amount(amount)
+		//						.build();
 	}
 
 	public ItemStack getItem(Player player, int amount) {
@@ -71,7 +71,7 @@ public enum Item {
 	}
 
 	public static class ItemKey { // Quick fix, change later
-		public static final Key ITEM = new Key(Miners.getInstance(), "ITEM");
+		public static final Key ITEM = new Key(Miners.getInstance(), "item");
 	}
 
 }

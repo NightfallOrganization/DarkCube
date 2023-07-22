@@ -20,26 +20,31 @@ public class SetLifesCommand extends PServerExecutor {
 
 	public SetLifesCommand() {
 		super("setlifes", new String[0], b -> b.then(
-				Commands.argument("lifes", IntegerArgumentType.integer(0, 999)).requires(source -> {
-					return WoolBattle.instance().getLobby().enabled();
-				}).executes(context -> {
-					int lifes = IntegerArgumentType.getInteger(context, "lifes");
-					WoolBattle.instance().baseLifes = lifes;
-					context.getSource().sendMessage(Message.WOOLBATTLE_SETLIFES_LIFES, lifes);
-					return 0;
-				})).then(Commands.argument("team", TeamArgument.teamArgument(TeamType::isEnabled))
-				.then(Commands.argument("lifes", IntegerArgumentType.integer(0, 999))
+						Commands.argument("lifes", IntegerArgumentType.integer(0, 999))
+								.requires(source -> WoolBattle.instance().getLobby().enabled())
+								.executes(context -> {
+									int lifes = IntegerArgumentType.getInteger(context, "lifes");
+									WoolBattle.instance().baseLifes = lifes;
+									context.getSource()
+											.sendMessage(Message.WOOLBATTLE_SETLIFES_LIFES, lifes);
+									return 0;
+								}))
+				.then(Commands.argument("team", TeamArgument.teamArgument(TeamType::isEnabled))
 						.requires(source -> WoolBattle.instance().getIngame().enabled())
-						.executes(context -> {
-							TeamType type = TeamArgument.getTeam(context, "team");
-							int lifes = IntegerArgumentType.getInteger(context, "lifes");
-							Team team = WoolBattle.instance().getTeamManager().getTeam(type);
-							team.setLifes(lifes);
-							context.getSource().sendMessage(Message.WOOLBATTLE_SETLIFES_TEAM_LIFES,
-									Component.text(team.getType().getDisplayNameKey())
-											.style(team.getPrefixStyle()), lifes);
-							return 0;
-						}))));
+						.then(Commands.argument("lifes", IntegerArgumentType.integer(0, 999))
+								.executes(context -> {
+									TeamType type = TeamArgument.getTeam(context, "team");
+									int lifes = IntegerArgumentType.getInteger(context, "lifes");
+									Team team =
+											WoolBattle.instance().getTeamManager().getTeam(type);
+									team.setLifes(lifes);
+									context.getSource()
+											.sendMessage(Message.WOOLBATTLE_SETLIFES_TEAM_LIFES,
+													Component.text(
+																	team.getType().getDisplayNameKey())
+															.style(team.getPrefixStyle()), lifes);
+									return 0;
+								}))));
 	}
 
 }

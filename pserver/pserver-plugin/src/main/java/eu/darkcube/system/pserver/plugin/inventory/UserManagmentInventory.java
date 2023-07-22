@@ -28,10 +28,10 @@ import java.util.UUID;
 public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
 
 	public static final InventoryType TYPE = InventoryType.of("PServer_UserManagment");
-	public static final Key KEY = new Key(PServerPlugin.instance(), "KEY");
+	public static final Key KEY = new Key(PServerPlugin.instance(), "key");
 	public static final String KEY_VALUE = "UserManagmentInventoryUser";
-	public static final Key USER_UUID_KEY = new Key(PServerPlugin.instance(), "user-uuid");
-	public static final Key USER_NAME_KEY = new Key(PServerPlugin.instance(), "user-name");
+	public static final Key USER_UUID_KEY = new Key(PServerPlugin.instance(), "user_uuid");
+	public static final Key USER_NAME_KEY = new Key(PServerPlugin.instance(), "user_name");
 
 	private final UserManagmentInventoryListener listener;
 

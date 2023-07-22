@@ -4,7 +4,6 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 package de.dasbabypixel.prefixplugin;
 
 import java.util.HashMap;
@@ -29,8 +28,9 @@ class ScoreboardTag {
 	public static ScoreboardTag getScoreboardTag(UUID uuid) {
 		ScoreboardTag tag = TAG_BY_PLAYER.get(uuid);
 		if (tag == null) {
-//			int weight = LuckPermsProvider.get().getGroupManager().getGroup(Main.getPlugin().getScoreboardManager().getUser(uuid).getPrimaryGroup()).getWeight().orElse(Integer.MAX_VALUE);
-			int weight = Main.getPlugin().getScoreboardManager().getUser(uuid).getCachedData().getMetaData().getPrefixes().keySet().stream().mapToInt(i -> i).max().orElse(Integer.MAX_VALUE);
+			int weight = PrefixPluginBukkit.instance().getScoreboardManager().getUser(uuid)
+					.getCachedData().getMetaData().getPrefixes().keySet().stream().mapToInt(i -> i)
+					.max().orElse(Integer.MAX_VALUE);
 			tag = new ScoreboardTag(uuid, weight);
 		}
 		return tag;
@@ -46,11 +46,11 @@ class ScoreboardTag {
 		}
 	}
 
-	public int getWeight() {
+	public int weight() {
 		return weight;
 	}
 
-	public int getPosition() {
+	public int position() {
 		return position;
 	}
 

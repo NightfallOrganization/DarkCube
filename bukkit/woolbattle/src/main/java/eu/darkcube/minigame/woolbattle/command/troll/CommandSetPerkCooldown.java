@@ -17,8 +17,9 @@ import java.util.Collection;
 
 public class CommandSetPerkCooldown extends WBCommandExecutor {
 	public CommandSetPerkCooldown() {
-		super("setPerkCooldown", b -> b.then(Commands.argument("perks", PerkArgument.perkArgument())
-				.then(Commands.argument("cooldown", IntegerArgumentType.integer(0, 64))
+		super("setPerkCooldown", b -> b.then(Commands.argument("perks",
+						PerkArgument.perkArgument())
+				.then(Commands.argument("cooldown", IntegerArgumentType.integer(0))
 						.executes(ctx -> {
 							Collection<Perk> perks = PerkArgument.getPerkTypes(ctx, "perks");
 							int cooldown = IntegerArgumentType.getInteger(ctx, "cooldown");
@@ -59,7 +60,8 @@ public class CommandSetPerkCooldown extends WBCommandExecutor {
 	//			final int fcd = cd;
 	//			for (PerkType type : perks) {
 	//				//				type.setCooldown(cd);
-	//				//				Main.getInstance().sendMessage("§aDu hast den Cooldown für das Perk §6" + type.getPerkName().getName()
+	//				//				Main.getInstance().sendMessage("§aDu hast den Cooldown für das
+	//				Perk §6" + type.getPerkName().getName()
 	//				//						+ " §aauf §6" + cd + "§a gesetzt!");
 	//				setCD(() -> type.setCooldown(fcd), fcd, type.getPerkName().getName(), sender);
 	//			}
@@ -74,7 +76,8 @@ public class CommandSetPerkCooldown extends WBCommandExecutor {
 	//	private void setCD(Runnable r, int cd, String name, CommandSender sender) {
 	//		r.run();
 	//		WoolBattle.getInstance().sendMessage(
-	//				"§aDu hast den Cooldown für das Perk §6" + name + " §aauf §6" + cd + "§a gesetzt!",
+	//				"§aDu hast den Cooldown für das Perk §6" + name + " §aauf §6" + cd + "§a
+	//				gesetzt!",
 	//				sender);
 	//	}
 }

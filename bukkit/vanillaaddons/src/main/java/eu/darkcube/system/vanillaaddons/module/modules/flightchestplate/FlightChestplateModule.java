@@ -17,6 +17,7 @@ import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.event.ArmorEquipEvent;
+import eu.darkcube.system.vanillaaddons.event.ArmorEquipEvent.ArmorType;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import eu.darkcube.system.vanillaaddons.module.modules.recipes.Recipe;
 import eu.darkcube.system.vanillaaddons.util.Item;
@@ -30,6 +31,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.ItemStack;
@@ -154,6 +156,8 @@ public class FlightChestplateModule implements Listener, Module {
 
 	@EventHandler
 	public void handle(ArmorEquipEvent event) {
+		if (event.getType() != ArmorType.CHESTPLATE)
+			return;
 		ItemStack newItem = event.getNewArmorPiece();
 		if (newItem != null) {
 			ItemBuilder item = ItemBuilder.item(newItem);
@@ -204,6 +208,23 @@ public class FlightChestplateModule implements Listener, Module {
 
 	@EventHandler
 	public void handle(PlayerJoinEvent event) {
+		if (event.getPlayer().getPersistentDataContainer()
+				.has(STORAGE_KEY, PersistentDataType.BYTE)) {
+			int speed = 0;
+			ItemBuilder item = event.getPlayer().getInventory().getChestplate() == null
+					? null
+					: ItemBuilder.item(event.getPlayer().getInventory().getChestplate());
+			if (item == null) {
+				event.getPlayer().getPersistentDataContainer().remove(STORAGE_KEY);
+			} else if (item.persistentDataStorage().has(SPEED_KEY)) {
+				speed = item.persistentDataStorage().get(SPEED_KEY, PersistentDataTypes.INTEGER);
+			}
+			update(event.getPlayer(), speed);
+		}
+	}
+
+	@EventHandler
+	public void handle(PlayerChangedWorldEvent event) {
 		if (event.getPlayer().getPersistentDataContainer()
 				.has(STORAGE_KEY, PersistentDataType.BYTE)) {
 			int speed = 0;

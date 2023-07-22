@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.util;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.inventoryapi.item.meta.SpawnEggBuilderMeta;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -88,8 +89,12 @@ public enum Item {
 	PERK_ELEVATOR_COOLDOWN(item(PISTON_BASE)),
 	PERK_ROPE(item(VINE)),
 	PERK_ROPE_COOLDOWN(item(VINE)),
+	PERK_STOMPER(item(DIAMOND_BOOTS)),
+	PERK_HOOK_ARROW(item(REDSTONE_TORCH_ON)),
+	PERK_HOOK_ARROW_COOLDOWN(item(REDSTONE_TORCH_ON)),
 	DEFAULT_BOW(
-			item(BOW).enchant(Enchantment.ARROW_INFINITE, 1).enchant(Enchantment.ARROW_KNOCKBACK, 2)
+			item(BOW).enchant(Enchantment.ARROW_INFINITE, 1).enchant(Enchantment.ARROW_KNOCKBACK
+							, 2)
 					.enchant(Enchantment.KNOCKBACK, 5).flag(ItemFlag.HIDE_UNBREAKABLE)
 					.unbreakable(true)),
 	DEFAULT_SHEARS(item(SHEARS).enchant(Enchantment.KNOCKBACK, 5).enchant(Enchantment.DIG_SPEED, 5)
@@ -111,7 +116,17 @@ public enum Item {
 	NEXT_PAGE(item(STAINED_GLASS_PANE).damage(5)),
 	PREV_PAGE(item(STAINED_GLASS_PANE).damage(5)),
 	NEXT_PAGE_UNUSABLE(item(STAINED_GLASS_PANE).damage(14)),
-	PREV_PAGE_UNUSABLE(item(STAINED_GLASS_PANE).damage(14));
+	PREV_PAGE_UNUSABLE(item(STAINED_GLASS_PANE).damage(14)),
+	PERK_SCAMP(item(GOLD_INGOT)),
+	PERK_SPIDER(item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52)),
+	PERK_SPIDER_COOLDOWN(
+			item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52)),
+	PERK_DRAW_ARROW(item(TORCH)),
+	PERK_DRAW_ARROW_COOLDOWN(item(TORCH)),
+	PERK_FREEZE_ARROW(item(ARROW)),
+	PERK_FREEZE_ARROW_COOLDOWN(item(ARROW)),
+	PERK_BERSERKER(item(DIAMOND_SWORD)),
+	;
 
 	private final ItemBuilder builder;
 
@@ -144,5 +159,4 @@ public enum Item {
 	public ItemStack getItem(WBUser user, Object[] replacements, Object... loreReplacements) {
 		return ItemManager.getItem(this, user, replacements, loreReplacements);
 	}
-
 }

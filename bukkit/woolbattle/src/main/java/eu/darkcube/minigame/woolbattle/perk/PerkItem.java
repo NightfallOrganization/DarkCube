@@ -7,6 +7,7 @@
 package eu.darkcube.minigame.woolbattle.perk;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -22,7 +23,7 @@ import java.util.function.Supplier;
 
 public class PerkItem {
 
-	public static final Key KEY_PERK_ID = new Key(WoolBattle.instance(), "perkId");
+	public static final Key KEY_PERK_ID = new Key(WoolBattle.instance(), "perk_id");
 	public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
 
 	private final Supplier<Item> itemSupplier;
@@ -55,14 +56,24 @@ public class PerkItem {
 		if (item == null)
 			return null;
 		ItemBuilder b = ItemBuilder.item(item.getItem(perk.owner()));
-		int cd = (perk.cooldown() + 19) / 20;
-		if (cd > 0) {
-			b.amount(cd);
-		} else if (perk.cooldown() == 0) {
+		int amt = itemAmount();
+		if (amt > 0) {
+			b.amount(Math.min(amt, 65));
+		} else if (amt == 0) {
 			b.glow(true);
 		}
 		b.persistentDataStorage().set(KEY_PERK_ID, TYPE_PERK_ID, perk.id());
+		modify(b);
 		return b.build();
+	}
+
+	protected void modify(ItemBuilder item) {
+	}
+
+	protected int itemAmount() {
+		return perk.perk().cooldown().unit() == Unit.TICKS
+				? (perk.cooldown() + 19) / 20
+				: perk.cooldown();
 	}
 
 	private void updateInventory(int slot, ItemStack item) {
