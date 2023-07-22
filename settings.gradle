@@ -4,9 +4,9 @@ pluginManagement {
         maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     }
     plugins {
-        id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
+        id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
         id 'net.kyori.blossom' version '1.3.1' apply false
-        id 'io.papermc.paperweight.userdev' version '1.4.1' apply false
+        id 'io.papermc.paperweight.userdev' version '1.5.5' apply false
     }
 }
 
@@ -19,7 +19,7 @@ include 'bukkit:changepermissionmessage'
 includeSubProjects('darkcubesystem', 'api', 'module')
 includeSubProjects('darkcubesystem:libs', 'brigadier', 'gson', 'annotations', 'npc-lib')
 includeSubProjects('darkcubesystem:libs:adventure', 'adventure-api', 'adventure-key', 'adventure-nbt', 'adventure-platform-api', 'adventure-platform-bukkit', 'adventure-platform-facet', 'adventure-platform-viaversion', 'adventure-text-serializer-bungeecord', 'adventure-text-serializer-gson', 'adventure-text-serializer-gson-legacy-impl', 'adventure-text-serializer-legacy', 'adventure-text-serializer-plain', 'examination-api', 'examination-string')
-includeSubProjects('darkcubesystem:bukkit', '1.8.8', '1.19.3')
+includeSubProjects('darkcubesystem:bukkit', '1.8.8', '1.19.3', '1.20.1')
 //includeSubProjects('darkcubesystem', '1.8.8', '1.19.3', 'core', 'module')
 include 'bukkit:darkessentials'
 //include 'bukkit:holograms'

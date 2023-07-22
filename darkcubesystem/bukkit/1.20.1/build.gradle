@@ -1,0 +1,39 @@
+import java.nio.charset.StandardCharsets
+
+plugins {
+    id 'io.papermc.paperweight.userdev'
+    id 'java-library'
+}
+
+dependencies {
+    paperweightDevelopmentBundle('io.papermc.paper:dev-bundle:1.20.1-R0.1-SNAPSHOT').changing(false)
+    implementation parent.parent.project('api')
+    compileOnly libs.cloudnetDriver
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks {
+    reobfJar {
+        var targetFile = tasks.reobfJar.outputJar.getAsFile().get()
+        outputs.file targetFile
+        doLast {
+            copy {
+                from tasks.reobfJar.outputJar.getAsFile().get()
+                into targetFile.getParentFile()
+                rename { targetFile.getName() }
+            }
+        }
+    }
+    assemble {
+        dependsOn(reobfJar)
+    }
+    compileJava {
+        options.release.set(17)
+        options.encoding(StandardCharsets.UTF_8.name())
+    }
+}
