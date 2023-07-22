@@ -6,5 +6,5 @@
  */
 package de.dasbabypixel.prefixplugin;
 
-public class ScoreboardManager_v1_20_R1 extends ScoreboardManager_v1_19_R2 {
+public class ScoreboardManager_v1_20_R1 extends ScoreboardManager_v1_13_R2 {
 }
