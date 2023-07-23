@@ -2,6 +2,10 @@ plugins {
     id 'java-library'
 }
 
+jar {
+    archiveBaseName = 'woolbattle'
+}
+
 dependencies {
     compileOnlyApi project(':darkcubesystem:bukkit')
     compileOnlyApi project(':bukkit:statsapi')
