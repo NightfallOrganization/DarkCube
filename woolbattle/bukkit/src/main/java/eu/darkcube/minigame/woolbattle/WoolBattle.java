@@ -155,6 +155,7 @@ public class WoolBattle extends Plugin {
 
 	@Override
 	public void onLoad() {
+
 		this.pluginClassLoader = new ReflectionClassLoader(this);
 		new DependencyManager(this).loadDependencies(Dependency.values());
 

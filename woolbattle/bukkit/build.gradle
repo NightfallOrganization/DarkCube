@@ -1,5 +1,9 @@
+plugins {
+    id 'java-library'
+}
+
 dependencies {
-    compileOnlyApi project(':darkcubesystem:bukkit')
+    compileOnlyApi project(':darkcubesystem')
     compileOnlyApi project(':bukkit:statsapi')
     compileOnly project(':pserver:pserver-api')
     compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
