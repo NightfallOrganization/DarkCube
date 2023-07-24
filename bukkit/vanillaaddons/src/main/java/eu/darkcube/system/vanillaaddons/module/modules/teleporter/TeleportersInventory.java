@@ -36,7 +36,7 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 	@Override
 	protected AddonsAsyncPagedInventory openInventory(AUser user) {
 		AddonsAsyncPagedInventory i = new AddonsAsyncPagedInventory(TYPE,
-				Component.text("Teleporters").color(NamedTextColor.GOLD), () -> true) {
+				Component.text("\uDAFF\uDFEFⲊ").color(NamedTextColor.WHITE), () -> true) {
 			@Override
 			protected void fillItems(Map<Integer, ItemStack> items) {
 				int i = 0;
