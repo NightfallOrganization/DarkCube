@@ -6,6 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle;
 
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.service.ServiceTemplate;
+import de.dytanic.cloudnet.driver.template.FileInfo;
+import de.dytanic.cloudnet.driver.template.TemplateStorage;
 import eu.darkcube.minigame.woolbattle.command.*;
 import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
@@ -155,6 +159,20 @@ public class WoolBattle extends Plugin {
 
 	@Override
 	public void onLoad() {
+
+		TemplateStorage templateStorage = CloudNetDriver.getInstance().getLocalTemplateStorage();
+		try {
+			for (FileInfo fileInfo : templateStorage.listFiles(
+					new ServiceTemplate("woolbattle", "2x1", "local"), false)) {
+				System.out.println(fileInfo.getName());
+			}
+			for (FileInfo fileInfo : templateStorage.listFiles(
+					new ServiceTemplate("woolbattle", "2x1", "local"), "Abstract1-2x1", false)) {
+				System.out.println(fileInfo.getName());
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		this.pluginClassLoader = new ReflectionClassLoader(this);
 		new DependencyManager(this).loadDependencies(Dependency.values());

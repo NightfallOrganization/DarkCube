@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+}
+
+jar {
+    archiveBaseName = 'woolbattle'
+}
+
+javadoc {
+    archivesBaseName = 'woolbattle'
+}
+
+java {
+    withSourcesJar()
+}
+
+dependencies {
+    compileOnly libs.cloudnet
+    compileOnly libs.cloudnetBridge
+    compileOnly rootProject.project('darkcubesystem').project('libs').project('annotations')
+}

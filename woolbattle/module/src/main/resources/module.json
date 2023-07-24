@@ -1,0 +1,10 @@
+{
+  "runtimeModule": true,
+  "group": "eu.darkcube.system.cloudnet.modules",
+  "name": "WoolBattle",
+  "version": "1.0",
+  "author": "DasBabyPixel",
+  "description": "WoolBattle Module",
+  "main": "eu.darkcube.minigame.woolbattle.module.WoolBattle",
+  "storesSensitiveData": true
+}

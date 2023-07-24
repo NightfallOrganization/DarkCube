@@ -30,27 +30,4 @@ public class CommandEnable extends WBCommandExecutor {
 			return 0;
 		}));
 	}
-	//	public CommandEnable() {
-	//		super(WoolBattle.getInstance(), "enable", new Command[0], "Aktiviert die Map");
-	//	}
-	//
-	//	@Override
-	//	public boolean execute(CommandSender sender, String[] args) {
-	//		if(args.length == 0) {
-	//			Map map = WoolBattle.getInstance().getMapManager().getMap(getSpaced());
-	//			if (map == null) {
-	//				sender.sendMessage("§cEs konnte keine Map mit dem Namen '" + getSpaced() + "'gefunden werden.");
-	//				return true;
-	//			}
-	//			if(map.isEnabled()) {
-	//				sender.sendMessage("§cDiese Map ist bereits aktiviert!");
-	//				return true;
-	//			}
-	//			map.enable();
-	//			sender.sendMessage("§aDu hast die Map '" + map.getName() + "' aktiviert!");
-	//			return true;
-	//		}
-	//		return false;
-	//	}
-
 }

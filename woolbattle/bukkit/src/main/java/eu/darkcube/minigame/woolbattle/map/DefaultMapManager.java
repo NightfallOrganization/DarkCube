@@ -6,65 +6,62 @@
  */
 package eu.darkcube.minigame.woolbattle.map;
 
-import com.google.common.reflect.TypeToken;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.database.Database;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class DefaultMapManager implements MapManager {
 
-	private final java.util.Map<String, Map> MAPS;
+    final Database database =
+            CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("woolbattle_maps");
+    private final java.util.Map<String, Map> maps = new HashMap<>();
 
-	public DefaultMapManager(String maps) {
-		if (maps == null) {
-			MAPS = new HashMap<>();
-		} else {
-			MAPS = GsonSerializer.gson.fromJson(maps, new TypeToken<java.util.Map<String, Map>>() {
-				private static final long serialVersionUID = -4394658839136612803L;
-			}.getType());
-		}
-	}
+    public DefaultMapManager() {
+        for (JsonDocument document : database.documents()) {
+            String mapJson = document.toJson();
+            Map map = GsonSerializer.gson.fromJson(mapJson, Map.class);
+            this.maps.put(map.getName(), map);
+        }
+    }
 
-	public DefaultMapManager() {
-		this(WoolBattle.instance().getConfig("spawns").getString("maps"));
-	}
+    @Override
+    public Map getMap(String name) {
+        return maps.get(name);
+    }
 
-	@Override
-	public Map getMap(String name) {
-		return MAPS.get(name);
-	}
+    @Override
+    public Map createMap(String name, MapSize mapSize) {
+        Map map = getMap(name);
+        if (map != null)
+            return map;
+        DefaultMap dmap = new DefaultMap(name, mapSize);
+        map = dmap;
+        maps.put(name, map);
+        database.insert(name, dmap.toDocument());
+        return map;
+    }
 
-	@Override
-	public Map createMap(String name) {
-		Map map = getMap(name);
-		if (map != null)
-			return map;
-		map = new DefaultMap(name);
-		MAPS.put(name, map);
-		saveMaps();
-		return map;
-	}
+    @Override
+    public Collection<? extends Map> getMaps() {
+        return Collections.unmodifiableCollection(maps.values());
+    }
 
-	@Override
-	public Collection<? extends Map> getMaps() {
-		return Collections.unmodifiableCollection(MAPS.values());
-	}
+    @Override
+    public void deleteMap(Map map) {
+        maps.remove(map.getName());
+        database.delete(map.getName());
+    }
 
-	@Override
-	public void deleteMap(Map map) {
-		MAPS.remove(map.getName());
-		saveMaps();
-	}
-
-	@Override
-	public void saveMaps() {
-		String json = GsonSerializer.gson.toJson(MAPS);
-		YamlConfiguration cfg = WoolBattle.instance().getConfig("spawns");
-		cfg.set("maps", json);
-		WoolBattle.instance().saveConfig(cfg);
-	}
+    @Override
+    public void saveMaps() {
+        for (Entry<String, Map> entry : maps.entrySet()) {
+            ((DefaultMap) entry.getValue()).save();
+        }
+    }
 }

@@ -6,103 +6,88 @@
  */
 package eu.darkcube.minigame.woolbattle.map;
 
+import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.util.Locations;
+import eu.darkcube.minigame.woolbattle.util.GsonSerializer.DontSerialize;
 import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
-import org.bukkit.Location;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import org.bukkit.Material;
-
-import java.util.HashMap;
 
 public class DefaultMap implements Map, Serializable {
 
-	private final java.util.Map<String, Location> spawns;
-	private String name;
-	private int deathHeight;
-	private boolean enabled;
-	private MaterialAndId icon;
+    private String name;
+    private boolean enabled;
+    private MaterialAndId icon;
+    private MapSize size;
+    @DontSerialize
+    private @Nullable MapIngameData ingameData;
 
-	DefaultMap() {
-		spawns = null;
-	}
+    public DefaultMap(String name, MapSize size) {
+        this.name = name;
+        this.size = size;
+        enabled = false;
+        icon = new MaterialAndId(Material.GRASS);
+    }
 
-	public DefaultMap(String name) {
-		this.name = name;
-		spawns = new HashMap<>();
-		enabled = false;
-		icon = new MaterialAndId(Material.GRASS);
-	}
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-	@Override
-	public boolean isEnabled() {
-		return enabled;
-	}
+    @Override
+    public MaterialAndId getIcon() {
+        return icon;
+    }
 
-	@Override
-	public int getDeathHeight() {
-		return deathHeight;
-	}
+    @Override
+    public void setIcon(MaterialAndId icon) {
+        this.icon = icon;
+        save();
+    }
 
-	@Override
-	public MaterialAndId getIcon() {
-		return icon;
-	}
+    @Override
+    public void enable() {
+        enabled = true;
+        save();
+    }
 
-	@Override
-	public void setIcon(MaterialAndId icon) {
-		this.icon = icon;
-		save();
-	}
+    @Override
+    public void disable() {
+        enabled = false;
+        save();
+    }
 
-	@Override
-	public void enable() {
-		enabled = true;
-		save();
-	}
+    @Override
+    public MapSize size() {
+        return size;
+    }
 
-	@Override
-	public void disable() {
-		enabled = false;
-		save();
-	}
+    public void ingameData(MapIngameData ingameData) {
+        this.ingameData = ingameData;
+    }
 
-	@Override
-	public void delete() {
-		WoolBattle.instance().getMapManager().deleteMap(this);
-	}
+    @Override
+    public @Nullable MapIngameData ingameData() {
+        return ingameData;
+    }
 
-	@Override
-	public void setSpawn(String name, Location loc) {
-		spawns.put(name, loc);
-		save();
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public Location getSpawn(String name) {
-		if (spawns == null)
-			return null;
-		Location spawn = spawns.get(name);
-		return spawn != null ? spawn : Locations.DEFAULT_LOCATION;
-	}
+    @Override
+    public String serialize() {
+        return Serializable.super.serialize();
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    JsonDocument toDocument() {
+        return JsonDocument.newDocument(serialize());
+    }
 
-	@Override
-	public String serialize() {
-		return Serializable.super.serialize();
-	}
-
-	@Override
-	public void setDeathHeight(int height) {
-		this.deathHeight = height;
-		save();
-	}
-
-	private void save() {
-		WoolBattle.instance().getMapManager().saveMaps();
-	}
+    void save() {
+        ((DefaultMapManager) WoolBattle.instance().getMapManager()).database.update(name,
+                toDocument());
+    }
 }
