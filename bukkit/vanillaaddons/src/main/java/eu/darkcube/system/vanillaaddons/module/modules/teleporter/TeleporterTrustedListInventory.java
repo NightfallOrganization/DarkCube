@@ -94,7 +94,6 @@ public class TeleporterTrustedListInventory
 						.displayname(Component.text("Spieler hinzufügen")
 								.color(TextColor.color(170, 0, 170))).persistentDataStorage()
 						.iset(KEY_TYPE, PersistentDataTypes.INTEGER, 0).builder().build());
-				super.insertFallbackItems();
 			}
 		};
 	}

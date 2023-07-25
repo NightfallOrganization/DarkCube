@@ -116,6 +116,10 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 						ItemBuilder.item(Material.ARROW).displayname(Component.text("Next Page"))
 								.build());
 			}
+
+			@Override
+			protected void insertFallbackItems() {
+			}
 		};
 		i.open(Objects.requireNonNull(Bukkit.getPlayer(user.user().getUniqueId())));
 		return i;
