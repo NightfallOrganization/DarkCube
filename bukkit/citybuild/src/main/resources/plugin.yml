@@ -1,0 +1,24 @@
+main: eu.darkcube.system.citybuild.commands.Citybuild
+name: CityBuild
+author: EliteDarkness
+version: 1.0
+api-version: 1.13
+commands:
+  gm:
+    description: Wechselt den Gamemode.
+  heal:
+    description: Heilt den Spieler.
+  day:
+    description: Setzt Tag.
+  night:
+    description: Setzt Nacht.
+  god:
+    description: Setzt den Spieler in die Unzerstörbarkeit.
+  fly:
+    description: Setzt den Spieler in den Flugmodus.
+  feed:
+    description: Füttert den Spieler.
+  max:
+    description: Maximiert die Werte des Spielers.
+  trash:
+    description: Öffnet einen Mülleimer.
