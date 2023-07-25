@@ -8,15 +8,14 @@ package eu.darkcube.minigame.woolbattle.map;
 
 import eu.darkcube.minigame.woolbattle.util.Serializable;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public interface MapIngameData extends Serializable {
-
-    int deathHeight();
-
-    void deathHeight(int deathHeight);
 
     void spawn(String name, Location loc);
 
     Location spawn(String name);
+
+    World world();
 
 }

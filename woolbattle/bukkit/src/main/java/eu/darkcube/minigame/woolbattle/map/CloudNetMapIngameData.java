@@ -6,6 +6,9 @@
  */
 package eu.darkcube.minigame.woolbattle.map;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
+import eu.darkcube.minigame.woolbattle.util.UnloadedLocation;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -13,9 +16,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CloudNetMapIngameData implements MapIngameData {
-    private final Map<String, Location> spawns = new HashMap<>();
+    private final Map<String, UnloadedLocation> spawns = new HashMap<>();
+    private CloudNetMapLoader loader = ((CloudNetMapLoader) WoolBattle.instance().mapLoader());
+    private String worldName;
+    @GsonSerializer.DontSerialize
     private World world;
-    private int deathHeight;
+
+    public String worldName() {
+        return worldName;
+    }
+
+    public void worldName(String worldName) {
+        this.worldName = worldName;
+    }
 
     public World world() {
         return world;
@@ -26,29 +39,18 @@ public class CloudNetMapIngameData implements MapIngameData {
     }
 
     @Override
-    public int deathHeight() {
-        return deathHeight;
-    }
-
-    @Override
-    public void deathHeight(int deathHeight) {
-        this.deathHeight = deathHeight;
-    }
-
-    @Override
     public void spawn(String name, Location loc) {
         if (loc == null) spawns.remove(name);
         else {
-            (loc = loc.clone()).setWorld(null);
-            spawns.put(name, loc);
+            UnloadedLocation l = new UnloadedLocation(loc);
+            spawns.put(name, l);
         }
     }
 
     @Override
     public Location spawn(String name) {
-        Location loc = spawns.get(name);
+        UnloadedLocation loc = spawns.get(name);
         if (loc == null) return null;
-        (loc = loc.clone()).setWorld(world);
-        return loc;
+        return loc.loaded();
     }
 }

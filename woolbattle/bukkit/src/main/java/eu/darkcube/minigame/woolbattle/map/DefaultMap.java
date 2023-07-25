@@ -18,6 +18,7 @@ public class DefaultMap implements Map, Serializable {
 
     private String name;
     private boolean enabled;
+    private int deathHeight;
     private MaterialAndId icon;
     private MapSize size;
     @DontSerialize
@@ -28,6 +29,17 @@ public class DefaultMap implements Map, Serializable {
         this.size = size;
         enabled = false;
         icon = new MaterialAndId(Material.GRASS);
+    }
+
+    @Override
+    public int deathHeight() {
+        return deathHeight;
+    }
+
+    @Override
+    public void deathHeight(int deathHeight) {
+        this.deathHeight = deathHeight;
+        save();
     }
 
     @Override

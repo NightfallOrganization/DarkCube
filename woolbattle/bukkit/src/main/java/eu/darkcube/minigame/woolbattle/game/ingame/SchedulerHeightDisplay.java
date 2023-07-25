@@ -17,39 +17,39 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.Legacy
 
 public class SchedulerHeightDisplay extends Scheduler implements ConfiguredScheduler {
 
-	public static void display(WBUser user) {
+    public static void display(WBUser user) {
 
-		HeightDisplay display = user.heightDisplay();
-		if (display.isEnabled()) {
-			int deathHeight = WoolBattle.instance().getMap().getDeathHeight();
-			int currentHeight = user.getBukkitEntity().getLocation().getBlockY();
-			int diff = (diff = currentHeight - deathHeight) < 0 ? 0 : diff;
+        HeightDisplay display = user.heightDisplay();
+        if (display.isEnabled()) {
+            int deathHeight = WoolBattle.instance().getMap().deathHeight();
+            int currentHeight = user.getBukkitEntity().getLocation().getBlockY();
+            int diff = (diff = currentHeight - deathHeight) < 0 ? 0 : diff;
 
-			if (display.maxDistance == -1 || display.maxDistance < diff) {
-				Team team = user.getTeam();
-				if (team != null) {
-					if (team.getType() != TeamType.SPECTATOR) {
-						user.user().sendActionBar(LegacyComponentSerializer.legacySection()
-								.deserialize(
-										"§8» " + display.getColor().toString() + diff + " §8«"));
-					}
-				}
-			}
-		}
-	}
+            if (display.maxDistance == -1 || display.maxDistance < diff) {
+                Team team = user.getTeam();
+                if (team != null) {
+                    if (team.getType() != TeamType.SPECTATOR) {
+                        user.user().sendActionBar(LegacyComponentSerializer.legacySection()
+                                .deserialize(
+                                        "§8» " + display.getColor().toString() + diff + " §8«"));
+                    }
+                }
+            }
+        }
+    }
 
-	@Override
-	public void start() {
-		this.runTaskTimer(20);
-	}
+    @Override
+    public void start() {
+        this.runTaskTimer(20);
+    }
 
-	@Override
-	public void stop() {
-		cancel();
-	}
+    @Override
+    public void stop() {
+        cancel();
+    }
 
-	@Override
-	public void run() {
-		WBUser.onlineUsers().forEach(SchedulerHeightDisplay::display);
-	}
+    @Override
+    public void run() {
+        WBUser.onlineUsers().forEach(SchedulerHeightDisplay::display);
+    }
 }

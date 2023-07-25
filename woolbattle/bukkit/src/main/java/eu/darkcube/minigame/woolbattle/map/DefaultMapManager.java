@@ -14,7 +14,6 @@ import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 public class DefaultMapManager implements MapManager {
 
@@ -56,12 +55,5 @@ public class DefaultMapManager implements MapManager {
     public void deleteMap(Map map) {
         maps.remove(map.getName());
         database.delete(map.getName());
-    }
-
-    @Override
-    public void saveMaps() {
-        for (Entry<String, Map> entry : maps.entrySet()) {
-            ((DefaultMap) entry.getValue()).save();
-        }
     }
 }

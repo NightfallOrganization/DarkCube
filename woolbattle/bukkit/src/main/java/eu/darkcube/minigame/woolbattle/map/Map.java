@@ -12,10 +12,10 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 public interface Map {
 
     boolean isEnabled();
-//
-//	int getDeathHeight();
-//
-//	void setDeathHeight(int height);
+
+    int deathHeight();
+
+    void deathHeight(int height);
 
     MaterialAndId getIcon();
 

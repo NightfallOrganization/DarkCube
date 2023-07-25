@@ -49,6 +49,7 @@ public enum Message implements BaseMessage {
     PLAYER_DIED,
     PLAYER_WAS_KILLED_BY_PLAYER,
     INVALID_MAP_SIZE,
+    STARTING_GAME,
 
     INVENTORY_PERKS,
     INVENTORY_VOTING,
