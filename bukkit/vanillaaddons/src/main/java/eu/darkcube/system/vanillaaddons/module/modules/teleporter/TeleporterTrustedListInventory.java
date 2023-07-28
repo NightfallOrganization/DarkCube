@@ -13,6 +13,7 @@ import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -38,7 +39,8 @@ public class TeleporterTrustedListInventory
 	@Override
 	protected AddonsAsyncPagedInventory openInventory(AUser user) {
 		final Key KEY_TYPE = new Key(VanillaAddons.instance(), "type");
-		return new AddonsAsyncPagedInventory(TYPE, data().dname(), () -> true) {
+		return new AddonsAsyncPagedInventory(TYPE,
+				Component.text("\uDAFF\uDFEFḅ").color(NamedTextColor.WHITE), () -> true) {
 			{
 				open(user.user().asPlayer());
 			}
@@ -94,7 +96,6 @@ public class TeleporterTrustedListInventory
 						.displayname(Component.text("Spieler hinzufügen")
 								.color(TextColor.color(170, 0, 170))).persistentDataStorage()
 						.iset(KEY_TYPE, PersistentDataTypes.INTEGER, 0).builder().build());
-				super.insertFallbackItems();
 			}
 		};
 	}

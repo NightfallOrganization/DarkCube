@@ -2,6 +2,7 @@ dependencies {
     compileOnlyApi project(':darkcubesystem:bukkit')
     compileOnlyApi project(':bukkit:statsapi')
     compileOnly project(':pserver:pserver-api')
+    compileOnly 'mysql:mysql-connector-java:5.1.14'
     compileOnly 'io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT'
     compileOnlyApi libs.cloudnetBridge
     compileOnlyApi libs.cloudnetWrapper
