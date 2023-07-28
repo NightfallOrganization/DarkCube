@@ -23,65 +23,65 @@ import java.util.Map;
 import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
 
 public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
-	public static final InventoryType TYPE =
-			InventoryType.of("woolbattle-voting-enderpearl-glitch");
+    public static final InventoryType TYPE =
+            InventoryType.of("woolbattle-voting-enderpearl-glitch");
 
-	public VotingEnderpearlGlitchInventory(WBUser user) {
-		super(TYPE, Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user), user);
-	}
+    public VotingEnderpearlGlitchInventory(WBUser user) {
+        super(TYPE, Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user), user);
+    }
 
-	@Override
-	protected void inventoryClick(IInventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.item() == null)
-			return;
-		String itemId = ItemManager.getItemId(event.item());
-		if (itemId == null)
-			return;
-		Boolean vote = null;
-		if (itemId.equals(Item.GENERAL_VOTING_FOR.getItemId())) {
-			vote = true;
-		} else if (itemId.equals(Item.GENERAL_VOTING_AGAINST.getItemId())) {
-			vote = false;
-		}
-		Vote<Boolean> old = WoolBattle.instance().getLobby().VOTES_EP_GLITCH.get(user);
-		if (old != null) {
-			if (old.vote == vote) {
-				user.user().sendMessage(Message.ALREADY_VOTED_FOR_THIS);
-				return;
-			}
-		}
-		if (vote != null) {
-			WoolBattle.instance().getLobby().VOTES_EP_GLITCH.put(user,
-					new Vote<>(System.currentTimeMillis(), vote));
-			WoolBattle.instance().getLobby().recalculateEpGlitch();
-			user.user().sendMessage(
-					vote ? Message.VOTED_FOR_EP_GLITCH : Message.VOTED_AGAINST_EP_GLITCH);
-			recalculate();
-		}
-	}
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
+        event.setCancelled(true);
+        if (event.item() == null)
+            return;
+        String itemId = ItemManager.getItemId(event.item());
+        if (itemId == null)
+            return;
+        Boolean vote = null;
+        if (itemId.equals(Item.GENERAL_VOTING_FOR.getItemId())) {
+            vote = true;
+        } else if (itemId.equals(Item.GENERAL_VOTING_AGAINST.getItemId())) {
+            vote = false;
+        }
+        Vote<Boolean> old = WoolBattle.instance().lobby().VOTES_EP_GLITCH.get(user);
+        if (old != null) {
+            if (old.vote == vote) {
+                user.user().sendMessage(Message.ALREADY_VOTED_FOR_THIS);
+                return;
+            }
+        }
+        if (vote != null) {
+            WoolBattle.instance().lobby().VOTES_EP_GLITCH.put(user,
+                    new Vote<>(System.currentTimeMillis(), vote));
+            WoolBattle.instance().lobby().recalculateEpGlitch();
+            user.user().sendMessage(
+                    vote ? Message.VOTED_FOR_EP_GLITCH : Message.VOTED_AGAINST_EP_GLITCH);
+            recalculate();
+        }
+    }
 
-	@Override
-	protected void fillItems(Map<Integer, ItemStack> items) {
-		ItemBuilder b1 = item(Item.GENERAL_VOTING_FOR.getItem(user));
-		ItemBuilder b2 = item(Item.GENERAL_VOTING_AGAINST.getItem(user));
-		Vote<Boolean> vote = WoolBattle.instance().getLobby().VOTES_EP_GLITCH.get(user);
-		if (vote != null) {
-			if (vote.vote) {
-				b1.glow(true);
-			} else {
-				b2.glow(true);
-			}
-		}
-		fallbackItems.put(IInventory.slot(3, 4), b1.build());
-		fallbackItems.put(IInventory.slot(3, 6), b2.build());
-		updateSlots.offer(IInventory.slot(3, 4));
-		updateSlots.offer(IInventory.slot(3, 6));
-	}
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
+        ItemBuilder b1 = item(Item.GENERAL_VOTING_FOR.getItem(user));
+        ItemBuilder b2 = item(Item.GENERAL_VOTING_AGAINST.getItem(user));
+        Vote<Boolean> vote = WoolBattle.instance().lobby().VOTES_EP_GLITCH.get(user);
+        if (vote != null) {
+            if (vote.vote) {
+                b1.glow(true);
+            } else {
+                b2.glow(true);
+            }
+        }
+        fallbackItems.put(IInventory.slot(3, 4), b1.build());
+        fallbackItems.put(IInventory.slot(3, 6), b2.build());
+        updateSlots.offer(IInventory.slot(3, 4));
+        updateSlots.offer(IInventory.slot(3, 6));
+    }
 
-	@Override
-	protected void insertFallbackItems() {
-		fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING_EP_GLITCH.getItem(user));
-		super.insertFallbackItems();
-	}
+    @Override
+    protected void insertFallbackItems() {
+        fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING_EP_GLITCH.getItem(user));
+        super.insertFallbackItems();
+    }
 }

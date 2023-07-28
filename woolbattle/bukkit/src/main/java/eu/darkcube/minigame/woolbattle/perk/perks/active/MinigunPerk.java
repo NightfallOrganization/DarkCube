@@ -29,110 +29,110 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Random;
 
 public class MinigunPerk extends Perk {
-	public static final PerkName MINIGUN = new PerkName("MINIGUN");
+    public static final PerkName MINIGUN = new PerkName("MINIGUN");
 
-	public MinigunPerk() {
-		super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_MINIGUN_COOLDOWN));
-		addListener(new ListenerMinigun(this));
-	}
+    public MinigunPerk() {
+        super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN,
+                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
+                        Item.PERK_MINIGUN_COOLDOWN));
+        addListener(new ListenerMinigun(this));
+    }
 
-	public static class ListenerMinigun extends BasicPerkListener {
+    public static class ListenerMinigun extends BasicPerkListener {
 
-		private static final Key DATA_SCHEDULER =
-				new Key(WoolBattle.instance(), "minigunScheduler");
+        private static final Key DATA_SCHEDULER =
+                new Key(WoolBattle.instance(), "minigunScheduler");
 
-		public ListenerMinigun(Perk perk) {
-			super(perk);
-		}
+        public ListenerMinigun(Perk perk) {
+            super(perk);
+        }
 
-		@Override
-		protected boolean activateRight(UserPerk perk) {
-			WBUser user = perk.owner();
-			if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
-				return false;
-			}
-			user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler() {
-				private int count = 0;
+        @Override
+        protected boolean activateRight(UserPerk perk) {
+            WBUser user = perk.owner();
+            if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
+                return false;
+            }
+            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler() {
+                private int count = 0;
 
-				{
-					runTaskTimer(3);
-				}
+                {
+                    runTaskTimer(3);
+                }
 
-				@Override
-				public void cancel() {
-					perk.cooldown(perk.perk().cooldown().cooldown());
-					super.cancel();
-				}
+                @Override
+                public void cancel() {
+                    perk.cooldown(perk.perk().cooldown().cooldown());
+                    super.cancel();
+                }
 
-				@Override
-				public void run() {
-					Player p = user.getBukkitEntity();
-					ItemStack item = p.getItemInHand();
+                @Override
+                public void run() {
+                    Player p = user.getBukkitEntity();
+                    ItemStack item = p.getItemInHand();
 
-					if (count >= 20 || item == null || !item.equals(
-							perk.currentPerkItem().calculateItem())) {
-						stop(user);
-						return;
-					}
-					count++;
-					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 3, false, false),
-							true);
-					Snowball s = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
-					s.setShooter(p);
-					s.setVelocity(p.getLocation().getDirection().multiply(2.5));
-					s.setMetadata("type", new FixedMetadataValue(WoolBattle.instance(), "minigun"
-					));
-					payForThePerk(perk);
-				}
-			});
+                    if (count >= 20 || item == null || !item.equals(
+                            perk.currentPerkItem().calculateItem())) {
+                        stop(user);
+                        return;
+                    }
+                    count++;
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 3, false, false),
+                            true);
+                    Snowball s = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
+                    s.setShooter(p);
+                    s.setVelocity(p.getLocation().getDirection().multiply(2.5));
+                    s.setMetadata("type", new FixedMetadataValue(WoolBattle.instance(), "minigun"
+                    ));
+                    payForThePerk(perk);
+                }
+            });
 
-			return false;
-		}
+            return false;
+        }
 
-		@EventHandler
-		public void handle(EntityDamageByEntityEvent event) {
-			if (event.getEntity() instanceof Player) {
-				WBUser target = WBUser.getUser((Player) event.getEntity());
-				if (event.getDamager() instanceof Snowball) {
-					Snowball ball = (Snowball) event.getDamager();
-					if (ball.getShooter() instanceof Player) {
-						Player p = (Player) ball.getShooter();
-						WBUser user = WBUser.getUser(p);
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent event) {
+            if (event.getEntity() instanceof Player) {
+                WBUser target = WBUser.getUser((Player) event.getEntity());
+                if (event.getDamager() instanceof Snowball) {
+                    Snowball ball = (Snowball) event.getDamager();
+                    if (ball.getShooter() instanceof Player) {
+                        Player p = (Player) ball.getShooter();
+                        WBUser user = WBUser.getUser(p);
 
-						if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString()
-								.equals("minigun")) {
-							event.setCancelled(true);
-							if (target.projectileImmunityTicks() > 0) {
-								return;
-							}
-							if (!WoolBattle.instance().getIngame().attack(user, target)) {
-								return;
-							}
-							target.getBukkitEntity().damage(0);
+                        if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString()
+                                .equals("minigun")) {
+                            event.setCancelled(true);
+                            if (target.projectileImmunityTicks() > 0) {
+                                return;
+                            }
+                            if (!WoolBattle.instance().ingame().attack(user, target)) {
+                                return;
+                            }
+                            target.getBukkitEntity().damage(0);
 
-							target.getBukkitEntity().setVelocity(
-									ball.getVelocity().setY(0).normalize()
-											.multiply(.47 + new Random().nextDouble() / 70 + 1.1)
-											.setY(.400023));
-						}
-					}
-				}
-			}
-		}
+                            target.getBukkitEntity().setVelocity(
+                                    ball.getVelocity().setY(0).normalize()
+                                            .multiply(.47 + new Random().nextDouble() / 70 + 1.1)
+                                            .setY(.400023));
+                        }
+                    }
+                }
+            }
+        }
 
-		@EventHandler
-		public void handle(PlayerItemHeldEvent event) {
-			WBUser user = WBUser.getUser(event.getPlayer());
-			stop(user);
-		}
+        @EventHandler
+        public void handle(PlayerItemHeldEvent event) {
+            WBUser user = WBUser.getUser(event.getPlayer());
+            stop(user);
+        }
 
-		private void stop(WBUser user) {
-			if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
-				user.user().getMetaDataStorage().<Scheduler>remove(DATA_SCHEDULER).cancel();
-			}
-		}
-	}
+        private void stop(WBUser user) {
+            if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
+                user.user().getMetaDataStorage().<Scheduler>remove(DATA_SCHEDULER).cancel();
+            }
+        }
+    }
 
 }

@@ -14,15 +14,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 public class ListenerChangeBlock extends Listener<EntityChangeBlockEvent> {
-	@Override
-	@EventHandler
-	public void handle(EntityChangeBlockEvent e) {
-		if (e.getEntityType() == EntityType.FALLING_BLOCK) {
-			if (e.getTo() == Material.WOOL) {
-				WoolBattle.instance().getIngame().placedBlocks.add(e.getBlock());
-			} else {
-				e.setCancelled(true);
-			}
-		}
-	}
+    @Override
+    @EventHandler
+    public void handle(EntityChangeBlockEvent e) {
+        if (e.getEntityType() == EntityType.FALLING_BLOCK) {
+            if (e.getTo() == Material.WOOL) {
+                WoolBattle.instance().ingame().placedBlocks.add(e.getBlock());
+            } else {
+                e.setCancelled(true);
+            }
+        }
+    }
 }

@@ -17,11 +17,16 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.Legacy
 
 public class SchedulerHeightDisplay extends Scheduler implements ConfiguredScheduler {
 
-    public static void display(WBUser user) {
+    private final WoolBattle woolbattle;
 
+    public SchedulerHeightDisplay(WoolBattle woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    public static void display(WoolBattle woolbattle, WBUser user) {
         HeightDisplay display = user.heightDisplay();
         if (display.isEnabled()) {
-            int deathHeight = WoolBattle.instance().getMap().deathHeight();
+            int deathHeight = woolbattle.gameData().map().deathHeight();
             int currentHeight = user.getBukkitEntity().getLocation().getBlockY();
             int diff = (diff = currentHeight - deathHeight) < 0 ? 0 : diff;
 
@@ -38,6 +43,10 @@ public class SchedulerHeightDisplay extends Scheduler implements ConfiguredSched
         }
     }
 
+    public void display(WBUser user) {
+        display(woolbattle, user);
+    }
+
     @Override
     public void start() {
         this.runTaskTimer(20);
@@ -50,6 +59,6 @@ public class SchedulerHeightDisplay extends Scheduler implements ConfiguredSched
 
     @Override
     public void run() {
-        WBUser.onlineUsers().forEach(SchedulerHeightDisplay::display);
+        WBUser.onlineUsers().forEach(this::display);
     }
 }

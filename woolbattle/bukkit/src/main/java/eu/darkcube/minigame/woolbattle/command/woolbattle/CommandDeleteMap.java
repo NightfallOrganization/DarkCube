@@ -18,7 +18,7 @@ public class CommandDeleteMap extends WBCommandExecutor {
         super("deleteMap",
                 b -> b.then(Commands.argument("map", MapArgument.mapArgument()).executes(ctx -> {
                     Map map = MapArgument.getMap(ctx, "map");
-                    WoolBattle.instance().getMapManager().deleteMap(map);
+                    WoolBattle.instance().mapManager().deleteMap(map);
                     ctx.getSource().sendMessage(
                             Component.text("Du hast die Map " + map.getName() + " gelöscht!"));
                     return 0;

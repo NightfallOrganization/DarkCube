@@ -17,36 +17,36 @@ import org.bukkit.inventory.ItemStack;
 
 public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 
-	@Override
-	@EventHandler
-	public void handle(InventoryClickEvent e) {
-		if (!(e.getWhoClicked() instanceof Player)) {
-			return;
-		}
-		Player p = (Player) e.getWhoClicked();
-		ItemStack item = e.getCurrentItem();
-		if (item == null) {
-			return;
-		}
-		String itemId = ItemManager.getItemId(item);
-		if (itemId == null) {
-			return;
-		}
-		if (WoolBattle.instance().getLobby().enabled() && e.getHotbarButton() != -1) {
-			e.setCancelled(true);
-		}
+    @Override
+    @EventHandler
+    public void handle(InventoryClickEvent e) {
+        if (!(e.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        Player p = (Player) e.getWhoClicked();
+        ItemStack item = e.getCurrentItem();
+        if (item == null) {
+            return;
+        }
+        String itemId = ItemManager.getItemId(item);
+        if (itemId == null) {
+            return;
+        }
+        if (WoolBattle.instance().lobby().enabled() && e.getHotbarButton() != -1) {
+            e.setCancelled(true);
+        }
 
-		if (e.isCancelled()) {
-			return;
-		}
-		if (e.getRawSlot() != -1 && e.getRawSlot() != -999) {
-			EventInteract pe =
-					new EventInteract(p, e.getCurrentItem(), e.getClickedInventory(), e.getClick());
-			Bukkit.getPluginManager().callEvent(pe);
-			e.setCancelled(pe.isCancelled());
-			e.setCurrentItem(pe.getItem());
-		} else {
-			e.setCancelled(true);
-		}
-	}
+        if (e.isCancelled()) {
+            return;
+        }
+        if (e.getRawSlot() != -1 && e.getRawSlot() != -999) {
+            EventInteract pe =
+                    new EventInteract(p, e.getCurrentItem(), e.getClickedInventory(), e.getClick());
+            Bukkit.getPluginManager().callEvent(pe);
+            e.setCancelled(pe.isCancelled());
+            e.setCurrentItem(pe.getItem());
+        } else {
+            e.setCancelled(true);
+        }
+    }
 }

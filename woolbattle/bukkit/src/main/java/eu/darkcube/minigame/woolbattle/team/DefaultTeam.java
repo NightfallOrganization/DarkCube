@@ -23,96 +23,96 @@ import java.util.stream.Collectors;
 
 class DefaultTeam implements Team {
 
-	private UUID uuid;
-	private TeamType type;
-	private int lifes;
+    private UUID uuid;
+    private TeamType type;
+    private int lifes;
 
-	public DefaultTeam(TeamType type) {
-		this.uuid = UUID.randomUUID();
-		this.type = type;
-	}
+    public DefaultTeam(TeamType type) {
+        this.uuid = UUID.randomUUID();
+        this.type = type;
+    }
 
-	@Override
-	public int compareTo(Team o) {
-		return getType().compareTo(o.getType());
-	}
+    @Override
+    public int compareTo(Team o) {
+        return getType().compareTo(o.getType());
+    }
 
-	@Override
-	public UUID getUniqueId() {
-		return uuid;
-	}
+    @Override
+    public UUID getUniqueId() {
+        return uuid;
+    }
 
-	@Override
-	public boolean isSpectator() {
-		return getType().equals(TeamType.SPECTATOR);
-	}
+    @Override
+    public boolean isSpectator() {
+        return getType().equals(TeamType.SPECTATOR);
+    }
 
-	@Override
-	public boolean canPlay() {
-		return !isSpectator();
-	}
+    @Override
+    public boolean canPlay() {
+        return !isSpectator();
+    }
 
-	@Override
-	public Component getName(ILanguagedCommandExecutor executor) {
-		return Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey(),
-				executor.getLanguage()).style(getPrefixStyle());
-	}
+    @Override
+    public Component getName(ILanguagedCommandExecutor executor) {
+        return Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey(),
+                executor.getLanguage()).style(getPrefixStyle());
+    }
 
-	@Override
-	public Style getPrefixStyle() {
-		return AdventureSupport.convert(ChatColor.getByChar(getType().getNameColor()));
-	}
+    @Override
+    public Style getPrefixStyle() {
+        return AdventureSupport.convert(ChatColor.getByChar(getType().getNameColor()));
+    }
 
-	@Override
-	public TeamType getType() {
-		return type;
-	}
+    @Override
+    public TeamType getType() {
+        return type;
+    }
 
-	@Override
-	public Collection<? extends WBUser> getUsers() {
-		return WBUser.onlineUsers().stream().filter(user -> user.getTeam().equals(this))
-				.collect(Collectors.toSet());
-	}
+    @Override
+    public Collection<? extends WBUser> getUsers() {
+        return WBUser.onlineUsers().stream().filter(user -> user.getTeam().equals(this))
+                .collect(Collectors.toSet());
+    }
 
-	@Override
-	public boolean contains(UUID user) {
-		for (WBUser u : getUsers()) {
-			if (u.getUniqueId().equals(user)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean contains(UUID user) {
+        for (WBUser u : getUsers()) {
+            if (u.getUniqueId().equals(user)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public int getLifes() {
-		return lifes;
-	}
+    @Override
+    public int getLifes() {
+        return lifes;
+    }
 
-	@Override
-	public void setLifes(int lifes) {
-		this.lifes = lifes;
-		WBUser.onlineUsers()
-				.forEach(u -> WoolBattle.instance().getIngame().reloadScoreboardLifes(u));
-	}
+    @Override
+    public void setLifes(int lifes) {
+        this.lifes = lifes;
+        WBUser.onlineUsers()
+                .forEach(u -> WoolBattle.instance().ingame().reloadScoreboardLifes(u));
+    }
 
-	@Override
-	public void setSpawn(Map map, Location location) {
-		map.setSpawn(getType().getDisplayNameKey(), location);
-	}
+    @Override
+    public void setSpawn(Map map, Location location) {
+        map.ingameData().spawn(getType().getDisplayNameKey(), location);
+    }
 
-	@Override
-	public Location getSpawn(Map map) {
-		return map.getSpawn(getType().getDisplayNameKey());
-	}
+    @Override
+    public Location getSpawn(Map map) {
+        return map.ingameData().spawn(getType().getDisplayNameKey());
+    }
 
-	@Override
-	public Location getSpawn() {
-		return getSpawn(WoolBattle.instance().getMap());
-	}
+    @Override
+    public Location getSpawn() {
+        return getSpawn(WoolBattle.instance().gameData().map());
+    }
 
-	@Override
-	public void setSpawn(Location location) {
-		setSpawn(WoolBattle.instance().getMap(), location);
-	}
+    @Override
+    public void setSpawn(Location location) {
+        setSpawn(WoolBattle.instance().gameData().map(), location);
+    }
 }

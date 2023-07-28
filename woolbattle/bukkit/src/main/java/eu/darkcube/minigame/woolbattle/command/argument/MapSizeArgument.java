@@ -39,7 +39,7 @@ public class MapSizeArgument implements ArgumentType<MapSize> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        String[] suggestions = WoolBattle.instance().getMapManager().getMaps().stream().map(Map::size).map(MapSize::toString).toArray(String[]::new);
+        String[] suggestions = WoolBattle.instance().mapManager().getMaps().stream().map(Map::size).map(MapSize::toString).toArray(String[]::new);
         return ISuggestionProvider.suggest(suggestions, builder);
     }
 

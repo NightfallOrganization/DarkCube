@@ -14,47 +14,45 @@ import eu.darkcube.minigame.woolbattle.command.*;
 import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
-import eu.darkcube.minigame.woolbattle.listener.*;
-import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerWeatherChange;
-import eu.darkcube.minigame.woolbattle.map.*;
+import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
+import eu.darkcube.minigame.woolbattle.map.CloudNetMapLoader;
+import eu.darkcube.minigame.woolbattle.map.DefaultMapManager;
+import eu.darkcube.minigame.woolbattle.map.MapLoader;
+import eu.darkcube.minigame.woolbattle.map.MapManager;
 import eu.darkcube.minigame.woolbattle.mysql.MySQL;
 import eu.darkcube.minigame.woolbattle.perk.PerkRegistry;
 import eu.darkcube.minigame.woolbattle.team.DefaultTeamManager;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamManager;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.translation.LanguageHelper;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.user.WBUserModifier;
-import eu.darkcube.minigame.woolbattle.util.*;
+import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
+import eu.darkcube.minigame.woolbattle.util.DependencyManager;
 import eu.darkcube.minigame.woolbattle.util.DependencyManager.Dependency;
-import eu.darkcube.minigame.woolbattle.util.convertingrule.*;
+import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
+import eu.darkcube.minigame.woolbattle.util.ScoreboardObjective;
+import eu.darkcube.minigame.woolbattle.util.convertingrule.ConvertingRuleHelper;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
-import eu.darkcube.system.Plugin;
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.ILanguagedCommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.loader.PluginClassLoader;
 import eu.darkcube.system.loader.ReflectionClassLoader;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.data.UserModifier;
-import eu.darkcube.system.util.GameState;
-import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
-import org.bukkit.WorldCreator;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.InvalidDescriptionException;
-import org.bukkit.plugin.InvalidPluginException;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -67,54 +65,38 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
+public class WoolBattle extends DarkCubePlugin {
 
-public class WoolBattle extends Plugin {
-
+    @Deprecated
     private static WoolBattle instance;
-    public String name;
-    public String tabprefix;
     public String atall;
     public String atteam;
-    public Integer baseLifes;
-    public Map baseMap;
     private PerkRegistry perkRegistry;
     private UserModifier userModifier;
-    private GameState state;
     private Lobby lobby;
     private Ingame ingame;
     private Endgame endgame;
-    private Map map;
     private TeamManager teamManager;
     private MapManager mapManager;
     private Collection<SchedulerTask> schedulers;
+    private GameData gameData;
     private PluginClassLoader pluginClassLoader;
     private BukkitTask tickTask;
     private MapLoader mapLoader;
-    private ListenerPlayerInteract listenerPlayerInteract;
-    private ListenerInventoryClick listenerInventoryClick;
-    private ListenerInventoryClose listenerInventoryClose;
-    private ListenerFoodLevelChange listenerFoodLevelChange;
-    private ListenerWeatherChange listenerWeatherChange;
-    private ListenerLaunchable listenerLaunchable;
-    private ListenerAntiMonster listenerAntiMonster;
-    private ListenerChat listenerChat;
+    private WoolBattleListeners listeners = new WoolBattleListeners();
     private MySQL mysql;
     private int maxPlayers;
-    private boolean epGlitch = true;
-    private int currentTick;
 
     public WoolBattle() {
         super("woolbattle");
+        this.pluginClassLoader = new ReflectionClassLoader(this);
         WoolBattle.instance = this;
-
-        System.setProperty("file.encoding", "UTF-8");
     }
 
     public static void initScoreboard(Scoreboard sb, WBUser owner) {
         // Spectator is not included in "Team"
-        Collection<Team> teams = new HashSet<>(WoolBattle.instance().getTeamManager().getTeams());
-        teams.add(WoolBattle.instance().getTeamManager().getSpectator());
+        Collection<Team> teams = new HashSet<>(WoolBattle.instance().teamManager().getTeams());
+        teams.add(WoolBattle.instance().teamManager().getSpectator());
         for (Team t : teams) {
             ScoreboardTeam team = sb.createTeam(t.getType().getScoreboardTag());
             String s = LegacyComponentSerializer.legacySection()
@@ -133,6 +115,7 @@ public class WoolBattle extends Plugin {
         }
     }
 
+    @Deprecated
     public static WoolBattle instance() {
         return WoolBattle.instance;
     }
@@ -173,37 +156,11 @@ public class WoolBattle extends Plugin {
             throw new RuntimeException(e);
         }
 
-        this.pluginClassLoader = new ReflectionClassLoader(this);
         new DependencyManager(this).loadDependencies(Dependency.values());
 
-        // Load all messages
-        try {
-            Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties",
-                    Message.KEY_MODFIIER);
-            Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties",
-                    Message.KEY_MODFIIER);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        List<String> languageEntries = new ArrayList<>();
-        languageEntries.addAll(Arrays.asList(Message.values()).stream().map(Message::key)
-                .collect(Collectors.toList()));
-        languageEntries.addAll(
-                Arrays.asList(Item.values()).stream().map(i -> Message.ITEM_PREFIX + i.getKey())
-                        .collect(Collectors.toList()));
-        languageEntries.addAll(
-                Arrays.asList(Item.values()).stream().filter(i -> i.getBuilder().lore().size() > 0)
-                        .map(i -> Message.ITEM_PREFIX + Message.LORE_PREFIX + i.getKey())
-                        .collect(Collectors.toList()));
-        Language.validateEntries(languageEntries.toArray(new String[0]),
-                s -> Message.KEY_PREFIX + s);
+        LanguageHelper.load();
 
-        // Create Array converting rules
-        Arrays.addConvertingRule(new ConvertingRuleLanguage());
-        Arrays.addConvertingRule(new ConvertingRuleChatColor());
-        Arrays.addConvertingRule(new ConvertingRuleDyeColor());
-        Arrays.addConvertingRule(new ConvertingRuleTeam());
-        Arrays.addConvertingRule(new ConvertingRuleMap());
+        ConvertingRuleHelper.load();
 
         // Create configs
         this.saveDefaultConfig("teams");
@@ -215,32 +172,14 @@ public class WoolBattle extends Plugin {
         this.saveDefaultConfig("mysql");
         this.createConfig("mysql");
 
-        this.saveDefaultConfig("worlds");
-        this.createConfig("worlds");
-
-        this.saveDefaultConfig("spawns");
-        this.createConfig("spawns");
-
         this.schedulers = new ArrayList<>();
         this.perkRegistry = new PerkRegistry();
-
-        // Init listeners
-        this.listenerInventoryClose = new ListenerInventoryClose();
-        this.listenerInventoryClick = new ListenerInventoryClick();
-        this.listenerPlayerInteract = new ListenerPlayerInteract();
-        this.listenerFoodLevelChange = new ListenerFoodLevelChange();
-        this.listenerWeatherChange = new ListenerWeatherChange();
-        this.listenerLaunchable = new ListenerLaunchable();
-        this.listenerChat = new ListenerChat();
-        this.listenerAntiMonster = new ListenerAntiMonster();
 
         // Load and connect mysql
         this.mysql = new MySQL();
         this.mysql.connect();
 
         // Load Name and Tab prefix
-        this.name = this.getConfig("config").getString("name");
-        this.tabprefix = this.getConfig("config").getString("tabprefix");
         this.atall = this.getConfig("config").getString("at_all");
         this.atteam = this.getConfig("config").getString("at_team");
 
@@ -264,31 +203,23 @@ public class WoolBattle extends Plugin {
             this.teamManager.getSpectator().getType().save();
         }
         types.forEach(type -> this.teamManager.getOrCreateTeam(type));
+
         this.maxPlayers = 0;
         for (Team team : this.teamManager.getTeams()) {
             this.maxPlayers += team.getType().getMaxPlayers();
         }
-        // Set gamestate
-        this.state = GameState.UNKNOWN;
 
         // Init all GameStates
-        this.lobby = new Lobby();
-        this.ingame = new Ingame();
+        this.lobby = new Lobby(this);
+        this.ingame = new Ingame(this);
         this.endgame = new Endgame();
 
-        // I've to do this so the listener may be registered
-        PluginManager pm = this.getServer().getPluginManager();
-        pm.registerInterface(VoidWorldPluginLoader.class);
-        try {
-            pm.loadPlugin(VoidWorldPluginLoader.file);
-        } catch (UnknownDependencyException | InvalidPluginException |
-                 InvalidDescriptionException ex) {
-            ex.printStackTrace();
-        }
+        VoidWorldPluginLoader.load();
     }
 
     @Override
     public void onDisable() {
+        listeners.unregisterAll();
         UserAPI.getInstance().removeModifier(userModifier);
         this.tickTask.cancel();
         this.mysql.disconnect();
@@ -297,13 +228,9 @@ public class WoolBattle extends Plugin {
     @Override
     public void onEnable() {
         mapLoader = new CloudNetMapLoader();
-        for (String world : this.getConfig("worlds").getStringList("worlds")) {
-            if (Bukkit.getWorld(world) == null)
-                Bukkit.createWorld(new WorldCreator(world));
-        }
 
         // Load Maps
-        this.mapManager = new DefaultMapManager();
+        mapManager = new DefaultMapManager();
 
         this.lobby.recalculateMap();
         this.lobby.recalculateEpGlitch();
@@ -322,7 +249,6 @@ public class WoolBattle extends Plugin {
 
             @Override
             public void run() {
-                currentTick++;
                 for (SchedulerTask s : new ArrayList<>(schedulers)) {
                     if (s.canExecute()) {
                         s.run();
@@ -333,14 +259,7 @@ public class WoolBattle extends Plugin {
         }.runTaskTimer(this, 0, 1);
 
         // Register default listeners
-        WoolBattle.registerListeners(this.listenerInventoryClick);
-        WoolBattle.registerListeners(this.listenerInventoryClose);
-        WoolBattle.registerListeners(this.listenerPlayerInteract);
-        WoolBattle.registerListeners(this.listenerFoodLevelChange);
-        WoolBattle.registerListeners(this.listenerWeatherChange);
-        WoolBattle.registerListeners(this.listenerLaunchable);
-        WoolBattle.registerListeners(this.listenerChat);
-        WoolBattle.registerListeners(this.listenerAntiMonster);
+        listeners.registerAll(this);
 
         // Load worlds (At serverstart there are no worlds but if the plugin
         // gets
@@ -373,94 +292,44 @@ public class WoolBattle extends Plugin {
         }.runTaskTimerAsynchronously(WoolBattle.instance(), 10, 10);
     }
 
-    public Map getMap() {
-        return this.baseMap == null ? this.map : this.baseMap;
+    public GameData gameData() {
+        return gameData;
     }
 
-    public void setMap(Map map) {
-        this.map = map;
-        WBUser.onlineUsers().forEach(this::setMap);
+    public void gameData(GameData gameData) {
+        this.gameData = gameData;
     }
 
-    public void setMap(WBUser user) {
-        if (this.getLobby().enabled()) {
-            Scoreboard sb = new Scoreboard(user);
-            ScoreboardTeam team = sb.getTeam(ObjectiveTeam.MAP.getKey());
-            Map m = this.getMap();
-            Component suffix =
-                    m == null ? text("No Maps").color(NamedTextColor.RED) : text(m.getName());
-            team.setSuffix(suffix);
-        }
-    }
-
-    public int getMaxPlayers() {
+    public int maxPlayers() {
         return this.maxPlayers;
     }
 
-    public boolean isEpGlitch() {
-        return this.epGlitch;
-    }
-
-    public void setEpGlitch(boolean glitch) {
-        this.epGlitch = glitch;
-        WBUser.onlineUsers().forEach(this::setEpGlitch);
-    }
-
-    public void setEpGlitch(WBUser user) {
-        Scoreboard sb = new Scoreboard(user);
-        ScoreboardTeam team = sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
-        Component suffix = this.epGlitch
-                ? Message.EP_GLITCH_ON.getMessage(user)
-                : Message.EP_GLITCH_OFF.getMessage(user);
-        team.setSuffix(suffix);
-    }
-
-    public void setOnline(WBUser user) {
-        Scoreboard sb = new Scoreboard(user);
-        ScoreboardTeam team = sb.getTeam(ObjectiveTeam.ONLINE.getKey());
-        Component suffix = text(Bukkit.getOnlinePlayers().size());
-        team.setSuffix(suffix);
-    }
-
-    public int getCurrentTick() {
-        return this.currentTick;
-    }
-
-    public PluginClassLoader getPluginClassLoader() {
+    public PluginClassLoader pluginClassLoader() {
         return this.pluginClassLoader;
     }
 
-    public Lobby getLobby() {
+    public Lobby lobby() {
         return this.lobby;
     }
 
-    public Ingame getIngame() {
+    public Ingame ingame() {
         return this.ingame;
     }
 
-    public TeamManager getTeamManager() {
-        return this.teamManager;
-    }
-
-    public Endgame getEndgame() {
+    public Endgame endgame() {
         return this.endgame;
     }
 
-    public GameState getGameState() {
-        return this.state;
+    public TeamManager teamManager() {
+        return this.teamManager;
     }
 
-    public Collection<SchedulerTask> getSchedulers() {
+    public Collection<SchedulerTask> schedulers() {
         return this.schedulers;
     }
 
-    public MapManager getMapManager() {
+    public MapManager mapManager() {
         return this.mapManager;
-    }
-
-    @Override
-    public String getCommandPrefix() {
-        return this.reloadConfig("config").getString(Config.COMMAND_PREFIX);
     }
 
     public MapLoader mapLoader() {

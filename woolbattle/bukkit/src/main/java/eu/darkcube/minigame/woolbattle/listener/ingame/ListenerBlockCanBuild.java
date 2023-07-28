@@ -21,36 +21,36 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockCanBuildEvent;
 
 public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
-	@Override
-	@EventHandler
-	public void handle(BlockCanBuildEvent e) {
-		if (e.getBlock().getType() != Material.AIR) {
-			e.setBuildable(false);
-			return;
-		}
-		if (e.getMaterial() == Material.WOOL) {
-			e.setBuildable(true);
-			Block block = CraftMagicNumbers.getBlock(e.getMaterial());
-			AxisAlignedBB box = block.a(((CraftWorld) e.getBlock().getWorld()).getHandle(),
-					new BlockPosition(e.getBlock().getX(), e.getBlock().getY(),
-							e.getBlock().getZ()), block.getBlockData());
-			for (Entity ent : e.getBlock().getWorld().getEntities()) {
-				AxisAlignedBB entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
-				if (box.b(entityBox)) {
-					if (preventsBlockPlacement(ent)) {
-						e.setBuildable(false);
-						return;
-					}
-				}
-			}
-		}
-	}
+    @Override
+    @EventHandler
+    public void handle(BlockCanBuildEvent e) {
+        if (e.getBlock().getType() != Material.AIR) {
+            e.setBuildable(false);
+            return;
+        }
+        if (e.getMaterial() == Material.WOOL) {
+            e.setBuildable(true);
+            Block block = CraftMagicNumbers.getBlock(e.getMaterial());
+            AxisAlignedBB box = block.a(((CraftWorld) e.getBlock().getWorld()).getHandle(),
+                    new BlockPosition(e.getBlock().getX(), e.getBlock().getY(),
+                            e.getBlock().getZ()), block.getBlockData());
+            for (Entity ent : e.getBlock().getWorld().getEntities()) {
+                AxisAlignedBB entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
+                if (box.b(entityBox)) {
+                    if (preventsBlockPlacement(ent)) {
+                        e.setBuildable(false);
+                        return;
+                    }
+                }
+            }
+        }
+    }
 
-	private boolean preventsBlockPlacement(Entity entity) {
-		if (entity instanceof Player) {
-			Player p = (Player) entity;
-			return !WoolBattle.instance().getTeamManager().getSpectator().contains(p.getUniqueId());
-		}
-		return false;
-	}
+    private boolean preventsBlockPlacement(Entity entity) {
+        if (entity instanceof Player) {
+            Player p = (Player) entity;
+            return !WoolBattle.instance().teamManager().getSpectator().contains(p.getUniqueId());
+        }
+        return false;
+    }
 }

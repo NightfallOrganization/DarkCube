@@ -8,58 +8,42 @@ package eu.darkcube.minigame.woolbattle.game;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import eu.darkcube.minigame.woolbattle.Config;
+import eu.darkcube.minigame.woolbattle.GameData;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.game.lobby.LobbyDeathLineTask;
 import eu.darkcube.minigame.woolbattle.listener.lobby.*;
 import eu.darkcube.minigame.woolbattle.listener.lobby.item.*;
 import eu.darkcube.minigame.woolbattle.team.Team;
+import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.*;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableObject;
 import eu.darkcube.minigame.woolbattle.util.observable.SimpleObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.Arrays;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
+
 public class Lobby extends GamePhase {
 
-    public final ListenerPlayerDropItem listenerPlayerDropItem;
-
-    public final ListenerEntityDamage listenerEntityDamage;
-
-    public final ListenerBlockBreak listenerBlockBreak;
-
-    public final ListenerBlockPlace listenerBlockPlace;
-
-    public final ListenerPlayerJoin listenerPlayerJoin;
-
-    public final ListenerPlayerQuit listenerPlayerQuit;
-
-    public final ListenerPlayerLogin listenerPlayerLogin;
-
-    public final ListenerInteract listenerInteract;
-
-    public final ListenerItemParticles listenerItemParticles;
-
-    public final ListenerItemVoting listenerItemVoting;
-
-    public final ListenerItemPerks listenerItemPerks;
-
-    public final ListenerItemTeams listenerItemTeams;
-
-    public final ListenerItemSettings listenerItemSettings;
-
-    public final ListenerInteractMenuBack listenerInteractMenuBack;
     public final Map<WBUser, Vote<eu.darkcube.minigame.woolbattle.map.Map>> VOTES_MAP;
     public final Map<WBUser, Vote<Boolean>> VOTES_EP_GLITCH;
     public final Map<WBUser, Integer> VOTES_LIFES = new HashMap<>();
@@ -68,38 +52,18 @@ public class Lobby extends GamePhase {
     private final Map<WBUser, Set<WBUser>> SCOREBOARD_MISSING_USERS;
     private final ObservableInteger timer;
     private final ObservableInteger overrideTimer;
+    private final WoolBattle woolbattle;
     private int MIN_PLAYER_COUNT;
-
     private int MAX_PLAYER_COUNT;
-
     private int deathline;
-
     private Scheduler timerTask;
-
-    private Scheduler deathLineTask;
-
     private Location spawn;
 
-    public Lobby() {
+    public Lobby(WoolBattle woolbattle) {
+        this.woolbattle = woolbattle;
         this.SCOREBOARD_BY_USER = new HashMap<>();
         this.SCOREBOARD_MISSING_USERS = new HashMap<>();
-
-        this.listenerPlayerDropItem = new ListenerPlayerDropItem();
-        this.listenerEntityDamage = new ListenerEntityDamage();
-        this.listenerBlockBreak = new ListenerBlockBreak();
-        this.listenerBlockPlace = new ListenerBlockPlace();
-        this.listenerPlayerJoin = new ListenerPlayerJoin();
-        this.listenerPlayerQuit = new ListenerPlayerQuit();
-        this.listenerPlayerLogin = new ListenerPlayerLogin();
-        this.listenerInteract = new ListenerInteract();
-
-        this.listenerItemParticles = new ListenerItemParticles();
-        this.listenerItemSettings = new ListenerItemSettings();
-        this.listenerItemVoting = new ListenerItemVoting();
-        this.listenerItemTeams = new ListenerItemTeams();
-        this.listenerItemPerks = new ListenerItemPerks();
-
-        this.listenerInteractMenuBack = new ListenerInteractMenuBack();
+        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(), new ListenerItemVoting(), new ListenerItemTeams(), new ListenerItemPerks(), new ListenerInteractMenuBack());
 
         this.VOTES_MAP = new HashMap<>();
         this.VOTES_EP_GLITCH = new HashMap<>();
@@ -116,7 +80,7 @@ public class Lobby extends GamePhase {
                             p.setExp(0);
                         });
                         disable();
-                        WoolBattle.instance().getIngame().enable();
+                        woolbattle.ingame().enable();
                         return;
                     }
                     AtomicDouble exp = new AtomicDouble(
@@ -156,18 +120,7 @@ public class Lobby extends GamePhase {
         this.overrideTimer.setSilent(0);
         this.timer.setSilent(this.MAX_TIMER_SECONDS * 20);
 
-        this.deathLineTask = new Scheduler() {
-
-            @Override
-            public void run() {
-                Bukkit.getOnlinePlayers().forEach(p -> {
-                    if (p.getLocation().getBlockY() < Lobby.this.deathline) {
-                        p.teleport(Lobby.this.getSpawn());
-                    }
-                });
-            }
-
-        };
+        addScheduler(new LobbyDeathLineTask(this));
 
         this.timerTask = new Scheduler() {
 
@@ -177,7 +130,7 @@ public class Lobby extends GamePhase {
             public void run() {
                 if (Lobby.this.MAX_PLAYER_COUNT == 0 && !this.announced) {
                     this.announced = true;
-                    WoolBattle.instance()
+                    woolbattle
                             .sendConsole("It does not seem that any teams have been set up");
                 } else if (Lobby.this.MAX_PLAYER_COUNT != 0) {
                     final int online = Bukkit.getOnlinePlayers().size();
@@ -205,8 +158,7 @@ public class Lobby extends GamePhase {
     @Override
     public void onEnable() {
         CloudNetLink.update();
-        WoolBattle.instance().reloadConfig("config");
-        WoolBattle.instance().baseLifes = null;
+        woolbattle.gameData(new GameData(woolbattle));
         //		Main.getInstance().getSchedulers().clear();
         this.setTimer(60 * 20);
         this.VOTES_LIFES.clear();
@@ -217,62 +169,116 @@ public class Lobby extends GamePhase {
         WBUser.onlineUsers().forEach(u -> this.SCOREBOARD_MISSING_USERS.put(u, new HashSet<>()));
         Bukkit.getOnlinePlayers().forEach(p -> {
             p.closeInventory();
-            this.listenerPlayerJoin.handle(new PlayerJoinEvent(p, null));
+            setupPlayer(WBUser.getUser(p), false);
             this.setTimer(Math.max(this.getTimer(), 300));
             p.teleport(this.getSpawn());
         });
         WBUser.onlineUsers().forEach(this::reloadUsers);
         this.MIN_PLAYER_COUNT =
-                WoolBattle.instance().getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
-        this.deathline = WoolBattle.instance().getConfig("spawns").getInt("lobbydeathline");
+                woolbattle.getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+        this.deathline = woolbattle.getConfig("spawns").getInt("lobbydeathline");
 
         int i = 0;
-        for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
+        for (Team team : woolbattle.teamManager().getTeams()) {
             if (team.getType().isEnabled())
                 i += team.getType().getMaxPlayers();
         }
         this.MAX_PLAYER_COUNT = i;
 
-        WoolBattle.registerListeners(this.listenerItemTeams, this.listenerItemPerks,
-                this.listenerItemVoting, this.listenerItemParticles, this.listenerBlockBreak,
-                this.listenerBlockPlace, this.listenerPlayerJoin, this.listenerPlayerQuit,
-                this.listenerPlayerDropItem, this.listenerEntityDamage,
-                this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings,
-                this.listenerInteract);
         this.timerTask.runTaskTimer(1);
-        this.deathLineTask.runTaskTimer(20);
     }
 
     @Override
     public void onDisable() {
-        WoolBattle.unregisterListeners(this.listenerItemTeams, this.listenerItemPerks,
-                this.listenerItemVoting, this.listenerItemParticles, this.listenerBlockBreak,
-                this.listenerBlockPlace, this.listenerPlayerJoin, this.listenerPlayerQuit,
-                this.listenerPlayerDropItem, this.listenerEntityDamage,
-                this.listenerInteractMenuBack, this.listenerPlayerLogin, this.listenerItemSettings,
-                this.listenerInteract);
         this.timerTask.cancel();
-        this.deathLineTask.cancel();
+    }
+
+    public void setupPlayer(WBUser user, boolean fullSetup) {
+        Player p = user.getBukkitEntity();
+        CloudNetLink.update();
+        woolbattle.teamManager()
+                .setTeam(user, woolbattle.teamManager().getSpectator());
+        Scoreboard sb = new Scoreboard();
+        WoolBattle.initScoreboard(sb, user);
+        getScoreboardByUser().put(user, sb);
+        loadScoreboard(user);
+        p.setScoreboard(sb.getScoreboard());
+
+        Objective obj = sb.getObjective(ScoreboardObjective.LOBBY.getKey());
+        int minPlayerCount =
+                woolbattle.getConfig("config").getInt(Config.MIN_PLAYER_COUNT);
+        ScoreboardTeam needed = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
+        for (int i = 0; i < ObjectiveTeam.values().length; i++) {
+            ObjectiveTeam ot = ObjectiveTeam.values()[i];
+            sb.getTeam(ot.getKey()).addPlayer(ot.getInvisTag());
+            obj.setScore(ot.getInvisTag(), i + 1);
+        }
+
+        for (PotionEffect effect : p.getActivePotionEffects()) {
+            p.removePotionEffect(effect.getType());
+        }
+
+        needed.setSuffix(text(minPlayerCount));
+        if (woolbattle.lobby().enabled()) ScoreboardHelper.setMap(woolbattle, user);
+        ScoreboardHelper.setOnline(user);
+        ScoreboardHelper.setEpGlitch(woolbattle, user);
+
+        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        WBUser.onlineUsers().forEach(t -> {
+            if (fullSetup) reloadUsers(t);
+            ScoreboardHelper.setOnline(t);
+        });
+
+        if (fullSetup) {
+            p.teleport(getSpawn());
+        }
+
+        p.setGameMode(GameMode.SURVIVAL);
+        p.resetMaxHealth();
+        p.resetPlayerTime();
+        p.resetPlayerWeather();
+        p.setAllowFlight(false);
+        p.setExhaustion(0);
+        p.setExp(0);
+        p.setLevel(0);
+        p.setFoodLevel(20);
+        p.setHealth(20);
+        p.setItemOnCursor(null);
+        p.setSaturation(0);
+        PlayerInventory inv = p.getInventory();
+        inv.clear();
+        inv.setArmorContents(new ItemStack[4]);
+        setParticlesItem(user, p);
+        inv.setItem(0, Item.LOBBY_PERKS.getItem(user));
+        inv.setItem(1, Item.LOBBY_TEAMS.getItem(user));
+        inv.setItem(7, Item.SETTINGS.getItem(user));
+        inv.setItem(8, Item.LOBBY_VOTING.getItem(user));
+
+        if (fullSetup) {
+            setTimer(Math.max(getTimer(), 300));
+            woolbattle.sendMessage(Message.PLAYER_JOINED, user.getTeamPlayerName());
+        } else {
+            setTimer(getTimer());
+        }
     }
 
     public void recalculateMap() {
         eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(
                 this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled())
                         .collect(Collectors.toList()),
-                WoolBattle.instance().getMapManager().getMaps().stream()
+                woolbattle.mapManager().getMaps().stream()
                         .filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
-                        .collect(Collectors.toSet()), WoolBattle.instance().getMap());
+                        .collect(Collectors.toSet()), woolbattle.gameData().map());
         if (map != null)
             if (!map.isEnabled())
                 map = null;
-        WoolBattle.instance().setMap(map);
+        woolbattle.gameData().votedMap(map);
     }
 
     public void recalculateEpGlitch() {
-        boolean glitch =
-                Vote.calculateWinner(this.VOTES_EP_GLITCH.values(), Arrays.asList(true, false),
-                        false);
-        WoolBattle.instance().setEpGlitch(glitch);
+        boolean glitch = Vote.calculateWinner(this.VOTES_EP_GLITCH.values(), Arrays.asList(true, false), GameData.EP_GLITCH_DEFAULT);
+        woolbattle.gameData().epGlitch(glitch);
     }
 
     public void loadScoreboard(WBUser user) {
@@ -284,8 +290,7 @@ public class Lobby extends GamePhase {
         });
         this.SCOREBOARD_MISSING_USERS.values().forEach(users -> users.add(user));
         this.SCOREBOARD_MISSING_USERS.put(user, missing);
-        this.SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag())
-                .addPlayer(user.getPlayerName());
+        this.SCOREBOARD_BY_USER.get(user).getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
     }
 
     public void setParticlesItem(WBUser user, Player p) {
@@ -320,7 +325,7 @@ public class Lobby extends GamePhase {
     public Location getSpawn() {
         if (this.spawn == null)
             this.spawn = Locations.deserialize(
-                    WoolBattle.instance().getConfig("spawns").getString("lobby"),
+                    woolbattle.getConfig("spawns").getString("lobby"),
                     Locations.DEFAULT_LOCATION);
         assert this.spawn != null;
         return this.spawn.clone();
@@ -328,9 +333,13 @@ public class Lobby extends GamePhase {
 
     public void setSpawn(Location spawn) {
         this.spawn = spawn;
-        YamlConfiguration cfg = WoolBattle.instance().getConfig("spawns");
+        YamlConfiguration cfg = woolbattle.getConfig("spawns");
         cfg.set("lobby", Locations.serialize(spawn));
-        WoolBattle.instance().saveConfig(cfg);
+        woolbattle.saveConfig(cfg);
+    }
+
+    public int deathline() {
+        return deathline;
     }
 
     public Map<WBUser, Scoreboard> getScoreboardByUser() {

@@ -28,85 +28,85 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 public class TeamsInventory extends WoolBattlePagedInventory {
-	public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
-	private static final Key TEAM = new Key(WoolBattle.instance(), "team_id");
-	private final TeamsListener listener = new TeamsListener();
+    public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
+    private static final Key TEAM = new Key(WoolBattle.instance(), "team_id");
+    private final TeamsListener listener = new TeamsListener();
 
-	public TeamsInventory(WBUser user) {
-		super(TYPE, Message.INVENTORY_TEAMS.getMessage(user), user);
-		Bukkit.getPluginManager().registerEvents(listener, WoolBattle.instance());
-	}
+    public TeamsInventory(WBUser user) {
+        super(TYPE, Message.INVENTORY_TEAMS.getMessage(user), user);
+        Bukkit.getPluginManager().registerEvents(listener, WoolBattle.instance());
+    }
 
-	@Override
-	protected void inventoryClick(IInventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.item() == null)
-			return;
-		String teamId = ItemManager.getId(event.item(), TEAM);
-		if (teamId == null)
-			return;
-		Team team = WoolBattle.instance().getTeamManager().getTeam(teamId);
-		if (team.equals(user.getTeam())) {
-			user.user().sendMessage(Message.ALREADY_IN_TEAM);
-			return;
-		}
-		if (team.getUsers().size() >= team.getType().getMaxPlayers()) {
-			user.user().sendMessage(Message.TEAM_IS_FULL, team.getName(user.user()));
-			return;
-		}
-		user.setTeam(team);
-		user.user().sendMessage(Message.CHANGED_TEAM, team.getName(user.user()));
-		Bukkit.getPluginManager().callEvent(new Refresh());
-	}
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
+        event.setCancelled(true);
+        if (event.item() == null)
+            return;
+        String teamId = ItemManager.getId(event.item(), TEAM);
+        if (teamId == null)
+            return;
+        Team team = WoolBattle.instance().teamManager().getTeam(teamId);
+        if (team.equals(user.getTeam())) {
+            user.user().sendMessage(Message.ALREADY_IN_TEAM);
+            return;
+        }
+        if (team.getUsers().size() >= team.getType().getMaxPlayers()) {
+            user.user().sendMessage(Message.TEAM_IS_FULL, team.getName(user.user()));
+            return;
+        }
+        user.setTeam(team);
+        user.user().sendMessage(Message.CHANGED_TEAM, team.getName(user.user()));
+        Bukkit.getPluginManager().callEvent(new Refresh());
+    }
 
-	@Override
-	protected void fillItems(Map<Integer, ItemStack> items) {
-		int i = 0;
-		for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
-			ItemBuilder b = ItemBuilder.item(Material.WOOL);
-			b.displayname(team.getName(user.user()));
-			b.damage(team.getType().getWoolColorByte());
-			if (team.getUsers().contains(user)) {
-				b.glow(true);
-			}
-			team.getUsers().forEach(u -> b.lore(u.getTeamPlayerName()));
-			ItemManager.setId(b, TEAM, team.getType().getDisplayNameKey());
-			items.put(i++, b.build());
-		}
-	}
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
+        int i = 0;
+        for (Team team : WoolBattle.instance().teamManager().getTeams()) {
+            ItemBuilder b = ItemBuilder.item(Material.WOOL);
+            b.displayname(team.getName(user.user()));
+            b.damage(team.getType().getWoolColorByte());
+            if (team.getUsers().contains(user)) {
+                b.glow(true);
+            }
+            team.getUsers().forEach(u -> b.lore(u.getTeamPlayerName()));
+            ItemManager.setId(b, TEAM, team.getType().getDisplayNameKey());
+            items.put(i++, b.build());
+        }
+    }
 
-	@Override
-	protected void insertFallbackItems() {
-		fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_TEAMS.getItem(user));
-		super.insertFallbackItems();
-	}
+    @Override
+    protected void insertFallbackItems() {
+        fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_TEAMS.getItem(user));
+        super.insertFallbackItems();
+    }
 
-	@Override
-	protected void destroy() {
-		HandlerList.unregisterAll(listener);
-		super.destroy();
-	}
+    @Override
+    protected void destroy() {
+        HandlerList.unregisterAll(listener);
+        super.destroy();
+    }
 
-	public static class Refresh extends Event {
-		private static final HandlerList handlers = new HandlerList();
+    public static class Refresh extends Event {
+        private static final HandlerList handlers = new HandlerList();
 
-		public Refresh() {
-		}
+        public Refresh() {
+        }
 
-		public static HandlerList getHandlerList() {
-			return handlers;
-		}
+        public static HandlerList getHandlerList() {
+            return handlers;
+        }
 
-		@Override
-		public HandlerList getHandlers() {
-			return handlers;
-		}
-	}
+        @Override
+        public HandlerList getHandlers() {
+            return handlers;
+        }
+    }
 
-	private class TeamsListener implements Listener {
-		@EventHandler
-		public void handle(Refresh event) {
-			recalculate();
-		}
-	}
+    private class TeamsListener implements Listener {
+        @EventHandler
+        public void handle(Refresh event) {
+            recalculate();
+        }
+    }
 }

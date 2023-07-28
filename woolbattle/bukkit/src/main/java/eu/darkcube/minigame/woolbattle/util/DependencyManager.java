@@ -17,52 +17,52 @@ import java.nio.file.Path;
 
 public class DependencyManager {
 
-	private WoolBattle plugin;
+    private WoolBattle plugin;
 
-	public DependencyManager(WoolBattle plugin) {
-		this.plugin = plugin;
-	}
+    public DependencyManager(WoolBattle plugin) {
+        this.plugin = plugin;
+    }
 
-	public void loadDependencies(Dependency... dependencies) {
-		for (Dependency depend : dependencies) {
-			Path file = depend.getFile();
-			if (!Files.exists(file)) {
-				try {
-					InputStream in =
-							new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.20/mysql-connector-java-8.0.20.jar").openConnection()
-									.getInputStream();
-					byte[] bytes = ByteStreams.toByteArray(in);
-					Files.write(file, bytes);
-					in.close();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-			plugin.getPluginClassLoader().loadJar(file);
-		}
-	}
+    public void loadDependencies(Dependency... dependencies) {
+        for (Dependency depend : dependencies) {
+            Path file = depend.getFile();
+            if (!Files.exists(file)) {
+                try {
+                    InputStream in =
+                            new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.20/mysql-connector-java-8.0.20.jar").openConnection()
+                                    .getInputStream();
+                    byte[] bytes = ByteStreams.toByteArray(in);
+                    Files.write(file, bytes);
+                    in.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            plugin.pluginClassLoader().loadJar(file);
+        }
+    }
 
-	public enum Dependency {
+    public enum Dependency {
 
-		MYSQL_DRIVER("mysql_driver.jar");
+        MYSQL_DRIVER("mysql_driver.jar");
 
-		private String url;
+        private String url;
 
-		Dependency(String url) {
-			this.url = url;
-		}
+        Dependency(String url) {
+            this.url = url;
+        }
 
-		public String getURL() {
-			return url;
-		}
+        public String getURL() {
+            return url;
+        }
 
-		public Path getFile() {
-			WoolBattle plugin = WoolBattle.instance();
-			File libs = new File(plugin.getDataFolder(), "libs");
-			if (!libs.exists())
-				libs.mkdirs();
-			File file = new File(libs, getURL());
-			return file.toPath();
-		}
-	}
+        public Path getFile() {
+            WoolBattle plugin = WoolBattle.instance();
+            File libs = new File(plugin.getDataFolder(), "libs");
+            if (!libs.exists())
+                libs.mkdirs();
+            File file = new File(libs, getURL());
+            return file.toPath();
+        }
+    }
 }

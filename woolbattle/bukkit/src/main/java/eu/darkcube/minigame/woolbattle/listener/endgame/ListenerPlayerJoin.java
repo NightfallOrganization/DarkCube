@@ -14,15 +14,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
-	@Override
-	@EventHandler
-	public void handle(PlayerJoinEvent e) {
-		WoolBattle main = WoolBattle.instance();
-		Player p = e.getPlayer();
-		WBUser user = WBUser.getUser(p);
-		main.getEndgame().setPlayerItems(user);
-		e.setJoinMessage(null);
-		p.setAllowFlight(false);
-		p.teleport(main.getLobby().getSpawn());
-	}
+    @Override
+    @EventHandler
+    public void handle(PlayerJoinEvent e) {
+        WoolBattle main = WoolBattle.instance();
+        Player p = e.getPlayer();
+        WBUser user = WBUser.getUser(p);
+        main.endgame().setPlayerItems(user);
+        e.setJoinMessage(null);
+        p.setAllowFlight(false);
+        p.teleport(main.lobby().getSpawn());
+    }
 }

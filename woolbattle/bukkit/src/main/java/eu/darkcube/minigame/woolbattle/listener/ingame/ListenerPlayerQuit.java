@@ -19,24 +19,24 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
 
-	@Override
-	@EventHandler
-	public void handle(PlayerQuitEvent e) {
-		e.setQuitMessage(null);
-		WoolBattle main = WoolBattle.instance();
-		Player p = e.getPlayer();
-		WBUser user = WBUser.getUser(p);
-		if (user.getTeam().getType() == TeamType.SPECTATOR) {
-			return;
-		}
-		Team t = WoolBattle.instance().getIngame().lastTeam.remove(user);
-		if (t != null) {
-			if (t.getUsers().size() != 0) {
-				StatsLink.addLoss(user);
-			}
-		}
-		WoolBattle.instance().sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
-		main.getIngame().kill(user, true);
-	}
+    @Override
+    @EventHandler
+    public void handle(PlayerQuitEvent e) {
+        e.setQuitMessage(null);
+        WoolBattle main = WoolBattle.instance();
+        Player p = e.getPlayer();
+        WBUser user = WBUser.getUser(p);
+        if (user.getTeam().getType() == TeamType.SPECTATOR) {
+            return;
+        }
+        Team t = WoolBattle.instance().ingame().lastTeam.remove(user);
+        if (t != null) {
+            if (t.getUsers().size() != 0) {
+                StatsLink.addLoss(user);
+            }
+        }
+        WoolBattle.instance().sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
+        main.ingame().kill(user, true);
+    }
 
 }

@@ -18,46 +18,46 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class CapsulePerk extends Perk {
-	public static final PerkName CAPSULE = new PerkName("CAPSULE");
+    public static final PerkName CAPSULE = new PerkName("CAPSULE");
 
-	public CapsulePerk() {
-		super(ActivationType.ACTIVE, CAPSULE, 30, 24, Item.PERK_CAPSULE,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_CAPSULE_COOLDOWN));
-		addListener(new ListenerCapsule(this));
-	}
+    public CapsulePerk() {
+        super(ActivationType.ACTIVE, CAPSULE, 30, 24, Item.PERK_CAPSULE,
+                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
+                        Item.PERK_CAPSULE_COOLDOWN));
+        addListener(new ListenerCapsule(this));
+    }
 
-	public static class ListenerCapsule extends BasicPerkListener {
+    public static class ListenerCapsule extends BasicPerkListener {
 
-		public ListenerCapsule(Perk perk) {
-			super(perk);
-		}
+        public ListenerCapsule(Perk perk) {
+            super(perk);
+        }
 
-		@Override
-		protected boolean activateRight(UserPerk perk) {
-			Player p = perk.owner().getBukkitEntity();
-			Location loc = p.getLocation();
-			this.setBlock(perk.owner(), loc.subtract(0, 1, 0));
-			this.setBlock(perk.owner(), loc.add(0, 3, 0));
-			this.setBlock2(perk.owner(), loc.subtract(1, 1, 0));
-			this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
-			this.setBlock2(perk.owner(), loc.add(2, 1, 0));
-			this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
-			this.setBlock2(perk.owner(), loc.subtract(1, 0, 1));
-			this.setBlock2(perk.owner(), loc.add(0, 1, 0));
-			this.setBlock2(perk.owner(), loc.add(0, 0, 2));
-			this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
-			p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5)
-					.setDirection(p.getLocation().getDirection()));
-			return true;
-		}
+        @Override
+        protected boolean activateRight(UserPerk perk) {
+            Player p = perk.owner().getBukkitEntity();
+            Location loc = p.getLocation();
+            this.setBlock(perk.owner(), loc.subtract(0, 1, 0));
+            this.setBlock(perk.owner(), loc.add(0, 3, 0));
+            this.setBlock2(perk.owner(), loc.subtract(1, 1, 0));
+            this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
+            this.setBlock2(perk.owner(), loc.add(2, 1, 0));
+            this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
+            this.setBlock2(perk.owner(), loc.subtract(1, 0, 1));
+            this.setBlock2(perk.owner(), loc.add(0, 1, 0));
+            this.setBlock2(perk.owner(), loc.add(0, 0, 2));
+            this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
+            p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5)
+                    .setDirection(p.getLocation().getDirection()));
+            return true;
+        }
 
-		private void setBlock(WBUser user, Location block) {
-			WoolBattle.instance().getIngame().place(user, block.getBlock(), 2, false);
-		}
+        private void setBlock(WBUser user, Location block) {
+            WoolBattle.instance().ingame().place(user, block.getBlock(), 2, false);
+        }
 
-		private void setBlock2(WBUser user, Location block) {
-			WoolBattle.instance().getIngame().place(user, block.getBlock(), 0, false);
-		}
-	}
+        private void setBlock2(WBUser user, Location block) {
+            WoolBattle.instance().ingame().place(user, block.getBlock(), 0, false);
+        }
+    }
 }

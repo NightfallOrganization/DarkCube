@@ -19,38 +19,38 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
 
-	@Override
-	@EventHandler
-	public synchronized void handle(BlockBreakEvent e) {
-		Player p = e.getPlayer();
-		WBUser user = WBUser.getUser(p);
-		Block block = e.getBlock();
-		e.setExpToDrop(0);
-		if (!user.isTrollMode()) {
-			if (user.getTeam().getType() == TeamType.SPECTATOR) {
-				e.setCancelled(true);
-				return;
-			}
-		} else {
-			WoolBattle.instance().getIngame().destroy(block, true);
-			return;
-		}
-		Material type = block.getType();
-		if (type == Material.WOOL) {
-			WoolBattle.instance().getIngame().destroy(block, true);
-			int tryadd = user.getWoolBreakAmount();
-			int added = user.addWool(tryadd);
-			if (added != 0) {
-				playSound(user.getBukkitEntity());
-			}
-			return;
-		}
-		if (!WoolBattle.instance().getIngame().placedBlocks.contains(block)) {
-			e.setCancelled(true);
-		}
-	}
+    @Override
+    @EventHandler
+    public synchronized void handle(BlockBreakEvent e) {
+        Player p = e.getPlayer();
+        WBUser user = WBUser.getUser(p);
+        Block block = e.getBlock();
+        e.setExpToDrop(0);
+        if (!user.isTrollMode()) {
+            if (user.getTeam().getType() == TeamType.SPECTATOR) {
+                e.setCancelled(true);
+                return;
+            }
+        } else {
+            WoolBattle.instance().ingame().destroy(block, true);
+            return;
+        }
+        Material type = block.getType();
+        if (type == Material.WOOL) {
+            WoolBattle.instance().ingame().destroy(block, true);
+            int tryadd = user.getWoolBreakAmount();
+            int added = user.addWool(tryadd);
+            if (added != 0) {
+                playSound(user.getBukkitEntity());
+            }
+            return;
+        }
+        if (!WoolBattle.instance().ingame().placedBlocks.contains(block)) {
+            e.setCancelled(true);
+        }
+    }
 
-	private void playSound(Player p) {
-		p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1);
-	}
+    private void playSound(Player p) {
+        p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1);
+    }
 }

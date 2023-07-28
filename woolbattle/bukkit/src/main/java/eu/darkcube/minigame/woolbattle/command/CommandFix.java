@@ -10,30 +10,30 @@ import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 
 public class CommandFix extends WBCommandExecutor {
-	public CommandFix() {
-		super("fix",
-				b -> b.requires(s -> WoolBattle.instance().getIngame().enabled()).executes(ctx -> {
-					WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
-					WoolBattle.instance().getIngame().setPlayerItems(user);
-					return 0;
-				}));
-	}
-	//	public CommandFix() {
-	//		super(WoolBattle.getInstance(), "fix", new Command[0], "Fix");
-	//	}
-	//
-	//	@Override
-	//	public boolean execute(CommandSender sender, String[] args) {
-	//		if (sender instanceof Player && WoolBattle.getInstance().getIngame().isEnabled()) {
-	//			new Scheduler() {
-	//				@Override
-	//				public void run() {
-	//					Player p = (Player) sender;
-	//					WBUser user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
-	//					WoolBattle.getInstance().getIngame().setPlayerItems(user);
-	//				}
-	//			}.runTaskLater(1);
-	//		}
-	//		return true;
-	//	}
+    public CommandFix() {
+        super("fix",
+                b -> b.requires(s -> WoolBattle.instance().ingame().enabled()).executes(ctx -> {
+                    WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
+                    WoolBattle.instance().ingame().setPlayerItems(user);
+                    return 0;
+                }));
+    }
+    //	public CommandFix() {
+    //		super(WoolBattle.getInstance(), "fix", new Command[0], "Fix");
+    //	}
+    //
+    //	@Override
+    //	public boolean execute(CommandSender sender, String[] args) {
+    //		if (sender instanceof Player && WoolBattle.getInstance().getIngame().isEnabled()) {
+    //			new Scheduler() {
+    //				@Override
+    //				public void run() {
+    //					Player p = (Player) sender;
+    //					WBUser user = WoolBattle.getInstance().getUserWrapper().getUser(p.getUniqueId());
+    //					WoolBattle.getInstance().getIngame().setPlayerItems(user);
+    //				}
+    //			}.runTaskLater(1);
+    //		}
+    //		return true;
+    //	}
 }

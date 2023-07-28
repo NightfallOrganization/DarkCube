@@ -19,20 +19,20 @@ import org.bukkit.entity.Player;
 
 public class CommandSetTeam extends CommandExecutor {
 
-	public CommandSetTeam() {
-		super("woolbattle", "setteam", "woolbattle.command.setteam", new String[0], b -> {
-			b.then(Commands.argument("player", EntityArgument.player())
-					.then(Commands.argument("team", TeamArgument.teamArgument())
-							.executes(context -> {
-								Player player = EntityArgument.getPlayer(context, "player");
-								WBUser user = WBUser.getUser(player);
-								TeamType type = TeamArgument.getTeam(context, "team");
-								Team team = WoolBattle.instance().getTeamManager().getTeam(type);
-								user.setTeam(team);
-								context.getSource().sendMessage(Component.text("Team gesetzt!"));
-								return 0;
-							})));
-		});
-	}
+    public CommandSetTeam() {
+        super("woolbattle", "setteam", "woolbattle.command.setteam", new String[0], b -> {
+            b.then(Commands.argument("player", EntityArgument.player())
+                    .then(Commands.argument("team", TeamArgument.teamArgument())
+                            .executes(context -> {
+                                Player player = EntityArgument.getPlayer(context, "player");
+                                WBUser user = WBUser.getUser(player);
+                                TeamType type = TeamArgument.getTeam(context, "team");
+                                Team team = WoolBattle.instance().teamManager().getTeam(type);
+                                user.setTeam(team);
+                                context.getSource().sendMessage(Component.text("Team gesetzt!"));
+                                return 0;
+                            })));
+        });
+    }
 
 }

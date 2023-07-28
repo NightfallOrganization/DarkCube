@@ -21,12 +21,12 @@ public class CommandCreateMap extends WBCommandExecutor {
                 b -> b.then(Commands.argument("map", StringArgument.string()).then(Commands.argument("size", MapSizeArgument.mapSize()).executes(ctx -> {
                     String mname = StringArgument.getString(ctx, "map");
                     MapSize mapSize = MapSizeArgument.mapSize(ctx, "size");
-                    Map map = WoolBattle.instance().getMapManager().getMap(mname);
+                    Map map = WoolBattle.instance().mapManager().getMap(mname);
                     if (map != null) {
                         ctx.getSource().sendMessage(Component.text(
                                 "Es gibt bereits eine Map mit dem Namen '" + mname + "'."));
                     } else {
-                        map = WoolBattle.instance().getMapManager().createMap(mname, mapSize);
+                        map = WoolBattle.instance().mapManager().createMap(mname, mapSize);
                         ctx.getSource().sendMessage(
                                 Component.text("Du hast die Map " + map.getName() + " erstellt!"));
                     }

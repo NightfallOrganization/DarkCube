@@ -59,47 +59,49 @@ import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
 
-    public static int MAX_BLOCK_ARROW_HITS =
-            WoolBattle.instance().getConfig("config").getInt("maxblockarrowhits");
-    public static int SPAWNPROTECTION_TICKS =
-            WoolBattle.instance().getConfig("config").getInt("spawnprotectionticks");
-    public static int SPAWNPROTECTION_TICKS_GLOBAL =
-            WoolBattle.instance().getConfig("config").getInt("spawnprotectionticksglobal");
     public final Map<WBUser, Team> lastTeam = new HashMap<>();
+    private final WoolBattle woolbattle;
     public Set<Block> placedBlocks = new HashSet<>();
     public Map<Block, DyeColor> breakedWool = new HashMap<>();
     public Map<WBUser, Integer> killstreak = new HashMap<>();
     public int killsFor1Life = 5;
     public boolean isGlobalSpawnProtection = false;
     public Team winner;
+    private int maxBlockArrowHits;
+    private int spawnprotectionTicks;
+    private int spawnprotectionTicksGlobal;
     private boolean startingIngame = false;
 
-    public Ingame() {
+    public Ingame(WoolBattle woolbattle) {
+        this.woolbattle = woolbattle;
+        maxBlockArrowHits = woolbattle.getConfig("config").getInt("maxblockarrowhits");
+        spawnprotectionTicks = woolbattle.getConfig("config").getInt("spawnprotectionticks");
+        spawnprotectionTicksGlobal = woolbattle.getConfig("config").getInt("spawnprotectionticksglobal");
         addListener(new ListenerItemPickup(), new ListenerItemDrop(), new ListenerBlockBreak(),
                 new ListenerBlockPlace(), new ListenerBlockCanBuild(), new ListenerPlayerJoin(),
                 new ListenerPlayerQuit(), new ListenerPlayerLogin(),
                 new ListenerEntityDamageByEntity(), new ListenerEntityDamage(),
                 new ListenerChangeBlock(), new ListenerInventoryClick(),
                 new ListenerInventoryDrag(), new ListenerInteract(), new ListenerPlayerMove(),
-                new ListenerEntitySpawn(), new ListenerExplode(), new ListenerDeathMove());
+                new ListenerEntitySpawn(), new ListenerExplode(), new ListenerDeathMove(woolbattle));
 
         addScheduler(new SchedulerParticles(), new SchedulerSpawnProtection(this),
-                new SchedulerResetWool(breakedWool, placedBlocks), new SchedulerHeightDisplay(),
+                new SchedulerResetWool(breakedWool, placedBlocks), new SchedulerHeightDisplay(woolbattle),
                 new SchedulerTick(), new SchedulerPerkCooldown());
 
     }
 
-    public static <T> T getMetaData(Block block, String key, T defaultValue) {
+    public <T> T getMetaData(Block block, String key, T defaultValue) {
         if (block.hasMetadata("WoolBattleMetaStorage")) {
             BasicMetaDataStorage storage =
                     (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0)
                             .value();
-            return storage.getOr(new Key(WoolBattle.instance(), key), defaultValue);
+            return storage.getOr(new Key(woolbattle, key), defaultValue);
         }
         return defaultValue;
     }
 
-    public static void setMetaData(Block block, String key, Object value) {
+    public void setMetaData(Block block, String key, Object value) {
         BasicMetaDataStorage storage;
         boolean has = block.hasMetadata("WoolBattleMetaStorage");
         if (has) {
@@ -108,7 +110,7 @@ public class Ingame extends GamePhase {
         } else {
             storage = new BasicMetaDataStorage();
         }
-        Key k = new Key(WoolBattle.instance(), key);
+        Key k = new Key(woolbattle, key);
         if (value == null) {
             if (storage.has(k)) {
                 storage.remove(k);
@@ -118,12 +120,12 @@ public class Ingame extends GamePhase {
         }
         if (storage.data.isEmpty()) {
             if (has) {
-                block.removeMetadata("WoolBattleMetaStorage", WoolBattle.instance());
+                block.removeMetadata("WoolBattleMetaStorage", woolbattle);
             }
         } else {
             if (!has) {
                 block.setMetadata("WoolBattleMetaStorage",
-                        new FixedMetadataValue(WoolBattle.instance(), storage));
+                        new FixedMetadataValue(woolbattle, storage));
             }
         }
     }
@@ -146,12 +148,12 @@ public class Ingame extends GamePhase {
         if (damageBlock.isCancelled()) {
             return;
         }
-        if (damage >= Ingame.MAX_BLOCK_ARROW_HITS) {
+        if (damage >= maxBlockArrowHits) {
             if (destroy(block)) {
                 return;
             }
         }
-        Ingame.setMetaData(block, "arrow_damage", damage);
+        setMetaData(block, "arrow_damage", damage);
     }
 
     public boolean destroy(Block block) {
@@ -163,7 +165,7 @@ public class Ingame extends GamePhase {
             return false;
         EventDestroyBlock destroyBlock = new EventDestroyBlock(block);
         if (force || !destroyBlock.isCancelled()) {
-            Ingame ingame = WoolBattle.instance().getIngame();
+            Ingame ingame = woolbattle.ingame();
             if (ingame.placedBlocks.contains(block)) {
                 ingame.placedBlocks.remove(block);
             } else if (block.getType() == Material.WOOL) {
@@ -171,7 +173,7 @@ public class Ingame extends GamePhase {
             }
 
             if (block.hasMetadata("WoolBattleMetaStorage")) {
-                block.removeMetadata("WoolBattleMetaStorage", WoolBattle.instance());
+                block.removeMetadata("WoolBattleMetaStorage", woolbattle);
             }
             block.setType(Material.AIR);
             return true;
@@ -189,8 +191,8 @@ public class Ingame extends GamePhase {
 
         CloudNetLink.update();
 
-        CompletableFuture<Void> future = WoolBattle.instance().mapLoader().loadMap(WoolBattle.instance().getMap());
-        WoolBattle.instance().sendMessage(Message.STARTING_GAME);
+        CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(woolbattle.gameData().map());
+        woolbattle.sendMessage(Message.STARTING_GAME);
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -209,8 +211,8 @@ public class Ingame extends GamePhase {
 
         this.splitPlayersToTeams();
         int lifes = -1;
-        if (!WoolBattle.instance().getLobby().VOTES_LIFES.isEmpty()) {
-            Collection<Integer> list = WoolBattle.instance().getLobby().VOTES_LIFES.values();
+        if (!woolbattle.lobby().VOTES_LIFES.isEmpty()) {
+            Collection<Integer> list = woolbattle.lobby().VOTES_LIFES.values();
             double d = 0;
             for (int i : list) {
                 d += i;
@@ -228,11 +230,9 @@ public class Ingame extends GamePhase {
             xtra += playersize;
             lifes = 10 + xtra;
         }
-        if (WoolBattle.instance().baseLifes != null)
-            lifes = WoolBattle.instance().baseLifes;
-        for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
-            team.setLifes(lifes);
-        }
+        if (woolbattle.gameData().forceLifes() != -1) lifes = woolbattle.gameData().forceLifes();
+
+        for (Team team : woolbattle.teamManager().getTeams()) team.setLifes(lifes);
 
         if (this.placedBlocks != null) {
             for (Block b : new ArrayList<>(this.placedBlocks)) {
@@ -260,14 +260,14 @@ public class Ingame extends GamePhase {
                 }
             }
         }
-        WoolBattle.instance().perkRegistry().perks().values().forEach(Perk::startLogic);
+        woolbattle.perkRegistry().perks().values().forEach(Perk::startLogic);
         this.startingIngame = false;
     }
 
     @Override
     public void onDisable() {
 
-        WoolBattle.instance().perkRegistry().perks().values().forEach(Perk::stopLogic);
+        woolbattle.perkRegistry().perks().values().forEach(Perk::stopLogic);
 
         if (this.placedBlocks != null) {
             for (Block b : new ArrayList<>(this.placedBlocks)) {
@@ -335,7 +335,7 @@ public class Ingame extends GamePhase {
             this.killstreak.put(killer, this.getKillstreak(killer) + 1);
             int killstreak = this.getKillstreak(killer);
             if (killstreak > 0 && killstreak % this.killsFor1Life == 0) {
-                new Scheduler(() -> WoolBattle.instance()
+                new Scheduler(() -> woolbattle
                         .sendMessage(Message.KILLSTREAK, killer.getTeamPlayerName(),
                                 killstreak)).runTask();
                 killer.getTeam().setLifes(killer.getTeam().getLifes() + 1);
@@ -354,20 +354,20 @@ public class Ingame extends GamePhase {
             if (killer != null) {
                 user.setLastHit(null);
                 user.resetTicksAfterLastHit();
-                user.setSpawnProtectionTicks(Ingame.SPAWNPROTECTION_TICKS);
+                user.setSpawnProtectionTicks(spawnprotectionTicks);
             }
             return;
         }
         if (countAsDeath) {
-            WoolBattle.instance()
+            woolbattle
                     .sendMessage(Message.PLAYER_WAS_KILLED_BY_PLAYER, user.getTeamPlayerName(),
                             killer.getTeamPlayerName());
         }
 
         Team userTeam = user.getTeam();
         if (userTeam.getLifes() == 0 || leaving) {
-            WoolBattle.instance().getTeamManager()
-                    .setTeam(user, WoolBattle.instance().getTeamManager().getSpectator());
+            woolbattle.teamManager()
+                    .setTeam(user, woolbattle.teamManager().getSpectator());
         }
 
         if (userTeam.getUsers().size() == 0) {
@@ -377,7 +377,7 @@ public class Ingame extends GamePhase {
                 }
             }
 
-            WoolBattle.instance().sendMessage(Message.TEAM_WAS_ELIMINATED,
+            woolbattle.sendMessage(Message.TEAM_WAS_ELIMINATED,
                     u -> new Object[]{userTeam.getName(u)});
             if (leaving) {
                 user.getBukkitEntity().kickPlayer("Disconnected");
@@ -393,13 +393,13 @@ public class Ingame extends GamePhase {
         user.getBukkitEntity().teleport(user.getTeam().getSpawn());
         user.setLastHit(null);
         user.resetTicksAfterLastHit();
-        user.setSpawnProtectionTicks(Ingame.SPAWNPROTECTION_TICKS);
+        user.setSpawnProtectionTicks(spawnprotectionTicks);
     }
 
     public void checkGameEnd() {
         if (this.startingIngame)
             return;
-        List<Team> teams = WoolBattle.instance().getTeamManager().getTeams().stream()
+        List<Team> teams = woolbattle.teamManager().getTeams().stream()
                 .filter(t -> t.getUsers().size() >= 1).collect(Collectors.toList());
         if (teams.size() == 1) {
             this.winner = teams.get(0);
@@ -407,7 +407,7 @@ public class Ingame extends GamePhase {
                 StatsLink.addWin(i);
             }
             this.disable();
-            WoolBattle.instance().getEndgame().enable();
+            woolbattle.endgame().enable();
         }
     }
 
@@ -415,7 +415,7 @@ public class Ingame extends GamePhase {
         Scoreboard sb = new Scoreboard(user);
         Objective obj = sb.getObjective(ScoreboardObjective.INGAME.getKey());
         int i = 0;
-        for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
+        for (Team team : woolbattle.teamManager().getTeams()) {
             ScoreboardTeam t = sb.getTeam(team.getType().getIngameScoreboardTag());
             t.addPlayer(team.getType().getInvisibleTag());
             t.setSuffix(Component.text(Characters.SHIFT_SHIFT_LEFT.toString())
@@ -426,44 +426,16 @@ public class Ingame extends GamePhase {
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
-    // public void setSpectator(User user) {
-    // Player p = user.getBukkitEntity();
-    // if (user.getTeam() != null)
-    // lastTeam.put(user, user.getTeam());
-    // Main.getInstance().getTeamManager().setTeam(user,
-    // Main.getInstance().getTeamManager().getSpectator());
-    // Scoreboard sb = new Scoreboard();
-    // p.setScoreboard(sb.getScoreboard());
-    // Main.initScoreboard(sb, user);
-    // Main.getInstance().getUserWrapper().getUsers().forEach(u -> {
-    // Scoreboard s = new Scoreboard(u);
-    // s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
-    // if (u.getTeam().getType() != TeamType.SPECTATOR) {
-    // u.getBukkitEntity().hidePlayer(p);
-    // } else {
-    // p.showPlayer(u.getBukkitEntity());
-    // }
-    // if (u != user) {
-    // sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
-    // }
-    // });
-    // loadScoreboardObjective(user);
-    // reloadTab(user);
-    // p.spigot().setCollidesWithEntities(false);
-    // p.setAllowFlight(true);
-    // p.teleport(Main.getInstance().getMap().getSpawn(TeamType.SPECTATOR.getDisplayNameKey()));
-    // }
-
     public boolean revive(WBUser target) {
         if (!this.lastTeam.containsKey(target)) {
             return false;
         }
-        WoolBattle.instance().getTeamManager().setTeam(target, this.lastTeam.remove(target));
+        woolbattle.teamManager().setTeam(target, this.lastTeam.remove(target));
         return true;
     }
 
     private void splitPlayersToTeams() {
-        Collection<? extends Team> teams = WoolBattle.instance().getTeamManager().getTeams();
+        Collection<? extends Team> teams = woolbattle.teamManager().getTeams();
         int chosenCount = 0;
         for (Team team : teams) {
             chosenCount += team.getUsers().size();
@@ -482,7 +454,7 @@ public class Ingame extends GamePhase {
                             WBUser user = o.get();
                             users1.add(user);
                         } else {
-                            WoolBattle.instance()
+                            woolbattle
                                     .sendConsole("§cUser of team was somehow not found");
                         }
                     }
@@ -619,7 +591,7 @@ public class Ingame extends GamePhase {
 
     public void reloadScoreboardLifes(WBUser user) {
         Scoreboard sb = new Scoreboard(user);
-        for (Team team : WoolBattle.instance().getTeamManager().getTeams()) {
+        for (Team team : woolbattle.teamManager().getTeams()) {
             this.reloadScoreboardLifes(sb, team);
         }
     }
@@ -663,5 +635,17 @@ public class Ingame extends GamePhase {
         target.setLastHit(user);
         target.setTicksAfterLastHit(0);
         return true;
+    }
+
+    public int spawnprotectionTicks() {
+        return spawnprotectionTicks;
+    }
+
+    public int spawnprotectionTicksGlobal() {
+        return spawnprotectionTicksGlobal;
+    }
+
+    public int maxBlockArrowHits() {
+        return maxBlockArrowHits;
     }
 }

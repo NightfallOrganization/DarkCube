@@ -16,54 +16,54 @@ import eu.darkcube.system.util.GameState;
 
 public class CloudNetLink {
 
-	public static boolean shouldDisplay = true;
-	private static boolean fullyLoaded = false;
-	private static boolean isCloudnet;
+    public static boolean shouldDisplay = true;
+    private static boolean fullyLoaded = false;
+    private static boolean isCloudnet;
 
-	static {
-		try {
-			Wrapper.getInstance().getServiceId();
-			CloudNetLink.isCloudnet = true;
-			DarkCubeBukkit.autoConfigure(false);
-			new Scheduler(() -> {
-				fullyLoaded = true;
-				update();
-				System.out.println("Fully loaded!");
-			}).runTask();
-		} catch (Exception ex) {
-			CloudNetLink.isCloudnet = false;
-		}
-	}
+    static {
+        try {
+            Wrapper.getInstance().getServiceId();
+            CloudNetLink.isCloudnet = true;
+            DarkCubeBukkit.autoConfigure(false);
+            new Scheduler(() -> {
+                fullyLoaded = true;
+                update();
+                System.out.println("Fully loaded!");
+            }).runTask();
+        } catch (Exception ex) {
+            CloudNetLink.isCloudnet = false;
+        }
+    }
 
-	public static void update() {
-		try {
-			if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay && fullyLoaded) {
-				GameState current = GameState.UNKNOWN;
-				if (WoolBattle.instance().getLobby().enabled()) {
-					current = GameState.LOBBY;
-				} else if (WoolBattle.instance().getIngame().enabled()) {
-					current = GameState.INGAME;
-				} else if (WoolBattle.instance().getEndgame().enabled()) {
-					current = GameState.STOPPING;
-				}
-				DarkCubeBukkit.gameState(current);
-				DarkCubeBukkit.playingPlayers()
-						.set(WoolBattle.instance().getLobby().enabled()
-								? WBUser.onlineUsers().size()
-								: (int) WBUser.onlineUsers().stream()
-										.filter(u -> u.getTeam().canPlay()).count());
-				DarkCubeBukkit.maxPlayingPlayers().set(WoolBattle.instance().getMaxPlayers());
-				BridgeServerHelper.setMaxPlayers(1000);
-				String mapname = WoolBattle.instance().getMap() == null
-						? "Unknown Map"
-						: WoolBattle.instance().getMap().getName();
-				DarkCubeBukkit.displayName("§d" + mapname + " §7(" + Wrapper.getInstance()
-						.getCurrentServiceInfoSnapshot().getServiceId().getTaskName()
-						.substring("woolbattle".length()) + ")");
-				Wrapper.getInstance().publishServiceInfoUpdate();
-			}
-		} catch (Exception ignored) {
-		}
-	}
+    public static void update() {
+        try {
+            if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay && fullyLoaded) {
+                GameState current = GameState.UNKNOWN;
+                if (WoolBattle.instance().lobby().enabled()) {
+                    current = GameState.LOBBY;
+                } else if (WoolBattle.instance().ingame().enabled()) {
+                    current = GameState.INGAME;
+                } else if (WoolBattle.instance().endgame().enabled()) {
+                    current = GameState.STOPPING;
+                }
+                DarkCubeBukkit.gameState(current);
+                DarkCubeBukkit.playingPlayers()
+                        .set(WoolBattle.instance().lobby().enabled()
+                                ? WBUser.onlineUsers().size()
+                                : (int) WBUser.onlineUsers().stream()
+                                .filter(u -> u.getTeam().canPlay()).count());
+                DarkCubeBukkit.maxPlayingPlayers().set(WoolBattle.instance().maxPlayers());
+                BridgeServerHelper.setMaxPlayers(1000);
+                String mapname = WoolBattle.instance().gameData().map() == null
+                        ? "Unknown Map"
+                        : WoolBattle.instance().gameData().map().getName();
+                DarkCubeBukkit.displayName("§d" + mapname + " §7(" + Wrapper.getInstance()
+                        .getCurrentServiceInfoSnapshot().getServiceId().getTaskName()
+                        .substring("woolbattle".length()) + ")");
+                Wrapper.getInstance().publishServiceInfoUpdate();
+            }
+        } catch (Exception ignored) {
+        }
+    }
 
 }

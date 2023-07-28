@@ -11,26 +11,32 @@ import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
+    private final WoolBattle woolBattle;
 
-	@Override
-	@EventHandler
-	public void handle(PlayerQuitEvent e) {
-		WBUser user = WBUser.getUser(e.getPlayer());
-		Lobby lobby = WoolBattle.instance().getLobby();
-		lobby.getScoreboardByUser().remove(user);
-		lobby.VOTES_MAP.remove(user);
-		lobby.VOTES_EP_GLITCH.remove(user);
-		lobby.VOTES_LIFES.remove(user);
-		WoolBattle.instance().getLobby().recalculateMap();
-		WoolBattle.instance().getLobby().recalculateEpGlitch();
+    public ListenerPlayerQuit(WoolBattle woolBattle) {
+        this.woolBattle = woolBattle;
+    }
 
-		WoolBattle.instance().sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
+    @Override
+    @EventHandler
+    public void handle(PlayerQuitEvent e) {
+        WBUser user = WBUser.getUser(e.getPlayer());
+        Lobby lobby = woolBattle.lobby();
+        lobby.getScoreboardByUser().remove(user);
+        lobby.VOTES_MAP.remove(user);
+        lobby.VOTES_EP_GLITCH.remove(user);
+        lobby.VOTES_LIFES.remove(user);
+        woolBattle.lobby().recalculateMap();
+        woolBattle.lobby().recalculateEpGlitch();
 
-		WBUser.onlineUsers().forEach(t -> WoolBattle.instance().setOnline(t));
-		e.setQuitMessage(null);
-	}
+        woolBattle.sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
+
+        WBUser.onlineUsers().forEach(ScoreboardHelper::setOnline);
+        e.setQuitMessage(null);
+    }
 }

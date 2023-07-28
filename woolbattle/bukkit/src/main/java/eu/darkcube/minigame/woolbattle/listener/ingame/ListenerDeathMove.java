@@ -16,22 +16,26 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 
-	private WoolBattle main = WoolBattle.instance();
+    private final WoolBattle woolbattle;
 
-	@Override
-	@EventHandler
-	public void handle(PlayerMoveEvent e) {
-		Player p = e.getPlayer();
-		WBUser user = WBUser.getUser(p);
-		if (user.getTeam().getType() != TeamType.SPECTATOR) {
-			if (p.getLocation().getY() <= this.main.getMap().getDeathHeight()) {
-				this.main.getIngame().kill(user);
-			}
-			return;
-		}
-		if (e.getTo().getY() < 0) {
-			p.teleport(user.getTeam().getSpawn());
-		}
-	}
+    public ListenerDeathMove(WoolBattle woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override
+    @EventHandler
+    public void handle(PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        WBUser user = WBUser.getUser(p);
+        if (user.getTeam().getType() != TeamType.SPECTATOR) {
+            if (p.getLocation().getY() <= this.woolbattle.gameData().map().deathHeight()) {
+                this.woolbattle.ingame().kill(user);
+            }
+            return;
+        }
+        if (e.getTo().getY() < 0) {
+            p.teleport(user.getTeam().getSpawn());
+        }
+    }
 
 }

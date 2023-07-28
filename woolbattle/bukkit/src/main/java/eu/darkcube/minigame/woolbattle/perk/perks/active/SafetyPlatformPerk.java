@@ -17,58 +17,58 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import org.bukkit.Location;
 
 public class SafetyPlatformPerk extends Perk {
-	public static final PerkName SAFETY_PLATFORM = new PerkName("SAFETY_PLATFORM");
+    public static final PerkName SAFETY_PLATFORM = new PerkName("SAFETY_PLATFORM");
 
-	public SafetyPlatformPerk() {
-		super(ActivationType.ACTIVE, SAFETY_PLATFORM, 25, 24, Item.PERK_SAFETY_PLATFORM,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_SAFETY_PLATFORM_COOLDOWN));
-		addListener(new ListenerSafetyPlatform(this));
-	}
+    public SafetyPlatformPerk() {
+        super(ActivationType.ACTIVE, SAFETY_PLATFORM, 25, 24, Item.PERK_SAFETY_PLATFORM,
+                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
+                        Item.PERK_SAFETY_PLATFORM_COOLDOWN));
+        addListener(new ListenerSafetyPlatform(this));
+    }
 
-	public static class ListenerSafetyPlatform extends BasicPerkListener {
+    public static class ListenerSafetyPlatform extends BasicPerkListener {
 
-		public ListenerSafetyPlatform(Perk perk) {
-			super(perk);
-		}
+        public ListenerSafetyPlatform(Perk perk) {
+            super(perk);
+        }
 
-		@Override
-		protected boolean activateRight(UserPerk perk) {
-			boolean suc = setBlocks(perk.owner());
-			if (!suc)
-				WoolBattle.instance().getIngame().playSoundNotEnoughWool(perk.owner());
-			return suc;
-		}
+        @Override
+        protected boolean activateRight(UserPerk perk) {
+            boolean suc = setBlocks(perk.owner());
+            if (!suc)
+                WoolBattle.instance().ingame().playSoundNotEnoughWool(perk.owner());
+            return suc;
+        }
 
-		private boolean setBlocks(WBUser p) {
+        private boolean setBlocks(WBUser p) {
 
-			final Location pLoc = p.getBukkitEntity().getLocation();
-			Location center = pLoc.getBlock().getLocation().add(0.5, 0.25, 0.5)
-					.setDirection(pLoc.getDirection());
-			center.subtract(-0.5, 0, -0.5);
-			final double radius = 2.5;
-			for (double x = -radius; x <= radius; x++) {
-				for (double z = -radius; z <= radius; z++) {
-					if (isCorner(x, z, radius)) {
-						continue;
-					}
-					block(center.clone().add(x, -1, z), p);
-				}
-			}
+            final Location pLoc = p.getBukkitEntity().getLocation();
+            Location center = pLoc.getBlock().getLocation().add(0.5, 0.25, 0.5)
+                    .setDirection(pLoc.getDirection());
+            center.subtract(-0.5, 0, -0.5);
+            final double radius = 2.5;
+            for (double x = -radius; x <= radius; x++) {
+                for (double z = -radius; z <= radius; z++) {
+                    if (isCorner(x, z, radius)) {
+                        continue;
+                    }
+                    block(center.clone().add(x, -1, z), p);
+                }
+            }
 
-			p.getBukkitEntity().teleport(center);
-			return true;
-		}
+            p.getBukkitEntity().teleport(center);
+            return true;
+        }
 
-		private boolean isCorner(double x, double z,
-				@SuppressWarnings("SameParameterValue") double r) {
-			return (x == -r && z == -r) || (x == r && z == -r) || (x == -r && z == r) || (x == r
-					&& z == r);
-		}
+        private boolean isCorner(double x, double z,
+                                 @SuppressWarnings("SameParameterValue") double r) {
+            return (x == -r && z == -r) || (x == r && z == -r) || (x == -r && z == r) || (x == r
+                    && z == r);
+        }
 
-		private void block(Location loc, WBUser u) {
-			WoolBattle.instance().getIngame().place(u, loc.getBlock());
-		}
-	}
+        private void block(Location loc, WBUser u) {
+            WoolBattle.instance().ingame().place(u, loc.getBlock());
+        }
+    }
 
 }

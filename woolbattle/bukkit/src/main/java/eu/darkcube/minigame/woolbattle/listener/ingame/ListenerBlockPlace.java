@@ -20,31 +20,31 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
-	@Override
-	@EventHandler
-	public void handle(BlockPlaceEvent e) {
-		Player p = e.getPlayer();
-		WBUser user = WBUser.getUser(p);
-		if (!user.isTrollMode()) {
-			if (user.getTeam().getType() == TeamType.SPECTATOR) {
-				e.setCancelled(true);
-				return;
-			}
-		} else {
-			return;
-		}
-		if (e.getItemInHand() != null) {
-			ItemBuilder b = ItemBuilder.item(e.getItemInHand());
-			if (b.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
-				e.setCancelled(true);
-				return;
-			}
-			if (e.getItemInHand().getType() == Material.WOOL) {
-				user.removeWool(1, false);
-			}
-		}
-		Block block = e.getBlock();
-		Ingame ingame = WoolBattle.instance().getIngame();
-		ingame.placedBlocks.add(block);
-	}
+    @Override
+    @EventHandler
+    public void handle(BlockPlaceEvent e) {
+        Player p = e.getPlayer();
+        WBUser user = WBUser.getUser(p);
+        if (!user.isTrollMode()) {
+            if (user.getTeam().getType() == TeamType.SPECTATOR) {
+                e.setCancelled(true);
+                return;
+            }
+        } else {
+            return;
+        }
+        if (e.getItemInHand() != null) {
+            ItemBuilder b = ItemBuilder.item(e.getItemInHand());
+            if (b.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
+                e.setCancelled(true);
+                return;
+            }
+            if (e.getItemInHand().getType() == Material.WOOL) {
+                user.removeWool(1, false);
+            }
+        }
+        Block block = e.getBlock();
+        Ingame ingame = WoolBattle.instance().ingame();
+        ingame.placedBlocks.add(block);
+    }
 }

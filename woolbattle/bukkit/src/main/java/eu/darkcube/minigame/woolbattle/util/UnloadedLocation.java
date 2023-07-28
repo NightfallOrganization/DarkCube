@@ -20,8 +20,6 @@ public class UnloadedLocation {
     public float pitch;
     public String world;
     @GsonSerializer.DontSerialize
-    private World loadedWorld = null;
-    @GsonSerializer.DontSerialize
     private Location loaded = null;
 
     public UnloadedLocation(Location l) {
@@ -38,6 +36,7 @@ public class UnloadedLocation {
     }
 
     public @Nullable Location loaded() {
+        World loadedWorld;
         if (world == null) {
             loadedWorld = null;
             loaded = null;

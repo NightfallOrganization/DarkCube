@@ -99,7 +99,7 @@ public class DefaultMap implements Map, Serializable {
     }
 
     void save() {
-        ((DefaultMapManager) WoolBattle.instance().getMapManager()).database.update(name,
+        ((DefaultMapManager) WoolBattle.instance().mapManager()).database.update(name,
                 toDocument());
     }
 }
