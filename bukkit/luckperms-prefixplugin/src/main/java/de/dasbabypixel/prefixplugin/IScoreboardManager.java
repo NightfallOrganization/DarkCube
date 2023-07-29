@@ -167,7 +167,8 @@ public abstract class IScoreboardManager implements Listener {
         }
         ScoreboardTag tag = ScoreboardTag.getScoreboardTag(uuid);
         for (Scoreboard scoreboard : SCOREBOARD_BY_UUID.values()) {
-            scoreboard.getTeam(tag.toString()).unregister();
+            Team team = scoreboard.getTeam(tag.toString());
+            if (team != null) team.unregister();
         }
         tag.unregister();
     }
@@ -176,7 +177,6 @@ public abstract class IScoreboardManager implements Listener {
     public void load(UUID uuid) {
         Player p = Bukkit.getPlayer(uuid);
         if (p == null) return;
-        unload(uuid);
         Scoreboard sb = p.getScoreboard();
         if (sb == null || sb.equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
             sb = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -206,7 +206,7 @@ public abstract class IScoreboardManager implements Listener {
         reload(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
         load(e.getPlayer().getUniqueId());
     }
@@ -232,13 +232,13 @@ public abstract class IScoreboardManager implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent e) {
         unload(e.getPlayer().getUniqueId());
         e.setQuitMessage(null);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onQuitMessage(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         String msg = QUIT_MESSAGE;
