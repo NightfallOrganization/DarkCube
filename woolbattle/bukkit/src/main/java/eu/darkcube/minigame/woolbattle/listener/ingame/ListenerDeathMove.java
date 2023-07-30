@@ -8,7 +8,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,7 +26,7 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
     public void handle(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
-        if (user.getTeam().getType() != TeamType.SPECTATOR) {
+        if (!user.getTeam().isSpectator()) {
             if (p.getLocation().getY() <= this.woolbattle.gameData().map().deathHeight()) {
                 this.woolbattle.ingame().kill(user);
             }

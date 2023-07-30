@@ -13,17 +13,21 @@ dependencies {
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-    withJavadocJar()
-    withSourcesJar()
+}
+
+interface Injected {
+    @Inject
+    FileSystemOperations getFs()
 }
 
 tasks {
     reobfJar {
         var targetFile = tasks.reobfJar.outputJar.getAsFile().get()
         outputs.file targetFile
+        def injected = project.objects.newInstance(Injected)
         doLast {
-            copy {
-                from tasks.reobfJar.outputJar.getAsFile().get()
+            injected.fs.copy {
+                from outputJar.getAsFile().get()
                 into targetFile.getParentFile()
                 rename { targetFile.getName() }
             }

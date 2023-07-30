@@ -8,7 +8,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -27,7 +26,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
         Block block = e.getBlock();
         e.setExpToDrop(0);
         if (!user.isTrollMode()) {
-            if (user.getTeam().getType() == TeamType.SPECTATOR) {
+            if (user.getTeam().isSpectator()) {
                 e.setCancelled(true);
                 return;
             }

@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.team;
 
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.v3.ILanguagedCommandExecutor;
+import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import org.bukkit.Location;
@@ -18,32 +18,32 @@ import java.util.UUID;
 
 public interface Team extends Comparable<Team> {
 
-	UUID getUniqueId();
+    UUID getUniqueId();
 
-	boolean isSpectator();
+    boolean isSpectator();
 
-	boolean canPlay();
+    boolean canPlay();
 
-	Component getName(ILanguagedCommandExecutor executor);
+    Component getName(ICommandExecutor executor);
 
-	Style getPrefixStyle();
+    Style getPrefixStyle();
 
-	TeamType getType();
+    TeamType getType();
 
-	Collection<? extends WBUser> getUsers();
+    Collection<? extends WBUser> getUsers();
 
-	boolean contains(UUID user);
+    boolean contains(UUID user);
 
-	int getLifes();
+    int getLifes();
 
-	void setLifes(int lifes);
+    void setLifes(int lifes);
 
-	void setSpawn(Map map, Location location);
+    void setSpawn(Map map, Location location);
 
-	Location getSpawn(Map map);
+    Location getSpawn(Map map);
 
-	Location getSpawn();
+    Location getSpawn();
 
-	void setSpawn(Location location);
+    void setSpawn(Location location);
 
 }

@@ -14,13 +14,12 @@ import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 public class CommandDeleteMap extends WBCommandExecutor {
-    public CommandDeleteMap() {
-        super("deleteMap",
-                b -> b.then(Commands.argument("map", MapArgument.mapArgument()).executes(ctx -> {
+    public CommandDeleteMap(WoolBattle woolbattle) {
+        super("deleteMap", b -> b
+                .then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(ctx -> {
                     Map map = MapArgument.getMap(ctx, "map");
-                    WoolBattle.instance().mapManager().deleteMap(map);
-                    ctx.getSource().sendMessage(
-                            Component.text("Du hast die Map " + map.getName() + " gelöscht!"));
+                    woolbattle.mapManager().deleteMap(map);
+                    ctx.getSource().sendMessage(Component.text("Du hast die Map " + map.getName() + " gelöscht!"));
                     return 0;
                 })));
     }

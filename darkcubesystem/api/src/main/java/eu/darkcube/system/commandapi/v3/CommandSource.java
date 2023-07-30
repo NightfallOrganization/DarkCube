@@ -34,245 +34,239 @@ import java.util.stream.Collectors;
 
 public class CommandSource implements ISuggestionProvider, ForwardingAudience {
 
-	public static final SimpleCommandExceptionType REQUIRES_PLAYER_EXCEPTION_TYPE =
-			new SimpleCommandExceptionType(new LiteralMessage("You need to be a player!"));
+    public static final SimpleCommandExceptionType REQUIRES_PLAYER_EXCEPTION_TYPE =
+            new SimpleCommandExceptionType(new LiteralMessage("You need to be a player!"));
 
-	public static final SimpleCommandExceptionType REQUIRES_ENTITY_EXCEPTION_TYPE =
-			new SimpleCommandExceptionType(new LiteralMessage("You need to be an entity!"));
+    public static final SimpleCommandExceptionType REQUIRES_ENTITY_EXCEPTION_TYPE =
+            new SimpleCommandExceptionType(new LiteralMessage("You need to be an entity!"));
 
-	private final ICommandExecutor source;
+    private final ICommandExecutor source;
+    private final Vector3d pos;
+    private final World world;
+    private final String name;
+    private final String displayName;
+    private final boolean feedbackDisabled;
+    private final Entity entity;
+    private final ResultConsumer<CommandSource> resultConsumer;
+    private final Type entityAnchorType;
+    private final Vector2f rotation;
+    private final Map<String, Object> extra;
 
-	private final Vector3d pos;
+    public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name,
+                         String displayName, Entity entity, Vector2f rotation, Map<String, Object> extra) {
+        this(source, pos, world, name, displayName, false, entity, (context, success, result) -> {
+        }, Type.FEET, rotation, extra);
+    }
 
-	private final World world;
+    public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name,
+                         String displayName, boolean feedbackDisabled, Entity entity,
+                         ResultConsumer<CommandSource> resultConsumer, Type entityAnchorType, Vector2f rotation,
+                         Map<String, Object> extra) {
+        super();
+        this.source = source;
+        this.pos = pos;
+        this.world = world;
+        this.name = name;
+        this.displayName = displayName;
+        this.feedbackDisabled = feedbackDisabled;
+        this.entity = entity;
+        this.resultConsumer = resultConsumer;
+        this.entityAnchorType = entityAnchorType;
+        this.rotation = rotation;
+        this.extra = extra;
+    }
 
-	private final String name;
+    public static CommandSource create(CommandSender sender) {
+        ICommandExecutor executor = new BukkitCommandExecutor(sender);
+        return create(executor);
+    }
 
-	private final String displayName;
+    public static CommandSource create(ICommandExecutor executor) {
+        CommandSender sender = ((BukkitCommandExecutor) executor).sender();
+        Vector3d pos = null;
+        World world = null;
+        String name = sender.getName();
+        String displayName = sender.getName();
+        Entity entity = null;
+        Vector2f rotation = null;
+        if (sender instanceof Entity) {
+            entity = (Entity) sender;
+            pos = Vector3d.position(entity.getLocation());
+            displayName = entity instanceof Player ? name : entity.getCustomName();
+            rotation = new Vector2f(entity.getLocation().getYaw(),
+                    entity.getLocation().getPitch());
+            world = entity.getWorld();
+        } else if (sender instanceof BlockCommandSender) {
+            BlockCommandSender b = (BlockCommandSender) sender;
+            pos = Vector3d.position(b.getBlock().getLocation().add(0.5, 0.5, 0.5));
+            rotation = new Vector2f(0, 0);
+            world = b.getBlock().getWorld();
+        }
+        return new CommandSource(executor, pos, world, name, displayName, entity, rotation, new HashMap<>());
+    }
 
-	private final boolean feedbackDisabled;
+    public void sendMessage(Message message) {
+        if (message instanceof MessageWrapper) {
+            MessageWrapper w = (MessageWrapper) message;
+            BaseMessage m = w.getMessage();
+            sendMessage(m.getMessage(source, w.getComponents()));
+        } else {
+            sendMessage(Component.text(message.getString()).color(NamedTextColor.RED));
+        }
+    }
 
-	private final Entity entity;
+    public void sendMessage(BaseMessage message, Object... objects) {
+        sendMessage(message.getMessage(source, objects));
+    }
 
-	private final ResultConsumer<CommandSource> resultConsumer;
+    @Override
+    public @NotNull Iterable<? extends Audience> audiences() {
+        return Collections.singleton(source);
+    }
 
-	private final Type entityAnchorType;
+    public CommandSource withEntity(Entity entity) {
+        return this.entity == entity
+                ? this
+                : new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+                this.feedbackDisabled, entity, this.resultConsumer, this.entityAnchorType,
+                this.rotation, this.extra);
+    }
 
-	private final Vector2f rotation;
+    public CommandSource withPos(Vector3d pos) {
+        return this.pos == pos
+                ? this
+                : new CommandSource(this.source, pos, this.world, this.name, this.displayName,
+                this.feedbackDisabled, this.entity, this.resultConsumer,
+                this.entityAnchorType, this.rotation, this.extra);
+    }
 
-	private final Map<String, Object> extra;
+    public CommandSource withRotation(Vector2f rotation) {
+        return this.rotation == rotation
+                ? this
+                : new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+                this.feedbackDisabled, this.entity, this.resultConsumer,
+                this.entityAnchorType, rotation, this.extra);
+    }
 
-	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name,
-			String displayName, Entity entity, Vector2f rotation, Map<String, Object> extra) {
-		this(source, pos, world, name, displayName, false, entity, (context, success, result) -> {
-		}, Type.FEET, rotation, extra);
-	}
+    public CommandSource withResultConsumer(ResultConsumer<CommandSource> resultConsumer) {
+        return this.resultConsumer == resultConsumer
+                ? this
+                : new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+                this.feedbackDisabled, this.entity, resultConsumer, this.entityAnchorType,
+                this.rotation, this.extra);
+    }
 
-	public CommandSource(ICommandExecutor source, Vector3d pos, World world, String name,
-			String displayName, boolean feedbackDisabled, Entity entity,
-			ResultConsumer<CommandSource> resultConsumer, Type entityAnchorType, Vector2f rotation,
-			Map<String, Object> extra) {
-		super();
-		this.source = source;
-		this.pos = pos;
-		this.world = world;
-		this.name = name;
-		this.displayName = displayName;
-		this.feedbackDisabled = feedbackDisabled;
-		this.entity = entity;
-		this.resultConsumer = resultConsumer;
-		this.entityAnchorType = entityAnchorType;
-		this.rotation = rotation;
-		this.extra = extra;
-	}
+    public CommandSource withFeedbackDisabled(boolean feedbackDisabled) {
+        return this.feedbackDisabled == feedbackDisabled
+                ? this
+                : new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+                feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType,
+                this.rotation, this.extra);
+    }
 
-	public static CommandSource create(CommandSender sender) {
-		ICommandExecutor executor = new BukkitCommandExecutor(sender);
-		Vector3d pos = null;
-		World world = null;
-		String name = sender.getName();
-		String displayName = sender.getName();
-		Entity entity = null;
-		Vector2f rotation = null;
-		if (sender instanceof Entity) {
-			entity = (Entity) sender;
-			pos = Vector3d.position(entity.getLocation());
-			displayName = entity instanceof Player ? name : entity.getCustomName();
-			rotation = new Vector2f(entity.getLocation().getYaw(),
-					entity.getLocation().getPitch());
-			world = entity.getWorld();
-		} else if (sender instanceof BlockCommandSender) {
-			BlockCommandSender b = (BlockCommandSender) sender;
-			pos = Vector3d.position(b.getBlock().getLocation().add(0.5, 0.5, 0.5));
-			rotation = new Vector2f(0, 0);
-			world = b.getBlock().getWorld();
-		}
-		return new CommandSource(executor, pos, world, name, displayName, entity, rotation,
-				new HashMap<>());
-	}
+    public CommandSource withAnchorType(Type entityAnchorType) {
+        return this.entityAnchorType == entityAnchorType
+                ? this
+                : new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+                this.feedbackDisabled, this.entity, this.resultConsumer, entityAnchorType,
+                this.rotation, this.extra);
+    }
 
-	public void sendMessage(Message message) {
-		if (message instanceof MessageWrapper) {
-			MessageWrapper w = (MessageWrapper) message;
-			BaseMessage m = w.getMessage();
-			sendMessage(m.getMessage(source, w.getComponents()));
-		} else {
-			sendMessage(Component.text(message.getString()).color(NamedTextColor.RED));
-		}
-	}
+    public CommandSource withWorld(World world) {
+        return this.world == world
+                ? this
+                : new CommandSource(this.source, this.pos, world, this.name, this.displayName,
+                this.feedbackDisabled, this.entity, this.resultConsumer,
+                this.entityAnchorType, this.rotation, this.extra);
+    }
 
-	public void sendMessage(BaseMessage message, Object... objects) {
-		sendMessage(message.getMessage(source, objects));
-	}
+    public CommandSource with(String key, Object object) {
+        Map<String, Object> extra = new HashMap<>(this.extra);
+        extra.put(key, object);
+        return new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
+                this.feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType,
+                this.rotation, extra);
+    }
 
-	@Override
-	public @NotNull Iterable<? extends Audience> audiences() {
-		return Collections.singleton(source);
-	}
+    public <T> T get(String key) {
+        return this.get(key, null);
+    }
 
-	public CommandSource withEntity(Entity entity) {
-		return this.entity == entity
-				? this
-				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, entity, this.resultConsumer, this.entityAnchorType,
-						this.rotation, this.extra);
-	}
+    @SuppressWarnings("unchecked")
+    public <T> T get(String key, T defaultValue) {
+        return (T) this.extra.getOrDefault(key, defaultValue);
+    }
 
-	public CommandSource withPos(Vector3d pos) {
-		return this.pos == pos
-				? this
-				: new CommandSource(this.source, pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, this.resultConsumer,
-						this.entityAnchorType, this.rotation, this.extra);
-	}
+    public Map<String, Object> getExtra() {
+        return this.extra;
+    }
 
-	public CommandSource withRotation(Vector2f rotation) {
-		return this.rotation == rotation
-				? this
-				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, this.resultConsumer,
-						this.entityAnchorType, rotation, this.extra);
-	}
+    public CommandSource withRotation(Entity entity, Type anchorType) {
+        return this.withRotation(anchorType.apply(entity));
+    }
 
-	public CommandSource withResultConsumer(ResultConsumer<CommandSource> resultConsumer) {
-		return this.resultConsumer == resultConsumer
-				? this
-				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, resultConsumer, this.entityAnchorType,
-						this.rotation, this.extra);
-	}
+    public CommandSource withRotation(Vector3d lookPos) {
+        Vector3d vector3d = this.entityAnchorType.apply(this);
+        double d0 = lookPos.x - vector3d.x;
+        double d1 = lookPos.y - vector3d.y;
+        double d2 = lookPos.z - vector3d.z;
+        double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
+        float f = MathHelper.wrapDegrees(
+                (float) (-(MathHelper.atan2(d1, d3) * (180F / (float) Math.PI))));
+        float f1 = MathHelper.wrapDegrees(
+                (float) (MathHelper.atan2(d2, d0) * (180F / (float) Math.PI)) - 90.0F);
+        return this.withRotation(new Vector2f(f, f1));
+    }
 
-	public CommandSource withFeedbackDisabled(boolean feedbackDisabled) {
-		return this.feedbackDisabled == feedbackDisabled
-				? this
-				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType,
-						this.rotation, this.extra);
-	}
+    public String getDisplayName() {
+        return this.displayName;
+    }
 
-	public CommandSource withAnchorType(Type entityAnchorType) {
-		return this.entityAnchorType == entityAnchorType
-				? this
-				: new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, this.resultConsumer, entityAnchorType,
-						this.rotation, this.extra);
-	}
+    public Entity getEntity() {
+        return this.entity;
+    }
 
-	public CommandSource withWorld(World world) {
-		return this.world == world
-				? this
-				: new CommandSource(this.source, this.pos, world, this.name, this.displayName,
-						this.feedbackDisabled, this.entity, this.resultConsumer,
-						this.entityAnchorType, this.rotation, this.extra);
-	}
+    public Entity assertIsEntity() throws CommandSyntaxException {
+        if (this.entity == null) {
+            throw CommandSource.REQUIRES_ENTITY_EXCEPTION_TYPE.create();
+        }
+        return this.entity;
+    }
 
-	public CommandSource with(String key, Object object) {
-		Map<String, Object> extra = new HashMap<>(this.extra);
-		extra.put(key, object);
-		return new CommandSource(this.source, this.pos, this.world, this.name, this.displayName,
-				this.feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType,
-				this.rotation, extra);
-	}
+    public Player asPlayer() throws CommandSyntaxException {
+        if (!(this.entity instanceof Player)) {
+            throw CommandSource.REQUIRES_PLAYER_EXCEPTION_TYPE.create();
+        }
+        return (Player) this.entity;
+    }
 
-	public <T> T get(String key) {
-		return this.get(key, null);
-	}
+    @Override
+    public Collection<String> getPlayerNames() {
+        return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+    }
 
-	@SuppressWarnings("unchecked")
-	public <T> T get(String key, T defaultValue) {
-		return (T) this.extra.getOrDefault(key, defaultValue);
-	}
+    public Type getEntityAnchorType() {
+        return this.entityAnchorType;
+    }
 
-	public Map<String, Object> getExtra() {
-		return this.extra;
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public CommandSource withRotation(Entity entity, Type anchorType) {
-		return this.withRotation(anchorType.apply(entity));
-	}
+    public Vector3d getPos() {
+        return this.pos;
+    }
 
-	public CommandSource withRotation(Vector3d lookPos) {
-		Vector3d vector3d = this.entityAnchorType.apply(this);
-		double d0 = lookPos.x - vector3d.x;
-		double d1 = lookPos.y - vector3d.y;
-		double d2 = lookPos.z - vector3d.z;
-		double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
-		float f = MathHelper.wrapDegrees(
-				(float) (-(MathHelper.atan2(d1, d3) * (180F / (float) Math.PI))));
-		float f1 = MathHelper.wrapDegrees(
-				(float) (MathHelper.atan2(d2, d0) * (180F / (float) Math.PI)) - 90.0F);
-		return this.withRotation(new Vector2f(f, f1));
-	}
+    public Vector2f getRotation() {
+        return this.rotation;
+    }
 
-	public String getDisplayName() {
-		return this.displayName;
-	}
+    public ICommandExecutor getSource() {
+        return this.source;
+    }
 
-	public Entity getEntity() {
-		return this.entity;
-	}
-
-	public Entity assertIsEntity() throws CommandSyntaxException {
-		if (this.entity == null) {
-			throw CommandSource.REQUIRES_ENTITY_EXCEPTION_TYPE.create();
-		}
-		return this.entity;
-	}
-
-	public Player asPlayer() throws CommandSyntaxException {
-		if (!(this.entity instanceof Player)) {
-			throw CommandSource.REQUIRES_PLAYER_EXCEPTION_TYPE.create();
-		}
-		return (Player) this.entity;
-	}
-
-	@Override
-	public Collection<String> getPlayerNames() {
-		return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-	}
-
-	public Type getEntityAnchorType() {
-		return this.entityAnchorType;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public Vector3d getPos() {
-		return this.pos;
-	}
-
-	public Vector2f getRotation() {
-		return this.rotation;
-	}
-
-	public ICommandExecutor getSource() {
-		return this.source;
-	}
-
-	public World getWorld() {
-		return this.world;
-	}
+    public World getWorld() {
+        return this.world;
+    }
 
 }

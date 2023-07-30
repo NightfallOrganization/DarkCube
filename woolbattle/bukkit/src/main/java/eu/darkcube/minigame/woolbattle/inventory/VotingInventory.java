@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -15,35 +16,35 @@ import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 
 public class VotingInventory extends WoolBattlePagedInventory {
-	public static final InventoryType TYPE = InventoryType.of("woolbattle-voting");
+    public static final InventoryType TYPE = InventoryType.of("woolbattle-voting");
 
-	public VotingInventory(WBUser user) {
-		super(TYPE, Message.INVENTORY_VOTING.getMessage(user), user);
-	}
+    public VotingInventory(WoolBattle woolbattle, WBUser user) {
+        super(woolbattle, TYPE, Message.INVENTORY_VOTING.getMessage(user), user);
+    }
 
-	@Override
-	protected void inventoryClick(IInventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.item() == null)
-			return;
-		String itemId = ItemManager.getItemId(event.item());
-		if (itemId == null)
-			return;
-		if (itemId.equals(Item.LOBBY_VOTING_EP_GLITCH.getItemId())) {
-			user.setOpenInventory(new VotingEnderpearlGlitchInventory(user));
-		} else if (itemId.equals(Item.LOBBY_VOTING_MAPS.getItemId())) {
-			user.setOpenInventory(new VotingMapsInventory(user));
-		} else if (itemId.equals(Item.LOBBY_VOTING_LIFES.getItemId())) {
-			user.setOpenInventory(new VotingLifesInventory(user));
-		}
-	}
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
+        event.setCancelled(true);
+        if (event.item() == null)
+            return;
+        String itemId = ItemManager.getItemId(event.item());
+        if (itemId == null)
+            return;
+        if (itemId.equals(Item.LOBBY_VOTING_EP_GLITCH.getItemId())) {
+            user.setOpenInventory(new VotingEnderpearlGlitchInventory(woolbattle, user));
+        } else if (itemId.equals(Item.LOBBY_VOTING_MAPS.getItemId())) {
+            user.setOpenInventory(new VotingMapsInventory(woolbattle, user));
+        } else if (itemId.equals(Item.LOBBY_VOTING_LIFES.getItemId())) {
+            user.setOpenInventory(new VotingLifesInventory(woolbattle, user));
+        }
+    }
 
-	@Override
-	protected void insertFallbackItems() {
-		super.insertFallbackItems();
-		fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING.getItem(user));
-		fallbackItems.put(IInventory.slot(3, 3), Item.LOBBY_VOTING_EP_GLITCH.getItem(user));
-		fallbackItems.put(IInventory.slot(3, 5), Item.LOBBY_VOTING_MAPS.getItem(user));
-		fallbackItems.put(IInventory.slot(3, 7), Item.LOBBY_VOTING_LIFES.getItem(user));
-	}
+    @Override
+    protected void insertFallbackItems() {
+        super.insertFallbackItems();
+        fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING.getItem(user));
+        fallbackItems.put(IInventory.slot(3, 3), Item.LOBBY_VOTING_EP_GLITCH.getItem(user));
+        fallbackItems.put(IInventory.slot(3, 5), Item.LOBBY_VOTING_MAPS.getItem(user));
+        fallbackItems.put(IInventory.slot(3, 7), Item.LOBBY_VOTING_LIFES.getItem(user));
+    }
 }

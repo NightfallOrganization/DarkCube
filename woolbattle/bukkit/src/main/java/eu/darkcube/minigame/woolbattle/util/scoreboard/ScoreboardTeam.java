@@ -12,61 +12,65 @@ import org.bukkit.scoreboard.NameTagVisibility;
 
 public class ScoreboardTeam {
 
-	private org.bukkit.scoreboard.Team team;
-	private Scoreboard sb;
+    private org.bukkit.scoreboard.Team team;
+    private Scoreboard sb;
 
-	public ScoreboardTeam(Scoreboard sb, org.bukkit.scoreboard.Team team) {
-		this.team = team;
-		this.sb = sb;
-	}
+    public ScoreboardTeam(Scoreboard sb, org.bukkit.scoreboard.Team team) {
+        this.team = team;
+        this.sb = sb;
+    }
 
-	public void addPlayer(String name) {
-		team.addEntry(name);
-	}
+    public void addPlayer(String name) {
+        team.addEntry(name);
+    }
 
-	public void removePlayer(String name) {
-		team.removeEntry(name);
-	}
+    public void removePlayer(String name) {
+        team.removeEntry(name);
+    }
 
-	public org.bukkit.scoreboard.Team getTeam() {
-		return team;
-	}
+    public org.bukkit.scoreboard.Team getTeam() {
+        return team;
+    }
 
-	public void allowFriendlyFire(boolean flag) {
-		team.setAllowFriendlyFire(flag);
-	}
+    public void allowFriendlyFire(boolean flag) {
+        team.setAllowFriendlyFire(flag);
+    }
 
-	public void canSeeFriendlyInvisible(boolean flag) {
-		team.setCanSeeFriendlyInvisibles(flag);
-	}
+    public void canSeeFriendlyInvisible(boolean flag) {
+        team.setCanSeeFriendlyInvisibles(flag);
+    }
 
-	public void displayName(String name) {
-		team.setDisplayName(name);
-	}
+    public void displayName(String name) {
+        team.setDisplayName(name);
+    }
 
-	public void setPrefix(String prefix) {
-		String p = prefix;
-		if (p.length() > 16)
-			p = p.substring(0, 16);
-		team.setPrefix(p);
-	}
+    public String getPrefix() {
+        return team.getPrefix();
+    }
 
-	public void setPrefix(Component prefix) {
-		setPrefix(LegacyComponentSerializer.legacySection().serialize(prefix));
-	}
+    public void setPrefix(String prefix) {
+        String p = prefix;
+        if (p.length() > 16)
+            p = p.substring(0, 16);
+        team.setPrefix(p);
+    }
 
-	public void setSuffix(Component suffix) {
-		String s = LegacyComponentSerializer.legacySection().serialize(suffix);
-		if (s.length() > 16)
-			s = s.substring(0, 16);
-		team.setSuffix(s);
-	}
+    public void setPrefix(Component prefix) {
+        setPrefix(LegacyComponentSerializer.legacySection().serialize(prefix));
+    }
 
-	public void nameTagVisibility(NameTagVisibility visibility) {
-		team.setNameTagVisibility(visibility);
-	}
+    public void setSuffix(Component suffix) {
+        String s = LegacyComponentSerializer.legacySection().serialize(suffix);
+        if (s.length() > 16)
+            s = s.substring(0, 16);
+        team.setSuffix(s);
+    }
 
-	public Scoreboard getScoreboard() {
-		return sb;
-	}
+    public void nameTagVisibility(NameTagVisibility visibility) {
+        team.setNameTagVisibility(visibility);
+    }
+
+    public Scoreboard getScoreboard() {
+        return sb;
+    }
 }

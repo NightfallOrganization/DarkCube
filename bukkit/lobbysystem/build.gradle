@@ -7,9 +7,8 @@ tasks {
         archiveClassifier.set("")
         relocate('com.github.unldenis.hologram', 'eu.darkcube.system.libs.lobbysystem.com.github.unldenis.hologram')
     }
-    build {
-        dependsOn(shadowJar)
-    }
+    jar.archiveClassifier.set("pure")
+    assemble.dependsOn shadowJar
 }
 
 dependencies {

@@ -29,12 +29,18 @@ import java.util.Map;
 
 public class TeamsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
-    private static final Key TEAM = new Key(WoolBattle.instance(), "team_id");
+    private final Key TEAM = new Key(woolbattle, "team_id");
     private final TeamsListener listener = new TeamsListener();
 
-    public TeamsInventory(WBUser user) {
-        super(TYPE, Message.INVENTORY_TEAMS.getMessage(user), user);
-        Bukkit.getPluginManager().registerEvents(listener, WoolBattle.instance());
+    public TeamsInventory(WoolBattle woolbattle, WBUser user) {
+        super(woolbattle, TYPE, Message.INVENTORY_TEAMS.getMessage(user), user);
+        Bukkit.getPluginManager().registerEvents(listener, woolbattle);
+        complete();
+    }
+
+    @Override
+    protected boolean done() {
+        return super.done() && TEAM != null;
     }
 
     @Override
@@ -45,7 +51,7 @@ public class TeamsInventory extends WoolBattlePagedInventory {
         String teamId = ItemManager.getId(event.item(), TEAM);
         if (teamId == null)
             return;
-        Team team = WoolBattle.instance().teamManager().getTeam(teamId);
+        Team team = woolbattle.teamManager().getTeam(teamId);
         if (team.equals(user.getTeam())) {
             user.user().sendMessage(Message.ALREADY_IN_TEAM);
             return;
@@ -62,10 +68,11 @@ public class TeamsInventory extends WoolBattlePagedInventory {
     @Override
     protected void fillItems(Map<Integer, ItemStack> items) {
         int i = 0;
-        for (Team team : WoolBattle.instance().teamManager().getTeams()) {
+        for (Team team : woolbattle.teamManager().getTeams()) {
+            if (team.isSpectator()) continue;
             ItemBuilder b = ItemBuilder.item(Material.WOOL);
             b.displayname(team.getName(user.user()));
-            b.damage(team.getType().getWoolColorByte());
+            b.damage(team.getType().getWoolColor().getWoolData());
             if (team.getUsers().contains(user)) {
                 b.glow(true);
             }

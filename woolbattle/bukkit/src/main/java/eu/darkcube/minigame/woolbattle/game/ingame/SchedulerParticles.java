@@ -21,48 +21,48 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class SchedulerParticles extends Scheduler implements ConfiguredScheduler {
-	@Override
-	public void run() {
-		Collection<Player> particlePlayers =
-				WBUser.onlineUsers().stream().filter(WBUser::particles).map(WBUser::getBukkitEntity)
-						.collect(Collectors.toList());
-		for (World world : Bukkit.getWorlds()) {
-			for (Arrow arrow : world.getEntitiesByClass(Arrow.class)) {
-				if (arrow.hasMetadata("noParticles")) {
-					continue;
-				}
-				Location loc = arrow.getLocation();
-				loc.add(arrow.getVelocity().multiply(10));
-				for (int x = -1; x < 2; x++) {
-					for (int z = -1; z < 2; z++) {
-						Location l = arrow.getLocation();
-						l.add(x * 16, 0, z * 16);
-						l.getChunk().load();
-					}
-				}
-				if (arrow.getShooter() instanceof Player) {
-					if (arrow.isDead() || arrow.isOnGround() || !arrow.isValid()
-							|| !((Player) arrow.getShooter()).isOnline() || !arrow.getLocation()
-							.getChunk().isLoaded()) {
-						arrow.remove();
-						continue;
-					}
-					WBUser user = WBUser.getUser(((Player) arrow.getShooter()));
-					ParticleEffect.BLOCK_CRACK.display(new ParticleEffect.BlockData(Material.WOOL,
-									user.getTeam().getType().getWoolColorByte()), 0, 0, 0, 1, 5,
-							arrow.getLocation(), particlePlayers);
-				}
-			}
-		}
-	}
+    @Override
+    public void run() {
+        Collection<Player> particlePlayers =
+                WBUser.onlineUsers().stream().filter(WBUser::particles).map(WBUser::getBukkitEntity)
+                        .collect(Collectors.toList());
+        for (World world : Bukkit.getWorlds()) {
+            for (Arrow arrow : world.getEntitiesByClass(Arrow.class)) {
+                if (arrow.hasMetadata("noParticles")) {
+                    continue;
+                }
+                Location loc = arrow.getLocation();
+                loc.add(arrow.getVelocity().multiply(10));
+                for (int x = -1; x < 2; x++) {
+                    for (int z = -1; z < 2; z++) {
+                        Location l = arrow.getLocation();
+                        l.add(x * 16, 0, z * 16);
+                        l.getChunk().load();
+                    }
+                }
+                if (arrow.getShooter() instanceof Player) {
+                    if (arrow.isDead() || arrow.isOnGround() || !arrow.isValid()
+                            || !((Player) arrow.getShooter()).isOnline() || !arrow.getLocation()
+                            .getChunk().isLoaded()) {
+                        arrow.remove();
+                        continue;
+                    }
+                    WBUser user = WBUser.getUser(((Player) arrow.getShooter()));
+                    ParticleEffect.BLOCK_CRACK.display(new ParticleEffect.BlockData(Material.WOOL,
+                                    user.getTeam().getType().getWoolColor().getWoolData()), 0, 0, 0, 1, 5,
+                            arrow.getLocation(), particlePlayers);
+                }
+            }
+        }
+    }
 
-	@Override
-	public void start() {
-		runTaskTimer(1);
-	}
+    @Override
+    public void start() {
+        runTaskTimer(1);
+    }
 
-	@Override
-	public void stop() {
-		cancel();
-	}
+    @Override
+    public void stop() {
+        cancel();
+    }
 }

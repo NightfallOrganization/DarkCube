@@ -15,15 +15,15 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 import eu.darkcube.system.commandapi.v3.Commands;
 
 public class CommandSetMap extends WBCommandExecutor {
-    public CommandSetMap() {
-        super("setMap",
-                b -> b.then(Commands.argument("map", MapArgument.mapArgument()).executes(ctx -> {
+    public CommandSetMap(WoolBattle woolbattle) {
+        super("setMap", b -> b
+                .then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(ctx -> {
                     Map map = MapArgument.getMap(ctx, "map");
-                    WoolBattle.instance().gameData().forceMap(map);
-                    if (WoolBattle.instance().lobby().enabled()) {
-                        WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setMap(WoolBattle.instance(), u));
-                    } else if (WoolBattle.instance().ingame().enabled()) {
-                        WoolBattle.instance().gameData().forceMap(map);
+                    woolbattle.gameData().forceMap(map);
+                    if (woolbattle.lobby().enabled()) {
+                        WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setMap(woolbattle, u));
+                    } else if (woolbattle.ingame().enabled()) {
+                        woolbattle.gameData().forceMap(map);
                         for (WBUser user : WBUser.onlineUsers()) {
                             user.getBukkitEntity().teleport(user.getTeam().getSpawn());
                         }

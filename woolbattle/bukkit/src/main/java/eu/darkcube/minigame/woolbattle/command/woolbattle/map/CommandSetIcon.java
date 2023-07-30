@@ -15,6 +15,7 @@ import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -31,7 +32,7 @@ public class CommandSetIcon extends WBCommandExecutor {
                                         IntegerArgumentType.getInteger(ctx, "id"))))));
     }
 
-    private static int setIcon(CommandContext<CommandSource> ctx, Material material, int id) {
+    private static int setIcon(CommandContext<CommandSource> ctx, Material material, int id) throws CommandSyntaxException {
         if (material == Material.AIR) {
             ctx.getSource().sendMessage(Component.text("Luft is unfair .-."));
             return 0;

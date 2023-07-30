@@ -10,7 +10,6 @@ import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import org.bukkit.Material;
@@ -26,7 +25,7 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         if (!user.isTrollMode()) {
-            if (user.getTeam().getType() == TeamType.SPECTATOR) {
+            if (user.getTeam().isSpectator()) {
                 e.setCancelled(true);
                 return;
             }

@@ -9,7 +9,6 @@ package eu.darkcube.minigame.woolbattle.listener.ingame;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.team.Team;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
@@ -26,7 +25,7 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         WoolBattle main = WoolBattle.instance();
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
-        if (user.getTeam().getType() == TeamType.SPECTATOR) {
+        if (user.getTeam().isSpectator()) {
             return;
         }
         Team t = WoolBattle.instance().ingame().lastTeam.remove(user);

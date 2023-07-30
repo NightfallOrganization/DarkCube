@@ -8,7 +8,6 @@ package eu.darkcube.minigame.woolbattle.game.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.team.Team;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -33,7 +32,7 @@ public class SchedulerHeightDisplay extends Scheduler implements ConfiguredSched
             if (display.maxDistance == -1 || display.maxDistance < diff) {
                 Team team = user.getTeam();
                 if (team != null) {
-                    if (team.getType() != TeamType.SPECTATOR) {
+                    if (!team.isSpectator()) {
                         user.user().sendActionBar(LegacyComponentSerializer.legacySection()
                                 .deserialize(
                                         "§8» " + display.getColor().toString() + diff + " §8«"));

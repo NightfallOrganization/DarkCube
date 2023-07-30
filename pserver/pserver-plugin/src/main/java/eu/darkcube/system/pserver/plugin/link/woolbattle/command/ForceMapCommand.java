@@ -15,11 +15,11 @@ import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 
 public class ForceMapCommand extends PServerExecutor {
 
-    public ForceMapCommand() {
+    public ForceMapCommand(WoolBattle woolbattle) {
         super("forcemap", new String[0], b -> b.then(
-                Commands.argument("map", MapArgument.mapArgument()).executes(context -> {
+                Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(context -> {
                     Map map = MapArgument.getMap(context, "map");
-                    WoolBattle.instance().gameData().forceMap(map);
+                    woolbattle.gameData().forceMap(map);
                     context.getSource().sendMessage(Message.WOOLBATTLE_FORCEMAP, map.getName());
                     return 0;
                 })));

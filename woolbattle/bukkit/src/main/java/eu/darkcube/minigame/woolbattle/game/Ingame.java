@@ -22,7 +22,6 @@ import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.team.Team;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -77,17 +76,9 @@ public class Ingame extends GamePhase {
         maxBlockArrowHits = woolbattle.getConfig("config").getInt("maxblockarrowhits");
         spawnprotectionTicks = woolbattle.getConfig("config").getInt("spawnprotectionticks");
         spawnprotectionTicksGlobal = woolbattle.getConfig("config").getInt("spawnprotectionticksglobal");
-        addListener(new ListenerItemPickup(), new ListenerItemDrop(), new ListenerBlockBreak(),
-                new ListenerBlockPlace(), new ListenerBlockCanBuild(), new ListenerPlayerJoin(),
-                new ListenerPlayerQuit(), new ListenerPlayerLogin(),
-                new ListenerEntityDamageByEntity(), new ListenerEntityDamage(),
-                new ListenerChangeBlock(), new ListenerInventoryClick(),
-                new ListenerInventoryDrag(), new ListenerInteract(), new ListenerPlayerMove(),
-                new ListenerEntitySpawn(), new ListenerExplode(), new ListenerDeathMove(woolbattle));
+        addListener(new ListenerItemPickup(), new ListenerItemDrop(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerBlockCanBuild(), new ListenerPlayerJoin(), new ListenerPlayerQuit(), new ListenerPlayerLogin(), new ListenerEntityDamageByEntity(), new ListenerEntityDamage(), new ListenerChangeBlock(), new ListenerInventoryClick(), new ListenerInventoryDrag(), new ListenerInteract(woolbattle), new ListenerPlayerMove(), new ListenerEntitySpawn(), new ListenerExplode(), new ListenerDeathMove(woolbattle));
 
-        addScheduler(new SchedulerParticles(), new SchedulerSpawnProtection(this),
-                new SchedulerResetWool(breakedWool, placedBlocks), new SchedulerHeightDisplay(woolbattle),
-                new SchedulerTick(), new SchedulerPerkCooldown());
+        addScheduler(new SchedulerParticles(), new SchedulerSpawnProtection(this), new SchedulerResetWool(breakedWool, placedBlocks), new SchedulerHeightDisplay(woolbattle), new SchedulerTick(), new SchedulerPerkCooldown());
 
     }
 
@@ -478,7 +469,7 @@ public class Ingame extends GamePhase {
             for (Team team : teams) {
                 if (team.getUsers().size() == i) {
                     for (WBUser user : WBUser.onlineUsers()) {
-                        if (user.getTeam().getType() == TeamType.SPECTATOR) {
+                        if (user.getTeam().isSpectator()) {
                             user.setTeam(team);
                             break;
                         }
@@ -520,7 +511,7 @@ public class Ingame extends GamePhase {
         if (!this.enabled()) {
             return;
         }
-        if (user.getTeam().getType() == TeamType.SPECTATOR) {
+        if (user.getTeam().isSpectator()) {
             this.fixSpectator(user);
             return;
         }
@@ -566,13 +557,13 @@ public class Ingame extends GamePhase {
         if (user.getTeam() != null)
             this.lastTeam.put(user, user.getTeam());
         Player p = user.getBukkitEntity();
-        Scoreboard sb = new Scoreboard();
+        Scoreboard sb = new Scoreboard(user);
         p.setScoreboard(sb.getScoreboard());
         WoolBattle.initScoreboard(sb, user);
         WBUser.onlineUsers().forEach(u -> {
             Scoreboard s = new Scoreboard(u);
             s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
-            if (u.getTeam().getType() != TeamType.SPECTATOR) {
+            if (!u.getTeam().isSpectator()) {
                 u.getBukkitEntity().hidePlayer(p);
             } else {
                 p.showPlayer(u.getBukkitEntity());

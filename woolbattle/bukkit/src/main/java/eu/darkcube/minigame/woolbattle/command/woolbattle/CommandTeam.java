@@ -6,37 +6,45 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
-import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
+import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
+import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.team.CommandSetSpawn;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.team.*;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 
 public class CommandTeam extends WBCommandExecutor {
-	public CommandTeam() {
-		super("team", b -> b.then(Commands.argument("team", TeamArgument.teamArgument())
-				.then(new CommandDisable().builder()).then(new CommandEnable().builder())
-				.then(new CommandInfo().builder()).then(new CommandSetNameColor().builder())
-				.then(new CommandSetSpawn().builder()).then(new CommandSetWoolColor().builder())));
-	}
+    public CommandTeam(WoolBattle woolbattle) {
 
-	//	public CommandTeam() {
-	//		super(WoolBattle.getInstance(), "team",
-	//				new SubCommand[] { new CommandSetSpawn(), new CommandDisable(), new CommandEnable(),
-	//						new CommandSetNameColor(), new CommandSetWoolColor(), new CommandInfo() },
-	//				"Team Hauptcommand", CommandArgument.TEAM);
-	//	}
-	//
-	//	@Override
-	//	public List<String> onTabComplete(String[] args) {
-	//		if (args.length == 1) {
-	//			return Arrays.toSortedStringList(TeamType.values(), args[0]);
-	//		}
-	//		return super.onTabComplete(args);
-	//	}
-	//
-	//	@Override
-	//	public boolean execute(CommandSender sender, String[] args) {
-	//		return false;
-	//	}
+        super("team", b -> b
+                .then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle))
+                        .then(Commands.argument("team", TeamTypeArgument.teamTypeArgument(woolbattle, new MapSizeToString()))
+                                .then(new CommandDisable().builder())
+                                .then(new CommandEnable().builder())
+                                .then(new CommandInfo().builder())
+                                .then(new CommandSetNameColor().builder())
+                                .then(new CommandSetSpawn(woolbattle).builder())
+                                .then(new CommandSetWoolColor().builder())
+                                .then(new CommandDelete().builder())
+                        )
+                )
+        );
+    }
+
+    private static class MapSizeToString implements TeamTypeArgument.ToStringFunction {
+        private final TeamTypeArgument.ToStringFunction parent = TeamTypeArgument.ToStringFunction.function();
+
+        @Override
+        public <S> String[] toString(CommandContext<S> context, TeamType teamType) {
+            MapSize mapSize = MapSizeArgument.mapSize(context, "mapSize");
+            if (mapSize.equals(teamType.mapSize())) {
+                return parent.toString(context, teamType);
+            }
+            return new String[0];
+        }
+    }
 }

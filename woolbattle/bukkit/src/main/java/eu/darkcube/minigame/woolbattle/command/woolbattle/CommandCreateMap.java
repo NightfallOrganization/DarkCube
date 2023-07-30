@@ -16,19 +16,17 @@ import eu.darkcube.system.commandapi.v3.arguments.StringArgument;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 public class CommandCreateMap extends WBCommandExecutor {
-    public CommandCreateMap() {
+    public CommandCreateMap(WoolBattle woolbattle) {
         super("createMap",
-                b -> b.then(Commands.argument("map", StringArgument.string()).then(Commands.argument("size", MapSizeArgument.mapSize()).executes(ctx -> {
+                b -> b.then(Commands.argument("map", StringArgument.string()).then(Commands.argument("size", MapSizeArgument.mapSize(woolbattle)).executes(ctx -> {
                     String mname = StringArgument.getString(ctx, "map");
                     MapSize mapSize = MapSizeArgument.mapSize(ctx, "size");
-                    Map map = WoolBattle.instance().mapManager().getMap(mname);
+                    Map map = woolbattle.mapManager().getMap(mname, mapSize);
                     if (map != null) {
-                        ctx.getSource().sendMessage(Component.text(
-                                "Es gibt bereits eine Map mit dem Namen '" + mname + "'."));
+                        ctx.getSource().sendMessage(Component.text("Es gibt bereits eine Map mit dem Namen '" + mname + "'."));
                     } else {
-                        map = WoolBattle.instance().mapManager().createMap(mname, mapSize);
-                        ctx.getSource().sendMessage(
-                                Component.text("Du hast die Map " + map.getName() + " erstellt!"));
+                        map = woolbattle.mapManager().createMap(mname, mapSize);
+                        ctx.getSource().sendMessage(Component.text("Du hast die Map " + map.getName() + " erstellt!"));
                     }
                     return 0;
                 }))));

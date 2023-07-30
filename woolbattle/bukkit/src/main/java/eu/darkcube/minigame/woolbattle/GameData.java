@@ -8,12 +8,14 @@
 package eu.darkcube.minigame.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.map.Map;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 
 public class GameData {
     public static final boolean EP_GLITCH_DEFAULT = false;
     private final WoolBattle woolBattle;
+    private MapSize mapSize;
     private Map forceMap;
     private Map votedMap;
     private boolean epGlitch = EP_GLITCH_DEFAULT;
@@ -47,6 +49,14 @@ public class GameData {
     public void forceMap(Map forceMap) {
         this.forceMap = forceMap;
         reloadScoreboardMap();
+    }
+
+    public MapSize mapSize() {
+        return mapSize;
+    }
+
+    public void mapSize(MapSize mapSize) {
+        this.mapSize = mapSize;
     }
 
     public Map votedMap() {

@@ -26,8 +26,8 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE =
             InventoryType.of("woolbattle-voting-enderpearl-glitch");
 
-    public VotingEnderpearlGlitchInventory(WBUser user) {
-        super(TYPE, Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user), user);
+    public VotingEnderpearlGlitchInventory(WoolBattle woolbattle, WBUser user) {
+        super(woolbattle, TYPE, Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user), user);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
         } else if (itemId.equals(Item.GENERAL_VOTING_AGAINST.getItemId())) {
             vote = false;
         }
-        Vote<Boolean> old = WoolBattle.instance().lobby().VOTES_EP_GLITCH.get(user);
+        Vote<Boolean> old = woolbattle.lobby().VOTES_EP_GLITCH.get(user);
         if (old != null) {
             if (old.vote == vote) {
                 user.user().sendMessage(Message.ALREADY_VOTED_FOR_THIS);
@@ -52,9 +52,8 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
             }
         }
         if (vote != null) {
-            WoolBattle.instance().lobby().VOTES_EP_GLITCH.put(user,
-                    new Vote<>(System.currentTimeMillis(), vote));
-            WoolBattle.instance().lobby().recalculateEpGlitch();
+            woolbattle.lobby().VOTES_EP_GLITCH.put(user, new Vote<>(System.currentTimeMillis(), vote));
+            woolbattle.lobby().recalculateEpGlitch();
             user.user().sendMessage(
                     vote ? Message.VOTED_FOR_EP_GLITCH : Message.VOTED_AGAINST_EP_GLITCH);
             recalculate();

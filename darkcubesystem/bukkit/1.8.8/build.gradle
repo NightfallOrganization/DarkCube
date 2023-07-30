@@ -7,7 +7,3 @@ dependencies {
     implementation parent.parent.project('api')
     compileOnly libs.cloudnetDriver
 }
-
-java {
-    withSourcesJar()
-}

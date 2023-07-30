@@ -2,7 +2,7 @@ ext {
     shadow = "com.github.johnrengelman.shadow"
 }
 
-allprojects {
+allprojects { Project project ->
     repositories {
         maven {
             name 'DarkCube'
@@ -23,17 +23,18 @@ allprojects {
         maven { url = 'https://repo.cloudnetservice.eu/repository/releases/' }
         maven { url = 'https://repo.viaversion.com' }
     }
-    pluginManager.withPlugin('java') {
-        java {
-            toolchain.languageVersion.set(JavaLanguageVersion.of(8))
-        }
+    project.pluginManager.withPlugin('java') { AppliedPlugin appliedPlugin ->
+        JavaPluginExtension extension = project.extensions.getByType(JavaPluginExtension.class)
+        JavaToolchainSpec toolchain = extension.toolchain
+        toolchain.getLanguageVersion().set(JavaLanguageVersion.of(8))
 
         javadoc.options.encoding = 'UTF-8'
         compileJava.options.encoding = 'UTF-8'
     }
 
-    tasks.withType(JavaCompile).configureEach {
+    project.tasks.withType(JavaCompile).configureEach {
         options.deprecation = true
+        options.fork = true
     }
 }
 

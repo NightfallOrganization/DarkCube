@@ -22,7 +22,6 @@ import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.Internal;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.Key;
@@ -77,36 +76,6 @@ class DefaultWBUser implements WBUser {
                     p -> p);
     private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME =
             PersistentDataTypes.list(TYPE_PERK_NAME);
-    private static final PersistentDataType<int[]> TYPE_INT_ARRAY =
-            new PersistentDataType<int[]>() {
-                @Override
-                public int[] deserialize(JsonDocument doc, String key) {
-                    byte[] bytes = doc.getBinary(key);
-                    IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
-                    int len = buf.get();
-                    int[] ar = new int[len];
-                    for (int i = 0; buf.remaining() > 0; i++) {
-                        ar[i] = buf.get();
-                    }
-                    return ar;
-                }
-
-                @Override
-                public void serialize(JsonDocument doc, String key, int[] data) {
-                    ByteBuffer buf =
-                            ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
-                    IntBuffer ib = buf.asIntBuffer();
-                    ib.put(data.length);
-                    for (int i : data)
-                        ib.put(i);
-                    doc.append(key, buf.array());
-                }
-
-                @Override
-                public int[] clone(int[] object) {
-                    return object.clone();
-                }
-            };
     private static final PersistentDataType<PlayerPerks> TYPE_PERKS =
             new PersistentDataType<PlayerPerks>() {
                 @Override
@@ -150,7 +119,39 @@ class DefaultWBUser implements WBUser {
                     return object.clone();
                 }
             };
+    private static final PersistentDataType<int[]> TYPE_INT_ARRAY =
+            new PersistentDataType<int[]>() {
+                @Override
+                public int[] deserialize(JsonDocument doc, String key) {
+                    byte[] bytes = doc.getBinary(key);
+                    IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
+                    int len = buf.get();
+                    int[] ar = new int[len];
+                    for (int i = 0; buf.remaining() > 0; i++) {
+                        ar[i] = buf.get();
+                    }
+                    return ar;
+                }
+
+                @Override
+                public void serialize(JsonDocument doc, String key, int[] data) {
+                    ByteBuffer buf =
+                            ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
+                    IntBuffer ib = buf.asIntBuffer();
+                    ib.put(data.length);
+                    for (int i : data)
+                        ib.put(i);
+                    doc.append(key, buf.array());
+                }
+
+                @Override
+                public int[] clone(int[] object) {
+                    return object.clone();
+                }
+            };
+    private final WoolBattle woolbattle;
     private final User user;
+    private final UserPerks perks;
     private boolean trollmode;
     private int spawnProtectionTicks;
     private IInventory openInventory;
@@ -159,10 +160,10 @@ class DefaultWBUser implements WBUser {
     private WBUser lastHit;
     private int ticksAfterLastHit;
     private int projectileImmunityTicks;
-    private UserPerks perks;
     private int woolCount;
 
-    public DefaultWBUser(User user) {
+    public DefaultWBUser(WoolBattle woolbattle, User user) {
+        this.woolbattle = woolbattle;
         this.user = user;
         user.getPersistentDataStorage().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY,
                 HeightDisplay.getDefault());
@@ -211,12 +212,12 @@ class DefaultWBUser implements WBUser {
 
     @Override
     public Team getTeam() {
-        return WoolBattle.instance().teamManager().getTeam(this);
+        return woolbattle.teamManager().getTeam(this);
     }
 
     @Override
     public void setTeam(Team team) {
-        WoolBattle.instance().teamManager().setTeam(this, team);
+        woolbattle.teamManager().setTeam(this, team);
     }
 
     @Override
@@ -372,7 +373,7 @@ class DefaultWBUser implements WBUser {
     @Override
     public void setSpawnProtectionTicks(int ticks) {
         this.spawnProtectionTicks = ticks;
-        getBukkitEntity().setExp((float) getSpawnProtectionTicks() / (float) WoolBattle.instance().ingame().spawnprotectionTicks());
+        getBukkitEntity().setExp((float) getSpawnProtectionTicks() / (float) woolbattle.ingame().spawnprotectionTicks());
     }
 
     @Override
@@ -388,8 +389,7 @@ class DefaultWBUser implements WBUser {
     @Override
     public void setTrollMode(boolean trollmode) {
         this.trollmode = trollmode;
-        WoolBattle.instance()
-                .sendMessage("§aTrollmode " + (trollmode ? "§aAn" : "§cAus"), getBukkitEntity());
+        woolbattle.sendMessage("§aTrollmode " + (trollmode ? "§aAn" : "§cAus"), getBukkitEntity());
     }
 
     @Override
@@ -411,7 +411,7 @@ class DefaultWBUser implements WBUser {
 
     @Override
     public ItemStack getSingleWoolItem() {
-        return new ItemStack(Material.WOOL, 1, getTeam().getType().getWoolColorByte());
+        return new ItemStack(Material.WOOL, 1, getTeam().getType().getWoolColor().getWoolData());
     }
 
     @Override
@@ -470,11 +470,6 @@ class DefaultWBUser implements WBUser {
     @Override
     public double getKD() {
         return getDeaths() != 0 ? (double) getKills() / (double) getDeaths() : getKills();
-    }
-
-    @Internal
-    public void woolCount(int woolCount) {
-        this.woolCount = woolCount;
     }
 
     private int perkCount(@SuppressWarnings("SameParameterValue") PerkName perk) {

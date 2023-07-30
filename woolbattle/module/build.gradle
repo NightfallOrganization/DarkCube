@@ -10,10 +10,6 @@ javadoc {
     archivesBaseName = 'woolbattle'
 }
 
-java {
-    withSourcesJar()
-}
-
 dependencies {
     compileOnly libs.cloudnet
     compileOnly libs.cloudnetBridge

@@ -22,42 +22,49 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 public class PerksInventory extends WoolBattlePagedInventory {
-	public static final InventoryType TYPE = InventoryType.of("woolbattle_perks");
-	private static final Key PERKS_TYPE = new Key(WoolBattle.instance(), "perks_type");
-	private static final Key PERKS_TYPE_NUMBER =
-			new Key(WoolBattle.instance(), "perks_type_number");
+    public static final InventoryType TYPE = InventoryType.of("woolbattle_perks");
+    private final Key PERKS_TYPE;
+    private final Key PERKS_TYPE_NUMBER;
 
-	public PerksInventory(WBUser user) {
-		super(TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
-	}
+    public PerksInventory(WoolBattle woolbattle, WBUser user) {
+        super(woolbattle, TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
+        PERKS_TYPE = new Key(woolbattle, "perks_type");
+        PERKS_TYPE_NUMBER = new Key(woolbattle, "perks_type_number");
+        complete();
+    }
 
-	@Override
-	protected void inventoryClick(IInventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.item() == null)
-			return;
-		String typeId = ItemManager.getId(event.item(), PERKS_TYPE);
-		if (typeId == null)
-			return;
-		ActivationType type = ActivationType.values()[Integer.parseInt(typeId)];
-		int number = Integer.parseInt(ItemManager.getId(event.item(), PERKS_TYPE_NUMBER));
-		user.setOpenInventory(new PerksTypeInventory(user, type, number));
-	}
+    @Override
+    protected boolean done() {
+        return super.done() && PERKS_TYPE != null;
+    }
 
-	@Override
-	protected void fillItems(Map<Integer, ItemStack> items) {
-		PerkRegistry registry = WoolBattle.instance().perkRegistry();
-		int i = 0;
-		for (Perk.ActivationType type : Perk.ActivationType.values()) {
-			Perk[] perks = registry.perks(type);
-			for (int j = 0; j < type.maxCount(); j++) {
-				if (perks.length > type.maxCount()) {
-					ItemBuilder b = ItemBuilder.item(type.displayItem().getItem(user, j));
-					ItemManager.setId(b, PERKS_TYPE, String.valueOf(type.ordinal()));
-					ItemManager.setId(b, PERKS_TYPE_NUMBER, String.valueOf(j));
-					items.put(i++, b.build());
-				}
-			}
-		}
-	}
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
+        event.setCancelled(true);
+        if (event.item() == null)
+            return;
+        String typeId = ItemManager.getId(event.item(), PERKS_TYPE);
+        if (typeId == null)
+            return;
+        ActivationType type = ActivationType.values()[Integer.parseInt(typeId)];
+        int number = Integer.parseInt(ItemManager.getId(event.item(), PERKS_TYPE_NUMBER));
+        user.setOpenInventory(new PerksTypeInventory(woolbattle, user, type, number));
+    }
+
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
+        PerkRegistry registry = woolbattle.perkRegistry();
+        int i = 0;
+        for (Perk.ActivationType type : Perk.ActivationType.values()) {
+            Perk[] perks = registry.perks(type);
+            for (int j = 0; j < type.maxCount(); j++) {
+                if (perks.length > type.maxCount()) {
+                    ItemBuilder b = ItemBuilder.item(type.displayItem().getItem(user, j));
+                    ItemManager.setId(b, PERKS_TYPE, String.valueOf(type.ordinal()));
+                    ItemManager.setId(b, PERKS_TYPE_NUMBER, String.valueOf(j));
+                    items.put(i++, b.build());
+                }
+            }
+        }
+    }
 }

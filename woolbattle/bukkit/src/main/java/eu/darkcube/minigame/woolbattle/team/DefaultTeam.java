@@ -10,21 +10,21 @@ import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.v3.ILanguagedCommandExecutor;
+import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import eu.darkcube.system.util.AdventureSupport;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 class DefaultTeam implements Team {
 
-    private UUID uuid;
-    private TeamType type;
+    private final UUID uuid;
+    private final TeamType type;
     private int lifes;
 
     public DefaultTeam(TeamType type) {
@@ -44,7 +44,7 @@ class DefaultTeam implements Team {
 
     @Override
     public boolean isSpectator() {
-        return getType().equals(TeamType.SPECTATOR);
+        return getType().getDisplayNameKey().equals("spectator");
     }
 
     @Override
@@ -53,14 +53,13 @@ class DefaultTeam implements Team {
     }
 
     @Override
-    public Component getName(ILanguagedCommandExecutor executor) {
-        return Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey(),
-                executor.getLanguage()).style(getPrefixStyle());
+    public Component getName(ICommandExecutor executor) {
+        return Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey().toUpperCase(Locale.ROOT), executor.getLanguage()).style(getPrefixStyle());
     }
 
     @Override
     public Style getPrefixStyle() {
-        return AdventureSupport.convert(ChatColor.getByChar(getType().getNameColor()));
+        return AdventureSupport.convert(getType().getNameColor());
     }
 
     @Override
@@ -70,8 +69,7 @@ class DefaultTeam implements Team {
 
     @Override
     public Collection<? extends WBUser> getUsers() {
-        return WBUser.onlineUsers().stream().filter(user -> user.getTeam().equals(this))
-                .collect(Collectors.toSet());
+        return WBUser.onlineUsers().stream().filter(user -> user.getTeam().equals(this)).collect(Collectors.toSet());
     }
 
     @Override
@@ -92,8 +90,7 @@ class DefaultTeam implements Team {
     @Override
     public void setLifes(int lifes) {
         this.lifes = lifes;
-        WBUser.onlineUsers()
-                .forEach(u -> WoolBattle.instance().ingame().reloadScoreboardLifes(u));
+        WBUser.onlineUsers().forEach(u -> WoolBattle.instance().ingame().reloadScoreboardLifes(u));
     }
 
     @Override

@@ -7,7 +7,6 @@
 package eu.darkcube.minigame.woolbattle.listener;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -45,17 +44,17 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
                 atall = false;
                 msg = msg.substring(2);
             }
-            if (user.getTeam().getType().equals(TeamType.SPECTATOR)) {
+            if (user.getTeam().isSpectator()) {
                 atall = false;
             }
         }
-        String color = ChatColor.getByChar(user.getTeam().getType().getNameColor()).toString();
+        String color = user.getTeam().getType().getNameColor().toString();
         e.setCancelled(true);
         if (msg.length() == 0 || (startsatall && msg.substring(2).length() == 0)) {
             return;
         }
         msg = getMessage(p, msg, atall, color, main, startsatall);
-        if (user.getTeam().getType().equals(TeamType.SPECTATOR)) {
+        if (user.getTeam().isSpectator()) {
             main.sendMessageWithoutPrefix(msg,
                     user.getTeam().getUsers().stream().map(u -> Bukkit.getPlayer(u.getUniqueId()))
                             .collect(Collectors.toSet()));

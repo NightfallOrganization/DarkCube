@@ -6,9 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
+import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
-import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
+import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Locations;
@@ -20,13 +21,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class CommandSetSpawn extends WBCommandExecutor {
-    public CommandSetSpawn() {
-        super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument())
+    public CommandSetSpawn(WoolBattle woolbattle) {
+        super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle))
                 .executes(CommandSetSpawn::set)));
     }
 
     private static int set(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
-        TeamType team = TeamArgument.getTeam(ctx, "team");
+        TeamType team = TeamTypeArgument.teamType(ctx, "team");
         Map map = MapArgument.getMap(ctx, "map");
         Player player = ctx.getSource().asPlayer();
         if (map.ingameData() == null) {

@@ -6,222 +6,131 @@
  */
 package eu.darkcube.minigame.woolbattle.team;
 
-import com.google.gson.Gson;
 import eu.darkcube.minigame.woolbattle.WoolBattle;
-import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.minigame.woolbattle.util.GsonSerializer.DontSerialize;
-import eu.darkcube.minigame.woolbattle.util.Serializable;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
-public class TeamType implements Comparable<TeamType>, Serializable {
+public class TeamType implements Comparable<TeamType> {
 
-	private static final Collection<TeamType> TYPES = new HashSet<>();
-	public static TeamType SPECTATOR;
+    private final WoolBattle woolbattle;
+    private final int uniqueId;
+    private final String scoreboardTag;
+    private final MapSize mapSize;
+    private final String invisibleTag;
+    private final String displayNameKey;
+    private final int weight;
+    private ChatColor namecolor;
+    private DyeColor woolcolor;
+    private boolean enabled;
 
-	private final String invisibleTag;
-	private final String scoreboardTag;
-	private final String displayNameKey;
-	private final int weight;
-	private boolean enabled;
-	private byte woolcolor;
-	@DontSerialize
-	private DyeColor woolcolorDye;
-	private char namecolor;
-	private int maxPlayers;
-	@DontSerialize
-	private int index;
+    public TeamType(WoolBattle woolbattle, int uniqueId, MapSize mapSize, String displayNameKey, int weight, DyeColor woolcolor, ChatColor namecolor, boolean enabled) {
+        this.woolbattle = woolbattle;
+        this.mapSize = mapSize;
+        this.displayNameKey = displayNameKey;
+        this.woolcolor = woolcolor;
+        this.enabled = enabled;
+        this.weight = weight;
+        this.namecolor = namecolor;
+        this.uniqueId = uniqueId;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < this.uniqueId; i++) {
+            builder.append(ChatColor.DARK_BLUE);
+        }
+        builder.append(ChatColor.DARK_RED);
+        this.scoreboardTag = this.weight + "I" + this.uniqueId;
+        this.invisibleTag = builder.toString();
+    }
 
-	@SuppressWarnings("deprecation")
-	public TeamType(String displayNameKey, int weight, byte woolcolor, ChatColor namecolor,
-			boolean enabled, int maxPlayers) {
-		this.displayNameKey = displayNameKey;
-		this.woolcolor = woolcolor;
-		this.woolcolorDye = DyeColor.getByData(woolcolor);
-		this.namecolor = namecolor.getChar();
-		this.maxPlayers = maxPlayers;
-		this.enabled = enabled;
-		this.weight = weight;
-		this.index = index(true);
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < this.index; i++) {
-			builder.append(ChatColor.DARK_BLUE);
-		}
-		builder.append(ChatColor.DARK_RED);
-		this.scoreboardTag = this.weight + "I" + index;
-		this.invisibleTag = builder.toString();
-		TYPES.add(this);
-	}
+    public void save() {
+        woolbattle.teamManager().save(this);
+    }
 
-	public static TeamType byDisplayNameKey(String displayNameKey) {
-		for (TeamType type : TYPES) {
-			if (type.displayNameKey.equals(displayNameKey)) {
-				return type;
-			}
-		}
-		return null;
-	}
+    public void delete() {
+        woolbattle.teamManager().delete(this);
+    }
 
-	public static TeamType deserialize(String json) {
-		for (TeamType type : TYPES) {
-			if (type.serialize().equals(json)) {
-				return type;
-			}
-		}
-		TeamType type = new Gson().fromJson(json, TeamType.class);
-		type.index(true);
-		TYPES.add(type);
-		return type;
-	}
+    public DyeColor getWoolColor() {
+        return woolcolor;
+    }
 
-	public static TeamType[] validValues() {
-		Collection<TeamType> types = Arrays.asList(values());
-		types = types.stream().filter(TeamType::isEnabled).collect(Collectors.toSet());
-		return types.toArray(new TeamType[0]);
-	}
+    public void setWoolColor(DyeColor woolcolor) {
+        this.woolcolor = woolcolor;
+        save();
+    }
 
-	public static TeamType[] values() {
-		return TYPES.toArray(new TeamType[0]);
-	}
+    public String getDisplayNameKey() {
+        return displayNameKey;
+    }
 
-	public static Collection<TeamType> getTypes() {
-		return TYPES;
-	}
+    public int getUniqueId() {
+        return uniqueId;
+    }
 
-	public void save() {
-		TYPES.add(this);
-		YamlConfiguration cfg = WoolBattle.instance().getConfig("teams");
-		List<String> teams = cfg.getStringList("teams");
-		teams.add(serialize());
-		cfg.set("teams", teams);
-		WoolBattle.instance().saveConfig(cfg);
-	}
+    public String getInvisibleTag() {
+        return invisibleTag;
+    }
 
-	public boolean isDeleted() {
-		return !WoolBattle.instance().getConfig("teams").getStringList("teams")
-				.contains(serialize());
-	}
+    public String getIngameScoreboardTag() {
+        return "ig" + getWeight();
+    }
 
-	public void delete() {
-		YamlConfiguration cfg = WoolBattle.instance().getConfig("teams");
-		List<String> teams = cfg.getStringList("teams");
-		teams.remove(serialize());
-		cfg.set("teams", teams);
-		TYPES.remove(this);
-		WoolBattle.instance().saveConfig(cfg);
-	}
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-	private int index(boolean flag) {
-		if (flag)
-			this.index = 0;
-		for (TeamType type : TYPES) {
-			if (type.index == index) {
-				index++;
-				return index(false);
-			}
-		}
-		return this.index;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        save();
+    }
 
-	public byte getWoolColorByte() {
-		return woolcolor;
-	}
+    public MapSize mapSize() {
+        return mapSize;
+    }
 
-	@SuppressWarnings("deprecation")
-	public DyeColor getWoolColor() {
-		if (woolcolorDye == null) {
-			woolcolorDye = DyeColor.getByData(woolcolor);
-		}
-		return woolcolorDye;
-	}
+    public int getMaxPlayers() {
+        return mapSize.teamSize();
+    }
 
-	@SuppressWarnings("deprecation")
-	public void setWoolColor(DyeColor woolcolor) {
-		delete();
-		this.woolcolorDye = woolcolor;
-		this.woolcolor = woolcolor.getData();
-		save();
-	}
+    public ChatColor getNameColor() {
+        return namecolor;
+    }
 
-	public String getDisplayNameKey() {
-		return displayNameKey;
-	}
+    public void setNameColor(ChatColor namecolor) {
+        this.namecolor = namecolor;
+        save();
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public String getScoreboardTag() {
+        return scoreboardTag;
+    }
 
-	public String getInvisibleTag() {
-		return invisibleTag;
-	}
+    public int getWeight() {
+        return weight;
+    }
 
-	public String getIngameScoreboardTag() {
-		return "ig" + getWeight();
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TeamType teamType = (TeamType) o;
+        return uniqueId == teamType.uniqueId && weight == teamType.weight && enabled == teamType.enabled && Objects.equals(woolbattle, teamType.woolbattle) && Objects.equals(scoreboardTag, teamType.scoreboardTag) && Objects.equals(mapSize, teamType.mapSize) && Objects.equals(invisibleTag, teamType.invisibleTag) && Objects.equals(displayNameKey, teamType.displayNameKey) && namecolor == teamType.namecolor && woolcolor == teamType.woolcolor;
+    }
 
-	public boolean isEnabled() {
-		return enabled;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(woolbattle, uniqueId, scoreboardTag, mapSize, invisibleTag, displayNameKey, weight, namecolor, woolcolor, enabled);
+    }
 
-	public void setEnabled(boolean enabled) {
-		delete();
-		this.enabled = enabled;
-		save();
-	}
+    @Override
+    public String toString() {
+        return getDisplayNameKey();
+    }
 
-	public int getMaxPlayers() {
-		return maxPlayers;
-	}
-
-	public void setMaxPlayers(int maxPlayers) {
-		delete();
-		this.maxPlayers = maxPlayers;
-		save();
-	}
-
-	public char getNameColor() {
-		return namecolor;
-	}
-
-	public void setNameColor(ChatColor namecolor) {
-		delete();
-		this.namecolor = namecolor.getChar();
-		save();
-	}
-
-	public String getScoreboardTag() {
-		return scoreboardTag;
-	}
-
-	public int getWeight() {
-		return weight;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof TeamType)) {
-			return false;
-		}
-		TeamType o = (TeamType) obj;
-		return o.enabled == enabled && o.displayNameKey.equals(displayNameKey) && o.index == index
-				&& o.invisibleTag.equals(invisibleTag) && o.maxPlayers == maxPlayers
-				&& o.namecolor == namecolor && o.scoreboardTag.equals(scoreboardTag)
-				&& o.weight == weight && o.woolcolor == woolcolor;
-	}
-
-	@Override
-	public String toString() {
-		return getDisplayNameKey();
-	}
-
-	@Override
-	public int compareTo(TeamType o) {
-		return -Integer.compare(o.getWeight(), weight);
-	}
+    @Override
+    public int compareTo(TeamType o) {
+        return -Integer.compare(o.getWeight(), weight);
+    }
 }

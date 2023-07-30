@@ -8,46 +8,36 @@ package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
+import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 import java.util.Collection;
 
 public class CommandListMaps extends WBCommandExecutor {
-    public CommandListMaps() {
-        super("listMaps", b -> b.executes(ctx -> {
-            Component c = Component.empty();
-            Collection<? extends Map> maps = WoolBattle.instance().mapManager().getMaps();
-            if (maps.isEmpty()) {
-                c = Component.text("Es sind keine Maps erstellt");
-            } else {
-                for (Map map : maps) {
-                    c = c.append(Component.text(" - " + map.serialize()))
-                            .append(Component.newline());
-                }
-            }
-            ctx.getSource().sendMessage(c);
-            return 0;
-        }));
+    public CommandListMaps(WoolBattle woolbattle) {
+        super("listMaps", b -> b
+                .executes(ctx -> listMaps(ctx, woolbattle.mapManager().getMaps()))
+                .then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle))
+                        .executes(ctx -> listMaps(ctx, woolbattle.mapManager().getMaps(MapSizeArgument.mapSize(ctx, "mapSize"))))
+                )
+        );
     }
-    //	public CommandListMaps() {
-    //		super(WoolBattle.getInstance(), "listMaps", new Command[0], "Listet alle Maps auf");
-    //	}
-    //
-    //	@Override
-    //	public boolean execute(CommandSender sender, String[] args) {
-    //		Collection<? extends Map> maps = WoolBattle.getInstance().getMapManager().getMaps();
-    //		if (maps.size() == 0) {
-    //			sender.sendMessage("§cEs sind keine Teams erstellt!");
-    //			return true;
-    //		}
-    //		StringBuilder b = new StringBuilder();
-    //		for (Map m : maps) {
-    //			b.append("§7- Name: '§5").append(m.getName()).append("§7', DeathHeight: §5").append(m.getDeathHeight())
-    //					.append("§7, Icon: ").append(m.getIcon()).append("\n");
-    //		}
-    //		sender.sendMessage(b.toString());
-    //		return true;
-    //	}
 
+    private static int listMaps(CommandContext<CommandSource> ctx, Collection<? extends Map> maps) {
+        Component c = Component.empty();
+        if (maps.isEmpty()) {
+            c = Component.text("Es sind keine Maps erstellt");
+        } else {
+            for (Map map : maps) {
+                c = c.append(Component.text(" - " + map.serialize()))
+                        .append(Component.newline());
+            }
+        }
+        ctx.getSource().sendMessage(c);
+        return 0;
+    }
 }

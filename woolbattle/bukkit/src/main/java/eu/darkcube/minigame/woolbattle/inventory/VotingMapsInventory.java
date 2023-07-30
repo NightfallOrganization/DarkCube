@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.inventory;
 
 import eu.darkcube.minigame.woolbattle.WoolBattle;
 import eu.darkcube.minigame.woolbattle.map.Map;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -29,22 +30,27 @@ import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 
 public class VotingMapsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-maps");
-    private static final Key MAP = new Key(WoolBattle.instance(), "voting-map");
+    private final Key MAP = new Key(woolbattle, "voting-map");
 
-    public VotingMapsInventory(WBUser user) {
-        super(TYPE, Message.INVENTORY_VOTING_MAPS.getMessage(user), user);
+    public VotingMapsInventory(WoolBattle woolbattle, WBUser user) {
+        super(woolbattle, TYPE, Message.INVENTORY_VOTING_MAPS.getMessage(user), user);
+        complete();
+    }
+
+    @Override
+    protected boolean done() {
+        return super.done() && MAP != null;
     }
 
     @Override
     protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
+        if (event.item() == null) return;
         String mapName = ItemManager.getId(event.item(), MAP);
-        if (mapName == null)
-            return;
-        Map map = WoolBattle.instance().mapManager().getMap(mapName);
-        Vote<Map> vote = WoolBattle.instance().lobby().VOTES_MAP.get(user);
+        if (mapName == null || woolbattle.gameData().mapSize() == null) return;
+
+        Map map = woolbattle.mapManager().getMap(mapName, woolbattle.gameData().mapSize());
+        Vote<Map> vote = woolbattle.lobby().VOTES_MAP.get(user);
         if (vote != null) {
             if (map.equals(vote.vote)) {
                 user.user().sendMessage(Message.ALREADY_VOTED_FOR_MAP, mapName);
@@ -52,18 +58,18 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
             }
         }
         vote = new Vote<>(System.currentTimeMillis(), map);
-        WoolBattle.instance().lobby().VOTES_MAP.put(user, vote);
-        WoolBattle.instance().lobby().recalculateMap();
+        woolbattle.lobby().VOTES_MAP.put(user, vote);
+        woolbattle.lobby().recalculateMap();
         user.user().sendMessage(Message.VOTED_FOR_MAP, mapName);
         recalculate();
     }
 
     @Override
     protected void fillItems(java.util.Map<Integer, ItemStack> items) {
-        List<Map> maps =
-                WoolBattle.instance().mapManager().getMaps().stream().filter(Map::isEnabled)
-                        .collect(Collectors.toList());
-        Vote<Map> vote = WoolBattle.instance().lobby().VOTES_MAP.get(user);
+        MapSize mapSize = woolbattle.gameData().mapSize();
+        if (mapSize == null) return;
+        List<Map> maps = woolbattle.mapManager().getMaps(mapSize).stream().filter(Map::isEnabled).collect(Collectors.toList());
+        Vote<Map> vote = woolbattle.lobby().VOTES_MAP.get(user);
         for (int i = 0; i < maps.size(); i++) {
             Map map = maps.get(i);
             ItemBuilder bu = item(map.getIcon().getMaterial()).damage(map.getIcon().getId());

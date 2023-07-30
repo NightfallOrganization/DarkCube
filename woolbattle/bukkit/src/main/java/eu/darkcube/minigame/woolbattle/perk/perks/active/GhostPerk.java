@@ -17,7 +17,6 @@ import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
@@ -179,7 +178,7 @@ public class GhostPerk extends Perk {
                 WBUser attacker = e.getDamager() instanceof Player
                         ? WBUser.getUser((Player) e.getDamager())
                         : WBUser.getUser((Player) ((Projectile) e.getDamager()).getShooter());
-                if (attacker.getTeam().getType() == TeamType.SPECTATOR && !attacker.isTrollMode()) {
+                if (attacker.getTeam().isSpectator() && !attacker.isTrollMode()) {
                     e.setCancelled(true);
                     return;
                 }

@@ -24,8 +24,8 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_voting_lifes");
     private static final Key LIFES = new Key(WoolBattle.instance(), "voting_lifes");
 
-    public VotingLifesInventory(WBUser user) {
-        super(TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);
+    public VotingLifesInventory(WoolBattle woolbattle, WBUser user) {
+        super(woolbattle, TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);
     }
 
     @Override

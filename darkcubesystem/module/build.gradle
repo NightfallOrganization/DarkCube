@@ -2,10 +2,6 @@ plugins {
     id 'java-library'
 }
 
-java {
-    withSourcesJar()
-}
-
 dependencies {
     compileOnly libs.cloudnet
     compileOnly libs.cloudnetBridge

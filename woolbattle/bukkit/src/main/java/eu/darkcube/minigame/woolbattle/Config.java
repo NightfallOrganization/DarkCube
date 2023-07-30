@@ -7,9 +7,17 @@
 
 package eu.darkcube.minigame.woolbattle;
 
+import eu.darkcube.system.util.data.Key;
+
 public class Config {
 
-    public static final String COMMAND_PREFIX = "commandprefix";
-    public static final String MIN_PLAYER_COUNT = "minplayercount";
+    public static Key SPAWN;
+    public static Key MIN_PLAYER_COUNT;
+    public static Key LOBBYDEATHLINE;
 
+    static void load(WoolBattle woolbattle) {
+        SPAWN = new Key(woolbattle, "spawn");
+        MIN_PLAYER_COUNT = new Key(woolbattle, "min_player_count");
+        LOBBYDEATHLINE = new Key(woolbattle, "lobbydeathline");
+    }
 }

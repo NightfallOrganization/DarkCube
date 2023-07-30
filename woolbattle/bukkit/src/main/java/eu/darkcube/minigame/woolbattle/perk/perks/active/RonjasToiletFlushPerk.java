@@ -12,7 +12,6 @@ import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.user.CooldownUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
@@ -63,7 +62,7 @@ public class RonjasToiletFlushPerk extends Perk {
 
                 if (egg.getTicksLived() <= 3) {
                     WBUser.onlineUsers().stream()
-                            .filter(u -> u.getTeam().getType() != TeamType.SPECTATOR)
+                            .filter(u -> !u.getTeam().isSpectator())
                             .map(WBUser::getBukkitEntity).filter(bukkitEntity ->
                                     bukkitEntity.getLocation().distance(egg.getLocation()) < RANGE)
                             .forEach(t -> {
@@ -74,7 +73,7 @@ public class RonjasToiletFlushPerk extends Perk {
                             });
                 } else {
                     WBUser.onlineUsers().stream()
-                            .filter(u -> u.getTeam().getType() != TeamType.SPECTATOR)
+                            .filter(u -> !u.getTeam().isSpectator())
                             .map(WBUser::getBukkitEntity)
                             .filter(bukkitEntity -> bukkitEntity.getWorld().equals(egg.getWorld()))
                             .filter(bukkitEntity ->

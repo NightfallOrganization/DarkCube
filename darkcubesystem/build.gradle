@@ -3,8 +3,11 @@ plugins {
     id 'java-library'
 }
 
-tasks.shadowJar.archiveClassifier.set('')
-tasks.build.dependsOn(tasks.shadowJar)
+tasks {
+    shadowJar.archiveClassifier = ''
+    jar.archiveClassifier = 'pure'
+    assemble.dependsOn shadowJar
+}
 
 dependencies {
     api project('api')

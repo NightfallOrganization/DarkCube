@@ -27,7 +27,6 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
     public void handle(PlayerQuitEvent e) {
         WBUser user = WBUser.getUser(e.getPlayer());
         Lobby lobby = woolBattle.lobby();
-        lobby.getScoreboardByUser().remove(user);
         lobby.VOTES_MAP.remove(user);
         lobby.VOTES_EP_GLITCH.remove(user);
         lobby.VOTES_LIFES.remove(user);

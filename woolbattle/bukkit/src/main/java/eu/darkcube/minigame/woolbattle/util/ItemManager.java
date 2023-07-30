@@ -99,9 +99,8 @@ public class ItemManager {
         return builder.build();
     }
 
-    public static ItemBuilder setId(ItemBuilder b, Key key, String id) {
+    public static void setId(ItemBuilder b, Key key, String id) {
         b.persistentDataStorage().set(key, PersistentDataTypes.STRING, id);
-        return b;
     }
 
     public static String getId(ItemStack s, Key key) {

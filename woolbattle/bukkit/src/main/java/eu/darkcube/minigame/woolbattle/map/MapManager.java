@@ -10,11 +10,13 @@ import java.util.Collection;
 
 public interface MapManager {
 
-    Map getMap(String name);
+    Map getMap(String name, MapSize mapSize);
 
     Map createMap(String name, MapSize mapSize);
 
     Collection<? extends Map> getMaps();
+
+    Collection<? extends Map> getMaps(MapSize mapSize);
 
     void deleteMap(Map map);
 
