@@ -25,7 +25,7 @@ public class God implements CommandExecutor {
 
         if(!command.getName().equalsIgnoreCase("god") || (args.length > 1)) {
 
-            sender.sendMessage("§7Unbekannter Befehl. Nutze §b/god (Person) §7um dich oder andere in den God zu setzten");
+            sender.sendMessage("§7Unbekannter Befehl. Nutze §a/god (Person) §7um dich oder andere in den God zu setzten");
             return false;
 
         }
@@ -38,12 +38,12 @@ public class God implements CommandExecutor {
 
                 player.setInvulnerable(true);
                 player.setSaturation(40000);
-                sender.sendMessage("§b"+ player.getName() +"§7 wurde in den Godmodus gesetzt");
+                sender.sendMessage("§a"+ player.getName() +"§7 wurde in den Godmodus gesetzt");
                 return true;
             }
             else if (player.isInvulnerable() == true) {
                 player.setInvulnerable(false);
-                sender.sendMessage("§b"+ player.getName() +"§7 wurde aus den Godmodus gesetzt");
+                sender.sendMessage("§a"+ player.getName() +"§7 wurde aus den Godmodus gesetzt");
                 return true;
             }
         }
@@ -54,20 +54,20 @@ public class God implements CommandExecutor {
 
                 player.setInvulnerable(true);
                 player.setSaturation(20);
-                sender.sendMessage("§7Godmodus §bAN");
+                sender.sendMessage("§7Godmodus §aAN");
                 return false;
             }
             else if (player.isInvulnerable() == true) {
                 player.setInvulnerable(false);
                 player.setSaturation(20);
-                sender.sendMessage("§7Godmodus §bAUS");
+                sender.sendMessage("§7Godmodus §aAUS");
                 return true;
             }
 
 
         }
 
-        sender.sendMessage("§7Unbekannter Befehl. Nutze §b/god (Person) §7um dich oder andere in den God zu setzten");
+        sender.sendMessage("§7Unbekannter Befehl. Nutze §a/god (Person) §7um dich oder andere in den God zu setzten");
         return false;
     }
 

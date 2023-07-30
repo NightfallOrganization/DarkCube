@@ -25,7 +25,7 @@ public class Max implements CommandExecutor {
 
         if(!command.getName().equalsIgnoreCase("max") || (args.length > 1)) {
 
-            sender.sendMessage("§7Unbekannter Befehl. Nutze §b/max (Person) §7um dich zu maxen");
+            sender.sendMessage("§7Unbekannter Befehl. Nutze §a/max (Person) §7um dich zu maxen");
             return false;
 
         }
@@ -35,23 +35,23 @@ public class Max implements CommandExecutor {
             Player player = Bukkit.getPlayer(args[0]);
 
             player.setHealth(20);
-            player.setSaturation(20);
+            player.setSaturation(200);
             player.setFoodLevel(20);
-            sender.sendMessage("§b"+ player.getName() +"§7 wurde gemaxed");
+            sender.sendMessage("§a"+ player.getName() +"§7 wurde gemaxed");
             return true;
         }
         else if(args.length == 0) {
             Player player = (Player) sender;
 
             player.setHealth(20);
-            player.setSaturation(20);
+            player.setSaturation(200);
             player.setFoodLevel(20);
-            sender.sendMessage("§7Du wurdest §bgemaxed");
+            sender.sendMessage("§7Du wurdest §agemaxed");
             return true;
 
         }
 
-        sender.sendMessage("§7Unbekannter Befehl. Nutze §b/max (Person) §7um dich zu maxen");
+        sender.sendMessage("§7Unbekannter Befehl. Nutze §a/max (Person) §7um dich zu maxen");
         return false;
     }
 

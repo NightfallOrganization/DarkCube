@@ -25,7 +25,7 @@ public class Feed implements CommandExecutor {
 
         if(!command.getName().equalsIgnoreCase("feed") || (args.length > 1)) {
 
-            sender.sendMessage("§7Unbekannter Befehl. Nutze §b/feed (Person) 1§7, um dich oder andere zu füttern");
+            sender.sendMessage("§7Unbekannter Befehl. Nutze §a/feed (Person) 1§7, um dich oder andere zu füttern");
             return false;
 
         }
@@ -36,7 +36,7 @@ public class Feed implements CommandExecutor {
 
             player.setSaturation(20);
             player.setFoodLevel(20);
-            sender.sendMessage("§b"+ player.getName() +"§7 wurde gefüttert");
+            sender.sendMessage("§a"+ player.getName() +"§7 wurde gefüttert");
             return true;
         }
         else if(args.length == 0) {
@@ -44,12 +44,12 @@ public class Feed implements CommandExecutor {
 
             player.setSaturation(20);
             player.setFoodLevel(20);
-            sender.sendMessage("§7Du wurdest §bgefüttert");
+            sender.sendMessage("§7Du wurdest §agefüttert");
             return true;
 
         }
 
-        sender.sendMessage("§7Unbekannter Befehl. Nutze §b/feed (Person) 1§7, um dich oder andere zu füttern");
+        sender.sendMessage("§7Unbekannter Befehl. Nutze §a/feed (Person) 1§7, um dich oder andere zu füttern");
         return false;
     }
 

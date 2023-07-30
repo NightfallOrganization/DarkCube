@@ -27,7 +27,7 @@ public class Heal implements CommandExecutor {
 
 		if(!command.getName().equalsIgnoreCase("heal") || (args.length > 1)) {
 
-			sender.sendMessage("§7Unbekannter Befehl. Nutze §b/heal (Person) §7um dich oder andere zu heilen");
+			sender.sendMessage("§7Unbekannter Befehl. Nutze §a/heal (Person) §7um dich oder andere zu heilen");
 			return false;
 
 		}
@@ -37,19 +37,19 @@ public class Heal implements CommandExecutor {
 			Player player = Bukkit.getPlayer(args[0]);
 
 			player.setHealth(20);
-			sender.sendMessage("§b"+ player.getName() +"§7 wurde geheilt");
+			sender.sendMessage("§a"+ player.getName() +"§7 wurde geheilt");
 			return true;
 		}
 		else if(args.length == 0) {
 			Player player = (Player) sender;
 
 			player.setHealth(20);
-			sender.sendMessage("§7Du wurdest §bgeheilt");
+			sender.sendMessage("§7Du wurdest §ageheilt");
 			return true;
 
 		}
 
-		sender.sendMessage("§7Unbekannter Befehl. Nutze §b/heal (Person) §7um dich oder andere zu heilen");
+		sender.sendMessage("§7Unbekannter Befehl. Nutze §a/heal (Person) §7um dich oder andere zu heilen");
 		return false;
 	}
 

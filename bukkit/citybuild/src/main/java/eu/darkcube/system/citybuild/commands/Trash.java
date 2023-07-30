@@ -27,7 +27,7 @@ public class Trash implements CommandExecutor {
 
         if(!command.getName().equalsIgnoreCase("trash")) {
 
-            sender.sendMessage("§7Unbekannter Befehl. Nutze §b/trash §7um den Mülleimer zu öffnen");
+            sender.sendMessage("§7Unbekannter Befehl. Nutze §a/trash §7um den Mülleimer zu öffnen");
             return false;
 
         }
@@ -40,7 +40,7 @@ public class Trash implements CommandExecutor {
             return true;
         }
 
-        sender.sendMessage("§7Unbekannter Befehl. Nutze §b/trash §7um den Mülleimer zu öffnen");
+        sender.sendMessage("§7Unbekannter Befehl. Nutze §a/trash §7um den Mülleimer zu öffnen");
         return false;
     }
 

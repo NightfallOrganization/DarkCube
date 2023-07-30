@@ -32,14 +32,14 @@ public class Day implements CommandExecutor {
 
 			World world = player.getWorld();
 			world.setTime(3000);
-			sender.sendMessage("§7Du hast §bTag §7gesetzt");
+			sender.sendMessage("§7Du hast §aTag §7gesetzt");
 
 			return true;
 		}
 
 
 
-		sender.sendMessage("§7Unbekannter Befehl. Nutze §b/day §7, um Tag zu setzten");
+		sender.sendMessage("§7Unbekannter Befehl. Nutze §a/day §7, um Tag zu setzten");
 		return false;
 	}
 

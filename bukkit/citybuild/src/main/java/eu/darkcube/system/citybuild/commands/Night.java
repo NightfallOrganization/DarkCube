@@ -29,14 +29,14 @@ public class Night implements CommandExecutor {
 
             World world = player.getWorld();
             world.setTime(14000);
-            sender.sendMessage("§7Du hast §bNacht §7gesetzt");
+            sender.sendMessage("§7Du hast §aNacht §7gesetzt");
 
             return true;
         }
 
 
 
-        sender.sendMessage("§7Unbekannter Befehl. Nutze §b/night §7um Nacht zu setzten");
+        sender.sendMessage("§7Unbekannter Befehl. Nutze §a/night §7um Nacht zu setzten");
         return false;
     }
 
