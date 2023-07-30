@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -71,6 +72,15 @@ public class Fly implements CommandExecutor, Listener {
     // Methode zum Beibehalten des Flugstatus, wenn der Spielmodus geändert wird
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+        if (player.getAllowFlight()) {
+            Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), () -> player.setAllowFlight(true), 1L);
+        }
+    }
+
+    // Methode zum Beibehalten des Flugstatus, wenn der Spieler die Welt wechselt
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         if (player.getAllowFlight()) {
             Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), () -> player.setAllowFlight(true), 1L);
