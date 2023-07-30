@@ -6,40 +6,104 @@
  */
 package de.dasbabypixel.prefixplugin;
 
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
+import eu.darkcube.system.userapi.User;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 public class PrefixPlugin {
 
-	private static PrefixPlugin plugin = new PrefixPlugin(PrefixPluginBukkit.instance());
-	private PrefixPluginBukkit main;
+    private static PrefixPlugin plugin = new PrefixPlugin(PrefixPluginBukkit.instance());
+    private PrefixPluginBukkit main;
 
-	private PrefixPlugin(PrefixPluginBukkit main) {
-		this.main = main;
-	}
+    private PrefixPlugin(PrefixPluginBukkit main) {
+        this.main = main;
+    }
 
-	public static PrefixPlugin getApi() {
-		return plugin;
-	}
+    @Api
+    public static PrefixPlugin api() {
+        return plugin;
+    }
 
-	public String getName(Player p) {
-		return main.getScoreboardManager().replacePlaceHolders(p, "%prefix%%name%%suffix%");
-	}
+    /**
+     * Reloads the entire system
+     */
+    @Api
+    public void reload() {
+        main.getScoreboardManager().reload();
+    }
 
-	public void setSuffix(UUID uuid, String suffix) {
-		main.getScoreboardManager().setSuffix(uuid, suffix);
-	}
+    /**
+     * Reloads a player
+     */
+    @Api
+    public void reload(Player player) {
+        main.getScoreboardManager().reload(player.getUniqueId());
+    }
 
-	public void setPrefix(UUID uuid, String prefix) {
-		main.getScoreboardManager().setPrefix(uuid, prefix);
-	}
+    /**
+     * Reloads a player
+     */
+    @Api
+    public void reload(User user) {
+        main.getScoreboardManager().reload(user.getUniqueId());
+    }
 
-	public String getPrefix(UUID uuid) {
-		return main.getScoreboardManager().getPrefix(uuid);
-	}
+    /**
+     * Reloads a player
+     */
+    @Api
+    public void reload(UUID uuid) {
+        main.getScoreboardManager().reload(uuid);
+    }
 
-	public String getSuffix(UUID uuid) {
-		return main.getScoreboardManager().getSuffix(uuid);
-	}
+    /**
+     * Gets the name with prefix and suffix for displaying purposes
+     *
+     * @param p the player
+     *
+     * @return the name
+     */
+    @Api
+    public String name(Player p) {
+        return main.getScoreboardManager().replacePlaceHolders(p, "%prefix%%name%%suffix%");
+    }
+
+    /**
+     * @deprecated stupidity
+     */
+    @Deprecated
+    @ScheduledForRemoval
+    public void setSuffix(UUID uuid, String suffix) {
+        main.getScoreboardManager().setSuffix(uuid, suffix);
+    }
+
+    /**
+     * @deprecated stupidity
+     */
+    @Deprecated
+    @ScheduledForRemoval
+    public void setPrefix(UUID uuid, String prefix) {
+        main.getScoreboardManager().setPrefix(uuid, prefix);
+    }
+
+    /**
+     * @deprecated stupidity
+     */
+    @Deprecated
+    @ScheduledForRemoval
+    public String getPrefix(UUID uuid) {
+        return main.getScoreboardManager().getPrefix(uuid);
+    }
+
+    /**
+     * @deprecated stupidity
+     */
+    @Deprecated
+    @ScheduledForRemoval
+    public String getSuffix(UUID uuid) {
+        return main.getScoreboardManager().getSuffix(uuid);
+    }
 }

@@ -9,12 +9,9 @@ package eu.darkcube.system.vanillaaddons.module.modules.anvilmechanics;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.EnchantmentStorageBuilderMeta;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -255,12 +252,6 @@ public class AnvilMechanicsModule implements Module, Listener {
 		return cost * 2 + 1;
 	}
 
-	private void applyDisplayname(@NotNull ItemBuilder result, @Nullable String renameText) {
-		if (renameText != null)
-			result.displayname(LegacyComponentSerializer.legacySection()
-					.deserialize(ChatColor.translateAlternateColorCodes('&', renameText)));
-	}
-
 	@Override
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, addons);
@@ -269,10 +260,6 @@ public class AnvilMechanicsModule implements Module, Listener {
 	@Override
 	public void onDisable() {
 		HandlerList.unregisterAll(this);
-	}
-
-	private enum Type {
-		REPAIR, COMBINE
 	}
 
 	private record Data(ItemBuilder first, ItemBuilder second, ItemBuilder result, int levelCost,
