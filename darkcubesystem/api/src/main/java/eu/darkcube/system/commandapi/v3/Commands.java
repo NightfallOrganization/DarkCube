@@ -118,8 +118,7 @@ public class Commands {
         }
     }
 
-    private boolean unregister(CommandNode<CommandSource> parent,
-                               CommandEntry.OriginalCommandTree original) {
+    private boolean unregister(CommandNode<CommandSource> parent, CommandEntry.OriginalCommandTree original) {
         CommandNode<CommandSource> node = parent.getChild(original.source.getName());
         if (node == null) return false;
         for (CommandEntry.OriginalCommandTree o : original.children) {
@@ -140,7 +139,7 @@ public class Commands {
         Collection<CommandEntry.OriginalCommandTree> nodes = new HashSet<>();
         for (String name : executor.getNames()) {
             nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(executor.builder(name)), true));
-            nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(executor.builder(executor.getPrefix() + ":" + executor.getName())), false));
+            nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(executor.builder(executor.getPrefix() + ":" + name)), false));
         }
         commandEntries.add(new CommandEntry(executor, nodes));
     }
@@ -231,8 +230,7 @@ public class Commands {
 
             @Override
             public String toString() {
-                return "OriginalCommandTree{" + "command=" + command + ", source=" + source
-                        + ", children=" + children + ", prefixless=" + prefixless + '}';
+                return "OriginalCommandTree{" + "command=" + command + ", source=" + source + ", children=" + children + ", prefixless=" + prefixless + '}';
             }
         }
     }

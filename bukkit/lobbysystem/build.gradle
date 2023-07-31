@@ -4,8 +4,26 @@ plugins {
 
 tasks {
     shadowJar {
+        minimize()
         archiveClassifier.set("")
         relocate('com.github.unldenis.hologram', 'eu.darkcube.system.libs.lobbysystem.com.github.unldenis.hologram')
+        relocate('com.github.juliarn.npclib.relocate.gson', 'eu.darkcube.system.libs.com.google.gson')
+        relocate('com.github.juliarn.npclib', 'eu.darkcube.system.libs.lobbysystem.com.github.juliarn.npclib')
+        relocate('net.kyori', 'eu.darkcube.system.libs.lobbysystem.net.kyori')
+        exclude 'assets/'
+        exclude '**/packetevents/**'
+        exclude '**/gson/**'
+        exclude 'me/clip/placeholderapi/**'
+        exclude 'license.txt'
+        exclude 'input'
+        exclude 'classpath.index'
+        dependencies {
+            include(dependencyFilter.dependency('com.github.juliarn.npc-lib:npc-lib-bukkit') as Spec<FileTreeElement>)
+            include(dependencyFilter.dependency('com.github.juliarn.npc-lib:npc-lib-labymod') as Spec<FileTreeElement>)
+            include(dependencyFilter.dependency('com.github.unldenis.hologram:hologram-lib') as Spec<FileTreeElement>)
+            include(dependencyFilter.dependency('me.clip:placeholderapi') as Spec<FileTreeElement>)
+            include(project(':common:labymod-emotes') as Spec<FileTreeElement>)
+        }
     }
     jar.archiveClassifier.set("pure")
     assemble.dependsOn shadowJar
@@ -18,9 +36,11 @@ dependencies {
     compileOnly project(':pserver:pserver-bukkit')
     compileOnly project(':pserver:pserver-api')
     api project(':common:labymod-emotes')
-    implementation 'com.github.unldenis:Hologram-Lib:efaed21'
-    compileOnly 'org.jetbrains:annotations:23.1.0'
-//    compileOnly libs.cloudnetDriver
+    implementation("com.github.juliarn.npc-lib:npc-lib-bukkit:3.0.0-beta5")
+    implementation("com.github.juliarn.npc-lib:npc-lib-labymod:3.0.0-beta5")
+    implementation libs.hologramlib
+    implementation 'me.clip:placeholderapi:2.11.3'
+    compileOnly libs.annotations
     compileOnly libs.cloudnetBridge
     compileOnly libs.luckperms
 }

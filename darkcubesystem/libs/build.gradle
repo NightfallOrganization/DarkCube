@@ -7,5 +7,4 @@ dependencies {
     api project('annotations')
     api project('brigadier')
     api project('gson')
-    api project('npc-lib')
 }

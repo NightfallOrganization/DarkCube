@@ -7,24 +7,15 @@
 
 package eu.darkcube.system.commandapi.v3;
 
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.packet.Direction;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
-import eu.darkcube.system.version.ViaSupport;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @ApiStatus.Internal
@@ -41,24 +32,21 @@ public class InternalCommandTabExecutor implements TabExecutor {
         ICommandExecutor executor = new BukkitCommandExecutor(sender);
         if (!completions.isEmpty()) {
             if (sender instanceof Player) {
-                Player p = (Player) sender;
-                int version = ViaSupport.getVersion(p);
-                if (version < 393) { // 393 is the version for 1.13
-                    // https://minecraft.fandom.com/wiki/Protocol_version
-                    executor.sendMessage(Component.text(" "));
-                    executor.sendCompletions(commandLine, completions);
-                } else {
-                    UserConnection con = Via.getManager().getConnectionManager().getConnectedClient(p.getUniqueId());
-                    Protocol<?, ?, ?, ?> protocol = Via.getManager().getProtocolManager().getProtocol(version, 393);
-                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.TAB_COMPLETE, con);
-                    try {
-                        protocol.transform(Direction.CLIENTBOUND, State.PLAY, wrapper);
-                        wrapper.scheduleSendRaw();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return Collections.emptyList();
-                }
+//                Player p = (Player) sender;
+//                if (ViaSupport.supported()) {
+//                    int version = ViaSupport.getVersion(p);
+//                    if (version < 393) { // 393 is the version for 1.13
+//                        // https://minecraft.fandom.com/wiki/Protocol_version
+//                        executor.sendMessage(Component.text(" "));
+//                        executor.sendCompletions(commandLine, completions);
+//                    } else {
+//                        ViaTabExecutor.work(version, p);
+//                        return Collections.emptyList();
+//                    }
+//                } else {
+                executor.sendMessage(Component.text(" "));
+                executor.sendCompletions(commandLine, completions);
+//                }
             }
         }
         List<String> r = new ArrayList<>();

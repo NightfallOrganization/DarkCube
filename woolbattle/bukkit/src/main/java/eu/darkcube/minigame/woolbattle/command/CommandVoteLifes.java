@@ -13,12 +13,12 @@ import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 
 public class CommandVoteLifes extends WBCommandExecutor {
-    public CommandVoteLifes() {
+    public CommandVoteLifes(WoolBattle woolbattle) {
         super("votelifes", new String[]{"vl", "vlifes"}, b -> b.then(
                 Commands.argument("lifes", IntegerArgumentType.integer(3, 30)).executes(ctx -> {
                     WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
                     int lifes = IntegerArgumentType.getInteger(ctx, "lifes");
-                    WoolBattle.instance().lobby().VOTES_LIFES.put(user, lifes);
+                    woolbattle.lobby().VOTES_LIFES.put(user, lifes);
                     user.user().sendMessage(Message.VOTED_LIFES, lifes);
                     return 0;
                 })));

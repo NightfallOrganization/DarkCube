@@ -12,21 +12,25 @@ import org.bukkit.entity.Player;
 
 public class ViaSupport {
 
-	private static boolean supported;
+    private static boolean supported;
 
-	static {
-		try {
-			Via.getAPI();
-			supported = true;
-		} catch (Throwable t) {
-			supported = false;
-		}
-	}
+    static {
+        try {
+            Via.getAPI();
+            supported = true;
+        } catch (Throwable t) {
+            supported = false;
+        }
+    }
 
-	public static int getVersion(Player player) {
-		if (supported) {
-			return Via.getAPI().getPlayerVersion(player.getUniqueId());
-		}
-		return Integer.MAX_VALUE;
-	}
+    public static boolean supported() {
+        return supported;
+    }
+
+    public static int getVersion(Player player) {
+        if (supported) {
+            return Via.getAPI().getPlayerVersion(player.getUniqueId());
+        }
+        return Integer.MAX_VALUE;
+    }
 }

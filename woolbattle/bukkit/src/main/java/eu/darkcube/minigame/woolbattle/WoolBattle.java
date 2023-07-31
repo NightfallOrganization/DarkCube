@@ -274,7 +274,7 @@ public class WoolBattle extends DarkCubePlugin {
         CommandAPI.getInstance().register(new CommandSettings(this));
         CommandAPI.getInstance().register(new CommandTimer());
         CommandAPI.getInstance().register(new CommandTroll());
-        CommandAPI.getInstance().register(new CommandVoteLifes());
+        CommandAPI.getInstance().register(new CommandVoteLifes(this));
         CommandAPI.getInstance().register(new CommandWoolBattle(this));
 
         CommandAPI.getInstance().register(new CommandSetTeam(this));
