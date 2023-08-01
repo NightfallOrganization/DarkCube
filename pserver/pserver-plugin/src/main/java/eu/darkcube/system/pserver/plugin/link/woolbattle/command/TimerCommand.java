@@ -15,17 +15,17 @@ import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 
 public class TimerCommand extends PServerExecutor {
 
-	public TimerCommand() {
-		super("timer", new String[0], b -> b.then(
-				Commands.argument("timer", IntegerArgumentType.integer(0, 10000))
-						.executes(context -> {
-							int timer = IntegerArgumentType.getInteger(context, "timer");
-							CommandSource source = context.getSource();
-							WoolBattle.instance().getLobby()
-									.setOverrideTimer(timer <= 1 ? 2 : timer * 20);
-							source.sendMessage(Message.WOOLBATTLE_TIMER, timer);
-							return 0;
-						})));
-	}
+    public TimerCommand() {
+        super("timer", new String[0], b -> b.then(
+                Commands.argument("timer", IntegerArgumentType.integer(0, 10000))
+                        .executes(context -> {
+                            int timer = IntegerArgumentType.getInteger(context, "timer");
+                            CommandSource source = context.getSource();
+                            WoolBattle.instance().lobby()
+                                    .setOverrideTimer(timer <= 1 ? 2 : timer * 20);
+                            source.sendMessage(Message.WOOLBATTLE_TIMER, timer);
+                            return 0;
+                        })));
+    }
 
 }

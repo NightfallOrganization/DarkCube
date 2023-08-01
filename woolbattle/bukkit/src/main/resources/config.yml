@@ -1,0 +1,6 @@
+at_all: '@a'
+at_team: '@t'
+minplayercount: 2
+maxblockarrowhits: 3
+spawnprotectionticks: 80
+spawnprotectionticksglobal: 600

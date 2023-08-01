@@ -1,8 +1,0 @@
-plugins {
-    id 'java-library'
-}
-
-dependencies {
-    api parent.project('examination-api')
-    api parent.project('examination-string')
-}

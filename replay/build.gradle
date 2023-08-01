@@ -4,20 +4,13 @@ plugins {
 }
 
 tasks {
-    shadowJar {
-        archiveClassifier.set("")
-    }
-    build {
-        dependsOn(shadowJar)
-    }
+    shadowJar.archiveClassifier = ""
+    jar.archiveClassifier = "pure"
+    assemble.dependsOn(shadowJar)
 }
 
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
-
-java {
-    withSourcesJar()
-}
 
 dependencies {
     api project(path: 'api')
