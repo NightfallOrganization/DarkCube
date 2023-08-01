@@ -30,8 +30,8 @@ public class TeleporterTrustedListAddInventory extends AbstractInventory<AnvilGU
 	protected AnvilGUI openInventory(AUser user) {
 		return new AnvilGUI.Builder().itemLeft(ItemBuilder.item(Material.NAME_TAG).displayname(
 						Component.text(user.user().getName()).color(TextColor.color(170, 0, 170))).build())
-				.onComplete(completion -> {
-					UUID uuid = Bukkit.getPlayerUniqueId(completion.getText());
+				.onClick((slot, snapshot) -> {
+					UUID uuid = Bukkit.getPlayerUniqueId(snapshot.getText());
 					if (uuid == null) {
 						return List.of(ResponseAction.replaceInputText("Ungültiger Name"));
 					}
