@@ -86,11 +86,9 @@ public class ConnectorNPC {
             return new ConnectorNPC(object.taskName, object.id, object.location, object.permissions);
         }
     });
-    private static final Collection<ServiceInfoSnapshot> services = ConcurrentHashMap.newKeySet();
 
     static {
         CloudNetDriver.getInstance().getEventManager().registerListener(new Listener());
-        services.addAll(CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices());
     }
 
     private final Location location;
@@ -261,6 +259,12 @@ public class ConnectorNPC {
     }
 
     public static class Listener {
+        private static final Collection<ServiceInfoSnapshot> services = ConcurrentHashMap.newKeySet();
+
+        static {
+            services.addAll(CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices());
+        }
+
         @EventListener
         public void handle(CloudServiceInfoUpdateEvent event) {
             add(event.getServiceInfo());
@@ -354,7 +358,7 @@ public class ConnectorNPC {
         private volatile Info newServer = null;
 
         private void query() {
-            Collection<ServiceInfoSnapshot> servers = services.stream().filter(s -> s.getServiceId().getTaskName().equals(taskName)).collect(Collectors.toSet());
+            Collection<ServiceInfoSnapshot> servers = Listener.services.stream().filter(s -> s.getServiceId().getTaskName().equals(taskName)).collect(Collectors.toSet());
             Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
             for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
                 try {

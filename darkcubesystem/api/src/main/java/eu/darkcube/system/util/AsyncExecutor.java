@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.util;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -16,7 +18,7 @@ public class AsyncExecutor {
 	private static ExecutorService service;
 
 	public static void start() {
-		service = Executors.newFixedThreadPool(4); // 4 threads should be enough for all our
+		service = Executors.newCachedThreadPool(new DefaultThreadFactory()); // 4 threads should be enough for all our
 		// needs. This is for performance reasons and to stop creating new threads if we don't
 		// have to
 	}
@@ -42,7 +44,7 @@ public class AsyncExecutor {
 			namePrefix = "AsyncExecutor-";
 		}
 
-		public Thread newThread(Runnable r) {
+		public Thread newThread(@NotNull Runnable r) {
 			Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
 			if (t.isDaemon())
 				t.setDaemon(false);
