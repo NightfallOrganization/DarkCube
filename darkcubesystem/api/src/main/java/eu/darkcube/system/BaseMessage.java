@@ -47,8 +47,7 @@ public interface BaseMessage {
     }
 
     default String getMessageString(ICommandExecutor executor, Object... args) {
-        return LegacyComponentSerializer.legacySection()
-                .serialize(getMessage(executor, new String[0], args));
+        return LegacyComponentSerializer.legacySection().serialize(getMessage(executor, new String[0], args));
     }
 
     default Component getMessage(ICommandExecutor executor, Object... args) {

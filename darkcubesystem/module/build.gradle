@@ -1,9 +1,0 @@
-plugins {
-    id 'java-library'
-}
-
-dependencies {
-    compileOnly libs.cloudnet
-    compileOnly libs.cloudnetBridge
-    compileOnly parent.project('api')
-}

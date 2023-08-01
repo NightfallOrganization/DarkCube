@@ -1,3 +1,5 @@
 <component name="CopyrightManager">
-  <settings default="DarkCube" />
+  <settings default="DarkCube">
+    <LanguageOptions name="Kotlin" />
+  </settings>
 </component>
