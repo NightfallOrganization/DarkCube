@@ -4,13 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.skyland.Equipment;
+package eu.darkcube.system.skyland.Equipment.loot;
 
-public enum EquipmentType {
-	AXE, HELMET
+import eu.darkcube.system.skyland.Equipment.loot.SkylandLoot;
+import org.bukkit.inventory.ItemStack;
 
-	;
-	ComponentTypes[] requiredComponents;
+public interface SkylandLoottable {
 
+
+	ItemStack[] getLoot();
 
 }

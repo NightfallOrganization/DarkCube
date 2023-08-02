@@ -39,11 +39,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -168,6 +166,7 @@ public class SkylandListener implements Listener {
 		for (SkylandStructure skylandStructure : Skyland.getInstance().getStructures()){
 
 			if (skylandStructure.getStructure() != null){
+				skylandStructure.unloadStructure(skylandStructure.getNamespacedKey());
 				//todo make sure to see if there is space
 				//for (int x = 0; x < 16; x++) {
 				//	for (int z = 0; x < 16; x++) {
@@ -188,7 +187,7 @@ public class SkylandListener implements Listener {
 
 						int y = Skyland.getInstance().getCustomChunkGenerator().getFinalTopY(x, z);
 						skylandStructure.getStructure().place(new Location(e.getWorld(), x, y+1 , z), true, StructureRotation.NONE, Mirror.NONE, -1, 1, new Random());
-
+						skylandStructure.unloadStructure(skylandStructure.getNamespacedKey());
 
 					}
 				}
@@ -208,8 +207,32 @@ public class SkylandListener implements Listener {
 	}
 
 	@EventHandler
-	public void onEntitySpawn(EntitySpawnEvent e){
+	public void onEntitySpawn(CreatureSpawnEvent e){
 		Biome biome = e.getLocation().getBlock().getBiome();
+
+		if (e.getSpawnReason().equals(SpawnReason.NATURAL)){
+
+			SkylandBiomes skylandBiomes = SkylandBiomes.getBiome(e.getLocation().getBlockX(), e.getLocation().getBlockZ());
+			if (skylandBiomes.getMobs().length == 0){
+				return;
+			}else {
+				Random random = new Random(2322);
+
+				int roll = random.nextInt(0, skylandBiomes.getMobs().length);
+				skylandBiomes.getMobs()[roll].spawnMob(e.getLocation(), skylandBiomes.getMobs()[roll].getType());
+				return;
+			}
+
+		}else if (!e.getSpawnReason().equals(SpawnReason.CUSTOM)){
+
+
+
+		}else {
+
+		}
+
+
+
 
 		//e.setCancelled(true);
 		//todo debug statement
@@ -257,6 +280,8 @@ public class SkylandListener implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
+
+
 
 		if (!userAPI){
 			userAPI = true;

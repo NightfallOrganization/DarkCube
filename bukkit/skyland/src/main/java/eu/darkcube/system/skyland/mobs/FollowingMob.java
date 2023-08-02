@@ -17,6 +17,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -28,13 +29,16 @@ import java.util.*;
 public class FollowingMob implements CustomMob{
 
 	Mob mob;
-
+	EntityType entityType;
 
 
 	Location targetL;
 	LivingEntity targetE;
 	boolean isTargetLoc;
 
+	NamespacedKey nameKey = new NamespacedKey(Skyland.getInstance(), "name");
+
+	NamespacedKey rarityKey = new NamespacedKey(Skyland.getInstance(), "rarity");
 	NamespacedKey speedKey = new NamespacedKey(Skyland.getInstance(), "speed");
 	//int speed;
 
@@ -47,8 +51,10 @@ public class FollowingMob implements CustomMob{
 
 
 
-	public FollowingMob(Mob mob, int dmg, PlayerStats[] stats, int speed, boolean isAware) {
+	public FollowingMob(Mob mob, int dmg, PlayerStats[] stats, int speed, boolean isAware, String name, Rarity rarity) {
 		this.mob = mob;
+		entityType = mob.getType();
+		mob.setCustomNameVisible(true);
 		mob.getPersistentDataContainer().set(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER, 0);
 		//this.speed = speed;
 		mob.getPersistentDataContainer().set(speedKey, PersistentDataType.INTEGER, speed);
@@ -59,6 +65,35 @@ public class FollowingMob implements CustomMob{
 		mob.setAware(isAware);
 		Skyland.getInstance().getMobs().add(this);
 
+		mob.getPersistentDataContainer().set(nameKey, PersistentDataType.STRING, name);
+
+		mob.getPersistentDataContainer().set(rarityKey, PersistentDataType.STRING, rarity.toString());
+
+
+
+	}
+
+	//todo rework constructor?
+
+	public FollowingMob(EntityType entityType, int dmg, PlayerStats[] stats, int speed, boolean isAware, String name, Rarity rarity) {
+		this.entityType = entityType;
+		mob.setCustomNameVisible(true);
+		mob.getPersistentDataContainer().set(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER, 0);
+		//this.speed = speed;
+		mob.getPersistentDataContainer().set(speedKey, PersistentDataType.INTEGER, speed);
+		//this.dmg = dmg;
+		mob.getPersistentDataContainer().set(dmgKey, PersistentDataType.INTEGER, dmg);
+		//this.stats = stats;
+		mob.getPersistentDataContainer().set(statsKey, PersistentDataType.STRING, new Gson().toJson(stats));
+		mob.setAware(isAware);
+		Skyland.getInstance().getMobs().add(this);
+
+		mob.getPersistentDataContainer().set(nameKey, PersistentDataType.STRING, name);
+
+		mob.getPersistentDataContainer().set(rarityKey, PersistentDataType.STRING, rarity.toString());
+
+
+
 	}
 
 	public FollowingMob(Mob mob){
@@ -66,7 +101,10 @@ public class FollowingMob implements CustomMob{
 		Skyland.getInstance().getMobs().add(this);
 	}
 
-
+	@Override
+	public void updateName() {
+		mob.setCustomName(((int)mob.getHealth()) + "/" + ((int)mob.getMaxHealth()) + " hp   " + getRarity().getPrefix()  + getName());
+	}
 
 	@Override
 	public Mob getMob() {
@@ -111,6 +149,11 @@ public class FollowingMob implements CustomMob{
 		}
 
 
+	}
+
+	@Override
+	public EntityType getType() {
+		return entityType;
 	}
 
 	@Override
@@ -186,6 +229,22 @@ public class FollowingMob implements CustomMob{
 
 	public void setStats(PlayerStats[] stats) {
 		mob.getPersistentDataContainer().set(statsKey, PersistentDataType.STRING, new Gson().toJson(stats));
+	}
+
+	public String getName(){
+		return mob.getPersistentDataContainer().get(nameKey, PersistentDataType.STRING);
+	}
+
+	public void setName(String name){
+		mob.getPersistentDataContainer().set(nameKey, PersistentDataType.STRING, name);
+	}
+
+	public Rarity getRarity(){
+		return Rarity.valueOf(mob.getPersistentDataContainer().get(rarityKey, PersistentDataType.STRING));
+	}
+
+	public void setRarity(Rarity rarity){
+		mob.getPersistentDataContainer().set(rarityKey, PersistentDataType.STRING, rarity.toString());
 	}
 
 }

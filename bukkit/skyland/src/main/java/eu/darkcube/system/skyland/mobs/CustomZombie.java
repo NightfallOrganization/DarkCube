@@ -12,6 +12,7 @@ import com.destroystokyo.paper.entity.ai.Goal;
 import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.skyland.Equipment.PlayerStats;
 import eu.darkcube.system.skyland.Equipment.PlayerStatsType;
+import eu.darkcube.system.skyland.Equipment.Rarity;
 import eu.darkcube.system.skyland.Skyland;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,7 +36,7 @@ public class CustomZombie {
 		zombie = (Villager) loc.getWorld().spawnEntity(loc.add(new Vector(10, 0 ,0)), EntityType.VILLAGER);
 		System.out.println("zombie should appear");
 		FollowingMob fm = new FollowingMob(zombie, 5, new PlayerStats[] {new PlayerStats(
-				PlayerStatsType.ARMOR, 100)}, 1, true);
+				PlayerStatsType.ARMOR, 100)}, 1, true, "zombie", Rarity.RARE);
 		System.out.println("following mob ai added");
 
 		/*

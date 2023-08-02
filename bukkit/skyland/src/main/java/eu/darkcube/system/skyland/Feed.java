@@ -17,6 +17,7 @@ import eu.darkcube.system.skyland.inventoryUI.UINewClassSelect;
 import eu.darkcube.system.skyland.inventoryUI.InventoryUI;
 import eu.darkcube.system.skyland.inventoryUI.UIitemStack;
 import eu.darkcube.system.skyland.mobs.CustomZombie;
+import eu.darkcube.system.skyland.skillsandability.BeamOfLight;
 import eu.darkcube.system.skyland.worldGen.SkylandBiomes;
 import eu.darkcube.system.skyland.worldGen.Structures.CustomPallette;
 import eu.darkcube.system.skyland.worldGen.Structures.SkylandStructure;
@@ -39,6 +40,7 @@ import org.bukkit.structure.Palette;
 import org.bukkit.structure.Structure;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 import org.checkerframework.common.reflection.qual.GetClass;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,15 +71,24 @@ public class Feed implements CommandExecutor {
 			} else if (args[0].equals("clear")) {
 				SkylandPlayerModifier.getSkylandPlayer(p).resetData();
 			} else if (args[0].equals("gui")) {
-				if (args.length > 2) {
+				if (args.length > 3) {
 					p.showTitle(Title.title(
 							Component.text(args[2]).color(TextColor.color(0x4e, 0x5c, 0x24)),
-							Component.text(""), Times.times(Duration.of(0, ChronoUnit.SECONDS),
+							Component.text(args[3]).color(TextColor.color(0x4e, 0x5c, 0x24)), Times.times(Duration.of(0, ChronoUnit.SECONDS),
 									Duration.of(Long.parseLong(args[1]), ChronoUnit.SECONDS),
 									Duration.of(0, ChronoUnit.SECONDS))));
 					//p.sendTitle(args[1], "", 0, 100000, 0);
 				} else {
-					p.sendTitle("\uEff1", "", 0, 100000, 0);
+					if (args.length > 2) {
+						p.showTitle(Title.title(
+								Component.text(args[2]).color(TextColor.color(0x4e, 0x5c, 0x24)),
+								Component.text(""), Times.times(Duration.of(0, ChronoUnit.SECONDS),
+										Duration.of(Long.parseLong(args[1]), ChronoUnit.SECONDS),
+										Duration.of(0, ChronoUnit.SECONDS))));
+					}else {
+						p.sendTitle("\uEff1", "", 0, 100000, 0);
+					}
+
 
 				}
 
@@ -115,26 +126,15 @@ public class Feed implements CommandExecutor {
 							Skyland.getInstance().getServer().getStructureManager();
 					Structure structure = structureManager.createStructure();
 
-					structure.fill(((Player) sender).getLocation(), new BlockVector(5, 5, 5),
+					structure.fill(((Player) sender).getLocation(), new BlockVector(32, 32, 32),
 							false);
 
 					SkylandStructure skylandStructure = new SkylandStructure(nsk,
 							new SkylandStructureModifiers[] {
 									new SkylandStructureModifiers(SkylandBiomes.TEST2, 10, 2, 3,
-											true)});
+											true, new Vector(0,0,0))});
 
-					Palette palette = new CustomPallette(structure.getPalettes().get(0).getBlocks());
 
-					for (BlockState state : palette.getBlocks()) {
-						p.sendMessage("state found");
-						if (state.getType().equals(Material.AIR)) {
-							p.sendMessage("state removed");
-							state.setType(Material.STRUCTURE_VOID);
-						}
-					}
-
-					//todo reflection / injection to fix fucking retard bukkit implementation
-					Skyland.getInstance().getServer();
 					structure.getPalettes().remove(0);
 					System.out.println("Paletts left after removal (1 if copy, 0 if raw): " + structure.getPalettes().size());
 					structure.getPalettes().add(new CustomPallette());
@@ -144,7 +144,7 @@ public class Feed implements CommandExecutor {
 
 
 					structureManager.saveStructure(nsk);
-
+					Skyland.getInstance().getStructures().add(skylandStructure);
 
 
 					p.sendMessage("structure saved");
@@ -174,6 +174,9 @@ public class Feed implements CommandExecutor {
 				if (args.length > 1) {
 					NamespacedKey namespacedKey = new NamespacedKey(Skyland.getInstance(),
 							args[1]);
+					SkylandStructure skylandStructure = Skyland.getInstance().getStructure(namespacedKey);
+					skylandStructure.enqueuStructures(p.getLocation());
+					/*
 					StructureManager structureManager =
 							Skyland.getInstance().getServer().getStructureManager();
 					int palette = 0;
@@ -184,6 +187,8 @@ public class Feed implements CommandExecutor {
 					structureManager.getStructure(namespacedKey)
 							.place(((Player) sender).getLocation(), true, StructureRotation.NONE,
 									Mirror.NONE, palette, 1, new Random());
+
+					 */
 					p.sendMessage("structure pasted");
 
 				}
@@ -268,6 +273,15 @@ public class Feed implements CommandExecutor {
 				}
 			} else if (args[0].equals("ascend")) {
 				p.teleport(new Location(Bukkit.getWorld("test"), 0, 200, 0));
+			} else if (args[0].equals("memory")) {
+				System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() + "/"+ Runtime.getRuntime()
+						.totalMemory());
+				sender.sendMessage(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()+ "/" + Runtime.getRuntime().totalMemory());
+
+			}else if (args[0].equals("skill")) {
+				p.sendMessage("beam!");
+				new BeamOfLight().activate(p);
+
 			}
 
 		} else {

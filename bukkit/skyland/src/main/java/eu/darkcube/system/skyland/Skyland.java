@@ -16,7 +16,11 @@ import eu.darkcube.system.skyland.mobs.FollowingMob;
 import eu.darkcube.system.skyland.worldGen.CustomChunkGenerator;
 import eu.darkcube.system.skyland.worldGen.Structures.SkylandStructure;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Mob;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,6 +60,7 @@ public class Skyland extends DarkCubePlugin {
 
 		CommandAPI.getInstance().unregisterByPrefix("skyland");
 		SkylandGeneratorCommand.deleteCustomWorlds(this);
+
 	}
 
 	@Override
@@ -131,6 +136,15 @@ public class Skyland extends DarkCubePlugin {
 			}
 		}.runTaskTimer(this, 20, 1);
 
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				for (CustomMob cm : mobs) {
+					cm.updateName();
+				}
+			}
+		}.runTaskTimer(this, 20, 5);
+
 	}
 
 
@@ -196,5 +210,14 @@ public class Skyland extends DarkCubePlugin {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public SkylandStructure getStructure(NamespacedKey nsk){
+		for (SkylandStructure skylandStructure : structures){
+			if (skylandStructure.getNamespacedKey().equals(nsk)){
+				return skylandStructure;
+			}
+		}
+		return null;
 	}
 }

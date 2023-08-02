@@ -4,13 +4,8 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.skyland.Equipment;
+package eu.darkcube.system.skyland.worldGen.Structures;
 
-public enum EquipmentType {
-	AXE, HELMET
-
-	;
-	ComponentTypes[] requiredComponents;
-
+public class ComplexSkylandStructure {
 
 }

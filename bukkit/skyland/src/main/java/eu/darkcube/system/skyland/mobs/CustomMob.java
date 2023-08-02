@@ -13,7 +13,10 @@ package eu.darkcube.system.skyland.mobs;
 		import org.bukkit.Location;
 		import org.bukkit.NamespacedKey;
 		import org.bukkit.entity.Entity;
+		import org.bukkit.entity.EntityType;
 		import org.bukkit.entity.Mob;
+		import org.bukkit.persistence.PersistentDataType;
+		import org.bukkit.util.Vector;
 
 		import java.util.ArrayList;
 		import java.util.HashMap;
@@ -21,8 +24,17 @@ package eu.darkcube.system.skyland.mobs;
 
 public interface CustomMob extends SkylandEntity {
 
+	void updateName();
+
 	Mob getMob();
 	void aiTick();
+	EntityType getType();
+
+
+	default void spawnMob(Location location, EntityType entityType){
+		Mob mob = (Mob) location.getWorld().spawnEntity(location, EntityType.VILLAGER);
+		mob.getPersistentDataContainer().set(getCustomMobTypeKey(), PersistentDataType.INTEGER, -1);
+	}
 
 	List<Materials> getLootTable();//todo maybe different format!
 

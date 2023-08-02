@@ -61,7 +61,7 @@ public enum Materials {
 	protected ArrayList<String> setModelLore() {
 		ArrayList<String> out = new ArrayList<>();
 		out.add("");
-		out.add("§7§m      §7« §bStats §7»§m      ");
+		out.add("§7§m      §7« §bStats when crafted onto a piece of Equipment §7»§m      ");
 		out.add("");
 
 		for (PlayerStats pl : getStats()) {

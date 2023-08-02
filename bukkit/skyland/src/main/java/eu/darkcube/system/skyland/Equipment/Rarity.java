@@ -50,6 +50,42 @@ public enum Rarity {
     }*/
 
 
+	public static Rarity rollRarity(){
+		int totalWeight = 0;
+		for (Rarity value : values()) {
+			totalWeight += value.getWeight();
+		}
+
+		Random random = new Random();
+		int roll = random.nextInt(totalWeight);
+		for (Rarity value : values()) {
+			if (value.getWeight() >= roll){
+				return value;
+			}
+			roll = roll -value.getWeight();
+		}
+
+		return Rarity.ORDINARY;
+	}
+
+	public static Rarity rollRarity(Rarity[] rarities){
+		int totalWeight = 0;
+		for (Rarity value : rarities) {
+			totalWeight += value.getWeight();
+		}
+
+		Random random = new Random();
+		int roll = random.nextInt(totalWeight);
+
+		for (Rarity value : rarities) {
+			if (value.getWeight() >= roll){
+				return value;
+			}
+			roll = roll -value.getWeight();
+		}
+
+		return Rarity.ORDINARY;
+	}
 	public int getWeight() {
 		return weight;
 	}

@@ -22,7 +22,7 @@ import java.util.Random;
 public enum SkylandBiomes {
 
 	//color green
-	FOREST(Biome.FOREST, new ArrayList<>(), new AllBiomeBlocks(
+	FOREST(Biome.FOREST, new CustomMob[]{}, new AllBiomeBlocks(
 			new BiomeBLock[] {new BiomeBLock(Material.GRASS_BLOCK),
 					new BiomeBLock(Material.SLIME_BLOCK)},
 			new BiomeBLock[] {new BiomeBLock(Material.DIRT), new BiomeBLock(Material.SLIME_BLOCK)},
@@ -32,7 +32,7 @@ public enum SkylandBiomes {
 			new TreeSet[] {new TreeSet(Material.OAK_LEAVES, Material.OAK_LOG)}), -14503604),
 
 	//color red
-	LAVA(Biome.BADLANDS, new ArrayList<>(), new AllBiomeBlocks(
+	LAVA(Biome.BADLANDS, new CustomMob[]{}, new AllBiomeBlocks(
 			new BiomeBLock[] {new BiomeBLock(Material.NETHERRACK),
 					new BiomeBLock(Material.NETHER_WART_BLOCK)},
 			new BiomeBLock[] {new BiomeBLock(Material.NETHER_BRICKS),
@@ -43,7 +43,7 @@ public enum SkylandBiomes {
 			new TreeSet[] {new TreeSet(Material.OAK_LEAVES, Material.OAK_LOG)}), -1237980),
 
 	//color black
-	TEST1(Biome.BAMBOO_JUNGLE, new ArrayList<>(), new AllBiomeBlocks(
+	TEST1(Biome.BAMBOO_JUNGLE, new CustomMob[]{}, new AllBiomeBlocks(
 			new BiomeBLock[] {new BiomeBLock(Material.ICE),
 					new BiomeBLock(Material.NETHER_WART_BLOCK)},
 			new BiomeBLock[] {new BiomeBLock(Material.NETHER_BRICKS),
@@ -54,7 +54,7 @@ public enum SkylandBiomes {
 			new TreeSet[] {new TreeSet(Material.OAK_LEAVES, Material.OAK_LOG)}), -16777216),
 
 	//color grey
-	TEST2(Biome.BEACH, new ArrayList<>(), new AllBiomeBlocks(
+	TEST2(Biome.BEACH, new CustomMob[]{}, new AllBiomeBlocks(
 			new BiomeBLock[] {new BiomeBLock(Material.CARVED_PUMPKIN),
 					new BiomeBLock(Material.NETHER_WART_BLOCK)},
 			new BiomeBLock[] {new BiomeBLock(Material.NETHER_BRICKS),
@@ -68,14 +68,14 @@ public enum SkylandBiomes {
 	;
 
 	final Biome biome;
-	final List<CustomMob> mobs;
+	final CustomMob[] mobs;
 	final AllBiomeBlocks biomeBlock;
 	final BiomeGenModifiers biomeGenModifiers;
 	int colorCode;
 	static SimplexOctaveGenerator biomeGen = new SimplexOctaveGenerator(new Random(1133423454), 6);
 	static SimplexOctaveGenerator biomeGen2 = new SimplexOctaveGenerator(new Random(124245), 6);
 
-	SkylandBiomes(Biome biome, List<CustomMob> mobs, AllBiomeBlocks biomeBlock, int colorCode) {
+	SkylandBiomes(Biome biome, CustomMob[] mobs, AllBiomeBlocks biomeBlock, int colorCode) {
 		this.biome = biome;
 		this.mobs = mobs;
 		this.biomeBlock = biomeBlock;
@@ -83,7 +83,7 @@ public enum SkylandBiomes {
 		this.colorCode = colorCode;
 	}
 
-	SkylandBiomes(Biome biome, List<CustomMob> mobs, AllBiomeBlocks biomeBlock,
+	SkylandBiomes(Biome biome, CustomMob[] mobs, AllBiomeBlocks biomeBlock,
 			BiomeGenModifiers biomeGenModifiers, int colorCode) {
 		this.biome = biome;
 		this.mobs = mobs;
@@ -101,7 +101,7 @@ public enum SkylandBiomes {
 		return biomeBlock;
 	}
 
-	public List<CustomMob> getMobs() {
+	public  CustomMob[] getMobs() {
 		return mobs;
 	}
 

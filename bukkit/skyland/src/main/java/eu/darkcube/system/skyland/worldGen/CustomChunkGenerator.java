@@ -34,6 +34,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	HashMap<Integer, Integer> testResultHashMap = new HashMap<>();
 
 	public CustomChunkGenerator() {
+		
 		//generator.setScale(0.008D);
 		//details.setScale(0.02D);
 		generator.setScale(0.0028D);
@@ -105,7 +106,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 					for (int i = currentHeight + 2 * islandGenHeight - 73;
 					     i > currentHeight + 2 * islandGenHeight - 73 - spikes; i--) {
 						skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
-						chunkData.setBlock(x, i, z, Material.GREEN_WOOL);
+						chunkData.setBlock(x, i, z, skylandBiomes.getBiomeBlock().getNextStone(random).getBlock());
 					}
 
 					spikes = ((spikeGen.noise(chunkX * 16 + x, chunkZ * 16 + z, 5D, 4D, true) + 1)
