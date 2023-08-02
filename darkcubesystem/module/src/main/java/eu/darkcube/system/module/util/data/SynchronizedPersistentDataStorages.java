@@ -25,81 +25,81 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SynchronizedPersistentDataStorages {
-	static final Database database;
-	private static final ReferenceQueue<SynchronizedPersistentDataStorage> queue =
-			new ReferenceQueue<>();
-	private static final Lock lock = new ReentrantLock(false);
-	private static final HashBiMap<Key, Reference<? extends SynchronizedPersistentDataStorage>>
-			storages = HashBiMap.create();
+    static final Database database;
+    private static final ReferenceQueue<SynchronizedPersistentDataStorage> queue =
+            new ReferenceQueue<>();
+    private static final Lock lock = new ReentrantLock(false);
+    private static final HashBiMap<Key, Reference<? extends SynchronizedPersistentDataStorage>>
+            storages = HashBiMap.create();
 
-	static {
-		database =
-				CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("persistent_data");
-		PacketAPI.getInstance().registerHandler(PacketWrapperNodeDataSet.class, new HandlerSet());
-		PacketAPI.getInstance()
-				.registerHandler(PacketWrapperNodeDataClearSet.class, new HandlerClearSet());
-		PacketAPI.getInstance()
-				.registerHandler(PacketWrapperNodeDataRemove.class, new HandlerRemove());
-		PacketAPI.getInstance().registerHandler(PacketWrapperNodeQuery.class, new HandlerQuery());
-		new CollectorHandler();
-		if (CloudNetDriver.getInstance().getDatabaseProvider()
-				.containsDatabase("plugin_persistent_data")) {
-			Database db = CloudNetDriver.getInstance().getDatabaseProvider()
-					.getDatabase("plugin_persistent_data");
-			for (String key : new ArrayList<>(db.keys())) {
-				database.insert(new Key(key, key).toString(), db.get(key));
-			}
-			CloudNetDriver.getInstance().getDatabaseProvider()
-					.deleteDatabase("plugin_persistent_data");
-		}
-	}
+    static {
+        database =
+                CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("persistent_data");
+        PacketAPI.getInstance().registerHandler(PacketWrapperNodeDataSet.class, new HandlerSet());
+        PacketAPI.getInstance()
+                .registerHandler(PacketWrapperNodeDataClearSet.class, new HandlerClearSet());
+        PacketAPI.getInstance()
+                .registerHandler(PacketWrapperNodeDataRemove.class, new HandlerRemove());
+        PacketAPI.getInstance().registerHandler(PacketWrapperNodeQuery.class, new HandlerQuery());
+        new CollectorHandler();
+        if (CloudNetDriver.getInstance().getDatabaseProvider()
+                .containsDatabase("plugin_persistent_data")) {
+            Database db = CloudNetDriver.getInstance().getDatabaseProvider()
+                    .getDatabase("plugin_persistent_data");
+            for (String key : new ArrayList<>(db.keys())) {
+                database.insert(new Key(key, key).toString(), db.get(key));
+            }
+            CloudNetDriver.getInstance().getDatabaseProvider()
+                    .deleteDatabase("plugin_persistent_data");
+        }
+    }
 
-	public static SynchronizedPersistentDataStorage storage(Key key) {
-		lock.lock();
-		Reference<? extends SynchronizedPersistentDataStorage> ref;
-		ref = storages.getOrDefault(key, null);
-		SynchronizedPersistentDataStorage storage = ref == null ? null : ref.get();
-		if (storage == null) {
-			storage = new SynchronizedPersistentDataStorage(key);
-			if (database.contains(key.key())) {
-				JsonDocument doc = database.get(key.toString());
-				database.delete(key.toString());
-				database.insert(key.toString(), doc);
-				storage.loadFromJsonDocument(doc);
-			} else if (database.contains(key.toString())) {
-				storage.loadFromJsonDocument(database.get(key.toString()));
-			}
-			ref = new SoftReference<>(storage);
-			storages.put(key, ref);
-		}
-		lock.unlock();
-		return storage;
-	}
+    public static SynchronizedPersistentDataStorage storage(Key key) {
+        lock.lock();
+        Reference<? extends SynchronizedPersistentDataStorage> ref;
+        ref = storages.getOrDefault(key, null);
+        SynchronizedPersistentDataStorage storage = ref == null ? null : ref.get();
+        if (storage == null) {
+            storage = new SynchronizedPersistentDataStorage(key);
+            if (database.contains(key.key())) {
+                JsonDocument doc = database.get(key.key());
+                database.delete(key.key());
+                database.insert(key.toString(), doc);
+                storage.loadFromJsonDocument(doc);
+            } else if (database.contains(key.toString())) {
+                storage.loadFromJsonDocument(database.get(key.toString()));
+            }
+            ref = new SoftReference<>(storage);
+            storages.put(key, ref);
+        }
+        lock.unlock();
+        return storage;
+    }
 
-	public static void init() {
-	}
+    public static void init() {
+    }
 
-	private static class CollectorHandler extends Thread {
-		public CollectorHandler() {
-			setName("SynchronizedStorageGCHandler");
-			setDaemon(true);
-			start();
-		}
+    private static class CollectorHandler extends Thread {
+        public CollectorHandler() {
+            setName("SynchronizedStorageGCHandler");
+            setDaemon(true);
+            start();
+        }
 
-		@Override
-		public void run() {
-			//noinspection InfiniteLoopStatement
-			while (true) {
-				try {
-					Reference<? extends SynchronizedPersistentDataStorage> reference =
-							queue.remove();
-					lock.lock();
-					storages.inverse().remove(reference);
-					lock.unlock();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-	}
+        @Override
+        public void run() {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                try {
+                    Reference<? extends SynchronizedPersistentDataStorage> reference =
+                            queue.remove();
+                    lock.lock();
+                    storages.inverse().remove(reference);
+                    lock.unlock();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
 }

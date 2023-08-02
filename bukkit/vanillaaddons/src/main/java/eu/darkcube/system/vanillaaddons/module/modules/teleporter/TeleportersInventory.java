@@ -36,7 +36,7 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 	@Override
 	protected AddonsAsyncPagedInventory openInventory(AUser user) {
 		AddonsAsyncPagedInventory i = new AddonsAsyncPagedInventory(TYPE,
-				Component.text("Teleporters").color(NamedTextColor.GOLD), () -> true) {
+				Component.text("\uDAFF\uDFEFⲊ").color(NamedTextColor.WHITE), () -> true) {
 			@Override
 			protected void fillItems(Map<Integer, ItemStack> items) {
 				int i = 0;
@@ -115,6 +115,10 @@ public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInve
 				arrowItem.put(PageArrow.NEXT,
 						ItemBuilder.item(Material.ARROW).displayname(Component.text("Next Page"))
 								.build());
+			}
+
+			@Override
+			protected void insertFallbackItems() {
 			}
 		};
 		i.open(Objects.requireNonNull(Bukkit.getPlayer(user.user().getUniqueId())));

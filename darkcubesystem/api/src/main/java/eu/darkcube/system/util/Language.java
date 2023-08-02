@@ -80,7 +80,7 @@ public enum Language {
 		List<Component> components = new ArrayList<>();
 		for (int i = 0; i < replacements.length; i++) {
 			if (replacements[i] instanceof BaseMessage) {
-				replacements[i] = ((BaseMessage) replacements[i]).getMessage(this, new String[0]);
+				replacements[i] = ((BaseMessage) replacements[i]).getMessage(this);
 			}
 			if (replacements[i] instanceof ComponentLike) {
 				ComponentLike componentLike = (ComponentLike) replacements[i];

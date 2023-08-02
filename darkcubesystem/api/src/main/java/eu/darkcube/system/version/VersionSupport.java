@@ -11,21 +11,28 @@ import org.bukkit.Bukkit;
 
 public class VersionSupport {
 
-	private static Version version;
+    private static Version version;
 
-	public static Version getVersion() {
-		if (version == null)
-			init();
-		return version;
-	}
+    /**
+     * @see #version()
+     */
+    @Deprecated
+    public static Version getVersion() {
+        return version();
+    }
 
-	private static void init() {
-		Class<? extends Version> cls = ReflectionUtils.getClass(
-						VersionSupport.class.getPackage().getName() + ".v" + Bukkit.getServer()
-								.getBukkitVersion().replace('.', '_').split("-", 2)[0] + ".Version")
-				.asSubclass(Version.class);
-		version = ReflectionUtils.instantiateObject(cls);
-		version.init();
-	}
+    public static Version version() {
+        if (version == null) init();
+        return version;
+    }
+
+    private static void init() {
+        Class<? extends Version> cls = ReflectionUtils.getClass(
+                        VersionSupport.class.getPackage().getName() + ".v" + Bukkit.getServer()
+                                .getBukkitVersion().replace('.', '_').split("-", 2)[0] + ".Version")
+                .asSubclass(Version.class);
+        version = ReflectionUtils.instantiateObject(cls);
+        version.init();
+    }
 
 }

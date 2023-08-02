@@ -18,29 +18,33 @@ import org.bukkit.plugin.Plugin;
  */
 public interface Version {
 
-	void init();
+    void init();
 
-	CommandAPI commandApi();
+    CommandAPI commandApi();
 
-	ItemProvider itemProvider();
+    ItemProvider itemProvider();
 
-	/**
-	 * For example 1_8_8 or 1_19_3
-	 *
-	 * @return this version's classifier
-	 */
-	String getClassifier();
+    /**
+     * For example 1_8_8 or 1_19_3
+     *
+     * @return this version's classifier
+     */
+    String getClassifier();
 
-	interface CommandAPI {
+    interface CommandAPI {
 
-		String getSpigotUnknownCommandMessage();
+        String getSpigotUnknownCommandMessage();
 
-		PluginCommand registerLegacy(Plugin plugin, Command command);
+        PluginCommand registerLegacy(Plugin plugin, Command command);
 
-		void unregister(String name);
+        void unregister(String name);
 
-		void register(CommandExecutor command);
+        default void register() {
+            register(null);
+        }
 
-		double[] getEntityBB(Entity entity);
-	}
+        void register(CommandExecutor command);
+
+        double[] getEntityBB(Entity entity);
+    }
 }

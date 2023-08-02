@@ -9,13 +9,14 @@ package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.TextComponent;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.inventory.AbstractInventory;
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule.TeleporterListener;
 import net.wesjd.anvilgui.AnvilGUI;
 import net.wesjd.anvilgui.AnvilGUI.ResponseAction;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -29,8 +30,11 @@ public class TeleporterRenameInventory extends AbstractInventory<AnvilGUI, Telep
 		return new AnvilGUI.Builder().plugin(VanillaAddons.instance()).title(data().name())
 				.itemLeft(ItemBuilder.item(Material.NAME_TAG)
 						.displayname(Component.text(data().name().replace('§', '&'))).build())
-				.onComplete(completion -> {
-					data().name(ChatColor.translateAlternateColorCodes('&', completion.getText()));
+				.onClick((slot, snapshot) -> {
+					TextComponent component = LegacyComponentSerializer.legacyAmpersand()
+							.deserialize(snapshot.getText());
+					String text = LegacyComponentSerializer.legacySection().serialize(component);
+					data().name(text);
 					TeleporterListener.saveTeleporters(VanillaAddons.instance(),
 							data().block().block().getWorld());
 					return List.of(ResponseAction.close());

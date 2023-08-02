@@ -1,6 +1,0 @@
-subprojects {
-    apply plugin: 'java-library'
-
-    compileJava.options.encoding = "UTF-8"
-    compileTestJava.options.encoding = "UTF-8"
-}

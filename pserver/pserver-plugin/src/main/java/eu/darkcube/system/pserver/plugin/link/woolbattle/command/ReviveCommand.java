@@ -14,19 +14,19 @@ import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 
 public class ReviveCommand extends PServerExecutor {
-	public ReviveCommand() {
-		super("revive", new String[0], b -> b.then(
-				Commands.argument("player", EntityArgument.player()).executes(context -> {
-					WBUser user = WBUser.getUser(EntityArgument.getPlayer(context, "player"));
-					if (WoolBattle.instance().getIngame().revive(user)) {
-						context.getSource().sendMessage(Message.WOOLBATTLE_REVIVED_PLAYER,
-								user.getTeamPlayerName());
-					} else {
-						context.getSource().sendMessage(Message.WOOLBATTLE_REVIVE_NO_TEAM_FOUND,
-								user.getTeamPlayerName());
-					}
-					return 0;
-				})));
-	}
+    public ReviveCommand() {
+        super("revive", new String[0], b -> b.then(
+                Commands.argument("player", EntityArgument.player()).executes(context -> {
+                    WBUser user = WBUser.getUser(EntityArgument.getPlayer(context, "player"));
+                    if (WoolBattle.instance().ingame().revive(user)) {
+                        context.getSource().sendMessage(Message.WOOLBATTLE_REVIVED_PLAYER,
+                                user.getTeamPlayerName());
+                    } else {
+                        context.getSource().sendMessage(Message.WOOLBATTLE_REVIVE_NO_TEAM_FOUND,
+                                user.getTeamPlayerName());
+                    }
+                    return 0;
+                })));
+    }
 
 }
