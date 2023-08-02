@@ -7,9 +7,9 @@
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
-import eu.darkcube.minigame.woolbattle.listener.ingame.perk.util.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
 import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -43,7 +43,7 @@ public class BowPerk extends Perk {
 		@Override
 		protected boolean activate(UserPerk perk) {
 			Arrow arrow = perk.owner().getBukkitEntity().launchProjectile(Arrow.class, force);
-			ArrowPerk.claimArrow(arrow, perk.owner(), 2);
+			ArrowPerk.claimArrow(arrow, perk.owner(), 2, 1);
 			arrow.setVelocity(arrow.getVelocity());
 			perk.owner().getBukkitEntity().getWorld()
 					.playSound(perk.owner().getBukkitEntity().getLocation(), Sound.SHOOT_ARROW, 1,

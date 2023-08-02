@@ -10,17 +10,17 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.BuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.LeatherArmorBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.inventoryapi.item.meta.*;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.util.ReflectionUtils;
 import eu.darkcube.system.util.ReflectionUtils.PackageType;
+import net.minecraft.server.v1_8_R3.MojangsonParseException;
+import net.minecraft.server.v1_8_R3.MojangsonParser;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -32,7 +32,10 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class ItemBuilder extends AbstractItemBuilder {
@@ -83,8 +86,18 @@ public class ItemBuilder extends AbstractItemBuilder {
 			NBTTagCompound tag = mci.getTag();
 			if (tag != null) {
 				if (tag.hasKey("System:persistentDataStorage")) {
+					String s = tag.getString("System:persistentDataStorage");
+					tag.remove("System:persistentDataStorage");
+					tag.setString("system:persistent_data_storage", s);
+				}
+				if (tag.hasKey("system:persistent_data_storage")) {
 					storage.loadFromJsonDocument(JsonDocument.newDocument(
-							tag.getString("System" + ":persistentDataStorage")));
+							tag.getString("system:persistent_data_storage")));
+				}
+
+				if (item.getType() == Material.MONSTER_EGG && tag.hasKey("EntityTag")) {
+					meta(SpawnEggBuilderMeta.class).entityTag(
+							tag.getCompound("EntityTag").toString());
 				}
 			}
 		}
@@ -102,11 +115,6 @@ public class ItemBuilder extends AbstractItemBuilder {
 
 	@Override
 	public AbstractItemBuilder clone() {
-		//		AbstractItemBuilder builder =
-		//				new ItemBuilder().amount(amount).damage(damage).displayname(displayname)
-		//						.enchantments(enchantments).flag(flags).glow(glow).lore(lore)
-		//						.material(material).unbreakable(unbreakable).metas(metas);
-		//		builder.persistentDataStorage().getData().append(storage.getData());
 		return new ItemBuilder(build());
 	}
 
@@ -132,8 +140,15 @@ public class ItemBuilder extends AbstractItemBuilder {
 			meta.addItemFlags(flags.toArray(new ItemFlag[0]));
 			List<String> lore = new ArrayList<>();
 			for (Component loreComponent : this.lore) {
+
 				String l = LegacyComponentSerializer.legacySection().serialize(loreComponent);
-				lore.addAll(Arrays.asList(l.split("\\R")));
+				String last = null;
+				for (String line : l.split("\\R")) {
+					if (last != null)
+						line = last + line;
+					last = ChatColor.getLastColors(line);
+					lore.add(line);
+				}
 			}
 			meta.setLore(lore);
 			if (glow) {
@@ -162,6 +177,23 @@ public class ItemBuilder extends AbstractItemBuilder {
 				} else if (builderMeta instanceof LeatherArmorBuilderMeta) {
 					((LeatherArmorMeta) meta).setColor(
 							((LeatherArmorBuilderMeta) builderMeta).color());
+				} else if (builderMeta instanceof SpawnEggBuilderMeta) {
+					if (((SpawnEggBuilderMeta) builderMeta).entityTag() != null) {
+						item.setItemMeta(meta);
+						net.minecraft.server.v1_8_R3.ItemStack mci =
+								CraftItemStack.asNMSCopy(item);
+						NBTTagCompound tag =
+								mci.getTag() == null ? new NBTTagCompound() : mci.getTag();
+						try {
+							tag.set("EntityTag", MojangsonParser.parse(
+									((SpawnEggBuilderMeta) builderMeta).entityTag()));
+						} catch (MojangsonParseException e) {
+							throw new RuntimeException(e);
+						}
+						mci.setTag(tag);
+						item = CraftItemStack.asBukkitCopy(mci);
+						meta = item.getItemMeta();
+					}
 				} else {
 					throw new UnsupportedOperationException(
 							"Meta not supported for this mc version: " + builderMeta);

@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class TeamsInventory extends WoolBattlePagedInventory {
 	public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
-	private static final Key TEAM = new Key(WoolBattle.instance(), "teamId");
+	private static final Key TEAM = new Key(WoolBattle.instance(), "team_id");
 	private final TeamsListener listener = new TeamsListener();
 
 	public TeamsInventory(WBUser user) {

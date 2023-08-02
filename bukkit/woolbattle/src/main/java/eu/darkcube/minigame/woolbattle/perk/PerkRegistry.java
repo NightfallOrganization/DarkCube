@@ -37,7 +37,7 @@ public class PerkRegistry {
 		register(new BoosterPerk());
 		register(new GrapplingHookPerk());
 		register(new RopePerk());
-		//		register(new FreezerPerk());
+		register(new FreezerPerk());
 		register(new ExtraWoolPerk());
 		register(new RocketJumpPerk());
 		register(new LongJumpPerk());
@@ -48,12 +48,18 @@ public class PerkRegistry {
 		register(new BowPerk());
 		register(new ArrowPerk());
 		register(new ShearsPerk());
-		//		register(new ArrowBombPerk());
-		//		register(new ProtectiveShieldPerk());
+		register(new ArrowBombPerk());
+		register(new ProtectiveShieldPerk());
 		register(new DoubleJumpPerk());
-		//		register(new MinePerk());
-		//		register(new ElevatorPerk());
-		//		register(new ReflectorPerk());
+		register(new MinePerk());
+		register(new ElevatorPerk());
+		register(new ReflectorPerk());
+		register(new ScampPerk());
+		register(new SpiderPerk());
+		register(new HookArrowPerk());
+		register(new DrawArrowPerk());
+		register(new FreezeArrowPerk());
+		register(new BerserkerPerk());
 	}
 
 	public void register(Perk perk) {

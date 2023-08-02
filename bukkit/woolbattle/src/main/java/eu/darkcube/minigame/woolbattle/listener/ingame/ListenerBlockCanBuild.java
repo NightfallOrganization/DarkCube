@@ -16,7 +16,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockCanBuildEvent;
 
@@ -37,14 +37,20 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
 			for (Entity ent : e.getBlock().getWorld().getEntities()) {
 				AxisAlignedBB entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
 				if (box.b(entityBox)) {
-					if (!WoolBattle.instance().getTeamManager().getSpectator()
-							.contains(ent.getUniqueId())
-							&& ent.getType() != EntityType.DROPPED_ITEM) {
+					if (preventsBlockPlacement(ent)) {
 						e.setBuildable(false);
 						return;
 					}
 				}
 			}
 		}
+	}
+
+	private boolean preventsBlockPlacement(Entity entity) {
+		if (entity instanceof Player) {
+			Player p = (Player) entity;
+			return !WoolBattle.instance().getTeamManager().getSpectator().contains(p.getUniqueId());
+		}
+		return false;
 	}
 }

@@ -65,6 +65,12 @@ public enum Language {
 		return GERMAN;
 	}
 
+	public static Style lastStyle(Component c) {
+		return c.children().isEmpty()
+				? c.style()
+				: c.children().get(c.children().size() - 1).style();
+	}
+
 	public boolean containsMessage(String key) {
 		return bundle.containsKey(key);
 	}
@@ -99,11 +105,12 @@ public enum Language {
 					formatted = s[1];
 					c = c.append(components.get(i));
 					String str = LegacyComponentSerializer.legacySection()
-							.serialize(Component.text(" ").style(getLastStyle(o)));
+							.serialize(Component.text(" ").style(lastStyle(o)));
 					str = str.replace(" ", "");
 
 					formatted = str + formatted;
-					//					c = c.append(LegacyComponentSerializer.legacySection().deserialize(formatted));
+					//					c = c.append(LegacyComponentSerializer.legacySection()
+					//					.deserialize(formatted));
 				} else {
 					break;
 				}
@@ -112,7 +119,7 @@ public enum Language {
 				c = LegacyComponentSerializer.legacySection().deserialize(formatted);
 			} else {
 				String str = LegacyComponentSerializer.legacySection()
-						.serialize(Component.text(" ").style(getLastStyle(c)));
+						.serialize(Component.text(" ").style(lastStyle(c)));
 				str = str.replace(" ", "");
 
 				formatted = str + formatted;
@@ -125,12 +132,6 @@ public enum Language {
 							Arrays.stream(replacements).map(String::valueOf).toArray(String[]::new))
 							+ ']');
 		}
-	}
-
-	private Style getLastStyle(Component c) {
-		return c.children().isEmpty()
-				? c.style()
-				: c.children().get(c.children().size() - 1).style();
 	}
 
 	public void validate(String[] entrySet, Function<String, String> keyModifier) {

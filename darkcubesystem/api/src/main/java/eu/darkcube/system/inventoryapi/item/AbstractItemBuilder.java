@@ -24,7 +24,6 @@ import org.bukkit.inventory.ItemFlag;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class AbstractItemBuilder implements ItemBuilder {
 
@@ -366,7 +365,7 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
 	@Override
 	public AbstractItemBuilder metas(Set<BuilderMeta> metas) {
 		this.metas.clear();
-		this.metas.addAll(metas.stream().map(BuilderMeta::clone).collect(Collectors.toSet()));
+		metas.stream().map(BuilderMeta::clone).forEach(this::meta);
 		return this;
 	}
 
