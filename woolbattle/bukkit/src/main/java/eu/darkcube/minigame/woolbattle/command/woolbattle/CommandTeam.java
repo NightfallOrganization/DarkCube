@@ -17,22 +17,43 @@ import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 public class CommandTeam extends WBCommandExecutor {
     public CommandTeam(WoolBattle woolbattle) {
 
-        super("team", b -> b
-                .then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle))
-                        .then(Commands.argument("team", TeamTypeArgument.teamTypeArgument(woolbattle, new MapSizeToString()))
-                                .then(new CommandDisable().builder())
-                                .then(new CommandEnable().builder())
-                                .then(new CommandInfo().builder())
-                                .then(new CommandSetNameColor().builder())
-                                .then(new CommandSetSpawn(woolbattle).builder())
-                                .then(new CommandSetWoolColor().builder())
-                                .then(new CommandDelete().builder())
-                        )
-                )
-        );
+        super("team", b -> b.then(Commands
+                .argument("mapSize", MapSizeArgument.mapSize(woolbattle, new MapSizeValidator(woolbattle)))
+                .then(Commands
+                        .argument("team", TeamTypeArgument.teamTypeArgument(woolbattle, new MapSizeToString()))
+                        .then(new CommandDisable().builder())
+                        .then(new CommandEnable().builder())
+                        .then(new CommandInfo().builder())
+                        .then(new CommandSetNameColor().builder())
+                        .then(new CommandSetSpawn(woolbattle).builder())
+                        .then(new CommandSetWoolColor().builder())
+                        .then(new CommandDelete().builder()))));
+    }
+
+    private static class MapSizeValidator implements Predicate<MapSize> {
+        private final WoolBattle woolbattle;
+
+        public MapSizeValidator(WoolBattle woolbattle) {
+            this.woolbattle = woolbattle;
+        }
+
+        @Override
+        public boolean test(MapSize mapSize) {
+            return woolbattle
+                    .teamManager()
+                    .teamTypes()
+                    .stream()
+                    .map(TeamType::mapSize)
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .contains(mapSize);
+        }
     }
 
     private static class MapSizeToString implements TeamTypeArgument.ToStringFunction {

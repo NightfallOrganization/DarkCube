@@ -27,7 +27,8 @@ public class CommandSetTeam extends CommandExecutor {
                                 WBUser user = WBUser.getUser(player);
                                 Team team = TeamArgument.team(context, "team");
                                 user.setTeam(team);
-                                context.getSource().sendMessage(Component.text("Team gesetzt!"));
+                                context.getSource()
+                                        .sendMessage(Component.text("Team gesetzt!"));
                                 return 0;
                             })));
         });

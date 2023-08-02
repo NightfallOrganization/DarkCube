@@ -13,6 +13,8 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
     compileOnlyApi(parent!!.project("api"))
     compileOnlyApi(libs.cloudnetWrapper)
+    compileOnlyApi(libs.viaversion)
+    compileOnlyApi(libs.viaversion.common)
     compileOnly(libs.luckperms)
     runtimeOnly(project("1.8.8"))
     runtimeOnly(project("1.19.3"))

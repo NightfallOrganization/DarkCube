@@ -57,7 +57,8 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
 
     @Override
     public MapSpec parse(StringReader reader) throws CommandSyntaxException {
-        return new MapSpec(reader.readString());
+        StringReader clone = new StringReader(reader);
+        return new MapSpec(reader.readString(), clone);
     }
 
     @Override
@@ -120,14 +121,16 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
 
     public class MapSpec {
         private final String mapName;
+        private final StringReader reader;
 
-        public MapSpec(String mapName) {
+        private MapSpec(String mapName, StringReader reader) {
             this.mapName = mapName;
+            this.reader = reader;
         }
 
         public <S> Map parse(CommandContext<S> context) throws CommandSyntaxException {
             Map type = fromStringFunction.fromString(context, mapName);
-            if (type == null) throw INVALID_ENUM.create(mapName);
+            if (type == null) throw INVALID_ENUM.createWithContext(reader, mapName);
             return type;
         }
     }

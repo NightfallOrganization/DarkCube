@@ -12,7 +12,7 @@ plugins {
 
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20.1-R0.1-SNAPSHOT")
-    implementation(parent?.parent!!.project("api"))
+    implementation(parent!!)
     compileOnly(libs.cloudnetDriver)
 }
 

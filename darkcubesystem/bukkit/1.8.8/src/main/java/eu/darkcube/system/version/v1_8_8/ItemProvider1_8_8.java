@@ -10,15 +10,15 @@ package eu.darkcube.system.version.v1_8_8;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemProvider implements eu.darkcube.system.inventoryapi.item.ItemProvider {
+public class ItemProvider1_8_8 implements eu.darkcube.system.inventoryapi.item.ItemProvider {
 	@Override
 	public eu.darkcube.system.inventoryapi.item.ItemBuilder item(Material material) {
-		return new ItemBuilder().material(material);
+		return new ItemBuilder1_8_8().material(material);
 	}
 
 	@Override
 	public eu.darkcube.system.inventoryapi.item.ItemBuilder item(ItemStack item) {
-		return new ItemBuilder(item);
+		return new ItemBuilder1_8_8(item);
 	}
 
 	@Override

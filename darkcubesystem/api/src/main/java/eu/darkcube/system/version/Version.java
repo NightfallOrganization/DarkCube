@@ -9,9 +9,13 @@ package eu.darkcube.system.version;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.inventoryapi.item.ItemProvider;
+import eu.darkcube.system.provider.Provider;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 /**
  * Obtain an instance with {@link VersionSupport#getVersion()}
@@ -31,7 +35,11 @@ public interface Version {
      */
     String getClassifier();
 
+    Provider provider();
+
     interface CommandAPI {
+
+        List<String> tabComplete(CommandSender sender, org.bukkit.command.Command command, String label, String[] args);
 
         String getSpigotUnknownCommandMessage();
 

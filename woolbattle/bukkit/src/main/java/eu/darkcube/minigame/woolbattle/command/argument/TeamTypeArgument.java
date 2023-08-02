@@ -27,15 +27,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeSpec> {
-    private static final DynamicCommandExceptionType INVALID_ENUM =
-            Messages.INVALID_ENUM.newDynamicCommandExceptionType();
-    private final WoolBattle woolbattle;
+    private static final DynamicCommandExceptionType INVALID_ENUM = Messages.INVALID_ENUM.newDynamicCommandExceptionType();
     private final Supplier<TeamType[]> values;
     private final ToStringFunction toStringFunction;
     private final FromStringFunction fromStringFunction;
 
     private TeamTypeArgument(WoolBattle woolbattle, Supplier<TeamType[]> teams, ToStringFunction toStringFunction) {
-        this.woolbattle = woolbattle;
         this.values = teams == null ? () -> woolbattle.teamManager().teamTypes().toArray(new TeamType[0]) : teams;
         this.toStringFunction = toStringFunction == null ? ToStringFunction.function() : toStringFunction;
         this.fromStringFunction = FromStringFunction.of(this.values, this.toStringFunction);
@@ -57,14 +54,11 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
         return context.getArgument(name, TeamTypeSpec.class).parse(context);
     }
 
-    public WoolBattle woolbattle() {
-        return woolbattle;
-    }
-
     @Override
     public TeamTypeSpec parse(StringReader reader) throws CommandSyntaxException {
+        StringReader clone = new StringReader(reader);
         String in = reader.readString();
-        return new TeamTypeSpec(in);
+        return new TeamTypeSpec(in, clone);
     }
 
     @Override
@@ -111,14 +105,16 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
 
     public class TeamTypeSpec {
         private final String displayNameKey;
+        private final StringReader reader;
 
-        public TeamTypeSpec(String displayNameKey) {
+        private TeamTypeSpec(String displayNameKey, StringReader reader) {
             this.displayNameKey = displayNameKey;
+            this.reader = reader;
         }
 
         public <S> TeamType parse(CommandContext<S> context) throws CommandSyntaxException {
             TeamType type = fromStringFunction.fromString(context, displayNameKey);
-            if (type == null) throw INVALID_ENUM.create(displayNameKey);
+            if (type == null) throw INVALID_ENUM.createWithContext(reader, displayNameKey);
             return type;
         }
     }

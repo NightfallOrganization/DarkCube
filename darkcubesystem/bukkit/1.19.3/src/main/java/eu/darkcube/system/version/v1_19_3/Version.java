@@ -6,29 +6,15 @@
  */
 package eu.darkcube.system.version.v1_19_3;
 
-public class Version implements eu.darkcube.system.version.Version {
-	private eu.darkcube.system.version.v1_19_3.CommandAPI commandAPI;
-	private ItemProvider itemProvider;
+import eu.darkcube.system.version.BukkitVersion;
+
+public class Version extends BukkitVersion {
 
 	@Override
 	public void init() {
-		this.commandAPI = new eu.darkcube.system.version.v1_19_3.CommandAPI();
-		this.itemProvider = new ItemProvider();
+		super.init();
+		commandApi = new CommandAPI1_19_3();
+		itemProvider = new ItemProvider1_19_3();
+		classifier = "1_19_3";
 	}
-
-	@Override
-	public String getClassifier() {
-		return "1_19_3";
-	}
-
-	@Override
-	public eu.darkcube.system.version.v1_19_3.CommandAPI commandApi() {
-		return commandAPI;
-	}
-
-	@Override
-	public ItemProvider itemProvider() {
-		return itemProvider;
-	}
-
 }

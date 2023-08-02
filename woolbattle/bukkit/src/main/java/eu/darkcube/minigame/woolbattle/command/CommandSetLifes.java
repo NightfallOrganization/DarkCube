@@ -18,24 +18,23 @@ public class CommandSetLifes extends WBCommandExecutor {
 
     public CommandSetLifes(WoolBattle woolbattle) {
         super("setlifes", "woolbattle.command.setlifes", new String[0], b -> b
-                .then(Commands.argument("lifes", IntegerArgumentType.integer(0, 99))
+                .then(Commands
+                        .argument("lifes", IntegerArgumentType.integer(0, 99))
                         .requires(source -> woolbattle.lobby().enabled())
                         .executes(context -> {
                             woolbattle.gameData().forceLifes(IntegerArgumentType.getInteger(context, "lifes"));
                             context.getSource().sendMessage(Message.CHANGED_LIFES.getServerMessage(woolbattle.gameData().forceLifes()));
                             return 0;
-                        })
-                ).then(Commands.argument("team", TeamTypeArgument.teamTypeArgument(woolbattle))
+                        }))
+                .then(Commands
+                        .argument("team", TeamTypeArgument.teamTypeArgument(woolbattle))
                         .requires(source -> woolbattle.ingame().enabled())
-                        .then(Commands.argument("lifes", IntegerArgumentType.integer(0, 99))
-                                .executes(context -> {
-                                    Team team = woolbattle.teamManager().getTeam(TeamTypeArgument.teamType(context, "team"));
-                                    team.setLifes(IntegerArgumentType.getInteger(context, "lifes"));
-                                    context.getSource().sendMessage(Component.text("Leben gesetzt!"));
-                                    return 0;
-                                })
-                        )
-                ));
+                        .then(Commands.argument("lifes", IntegerArgumentType.integer(0, 99)).executes(context -> {
+                            Team team = woolbattle.teamManager().getTeam(TeamTypeArgument.teamType(context, "team"));
+                            team.setLifes(IntegerArgumentType.getInteger(context, "lifes"));
+                            context.getSource().sendMessage(Component.text("Leben gesetzt!"));
+                            return 0;
+                        }))));
     }
 
 }

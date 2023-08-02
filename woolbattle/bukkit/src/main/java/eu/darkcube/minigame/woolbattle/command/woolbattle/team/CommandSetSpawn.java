@@ -22,8 +22,7 @@ import org.bukkit.entity.Player;
 
 public class CommandSetSpawn extends WBCommandExecutor {
     public CommandSetSpawn(WoolBattle woolbattle) {
-        super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle))
-                .executes(CommandSetSpawn::set)));
+        super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(CommandSetSpawn::set)));
     }
 
     private static int set(CommandContext<CommandSource> ctx) throws CommandSyntaxException {

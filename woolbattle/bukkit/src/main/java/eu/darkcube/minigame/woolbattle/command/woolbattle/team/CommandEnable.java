@@ -17,13 +17,14 @@ public class CommandEnable extends WBCommandExecutor {
         super("enable", b -> b.executes(ctx -> {
             TeamType team = TeamTypeArgument.teamType(ctx, "team");
             if (team.isEnabled()) {
-                ctx.getSource().sendMessage(Component.text("Dieses Team ist bereits aktiviert!")
-                        .color(NamedTextColor.RED));
+                ctx.getSource().sendMessage(Component.text("Dieses Team ist bereits aktiviert!").color(NamedTextColor.RED));
                 return 0;
             }
             team.setEnabled(true);
-            ctx.getSource().sendMessage(
-                    Component.text("Du hast das Team '" + team.getDisplayNameKey() + "' aktiviert!")
+            ctx
+                    .getSource()
+                    .sendMessage(Component
+                            .text("Du hast das Team '" + team.getDisplayNameKey() + "' aktiviert!")
                             .color(NamedTextColor.GRAY));
             return 0;
         }));

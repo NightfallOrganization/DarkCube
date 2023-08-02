@@ -7,8 +7,8 @@
 
 package eu.darkcube.system.libs.com.mojang.brigadier;
 
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.builder.ArgumentBuilder;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContextBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.SuggestionContext;
@@ -19,19 +19,10 @@ import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
 import eu.darkcube.system.libs.com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.darkcube.system.libs.com.mojang.brigadier.tree.RootCommandNode;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 
 /**
  * The core command dispatcher, for registering, parsing, and executing commands.
@@ -60,13 +51,6 @@ public class CommandDispatcher<S> {
     private static final String USAGE_OR = "|";
 
     private final RootCommandNode<S> root;
-
-    private final Predicate<CommandNode<S>> hasCommand = new Predicate<CommandNode<S>>() {
-        @Override
-        public boolean test(final CommandNode<S> input) {
-            return input != null && (input.getCommand() != null || input.getChildren().stream().anyMatch(hasCommand));
-        }
-    };
     private ResultConsumer<S> consumer = (c, s, r) -> {
     };
 
@@ -133,11 +117,11 @@ public class CommandDispatcher<S> {
      * will be notified of the result and success of the command. You can use that method to gather more meaningful
      * results than this method will return, especially when a command forks.</p>
      *
-     * @param input a command string to parse &amp; execute
+     * @param input  a command string to parse &amp; execute
      * @param source a custom "source" object, usually representing the originator of this command
      * @return a numeric result from a "command" that was performed
      * @throws CommandSyntaxException if the command failed to parse or execute
-     * @throws RuntimeException if the command failed to execute and was not handled gracefully
+     * @throws RuntimeException       if the command failed to execute and was not handled gracefully
      * @see #parse(String, Object)
      * @see #parse(StringReader, Object)
      * @see #execute(ParseResults)
@@ -167,11 +151,11 @@ public class CommandDispatcher<S> {
      * will be notified of the result and success of the command. You can use that method to gather more meaningful
      * results than this method will return, especially when a command forks.</p>
      *
-     * @param input a command string to parse &amp; execute
+     * @param input  a command string to parse &amp; execute
      * @param source a custom "source" object, usually representing the originator of this command
      * @return a numeric result from a "command" that was performed
      * @throws CommandSyntaxException if the command failed to parse or execute
-     * @throws RuntimeException if the command failed to execute and was not handled gracefully
+     * @throws RuntimeException       if the command failed to execute and was not handled gracefully
      * @see #parse(String, Object)
      * @see #parse(StringReader, Object)
      * @see #execute(ParseResults)
@@ -202,7 +186,7 @@ public class CommandDispatcher<S> {
      * @param parse the result of a successful {@link #parse(StringReader, Object)}
      * @return a numeric result from a "command" that was performed.
      * @throws CommandSyntaxException if the command failed to parse or execute
-     * @throws RuntimeException if the command failed to execute and was not handled gracefully
+     * @throws RuntimeException       if the command failed to execute and was not handled gracefully
      * @see #parse(String, Object)
      * @see #parse(StringReader, Object)
      * @see #execute(String, Object)
@@ -288,7 +272,12 @@ public class CommandDispatcher<S> {
         }
 
         return forked ? successfulForks : result;
-    }
+    }    private final Predicate<CommandNode<S>> hasCommand = new Predicate<CommandNode<S>>() {
+        @Override
+        public boolean test(final CommandNode<S> input) {
+            return input != null && (input.getCommand() != null || input.getChildren().stream().anyMatch(hasCommand));
+        }
+    };
 
     /**
      * Parses a given command.
@@ -311,7 +300,7 @@ public class CommandDispatcher<S> {
      * will occur. You only need to inspect it yourself if you wish to handle that yourself.</p>
      *
      * @param command a command string to parse
-     * @param source a custom "source" object, usually representing the originator of this command
+     * @param source  a custom "source" object, usually representing the originator of this command
      * @return the result of parsing this command
      * @see #parse(StringReader, Object)
      * @see #execute(ParseResults)
@@ -342,7 +331,7 @@ public class CommandDispatcher<S> {
      * will occur. You only need to inspect it yourself if you wish to handle that yourself.</p>
      *
      * @param command a command string to parse
-     * @param source a custom "source" object, usually representing the originator of this command
+     * @param source  a custom "source" object, usually representing the originator of this command
      * @return the result of parsing this command
      * @see #parse(String, Object)
      * @see #execute(ParseResults)
@@ -448,8 +437,8 @@ public class CommandDispatcher<S> {
      * <p>The path to the specified node will <b>not</b> be prepended to the output, as there can theoretically be many
      * ways to reach a given node. It will only give you paths relative to the specified node, not absolute from root.</p>
      *
-     * @param node target node to get child usage strings for
-     * @param source a custom "source" object, usually representing the originator of this command
+     * @param node       target node to get child usage strings for
+     * @param source     a custom "source" object, usually representing the originator of this command
      * @param restricted if true, commands that the {@code source} cannot access will not be mentioned
      * @return array of full usage strings under the target node
      */
@@ -495,7 +484,7 @@ public class CommandDispatcher<S> {
      *
      * <p>The returned usage will be restricted to only commands that the provided {@code source} can use.</p>
      *
-     * @param node target node to get child usage strings for
+     * @param node   target node to get child usage strings for
      * @param source a custom "source" object, usually representing the originator of this command
      * @return array of full usage strings under the target node
      */
@@ -527,7 +516,11 @@ public class CommandDispatcher<S> {
                 final String redirect = node.getRedirect() == root ? "..." : "-> " + node.getRedirect().getUsageText();
                 return self + ARGUMENT_SEPARATOR + redirect;
             } else {
-                final Collection<CommandNode<S>> children = node.getChildren().stream().filter(c -> c.canUse(source)).collect(Collectors.toList());
+                final Collection<CommandNode<S>> children = node
+                        .getChildren()
+                        .stream()
+                        .filter(c -> c.canUse(source))
+                        .collect(Collectors.toList());
                 if (children.size() == 1) {
                     final String usage = getSmartUsage(children.iterator().next(), source, childOptional, childOptional);
                     if (usage != null) {
@@ -598,6 +591,9 @@ public class CommandDispatcher<S> {
         @SuppressWarnings("unchecked") final CompletableFuture<Suggestions>[] futures = new CompletableFuture[parent.getChildren().size()];
         int i = 0;
         for (final CommandNode<S> node : parent.getChildren()) {
+            if (!node.canUse(parse.getContext().getSource())) {
+                continue;
+            }
             CompletableFuture<Suggestions> future = Suggestions.empty();
             try {
                 future = node.listSuggestions(context.build(truncatedInput), new SuggestionsBuilder(truncatedInput, truncatedInputLowerCase, start));
@@ -607,15 +603,17 @@ public class CommandDispatcher<S> {
         }
 
         final CompletableFuture<Suggestions> result = new CompletableFuture<>();
-        CompletableFuture.allOf(futures).thenRun(() -> {
-            final List<Suggestions> suggestions = new ArrayList<>();
-            for (final CompletableFuture<Suggestions> future : futures) {
-                suggestions.add(future.join());
-            }
-            result.complete(Suggestions.merge(fullInput, suggestions));
-        });
-
-        return result;
+        if (i != 0) {
+            CompletableFuture.allOf(Arrays.copyOf(futures, i)).thenRun(() -> {
+                final List<Suggestions> suggestions = new ArrayList<>();
+                for (final CompletableFuture<Suggestions> future : futures) {
+                    if (future != null) suggestions.add(future.join());
+                }
+                result.complete(Suggestions.merge(fullInput, suggestions));
+            });
+            return result;
+        }
+        return CompletableFuture.completedFuture(Suggestions.create(fullInput, new ArrayList<>()));
     }
 
     /**
@@ -709,4 +707,7 @@ public class CommandDispatcher<S> {
             addPaths(child, result, current);
         }
     }
+
+
+
 }

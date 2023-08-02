@@ -59,17 +59,26 @@ public class Commands {
         return dispatcher.getCompletionSuggestions(parse).thenApply(Suggestions::getList);
     }
 
-    public List<Suggestion> getTabCompletions(CommandSender sender, String commandLine) {
-        CommandSource source = CommandSource.create(sender);
-        StringReader reader = new StringReader(commandLine);
-        ParseResults<CommandSource> parseresults = getDispatcher().parse(reader, source);
+    public List<Suggestion> getTabCompletionsSync(ParseResults<CommandSource> parse) {
         try {
-            return dispatcher.getCompletionSuggestions(parseresults).get().getList();
-        } catch (InterruptedException | ExecutionException ex) {
-            ex.printStackTrace();
+            return getTabCompletions(parse).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        return null;
+        return Collections.emptyList();
     }
+
+//    public List<Suggestion> getTabCompletions(CommandSender sender, String commandLine) {
+//        CommandSource source = CommandSource.create(sender);
+//        StringReader reader = new StringReader(commandLine);
+//        ParseResults<CommandSource> parseresults = getDispatcher().parse(reader, source);
+//        try {
+//            return dispatcher.getCompletionSuggestions(parseresults).get().getList();
+//        } catch (InterruptedException | ExecutionException ex) {
+//            ex.printStackTrace();
+//        }
+//        return Collections.emptyList();
+//    }
 
     public void unregisterByPrefix(String prefix) {
         for (CommandEntry entry : new HashSet<>(commandEntries)) {
@@ -150,27 +159,27 @@ public class Commands {
         try {
             dispatcher.execute(parse);
         } catch (CommandSyntaxException ex) {
-            source.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
-            final String commandLineNext = commandLine + " ";
-            ParseResults<CommandSource> parse2 = dispatcher.parse(commandLineNext, source);
-
-            if (ex.getType() == CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand()) {
-                SuggestionContext<CommandSource> suggestionContext = parse2.getContext().findSuggestionContext(parse2.getReader().getTotalLength());
-                Map<CommandNode<CommandSource>, String> usages = dispatcher.getSmartUsage(suggestionContext.parent, source);
-                for (Map.Entry<CommandNode<CommandSource>, String> e : usages.entrySet()) {
-                    source.sendMessage(Component.text(commandLineNext + e.getValue().replace('|', '┃'), NamedTextColor.GRAY));
-                }
+            int failedCursor = ex.getCursor();
+            if (failedCursor == 0) {
+                return; // Happens when someone tries to execute a main command (PluginCommand) that requires a condition which is not met
+            }
+            if (failedCursor == -1) {
+                return; // When there is no context to the exception. Use #createWithContext to work around this
             }
 
-            getTabCompletions(parse2).thenAccept(completions -> {
-                if (completions.isEmpty()) {
-                    getTabCompletions(parse).thenAccept(completions2 -> {
-                        source.getSource().sendCompletions(commandLine, completions2);
-                    });
-                } else {
-                    source.getSource().sendCompletions(commandLineNext, completions);
-                }
-            });
+            source.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
+
+            if (failedCursor == commandLine.length()) {
+                final String commandLineNext = commandLine + " ";
+                ParseResults<CommandSource> parse2 = dispatcher.parse(commandLineNext, source);
+                getTabCompletions(parse2).thenAccept(completions -> {
+                    source.getSource().sendCompletions(commandLineNext, completions, usages(parse2));
+                });
+            } else {
+                getTabCompletions(parse).thenAccept(completions2 -> {
+                    source.getSource().sendCompletions(commandLine, completions2, usages(parse));
+                });
+            }
         } catch (Throwable ex) {
             StringWriter writer = new StringWriter();
             ex.printStackTrace(new PrintWriter(writer));
@@ -185,8 +194,9 @@ public class Commands {
         }
     }
 
-    private void sendCompletions(ICommandExecutor source, Collection<Suggestion> suggestions, Map<CommandNode<CommandSource>, String> usages) {
-
+    private Map<CommandNode<CommandSource>, String> usages(ParseResults<CommandSource> parse) {
+        SuggestionContext<CommandSource> suggestionContext = parse.getContext().findSuggestionContext(parse.getReader().getTotalLength());
+        return dispatcher.getSmartUsage(suggestionContext.parent, parse.getContext().getSource());
     }
 
     public CommandDispatcher<CommandSource> getDispatcher() {

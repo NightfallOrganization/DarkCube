@@ -267,27 +267,26 @@ public class ConnectorNPC {
 
         @EventListener
         public void handle(CloudServiceInfoUpdateEvent event) {
-            add(event.getServiceInfo());
-            if (!AsyncExecutor.service().isShutdown()) {
+            boolean added = false;
+            for (ServiceInfoSnapshot service : services) {
+                if (service.getServiceId().getUniqueId().equals(event.getServiceInfo().getServiceId().getUniqueId())) {
+                    services.remove(service); // No ConcurrentModificationException because of ConcurrentHashMap
+                    services.add(event.getServiceInfo());
+                    added = true;
+                    break;
+                }
+            }
+            if (added) if (!AsyncExecutor.service().isShutdown()) {
                 AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
             }
         }
 
         @EventListener
         public void handle(CloudServiceConnectNetworkEvent event) {
-            add(event.getServiceInfo());
+            services.add(event.getServiceInfo());
             if (!AsyncExecutor.service().isShutdown()) {
                 AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
             }
-        }
-
-        private void add(ServiceInfoSnapshot server) {
-            services.forEach(s -> {
-                if (s.getServiceId().equals(server.getServiceId())) {
-                    services.remove(s);
-                }
-            });
-            services.add(server);
         }
 
         @EventListener
