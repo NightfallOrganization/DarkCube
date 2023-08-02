@@ -27,18 +27,18 @@ import org.bukkit.event.player.PlayerKickEvent;
 import java.util.Objects;
 
 public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
-    private static DarkCubeSystem instance;
-    private final LinkManager linkManager = new LinkManager();
+	private static DarkCubeSystem instance;
+	private final LinkManager linkManager = new LinkManager();
 
-    public DarkCubeSystem() {
-        super("system");
-        DarkCubePlugin.systemPlugin(this);
-        instance = this;
-    }
+	public DarkCubeSystem() {
+		super("system");
+		DarkCubePlugin.systemPlugin(this);
+		instance = this;
+	}
 
-    public static DarkCubeSystem getInstance() {
-        return instance;
-    }
+	public static DarkCubeSystem getInstance() {
+		return instance;
+	}
 
     @Override
     public void onLoad() {
@@ -51,13 +51,13 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
         linkManager.addLink(CloudNetLink::new);
     }
 
-    @Override
-    public void onDisable() {
-        UserAPI.getInstance().loadedUsersForEach(user -> UserAPI.getInstance().unloadUser(user));
-        AsyncExecutor.stop();
-        AdventureSupport.audienceProvider().close();
-        linkManager.unregisterLinks();
-    }
+	@Override
+	public void onDisable() {
+		UserAPI.getInstance().loadedUsersForEach(user -> UserAPI.getInstance().unloadUser(user));
+		AsyncExecutor.stop();
+		AdventureSupport.audienceProvider().close();
+		linkManager.unregisterLinks();
+	}
 
     @Override
     public void onEnable() {
@@ -71,10 +71,10 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
         }
     }
 
-    @EventHandler
-    private void handle(PlayerKickEvent event) {
-        if (Objects.equals(event.getReason(), "disconnect.spam")) {
-            event.setCancelled(true);
-        }
-    }
+	@EventHandler
+	private void handle(PlayerKickEvent event) {
+		if (Objects.equals(event.getReason(), "disconnect.spam")) {
+			event.setCancelled(true);
+		}
+	}
 }
