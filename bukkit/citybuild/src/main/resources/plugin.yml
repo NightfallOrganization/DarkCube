@@ -30,6 +30,25 @@ commands:
     description: Öffnet ein Inventar mit custom Items
   killmobs:
     description: Tötet alle Mobs in der Welt des Spielers
+  addxp:
+    description: Gibt dem Spieler custom XP
+  mylevel:
+    description: Zeigt dein aktuelles Level
+  resetlevel:
+    description: Setzt dein Level und XP auf 0 zurück
+  myxp:
+    description: Zeigt die aktuellen benutzerdefinierten XP des Spielers an
+  myap:
+    description: Zeigt die aktuellen AP des Spielers an
+  attribute:
+    description: Öffnet die Attribute
+    aliases: [attr]
+  addhealth:
+    description: Gibt dem Spieler custom Health
+  myhealth:
+    description: Zeigt die aktuellen benutzerdefinierten Health des Spielers an
+  addregeneration:
+    description: Gibt dem Spieler custom Regeneration
 
 permissions:
   gm.use:
@@ -57,4 +76,22 @@ permissions:
   getitem.use:
     default: op
   killmobs.use:
+    default: op
+  addxp.use:
+    default: op
+  mylevel.use:
+    default: not op
+  resetlevel.use:
+    default: op
+  myxp.use:
+    default: op
+  myap.use:
+    default: op
+  attribute.use:
+    default: not op
+  addhealth.use:
+    default: op
+  myhealth.use:
+    default: op
+  addregeneration.use:
     default: op

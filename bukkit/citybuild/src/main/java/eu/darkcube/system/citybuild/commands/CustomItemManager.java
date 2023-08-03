@@ -7,14 +7,19 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class CustomItemManager {
 	private final JavaPlugin plugin;
+
+	private final List<NamespacedKey>recipes = new ArrayList<>();
 
 	public CustomItemManager(JavaPlugin plugin) {
 		this.plugin = plugin;
@@ -27,7 +32,7 @@ public class CustomItemManager {
 		recipe.setIngredient('A', Material.LEATHER);
 		recipe.setIngredient('B', Material.GOLD_BLOCK);
 		recipe.setIngredient('C', Material.CHEST);
-		plugin.getServer().addRecipe(recipe);
+		addRecipe(recipe);
 
 		// Add the recipe for the ender bag
 		ShapedRecipe enderBagRecipe = new ShapedRecipe(new NamespacedKey(plugin, "ender_bag"), getEnderBag());
@@ -36,7 +41,7 @@ public class CustomItemManager {
 		enderBagRecipe.setIngredient('B', Material.DIAMOND);
 		enderBagRecipe.setIngredient('C', Material.LEATHER);
 		enderBagRecipe.setIngredient('D', Material.ENDER_CHEST);
-		plugin.getServer().addRecipe(enderBagRecipe);
+		addRecipe(enderBagRecipe);
 
 		// Add the recipe for the "Ring of Healing"
 		ShapedRecipe ringOfHealingRecipe = new ShapedRecipe(new NamespacedKey(plugin, "ring_of_healing"), getRingOfHealing());
@@ -44,7 +49,7 @@ public class CustomItemManager {
 		ringOfHealingRecipe.setIngredient('A', Material.GOLD_BLOCK);
 		ringOfHealingRecipe.setIngredient('B', Material.NETHERITE_INGOT);
 		ringOfHealingRecipe.setIngredient('C', Material.GLISTERING_MELON_SLICE);
-		plugin.getServer().addRecipe(ringOfHealingRecipe);
+		addRecipe(ringOfHealingRecipe);
 
 		// Add the recipe for the "Ring of Speed"
 		ShapedRecipe ringOfSpeedRecipe = new ShapedRecipe(new NamespacedKey(plugin, "ring_of_speed"), getRingOfSpeed());
@@ -52,7 +57,7 @@ public class CustomItemManager {
 		ringOfSpeedRecipe.setIngredient('A', Material.IRON_BLOCK);
 		ringOfSpeedRecipe.setIngredient('B', Material.NETHERITE_INGOT);
 		ringOfSpeedRecipe.setIngredient('C', Material.FEATHER);
-		plugin.getServer().addRecipe(ringOfSpeedRecipe);
+		addRecipe(ringOfSpeedRecipe);
 
 		// Add the recipe for the "Swift Sword"
 		ShapedRecipe swiftSwordRecipe = new ShapedRecipe(new NamespacedKey(plugin, "swift_sword"), getSwiftSword());
@@ -61,7 +66,18 @@ public class CustomItemManager {
 		swiftSwordRecipe.setIngredient('B', Material.AMETHYST_CLUSTER);
 		swiftSwordRecipe.setIngredient('C', Material.NETHERITE_SWORD);
 		swiftSwordRecipe.setIngredient('D', Material.ENCHANTED_GOLDEN_APPLE);
-		plugin.getServer().addRecipe(swiftSwordRecipe);
+		addRecipe(swiftSwordRecipe);
+	}
+
+	private void addRecipe(ShapedRecipe recipe){
+		plugin.getServer().addRecipe(recipe);
+		recipes.add(recipe.getKey());
+	}
+
+	public void unloadRecipes(){
+		for (NamespacedKey recipe : recipes) {
+			plugin.getServer().removeRecipe(recipe);
+		}
 	}
 
 	public static ItemStack getCustomFireworkStar() {
@@ -120,11 +136,12 @@ public class CustomItemManager {
 			meta.setCustomModelData(2);
 			meta.setDisplayName("§dSwift Sword");
 			meta.setUnbreakable(true);
+
 			meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED,
 					new AttributeModifier("generic.attackspeed", 50.0,
 							AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 			meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE,
-					new AttributeModifier(UUID.randomUUID(), "generic.attackDamage", 2.0,
+					new AttributeModifier(UUID.randomUUID(), "generic.attackDamage", 2000.0,
 							AttributeModifier.Operation.ADD_NUMBER));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			swiftSword.setItemMeta(meta);

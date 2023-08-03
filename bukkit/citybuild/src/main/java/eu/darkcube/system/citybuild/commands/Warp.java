@@ -37,7 +37,7 @@ public class Warp implements CommandExecutor {
 
 		// Set the names
 		ItemMeta grassBlockMeta = grassBlock.getItemMeta();
-		grassBlockMeta.setDisplayName("§aFarmworld");
+		grassBlockMeta.setDisplayName("§aBeastrealm");
 		grassBlock.setItemMeta(grassBlockMeta);
 
 		ItemMeta crimsonNyliumMeta = crimsonNylium.getItemMeta();

@@ -1,5 +1,6 @@
 package eu.darkcube.system.citybuild.commands;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -34,7 +35,8 @@ public class ActionBarTask extends BukkitRunnable {
 			}
 
 			// Senden Sie die Nachricht in der Action Bar an den Spieler
-			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
+			//player.spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
+			player.sendActionBar(Component.text(""));
 		}
 	}
 }

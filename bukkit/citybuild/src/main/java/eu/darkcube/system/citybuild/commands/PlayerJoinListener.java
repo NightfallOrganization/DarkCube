@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -17,7 +18,7 @@ public class PlayerJoinListener implements Listener {
 
 	public PlayerJoinListener(ScoreboardHandler scoreboardHandler) {
 		this.scoreboardHandler = scoreboardHandler;
-		this.joinTimes = joinTimes;
+		joinTimes = new HashMap<>();
 	}
 
 	@EventHandler
@@ -27,10 +28,15 @@ public class PlayerJoinListener implements Listener {
 		joinTimes.put(player.getUniqueId(), System.currentTimeMillis());
 
 		// Erzwinge Ressourcenpaket-Download
-		String texturePackUrl = "https://cdn.discordapp.com/attachments/834274370670690315/1134951154795696170/pack.zip"; // Ersetzen Sie diesen Link durch den Link zu Ihrem Ressourcenpaket
+		String texturePackUrl = "";
 		player.setResourcePack(texturePackUrl);
 	}
 
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		joinTimes.remove(player.getUniqueId());
+	}
 //	@EventHandler
 //	public void handle(ReloadSinglePrefixEvent event) {
 //		event.setNewPrefix("Test");

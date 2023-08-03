@@ -19,7 +19,7 @@ public class SpawnCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			Location location = new Location(Bukkit.getWorld("plotworld"), 0.5, 63, 0.5);
+			Location location = new Location(Bukkit.getWorld("plotworld"), 0.5, 64, 0.5);
 			player.teleport(location);
 			player.sendMessage("§7Du wurdest zum §bSpawn §7teleportiert!");
 		} else {

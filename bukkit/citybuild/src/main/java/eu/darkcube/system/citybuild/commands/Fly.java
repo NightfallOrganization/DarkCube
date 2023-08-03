@@ -1,10 +1,3 @@
-/*
- * Copyright (c) 2023. [DarkCube]
- * All rights reserved.
- * You may not use or redistribute this software or any associated files without permission.
- * The above copyright notice shall be included in all copies of this software.
- */
-
 package eu.darkcube.system.citybuild.commands;
 
 import org.bukkit.Bukkit;
@@ -14,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -78,15 +70,6 @@ public class Fly implements CommandExecutor, Listener {
         }
     }
 
-    // Methode zum Beibehalten des Flugstatus, wenn der Spieler die Welt wechselt
-    @EventHandler
-    public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
-        Player player = event.getPlayer();
-        if (player.getAllowFlight()) {
-            Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), () -> player.setAllowFlight(true), 1L);
-        }
-    }
-
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (!(sender instanceof Player)) {
@@ -107,14 +90,13 @@ public class Fly implements CommandExecutor, Listener {
                 flyStatusMap.put(player.getName(), true);
                 saveFlyStatus();
                 sender.sendMessage("§a"+ player.getName() +"§7 wurde in den Flugmodus gesetzt");
-                return true;
             } else {
                 player.setAllowFlight(false);
                 flyStatusMap.put(player.getName(), false);
                 saveFlyStatus();
                 sender.sendMessage("§a"+ player.getName() +"§7 wurde aus den Flugmodus gesetzt");
-                return true;
             }
+            return true;
         } else if(args.length == 0) {
             Player player = (Player) sender;
 
