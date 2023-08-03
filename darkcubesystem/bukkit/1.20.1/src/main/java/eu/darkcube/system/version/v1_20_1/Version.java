@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.version.v1_20_1;
 
+import eu.darkcube.system.provider.via.ViaSupport;
 import eu.darkcube.system.version.BukkitVersion;
 
 public class Version extends BukkitVersion {
@@ -16,5 +17,6 @@ public class Version extends BukkitVersion {
 		this.commandApi = new CommandAPI1_20_1();
 		this.itemProvider = new ItemProvider1_20_1();
 		this.classifier = "1_20_1";
+		provider.register(ViaSupport.class,ViaSupport.wrapper(null)); // Unsupported
 	}
 }

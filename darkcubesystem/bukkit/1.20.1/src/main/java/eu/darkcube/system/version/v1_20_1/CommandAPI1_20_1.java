@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.version.v1_20_1;
 
+import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
@@ -15,6 +16,7 @@ import eu.darkcube.system.version.Version;
 import io.papermc.paper.brigadier.PaperBrigadier;
 import io.papermc.paper.console.BrigadierCommandCompleter;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.command.TabExecutor;
@@ -39,6 +41,10 @@ public class CommandAPI1_20_1 extends BukkitCommandAPI {
     @Override
     public String getSpigotUnknownCommandMessage() {
         return SpigotConfig.unknownCommandMessage;
+    }
+
+    @Override public List<String> tabComplete(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+        return super.tabComplete(sender, command, label, args);
     }
 
     @Override

@@ -38,7 +38,7 @@ public class BoundingBox {
 	}
 
 	public BoundingBox(Entity entity) {
-		double[] d = VersionSupport.getVersion().commandApi().getEntityBB(entity);
+		double[] d = VersionSupport.version().commandApi().getEntityBB(entity);
 		this.minX = d[0];
 		this.minY = d[1];
 		this.minZ = d[2];

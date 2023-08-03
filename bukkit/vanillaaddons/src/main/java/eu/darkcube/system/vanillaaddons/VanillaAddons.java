@@ -16,6 +16,7 @@ import eu.darkcube.system.vanillaaddons.listener.ArmorListener;
 import eu.darkcube.system.vanillaaddons.listener.InventoryListener;
 import eu.darkcube.system.vanillaaddons.module.ModuleManager;
 import eu.darkcube.system.vanillaaddons.module.modules.RandoShit;
+import eu.darkcube.system.vanillaaddons.module.modules.actionbar.ActionbarModule;
 import eu.darkcube.system.vanillaaddons.module.modules.anvilmechanics.AnvilMechanicsModule;
 import eu.darkcube.system.vanillaaddons.module.modules.colors.ColorsModule;
 import eu.darkcube.system.vanillaaddons.module.modules.deathchests.DeathChestsModule;
@@ -68,6 +69,7 @@ public class VanillaAddons extends DarkCubePlugin {
 		moduleManager.addModule(new OnlinetimeModule());
 		moduleManager.addModule(new DeathChestsModule(this));
 		moduleManager.addModule(new RandoShit(this));
+		moduleManager.addModule(new ActionbarModule());
 	}
 
 	@Override

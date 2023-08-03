@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.commandapi.v3;
 
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,7 +26,14 @@ public class CommandAPI {
         CommandAPI.instance = this;
     }
 
-    public static CommandAPI getInstance() {
+    /**
+     * @see #instance()
+     */
+    @Deprecated @ApiStatus.ScheduledForRemoval(inVersion = "0") public static CommandAPI getInstance() {
+        return instance();
+    }
+
+    @Api public static CommandAPI instance() {
         return CommandAPI.instance;
     }
 

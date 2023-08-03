@@ -21,15 +21,13 @@ import java.util.List;
 @ApiStatus.Internal
 public class ViaTabExecutor {
 
-    private static final Suggestion[] EMPTY = new Suggestion[0];
-    private static final IntList ids = new IntArrayList(16);
     private static final Cache[] cached = Cache.create(16);
     private static int cid = 0;
 
     public ViaTabExecutor() {
     }
 
-    public static int work(int version, Player p, String commandLine, List<Suggestion> completions) {
+    public static int work(String commandLine, List<Suggestion> completions) {
         int id = cid;
         cid = cid + 1;
         cid = cid % 16;

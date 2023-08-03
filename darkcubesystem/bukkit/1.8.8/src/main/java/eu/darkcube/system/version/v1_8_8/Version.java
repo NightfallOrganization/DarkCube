@@ -21,7 +21,6 @@ public class Version extends BukkitVersion {
         try {
             provider.register(ViaSupport.class, new ViaSupport1_8_8());
         } catch (Throwable t) {
-            t.printStackTrace();
             provider.register(ViaSupport.class, ViaSupport.wrapper(null));
         }
     }

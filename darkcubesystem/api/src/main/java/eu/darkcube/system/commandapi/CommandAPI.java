@@ -73,7 +73,7 @@ public class CommandAPI {
 	}
 
 	private static synchronized PluginCommand registerCommands(JavaPlugin plugin, Command owner) {
-		return VersionSupport.getVersion().commandApi().registerLegacy(plugin, owner);
+		return VersionSupport.version().commandApi().registerLegacy(plugin, owner);
 	}
 
 	private void loadPermissions(Command cmd) {

@@ -35,11 +35,11 @@ public class OnlinetimeModule extends CommandExecutor implements Module {
 
 	@Override
 	public void onEnable() {
-		CommandAPI.getInstance().register(this);
+		CommandAPI.instance().register(this);
 	}
 
 	@Override
 	public void onDisable() {
-		CommandAPI.getInstance().unregister(this);
+		CommandAPI.instance().unregister(this);
 	}
 }

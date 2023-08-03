@@ -17,6 +17,5 @@ dependencies {
     compileOnlyApi(libs.viaversion.common)
     compileOnly(libs.luckperms)
     runtimeOnly(project("1.8.8"))
-    runtimeOnly(project("1.19.3"))
     runtimeOnly(project("1.20.1"))
 }

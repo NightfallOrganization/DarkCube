@@ -18,7 +18,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 
 /**
- * Obtain an instance with {@link VersionSupport#getVersion()}
+ * Obtain an instance with {@link VersionSupport#version()}
  */
 public interface Version {
 

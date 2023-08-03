@@ -99,7 +99,7 @@ public class ViaSupport1_8_8 extends AbstractViaSupport {
 
     @Override
     public List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, List<Suggestion> completions) {
-        int id = ViaTabExecutor.work(playerVersion, player, commandLine, completions);
+        int id = ViaTabExecutor.work(commandLine, completions);
         return Collections.singletonList(TAB_COMPLETE_CANCEL + id);
     }
 }

@@ -13,23 +13,18 @@ public class VersionSupport {
 
     private static Version version;
 
-    /**
-     * @see #version()
-     */
-    @Deprecated
-    public static Version getVersion() {
-        return version();
-    }
-
     public static Version version() {
         if (version == null) init();
         return version;
     }
 
     private static void init() {
-        Class<? extends Version> cls = ReflectionUtils.getClass(
-                        VersionSupport.class.getPackage().getName() + ".v" + Bukkit.getServer()
-                                .getBukkitVersion().replace('.', '_').split("-", 2)[0] + ".Version")
+        Class<? extends Version> cls = ReflectionUtils
+                .getClass(VersionSupport.class.getPackage().getName() + ".v" + Bukkit
+                        .getServer()
+                        .getBukkitVersion()
+                        .replace('.', '_')
+                        .split("-", 2)[0] + ".Version")
                 .asSubclass(Version.class);
         version = ReflectionUtils.instantiateObject(cls);
         version.init();
