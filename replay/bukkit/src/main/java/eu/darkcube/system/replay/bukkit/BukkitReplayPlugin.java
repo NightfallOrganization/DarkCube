@@ -12,28 +12,30 @@ import eu.darkcube.system.version.VersionSupport;
 
 public class BukkitReplayPlugin extends DarkCubePlugin {
 
-	private final SimpleReplayPlugin plugin;
+    private final SimpleReplayPlugin plugin;
 
-	public BukkitReplayPlugin() {
-		super("replay");
-		Class<? extends SimpleReplayPlugin> cls = ReflectionUtils.getClass(
-				SimpleReplayPlugin.class.getPackage().getName() + ".v" + VersionSupport.getVersion()
-						.getClassifier() + ".ReplayPlugin").asSubclass(SimpleReplayPlugin.class);
-		this.plugin = ReflectionUtils.instantiateObject(cls);
-	}
+    public BukkitReplayPlugin() {
+        super("replay");
+        Class<? extends SimpleReplayPlugin> cls = ReflectionUtils
+                .getClass(SimpleReplayPlugin.class.getPackage().getName() + ".v" + VersionSupport
+                        .version()
+                        .getClassifier() + ".ReplayPlugin")
+                .asSubclass(SimpleReplayPlugin.class);
+        this.plugin = ReflectionUtils.instantiateObject(cls);
+    }
 
-	@Override
-	public void onLoad() {
-		plugin.onLoad();
-	}
+    @Override
+    public void onLoad() {
+        plugin.onLoad();
+    }
 
-	@Override
-	public void onEnable() {
-		plugin.onEnable();
-	}
+    @Override
+    public void onEnable() {
+        plugin.onEnable();
+    }
 
-	@Override
-	public void onDisable() {
-		plugin.onDisable();
-	}
+    @Override
+    public void onDisable() {
+        plugin.onDisable();
+    }
 }

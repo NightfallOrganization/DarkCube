@@ -16,6 +16,8 @@ import eu.darkcube.system.userapi.BukkitUserAPI;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.AsyncExecutor;
+import eu.darkcube.system.version.BukkitVersion;
+import eu.darkcube.system.version.Version;
 import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -38,16 +40,16 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		return instance;
 	}
 
-	@Override
-	public void onLoad() {
-		VersionSupport.getVersion();
-		AsyncExecutor.start();
-		EntityOptions.registerOptions();
-		PacketAPI.init();
-		CommandAPI.init(this);
-		linkManager.addLink(LuckPermsLink::new);
-		linkManager.addLink(CloudNetLink::new);
-	}
+    @Override
+    public void onLoad() {
+        VersionSupport.version();
+        AsyncExecutor.start();
+        EntityOptions.registerOptions();
+        PacketAPI.init();
+        CommandAPI.init(this);
+        linkManager.addLink(LuckPermsLink::new);
+        linkManager.addLink(CloudNetLink::new);
+    }
 
 	@Override
 	public void onDisable() {
@@ -57,13 +59,17 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
 		linkManager.unregisterLinks();
 	}
 
-	@Override
-	public void onEnable() {
-		BukkitUserAPI.init();
-		Bukkit.getPluginManager().registerEvents(this, this);
-		AdventureSupport.audienceProvider(); // Initializes adventure
-		linkManager.enableLinks();
-	}
+    @Override
+    public void onEnable() {
+        BukkitUserAPI.init();
+        Bukkit.getPluginManager().registerEvents(this, this);
+        AdventureSupport.audienceProvider(); // Initializes adventure
+        linkManager.enableLinks();
+        Version v = VersionSupport.version();
+        if (v instanceof BukkitVersion) {
+            ((BukkitVersion) v).enabled(this);
+        }
+    }
 
 	@EventHandler
 	private void handle(PlayerKickEvent event) {

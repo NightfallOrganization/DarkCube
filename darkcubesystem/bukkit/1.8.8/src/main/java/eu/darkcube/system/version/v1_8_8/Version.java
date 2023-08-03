@@ -6,29 +6,29 @@
  */
 package eu.darkcube.system.version.v1_8_8;
 
-public class Version implements eu.darkcube.system.version.Version {
-	private eu.darkcube.system.version.v1_8_8.CommandAPI commandAPI;
-	private ItemProvider itemProvider;
+import eu.darkcube.system.DarkCubeSystem;
+import eu.darkcube.system.provider.via.ViaSupport;
+import eu.darkcube.system.version.BukkitVersion;
+import eu.darkcube.system.version.v1_8_8.provider.via.ViaSupport1_8_8;
 
-	@Override
-	public void init() {
-		this.commandAPI = new eu.darkcube.system.version.v1_8_8.CommandAPI();
-		this.itemProvider = new ItemProvider();
-	}
+public class Version extends BukkitVersion {
+    @Override
+    public void init() {
+        super.init();
+        this.classifier = "1_8_8";
+        this.commandApi = new CommandAPI1_8_8();
+        this.itemProvider = new ItemProvider1_8_8();
+        try {
+            provider.register(ViaSupport.class, new ViaSupport1_8_8());
+        } catch (Throwable t) {
+            provider.register(ViaSupport.class, ViaSupport.wrapper(null));
+        }
+    }
 
-	@Override
-	public String getClassifier() {
-		return "1_8_8";
-	}
-
-	@Override
-	public eu.darkcube.system.version.v1_8_8.CommandAPI commandApi() {
-		return commandAPI;
-	}
-
-	@Override
-	public ItemProvider itemProvider() {
-		return itemProvider;
-	}
-
+    @Override
+    public void enabled(DarkCubeSystem system) {
+        super.enabled(system);
+        ViaSupport support = provider.service(ViaSupport.class);
+        if (support.supported()) ((ViaSupport1_8_8) support).enable();
+    }
 }

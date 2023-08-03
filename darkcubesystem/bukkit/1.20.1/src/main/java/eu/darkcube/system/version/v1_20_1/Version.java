@@ -6,29 +6,17 @@
  */
 package eu.darkcube.system.version.v1_20_1;
 
-public class Version implements eu.darkcube.system.version.Version {
-	private eu.darkcube.system.version.v1_20_1.CommandAPI commandAPI;
-	private ItemProvider itemProvider;
+import eu.darkcube.system.provider.via.ViaSupport;
+import eu.darkcube.system.version.BukkitVersion;
+
+public class Version extends BukkitVersion {
 
 	@Override
 	public void init() {
-		this.commandAPI = new eu.darkcube.system.version.v1_20_1.CommandAPI();
-		this.itemProvider = new ItemProvider();
+		super.init();
+		this.commandApi = new CommandAPI1_20_1();
+		this.itemProvider = new ItemProvider1_20_1();
+		this.classifier = "1_20_1";
+		provider.register(ViaSupport.class,ViaSupport.wrapper(null)); // Unsupported
 	}
-
-	@Override
-	public String getClassifier() {
-		return "1_20_1";
-	}
-
-	@Override
-	public eu.darkcube.system.version.v1_20_1.CommandAPI commandApi() {
-		return commandAPI;
-	}
-
-	@Override
-	public ItemProvider itemProvider() {
-		return itemProvider;
-	}
-
 }

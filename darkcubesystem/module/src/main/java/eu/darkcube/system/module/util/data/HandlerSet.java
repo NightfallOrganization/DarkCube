@@ -11,9 +11,9 @@ import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataSet;
 
 class HandlerSet implements PacketHandler<PacketWrapperNodeDataSet> {
-	@Override
-	public Packet handle(PacketWrapperNodeDataSet packet) {
-		SynchronizedPersistentDataStorages.storage(packet.key()).loadFromJsonDocument(packet.data());
-		return null;
-	}
+    @Override
+    public Packet handle(PacketWrapperNodeDataSet packet) {
+        SynchronizedPersistentDataStorages.storage(packet.key()).append(packet.data());
+        return null;
+    }
 }

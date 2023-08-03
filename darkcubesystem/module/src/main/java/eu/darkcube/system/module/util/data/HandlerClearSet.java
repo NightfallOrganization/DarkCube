@@ -11,10 +11,9 @@ import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataClearSet;
 
 class HandlerClearSet implements PacketHandler<PacketWrapperNodeDataClearSet> {
-	@Override
-	public Packet handle(PacketWrapperNodeDataClearSet packet) {
-		SynchronizedPersistentDataStorages.storage(packet.key())
-				.loadFromJsonDocument(packet.data());
-		return null;
-	}
+    @Override
+    public Packet handle(PacketWrapperNodeDataClearSet packet) {
+        SynchronizedPersistentDataStorages.storage(packet.key()).loadFromJsonDocument(packet.data());
+        return null;
+    }
 }

@@ -6,11 +6,15 @@ cloudnet = "3.4.5-RELEASE"
 bungee = "1.19-R0.1-SNAPSHOT"
 luckperms = "5.4"
 protocollib = "4.8.0"
-viaversion = "4.6.2"
+viaversion = "4.7.0"
+annotations = "24.0.1"
+hologramlib = "2.6.0-SNAPSHOT"
 
 [libraries]
-
+hologramlib = { group = "com.github.unldenis.hologram", name = "hologram-lib", version.ref = "hologramlib" }
+annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
 viaversion = { group = "com.viaversion", name = "viaversion-api", version.ref = "viaversion" }
+viaversion-common = { group = "com.viaversion", name = "viaversion-common", version.ref = "viaversion" }
 protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }

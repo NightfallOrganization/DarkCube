@@ -1,21 +1,20 @@
 main: eu.darkcube.system.skyland.Skyland
 name: Skyland
-author: EliteDarkness
+author: BrickStacker_S
 version: 1.0
 api-version: 1.13
+load: POSTWORLD
 commands:
   gm:
   heal:
   day:
   night:
   fly:
-  feed:
+  test:
   max:
   spawntrainingstand:
   god:
   trash:
   world:
-  loadworld:
-  unloadworld:
-  createworld:
   getitem:
+  getgui:

@@ -9,38 +9,50 @@ package eu.darkcube.system.version;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.inventoryapi.item.ItemProvider;
+import eu.darkcube.system.provider.Provider;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
+
 /**
- * Obtain an instance with {@link VersionSupport#getVersion()}
+ * Obtain an instance with {@link VersionSupport#version()}
  */
 public interface Version {
 
-	void init();
+    void init();
 
-	CommandAPI commandApi();
+    CommandAPI commandApi();
 
-	ItemProvider itemProvider();
+    ItemProvider itemProvider();
 
-	/**
-	 * For example 1_8_8 or 1_19_3
-	 *
-	 * @return this version's classifier
-	 */
-	String getClassifier();
+    /**
+     * For example 1_8_8 or 1_19_3
+     *
+     * @return this version's classifier
+     */
+    String getClassifier();
 
-	interface CommandAPI {
+    Provider provider();
 
-		String getSpigotUnknownCommandMessage();
+    interface CommandAPI {
 
-		PluginCommand registerLegacy(Plugin plugin, Command command);
+        List<String> tabComplete(CommandSender sender, org.bukkit.command.Command command, String label, String[] args);
 
-		void unregister(String name);
+        String getSpigotUnknownCommandMessage();
 
-		void register(CommandExecutor command);
+        PluginCommand registerLegacy(Plugin plugin, Command command);
 
-		double[] getEntityBB(Entity entity);
-	}
+        void unregister(String name);
+
+        default void register() {
+            register(null);
+        }
+
+        void register(CommandExecutor command);
+
+        double[] getEntityBB(Entity entity);
+    }
 }

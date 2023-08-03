@@ -1,7 +1,0 @@
-plugins {
-    id 'java-library'
-}
-
-dependencies {
-    compileOnlyApi parent.parent.project('annotations')
-}

@@ -90,7 +90,7 @@ public class LiteralCommandNode<S> extends CommandNode<S> {
         if (this == o) return true;
         if (!(o instanceof LiteralCommandNode)) return false;
 
-        final LiteralCommandNode that = (LiteralCommandNode) o;
+        final LiteralCommandNode<?> that = (LiteralCommandNode<?>) o;
 
         if (!literal.equals(that.literal)) return false;
         return super.equals(o);
