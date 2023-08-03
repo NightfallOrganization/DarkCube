@@ -37,6 +37,7 @@ include("bukkit:darkessentials")
 //include "bukkit:holograms"
 include("bukkit:jumpleague")
 //include "bukkit:knockout"
+include("bukkit:citybuild")
 include("bukkit:lobbysystem")
 include("bukkit:luckperms-prefixplugin")
 include("bukkit:miners")
