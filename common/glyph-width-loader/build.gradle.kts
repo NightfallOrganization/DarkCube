@@ -16,8 +16,15 @@ sourceSets {
     }
 }
 
+tasks.withType<JavaExec>().configureEach {
+    if (name.endsWith("main()")) {
+        notCompatibleWithConfigurationCache("JavaExec created by IntelliJ")
+    }
+}
+
 dependencies {
     "generatorImplementation"("com.google.code.gson:gson:2.10.1")
     "generatorImplementation"("it.unimi.dsi:fastutil:8.5.12")
-    implementation("it.unimi.dsi:fastutil:8.5.12")
+    compileOnly("it.unimi.dsi:fastutil:8.5.12")
+    testRuntimeOnly("it.unimi.dsi:fastutil:8.5.12")
 }

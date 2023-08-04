@@ -125,8 +125,8 @@ import java.util.concurrent.TimeUnit;
     /**
      * Loads data from the given path on the current {@link ClassLoader}.<br>
      * Uses {@link ClassLoader#getResourceAsStream(String)}
-     * 
-     * @see #loadGlyphData(InputStream) 
+     *
+     * @see #loadGlyphData(InputStream)
      */
     public void loadGlyphDataFromClassLoader(ClassLoader classLoader, String path) throws IOException {
         loadGlyphData(classLoader.getResourceAsStream(path));
@@ -136,6 +136,10 @@ import java.util.concurrent.TimeUnit;
      * Loads data from the given {@link InputStream}
      */
     public void loadGlyphData(InputStream in) throws IOException {
+        spaceWidthsList.clear();
+        spaceWidths.clear();
+        bitmapWidths.clear();
+        spaceCodepoints.clear();
         BufferedInputStream bin = new BufferedInputStream(in);
         ByteBuffer buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
         readBuffer(buffer, bin);
@@ -164,7 +168,7 @@ import java.util.concurrent.TimeUnit;
             spaceCodepoints.set(b, tmp);
         });
         for (int i = 0; i < spaceCodepoints.size(); i++) {
-            spaceWidthsList.add(spaceWidths.get(i));
+            spaceWidthsList.add(spaceWidths.get(spaceCodepoints.getInt(i)));
         }
     }
 

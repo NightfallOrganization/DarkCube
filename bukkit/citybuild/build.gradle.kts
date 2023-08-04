@@ -7,6 +7,7 @@
 
 plugins {
     id("glyph-width-loader")
+    id("com.github.johnrengelman.shadow")
     java
 }
 
@@ -26,6 +27,13 @@ tasks {
         dependsOn("generateGlyphWidths")
     }
     jar {
+        this.archiveClassifier = "pure"
+    }
+    assemble {
+        dependsOn(shadowJar)
+    }
+    shadowJar {
+        this.archiveClassifier = ""
         from(sourceSets.getByName("generated").output.resourcesDir)
     }
 }
@@ -34,4 +42,5 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnlyApi(project(":darkcubesystem"))
     compileOnlyApi(parent!!.project("luckperms-prefixplugin"))
+    implementation(project(":common:glyph-width-loader"))
 }
