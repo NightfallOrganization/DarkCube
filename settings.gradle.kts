@@ -5,7 +5,9 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
+
 pluginManagement {
+    includeBuild("build-extensions")
     repositories {
         gradlePluginPortal()
         maven {
@@ -60,6 +62,7 @@ include("cloudnet:cloudnet-database-mysql")
 include("cloudnet:stats-cloudnet")
 include("common")
 include("common:labymod-emotes")
+include("common:glyph-width-loader")
 include("pserver")
 include("pserver:pserver-api")
 include("pserver:pserver-bukkit")

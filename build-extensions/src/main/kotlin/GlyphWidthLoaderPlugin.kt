@@ -5,5 +5,10 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-public class Generator {
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+class GlyphWidthLoaderPlugin : Plugin<Project> {
+    override fun apply(project: Project) {
+    }
 }
