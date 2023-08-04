@@ -59,15 +59,17 @@ public class FontData {
     }
 
     public record Provider(JsonObject json) {
-        public static void space(Provider provider, Int2FloatMap widths) {
+        public static void space(Provider provider, Int2FloatMap removeKeys, Int2FloatMap widths) {
             JsonObject advances = provider.json().get("advances").getAsJsonObject();
             for (String key : advances.keySet()) {
                 float advance = advances.get(key).getAsFloat();
-                widths.put(key.codePointAt(0), advance);
+                int cp = key.codePointAt(0);
+                removeKeys.remove(cp);
+                widths.put(cp, advance);
             }
         }
 
-        public static void bitmap(Path assets, Provider provider, Int2FloatMap widths) throws IOException {
+        public static void bitmap(Path assets, Provider provider, Int2FloatMap removeKeys, Int2FloatMap widths) throws IOException {
             ResourceLocation loc = ResourceLocation.fromString(provider.string("file"));
             Path path = assets.resolve(loc.namespace()).resolve("textures").resolve(loc.path());
             InputStream in = Files.newInputStream(path);
@@ -96,6 +98,7 @@ public class FontData {
                     int actualWidth = actualWidth(image, glyphWidth, glyphHeight, x, y);
                     int advance = (int) (0.5D + (double) ((float) actualWidth * scale)) + 1;
                     widths.put(codepointMap[y][x], advance);
+                    removeKeys.remove(codepointMap[y][x]);
                 }
             }
         }

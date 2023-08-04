@@ -91,9 +91,9 @@ public class Generator {
 
         for (FontData.Provider provider : fontData.providers()) {
             if (provider.type().equals("space")) {
-                FontData.Provider.space(provider, spaceWidths);
+                FontData.Provider.space(provider, bitmapWidths, spaceWidths);
             } else if (provider.type().equals("bitmap")) {
-                FontData.Provider.bitmap(assets, provider, bitmapWidths);
+                FontData.Provider.bitmap(assets, provider, spaceWidths, bitmapWidths);
             } else {
                 System.err.println("Unsupported provider: " + provider.type());
             }
@@ -102,10 +102,9 @@ public class Generator {
         System.out.println("Saving glyphs to " + outputPath.toAbsolutePath());
 
         ByteBuffer buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
-        buffer.putInt(spaceWidths.size());
-        buffer.putInt(bitmapWidths.size());
+        buffer.putInt(0, spaceWidths.size());
+        buffer.putInt(4, bitmapWidths.size());
         out.write(buffer.array());
-        buffer.position(0);
         write(buffer, out, spaceWidths);
         write(buffer, out, bitmapWidths);
         out.close();
@@ -120,9 +119,8 @@ public class Generator {
         while (keyIterator.hasNext()) {
             int codepoint = keyIterator.nextInt();
             float width = widths.get(codepoint);
-            buffer.putInt(codepoint).putFloat(width);
+            buffer.putInt(0, codepoint).putFloat(4, width);
             out.write(buffer.array());
-            buffer.position(0);
         }
     }
 
