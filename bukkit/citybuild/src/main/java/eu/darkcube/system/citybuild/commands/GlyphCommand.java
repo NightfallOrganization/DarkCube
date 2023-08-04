@@ -23,29 +23,38 @@ public class GlyphCommand extends CommandExecutor {
                     float width = FloatArgumentType.getFloat(ctx, "width");
                     String text = plugin.glyphWidthManager().spacesForWidth(width);
                     float realWidth = plugin.glyphWidthManager().width(text);
-                    Component send = Component
+                    Component comp = Component
                             .text("Generated: " + text, NamedTextColor.GRAY)
                             .clickEvent(ClickEvent.copyToClipboard(text))
-                            .hoverEvent(HoverEvent.showText(Component.text("Copy " + text.codePoints().count() + " Characters")))
+                            .hoverEvent(HoverEvent.showText(Component
+                                    .text("Copy", NamedTextColor.GOLD)
+                                    .append(Component.text(" " + text.codePoints().count() + " Characters", NamedTextColor.GRAY))))
                             .append(Component.newline())
                             .append(Component.text("Real Width: ", NamedTextColor.GRAY))
-                            .append(Component.text(realWidth, NamedTextColor.GOLD));
-                    ctx.getSource().sendMessage(send);
+                            .append(Component.text(realWidth, NamedTextColor.AQUA));
+                    ctx.getSource().sendMessage(comp);
                     return 0;
                 })))
                 .then(Commands.literal("width").then(Commands.argument("text", StringArgumentType.greedyString()).executes(ctx -> {
                     String text = StringArgumentType.getString(ctx, "text");
-                    ctx
-                            .getSource()
-                            .sendMessage(Component
-                                    .text("Width: ", NamedTextColor.GRAY)
-                                    .append(Component.text(plugin.glyphWidthManager().width(text), NamedTextColor.AQUA)));
+                    Component comp = Component
+                            .text("Width: ", NamedTextColor.GRAY)
+                            .append(Component.text(plugin.glyphWidthManager().width(text), NamedTextColor.AQUA));
+                    ctx.getSource().sendMessage(comp);
                     return 0;
                 })))
                 .then(Commands.literal("nearest").then(Commands.argument("width", FloatArgumentType.floatArg()).executes(ctx -> {
                     float width = FloatArgumentType.getFloat(ctx, "width");
                     int cp = plugin.glyphWidthManager().nearestCodepoint(width);
-                    ctx.getSource().sendMessage(Component.text("Codepoint: " + cp + "(" + plugin.glyphWidthManager().width(cp) + ")"));
+                    float realWidth = plugin.glyphWidthManager().width(cp);
+                    Component comp = Component
+                            .text("Best Glyph: Id=" + cp, NamedTextColor.GRAY)
+                            .hoverEvent(HoverEvent.showText(Component.text("Copy", NamedTextColor.GOLD)))
+                            .clickEvent(ClickEvent.copyToClipboard(new String(new int[]{cp}, 0, 1)))
+                            .append(Component.newline())
+                            .append(Component.text("Real Width: ", NamedTextColor.GRAY))
+                            .append(Component.text(realWidth, NamedTextColor.AQUA));
+                    ctx.getSource().sendMessage(comp);
                     return 0;
                 }))));
     }
