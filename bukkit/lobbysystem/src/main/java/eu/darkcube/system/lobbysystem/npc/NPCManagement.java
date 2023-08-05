@@ -56,20 +56,18 @@ public class NPCManagement {
             builder.flag(NpcActionController.TAB_REMOVAL_TICKS, tabRemovalTicks);
         }).worldAccessor(BukkitWorldAccessor.worldAccessor()).packetFactory(BukkitProtocolAdapter.protocolLib()).build();
 
-        platform.eventBus().subscribe(ShowNpcEvent.Pre.class, event -> {
-        });
-        platform.eventBus().subscribe(AttackNpcEvent.class, event -> {
+        platform.eventManager().registerEventHandler(AttackNpcEvent.class, event -> {
             PlayerNPCInteractEvent.Hand hand = PlayerNPCInteractEvent.Hand.MAIN_HAND;
             PlayerNPCInteractEvent.EntityUseAction useAction = PlayerNPCInteractEvent.EntityUseAction.ATTACK;
             Bukkit.getPluginManager().callEvent(new PlayerNPCInteractEvent(event.player(), event.npc().flagValueOrDefault(flagNPC), hand, useAction));
         });
-        platform.eventBus().subscribe(InteractNpcEvent.class, event -> {
+        platform.eventManager().registerEventHandler(InteractNpcEvent.class, event -> {
             PlayerNPCInteractEvent.Hand hand = event.hand() == InteractNpcEvent.Hand.MAIN_HAND ? PlayerNPCInteractEvent.Hand.MAIN_HAND : PlayerNPCInteractEvent.Hand.OFF_HAND;
             PlayerNPCInteractEvent.EntityUseAction useAction = PlayerNPCInteractEvent.EntityUseAction.INTERACT;
             Bukkit.getPluginManager().callEvent(new PlayerNPCInteractEvent(event.player(), event.npc().flagValueOrDefault(flagNPC), hand, useAction));
         });
-        platform.eventBus().subscribe(HideNpcEvent.class, event -> Bukkit.getPluginManager().callEvent(new NPCShowEvent(event.npc().flagValueOrDefault(flagNPC), event.player())));
-        platform.eventBus().subscribe(ShowNpcEvent.Post.class, event -> {
+        platform.eventManager().registerEventHandler(HideNpcEvent.class, event -> Bukkit.getPluginManager().callEvent(new NPCShowEvent(event.npc().flagValueOrDefault(flagNPC), event.player())));
+        platform.eventManager().registerEventHandler(ShowNpcEvent.Post.class, event -> {
             Player player = event.player();
             event.npc().changeMetadata(EntityMetadataFactory.skinLayerMetaFactory(), true).schedule(player);
             Bukkit.getPluginManager().callEvent(new NPCShowEvent(event.npc().flagValueOrDefault(flagNPC), player));

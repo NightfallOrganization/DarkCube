@@ -284,6 +284,7 @@ public class ConnectorNPC {
         @EventListener
         public void handle(CloudServiceConnectNetworkEvent event) {
             services.add(event.getServiceInfo());
+            System.out.println("[ConnectorNPC] Server connected: " + event.getServiceInfo().getServiceId().getName());
             if (!AsyncExecutor.service().isShutdown()) {
                 AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
             }
@@ -291,6 +292,7 @@ public class ConnectorNPC {
 
         @EventListener
         public void handle(CloudServiceDisconnectNetworkEvent event) {
+            System.out.println("[ConnectorNPC] Server disconnected: " + event.getServiceInfo().getServiceId().getName());
             services.remove(event.getServiceInfo());
             if (!AsyncExecutor.service().isShutdown()) {
                 AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
