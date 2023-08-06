@@ -6,7 +6,6 @@
  */
 package eu.darkcube.system;
 
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
@@ -43,7 +42,7 @@ public interface BaseMessage {
     String key();
 
     default Component getMessage(CommandSender sender, Object... args) {
-        return getMessage(new BukkitCommandExecutor(sender), args);
+        return getMessage(ICommandExecutor.create(sender), args);
     }
 
     default String getMessageString(ICommandExecutor executor, Object... args) {

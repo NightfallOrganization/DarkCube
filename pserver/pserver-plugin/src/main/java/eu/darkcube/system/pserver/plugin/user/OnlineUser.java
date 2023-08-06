@@ -7,7 +7,6 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
@@ -22,7 +21,7 @@ public class OnlineUser extends UserWithExtraData {
 	public OnlineUser(final Player player) {
 		super(player.getUniqueId());
 		this.player = player;
-		this.executor = new BukkitCommandExecutor(player);
+		this.executor = ICommandExecutor.create(player);
 		this.language = UserAPI.getInstance().getUser(player).getLanguage();
 	}
 

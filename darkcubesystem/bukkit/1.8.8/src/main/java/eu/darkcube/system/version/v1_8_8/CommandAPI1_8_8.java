@@ -14,10 +14,7 @@ import eu.darkcube.system.commandapi.v3.InternalCommandTabExecutor;
 import eu.darkcube.system.version.BukkitCommandAPI;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.command.TabExecutor;
+import org.bukkit.command.*;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.command.VanillaCommandWrapper;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
@@ -38,13 +35,11 @@ public class CommandAPI1_8_8 extends BukkitCommandAPI {
     public CommandAPI1_8_8() {
     }
 
-    @Override
-    public String getSpigotUnknownCommandMessage() {
+    @Override public String getSpigotUnknownCommandMessage() {
         return SpigotConfig.unknownCommandMessage;
     }
 
-    @Override
-    public PluginCommand registerLegacy(Plugin plugin, Command command) {
+    @Override public PluginCommand registerLegacy(Plugin plugin, Command command) {
         try {
             Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             constructor.setAccessible(true);
@@ -66,8 +61,7 @@ public class CommandAPI1_8_8 extends BukkitCommandAPI {
         }
     }
 
-    @Override
-    public void unregister(String name) {
+    @Override public void unregister(String name) {
         try {
             SimpleCommandMap commandMap = ((CraftServer) Bukkit.getServer()).getCommandMap();
             final Field f = commandMap.getClass().getDeclaredField("knownCommands");
@@ -79,12 +73,38 @@ public class CommandAPI1_8_8 extends BukkitCommandAPI {
         }
     }
 
-    @Override
-    public void register(CommandExecutor command) {
+    @Override public void unregister(CommandExecutor command) {
+        try {
+            CommandMap commandMap = Bukkit.getServer().getCommandMap();
+            Field f = commandMap.getClass().getDeclaredField("knownCommands");
+            f.setAccessible(true);
+            final Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) f.get(commandMap);
+
+            String prefix = command.getPrefix().toLowerCase(Locale.ROOT);
+            for (String name : command.getNames()) {
+                unregister(knownCommands, name.toLowerCase(Locale.ROOT));
+                unregister(knownCommands, prefix + ":" + name.toLowerCase(Locale.ROOT));
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void unregister(Map<String, org.bukkit.command.Command> knownCommands, String name) {
+        org.bukkit.command.Command cmd = knownCommands.get(name);
+        if (cmd instanceof PluginCommand) {
+            PluginCommand pcmd = (PluginCommand) cmd;
+            if (pcmd.getExecutor() == executor) {
+                knownCommands.remove(name);
+            }
+        }
+    }
+
+    @Override public void register(CommandExecutor command) {
         try {
             final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             constructor.setAccessible(true);
-            final String name = command.getName().toLowerCase();
+            final String name = command.getName().toLowerCase(Locale.ROOT);
             if (name.contains(" ")) {
                 throw new IllegalArgumentException("Can't register command with whitespace in name!");
             }
@@ -107,7 +127,7 @@ public class CommandAPI1_8_8 extends BukkitCommandAPI {
             final Field f = commandMap.getClass().getDeclaredField("knownCommands");
             f.setAccessible(true);
             final Map<String, org.bukkit.command.Command> knownCommands = (Map<String, org.bukkit.command.Command>) f.get(commandMap);
-            final String prefix = command.getPrefix().toLowerCase();
+            final String prefix = command.getPrefix().toLowerCase(Locale.ROOT);
             if (prefix.contains(" ")) {
                 throw new IllegalArgumentException("Can't register command with whitespace in prefix!");
             }
@@ -128,8 +148,7 @@ public class CommandAPI1_8_8 extends BukkitCommandAPI {
         }
     }
 
-    @Override
-    public double[] getEntityBB(Entity entity) {
+    @Override public double[] getEntityBB(Entity entity) {
         AxisAlignedBB bb = ((CraftEntity) entity).getHandle().getBoundingBox();
         return new double[]{bb.a, bb.b, bb.c, bb.d, bb.e, bb.f};
     }
@@ -186,7 +205,7 @@ public class CommandAPI1_8_8 extends BukkitCommandAPI {
     }
 
     private void checkAmbiguities(String registerName, Map<String, org.bukkit.command.Command> knownCommands, PluginCommand command) {
-        registerName = registerName.toLowerCase();
+        registerName = registerName.toLowerCase(Locale.ROOT);
         if (knownCommands.containsKey(registerName)) {
             org.bukkit.command.Command cmd = knownCommands.get(registerName);
             if (cmd instanceof PluginCommand) {

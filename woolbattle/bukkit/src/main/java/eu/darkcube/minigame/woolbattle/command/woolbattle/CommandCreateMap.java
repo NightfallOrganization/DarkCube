@@ -12,14 +12,14 @@ import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.StringArgument;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 public class CommandCreateMap extends WBCommandExecutor {
     public CommandCreateMap(WoolBattle woolbattle) {
         super("createMap",
-                b -> b.then(Commands.argument("map", StringArgument.string()).then(Commands.argument("size", MapSizeArgument.mapSize(woolbattle)).executes(ctx -> {
-                    String mname = StringArgument.getString(ctx, "map");
+                b -> b.then(Commands.argument("map", StringArgumentType.string()).then(Commands.argument("size", MapSizeArgument.mapSize(woolbattle)).executes(ctx -> {
+                    String mname = StringArgumentType.getString(ctx, "map");
                     MapSize mapSize = MapSizeArgument.mapSize(ctx, "size");
                     Map map = woolbattle.mapManager().getMap(mname, mapSize);
                     if (map != null) {

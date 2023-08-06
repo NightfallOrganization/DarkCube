@@ -35,18 +35,6 @@ public interface User extends ForwardingAudience, ICommandExecutor {
     Player asPlayer();
 
     /**
-     * @return the user's language
-     */
-    Language getLanguage();
-
-    /**
-     * Sets the user's language
-     *
-     * @param language the language
-     */
-    void setLanguage(Language language);
-
-    /**
      * @return the user's cubes
      */
     BigInteger getCubes();

@@ -47,11 +47,9 @@ public interface Version {
 
         void unregister(String name);
 
-        default void register() {
-            register(null);
-        }
-
         void register(CommandExecutor command);
+
+        void unregister(CommandExecutor command);
 
         double[] getEntityBB(Entity entity);
     }

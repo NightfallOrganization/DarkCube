@@ -96,12 +96,12 @@ class AsyncWrapperUser implements User {
 	}
 
 	@Override
-	public Language getLanguage() {
+	public Language language() {
 		return user(User::getLanguage);
 	}
 
 	@Override
-	public void setLanguage(Language language) {
+	public void language(Language language) {
 		user((Consumer<BukkitUser>) u -> u.setLanguage(language));
 	}
 

@@ -15,18 +15,21 @@ import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuild
 import eu.darkcube.system.libs.com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.SuggestionContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
-import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.command.CommandSender;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -55,30 +58,18 @@ public class Commands {
         };
     }
 
-    public CompletableFuture<List<Suggestion>> getTabCompletions(ParseResults<CommandSource> parse) {
-        return dispatcher.getCompletionSuggestions(parse).thenApply(Suggestions::getList);
+    public @NotNull CompletableFuture<@NotNull Suggestions> getTabCompletions(ParseResults<CommandSource> parse) {
+        return dispatcher.getCompletionSuggestions(parse);
     }
 
-    public List<Suggestion> getTabCompletionsSync(ParseResults<CommandSource> parse) {
+    public @NotNull Suggestions getTabCompletionsSync(ParseResults<CommandSource> parse) {
         try {
             return getTabCompletions(parse).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        return Collections.emptyList();
+        return Suggestions.empty().getNow(null);
     }
-
-//    public List<Suggestion> getTabCompletions(CommandSender sender, String commandLine) {
-//        CommandSource source = CommandSource.create(sender);
-//        StringReader reader = new StringReader(commandLine);
-//        ParseResults<CommandSource> parseresults = getDispatcher().parse(reader, source);
-//        try {
-//            return dispatcher.getCompletionSuggestions(parseresults).get().getList();
-//        } catch (InterruptedException | ExecutionException ex) {
-//            ex.printStackTrace();
-//        }
-//        return Collections.emptyList();
-//    }
 
     public void unregisterByPrefix(String prefix) {
         for (CommandEntry entry : new HashSet<>(commandEntries)) {
@@ -173,11 +164,11 @@ public class Commands {
                 final String commandLineNext = commandLine + " ";
                 ParseResults<CommandSource> parse2 = dispatcher.parse(commandLineNext, source);
                 getTabCompletions(parse2).thenAccept(completions -> {
-                    source.getSource().sendCompletions(commandLineNext, completions, usages(parse2));
+                    source.sendCompletions(commandLineNext, completions, usages(parse2));
                 });
             } else {
                 getTabCompletions(parse).thenAccept(completions2 -> {
-                    source.getSource().sendCompletions(commandLine, completions2, usages(parse));
+                    source.sendCompletions(commandLine, completions2, usages(parse));
                 });
             }
         } catch (Throwable ex) {
@@ -203,8 +194,7 @@ public class Commands {
         return dispatcher;
     }
 
-    @FunctionalInterface
-    public interface IParser {
+    @FunctionalInterface public interface IParser {
         void parse(StringReader reader) throws CommandSyntaxException;
     }
 
@@ -217,8 +207,7 @@ public class Commands {
             this.nodes = nodes;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return "CommandEntry{" + "executor=" + executor + ", nodes=" + nodes + '}';
         }
 
@@ -238,8 +227,7 @@ public class Commands {
                 }
             }
 
-            @Override
-            public String toString() {
+            @Override public String toString() {
                 return "OriginalCommandTree{" + "command=" + command + ", source=" + source + ", children=" + children + ", prefixless=" + prefixless + '}';
             }
         }

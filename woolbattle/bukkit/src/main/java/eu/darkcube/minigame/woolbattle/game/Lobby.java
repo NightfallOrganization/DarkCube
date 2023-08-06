@@ -25,7 +25,6 @@ import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -114,7 +113,7 @@ public class Lobby extends GamePhase {
         maxPlayerCount = i;
         for (TeamType type : woolbattle.teamManager().teamTypes(mapSize)) {
             Team team = woolbattle.teamManager().loadTeam(type);
-            ICommandExecutor console = new BukkitCommandExecutor(Bukkit.getConsoleSender());
+            ICommandExecutor console = ICommandExecutor.create(Bukkit.getConsoleSender());
             console.sendMessage(Component.text("loaded team ").append(team.getName(console)));
         }
     }

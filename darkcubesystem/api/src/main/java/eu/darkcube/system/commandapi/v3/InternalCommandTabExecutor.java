@@ -68,7 +68,7 @@ public class InternalCommandTabExecutor implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
         String commandLine = join(label, args);
-        eu.darkcube.system.commandapi.v3.CommandAPI.getInstance().getCommands().executeCommand(sender, commandLine);
+        CommandAPI.instance().getCommands().executeCommand(sender, commandLine);
         return true;
     }
 }

@@ -6,8 +6,12 @@
  */
 package eu.darkcube.system.version.v1_20_1;
 
+import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.provider.via.ViaSupport;
+import eu.darkcube.system.version.BukkitCommandAPI;
 import eu.darkcube.system.version.BukkitVersion;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 
 public class Version extends BukkitVersion {
 
@@ -18,5 +22,10 @@ public class Version extends BukkitVersion {
 		this.itemProvider = new ItemProvider1_20_1();
 		this.classifier = "1_20_1";
 		provider.register(ViaSupport.class,ViaSupport.wrapper(null)); // Unsupported
+	}
+
+	@Override public void enabled(DarkCubeSystem system) {
+		super.enabled(system);
+		Bukkit.getPluginManager().registerEvents((Listener) commandApi,system);
 	}
 }

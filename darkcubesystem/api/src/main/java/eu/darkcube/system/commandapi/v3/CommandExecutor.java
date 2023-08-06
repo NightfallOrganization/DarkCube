@@ -29,14 +29,14 @@ public class CommandExecutor {
     public CommandExecutor(String prefix, String name, String permission, String[] aliases,
                            Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
         this.prefix = prefix;
-        this.name = name.toLowerCase();
+        this.name = name.toLowerCase(Locale.ROOT);
         this.permission = permission;
         this.aliases = aliases.clone();
         this.argumentBuilder = argumentBuilder;
         this.names = new String[this.aliases.length + 1];
         this.names[0] = this.name;
         for (int i = 0; i < this.aliases.length; i++) {
-            this.aliases[i] = this.aliases[i].toLowerCase(Locale.ENGLISH);
+            this.aliases[i] = this.aliases[i].toLowerCase(Locale.ROOT);
         }
         System.arraycopy(this.aliases, 0, this.names, 1, this.names.length - 1);
     }

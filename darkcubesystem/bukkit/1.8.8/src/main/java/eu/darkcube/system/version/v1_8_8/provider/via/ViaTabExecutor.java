@@ -11,6 +11,7 @@ import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
 import com.viaversion.viaversion.libs.fastutil.ints.IntList;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.StringRange;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -18,8 +19,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-@ApiStatus.Internal
-public class ViaTabExecutor {
+@ApiStatus.Internal public class ViaTabExecutor {
 
     private static final Cache[] cached = Cache.create(16);
     private static int cid = 0;
@@ -27,22 +27,18 @@ public class ViaTabExecutor {
     public ViaTabExecutor() {
     }
 
-    public static int work(String commandLine, List<Suggestion> completions) {
+    public static int work(String commandLine, Suggestions suggestions) {
         int id = cid;
         cid = cid + 1;
         cid = cid % 16;
-        Component[] tooltips = new Component[completions.size()];
-        String[] suggestions = new String[completions.size()];
-        int commonStart = commandLine.length();
-        for (Suggestion completion : completions) {
-            StringRange range = completion.getRange();
-            commonStart = Math.min(range.getStart(), commonStart);
-        }
+        Component[] tooltips = new Component[suggestions.getList().size()];
+        String[] ssuggestions = new String[suggestions.getList().size()];
+        StringRange range = suggestions.getRange();
 
         for (int i = 0; i < tooltips.length; i++) {
-            Suggestion completion = completions.get(i);
+            Suggestion completion = suggestions.getList().get(i);
 
-            suggestions[i] = completion.apply(commandLine).substring(commonStart);
+            ssuggestions[i] = completion.apply(commandLine).substring(range.getStart());
 
             Component hover = Component.empty();
             if (completion.getTooltip() != null && completion.getTooltip().getString() != null)
@@ -50,9 +46,7 @@ public class ViaTabExecutor {
             tooltips[i] = hover;
         }
 
-        int length = commandLine.length() - commonStart;
-
-        cached[id].data = new Data(commonStart, length, suggestions, tooltips);
+        cached[id].data = new Data(range.getStart(), range.getLength(), ssuggestions, tooltips);
         return id;
     }
 

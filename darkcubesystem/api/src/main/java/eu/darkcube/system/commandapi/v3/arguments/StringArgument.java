@@ -15,34 +15,31 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.CompletableFuture;
 
-public class StringArgument implements ArgumentType<String> {
+@Deprecated @ApiStatus.ScheduledForRemoval public class StringArgument implements ArgumentType<String> {
 
-	private final String[] suggestions;
+    private final String[] suggestions;
 
-	private StringArgument(String... suggestions) {
-		this.suggestions = suggestions;
-	}
+    private StringArgument(String... suggestions) {
+        this.suggestions = suggestions;
+    }
 
-	public static StringArgument string(String... suggestions) {
-		return new StringArgument(suggestions);
-	}
+    public static StringArgument string(String... suggestions) {
+        return new StringArgument(suggestions);
+    }
 
-	public static String getString(CommandContext<CommandSource> context,
-					String name) {
-		return context.getArgument(name, String.class);
-	}
+    public static String getString(CommandContext<CommandSource> context, String name) {
+        return context.getArgument(name, String.class);
+    }
 
-	@Override
-	public String parse(StringReader reader) throws CommandSyntaxException {
-		return reader.readString();
-	}
+    @Override public String parse(StringReader reader) throws CommandSyntaxException {
+        return reader.readString();
+    }
 
-	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(
-					CommandContext<S> context, SuggestionsBuilder builder) {
-		return ISuggestionProvider.suggest(this.suggestions, builder);
-	}
+    @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return ISuggestionProvider.suggest(this.suggestions, builder);
+    }
 }

@@ -14,6 +14,7 @@ import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -25,39 +26,37 @@ public class BukkitCommandExecutor implements ICommandExecutor, ForwardingAudien
     private final CommandSender sender;
     private final Audience audience;
 
-    public BukkitCommandExecutor(CommandSender sender) {
+    BukkitCommandExecutor(CommandSender sender) {
         this.sender = sender;
-        this.audience = AdventureSupport.audienceProvider().sender(sender);
+        CommandSender s = sender;
+        while (s instanceof ProxiedCommandSender) s = ((ProxiedCommandSender) s).getCaller();
+        this.audience = AdventureSupport.audienceProvider().sender(s);
         Bukkit.getPluginManager().callEvent(new BukkitCommandExecutorConfigureEvent(this));
     }
 
-    @Override
-    public @NotNull Iterable<? extends Audience> audiences() {
+    @Override public @NotNull Iterable<? extends Audience> audiences() {
         return Collections.singleton(audience);
     }
 
-    @Override
-    public Language getLanguage() {
+    @Override public Language language() {
         if (sender instanceof Player) {
-            return UserAPI.getInstance().getUser((Player) sender).getLanguage();
+            return UserAPI.getInstance().getUser((Player) sender).language();
         }
         return Language.DEFAULT;
     }
 
-    @Override
-    public void setLanguage(Language language) {
+    @Override public void language(Language language) {
         if (sender instanceof Player) {
-            UserAPI.getInstance().getUser((Player) sender).setLanguage(language);
+            UserAPI.getInstance().getUser((Player) sender).language(language);
         }
         logger.warning("Can't set language of the console!");
     }
 
-    public CommandSender sender() {
-        return sender;
+    @Override public String commandPrefix() {
+        return sender instanceof Player ? "/" : ICommandExecutor.super.commandPrefix();
     }
 
-    @Override
-    public String getCommandPrefix() {
-        return sender instanceof Player ? "/" : ICommandExecutor.super.getCommandPrefix();
+    public CommandSender sender() {
+        return sender;
     }
 }

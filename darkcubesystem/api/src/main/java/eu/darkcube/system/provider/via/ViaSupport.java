@@ -10,6 +10,7 @@ package eu.darkcube.system.provider.via;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import org.bukkit.entity.Player;
 
@@ -28,6 +29,6 @@ public interface ViaSupport {
 
     int serverVersion();
 
-    List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, List<Suggestion> completions);
+    List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, Suggestions suggestions);
 
 }

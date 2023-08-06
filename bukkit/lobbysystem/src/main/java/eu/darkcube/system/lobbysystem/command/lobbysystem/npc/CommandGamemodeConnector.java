@@ -8,7 +8,7 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem.npc;
 
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.StringArgument;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.ClickEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.ClickEvent.Action;
@@ -25,75 +25,66 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 public class CommandGamemodeConnector extends LobbyCommandExecutor {
-	public CommandGamemodeConnector() {
-		super("connector", b -> b.then(Commands.literal("modify")
-				.then(Commands.argument("connector", new GamemodeConnectorArgument())
-						.then(Commands.literal("destroy").executes(ctx -> {
-							ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
-							npc.hide();
-							ConnectorNPC.save();
-							ctx.getSource().sendMessage(Message.CONNECTOR_NPC_REMOVED, npc.key());
-							return 0;
-						})).then(Commands.literal("addPermission")
-								.then(Commands.argument("permission", StringArgument.string())
-										.executes(ctx -> {
-											String permission =
-													StringArgument.getString(ctx, "permission");
-											ConnectorNPC npc = ctx.getArgument("connector",
-													ConnectorNPC.class);
-											if (!npc.getPermissions().contains(permission))
-												npc.getPermissions().add(permission);
-											if (Bukkit.getPluginManager().getPermission(permission)
-													== null) {
-												Bukkit.getPluginManager()
-														.addPermission(new Permission(permission));
-											}
-											ConnectorNPC.save();
-											ctx.getSource().sendMessage(
-													Message.CONNECTOR_NPC_PERMISSION_ADDED,
-													permission);
-											return 0;
-										})))
-						.then(Commands.literal("listPermissions").executes(ctx -> {
-							ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
-							ctx.getSource().sendMessage(Message.CONNECTOR_NPC_PERMISSION_LIST,
-									npc.getPermissions().size());
-							for (String permission : npc.getPermissions()) {
-								ctx.getSource().sendMessage(
-										Component.text(" - ").color(NamedTextColor.GRAY)
-												.append(Component.text(permission)
-														.color(NamedTextColor.DARK_PURPLE)
-														.clickEvent(ClickEvent.clickEvent(
-																Action.SUGGEST_COMMAND,
-																"/lobbysystem npc connector modify "
-																		+ npc.key()
-																		+ " removePermission "
-																		+ permission))));
-							}
-							return 0;
-						})).then(Commands.literal("removePermission")
-								.then(Commands.argument("permission", StringArgument.string())
-										.executes(ctx -> {
-											String permission =
-													StringArgument.getString(ctx, "permission");
-											ConnectorNPC npc = ctx.getArgument("connector",
-													ConnectorNPC.class);
-											npc.getPermissions().remove(permission);
-											ConnectorNPC.save();
-											ctx.getSource().sendMessage(
-													Message.CONNECTOR_NPC_PERMISSION_REMOVED,
-													permission);
-											return 0;
-										}))))).then(Commands.literal("create")
-				.then(Commands.argument("task", ServiceTaskArgument.serviceTask()).executes(ctx -> {
-					Player player = ctx.getSource().asPlayer();
-					Location loc = Locations.getNiceLocation(player.getLocation());
-					ConnectorNPC npc = new ConnectorNPC(
-							ServiceTaskArgument.getServiceTask(ctx, "task").getName(), loc);
-					npc.show();
-					ConnectorNPC.save();
-					ctx.getSource().sendMessage(Message.CONNECTOR_NPC_CREATED, npc.key());
-					return 0;
-				}))));
-	}
+    public CommandGamemodeConnector() {
+        super("connector", b -> b
+                .then(Commands
+                        .literal("modify")
+                        .then(Commands
+                                .argument("connector", new GamemodeConnectorArgument())
+                                .then(Commands.literal("destroy").executes(ctx -> {
+                                    ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
+                                    npc.hide();
+                                    ConnectorNPC.save();
+                                    ctx.getSource().sendMessage(Message.CONNECTOR_NPC_REMOVED, npc.key());
+                                    return 0;
+                                }))
+                                .then(Commands
+                                        .literal("addPermission")
+                                        .then(Commands.argument("permission", StringArgumentType.string()).executes(ctx -> {
+                                            String permission = StringArgumentType.getString(ctx, "permission");
+                                            ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
+                                            if (!npc.getPermissions().contains(permission)) npc.getPermissions().add(permission);
+                                            if (Bukkit.getPluginManager().getPermission(permission) == null) {
+                                                Bukkit.getPluginManager().addPermission(new Permission(permission));
+                                            }
+                                            ConnectorNPC.save();
+                                            ctx.getSource().sendMessage(Message.CONNECTOR_NPC_PERMISSION_ADDED, permission);
+                                            return 0;
+                                        })))
+                                .then(Commands.literal("listPermissions").executes(ctx -> {
+                                    ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
+                                    ctx.getSource().sendMessage(Message.CONNECTOR_NPC_PERMISSION_LIST, npc.getPermissions().size());
+                                    for (String permission : npc.getPermissions()) {
+                                        ctx
+                                                .getSource()
+                                                .sendMessage(Component
+                                                        .text(" - ")
+                                                        .color(NamedTextColor.GRAY)
+                                                        .append(Component
+                                                                .text(permission)
+                                                                .color(NamedTextColor.DARK_PURPLE)
+                                                                .clickEvent(ClickEvent.clickEvent(Action.SUGGEST_COMMAND, "/lobbysystem npc connector modify " + npc.key() + " removePermission " + permission))));
+                                    }
+                                    return 0;
+                                }))
+                                .then(Commands
+                                        .literal("removePermission")
+                                        .then(Commands.argument("permission", StringArgumentType.string()).executes(ctx -> {
+                                            String permission = StringArgumentType.getString(ctx, "permission");
+                                            ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
+                                            npc.getPermissions().remove(permission);
+                                            ConnectorNPC.save();
+                                            ctx.getSource().sendMessage(Message.CONNECTOR_NPC_PERMISSION_REMOVED, permission);
+                                            return 0;
+                                        })))))
+                .then(Commands.literal("create").then(Commands.argument("task", ServiceTaskArgument.serviceTask()).executes(ctx -> {
+                    Player player = ctx.getSource().asPlayer();
+                    Location loc = Locations.getNiceLocation(player.getLocation());
+                    ConnectorNPC npc = new ConnectorNPC(ServiceTaskArgument.getServiceTask(ctx, "task").getName(), loc);
+                    npc.show();
+                    ConnectorNPC.save();
+                    ctx.getSource().sendMessage(Message.CONNECTOR_NPC_CREATED, npc.key());
+                    return 0;
+                }))));
+    }
 }

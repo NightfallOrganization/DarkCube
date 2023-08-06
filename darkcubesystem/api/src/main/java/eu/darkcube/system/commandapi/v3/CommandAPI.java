@@ -48,6 +48,7 @@ public class CommandAPI {
 
     public void unregister(CommandExecutor command) {
         commands.unregister(command);
+        VersionSupport.version().commandApi().unregister(command);
     }
 
     public void unregisterByPrefix(String prefix) {

@@ -30,7 +30,6 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -262,7 +261,7 @@ public class WoolBattle extends DarkCubePlugin {
         for (WBUser user : WBUser.onlineUsers()) {
             user.user().sendMessage(msg, function.apply(user.user()));
         }
-        BukkitCommandExecutor e = new BukkitCommandExecutor(Bukkit.getConsoleSender());
+        ICommandExecutor e = ICommandExecutor.create(Bukkit.getConsoleSender());
         e.sendMessage(msg, function.apply(e));
     }
 

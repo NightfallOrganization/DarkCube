@@ -21,6 +21,7 @@ import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.provider.via.AbstractViaSupport;
@@ -92,14 +93,13 @@ public class ViaSupport1_8_8 extends AbstractViaSupport {
         }, true);
     }
 
-    @Override
-    public void init() {
+    @Override public void init() {
 
     }
 
     @Override
-    public List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, List<Suggestion> completions) {
-        int id = ViaTabExecutor.work(commandLine, completions);
+    public List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, Suggestions suggestions) {
+        int id = ViaTabExecutor.work(commandLine, suggestions);
         return Collections.singletonList(TAB_COMPLETE_CANCEL + id);
     }
 }

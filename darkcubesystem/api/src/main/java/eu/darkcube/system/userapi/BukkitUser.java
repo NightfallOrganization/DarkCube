@@ -81,13 +81,13 @@ public class BukkitUser implements User {
 	}
 
 	@Override
-	public Language getLanguage() {
+	public Language language() {
 		return this.getPersistentDataStorage()
 				.get(new Key("UserAPI", "language"), LANGUAGE, () -> Language.DEFAULT);
 	}
 
 	@Override
-	public void setLanguage(Language language) {
+	public void language(Language language) {
 		getPersistentDataStorage().set(new Key("UserAPI", "language"), LANGUAGE, language);
 	}
 

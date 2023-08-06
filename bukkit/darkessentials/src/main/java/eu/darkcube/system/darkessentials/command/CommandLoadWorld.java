@@ -7,8 +7,8 @@
 package eu.darkcube.system.darkessentials.command;
 
 import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.StringArgument;
 import eu.darkcube.system.darkessentials.DarkEssentials;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -22,8 +22,8 @@ import java.util.List;
 public class CommandLoadWorld extends EssentialsCommand {
 	public CommandLoadWorld() {
 		super("loadworld",
-				b -> b.then(Commands.argument("world", StringArgument.string()).executes(ctx -> {
-					String worldName = StringArgument.getString(ctx, "world");
+				b -> b.then(Commands.argument("world", StringArgumentType.string()).executes(ctx -> {
+					String worldName = StringArgumentType.getString(ctx, "world");
 					if (!new File(DarkEssentials.getInstance().getServer().getWorldContainer(),
 							worldName).exists() && !new File(
 							DarkEssentials.getInstance().getServer().getWorldContainer()

@@ -7,7 +7,6 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import eu.darkcube.system.commandapi.v3.BukkitCommandExecutor;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
@@ -38,7 +37,7 @@ public class OfflineUser extends UserWithExtraData {
 			UserAPI.getInstance().unloadUser(user);
 		final UserCache.Entry entry = UserCache.cache().getEntry(uuid);
 		this.name = entry.name;
-		this.executor = new BukkitCommandExecutor(new OfflineSender());
+		this.executor = ICommandExecutor.create(new OfflineSender());
 	}
 
 	@Override
