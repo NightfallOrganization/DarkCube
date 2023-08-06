@@ -13,7 +13,7 @@ public class CustomHealthManager {
     private final NamespacedKey healthKey;
     private final NamespacedKey maxHealthKey;
     private final NamespacedKey regenKey;
-
+    private final NamespacedKey aroundDamageKey;
     private final JavaPlugin plugin;
 
     public CustomHealthManager(JavaPlugin plugin) {
@@ -21,7 +21,7 @@ public class CustomHealthManager {
         this.healthKey = new NamespacedKey(plugin, "health");
         this.maxHealthKey = new NamespacedKey(plugin, "max_health");
         this.regenKey = new NamespacedKey(plugin, "regeneration");
-
+        this.aroundDamageKey = new NamespacedKey(plugin, "AroundDamage");// 25
         startRegenerationTask();
     }
 
@@ -100,5 +100,28 @@ public class CustomHealthManager {
             return data.get(regenKey, PersistentDataType.INTEGER);
         }
         return 0;
+    }
+
+    public void resetAroundDamage(Player player) {
+        this.setAroundDamage(player, 0.0);// 109
+    }// 110
+
+    public void setAroundDamage(Player player, double value) {
+        PersistentDataContainer data = player.getPersistentDataContainer();// 113
+        if (!data.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {// 115
+            data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);// 116
+        }
+
+        data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, value);// 118
+    }// 119
+
+    public double getAroundDamage(Player player) {
+        PersistentDataContainer data = player.getPersistentDataContainer();// 122
+        if (data.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {// 123
+            return (Double)data.get(this.aroundDamageKey, PersistentDataType.DOUBLE);// 124
+        } else {
+            data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);// 127
+            return 0.0;// 128
+        }
     }
 }

@@ -13,12 +13,15 @@ import org.bukkit.persistence.PersistentDataType;
 public class ResetLevelCommand implements CommandExecutor {
 
     private LevelXPManager levelXPManager;
-    private CustomHealthManager healthManager;  // Deklaration der Variable hinzufügen
+    private CustomHealthManager healthManager;
+    private DefenseManager defenseManager;
 
-    public ResetLevelCommand(LevelXPManager levelXPManager, CustomHealthManager healthManager) {
+    public ResetLevelCommand(LevelXPManager levelXPManager, CustomHealthManager healthManager, DefenseManager defenseManager) {
         this.levelXPManager = levelXPManager;
-        this.healthManager = healthManager;  // Zuweisung der Variable hinzufügen
+        this.healthManager = healthManager;
+        this.defenseManager = defenseManager;
     }
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -30,12 +33,15 @@ public class ResetLevelCommand implements CommandExecutor {
             healthManager.resetHealth(player);  // Gesundheit zurücksetzen
             healthManager.resetMaxHealth(player);
             healthManager.resetRegen(player);  // Regeneration zurücksetzen
+            healthManager.resetAroundDamage(player);
 
             // Attribute zurücksetzen
             levelXPManager.resetAttribute(player, "speed");
             levelXPManager.resetAttribute(player, "strength");
             levelXPManager.resetAttribute(player, "aroundDamage");
             levelXPManager.resetAttribute(player, "hitSpeed");
+
+            defenseManager.resetDefense(player);
 
             // Spieler Geschwindigkeit und Attribute zurücksetzen
             player.setWalkSpeed(0.2f); // Standardlaufgeschwindigkeit

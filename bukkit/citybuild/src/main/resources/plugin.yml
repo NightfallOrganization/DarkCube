@@ -49,6 +49,16 @@ commands:
     description: Zeigt die aktuellen benutzerdefinierten Health des Spielers an
   addregeneration:
     description: Gibt dem Spieler custom Regeneration
+  addarounddamage:
+    description: Fügt AroundDamage zu einem Spieler hinzu
+  myarounddamage:
+    description: Zeigt den AroundDamage des Spielers an
+  adddefense:
+    description: Gibt dem Spieler custom Defense
+  mydefense:
+    description: Zeigt die aktuelle benutzerdefinierte Defense des Spielers an
+  myregeneration:
+    description: Zeigt den Regenerationswert des Spielers an
 
 permissions:
   gm.use:
@@ -94,4 +104,14 @@ permissions:
   myhealth.use:
     default: op
   addregeneration.use:
+    default: op
+  addarounddamage.use:
+    default: op
+  myarounddamage.use:
+    default: op
+  adddefense.use:
+    default: op
+  mydefense.use:
+    default: op
+  myregeneration.use:
     default: op
