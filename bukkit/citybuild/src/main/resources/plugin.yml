@@ -94,15 +94,15 @@ permissions:
   resetlevel.use:
     default: op
   myxp.use:
-    default: op
+    default: not op
   myap.use:
-    default: op
+    default: not op
   attribute.use:
     default: not op
   addhealth.use:
     default: op
   myhealth.use:
-    default: op
+    default: not op
   addregeneration.use:
     default: op
   addarounddamage.use:

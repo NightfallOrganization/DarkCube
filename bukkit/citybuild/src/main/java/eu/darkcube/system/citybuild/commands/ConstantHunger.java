@@ -16,9 +16,10 @@ public class ConstantHunger implements Listener {
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player) {
-            if (event.getFoodLevel() < 18) {
+            Player player = (Player) event.getEntity();
+            if(event.getFoodLevel() != player.getFoodLevel()) {
                 event.setCancelled(true);
-                ((Player) event.getEntity()).setFoodLevel(18);
+                player.setFoodLevel(20);
             }
         }
     }

@@ -39,11 +39,11 @@ public class Citybuild extends JavaPlugin {
     }
 
     public DefenseManager getDefenseManager() {
-        return this.defenseManager;// 33
+        return this.defenseManager;
     }
 
     public NamespacedKey getAroundDamageKey() {
-        return this.aroundDamageKey;// 37
+        return this.aroundDamageKey;
     }
 
     public PlayerOnlineTimeTracker getPlayerOnlineTimeTracker() {
@@ -56,110 +56,104 @@ public class Citybuild extends JavaPlugin {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        this.levelXPManager = new LevelXPManager(this);// 42
-        CustomHealthManager healthManager = new CustomHealthManager(this);// 43
-        AttributeCommand attributeCommand = new AttributeCommand(this, healthManager);// 44
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule naturalRegeneration false");// 46
-        AroundDamageCommands aroundDamageCommands = new AroundDamageCommands(this);// 47
-        this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");// 48
-        this.defenseManager = new DefenseManager(this);// 49
-        instance.getCommand("gm").setExecutor(new GM());// 51
-        instance.getCommand("heal").setExecutor(new Heal(healthManager));// 52
-        instance.getCommand("day").setExecutor(new Day());// 53
-        instance.getCommand("night").setExecutor(new Night());// 54
-        instance.getCommand("god").setExecutor(new God());// 55
-        instance.getCommand("fly").setExecutor(new Fly());// 56
-        instance.getCommand("feed").setExecutor(new Feed());// 57
-        instance.getCommand("max").setExecutor(new Max());// 58
-        instance.getCommand("trash").setExecutor(new Trash());// 59
-        instance.getCommand("warp").setExecutor(new Warp());// 60
-        instance.getCommand("spawn").setExecutor(new SpawnCommand());// 61
-        instance.getCommand("getitem").setExecutor(new GetItem());// 62
-        instance.getCommand("killmobs").setExecutor(new KillMobs());// 63
-        instance.getCommand("addxp").setExecutor(new AddXPCommand(this.levelXPManager));// 64
-        instance.getCommand("mylevel").setExecutor(new MyLevelCommand(this.levelXPManager));// 65
-        instance.getCommand("resetlevel").setExecutor(new ResetLevelCommand(this.levelXPManager, healthManager, this.defenseManager));// 66
-        instance.getCommand("myxp").setExecutor(new MyXPCommand(this.levelXPManager));// 67
-        instance.getCommand("myap").setExecutor(new MyAPCommand(this.levelXPManager));// 68
-        instance.getCommand("attribute").setExecutor(attributeCommand);// 69
-        instance.getCommand("addhealth").setExecutor(new AddHealthCommand(healthManager));// 70
-        instance.getCommand("myhealth").setExecutor(new MyHealthCommand(healthManager));// 71
-        instance.getCommand("addregeneration").setExecutor(new RegenerationCommand(healthManager));// 72
-        instance.getCommand("addarounddamage").setExecutor(aroundDamageCommands);// 73
-        instance.getCommand("myarounddamage").setExecutor(aroundDamageCommands);// 74
-        instance.getCommand("adddefense").setExecutor(new AddDefenseCommand(this));// 75
-        instance.getCommand("mydefense").setExecutor(new MyDefenseCommand(this.defenseManager));// 76
-        instance.getCommand("myregeneration").setExecutor(new MyRegenCommand(healthManager));// 77
+        this.levelXPManager = new LevelXPManager(this);
+        CustomHealthManager healthManager = new CustomHealthManager(this);
+        AttributeCommand attributeCommand = new AttributeCommand(this, healthManager);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule naturalRegeneration false");
+        AroundDamageCommands aroundDamageCommands = new AroundDamageCommands(this);
+        this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
+        this.defenseManager = new DefenseManager(this);
+        instance.getCommand("gm").setExecutor(new GM());
+        instance.getCommand("heal").setExecutor(new Heal(healthManager));
+        instance.getCommand("day").setExecutor(new Day());
+        instance.getCommand("night").setExecutor(new Night());
+        instance.getCommand("god").setExecutor(new God());
+        instance.getCommand("fly").setExecutor(new Fly());
+        instance.getCommand("feed").setExecutor(new Feed());
+        instance.getCommand("max").setExecutor(new Max());
+        instance.getCommand("trash").setExecutor(new Trash());
+        instance.getCommand("warp").setExecutor(new Warp());
+        instance.getCommand("spawn").setExecutor(new SpawnCommand());
+        instance.getCommand("getitem").setExecutor(new GetItem());
+        instance.getCommand("killmobs").setExecutor(new KillMobs());
+        instance.getCommand("addxp").setExecutor(new AddXPCommand(this.levelXPManager));
+        instance.getCommand("mylevel").setExecutor(new MyLevelCommand(this.levelXPManager));
+        instance.getCommand("resetlevel").setExecutor(new ResetLevelCommand(this.levelXPManager, healthManager, this.defenseManager, this));
+        instance.getCommand("myxp").setExecutor(new MyXPCommand(this.levelXPManager));
+        instance.getCommand("myap").setExecutor(new MyAPCommand(this.levelXPManager));
+        instance.getCommand("attribute").setExecutor(attributeCommand);
+        instance.getCommand("addhealth").setExecutor(new AddHealthCommand(healthManager));
+        instance.getCommand("myhealth").setExecutor(new MyHealthCommand(healthManager));
+        instance.getCommand("addregeneration").setExecutor(new RegenerationCommand(healthManager));
+        instance.getCommand("addarounddamage").setExecutor(aroundDamageCommands);
+        instance.getCommand("myarounddamage").setExecutor(aroundDamageCommands);
+        instance.getCommand("adddefense").setExecutor(new AddDefenseCommand(this));
+        instance.getCommand("mydefense").setExecutor(new MyDefenseCommand(this.defenseManager));
+        instance.getCommand("myregeneration").setExecutor(new MyRegenCommand(healthManager));
 
         CommandAPI.instance().register(glyphCommand);
 
-        (new ActionBarTask("Ⲓ", "Ⲕ")).runTaskTimer(this, 0L, 3L);// 79
-        this.customItemManager = new CustomItemManager(this);// 81
-        this.customItemManager.registerItems();// 82
-        BackpackListener backpackListener = new BackpackListener(this.customItemManager);// 85
-        backpackListener.loadInventories();// 86
-        this.getServer().getPluginManager().registerEvents(backpackListener, this);// 89
-        ScoreboardHandler scoreboardHandler = new ScoreboardHandler();// 91
-        this.playerOnlineTimeTracker = new PlayerOnlineTimeTracker(scoreboardHandler);// 92
-        Iterator var6 = this.getServer().getOnlinePlayers().iterator();// 93
+        (new ActionBarTask("Ⲓ", "Ⲕ")).runTaskTimer(this, 0L, 3L);
+        this.customItemManager = new CustomItemManager(this);
+        this.customItemManager.registerItems();
+        ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
+        this.playerOnlineTimeTracker = new PlayerOnlineTimeTracker(scoreboardHandler);
+        Iterator var6 = this.getServer().getOnlinePlayers().iterator();
 
         while(var6.hasNext()) {
             Player player = (Player)var6.next();
-            scoreboardHandler.showPlayerLevelScoreboard(player);// 94
+            scoreboardHandler.showPlayerLevelScoreboard(player);
         }
 
         Fly flyCommand = new Fly();// 98
-        this.getServer().getPluginManager().registerEvents(flyCommand, this);// 99
-        this.getCommand("fly").setExecutor(flyCommand);// 100
-        (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);// 103
-        LevelXPManager levelXPManager = new LevelXPManager(this);// 105
-        MonsterLevelHandler monsterLevelHandler = new MonsterLevelHandler(levelXPManager);// 106
-        this.getServer().getPluginManager().registerEvents(monsterLevelHandler, this);// 107
-        this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");// 109
-        AroundDamageHandler aroundDamageHandlerWithKey = new AroundDamageHandler(this, this.getAroundDamageKey());// 110
-        AroundDamageHandler aroundDamageHandler = new AroundDamageHandler(this, this.getAroundDamageKey());// 111
-        this.getServer().getPluginManager().registerEvents(aroundDamageHandler, this);// 112
-        this.getServer().getPluginManager().registerEvents(aroundDamageHandlerWithKey, this);// 113
-        this.getServer().getPluginManager().registerEvents(new DefenseListener(this.defenseManager), this);// 115
-        this.getServer().getPluginManager().registerEvents(new DefenseListener(this.defenseManager), this);// 116
-        this.getServer().getPluginManager().registerEvents(new AroundDamageHandler(this, this.getAroundDamageKey()), this);// 117
-        this.getServer().getPluginManager().registerEvents(new NoEffectPlugin(), this);// 118
-        this.getServer().getPluginManager().registerEvents(new ConstantHunger(), this);// 119
-        this.getServer().getPluginManager().registerEvents(new CustomDeathMessage(), this);// 120
-        this.getServer().getPluginManager().registerEvents(new PlayerDeathListener(healthManager), this);// 121
-        this.getServer().getPluginManager().registerEvents(new DamageListener(healthManager), this);// 122
-        this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);// 123
-        this.getServer().getPluginManager().registerEvents(attributeCommand, this);// 124
-        this.getServer().getPluginManager().registerEvents(new CustomMonsterSpawn(), this);// 125
-        this.getServer().getPluginManager().registerEvents(new NoMonsterSpawn(), this);// 126
-        this.getServer().getPluginManager().registerEvents(new NoLeafDecayListener(), this);// 127
-        this.getServer().getPluginManager().registerEvents(new NoMobDropsListener(), this);// 128
-        this.getServer().getPluginManager().registerEvents(levelXPManager, this);// 129
-        this.getServer().getPluginManager().registerEvents(new EndermanBlockPickupListener(), this);// 130
-        this.getServer().getPluginManager().registerEvents(new NoXpListener(), this);// 131
-        this.getServer().getPluginManager().registerEvents(new NoFriendlyFireHandler(), this);// 132
-        this.getServer().getPluginManager().registerEvents(new TimeHandler(), this);// 133
-        this.getServer().getPluginManager().registerEvents(new SwiftSwordListener(), this);// 134
-        this.getServer().getPluginManager().registerEvents(new RingOfHealingSwapHandler(), this);// 135
-        this.getServer().getPluginManager().registerEvents(new RingOfHealingListener(this), this);// 136
-        this.getServer().getPluginManager().registerEvents(new EnderBagListener(), this);// 137
-        this.getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);// 138
-        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(scoreboardHandler), this);// 139
-        this.getServer().getPluginManager().registerEvents(new PlayerLevelChangeListener(scoreboardHandler), this);// 140
-        this.getServer().getPluginManager().registerEvents(this.playerOnlineTimeTracker, this);// 141
-        (new ScoreboardUpdater(scoreboardHandler)).runTaskTimer(this, 0L, 9000L);// 144
+        this.getServer().getPluginManager().registerEvents(flyCommand, this);
+        this.getCommand("fly").setExecutor(flyCommand);
+        (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);
+        LevelXPManager levelXPManager = new LevelXPManager(this);
+        MonsterLevelHandler monsterLevelHandler = new MonsterLevelHandler(levelXPManager);
+        this.getServer().getPluginManager().registerEvents(monsterLevelHandler, this);
+        this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
+        AroundDamageHandler aroundDamageHandlerWithKey = new AroundDamageHandler(this, this.getAroundDamageKey());
+        AroundDamageHandler aroundDamageHandler = new AroundDamageHandler(this, this.getAroundDamageKey());
+        new BagListener(this);
+
+        this.getServer().getPluginManager().registerEvents(new SoundListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);
+        this.getServer().getPluginManager().registerEvents(aroundDamageHandler, this);
+        this.getServer().getPluginManager().registerEvents(aroundDamageHandlerWithKey, this);
+        this.getServer().getPluginManager().registerEvents(new DefenseListener(this.defenseManager), this);
+        this.getServer().getPluginManager().registerEvents(new DefenseListener(this.defenseManager), this);
+        this.getServer().getPluginManager().registerEvents(new AroundDamageHandler(this, this.getAroundDamageKey()), this);
+        this.getServer().getPluginManager().registerEvents(new NoEffectPlugin(), this);
+        this.getServer().getPluginManager().registerEvents(new ConstantHunger(), this);
+        this.getServer().getPluginManager().registerEvents(new CustomDeathMessage(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerDeathListener(healthManager), this);
+        this.getServer().getPluginManager().registerEvents(new DamageListener(healthManager), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);
+        this.getServer().getPluginManager().registerEvents(attributeCommand, this);
+        this.getServer().getPluginManager().registerEvents(new CustomMonsterSpawn(), this);
+        this.getServer().getPluginManager().registerEvents(new NoMonsterSpawn(), this);
+        this.getServer().getPluginManager().registerEvents(new NoLeafDecayListener(), this);
+        this.getServer().getPluginManager().registerEvents(new NoMobDropsListener(), this);
+        this.getServer().getPluginManager().registerEvents(levelXPManager, this);
+        this.getServer().getPluginManager().registerEvents(new EndermanBlockPickupListener(), this);
+        this.getServer().getPluginManager().registerEvents(new NoXpListener(), this);
+        this.getServer().getPluginManager().registerEvents(new NoFriendlyFireHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new TimeHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new SwiftSwordListener(), this);
+        this.getServer().getPluginManager().registerEvents(new RingOfHealingSwapHandler(), this);
+        this.getServer().getPluginManager().registerEvents(new RingOfHealingListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new EnderBagListener(), this);
+        this.getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(scoreboardHandler), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerLevelChangeListener(scoreboardHandler), this);
+        this.getServer().getPluginManager().registerEvents(this.playerOnlineTimeTracker, this);
+        (new ScoreboardUpdater(scoreboardHandler)).runTaskTimer(this, 0L, 9000L);
     }// 146
 
     @Override public void onDisable() {
         CommandAPI.instance().unregister(glyphCommand);
-        // Speichern der Inventare
-        for (RegisteredListener registeredListener : HandlerList.getRegisteredListeners(this)) {
-            Listener listener = registeredListener.getListener();
-            if (listener instanceof BackpackListener) {
-                ((BackpackListener) listener).saveInventories();
-                break;
-            }
-        }
+
         customItemManager.unloadRecipes();
     }
 
