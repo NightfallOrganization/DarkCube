@@ -18,7 +18,7 @@ public class DamageListener implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            int damage = (int) (event.getDamage() * 2);  // da 1 Herz = 2 Health
+            int damage = (int) (event.getDamage() * 1);  // da 1 Herz = 2 Health
             int currentHealth = healthManager.getHealth(player);
 
             if (currentHealth <= damage) {

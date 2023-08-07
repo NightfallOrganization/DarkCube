@@ -13,24 +13,26 @@ import org.bukkit.persistence.PersistentDataType;
 public class DefenseManager {
     private Citybuild plugin;
     private static final NamespacedKey DEFENSE_KEY = new NamespacedKey(Citybuild.getInstance(), "defense");
+    private static final double DEFENSE_MULTIPLIER = 0.25;  // Sie können diesen Wert anpassen
 
     public DefenseManager(Citybuild plugin) {
-        this.plugin = plugin;// 20
-    }// 21
+        this.plugin = plugin;
+    }
 
     public void addDefense(Player player, int defenseToAdd) {
-        PersistentDataContainer data = player.getPersistentDataContainer();// 24
-        int currentDefense = (Integer)data.getOrDefault(DEFENSE_KEY, PersistentDataType.INTEGER, 0);// 25
-        data.set(DEFENSE_KEY, PersistentDataType.INTEGER, currentDefense + defenseToAdd);// 26
-    }// 27
+        PersistentDataContainer data = player.getPersistentDataContainer();
+        double currentDefense = data.getOrDefault(DEFENSE_KEY, PersistentDataType.DOUBLE, 0.0);
+        data.set(DEFENSE_KEY, PersistentDataType.DOUBLE, currentDefense + (defenseToAdd * DEFENSE_MULTIPLIER));
+        System.out.println("Adding defense for " + player.getName());
+    }
 
     public void resetDefense(Player player) {
-        PersistentDataContainer data = player.getPersistentDataContainer();// 30
-        data.set(DEFENSE_KEY, PersistentDataType.INTEGER, 0);// 31
-    }// 32
+        PersistentDataContainer data = player.getPersistentDataContainer();
+        data.set(DEFENSE_KEY, PersistentDataType.DOUBLE, 0.0);
+    }
 
-    public int getDefense(Player player) {
-        PersistentDataContainer data = player.getPersistentDataContainer();// 35
-        return (Integer)data.getOrDefault(DEFENSE_KEY, PersistentDataType.INTEGER, 0);// 36
+    public double getDefense(Player player) {
+        PersistentDataContainer data = player.getPersistentDataContainer();
+        return data.getOrDefault(DEFENSE_KEY, PersistentDataType.DOUBLE, 0.0);
     }
 }

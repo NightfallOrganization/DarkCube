@@ -25,14 +25,11 @@ public class CustomItemManager {
 		this.plugin = plugin;
 	}
 
+	public JavaPlugin getPlugin() {
+		return this.plugin;
+	}
+
 	public void registerItems() {
-		// Add the recipe for the custom firework star
-		ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(plugin, "custom_firework_star"), getCustomFireworkStar());
-		recipe.shape("ABA", "ACA", "AAA");
-		recipe.setIngredient('A', Material.LEATHER);
-		recipe.setIngredient('B', Material.GOLD_BLOCK);
-		recipe.setIngredient('C', Material.CHEST);
-		addRecipe(recipe);
 
 		// Add the recipe for the ender bag
 		ShapedRecipe enderBagRecipe = new ShapedRecipe(new NamespacedKey(plugin, "ender_bag"), getEnderBag());
@@ -43,30 +40,6 @@ public class CustomItemManager {
 		enderBagRecipe.setIngredient('D', Material.ENDER_CHEST);
 		addRecipe(enderBagRecipe);
 
-		// Add the recipe for the "Ring of Healing"
-		ShapedRecipe ringOfHealingRecipe = new ShapedRecipe(new NamespacedKey(plugin, "ring_of_healing"), getRingOfHealing());
-		ringOfHealingRecipe.shape("ABA", "ACA", "AAA");
-		ringOfHealingRecipe.setIngredient('A', Material.GOLD_BLOCK);
-		ringOfHealingRecipe.setIngredient('B', Material.NETHERITE_INGOT);
-		ringOfHealingRecipe.setIngredient('C', Material.GLISTERING_MELON_SLICE);
-		addRecipe(ringOfHealingRecipe);
-
-		// Add the recipe for the "Ring of Speed"
-		ShapedRecipe ringOfSpeedRecipe = new ShapedRecipe(new NamespacedKey(plugin, "ring_of_speed"), getRingOfSpeed());
-		ringOfSpeedRecipe.shape("ABA", "ACA", "AAA");
-		ringOfSpeedRecipe.setIngredient('A', Material.IRON_BLOCK);
-		ringOfSpeedRecipe.setIngredient('B', Material.NETHERITE_INGOT);
-		ringOfSpeedRecipe.setIngredient('C', Material.FEATHER);
-		addRecipe(ringOfSpeedRecipe);
-
-		// Add the recipe for the "Swift Sword"
-		ShapedRecipe swiftSwordRecipe = new ShapedRecipe(new NamespacedKey(plugin, "swift_sword"), getSwiftSword());
-		swiftSwordRecipe.shape("ABA", "DCD", "ABA");
-		swiftSwordRecipe.setIngredient('A', Material.OBSIDIAN);
-		swiftSwordRecipe.setIngredient('B', Material.AMETHYST_CLUSTER);
-		swiftSwordRecipe.setIngredient('C', Material.NETHERITE_SWORD);
-		swiftSwordRecipe.setIngredient('D', Material.ENCHANTED_GOLDEN_APPLE);
-		addRecipe(swiftSwordRecipe);
 	}
 
 	private void addRecipe(ShapedRecipe recipe){
@@ -80,15 +53,15 @@ public class CustomItemManager {
 		}
 	}
 
-	public static ItemStack getCustomFireworkStar() {
-		ItemStack customFireworkStar = new ItemStack(Material.FIREWORK_STAR, 1);
-		ItemMeta meta = customFireworkStar.getItemMeta();
+	public static ItemStack getOrdinaryBag() {
+		ItemStack ordinaryBag = new ItemStack(Material.FIREWORK_STAR, 1);
+		ItemMeta meta = ordinaryBag.getItemMeta();
 		if (meta != null) {
-			meta.setCustomModelData(1);
-			meta.setDisplayName("§aOrdinary Bag");
-			customFireworkStar.setItemMeta(meta);
+			meta.setCustomModelData(1);  // Eine andere CustomModelData als die anderen Items
+			meta.setDisplayName("§6Ordinary Bag");
+			ordinaryBag.setItemMeta(meta);
 		}
-		return customFireworkStar;
+		return ordinaryBag;
 	}
 
 	public static ItemStack getEnderBag() {

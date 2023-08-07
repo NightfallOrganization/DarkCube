@@ -27,7 +27,7 @@ public class GetItem implements CommandExecutor {
                     .build());
 
             inventory.setItem(0, CustomItemManager.getSwiftSword());
-            inventory.setItem(1, CustomItemManager.getCustomFireworkStar());
+            inventory.setItem(1, CustomItemManager.getOrdinaryBag());
             inventory.setItem(2, CustomItemManager.getEnderBag());
             inventory.setItem(3, CustomItemManager.getRingOfHealing());
             inventory.setItem(4, CustomItemManager.getRingOfSpeed());
