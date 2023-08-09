@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.citybuild.commands;
 
 import org.bukkit.Bukkit;
@@ -26,7 +33,7 @@ public class SchadensAnzeige implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof LivingEntity) {
-            CustomHealthManager healthManager = new CustomHealthManager(Citybuild.getInstance());
+            CustomHealthManager healthManager = Citybuild.getInstance().getHealthManager();
             previousHealthMap.put(entity.getUniqueId(), healthManager.getMonsterHealth((LivingEntity) entity));
         }
     }
@@ -44,7 +51,7 @@ public class SchadensAnzeige implements Listener {
             if (previousHealthMap.containsKey(entity.getUniqueId())) {
                 int previousHealth = previousHealthMap.get(entity.getUniqueId());
                 Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), () -> {
-                    CustomHealthManager healthManager = new CustomHealthManager(Citybuild.getInstance());
+                    CustomHealthManager healthManager = Citybuild.getInstance().getHealthManager();
                     int newHealth = healthManager.getMonsterHealth((LivingEntity) entity);
                     int schaden = previousHealth - newHealth;
 
