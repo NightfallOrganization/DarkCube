@@ -30,9 +30,9 @@ public class Warp implements CommandExecutor {
 
 		// Create ItemStacks
 		ItemStack grassBlock = new ItemStack(Material.GRASS_BLOCK);
-		ItemStack crimsonNylium = new ItemStack(Material.CRIMSON_NYLIUM);
+		ItemStack crimsonNylium = new ItemStack(Material.ENDER_EYE);
 		ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
-		ItemStack endStone = new ItemStack(Material.END_STONE);
+		ItemStack endStone = new ItemStack(Material.ENDER_EYE);
 		ItemStack deepslate = new ItemStack(Material.DEEPSLATE_TILE_SLAB);
 
 		// Set the names
@@ -41,7 +41,7 @@ public class Warp implements CommandExecutor {
 		grassBlock.setItemMeta(grassBlockMeta);
 
 		ItemMeta crimsonNyliumMeta = crimsonNylium.getItemMeta();
-		crimsonNyliumMeta.setDisplayName("§4Nether");
+		crimsonNyliumMeta.setDisplayName("§eSoon...");
 		crimsonNylium.setItemMeta(crimsonNyliumMeta);
 
 		ItemMeta netherStarMeta = netherStar.getItemMeta();
@@ -49,7 +49,7 @@ public class Warp implements CommandExecutor {
 		netherStar.setItemMeta(netherStarMeta);
 
 		ItemMeta endStoneMeta = endStone.getItemMeta();
-		endStoneMeta.setDisplayName("§eEnd");
+		endStoneMeta.setDisplayName("§eSoon...");
 		endStone.setItemMeta(endStoneMeta);
 
 		ItemMeta deepslateMeta = deepslate.getItemMeta();

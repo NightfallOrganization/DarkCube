@@ -28,7 +28,7 @@ public class PlayerJoinListener implements Listener {
 		joinTimes.put(player.getUniqueId(), System.currentTimeMillis());
 
 		// Erzwinge Ressourcenpaket-Download
-		String texturePackUrl = "";
+		String texturePackUrl = "https://metropolis.darkcube.eu/Metropolis.zip";
 		player.setResourcePack(texturePackUrl);
 	}
 
