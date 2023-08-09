@@ -14,18 +14,22 @@ import org.bukkit.event.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import java.util.Random;
+
+import java.util.*;
+
 import org.bukkit.entity.Monster;
 
 import java.util.Random;
-import java.util.UUID;
 
 public class MonsterLevelHandler implements Listener {
 
 	private LevelXPManager levelXPManager;
+	private CustomHealthManager healthManager;
+	private final Map<LivingEntity, Map<Player, Double>> damageMap = new HashMap<>();
 
-	public MonsterLevelHandler(LevelXPManager levelXPManager) {
+	public MonsterLevelHandler(LevelXPManager levelXPManager, CustomHealthManager healthManager) {
 		this.levelXPManager = levelXPManager;
+		this.healthManager = healthManager;
 	}
 
 	private static final String WORLD_NAME = "Beastrealm";
@@ -35,6 +39,7 @@ public class MonsterLevelHandler implements Listener {
 	@EventHandler
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		Entity entity = event.getEntity();
+
 		// Storniert das Spawnen, wenn die Kreatur friedlich ist
 		if (entity instanceof Animals || entity instanceof Villager || entity instanceof Golem || entity instanceof Bat || entity instanceof Squid) {
 			event.setCancelled(true);
@@ -64,7 +69,12 @@ public class MonsterLevelHandler implements Listener {
 
 		applyLevelToMonster(monster, level);
 		equipMonster(monster, level);
+
+
 	}
+
+
+
 
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
@@ -86,7 +96,6 @@ public class MonsterLevelHandler implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		LivingEntity entity = event.getEntity();
-		Player killer = entity.getKiller();
 
 		if (!(entity instanceof Monster)) {
 			return;
@@ -97,19 +106,55 @@ public class MonsterLevelHandler implements Listener {
 			return;
 		}
 
-		if (killer == null) {
-			return;
+		// Holt die Schadensmap für das aktuelle Monster
+		Map<Player, Double> playerDamages = damageMap.get(entity);
+		if (playerDamages != null) {
+			// Ermittelt den Spieler, der dem Monster den meisten Schaden zugefügt hat
+			Player topDamager = playerDamages.entrySet().stream()
+					.max(Map.Entry.comparingByValue())
+					.map(Map.Entry::getKey)
+					.orElse(null);
+
+			if (topDamager != null) {
+				int level = calculateMonsterLevel(entity.getLocation());
+				double xp = levelXPManager.getXPForLevel(level);
+				double xpMultiplier = 0.005;
+				xp *= xpMultiplier;
+
+				levelXPManager.addXP(topDamager, xp);
+			}
+
+			damageMap.remove(entity);  // Entfernt das Monster aus der Schadensverfolgung, da es jetzt tot ist
 		}
-
-		int level = calculateMonsterLevel(entity.getLocation());
-
-		double xp = levelXPManager.getXPForLevel(level);
-		double xpMultiplier = 0.005;  // Monster geben nur 50% der benötigten XP pro Level
-		xp *= xpMultiplier;
-
-		levelXPManager.addXP(killer, xp);
 	}
 
+
+	@EventHandler
+	public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
+		if (event.getDamager() instanceof Player) {
+			Player player = (Player) event.getDamager();
+			LivingEntity target = (LivingEntity) event.getEntity();
+
+			damageMap
+					.computeIfAbsent(target, k -> new HashMap<>())
+					.merge(player, event.getFinalDamage(), Double::sum);
+
+			int currentHealth = healthManager.getMonsterHealth(target);
+			int newHealth = currentHealth - (int) event.getFinalDamage();
+
+			if (newHealth <= 0) {
+				target.setHealth(0);
+			} else {
+				healthManager.setMonsterHealth(target, newHealth);
+				if(target instanceof Monster) {
+					updateMonsterName((Monster)target);
+				}
+				event.setDamage(0.1);  // Setzen Sie den Schaden temporär auf einen geringen Wert
+
+//				player.sendMessage("Das Monster hat jetzt noch " + newHealth + " Health.");
+			}
+		}
+	}
 
 
 
@@ -159,21 +204,27 @@ public class MonsterLevelHandler implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void onMonsterDamage(EntityDamageEvent event) {
+		if (event.getEntity() instanceof Monster) {
+			Monster monster = (Monster) event.getEntity();
+			int currentHealth = healthManager.getMonsterHealth(monster);
+			int newHealth = currentHealth - (int) event.getFinalDamage();
+			if (newHealth <= 0) {
+				monster.setHealth(0);
+			} else {
+				healthManager.setMonsterHealth(monster, newHealth);
+				updateMonsterName(monster);
+				event.setDamage(0.1);  // Setzen Sie den Schaden temporär auf einen geringen Wert
+			}
+		}
+	}
 
 	@EventHandler
-	public void onEntityCombust(EntityCombustEvent event) {
-		if (!(event.getEntity() instanceof Monster)) {
-			return;
+	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+		if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.CUSTOM) {
+			event.setCancelled(true);
 		}
-
-		Monster monster = (Monster) event.getEntity();
-		World world = monster.getWorld();
-		if (!world.getName().equals(WORLD_NAME)) {
-			return;
-		}
-
-		// Verhindert jegliches Verbrennen des Monsters.
-		event.setCancelled(true);
 	}
 
 	private int calculateMonsterLevel(Location location) {
@@ -183,11 +234,11 @@ public class MonsterLevelHandler implements Listener {
 		return Math.max(1, distance / 100);
 	}
 
-
 	private void applyLevelToMonster(Monster monster, int level) {
-		double maxHealth = Math.min(level * 20, 2048);
-		monster.setMaxHealth(maxHealth);
-		monster.setHealth(maxHealth);
+		double maxHealth = level * 20;
+		healthManager.setMonsterHealth(monster, (int) maxHealth);
+		healthManager.setMonsterMaxHealth(monster, (int) maxHealth);
+		updateMonsterName(monster);
 		monster.setCustomName("§6Level §e" + level + " §7- §c100%");
 		monster.setCustomNameVisible(true);
 
@@ -231,22 +282,27 @@ public class MonsterLevelHandler implements Listener {
 		}
 	}
 
+	private void updateMonsterName(Monster monster) {
+		double maxHealth = healthManager.getMonsterMaxHealth(monster);
+		double currentHealth = healthManager.getMonsterHealth(monster);
+		double healthPercentage = (currentHealth / maxHealth) * 100;
+
+		String customName = monster.getCustomName();
+		if (customName != null && !customName.isEmpty()) {
+			int levelStartIndex = customName.indexOf("§e") + 2;  // +2 um "§e" zu überspringen
+			int levelEndIndex = customName.indexOf(" ", levelStartIndex);
+			String levelString = customName.substring(levelStartIndex, levelEndIndex);
+
+			monster.setCustomName("§6Level §e" + levelString + " §7- §c" + String.format("%.0f", healthPercentage) + "%");
+		} else {
+			monster.setCustomName("§c" + String.format("%.0f", healthPercentage) + "%");
+		}
+		monster.setCustomNameVisible(true);
+	}
 
 	private void equipRandomArmor(LivingEntity entity, int level) {
 		// Die Methode zum Ausrüsten der Monster mit zufälliger Rüstung und Waffen
 	}
-
-	private void updateMonsterName(Monster monster) {
-		double healthPercentage = (monster.getHealth() / monster.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) * 100;
-		String customName = monster.getCustomName();
-		if (customName != null && !customName.isEmpty()) {
-			int levelStartIndex = customName.indexOf("§e") + 2;  // +2 to skip "§e"
-			int levelEndIndex = customName.indexOf(" ", levelStartIndex);
-			String levelString = customName.substring(levelStartIndex, levelEndIndex);
-			monster.setCustomName("§6Level§7:§e" + levelString + " §7- §c" + String.format("%.2f", healthPercentage) + "%");
-		}
-	}
-
 
 	public void equipMonster(Monster monster, int level) {
 		Random random = new Random();

@@ -2,6 +2,7 @@ package eu.darkcube.system.citybuild.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -114,6 +115,32 @@ public class CustomHealthManager {
 
         data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, value);// 118
     }// 119
+
+    public void setMonsterHealth(LivingEntity monster, int health) {
+        PersistentDataContainer data = monster.getPersistentDataContainer();
+        data.set(healthKey, PersistentDataType.INTEGER, health);
+    }
+
+    public void setMonsterMaxHealth(LivingEntity monster, int health) {
+        PersistentDataContainer data = monster.getPersistentDataContainer();
+        data.set(maxHealthKey, PersistentDataType.INTEGER, health);
+    }
+
+    public int getMonsterHealth(LivingEntity monster) {
+        PersistentDataContainer data = monster.getPersistentDataContainer();
+        if (data.has(healthKey, PersistentDataType.INTEGER)) {
+            return data.get(healthKey, PersistentDataType.INTEGER);
+        }
+        return 0;
+    }
+
+    public int getMonsterMaxHealth(LivingEntity monster) {
+        PersistentDataContainer data = monster.getPersistentDataContainer();
+        if (data.has(maxHealthKey, PersistentDataType.INTEGER)) {
+            return data.get(maxHealthKey, PersistentDataType.INTEGER);
+        }
+        return 0;
+    }
 
     public double getAroundDamage(Player player) {
         PersistentDataContainer data = player.getPersistentDataContainer();// 122

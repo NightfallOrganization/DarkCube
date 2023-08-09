@@ -25,7 +25,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 public class CustomMonsterSpawn implements Listener {
     Random random = new Random();
-    private static final int SPAWN_CHANCE = 30;
+    private static final int SPAWN_CHANCE = 15;
     private static final double CHECK_RADIUS = 15.0;
 
     public CustomMonsterSpawn() {

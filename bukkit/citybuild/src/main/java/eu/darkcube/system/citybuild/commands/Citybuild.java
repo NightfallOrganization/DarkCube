@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.citybuild.commands;
 
+import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
 import org.bukkit.Bukkit;
@@ -110,13 +111,16 @@ public class Citybuild extends JavaPlugin {
         this.getCommand("fly").setExecutor(flyCommand);
         (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);
         LevelXPManager levelXPManager = new LevelXPManager(this);
-        MonsterLevelHandler monsterLevelHandler = new MonsterLevelHandler(levelXPManager);
+        MonsterLevelHandler monsterLevelHandler = new MonsterLevelHandler(levelXPManager, healthManager);
         this.getServer().getPluginManager().registerEvents(monsterLevelHandler, this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         AroundDamageHandler aroundDamageHandlerWithKey = new AroundDamageHandler(this, this.getAroundDamageKey());
         AroundDamageHandler aroundDamageHandler = new AroundDamageHandler(this, this.getAroundDamageKey());
         new BagListener(this);
 
+        this.getServer().getPluginManager().registerEvents(new EntityHealListener(), this);
+  //      this.getServer().getPluginManager().registerEvents(new SchadensAnzeige(), this);
+     //   this.getServer().getPluginManager().registerEvents(new KnockbackListener(), this);
         this.getServer().getPluginManager().registerEvents(new SoundListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);
         this.getServer().getPluginManager().registerEvents(aroundDamageHandler, this);
@@ -149,7 +153,7 @@ public class Citybuild extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerLevelChangeListener(scoreboardHandler), this);
         this.getServer().getPluginManager().registerEvents(this.playerOnlineTimeTracker, this);
         (new ScoreboardUpdater(scoreboardHandler)).runTaskTimer(this, 0L, 9000L);
-    }// 146
+    }
 
     @Override public void onDisable() {
         CommandAPI.instance().unregister(glyphCommand);
