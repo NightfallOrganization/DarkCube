@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -36,7 +36,7 @@ public class SafetyPlatformPerk extends Perk {
         protected boolean activateRight(UserPerk perk) {
             boolean suc = setBlocks(perk.owner());
             if (!suc)
-                WoolBattle.instance().ingame().playSoundNotEnoughWool(perk.owner());
+                WoolBattleBukkit.instance().ingame().playSoundNotEnoughWool(perk.owner());
             return suc;
         }
 
@@ -67,7 +67,7 @@ public class SafetyPlatformPerk extends Perk {
         }
 
         private void block(Location loc, WBUser u) {
-            WoolBattle.instance().ingame().place(u, loc.getBlock());
+            WoolBattleBukkit.instance().ingame().place(u, loc.getBlock());
         }
     }
 

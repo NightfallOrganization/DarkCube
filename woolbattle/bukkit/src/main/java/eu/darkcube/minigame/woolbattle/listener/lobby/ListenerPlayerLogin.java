@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.lobby;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Bukkit;
@@ -44,7 +44,7 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
         Player p = e.getPlayer();
         PermissionInfo info = getPermissionInfo(p);
 
-        boolean full = WoolBattle.instance().maxPlayers() <= WBUser.onlineUsers().size();
+        boolean full = WoolBattleBukkit.instance().maxPlayers() <= WBUser.onlineUsers().size();
         boolean shouldKick = info.hasPermission && full;
 
         Player weakestLink = null;

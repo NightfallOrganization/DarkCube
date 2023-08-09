@@ -21,7 +21,7 @@ public interface MapLoader {
     /**
      * Saves all data that can be loaded via this loader. This is the {@link MapIngameData}
      */
-    void save(Map map);
+    CompletableFuture<Void> save(Map map);
 
     /**
      * Unloads the given map. This frees any resources it might occupy on the server like the Bukkit World, the Files, etc.

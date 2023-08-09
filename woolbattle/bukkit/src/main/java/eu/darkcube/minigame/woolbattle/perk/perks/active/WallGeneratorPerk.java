@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -47,7 +47,7 @@ public class WallGeneratorPerk extends Perk {
         }
 
         private void deny(WBUser user, UserPerk perk) {
-            WoolBattle.instance().ingame().playSoundNotEnoughWool(user);
+            WoolBattleBukkit.instance().ingame().playSoundNotEnoughWool(user);
             setItem(perk);
         }
 
@@ -116,7 +116,7 @@ public class WallGeneratorPerk extends Perk {
             }
 
             private void setBlock(Location loc, WBUser user) {
-                if (WoolBattle.instance().ingame().place(user, loc.getBlock())) {
+                if (WoolBattleBukkit.instance().ingame().place(user, loc.getBlock())) {
                     payForThePerk(perk);
                 }
             }

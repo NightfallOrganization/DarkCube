@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.active.EventGhostStateChange;
 import eu.darkcube.minigame.woolbattle.event.perk.passive.EventMayDoubleJump;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserKill;
@@ -48,12 +48,12 @@ public class GhostPerk extends Perk {
 
     public static class ListenerGhost extends BasicPerkListener {
 
-        private static final Key DATA_GHOST_PERK = new Key(WoolBattle.instance(), "ghost_perk");
-        private static final Key DATA_GHOST_POS = new Key(WoolBattle.instance(), "ghost_pos");
+        private static final Key DATA_GHOST_PERK = new Key(WoolBattleBukkit.instance(), "ghost_perk");
+        private static final Key DATA_GHOST_POS = new Key(WoolBattleBukkit.instance(), "ghost_pos");
         private static final Key DATA_GHOST_ATTACKS =
-                new Key(WoolBattle.instance(), "ghost_attacks");
+                new Key(WoolBattleBukkit.instance(), "ghost_attacks");
         private static final Key DATA_GHOST_FORCE_ATTACKABLE =
-                new Key(WoolBattle.instance(), "ghost_force_attackable");
+                new Key(WoolBattleBukkit.instance(), "ghost_force_attackable");
 
         public ListenerGhost(Perk perk) {
             super(perk);
@@ -75,7 +75,7 @@ public class GhostPerk extends Perk {
             UserPerk perk = user.user().getMetaDataStorage().remove(DATA_GHOST_PERK);
             perk.cooldown(perk.perk().cooldown().cooldown());
             user.getBukkitEntity().setHealth(user.getBukkitEntity().getMaxHealth());
-            WoolBattle.instance().ingame().setArmor(user);
+            WoolBattleBukkit.instance().ingame().setArmor(user);
             ParticleEffect.MOB_APPEARANCE.display(0, 0, 0, 0, 1,
                     user.getBukkitEntity().getLocation(), user.getBukkitEntity());
             Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, false));
@@ -93,7 +93,7 @@ public class GhostPerk extends Perk {
                     new PotionEffect(PotionEffectType.INVISIBILITY, 10000000, 200, false, false));
             user.user().getMetaDataStorage().set(DATA_GHOST_POS, p.getLocation());
             user.user().getMetaDataStorage().set(DATA_GHOST_PERK, perk);
-            WoolBattle.instance().ingame().setArmor(user);
+            WoolBattleBukkit.instance().ingame().setArmor(user);
             p.setMaxHealth(20);
 
             Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, true));
@@ -187,7 +187,7 @@ public class GhostPerk extends Perk {
                     Player p = user.getBukkitEntity();
                     if (p.getNoDamageTicks() == 0) {
                         user.user().getMetaDataStorage().set(DATA_GHOST_FORCE_ATTACKABLE, true);
-                        boolean suc = WoolBattle.instance().ingame().attack(attacker, user);
+                        boolean suc = WoolBattleBukkit.instance().ingame().attack(attacker, user);
                         user.user().getMetaDataStorage().remove(DATA_GHOST_FORCE_ATTACKABLE);
                         if (suc) {
                             if (!user.user().getMetaDataStorage().has(DATA_GHOST_ATTACKS)) {

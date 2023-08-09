@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -32,13 +32,13 @@ import java.util.stream.Collectors;
 public class SettingsHeightDisplayColorInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE =
             InventoryType.of("woolbattle-settings-height-display-color");
-    private static final Key COLOR = new Key(WoolBattle.instance(), "height_display_color");
+    private static final Key COLOR = new Key(WoolBattleBukkit.instance(), "height_display_color");
     private static final PersistentDataType<ChatColor> COLOR_TYPE =
             PersistentDataTypes.enumType(ChatColor.class);
     private final Scheduler scheduler;
     private int number = 0;
 
-    public SettingsHeightDisplayColorInventory(WoolBattle woolbattle, WBUser user) {
+    public SettingsHeightDisplayColorInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.HEIGHT_DISPLAY_COLOR_SETTINGS_TITLE.getMessage(user), user);
         scheduler = new Scheduler() {
             @Override

@@ -6,7 +6,6 @@
  */
 package eu.darkcube.minigame.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.command.*;
 import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
@@ -30,7 +29,6 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -49,13 +47,14 @@ import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
-public class WoolBattle extends DarkCubePlugin {
+public class WoolBattleBukkit extends DarkCubePlugin {
 
     @Deprecated
-    private static WoolBattle instance;
+    private static WoolBattleBukkit instance;
     private final Collection<MapSize> knownMapSizes = new HashSet<>();
     private final PluginClassLoader pluginClassLoader;
     private final WoolBattleListeners listeners = new WoolBattleListeners();
+    private final WoolBattleCommands commands = new WoolBattleCommands(this);
     public String atall;
     public String atteam;
     private PerkRegistry perkRegistry;
@@ -72,19 +71,17 @@ public class WoolBattle extends DarkCubePlugin {
     private MySQL mysql;
 //    private int maxPlayers;
 
-    public WoolBattle() {
+    public WoolBattleBukkit() {
         super("woolbattle");
         Config.load(this);
         this.pluginClassLoader = new ReflectionClassLoader(this);
-        WoolBattle.instance = this;
+        WoolBattleBukkit.instance = this;
     }
 
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static void initScoreboard(Scoreboard sb, WBUser owner) {
+    @Deprecated @ApiStatus.ScheduledForRemoval public static void initScoreboard(Scoreboard sb, WBUser owner) {
         // Spectator is not included in "Team"
-        Collection<Team> teams = new HashSet<>(WoolBattle.instance().teamManager().getTeams());
-        teams.add(WoolBattle.instance().teamManager().getSpectator());
+        Collection<Team> teams = new HashSet<>(WoolBattleBukkit.instance().teamManager().getTeams());
+        teams.add(WoolBattleBukkit.instance().teamManager().getSpectator());
         for (Team t : teams) {
             ScoreboardTeam team = sb.createTeam(t.getType().getScoreboardTag());
             String s = LegacyComponentSerializer.legacySection().serialize(Component.text("", t.getPrefixStyle()));
@@ -102,9 +99,8 @@ public class WoolBattle extends DarkCubePlugin {
         }
     }
 
-    @Deprecated
-    public static WoolBattle instance() {
-        return WoolBattle.instance;
+    @Deprecated public static WoolBattleBukkit instance() {
+        return WoolBattleBukkit.instance;
     }
 
     public static void registerListeners(Listener... listener) {
@@ -112,8 +108,7 @@ public class WoolBattle extends DarkCubePlugin {
             if (l instanceof RegisterNotifyListener) {
                 ((RegisterNotifyListener) l).registered();
             }
-            WoolBattle.instance().getServer().getPluginManager()
-                    .registerEvents(l, WoolBattle.instance());
+            WoolBattleBukkit.instance().getServer().getPluginManager().registerEvents(l, WoolBattleBukkit.instance());
         }
     }
 
@@ -126,22 +121,7 @@ public class WoolBattle extends DarkCubePlugin {
         }
     }
 
-    @Override
-    public void onLoad() {
-
-//        TemplateStorage templateStorage = CloudNetDriver.getInstance().getLocalTemplateStorage();
-//        try {
-//            for (FileInfo fileInfo : templateStorage.listFiles(
-//                    new ServiceTemplate("woolbattle", "2x1", "local"), false)) {
-//                System.out.println(fileInfo.getName());
-//            }
-//            for (FileInfo fileInfo : templateStorage.listFiles(
-//                    new ServiceTemplate("woolbattle", "2x1", "local"), "Abstract1-2x1", false)) {
-//                System.out.println(fileInfo.getName());
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+    @Override public void onLoad() {
 
         new DependencyManager(this).loadDependencies(Dependency.values());
 
@@ -178,8 +158,7 @@ public class WoolBattle extends DarkCubePlugin {
         VoidWorldPluginLoader.load();
     }
 
-    @Override
-    public void onEnable() {
+    @Override public void onEnable() {
         mapLoader = new CloudNetMapLoader();
         mapManager = new DefaultMapManager();
 
@@ -190,15 +169,15 @@ public class WoolBattle extends DarkCubePlugin {
 
         listeners.registerAll(this);
 
-        this.lobby.enable();
+        lobby.enable();
 
-        loadCommands();
+        commands.enableAll();
 
         new CloudNetUpdateScheduler().runTaskTimer(50);
     }
 
-    @Override
-    public void onDisable() {
+    @Override public void onDisable() {
+        commands.disableAll();
         listeners.unregisterAll();
         UserAPI.getInstance().removeModifier(userModifier);
         this.tickTask.cancel();
@@ -263,22 +242,6 @@ public class WoolBattle extends DarkCubePlugin {
         }
         ICommandExecutor e = ICommandExecutor.create(Bukkit.getConsoleSender());
         e.sendMessage(msg, function.apply(e));
-    }
-
-    private void loadCommands() {
-        CommandAPI.getInstance().register(new CommandDisableStats());
-        CommandAPI.getInstance().register(new CommandFix());
-        CommandAPI.getInstance().register(new CommandIsStats());
-        CommandAPI.getInstance().register(new CommandSetMap(this));
-        CommandAPI.getInstance().register(new CommandSettings(this));
-        CommandAPI.getInstance().register(new CommandTimer());
-        CommandAPI.getInstance().register(new CommandTroll());
-        CommandAPI.getInstance().register(new CommandVoteLifes(this));
-        CommandAPI.getInstance().register(new CommandWoolBattle(this));
-
-        CommandAPI.getInstance().register(new CommandSetTeam(this));
-        CommandAPI.getInstance().register(new CommandSetLifes(this));
-        CommandAPI.getInstance().register(new CommandRevive());
     }
 
     public PerkRegistry perkRegistry() {

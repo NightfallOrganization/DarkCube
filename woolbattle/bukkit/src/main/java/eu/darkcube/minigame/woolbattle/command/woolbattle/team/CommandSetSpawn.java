@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
@@ -21,7 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class CommandSetSpawn extends WBCommandExecutor {
-    public CommandSetSpawn(WoolBattle woolbattle) {
+    public CommandSetSpawn(WoolBattleBukkit woolbattle) {
         super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(CommandSetSpawn::set)));
     }
 

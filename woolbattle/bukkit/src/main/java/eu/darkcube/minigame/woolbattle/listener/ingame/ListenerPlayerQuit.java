@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -22,19 +22,19 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
     @EventHandler
     public void handle(PlayerQuitEvent e) {
         e.setQuitMessage(null);
-        WoolBattle main = WoolBattle.instance();
+        WoolBattleBukkit main = WoolBattleBukkit.instance();
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         if (user.getTeam().isSpectator()) {
             return;
         }
-        Team t = WoolBattle.instance().ingame().lastTeam.remove(user);
+        Team t = WoolBattleBukkit.instance().ingame().lastTeam.remove(user);
         if (t != null) {
             if (t.getUsers().size() != 0) {
                 StatsLink.addLoss(user);
             }
         }
-        WoolBattle.instance().sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
+        WoolBattleBukkit.instance().sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
         main.ingame().kill(user, true);
     }
 

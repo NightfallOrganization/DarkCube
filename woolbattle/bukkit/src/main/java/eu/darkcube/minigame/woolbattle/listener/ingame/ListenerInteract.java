@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.inventory.CompassTeleportInventory;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -18,9 +18,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class ListenerInteract extends Listener<PlayerInteractEvent> {
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
 
-    public ListenerInteract(WoolBattle woolbattle) {
+    public ListenerInteract(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
     }
 

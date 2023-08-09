@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.entity.Player;
@@ -15,9 +15,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
 
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
 
-    public ListenerDeathMove(WoolBattle woolbattle) {
+    public ListenerDeathMove(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
     }
 

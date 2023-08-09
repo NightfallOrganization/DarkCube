@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -19,7 +19,7 @@ public class ListenerChangeBlock extends Listener<EntityChangeBlockEvent> {
     public void handle(EntityChangeBlockEvent e) {
         if (e.getEntityType() == EntityType.FALLING_BLOCK) {
             if (e.getTo() == Material.WOOL) {
-                WoolBattle.instance().ingame().placedBlocks.add(e.getBlock());
+                WoolBattleBukkit.instance().ingame().placedBlocks.add(e.getBlock());
             } else {
                 e.setCancelled(true);
             }

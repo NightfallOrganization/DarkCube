@@ -25,7 +25,7 @@ public class DefaultMapManager implements MapManager {
         for (JsonDocument document : database.documents()) {
             String mapJson = document.toJson();
             Map map = GsonSerializer.gson.fromJson(mapJson, Map.class);
-            this.maps(map.size()).put(map.getName(), map);
+            maps(map.size()).put(map.getName(), map);
         }
     }
 
@@ -39,10 +39,10 @@ public class DefaultMapManager implements MapManager {
         Map map = getMap(name, mapSize);
         if (map != null)
             return map;
-        DefaultMap dmap = new DefaultMap(name, mapSize);
-        map = dmap;
+        DefaultMap defaultMap = new DefaultMap(name, mapSize);
+        map = defaultMap;
         maps(map.size()).put(name, map);
-        database.insert(name, dmap.toDocument());
+        database.insert(name, defaultMap.toDocument());
         return map;
     }
 

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
@@ -114,7 +114,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
 						if (id == idHotbar) {
 							tue(idHotbar, idItem, idCursor, id);
 						} else if (id == idCursor) {
-							WoolBattle.instance().sendConsole(
+							WoolBattleBukkit.instance().sendConsole(
 									"Player " + p.getName() + " had slot error. Values:");
 							System.out.println("Slot: " + slot);
 							System.out.println("Tag: " + id);

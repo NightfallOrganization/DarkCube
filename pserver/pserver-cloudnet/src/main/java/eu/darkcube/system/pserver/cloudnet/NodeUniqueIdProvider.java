@@ -14,30 +14,30 @@ import java.util.UUID;
 
 public class NodeUniqueIdProvider {
 
-	private static final NodeUniqueIdProvider instance;
+    private static final NodeUniqueIdProvider instance;
 
-	static {
-		instance = new NodeUniqueIdProvider();
-	}
+    static {
+        instance = new NodeUniqueIdProvider();
+    }
 
-	public static void init() {
+    public static void init() {
 
-	}
+    }
 
-	public static NodeUniqueIdProvider instance() {
-		return instance;
-	}
+    public static NodeUniqueIdProvider instance() {
+        return instance;
+    }
 
-	public UniqueId newUniqueId() {
-		UniqueId id;
-		do {
-			UUID uuid = UUID.randomUUID();
-			id = new UniqueId(uuid.toString());
-		} while (!isAvailable(id));
-		return id;
-	}
+    public UniqueId newUniqueId() {
+        UniqueId id;
+        do {
+            UUID uuid = UUID.randomUUID();
+            id = new UniqueId(uuid.toString());
+        } while (!isAvailable(id));
+        return id;
+    }
 
-	public boolean isAvailable(UniqueId id) {
-		return !DatabaseProvider.get("pserver").cast(PServerDatabase.class).contains(id);
-	}
+    public boolean isAvailable(UniqueId id) {
+        return !DatabaseProvider.get("pserver").cast(PServerDatabase.class).contains(id);
+    }
 }

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -16,7 +16,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 public class CommandSetLifes extends WBCommandExecutor {
 
-    public CommandSetLifes(WoolBattle woolbattle) {
+    public CommandSetLifes(WoolBattleBukkit woolbattle) {
         super("setlifes", "woolbattle.command.setlifes", new String[0], b -> b
                 .then(Commands
                         .argument("lifes", IntegerArgumentType.integer(0, 99))

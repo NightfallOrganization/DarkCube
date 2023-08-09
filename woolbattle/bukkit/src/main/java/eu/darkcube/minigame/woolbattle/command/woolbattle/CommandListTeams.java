@@ -6,13 +6,13 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 public class CommandListTeams extends WBCommandExecutor {
-    public CommandListTeams(WoolBattle woolbattle) {
+    public CommandListTeams(WoolBattleBukkit woolbattle) {
         super("listTeams", b -> b.executes(ctx -> {
             Component c = Component.empty();
             TeamType[] types = woolbattle.teamManager().teamTypes().stream().filter(tt -> woolbattle.teamManager().getSpectator().getType() != tt).toArray(TeamType[]::new);

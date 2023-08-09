@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import org.bukkit.Bukkit;
@@ -32,7 +32,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
         if (itemId == null) {
             return;
         }
-        if (WoolBattle.instance().lobby().enabled() && e.getHotbarButton() != -1) {
+        if (WoolBattleBukkit.instance().lobby().enabled() && e.getHotbarButton() != -1) {
             e.setCancelled(true);
         }
 

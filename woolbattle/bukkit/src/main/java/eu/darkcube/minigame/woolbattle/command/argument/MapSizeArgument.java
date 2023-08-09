@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
@@ -24,19 +24,19 @@ import java.util.function.Predicate;
 
 public class MapSizeArgument implements ArgumentType<MapSize> {
     private static final DynamicCommandExceptionType TYPE_INVALID_SIZE = Message.INVALID_MAP_SIZE.newDynamicCommandExceptionType();
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private final Predicate<MapSize> validate;
 
-    public MapSizeArgument(WoolBattle woolbattle, Predicate<MapSize> validate) {
+    public MapSizeArgument(WoolBattleBukkit woolbattle, Predicate<MapSize> validate) {
         this.woolbattle = woolbattle;
         this.validate = validate;
     }
 
-    public static MapSizeArgument mapSize(WoolBattle woolbattle) {
+    public static MapSizeArgument mapSize(WoolBattleBukkit woolbattle) {
         return mapSize(woolbattle, m -> true);
     }
 
-    public static MapSizeArgument mapSize(WoolBattle woolbattle, Predicate<MapSize> validate) {
+    public static MapSizeArgument mapSize(WoolBattleBukkit woolbattle, Predicate<MapSize> validate) {
         return new MapSizeArgument(woolbattle, validate);
     }
 

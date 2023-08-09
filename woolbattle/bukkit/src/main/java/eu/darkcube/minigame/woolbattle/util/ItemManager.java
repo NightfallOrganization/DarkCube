@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.util;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
@@ -23,11 +23,11 @@ import java.util.Map;
 
 public class ItemManager {
 
-    public static final Key ITEM_ID = new Key(WoolBattle.instance(), "itemId");
+    public static final Key ITEM_ID = new Key(WoolBattleBukkit.instance(), "itemId");
 
     public static void removeItems(WBUser user, Inventory invToRemoveFrom, ItemStack itemToRemove,
                                    int count) {
-        if (WoolBattle.instance().ingame().enabled() && itemToRemove.getType() == Material.WOOL
+        if (WoolBattleBukkit.instance().ingame().enabled() && itemToRemove.getType() == Material.WOOL
                 && user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
             Map<Integer, ItemStack> leftOver = new HashMap<>();
             itemToRemove = new ItemStack(itemToRemove);

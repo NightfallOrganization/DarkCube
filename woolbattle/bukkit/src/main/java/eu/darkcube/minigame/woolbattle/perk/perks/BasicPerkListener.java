@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -30,12 +30,12 @@ public abstract class BasicPerkListener extends PerkListener implements Register
 
 	@Override
 	public void registered() {
-		WoolBattle.registerListeners(this.handle);
+		WoolBattleBukkit.registerListeners(this.handle);
 	}
 
 	@Override
 	public void unregistered() {
-		WoolBattle.unregisterListeners(this.handle);
+		WoolBattleBukkit.unregisterListeners(this.handle);
 	}
 
 	/**

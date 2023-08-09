@@ -6,24 +6,23 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.*;
 
 public class CommandWoolBattle extends WBCommandExecutor {
 
-    public CommandWoolBattle(WoolBattle woolbattle) {
-        super("woolbattle",
-                b -> b
-                        .then(new CommandTeam(woolbattle).builder())
-                        .then(new CommandCreateTeam(woolbattle).builder())
-                        .then(new CommandListTeams(woolbattle).builder())
-                        .then(new CommandCreateMap(woolbattle).builder())
-                        .then(new CommandDeleteMap(woolbattle).builder())
-                        .then(new CommandMap(woolbattle).builder())
-                        .then(new CommandListMaps(woolbattle).builder())
-                        .then(new CommandLoadWorld(woolbattle).builder())
-                        .then(new CommandLoadGame(woolbattle).builder())
-                        .then(new CommandSetSpawn().builder()));
+    public CommandWoolBattle(WoolBattleBukkit woolbattle) {
+        super("woolbattle", b -> b
+                .then(new CommandTeam(woolbattle).builder())
+                .then(new CommandCreateTeam(woolbattle).builder())
+                .then(new CommandListTeams(woolbattle).builder())
+                .then(new CommandCreateMap(woolbattle).builder())
+                .then(new CommandMap(woolbattle).builder())
+                .then(new CommandImport(woolbattle).builder())
+                .then(new CommandListMaps(woolbattle).builder())
+                .then(new CommandLoadWorld(woolbattle).builder())
+                .then(new CommandLoadGame(woolbattle).builder())
+                .then(new CommandSetSpawn(woolbattle).builder()));
     }
 
 }

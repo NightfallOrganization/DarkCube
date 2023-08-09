@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
@@ -39,7 +39,7 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 			boolean single) {
 		this.filter = filter == null ? p -> true : filter;
 		this.single = single;
-		this.values = perks == null ? () -> WoolBattle.instance().perkRegistry().perks().values()
+		this.values = perks == null ? () -> WoolBattleBukkit.instance().perkRegistry().perks().values()
 				.toArray(new Perk[0]) : perks;
 		this.toStringFunction =
 				toStringFunction == null ? defaultToStringFunction() : toStringFunction;

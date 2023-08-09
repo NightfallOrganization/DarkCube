@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
@@ -25,9 +25,9 @@ import java.util.UUID;
 
 public class CompassTeleportInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_compass_teleport");
-    private static final Key USER = new Key(WoolBattle.instance(), "tp_user_id");
+    private static final Key USER = new Key(WoolBattleBukkit.instance(), "tp_user_id");
 
-    public CompassTeleportInventory(WoolBattle woolbattle, WBUser user) {
+    public CompassTeleportInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_COMPASS.getMessage(user), user);
     }
 

@@ -14,14 +14,14 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 
 public class GameData {
     public static final boolean EP_GLITCH_DEFAULT = false;
-    private final WoolBattle woolBattle;
+    private final WoolBattleBukkit woolBattle;
     private MapSize mapSize;
     private Map forceMap;
     private Map votedMap;
     private boolean epGlitch = EP_GLITCH_DEFAULT;
     private int forceLifes = -1;
 
-    public GameData(WoolBattle woolBattle) {
+    public GameData(WoolBattleBukkit woolBattle) {
         this.woolBattle = woolBattle;
     }
 

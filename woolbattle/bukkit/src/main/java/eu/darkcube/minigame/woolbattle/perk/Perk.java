@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -103,7 +103,7 @@ public class Perk {
 	 * @see #stopLogic()
 	 */
 	public void startLogic() {
-		WoolBattle.registerListeners(listeners.toArray(new Listener[0]));
+		WoolBattleBukkit.registerListeners(listeners.toArray(new Listener[0]));
 		schedulers.forEach(ConfiguredScheduler::start);
 	}
 
@@ -115,7 +115,7 @@ public class Perk {
 	 */
 	public void stopLogic() {
 		schedulers.forEach(ConfiguredScheduler::stop);
-		WoolBattle.unregisterListeners(listeners.toArray(new Listener[0]));
+		WoolBattleBukkit.unregisterListeners(listeners.toArray(new Listener[0]));
 	}
 
 	public UserPerkCreator perkCreator() {

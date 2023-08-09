@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.lobby.item;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.EventInteract;
 import eu.darkcube.minigame.woolbattle.inventory.VotingInventory;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
@@ -16,9 +16,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 
 public class ListenerItemVoting extends Listener<EventInteract> {
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
 
-    public ListenerItemVoting(WoolBattle woolbattle) {
+    public ListenerItemVoting(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
     }
 

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.game.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -16,13 +16,13 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.Legacy
 
 public class SchedulerHeightDisplay extends Scheduler implements ConfiguredScheduler {
 
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
 
-    public SchedulerHeightDisplay(WoolBattle woolbattle) {
+    public SchedulerHeightDisplay(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
     }
 
-    public static void display(WoolBattle woolbattle, WBUser user) {
+    public static void display(WoolBattleBukkit woolbattle, WBUser user) {
         HeightDisplay display = user.heightDisplay();
         if (display.isEnabled()) {
             int deathHeight = woolbattle.gameData().map().deathHeight();

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public class TeamType implements Comparable<TeamType> {
 
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private final int uniqueId;
     private final String scoreboardTag;
     private final MapSize mapSize;
@@ -26,7 +26,7 @@ public class TeamType implements Comparable<TeamType> {
     private DyeColor woolcolor;
     private boolean enabled;
 
-    public TeamType(WoolBattle woolbattle, int uniqueId, MapSize mapSize, String displayNameKey, int weight, DyeColor woolcolor, ChatColor namecolor, boolean enabled) {
+    public TeamType(WoolBattleBukkit woolbattle, int uniqueId, MapSize mapSize, String displayNameKey, int weight, DyeColor woolcolor, ChatColor namecolor, boolean enabled) {
         this.woolbattle = woolbattle;
         this.mapSize = mapSize;
         this.displayNameKey = displayNameKey;

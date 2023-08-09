@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -26,7 +26,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE =
             InventoryType.of("woolbattle-voting-enderpearl-glitch");
 
-    public VotingEnderpearlGlitchInventory(WoolBattle woolbattle, WBUser user) {
+    public VotingEnderpearlGlitchInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user), user);
     }
 
@@ -64,7 +64,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
     protected void fillItems(Map<Integer, ItemStack> items) {
         ItemBuilder b1 = item(Item.GENERAL_VOTING_FOR.getItem(user));
         ItemBuilder b2 = item(Item.GENERAL_VOTING_AGAINST.getItem(user));
-        Vote<Boolean> vote = WoolBattle.instance().lobby().VOTES_EP_GLITCH.get(user);
+        Vote<Boolean> vote = WoolBattleBukkit.instance().lobby().VOTES_EP_GLITCH.get(user);
         if (vote != null) {
             if (vote.vote) {
                 b1.glow(true);

@@ -81,6 +81,10 @@ public class UnmodifiablePersistentDataStorage implements PersistentDataStorage 
         return storage.updateNotifiers();
     }
 
+    @Override public void clearCache() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         storage.addUpdateNotifier(notifier);

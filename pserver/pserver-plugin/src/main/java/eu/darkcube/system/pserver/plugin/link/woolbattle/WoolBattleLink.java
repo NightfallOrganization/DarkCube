@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.pserver.plugin.link.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
@@ -22,7 +22,7 @@ public class WoolBattleLink extends Link {
 
     @Override
     protected void link() throws Throwable {
-        WoolBattle woolbattle = WoolBattle.instance();
+        WoolBattleBukkit woolbattle = WoolBattleBukkit.instance();
         StatsLink.enabled = false;
         CloudNetLink.shouldDisplay = false;
         CommandAPI.getInstance().unregisterPrefixlessByPrefix("woolbattle");

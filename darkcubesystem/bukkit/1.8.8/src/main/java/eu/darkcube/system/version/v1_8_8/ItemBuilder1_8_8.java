@@ -13,6 +13,10 @@ import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.*;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
+import eu.darkcube.system.libs.com.google.gson.*;
+import eu.darkcube.system.libs.com.google.gson.stream.JsonReader;
+import eu.darkcube.system.libs.com.google.gson.stream.JsonToken;
+import eu.darkcube.system.libs.com.google.gson.stream.JsonWriter;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.util.ReflectionUtils;
@@ -31,6 +35,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +45,34 @@ import java.util.stream.Collectors;
 
 public class ItemBuilder1_8_8 extends AbstractItemBuilder {
 
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(ItemStack.class, new TypeAdapter<ItemStack>() {
+        @Override public void write(JsonWriter writer, ItemStack value) throws IOException {
+            if (value == null) {
+                writer.nullValue();
+                return;
+            }
+            net.minecraft.server.v1_8_R3.ItemStack nms = CraftItemStack.asNMSCopy(value);
+            NBTTagCompound nbt = new NBTTagCompound();
+            nms.save(nbt);
+            writer.value(nbt.toString());
+        }
+
+        @Override public ItemStack read(JsonReader reader) throws IOException {
+            if (reader.peek() == JsonToken.NULL) {
+                reader.nextNull();
+                return null;
+            }
+            String tag = reader.nextString();
+            NBTTagCompound nbt;
+            try {
+                nbt = MojangsonParser.parse(tag);
+            } catch (MojangsonParseException e) {
+                throw new RuntimeException(e);
+            }
+            net.minecraft.server.v1_8_R3.ItemStack nbtItem = net.minecraft.server.v1_8_R3.ItemStack.createStack(nbt);
+            return CraftItemStack.asBukkitCopy(nbtItem);
+        }
+    }).create();
     private static final Field CraftMetaSkull$profile = ReflectionUtils.getField("CraftMetaSkull", PackageType.CRAFTBUKKIT_INVENTORY, true, "profile");
 
     public ItemBuilder1_8_8() {
@@ -52,27 +85,33 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
             ItemMeta meta = item.getItemMeta();
             unbreakable(meta.spigot().isUnbreakable());
             String displayname = meta.getDisplayName();
-            if (displayname != null)
-                displayname(LegacyComponentSerializer.legacySection().deserialize(displayname));
+            if (displayname != null) displayname(LegacyComponentSerializer.legacySection().deserialize(displayname));
             for (Map.Entry<Enchantment, Integer> e : meta.getEnchants().entrySet()) {
                 enchant(e.getKey(), e.getValue());
             }
             setFlags(meta.getItemFlags());
-            lore(meta.hasLore() ? meta.getLore().stream().map(LegacyComponentSerializer.legacySection()::deserialize).collect(Collectors.toList()) : new ArrayList<>());
+            lore(meta.hasLore() ? meta
+                    .getLore()
+                    .stream()
+                    .map(LegacyComponentSerializer.legacySection()::deserialize)
+                    .collect(Collectors.toList()) : new ArrayList<>());
             damage(item.getDurability());
-            if (meta instanceof FireworkEffectMeta)
-                meta(FireworkBuilderMeta.class).fireworkEffect(((FireworkEffectMeta) meta).getEffect());
+            if (meta instanceof FireworkEffectMeta) meta(FireworkBuilderMeta.class).fireworkEffect(((FireworkEffectMeta) meta).getEffect());
             if (meta instanceof SkullMeta) {
                 GameProfile pp = (GameProfile) ReflectionUtils.getValue(meta, CraftMetaSkull$profile);
                 if (pp != null) {
-                    Property prop = pp.getProperties().containsKey("textures") ? pp.getProperties().get("textures").stream().findFirst().orElse(null) : null;
+                    Property prop = pp.getProperties().containsKey("textures") ? pp
+                            .getProperties()
+                            .get("textures")
+                            .stream()
+                            .findFirst()
+                            .orElse(null) : null;
                     Texture texture = prop == null ? null : new Texture(prop.getValue(), prop.getSignature());
                     UserProfile up = new UserProfile(pp.getName(), pp.getId(), texture);
                     meta(SkullBuilderMeta.class).owningPlayer(up);
                 }
             }
-            if (meta instanceof LeatherArmorMeta)
-                meta(LeatherArmorBuilderMeta.class).color(((LeatherArmorMeta) meta).getColor());
+            if (meta instanceof LeatherArmorMeta) meta(LeatherArmorBuilderMeta.class).color(((LeatherArmorMeta) meta).getColor());
             net.minecraft.server.v1_8_R3.ItemStack mci = CraftItemStack.asNMSCopy(item);
             NBTTagCompound tag = mci.getTag();
             if (tag != null) {
@@ -92,36 +131,34 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
         }
     }
 
-    @Override
-    public int repairCost() {
+    public static ItemBuilder1_8_8 deserialize(JsonElement json) {
+        return new ItemBuilder1_8_8(gson.fromJson(json, ItemStack.class));
+    }
+
+    @Override public int repairCost() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public AbstractItemBuilder repairCost(int repairCost) {
+    @Override public AbstractItemBuilder repairCost(int repairCost) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public AbstractItemBuilder clone() {
+    @Override public AbstractItemBuilder clone() {
         return new ItemBuilder1_8_8(build());
     }
 
-    @Override
-    public boolean canBeRepairedBy(eu.darkcube.system.inventoryapi.item.ItemBuilder item) {
+    @Override public boolean canBeRepairedBy(eu.darkcube.system.inventoryapi.item.ItemBuilder item) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public ItemStack build() {
+    @Override public ItemStack build() {
         ItemStack item = new ItemStack(material);
         item.setAmount(amount);
         item.setDurability((short) damage);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.spigot().setUnbreakable(unbreakable);
-            if (displayname != null)
-                meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(displayname));
+            if (displayname != null) meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(displayname));
             for (Map.Entry<Enchantment, Integer> e : enchantments.entrySet()) {
                 meta.addEnchant(e.getKey(), e.getValue(), true);
             }
@@ -131,8 +168,7 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
                 String l = LegacyComponentSerializer.legacySection().serialize(loreComponent);
                 String last = null;
                 for (String line : l.split("\\R")) {
-                    if (last != null)
-                        line = last + line;
+                    if (last != null) line = last + line;
                     last = ChatColor.getLastColors(line);
                     lore.add(line);
                 }
@@ -185,5 +221,9 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
             throw new IllegalArgumentException("Item without Meta: " + material);
         }
         return item;
+    }
+
+    @Override public JsonElement serialize() {
+        return gson.toJsonTree(build());
     }
 }

@@ -43,13 +43,11 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         this.key = key;
     }
 
-    @Override
-    public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
+    @Override public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
         return new UnmodifiablePersistentDataStorage(this);
     }
 
-    @Override
-    public @NotNull Collection<Key> keys() {
+    @Override public @NotNull Collection<Key> keys() {
         List<Key> keys = new ArrayList<>();
         try {
             lock.readLock().lock();
@@ -62,8 +60,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return Collections.unmodifiableCollection(keys);
     }
 
-    @Override
-    public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.writeLock().lock();
             data = type.clone(data);
@@ -81,16 +78,14 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public <T> T remove(@NotNull Key key, @Nullable PersistentDataType<T> type) {
+    @Override public <T> T remove(@NotNull Key key, @Nullable PersistentDataType<T> type) {
         T ret;
         try {
             lock.writeLock().lock();
             if (!data.contains(key.toString())) {
                 return null;
             }
-            @SuppressWarnings("unchecked")
-            T old = (T) cache.remove(key);
+            @SuppressWarnings("unchecked") T old = (T) cache.remove(key);
             if (old == null && type != null) {
                 old = type.deserialize(data, key.toString());
             }
@@ -104,8 +99,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return ret;
     }
 
-    @Override
-    public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
@@ -132,8 +126,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override
-    public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
+    @Override public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
@@ -169,8 +162,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return ret;
     }
 
-    @Override
-    public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.readLock().lock();
             if (this.data.contains(key.toString())) {
@@ -196,8 +188,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public boolean has(@NotNull Key key) {
+    @Override public boolean has(@NotNull Key key) {
         try {
             lock.readLock().lock();
             return data.contains(key.toString());
@@ -206,8 +197,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         try {
             lock.writeLock().lock();
             clearData();
@@ -218,8 +208,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public void loadFromJsonDocument(JsonDocument document) {
+    @Override public void loadFromJsonDocument(JsonDocument document) {
         try {
             lock.writeLock().lock();
             clearData();
@@ -244,8 +233,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public JsonDocument storeToJsonDocument() {
+    @Override public JsonDocument storeToJsonDocument() {
         try {
             lock.readLock().lock();
             return JsonDocument.newDocument().append(data);
@@ -254,96 +242,88 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override
-    public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
+    @Override public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
         return Collections.unmodifiableCollection(updateNotifiers);
     }
 
-    @Override
-    public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void clearCache() {
+        try {
+            lock.writeLock().lock();
+            cache.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.add(notifier);
     }
 
-    @Override
-    public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.remove(notifier);
     }
 
     private void save() {
         if (saving.compareAndSet(false, true)) {
-            SynchronizedPersistentDataStorages.database.containsAsync(key.toString())
-                    .addListener(new ITaskListener<Boolean>() {
-                        @Override
-                        public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
-                            if (aBoolean) {
-                                saveAgain.set(false);
-                                SynchronizedPersistentDataStorages.database.updateAsync(
-                                                key.toString(), storeToJsonDocument())
-                                        .addListener(new ITaskListener<Boolean>() {
-                                            @Override
-                                            public void onComplete(ITask<Boolean> task,
-                                                                   Boolean aBoolean) {
-                                                saving.set(false);
-                                                if (saveAgain.compareAndSet(true, false)) {
-                                                    save();
-                                                }
-                                            }
+            SynchronizedPersistentDataStorages.database.containsAsync(key.toString()).addListener(new ITaskListener<Boolean>() {
+                @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+                    if (aBoolean) {
+                        saveAgain.set(false);
+                        SynchronizedPersistentDataStorages.database
+                                .updateAsync(key.toString(), storeToJsonDocument())
+                                .addListener(new ITaskListener<Boolean>() {
+                                    @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+                                        saving.set(false);
+                                        if (saveAgain.compareAndSet(true, false)) {
+                                            save();
+                                        }
+                                    }
 
-                                            @Override
-                                            public void onCancelled(ITask<Boolean> task) {
-                                                new Error("Task cancelled").printStackTrace();
-                                            }
+                                    @Override public void onCancelled(ITask<Boolean> task) {
+                                        new Error("Task cancelled").printStackTrace();
+                                    }
 
-                                            @Override
-                                            public void onFailure(ITask<Boolean> task,
-                                                                  Throwable th) {
-                                                th.printStackTrace();
-                                                saving.set(false);
-                                                save();
-                                            }
-                                        });
-                            } else {
-                                saveAgain.set(false);
-                                SynchronizedPersistentDataStorages.database.insertAsync(
-                                                key.toString(), storeToJsonDocument())
-                                        .addListener(new ITaskListener<Boolean>() {
-                                            @Override
-                                            public void onComplete(ITask<Boolean> task,
-                                                                   Boolean aBoolean) {
-                                                saving.set(false);
-                                                if (saveAgain.compareAndSet(true, false)) {
-                                                    save();
-                                                }
-                                            }
+                                    @Override public void onFailure(ITask<Boolean> task, Throwable th) {
+                                        th.printStackTrace();
+                                        saving.set(false);
+                                        save();
+                                    }
+                                });
+                    } else {
+                        saveAgain.set(false);
+                        SynchronizedPersistentDataStorages.database
+                                .insertAsync(key.toString(), storeToJsonDocument())
+                                .addListener(new ITaskListener<Boolean>() {
+                                    @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+                                        saving.set(false);
+                                        if (saveAgain.compareAndSet(true, false)) {
+                                            save();
+                                        }
+                                    }
 
-                                            @Override
-                                            public void onCancelled(ITask<Boolean> task) {
-                                                new Error("Task cancelled").printStackTrace();
-                                            }
+                                    @Override public void onCancelled(ITask<Boolean> task) {
+                                        new Error("Task cancelled").printStackTrace();
+                                    }
 
-                                            @Override
-                                            public void onFailure(ITask<Boolean> task,
-                                                                  Throwable th) {
-                                                th.printStackTrace();
-                                                saving.set(false);
-                                                save();
-                                            }
-                                        });
-                            }
-                        }
+                                    @Override public void onFailure(ITask<Boolean> task, Throwable th) {
+                                        th.printStackTrace();
+                                        saving.set(false);
+                                        save();
+                                    }
+                                });
+                    }
+                }
 
-                        @Override
-                        public void onCancelled(ITask<Boolean> task) {
-                            new Error("Task cancelled").printStackTrace();
-                        }
+                @Override public void onCancelled(ITask<Boolean> task) {
+                    new Error("Task cancelled").printStackTrace();
+                }
 
-                        @Override
-                        public void onFailure(ITask<Boolean> task, Throwable th) {
-                            th.printStackTrace();
-                            saving.set(false);
-                            save();
-                        }
-                    });
+                @Override public void onFailure(ITask<Boolean> task, Throwable th) {
+                    th.printStackTrace();
+                    saving.set(false);
+                    save();
+                }
+            });
         } else {
             saveAgain.set(true);
             if (!saving.get()) {

@@ -7,7 +7,7 @@
 package eu.darkcube.minigame.woolbattle.util;
 
 import com.google.common.io.ByteStreams;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 
 import java.io.File;
 import java.io.InputStream;
@@ -17,9 +17,9 @@ import java.nio.file.Path;
 
 public class DependencyManager {
 
-    private WoolBattle plugin;
+    private WoolBattleBukkit plugin;
 
-    public DependencyManager(WoolBattle plugin) {
+    public DependencyManager(WoolBattleBukkit plugin) {
         this.plugin = plugin;
     }
 
@@ -57,7 +57,7 @@ public class DependencyManager {
         }
 
         public Path getFile() {
-            WoolBattle plugin = WoolBattle.instance();
+            WoolBattleBukkit plugin = WoolBattleBukkit.instance();
             File libs = new File(plugin.getDataFolder(), "libs");
             if (!libs.exists())
                 libs.mkdirs();

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -41,7 +41,7 @@ public class MinigunPerk extends Perk {
     public static class ListenerMinigun extends BasicPerkListener {
 
         private static final Key DATA_SCHEDULER =
-                new Key(WoolBattle.instance(), "minigunScheduler");
+                new Key(WoolBattleBukkit.instance(), "minigunScheduler");
 
         public ListenerMinigun(Perk perk) {
             super(perk);
@@ -82,7 +82,7 @@ public class MinigunPerk extends Perk {
                     Snowball s = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
                     s.setShooter(p);
                     s.setVelocity(p.getLocation().getDirection().multiply(2.5));
-                    s.setMetadata("type", new FixedMetadataValue(WoolBattle.instance(), "minigun"
+                    s.setMetadata("type", new FixedMetadataValue(WoolBattleBukkit.instance(), "minigun"
                     ));
                     payForThePerk(perk);
                 }
@@ -107,7 +107,7 @@ public class MinigunPerk extends Perk {
                             if (target.projectileImmunityTicks() > 0) {
                                 return;
                             }
-                            if (!WoolBattle.instance().ingame().attack(user, target)) {
+                            if (!WoolBattleBukkit.instance().ingame().attack(user, target)) {
                                 return;
                             }
                             target.getBukkitEntity().damage(0);

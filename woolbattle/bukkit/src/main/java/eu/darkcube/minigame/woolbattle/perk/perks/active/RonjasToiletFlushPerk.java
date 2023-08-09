@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -45,8 +45,8 @@ public class RonjasToiletFlushPerk extends Perk {
         @Override
         protected boolean activateRight(UserPerk perk) {
             Egg egg = perk.owner().getBukkitEntity().launchProjectile(Egg.class);
-            egg.setMetadata("source", new FixedMetadataValue(WoolBattle.instance(), perk.owner()));
-            egg.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(),
+            egg.setMetadata("source", new FixedMetadataValue(WoolBattleBukkit.instance(), perk.owner()));
+            egg.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(),
                     perk.perk().perkName().getName()));
             return true;
         }
@@ -104,7 +104,7 @@ public class RonjasToiletFlushPerk extends Perk {
                 e.setCancelled(true);
                 return;
             }
-            WoolBattle.instance().ingame().attack(user, target);
+            WoolBattleBukkit.instance().ingame().attack(user, target);
         }
 
         private boolean isEggPerk(Egg egg) {

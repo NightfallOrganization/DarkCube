@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -58,20 +58,20 @@ public class SlimePlatformPerk extends Perk {
         @SuppressWarnings("deprecation")
         private void setBlock(Location block, ArrayList<Block> l) {
             if (block.getBlock().getType() == Material.AIR) {
-                WoolBattle.instance().ingame().place(block.getBlock(), b -> {
+                WoolBattleBukkit.instance().ingame().place(block.getBlock(), b -> {
                     BlockState state = b.getState();
                     state.setType(Material.STAINED_CLAY);
                     state.setData(Material.STAINED_CLAY.getNewData((byte) 13));
                     state.update(true);
                     l.add(b);
-                    WoolBattle.instance().ingame().setMetaData(b, "slime", l);
+                    WoolBattleBukkit.instance().ingame().setMetaData(b, "slime", l);
                 });
             }
         }
 
         private boolean setBlock2(Location block) {
-            if (WoolBattle.instance().ingame().getMetaData(block.getBlock(), "slime", null) != null) {
-                WoolBattle.instance().ingame().destroy(block.getBlock());
+            if (WoolBattleBukkit.instance().ingame().getMetaData(block.getBlock(), "slime", null) != null) {
+                WoolBattleBukkit.instance().ingame().destroy(block.getBlock());
                 return true;
             }
             return false;
@@ -85,10 +85,10 @@ public class SlimePlatformPerk extends Perk {
                 return;
 
             ArrayList<Block> mv =
-                    WoolBattle.instance().ingame().getMetaData(e.getTo().clone().subtract(0, 1, 0).getBlock(), "slime",
+                    WoolBattleBukkit.instance().ingame().getMetaData(e.getTo().clone().subtract(0, 1, 0).getBlock(), "slime",
                             null);
             ArrayList<Block> mv2 =
-                    WoolBattle.instance().ingame().getMetaData(e.getTo().clone().subtract(0, 2, 0).getBlock(), "slime",
+                    WoolBattleBukkit.instance().ingame().getMetaData(e.getTo().clone().subtract(0, 2, 0).getBlock(), "slime",
                             null);
 
             if (mv != null || mv2 != null) {

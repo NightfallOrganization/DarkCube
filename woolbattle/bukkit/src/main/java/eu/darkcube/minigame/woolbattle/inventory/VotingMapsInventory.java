@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -32,7 +32,7 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-maps");
     private final Key MAP = new Key(woolbattle, "voting-map");
 
-    public VotingMapsInventory(WoolBattle woolbattle, WBUser user) {
+    public VotingMapsInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_MAPS.getMessage(user), user);
         complete();
     }
@@ -72,7 +72,7 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
         Vote<Map> vote = woolbattle.lobby().VOTES_MAP.get(user);
         for (int i = 0; i < maps.size(); i++) {
             Map map = maps.get(i);
-            ItemBuilder bu = item(map.getIcon().getMaterial()).damage(map.getIcon().getId());
+            ItemBuilder bu = item(map.getIcon());
             ItemManager.setId(bu, MAP, map.getName());
             if (vote != null)
                 if (map.equals(vote.vote))

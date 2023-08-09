@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.game;
 
 import eu.darkcube.minigame.woolbattle.Config;
 import eu.darkcube.minigame.woolbattle.GameData;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyDeathLineTask;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyOverrideTimer;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyTimer;
@@ -51,11 +51,11 @@ public class Lobby extends GamePhase {
     private final int MAX_TIMER_SECONDS = 60;
     private final ObservableInteger timer;
     private final ObservableInteger overrideTimer;
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private int maxPlayerCount;
     private Location spawn;
 
-    public Lobby(WoolBattle woolbattle) {
+    public Lobby(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle), new ListenerInteractMenuBack());
 
@@ -242,7 +242,7 @@ public class Lobby extends GamePhase {
         return woolbattle.persistentDataStorage().get(Config.LOBBYDEATHLINE, PersistentDataTypes.INTEGER, () -> 0);
     }
 
-    public WoolBattle woolbattle() {
+    public WoolBattleBukkit woolbattle() {
         return woolbattle;
     }
 

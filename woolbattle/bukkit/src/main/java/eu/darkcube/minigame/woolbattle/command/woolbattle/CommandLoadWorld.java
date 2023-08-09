@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPlugin;
 import eu.darkcube.system.commandapi.v3.Commands;
@@ -16,7 +16,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import java.io.File;
 
 public class CommandLoadWorld extends WBCommandExecutor {
-    public CommandLoadWorld(WoolBattle woolbattle) {
+    public CommandLoadWorld(WoolBattleBukkit woolbattle) {
         super("loadWorld", b -> b.then(Commands.argument("world", StringArgumentType.string()).executes(ctx -> {
             String worldName = StringArgumentType.getString(ctx, "world");
             if (!new File(woolbattle.getServer().getWorldContainer(), worldName).exists() && !new File(woolbattle

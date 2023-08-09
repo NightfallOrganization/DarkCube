@@ -104,6 +104,8 @@ public interface PersistentDataStorage {
      */
     @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers();
 
+    void clearCache();
+
     /**
      * Adds an {@link UpdateNotifier} to this storage
      *

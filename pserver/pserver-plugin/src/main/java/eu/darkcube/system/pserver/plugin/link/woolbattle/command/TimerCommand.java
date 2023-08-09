@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -21,7 +21,7 @@ public class TimerCommand extends PServerExecutor {
                         .executes(context -> {
                             int timer = IntegerArgumentType.getInteger(context, "timer");
                             CommandSource source = context.getSource();
-                            WoolBattle.instance().lobby()
+                            WoolBattleBukkit.instance().lobby()
                                     .setOverrideTimer(timer <= 1 ? 2 : timer * 20);
                             source.sendMessage(Message.WOOLBATTLE_TIMER, timer);
                             return 0;

@@ -51,27 +51,29 @@ public class VoidWorldPlugin implements Plugin {
         return instance;
     }
 
-    public final void loadWorld(String world) {
-        if (!new File(this.getServer().getWorldContainer(), world).exists() && !new File(
-                this.getServer().getWorldContainer().getParent(), world).exists()) {
+    public final World loadWorld(String world) {
+        if (!new File(this.getServer().getWorldContainer(), world).exists() && !new File(this
+                .getServer()
+                .getWorldContainer()
+                .getParent(), world).exists()) {
             System.out.println("World " + world + " not found");
-            return;
+            return null;
         }
         if (Bukkit.getWorld(world) == null) {
             // && !new File(Bukkit.getWorldContainer(), world).exists()) {
             try {
-                WorldCreator creator = new WorldCreator(world).generator(
-                        this.getDefaultWorldGenerator(world, world));
-                creator.createWorld();
+                WorldCreator creator = new WorldCreator(world).generator(this.getDefaultWorldGenerator(world, world));
+                return creator.createWorld();
             } catch (NullPointerException ex) {
                 ex.printStackTrace();
             }
+            return null;
         } else {
-            this.loadWorld(Bukkit.getWorld(world));
+            return this.loadWorld(Bukkit.getWorld(world));
         }
     }
 
-    public final void loadWorld(World world) {
+    public final World loadWorld(World world) {
         CraftWorld w = (CraftWorld) world;
         // Setting gamerules
         w.getHandle().tracker = new EntityTracker(w.getHandle());
@@ -97,17 +99,13 @@ public class VoidWorldPlugin implements Plugin {
         w.setGameRuleValue("showDeathMessages", "false");
         try {
             // Setting all chunkgenerator fields for world
-            Bukkit.getConsoleSender().sendMessage(
-                    "Preparing void world generation for world '" + world.getName() + "'");
-            w.getHandle().generator =
-                    this.getDefaultWorldGenerator(world.getName(), world.getName());
+            Bukkit.getConsoleSender().sendMessage("Preparing void world generation for world '" + world.getName() + "'");
+            w.getHandle().generator = this.getDefaultWorldGenerator(world.getName(), world.getName());
             Field field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("dataManager");
             field.setAccessible(true);
             IDataManager manager = (IDataManager) field.get(w.getHandle());
-            IChunkProvider gen = new CustomChunkGenerator(w.getHandle(), w.getHandle().getSeed(),
-                    w.getHandle().generator);
-            gen = new ChunkProviderServer(w.getHandle(),
-                    manager.createChunkLoader(w.getHandle().worldProvider), gen);
+            IChunkProvider gen = new CustomChunkGenerator(w.getHandle(), w.getHandle().getSeed(), w.getHandle().generator);
+            gen = new ChunkProviderServer(w.getHandle(), manager.createChunkLoader(w.getHandle().worldProvider), gen);
             w.getHandle().chunkProviderServer = (ChunkProviderServer) gen;
             field = net.minecraft.server.v1_8_R3.World.class.getDeclaredField("chunkProvider");
             field.setAccessible(true);
@@ -115,72 +113,58 @@ public class VoidWorldPlugin implements Plugin {
             field = w.getClass().getDeclaredField("generator");
             field.setAccessible(true);
             field.set(w, w.getHandle().generator);
-        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException |
-                 SecurityException ex) {
+        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException | SecurityException ex) {
             ex.printStackTrace();
         }
+        return world;
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label,
-                                      String[] args) {
+    @Override public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         return null;
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         return false;
     }
 
-    @Override
-    public File getDataFolder() {
+    @Override public File getDataFolder() {
         return null;
     }
 
-    @Override
-    public PluginDescriptionFile getDescription() {
+    @Override public PluginDescriptionFile getDescription() {
         return description;
     }
 
-    @Override
-    public FileConfiguration getConfig() {
+    @Override public FileConfiguration getConfig() {
         return null;
     }
 
-    @Override
-    public InputStream getResource(String var1) {
+    @Override public InputStream getResource(String var1) {
         return null;
     }
 
-    @Override
-    public void saveConfig() {
+    @Override public void saveConfig() {
     }
 
-    @Override
-    public void saveDefaultConfig() {
+    @Override public void saveDefaultConfig() {
     }
 
-    @Override
-    public void saveResource(String string, boolean bool) {
+    @Override public void saveResource(String string, boolean bool) {
 
     }
 
-    @Override
-    public void reloadConfig() {
+    @Override public void reloadConfig() {
     }
 
-    @Override
-    public PluginLoader getPluginLoader() {
+    @Override public PluginLoader getPluginLoader() {
         return loader;
     }
 
-    @Override
-    public Server getServer() {
+    @Override public Server getServer() {
         return server;
     }
 
-    @Override
-    public boolean isEnabled() {
+    @Override public boolean isEnabled() {
         return enabled;
     }
 
@@ -196,56 +180,45 @@ public class VoidWorldPlugin implements Plugin {
         }
     }
 
-    @Override
-    public void onDisable() {
+    @Override public void onDisable() {
         HandlerList.unregisterAll(listenerVoidWorld);
     }
 
-    @Override
-    public void onLoad() {
+    @Override public void onLoad() {
 
     }
 
-    @Override
-    public void onEnable() {
+    @Override public void onEnable() {
         Bukkit.getPluginManager().registerEvents(listenerVoidWorld = new ListenerVoidWorld(), this);
     }
 
-    @Override
-    public boolean isNaggable() {
+    @Override public boolean isNaggable() {
         return naggable;
     }
 
-    @Override
-    public void setNaggable(boolean naggable) {
+    @Override public void setNaggable(boolean naggable) {
         this.naggable = naggable;
     }
 
-    @Override
-    public EbeanServer getDatabase() {
+    @Override public EbeanServer getDatabase() {
         return null;
     }
 
-    @Override
-    public ChunkGenerator getDefaultWorldGenerator(String var1, String var2) {
+    @Override public ChunkGenerator getDefaultWorldGenerator(String var1, String var2) {
         return new ChunkGenerator() {
 
-            @Override
-            public ChunkData generateChunkData(World world, Random random, int x, int z,
-                                               BiomeGrid biome) {
+            @Override public ChunkData generateChunkData(World world, Random random, int x, int z, BiomeGrid biome) {
                 return this.createChunkData(world);
             }
 
         };
     }
 
-    @Override
-    public Logger getLogger() {
+    @Override public Logger getLogger() {
         return logger;
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "WoolBattleVoidWorld";
     }
 

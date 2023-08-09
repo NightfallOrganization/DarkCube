@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -36,7 +36,7 @@ public class LineBuilderPerk extends Perk {
     public static class ListenerLineBuilder extends BasicPerkListener {
 
         private static final Key DATA_SCHEDULER =
-                new Key(WoolBattle.instance(), "linebuilderScheduler");
+                new Key(WoolBattleBukkit.instance(), "linebuilderScheduler");
 
         public ListenerLineBuilder(Perk perk) {
             super(perk);
@@ -133,7 +133,7 @@ public class LineBuilderPerk extends Perk {
                     }
                     Location next = line.getNextBlock(user.getBukkitEntity().getLocation());
                     line.addBlock(next);
-                    WoolBattle.instance().ingame().place(user, next.getBlock());
+                    WoolBattleBukkit.instance().ingame().place(user, next.getBlock());
                     user.getBukkitEntity().addPotionEffect(
                             new PotionEffect(PotionEffectType.SLOW, 20, 10, false, false), true);
                 }

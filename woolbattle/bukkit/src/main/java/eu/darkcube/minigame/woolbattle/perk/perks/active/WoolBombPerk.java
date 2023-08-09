@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -42,9 +42,9 @@ public class WoolBombPerk extends Perk {
 		protected boolean activate(UserPerk perk) {
 			Player p = perk.owner().getBukkitEntity();
 			Snowball bomb = p.launchProjectile(Snowball.class);
-			bomb.setMetadata("source", new FixedMetadataValue(WoolBattle.instance(),
+			bomb.setMetadata("source", new FixedMetadataValue(WoolBattleBukkit.instance(),
 					perk.owner()));
-			bomb.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(),
+			bomb.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(),
 					perk.perk().perkName().getName()));
 			return true;
 		}
@@ -66,8 +66,8 @@ public class WoolBombPerk extends Perk {
 				WBUser user = (WBUser) bomb.getMetadata("source").get(0).value();
 				TNTPrimed tnt = bomb.getWorld().spawn(bomb.getLocation(), TNTPrimed.class);
 
-				tnt.setMetadata("boost", new FixedMetadataValue(WoolBattle.instance(), 3));
-				tnt.setMetadata("source", new FixedMetadataValue(WoolBattle.instance(), user));
+				tnt.setMetadata("boost", new FixedMetadataValue(WoolBattleBukkit.instance(), 3));
+				tnt.setMetadata("source", new FixedMetadataValue(WoolBattleBukkit.instance(), user));
 				tnt.setFuseTicks(10);
 				tnt.setYield(4f);
 			}

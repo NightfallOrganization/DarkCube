@@ -22,19 +22,14 @@ import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import eu.darkcube.system.version.v1_20_1.CommandAPI1_20_1;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.StringRange;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.command.VanillaCommandWrapper;
-import org.bukkit.craftbukkit.v1_20_R1.help.SimpleHelpMap;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -46,6 +41,18 @@ public class CommandConverter {
     public CommandConverter(CommandExecutor command) {
         this.command = command;
         this.dispatcher = MinecraftServer.getServer().vanillaCommandDispatcher;
+    }
+
+    public static com.mojang.brigadier.suggestion.Suggestions convert(eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions suggestions, int offset) {
+        return new com.mojang.brigadier.suggestion.Suggestions(convertRange(suggestions.getRange(), offset), suggestions
+                .getList()
+                .stream()
+                .map(s -> new Suggestion(convertRange(s.getRange(), offset), s.getText()))
+                .toList());
+    }
+
+    private static com.mojang.brigadier.context.StringRange convertRange(StringRange range, int offset) {
+        return new com.mojang.brigadier.context.StringRange(range.getStart() + offset, range.getEnd() + offset);
     }
 
     public VanillaCommandWrapper[] convert() {
@@ -108,7 +115,7 @@ public class CommandConverter {
             int offset = offsetCalc;
             CommandSource source = CommandSource.create(context.getSource().getBukkitSender());
             ParseResults<CommandSource> parse = commands.getDispatcher().parse(line, source);
-            return commands.getTabCompletions(parse).thenApply(sug -> CommandAPI1_20_1.convert(sug, offset));
+            return commands.getTabCompletions(parse).thenApply(sug -> convert(sug, offset));
         }
 
         @Override public boolean test(CommandSourceStack source) {

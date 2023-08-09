@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -43,7 +43,7 @@ public class SwitcherPerk extends Perk {
         @Override
         protected boolean activateRight(UserPerk perk) {
             Snowball ball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
-            ball.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(),
+            ball.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(),
                     perk.perk().perkName().getName()));
             return true;
         }
@@ -69,7 +69,7 @@ public class SwitcherPerk extends Perk {
                 if (user.projectileImmunityTicks() > 0)
                     return;
                 if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30))
-                    WoolBattle.instance().ingame().attack(WBUser.getUser(p), user);
+                    WoolBattleBukkit.instance().ingame().attack(WBUser.getUser(p), user);
                 Location loc = p.getLocation();
                 p.teleport(hit);
                 hit.teleport(loc);

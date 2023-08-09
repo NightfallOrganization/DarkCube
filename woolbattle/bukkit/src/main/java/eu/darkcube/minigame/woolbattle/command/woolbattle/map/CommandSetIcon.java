@@ -9,39 +9,33 @@ package eu.darkcube.minigame.woolbattle.command.woolbattle.map;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
-import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 public class CommandSetIcon extends WBCommandExecutor {
     public CommandSetIcon() {
-        super("setIcon", b -> b.then(
-                Commands.argument("material", EnumArgument.enumArgument(Material.values()))
-                        .executes(ctx -> setIcon(ctx,
-                                EnumArgument.getEnumArgument(ctx, "material", Material.class), 0))
-                        .then(Commands.argument("id", IntegerArgumentType.integer(0)).executes(
-                                ctx -> setIcon(ctx, EnumArgument.getEnumArgument(ctx, "material",
-                                                Material.class),
-                                        IntegerArgumentType.getInteger(ctx, "id"))))));
+        super("setIcon", b -> b.executes(CommandSetIcon::setIcon));
     }
 
-    private static int setIcon(CommandContext<CommandSource> ctx, Material material, int id) throws CommandSyntaxException {
+    private static int setIcon(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
+        ItemStack item = ctx.getSource().asPlayer().getItemInHand();
+        Material material = item == null ? Material.AIR : item.getType();
         if (material == Material.AIR) {
             ctx.getSource().sendMessage(Component.text("Luft is unfair .-."));
             return 0;
         }
         Map map = MapArgument.getMap(ctx, "map");
-        map.setIcon(new MaterialAndId(material, (byte) id));
-        ctx.getSource().sendMessage(Component.text(
-                "Die Map '" + map.getName() + "' hat nun das " + "Icon " + "'" + map.getIcon()
-                        + "'.").color(NamedTextColor.GREEN));
+        map.setIcon(item);
+        ctx
+                .getSource()
+                .sendMessage(Component
+                        .text("Die Map '" + map.getName() + "' hat nun das " + "Icon " + "'" + map.getIcon() + "'.")
+                        .color(NamedTextColor.GREEN));
         return 0;
     }
     //	public CommandSetIcon() {

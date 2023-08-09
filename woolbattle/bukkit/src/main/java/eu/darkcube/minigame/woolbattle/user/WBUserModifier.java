@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.user;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.mysql.MySQL;
 import eu.darkcube.minigame.woolbattle.old.UserData;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
@@ -26,9 +26,9 @@ public class WBUserModifier implements UserModifier {
     static Key USER;
     private final Logger logger = Logger.getLogger("WBUserModifier");
     private final Key DATA_VERSION;
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
 
-    public WBUserModifier(WoolBattle woolbattle) {
+    public WBUserModifier(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         this.DATA_VERSION = new Key(woolbattle, "data_version");
         if (USER == null) USER = new Key(woolbattle, "user");
@@ -37,6 +37,7 @@ public class WBUserModifier implements UserModifier {
     @SuppressWarnings("DataFlowIssue")
     @Override
     public void onLoad(User user) {
+        user.getPersistentDataStorage().clearCache();
         DefaultWBUser u = new DefaultWBUser(woolbattle, user);
         int oldDataVersion = 0;
         int dataVersion = 0;
@@ -65,6 +66,7 @@ public class WBUserModifier implements UserModifier {
     @Override
     public void onUnload(User user) {
         user.getMetaDataStorage().remove(USER);
+        user.getPersistentDataStorage().clearCache();
     }
 
     private void migrateFrom1To2(DefaultWBUser user) {

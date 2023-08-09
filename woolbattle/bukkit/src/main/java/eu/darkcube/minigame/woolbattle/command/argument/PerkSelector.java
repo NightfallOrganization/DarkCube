@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class PerkSelector {
 	}
 
 	public Collection<Perk> selectAll() {
-		return new ArrayList<>(WoolBattle.instance().perkRegistry().perks().values());
+		return new ArrayList<>(WoolBattleBukkit.instance().perkRegistry().perks().values());
 	}
 
 	public Perk selectOne() {

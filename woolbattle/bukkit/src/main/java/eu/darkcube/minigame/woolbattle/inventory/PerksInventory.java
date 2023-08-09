@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkRegistry;
@@ -26,7 +26,7 @@ public class PerksInventory extends WoolBattlePagedInventory {
     private final Key PERKS_TYPE;
     private final Key PERKS_TYPE_NUMBER;
 
-    public PerksInventory(WoolBattle woolbattle, WBUser user) {
+    public PerksInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
         PERKS_TYPE = new Key(woolbattle, "perks_type");
         PERKS_TYPE_NUMBER = new Key(woolbattle, "perks_type_number");

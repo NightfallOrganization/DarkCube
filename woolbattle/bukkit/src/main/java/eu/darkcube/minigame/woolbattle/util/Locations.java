@@ -23,9 +23,8 @@ public class Locations extends Parser {
     public static final float F180 = 180f;
 
     public static Set<Block> getBlocksInLine(Location start, Vector direction, int range) {
-        BlockIterator it =
-                new BlockIterator(start.getWorld(), start.toVector(), direction, 1, range);
-        Block last = null;
+        BlockIterator it = new BlockIterator(start.getWorld(), start.toVector(), direction, 1, range);
+        Block last;
         Set<Block> b = new HashSet<>();
         while (it.hasNext()) {
             last = it.next();
@@ -57,8 +56,7 @@ public class Locations extends Parser {
     public static float getNicePitch(float y) {
         y += 90f;
         float interval = 22.5f;
-        if (Math.round(y % interval) == y % interval)
-            return y - 90f;
+        if (Math.round(y % interval) == y % interval) return y - 90f;
 
         float hInterval = interval / 2f;
 
@@ -127,8 +125,7 @@ public class Locations extends Parser {
             World world = parseWorld(World);
             boolean ignoreDirection = parseBoolean(IgnoreDirection);
             Location loc = new Location(world, x, y, z, yaw, pitch);
-            if (oldLoc != null && ignoreDirection)
-                loc.setDirection(oldLoc.getDirection());
+            if (oldLoc != null && ignoreDirection) loc.setDirection(oldLoc.getDirection());
             return loc;
         } catch (Throwable ignored) {
         }
@@ -141,12 +138,8 @@ public class Locations extends Parser {
         double z = loc.getZ();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
-        StringBuilder builder = new StringBuilder();
-        builder.append(x).append(":").append(y).append(":").append(z).append(":").append(yaw)
-                .append(":").append(pitch).append(":")
-                .append(loc.getWorld() != null ? loc.getWorld().getName() : "null").append(":")
-                .append(ignoreDirection);
-        return builder.toString();
+        String worldName = (loc.getWorld() != null ? loc.getWorld().getName() : "null");
+        return x + ":" + y + ":" + z + ":" + yaw + ":" + pitch + ":" + worldName + ":" + ignoreDirection;
     }
 
     public static String toDisplay(Location loc) {

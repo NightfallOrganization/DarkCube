@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
 import eu.darkcube.system.commandapi.v3.Messages;
@@ -25,14 +25,14 @@ import java.util.stream.Stream;
 public class TeamArgument implements ArgumentType<Team> {
     private static final DynamicCommandExceptionType INVALID_ENUM =
             Messages.INVALID_ENUM.newDynamicCommandExceptionType();
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private final boolean spectator;
 
-    private TeamArgument(WoolBattle woolbattle) {
+    private TeamArgument(WoolBattleBukkit woolbattle) {
         this(woolbattle, false);
     }
 
-    private TeamArgument(WoolBattle woolbattle, boolean spectator) {
+    private TeamArgument(WoolBattleBukkit woolbattle, boolean spectator) {
         this.woolbattle = woolbattle;
         this.spectator = spectator;
     }
@@ -41,11 +41,11 @@ public class TeamArgument implements ArgumentType<Team> {
         return context.getArgument(name, Team.class);
     }
 
-    public static TeamArgument teamArgument(WoolBattle woolbattle) {
+    public static TeamArgument teamArgument(WoolBattleBukkit woolbattle) {
         return new TeamArgument(woolbattle);
     }
 
-    public static TeamArgument teamArgumentSpectator(WoolBattle woolbattle) {
+    public static TeamArgument teamArgumentSpectator(WoolBattleBukkit woolbattle) {
         return new TeamArgument(woolbattle, true);
     }
 

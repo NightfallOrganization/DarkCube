@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.troll;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.PerkArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -32,7 +32,7 @@ public class CommandSetPerk extends WBCommandExecutor {
 			RequiredArgumentBuilder<CommandSource, EntitySelector> b2 =
 					Commands.argument("players", EntityArgument.players());
 			for (ActivationType type : ActivationType.values()) {
-				Perk[] perkArray = WoolBattle.instance().perkRegistry().perks(type);
+				Perk[] perkArray = WoolBattleBukkit.instance().perkRegistry().perks(type);
 				if (perkArray.length <= 1) {
 					continue;
 				}

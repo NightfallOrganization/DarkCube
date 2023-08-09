@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -18,14 +18,14 @@ import java.util.HashSet;
 
 public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventory {
     protected final WBUser user;
-    protected final WoolBattle woolbattle;
+    protected final WoolBattleBukkit woolbattle;
     private boolean done = false;
 
-    public WoolBattlePagedInventory(WoolBattle woolbattle, InventoryType inventoryType, Component title, WBUser user) {
+    public WoolBattlePagedInventory(WoolBattleBukkit woolbattle, InventoryType inventoryType, Component title, WBUser user) {
         this(woolbattle, inventoryType, title, 5 * 9, AsyncPagedInventory.box(2, 2, 4, 8), user);
     }
 
-    public WoolBattlePagedInventory(WoolBattle woolbattle, InventoryType inventoryType, Component title, int size, int[] box, WBUser user) {
+    public WoolBattlePagedInventory(WoolBattleBukkit woolbattle, InventoryType inventoryType, Component title, int size, int[] box, WBUser user) {
         super(inventoryType, title, size, box, () -> true);
         this.woolbattle = woolbattle;
         this.user = user;

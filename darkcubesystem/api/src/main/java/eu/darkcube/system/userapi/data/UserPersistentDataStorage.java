@@ -67,7 +67,6 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
         new PacketUserPersistentDataSet(user.getUniqueId(), d).sendAsync();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         T ret;
@@ -90,7 +89,6 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         try {
@@ -165,6 +163,15 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
         try {
             user.lock();
             return JsonDocument.newDocument().append(data);
+        } finally {
+            user.unlock();
+        }
+    }
+
+    @Override public void clearCache() {
+        try {
+            user.lock();
+            caches.clear();
         } finally {
             user.unlock();
         }

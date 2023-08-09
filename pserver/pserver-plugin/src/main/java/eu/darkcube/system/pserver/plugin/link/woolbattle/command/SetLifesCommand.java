@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -19,7 +19,7 @@ import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 
 public class SetLifesCommand extends PServerExecutor {
 
-    public SetLifesCommand(WoolBattle woolbattle) {
+    public SetLifesCommand(WoolBattleBukkit woolbattle) {
         super("setlifes", new String[0], b -> b
                 .then(Commands.argument("lifes", IntegerArgumentType.integer(0, 999))
                         .requires(source -> woolbattle.lobby().enabled())

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -53,11 +53,11 @@ public class CapsulePerk extends Perk {
         }
 
         private void setBlock(WBUser user, Location block) {
-            WoolBattle.instance().ingame().place(user, block.getBlock(), 2, false);
+            WoolBattleBukkit.instance().ingame().place(user, block.getBlock(), 2, false);
         }
 
         private void setBlock2(WBUser user, Location block) {
-            WoolBattle.instance().ingame().place(user, block.getBlock(), 0, false);
+            WoolBattleBukkit.instance().ingame().place(user, block.getBlock(), 0, false);
         }
     }
 }

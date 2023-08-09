@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 public class PerkItem {
 
-	public static final Key KEY_PERK_ID = new Key(WoolBattle.instance(), "perk_id");
+	public static final Key KEY_PERK_ID = new Key(WoolBattleBukkit.instance(), "perk_id");
 	public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
 
 	private final Supplier<Item> itemSupplier;

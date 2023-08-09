@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -61,7 +61,7 @@ public class RopePerk extends Perk {
         }
 
         private void setBlock(Location block, WBUser user) {
-            WoolBattle.instance().ingame().place(user, block.getBlock());
+            WoolBattleBukkit.instance().ingame().place(user, block.getBlock());
         }
     }
 }

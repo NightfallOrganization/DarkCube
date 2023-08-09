@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.Block;
@@ -49,7 +49,7 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
     private boolean preventsBlockPlacement(Entity entity) {
         if (entity instanceof Player) {
             Player p = (Player) entity;
-            return !WoolBattle.instance().teamManager().getSpectator().contains(p.getUniqueId());
+            return !WoolBattleBukkit.instance().teamManager().getSpectator().contains(p.getUniqueId());
         }
         return false;
     }

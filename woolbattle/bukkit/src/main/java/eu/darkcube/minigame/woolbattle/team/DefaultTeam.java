@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -90,7 +90,7 @@ class DefaultTeam implements Team {
     @Override
     public void setLifes(int lifes) {
         this.lifes = lifes;
-        WBUser.onlineUsers().forEach(u -> WoolBattle.instance().ingame().reloadScoreboardLifes(u));
+        WBUser.onlineUsers().forEach(u -> WoolBattleBukkit.instance().ingame().reloadScoreboardLifes(u));
     }
 
     @Override
@@ -105,11 +105,11 @@ class DefaultTeam implements Team {
 
     @Override
     public Location getSpawn() {
-        return getSpawn(WoolBattle.instance().gameData().map());
+        return getSpawn(WoolBattleBukkit.instance().gameData().map());
     }
 
     @Override
     public void setSpawn(Location location) {
-        setSpawn(WoolBattle.instance().gameData().map(), location);
+        setSpawn(WoolBattleBukkit.instance().gameData().map(), location);
     }
 }

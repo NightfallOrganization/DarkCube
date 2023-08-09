@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -23,7 +23,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
     @Override
     @EventHandler
     public void handle(AsyncPlayerChatEvent e) {
-        WoolBattle main = WoolBattle.instance();
+        WoolBattleBukkit main = WoolBattleBukkit.instance();
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         String msg = e.getMessage();
@@ -74,7 +74,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
         }
     }
 
-    private String getMessage(Player p, String msg, boolean atall, String color, WoolBattle main,
+    private String getMessage(Player p, String msg, boolean atall, String color, WoolBattleBukkit main,
                               boolean satall) {
         return color + (atall && main.ingame().enabled() ? main.atall : "") + color + p.getName()
                 + ChatColor.RESET + ": " + (satall ? msg.substring(main.atall.length()) : msg);

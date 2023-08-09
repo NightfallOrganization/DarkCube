@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowArrowHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -54,7 +54,7 @@ public class DrawArrowPerk extends Perk {
 				if (perk.cooldown() == 0) {
 					perk.cooldown(cooldown().cooldown());
 					event.arrow().setMetadata("drawArrow",
-							new FixedMetadataValue(WoolBattle.instance(), perk));
+							new FixedMetadataValue(WoolBattleBukkit.instance(), perk));
 					break;
 				}
 				perk.cooldown(perk.cooldown() - 1);

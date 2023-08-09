@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.user;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
@@ -66,7 +66,7 @@ public class DefaultUserPerk implements UserPerk {
     public void slot(int slot) {
         int oldValue = this.slot;
         slotSilent(slot);
-        if (WoolBattle.instance().ingame().enabled()) {
+        if (WoolBattleBukkit.instance().ingame().enabled()) {
             if (oldValue == 100) {
                 owner().getBukkitEntity().getOpenInventory().setCursor(null);
             } else if (oldValue != -1 /* -1 for no slot set */) {
@@ -89,7 +89,7 @@ public class DefaultUserPerk implements UserPerk {
     @Override
     public void cooldown(int cooldown) {
         this.cooldown = Math.min(cooldown, perk.cooldown().cooldown());
-        if (WoolBattle.instance().ingame().enabled()) {
+        if (WoolBattleBukkit.instance().ingame().enabled()) {
             if (owner.getTeam().canPlay())
                 currentPerkItem().setItem();
         }

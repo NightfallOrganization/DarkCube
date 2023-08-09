@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -42,7 +42,7 @@ public class ScoreboardHelper {
         }
     }
 
-    public static void setNeeded(WoolBattle woolbattle, WBUser user) {
+    public static void setNeeded(WoolBattleBukkit woolbattle, WBUser user) {
         Scoreboard sb = new Scoreboard(user);
         ScoreboardTeam team = sb.getTeam(ObjectiveTeam.NEEDED.getKey());
         team.setSuffix(Component.text(woolbattle.lobby().minPlayerCount()));
@@ -54,13 +54,13 @@ public class ScoreboardHelper {
         team.setSuffix(text(WBUser.onlineUsers().size()));
     }
 
-    public static void setEpGlitch(WoolBattle woolbattle, WBUser user) {
+    public static void setEpGlitch(WoolBattleBukkit woolbattle, WBUser user) {
         Scoreboard sb = new Scoreboard(user);
         ScoreboardTeam team = sb.getTeam(ObjectiveTeam.EP_GLITCH.getKey());
         team.setSuffix((woolbattle.gameData().epGlitch() ? Message.EP_GLITCH_ON : Message.EP_GLITCH_OFF).getMessage(user));
     }
 
-    public static void setMap(WoolBattle woolbattle, WBUser user) {
+    public static void setMap(WoolBattleBukkit woolbattle, WBUser user) {
         Scoreboard sb = new Scoreboard(user);
         ScoreboardTeam team = sb.getTeam(ObjectiveTeam.MAP.getKey());
         Map m = woolbattle.gameData().map();

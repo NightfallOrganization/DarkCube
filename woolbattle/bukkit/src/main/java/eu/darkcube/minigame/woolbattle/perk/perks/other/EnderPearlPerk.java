@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.passive.EventEnderPearl;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -46,7 +46,7 @@ public class EnderPearlPerk extends Perk {
         protected boolean activateRight(UserPerk perk) {
             EnderPearl enderPearl =
                     perk.owner().getBukkitEntity().launchProjectile(EnderPearl.class);
-            enderPearl.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), perk));
+            enderPearl.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(), perk));
             return true;
         }
 
@@ -66,7 +66,7 @@ public class EnderPearlPerk extends Perk {
             if (!perk.perk().equals(perk()))
                 return;
             if (user.projectileImmunityTicks() == 0) {
-                if (!WoolBattle.instance().ingame().attack(perk.owner(), user)) {
+                if (!WoolBattleBukkit.instance().ingame().attack(perk.owner(), user)) {
                     event.setCancelled(true);
                 }
             }

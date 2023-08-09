@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.game;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerBlockBreak;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerEntityDamage;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerPlayerJoin;
@@ -40,13 +40,13 @@ public class Endgame extends GamePhase {
     @Override
     public void onEnable() {
         CloudNetLink.update();
-        final WoolBattle main = WoolBattle.instance();
+        final WoolBattleBukkit main = WoolBattleBukkit.instance();
         //		main.getSchedulers().clear();
 
-        WoolBattle.registerListeners(this.listenerPlayerJoin);
-        WoolBattle.registerListeners(this.listenerPlayerQuit);
-        WoolBattle.registerListeners(this.listenerBlockBreak);
-        WoolBattle.registerListeners(this.listenerEntityDamage);
+        WoolBattleBukkit.registerListeners(this.listenerPlayerJoin);
+        WoolBattleBukkit.registerListeners(this.listenerPlayerQuit);
+        WoolBattleBukkit.registerListeners(this.listenerBlockBreak);
+        WoolBattleBukkit.registerListeners(this.listenerEntityDamage);
 
         Team winner = main.ingame().winner;
         WBUser.onlineUsers().forEach(u -> {
@@ -117,10 +117,10 @@ public class Endgame extends GamePhase {
 
     @Override
     public void onDisable() {
-        WoolBattle.unregisterListeners(this.listenerPlayerJoin);
-        WoolBattle.unregisterListeners(this.listenerPlayerQuit);
-        WoolBattle.unregisterListeners(this.listenerBlockBreak);
-        WoolBattle.unregisterListeners(this.listenerEntityDamage);
+        WoolBattleBukkit.unregisterListeners(this.listenerPlayerJoin);
+        WoolBattleBukkit.unregisterListeners(this.listenerPlayerQuit);
+        WoolBattleBukkit.unregisterListeners(this.listenerBlockBreak);
+        WoolBattleBukkit.unregisterListeners(this.listenerEntityDamage);
     }
 
     private String val(double d) {

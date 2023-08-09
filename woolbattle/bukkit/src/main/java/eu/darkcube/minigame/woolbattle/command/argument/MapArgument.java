@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.system.commandapi.v3.CommandSource;
@@ -29,25 +29,25 @@ import java.util.function.Supplier;
 
 public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
     private static final DynamicCommandExceptionType INVALID_ENUM = Messages.INVALID_ENUM.newDynamicCommandExceptionType();
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private final ToStringFunction toStringFunction;
     private final FromStringFunction fromStringFunction;
 
-    public MapArgument(WoolBattle woolbattle, ToStringFunction toStringFunction) {
+    public MapArgument(WoolBattleBukkit woolbattle, ToStringFunction toStringFunction) {
         this.woolbattle = woolbattle;
         this.toStringFunction = toStringFunction;
         this.fromStringFunction = FromStringFunction.of(this::maps, toStringFunction);
     }
 
-    public static MapArgument mapArgument(WoolBattle woolbattle, ToStringFunction toStringFunction) {
+    public static MapArgument mapArgument(WoolBattleBukkit woolbattle, ToStringFunction toStringFunction) {
         return new MapArgument(woolbattle, toStringFunction);
     }
 
-    public static MapArgument mapArgument(WoolBattle woolbattle, MapSize mapSize) {
+    public static MapArgument mapArgument(WoolBattleBukkit woolbattle, MapSize mapSize) {
         return mapArgument(woolbattle, ToStringFunction.function(mapSize));
     }
 
-    public static MapArgument mapArgument(WoolBattle woolbattle) {
+    public static MapArgument mapArgument(WoolBattleBukkit woolbattle) {
         return mapArgument(woolbattle, woolbattle.gameData().mapSize());
     }
 

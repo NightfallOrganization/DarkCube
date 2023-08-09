@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
@@ -56,9 +56,9 @@ public class TntArrowPerk extends Perk {
 									arrow.getWorld().spawn(arrow.getLocation(), TNTPrimed.class);
 
 							tnt.setMetadata("boost",
-									new FixedMetadataValue(WoolBattle.instance(), 2));
+									new FixedMetadataValue(WoolBattleBukkit.instance(), 2));
 							tnt.setMetadata("source",
-									new FixedMetadataValue(WoolBattle.instance(), event.user()));
+									new FixedMetadataValue(WoolBattleBukkit.instance(), event.user()));
 							tnt.setIsIncendiary(false);
 							tnt.setFuseTicks(2);
 						}

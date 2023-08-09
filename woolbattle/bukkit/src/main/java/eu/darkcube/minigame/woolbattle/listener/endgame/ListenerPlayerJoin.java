@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.endgame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
     @Override
     @EventHandler
     public void handle(PlayerJoinEvent e) {
-        WoolBattle main = WoolBattle.instance();
+        WoolBattleBukkit main = WoolBattleBukkit.instance();
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         main.endgame().setPlayerItems(user);

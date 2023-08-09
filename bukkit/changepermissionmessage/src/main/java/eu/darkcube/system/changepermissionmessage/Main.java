@@ -10,6 +10,7 @@ package eu.darkcube.system.changepermissionmessage;
 import eu.darkcube.system.util.ReflectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,7 +21,6 @@ import java.util.Map;
 
 public class Main extends JavaPlugin {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
 		new BukkitRunnable() {
@@ -32,7 +32,7 @@ public class Main extends JavaPlugin {
 					Object craftServer = Bukkit.getServer();
 					Method getCommandMap = craftServer.getClass().getMethod("getCommandMap");
 					Object commandMap = getCommandMap.invoke(craftServer);
-					Field knownCommandsField = commandMap.getClass().getDeclaredField("knownCommands");
+					Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
 					knownCommandsField.setAccessible(true);
 					Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
 					knownCommandsField.setAccessible(false);

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.commandapi.v3.Commands;
@@ -15,7 +15,7 @@ import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
 
 public class ForceMapCommand extends PServerExecutor {
 
-    public ForceMapCommand(WoolBattle woolbattle) {
+    public ForceMapCommand(WoolBattleBukkit woolbattle) {
         super("forcemap", new String[0], b -> b.then(
                 Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(context -> {
                     Map map = MapArgument.getMap(context, "map");

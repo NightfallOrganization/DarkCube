@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowArrowHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.event.perk.other.PlayerHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAttackUser;
@@ -29,7 +29,7 @@ import org.bukkit.util.Vector;
 
 public class BerserkerPerk extends Perk {
     public static final PerkName BERSERKER = new PerkName("BERSERKER");
-    private static final Key combo = new Key(WoolBattle.instance(), "perk_berserker_combo");
+    private static final Key combo = new Key(WoolBattleBukkit.instance(), "perk_berserker_combo");
 
     public BerserkerPerk() {
         super(ActivationType.PASSIVE, BERSERKER, new Cooldown(Unit.ACTIVATIONS, 0), 0,
@@ -87,7 +87,7 @@ public class BerserkerPerk extends Perk {
         @EventHandler
         public void handle(PlayerHitPlayerEvent event) {
             for (UserPerk perk : event.attacker().perks().perks(perkName())) {
-                if (WoolBattle.instance().ingame().attack(event.attacker(), event.target())) {
+                if (WoolBattleBukkit.instance().ingame().attack(event.attacker(), event.target())) {
                     boolean far = event.target().getBukkitEntity().getLocation()
                             .distanceSquared(event.attacker().getBukkitEntity().getLocation())
                             > 200 * 200;

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -47,7 +47,7 @@ public class ArrowBombPerk extends Perk {
 		protected boolean activateRight(UserPerk perk) {
 			Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
 			snowball.setVelocity(snowball.getVelocity()); // de-sync fix
-			snowball.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), perk));
+			snowball.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(), perk));
 			return true;
 		}
 
@@ -81,7 +81,7 @@ public class ArrowBombPerk extends Perk {
 				Arrow arrow = user.getBukkitEntity().getWorld()
 						.spawnArrow(snowball.getLocation(), dir, .9F, 0);
 				arrow.setMetadata("noParticles",
-						new FixedMetadataValue(WoolBattle.instance(), true));
+						new FixedMetadataValue(WoolBattleBukkit.instance(), true));
 				ArrowPerk.claimArrow(arrow, user, 3, 2);
 			}
 		}

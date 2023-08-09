@@ -1,4 +1,4 @@
-main: eu.darkcube.minigame.woolbattle.WoolBattle
+main: eu.darkcube.minigame.woolbattle.WoolBattleBukkit
 version: 1.0
 author: DasBabyPixel
 name: WoolBattle

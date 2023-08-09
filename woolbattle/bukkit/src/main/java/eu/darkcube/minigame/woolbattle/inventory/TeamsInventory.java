@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -32,7 +32,7 @@ public class TeamsInventory extends WoolBattlePagedInventory {
     private final Key TEAM = new Key(woolbattle, "team_id");
     private final TeamsListener listener = new TeamsListener();
 
-    public TeamsInventory(WoolBattle woolbattle, WBUser user) {
+    public TeamsInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_TEAMS.getMessage(user), user);
         Bukkit.getPluginManager().registerEvents(listener, woolbattle);
         complete();

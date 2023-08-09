@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowArrowHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -44,11 +44,11 @@ public class ArrowPerk extends Perk {
     }
 
     public static void claimArrow(Arrow arrow, WBUser user, float strength, int blockDamage) {
-        arrow.setMetadata("user", new FixedMetadataValue(WoolBattle.instance(), user));
-        arrow.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), ArrowPerk.ARROW));
-        arrow.setMetadata("strength", new FixedMetadataValue(WoolBattle.instance(), strength));
+        arrow.setMetadata("user", new FixedMetadataValue(WoolBattleBukkit.instance(), user));
+        arrow.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(), ArrowPerk.ARROW));
+        arrow.setMetadata("strength", new FixedMetadataValue(WoolBattleBukkit.instance(), strength));
         arrow.setMetadata("blockDamage",
-                new FixedMetadataValue(WoolBattle.instance(), blockDamage));
+                new FixedMetadataValue(WoolBattleBukkit.instance(), blockDamage));
     }
 
     private class ArrowPerkListener implements Listener {
@@ -112,8 +112,8 @@ public class ArrowPerk extends Perk {
                     int z = movingobjectposition.a().getZ();
                     Block block = e.getEntity().getWorld().getBlockAt(x, y, z);
                     if (block.getType() == Material.WOOL) {
-                        WoolBattle.instance().ingame().setBlockDamage(block,
-                                WoolBattle.instance().ingame().getBlockDamage(block)
+                        WoolBattleBukkit.instance().ingame().setBlockDamage(block,
+                                WoolBattleBukkit.instance().ingame().getBlockDamage(block)
                                         + arrow.getMetadata("blockDamage").get(0).asInt());
                     }
                 }
@@ -152,7 +152,7 @@ public class ArrowPerk extends Perk {
                 arrow.remove();
                 return;
             }
-            if (!WoolBattle.instance().ingame().canAttack(shooter, user)) {
+            if (!WoolBattleBukkit.instance().ingame().canAttack(shooter, user)) {
                 arrow.remove();
                 return;
             }
@@ -162,7 +162,7 @@ public class ArrowPerk extends Perk {
                 arrow.remove();
                 return;
             }
-            if (!WoolBattle.instance().ingame().attack(shooter, user)) {
+            if (!WoolBattleBukkit.instance().ingame().attack(shooter, user)) {
                 arrow.remove();
                 logger.warning(
                         "Inconsistent behaviour for ArrowPerk. This might mess up some logic for "
@@ -183,7 +183,7 @@ public class ArrowPerk extends Perk {
                 @Override
                 public void run() {
                     Location loc = user.getBukkitEntity().getLocation();
-                    execute(WoolBattle.instance().ingame(), loc);
+                    execute(WoolBattleBukkit.instance().ingame(), loc);
                 }
 
                 private void /*Set<Block*/ execute(Ingame ingame, Location loc) {

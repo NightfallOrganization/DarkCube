@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.WoolBombPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -32,7 +32,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
         double y = mid.getY();
         double z = mid.getZ();
         for (Block b : e.blockList()) {
-            if (WoolBattle.instance().ingame().destroy(b)) {
+            if (WoolBattleBukkit.instance().ingame().destroy(b)) {
                 @SuppressWarnings("deprecation")
                 FallingBlock block = b.getWorld()
                         .spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(),
@@ -55,7 +55,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
         double y = mid.getY();
         double z = mid.getZ();
         for (Block b : event.blockList()) {
-            if (WoolBattle.instance().ingame().destroy(b)) {
+            if (WoolBattleBukkit.instance().ingame().destroy(b)) {
                 @SuppressWarnings("deprecation")
                 FallingBlock block = b.getWorld()
                         .spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(),
@@ -138,7 +138,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
                 velocity.setY(1 + (velocity.getY() * strengthY / 5));
                 velocity.setZ(velocity.getZ() * strengthZ);
                 p.setVelocity(velocity);
-                WoolBattle.instance().ingame().attack(attacker, user);
+                WoolBattleBukkit.instance().ingame().attack(attacker, user);
             }
         } else if (event.getDamager().getType() == EntityType.SNOWBALL) {
             Snowball bomb = (Snowball) event.getDamager();

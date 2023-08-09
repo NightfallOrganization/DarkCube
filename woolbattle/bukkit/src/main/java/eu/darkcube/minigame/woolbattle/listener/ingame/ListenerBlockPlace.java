@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
@@ -43,7 +43,7 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
             }
         }
         Block block = e.getBlock();
-        Ingame ingame = WoolBattle.instance().ingame();
+        Ingame ingame = WoolBattleBukkit.instance().ingame();
         ingame.placedBlocks.add(block);
     }
 }

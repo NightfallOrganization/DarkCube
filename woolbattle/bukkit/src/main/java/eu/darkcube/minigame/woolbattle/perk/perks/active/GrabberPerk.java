@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -35,10 +35,10 @@ public class GrabberPerk extends Perk {
 
     public static class ListenerGrabber extends BasicPerkListener {
 
-        private static final Key DATA_GRABBED = new Key(WoolBattle.instance(), "grabber_grabbed");
+        private static final Key DATA_GRABBED = new Key(WoolBattleBukkit.instance(), "grabber_grabbed");
         private static final Key DATA_SCHEDULER =
-                new Key(WoolBattle.instance(), "grabber_scheduler");
-        private static final Key DATA_PERK = new Key(WoolBattle.instance(), "perk_grabber");
+                new Key(WoolBattleBukkit.instance(), "grabber_scheduler");
+        private static final Key DATA_PERK = new Key(WoolBattleBukkit.instance(), "perk_grabber");
 
         public ListenerGrabber(Perk perk) {
             super(perk);
@@ -99,7 +99,7 @@ public class GrabberPerk extends Perk {
             egg.setShooter(p);
             egg.setVelocity(p.getLocation().getDirection().multiply(1.5));
             egg.setMetadata("perk",
-                    new FixedMetadataValue(WoolBattle.instance(), GrabberPerk.GRABBER));
+                    new FixedMetadataValue(WoolBattleBukkit.instance(), GrabberPerk.GRABBER));
             user.user().getMetaDataStorage().set(DATA_PERK, perk);
             return false;
         }
@@ -116,7 +116,7 @@ public class GrabberPerk extends Perk {
                 Egg egg = (Egg) e.getDamager();
                 if (egg.hasMetadata("perk") && egg.getMetadata("perk").get(0).value()
                         .equals(GrabberPerk.GRABBER)) {
-                    WoolBattle wb = WoolBattle.instance();
+                    WoolBattleBukkit wb = WoolBattleBukkit.instance();
                     Player target = (Player) e.getEntity();
                     WBUser targetUser = WBUser.getUser(target);
                     if (targetUser.projectileImmunityTicks() > 0) {

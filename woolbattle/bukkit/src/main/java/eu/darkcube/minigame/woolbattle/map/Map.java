@@ -6,8 +6,8 @@
  */
 package eu.darkcube.minigame.woolbattle.map;
 
-import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import org.bukkit.inventory.ItemStack;
 
 public interface Map {
 
@@ -17,9 +17,9 @@ public interface Map {
 
     void deathHeight(int height);
 
-    MaterialAndId getIcon();
+    ItemStack getIcon();
 
-    void setIcon(MaterialAndId icon);
+    void setIcon(ItemStack icon);
 
     void enable();
 

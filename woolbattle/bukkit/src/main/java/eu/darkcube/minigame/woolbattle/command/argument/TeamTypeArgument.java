@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.commandapi.v3.CommandSource;
@@ -32,21 +32,21 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
     private final ToStringFunction toStringFunction;
     private final FromStringFunction fromStringFunction;
 
-    private TeamTypeArgument(WoolBattle woolbattle, Supplier<TeamType[]> teams, ToStringFunction toStringFunction) {
+    private TeamTypeArgument(WoolBattleBukkit woolbattle, Supplier<TeamType[]> teams, ToStringFunction toStringFunction) {
         this.values = teams == null ? () -> woolbattle.teamManager().teamTypes().toArray(new TeamType[0]) : teams;
         this.toStringFunction = toStringFunction == null ? ToStringFunction.function() : toStringFunction;
         this.fromStringFunction = FromStringFunction.of(this.values, this.toStringFunction);
     }
 
-    public static TeamTypeArgument teamTypeArgument(WoolBattle woolbattle) {
+    public static TeamTypeArgument teamTypeArgument(WoolBattleBukkit woolbattle) {
         return new TeamTypeArgument(woolbattle, null, null);
     }
 
-    public static TeamTypeArgument teamTypeArgument(WoolBattle woolbattle, MapSize mapSize) {
+    public static TeamTypeArgument teamTypeArgument(WoolBattleBukkit woolbattle, MapSize mapSize) {
         return new TeamTypeArgument(woolbattle, () -> woolbattle.teamManager().teamTypes(mapSize).toArray(new TeamType[0]), null);
     }
 
-    public static TeamTypeArgument teamTypeArgument(WoolBattle woolbattle, ToStringFunction toStringFunction) {
+    public static TeamTypeArgument teamTypeArgument(WoolBattleBukkit woolbattle, ToStringFunction toStringFunction) {
         return new TeamTypeArgument(woolbattle, null, toStringFunction);
     }
 

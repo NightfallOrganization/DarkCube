@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.util;
 
 import de.dytanic.cloudnet.ext.bridge.server.BridgeServerHelper;
 import de.dytanic.cloudnet.wrapper.Wrapper;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.system.DarkCubeBukkit;
@@ -39,24 +39,24 @@ public class CloudNetLink {
         try {
             if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay && fullyLoaded) {
                 GameState current = GameState.UNKNOWN;
-                if (WoolBattle.instance().lobby().enabled()) {
+                if (WoolBattleBukkit.instance().lobby().enabled()) {
                     current = GameState.LOBBY;
-                } else if (WoolBattle.instance().ingame().enabled()) {
+                } else if (WoolBattleBukkit.instance().ingame().enabled()) {
                     current = GameState.INGAME;
-                } else if (WoolBattle.instance().endgame().enabled()) {
+                } else if (WoolBattleBukkit.instance().endgame().enabled()) {
                     current = GameState.STOPPING;
                 }
                 DarkCubeBukkit.gameState(current);
                 DarkCubeBukkit.playingPlayers()
-                        .set(WoolBattle.instance().lobby().enabled()
+                        .set(WoolBattleBukkit.instance().lobby().enabled()
                                 ? WBUser.onlineUsers().size()
                                 : (int) WBUser.onlineUsers().stream()
                                 .filter(u -> u.getTeam().canPlay()).count());
-                DarkCubeBukkit.maxPlayingPlayers().set(WoolBattle.instance().maxPlayers());
+                DarkCubeBukkit.maxPlayingPlayers().set(WoolBattleBukkit.instance().maxPlayers());
                 BridgeServerHelper.setMaxPlayers(1000);
-                String mapname = WoolBattle.instance().gameData().map() == null
+                String mapname = WoolBattleBukkit.instance().gameData().map() == null
                         ? "Unknown Map"
-                        : WoolBattle.instance().gameData().map().getName();
+                        : WoolBattleBukkit.instance().gameData().map().getName();
                 DarkCubeBukkit.displayName("§d" + mapname + " §7(" + Wrapper.getInstance()
                         .getCurrentServiceInfoSnapshot().getServiceId().getTaskName()
                         .substring("woolbattle".length()) + ")");

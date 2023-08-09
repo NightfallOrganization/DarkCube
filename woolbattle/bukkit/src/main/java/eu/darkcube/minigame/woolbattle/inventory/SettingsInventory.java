@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -18,7 +18,7 @@ import eu.darkcube.system.inventoryapi.v1.InventoryType;
 public class SettingsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-settings");
 
-    public SettingsInventory(WoolBattle woolbattle, WBUser user) {
+    public SettingsInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.SETTINGS_TITLE.getMessage(user), user);
     }
 

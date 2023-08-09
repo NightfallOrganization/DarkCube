@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerHeightDisplay;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -29,7 +29,7 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
     @Override
     @EventHandler
     public void handle(PlayerMoveEvent e) {
-        SchedulerHeightDisplay.display(WoolBattle.instance(), WBUser.getUser(e.getPlayer()));
+        SchedulerHeightDisplay.display(WoolBattleBukkit.instance(), WBUser.getUser(e.getPlayer()));
 
         if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
             return;

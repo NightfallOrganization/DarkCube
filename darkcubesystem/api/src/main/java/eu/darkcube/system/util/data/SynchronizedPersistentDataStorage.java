@@ -311,6 +311,15 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return Collections.unmodifiableCollection(updateNotifiers);
     }
 
+    @Override public void clearCache() {
+        try {
+            lock.writeLock().lock();
+            cache.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     @Override
     public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.add(notifier);

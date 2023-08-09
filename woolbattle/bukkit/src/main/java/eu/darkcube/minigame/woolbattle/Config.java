@@ -15,7 +15,7 @@ public class Config {
     public static Key MIN_PLAYER_COUNT;
     public static Key LOBBYDEATHLINE;
 
-    static void load(WoolBattle woolbattle) {
+    static void load(WoolBattleBukkit woolbattle) {
         SPAWN = new Key(woolbattle, "spawn");
         MIN_PLAYER_COUNT = new Key(woolbattle, "min_player_count");
         LOBBYDEATHLINE = new Key(woolbattle, "lobbydeathline");

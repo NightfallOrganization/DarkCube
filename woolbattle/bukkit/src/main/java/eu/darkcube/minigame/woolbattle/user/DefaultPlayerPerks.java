@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.user;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -141,7 +141,7 @@ public class DefaultPlayerPerks implements PlayerPerks {
 				} else { // Fallback
 
 					PerkName name = null;
-					for (Map.Entry<PerkName, Perk> e : WoolBattle.instance().perkRegistry().perks()
+					for (Map.Entry<PerkName, Perk> e : WoolBattleBukkit.instance().perkRegistry().perks()
 							.entrySet()) {
 						if (e.getValue().activationType() == type) {
 							name = e.getKey();

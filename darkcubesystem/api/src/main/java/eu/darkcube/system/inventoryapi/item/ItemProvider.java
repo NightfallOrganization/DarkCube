@@ -7,15 +7,19 @@
 
 package eu.darkcube.system.inventoryapi.item;
 
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public interface ItemProvider {
 
-	ItemBuilder item(Material material);
+    ItemBuilder item(Material material);
 
-	ItemBuilder item(ItemStack item);
+    ItemBuilder item(ItemStack item);
 
-	ItemBuilder spawner();
+    ItemBuilder item(JsonElement json);
+
+    ItemBuilder spawner();
 
 }

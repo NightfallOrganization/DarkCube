@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.passive.EventMayDoubleJump;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAttackUser;
 import eu.darkcube.minigame.woolbattle.event.user.UserEvent;
@@ -29,7 +29,7 @@ import org.bukkit.util.Vector;
 
 public class SpiderPerk extends Perk {
 	public static final PerkName SPIDER = new PerkName("SPIDER");
-	private static final Key CLIMBING = new Key(WoolBattle.instance(), "perk_spider_climbing");
+	private static final Key CLIMBING = new Key(WoolBattleBukkit.instance(), "perk_spider_climbing");
 
 	public SpiderPerk() {
 		super(ActivationType.PASSIVE, SPIDER, new Cooldown(Unit.TICKS, 60), 2, Item.PERK_SPIDER,

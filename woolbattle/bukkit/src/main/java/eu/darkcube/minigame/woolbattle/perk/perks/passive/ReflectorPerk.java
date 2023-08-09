@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowArrowHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.event.perk.other.PlayerHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -33,7 +33,7 @@ public class ReflectorPerk extends Perk {
     private final class ReflectorListener implements Listener {
         private final Random random = new Random();
         private final Key KEY_STORED_KNOCKBACK =
-                new Key(WoolBattle.instance(), "reflectorStoredKnockback");
+                new Key(WoolBattleBukkit.instance(), "reflectorStoredKnockback");
 
         private boolean attack(WBUser user, WBUser target) {
             if (user.user().getMetaDataStorage().has(KEY_STORED_KNOCKBACK)) {
@@ -44,7 +44,7 @@ public class ReflectorPerk extends Perk {
                     v.normalize();
                     v.multiply(stored);
                     v.setY(.4500023);
-                    if (WoolBattle.instance().ingame().attack(user, target)) {
+                    if (WoolBattleBukkit.instance().ingame().attack(user, target)) {
                         user.user().getMetaDataStorage().remove(KEY_STORED_KNOCKBACK);
                         target.getBukkitEntity().damage(0);
                         target.getBukkitEntity().setVelocity(v);

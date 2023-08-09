@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 
 public class CommandSetTeam extends CommandExecutor {
 
-    public CommandSetTeam(WoolBattle woolbattle) {
+    public CommandSetTeam(WoolBattleBukkit woolbattle) {
         super("woolbattle", "setteam", "woolbattle.command.setteam", new String[0], b -> {
             b.then(Commands.argument("player", EntityArgument.player())
                     .then(Commands.argument("team", TeamArgument.teamArgument(woolbattle))

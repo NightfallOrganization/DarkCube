@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.PlayerHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
@@ -23,7 +23,7 @@ public class ListenerEntityDamageByEntity extends Listener<EntityDamageByEntityE
     public void handle(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
             event.setDamage(0);
-            WoolBattle main = WoolBattle.instance();
+            WoolBattleBukkit main = WoolBattleBukkit.instance();
             WBUser target = WBUser.getUser((Player) event.getEntity());
             Ingame ingame = main.ingame();
             if (target.hasSpawnProtection() || ingame.isGlobalSpawnProtection) {

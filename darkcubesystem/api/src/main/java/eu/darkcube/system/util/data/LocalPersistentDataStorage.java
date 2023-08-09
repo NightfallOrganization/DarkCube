@@ -252,6 +252,10 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         }
     }
 
+    @Override public void clearCache() {
+        cache.clear();
+    }
+
     private void notifyNotifiers() {
         for (UpdateNotifier updateNotifier : updateNotifiers) {
             updateNotifier.notify(this);

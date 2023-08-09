@@ -31,7 +31,7 @@ public class WoolBattleListeners {
         listeners.add(new ListenerAntiMonster());
     }
 
-    public void registerAll(WoolBattle woolbattle) {
+    public void registerAll(WoolBattleBukkit woolbattle) {
         for (Listener listener : listeners) {
             Bukkit.getPluginManager().registerEvents(listener, woolbattle);
         }

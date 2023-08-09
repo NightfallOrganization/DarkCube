@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.map;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
@@ -22,7 +22,7 @@ public class CommandDisable extends WBCommandExecutor {
                         .color(NamedTextColor.RED));
             } else {
                 map.disable();
-                WoolBattle.instance().lobby().recalculateMap();
+                WoolBattleBukkit.instance().lobby().recalculateMap();
                 ctx.getSource().sendMessage(
                         Component.text("Du hast die Map '" + map.getName() + "' deaktiviert!")
                                 .color(NamedTextColor.GREEN));

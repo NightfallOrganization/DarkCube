@@ -7,41 +7,44 @@
 
 package eu.darkcube.minigame.woolbattle.util.gson;
 
-import java.lang.reflect.Type;
-
-import org.bukkit.Location;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
+import com.google.gson.*;
 import eu.darkcube.minigame.woolbattle.map.DefaultMap;
 import eu.darkcube.minigame.woolbattle.map.Map;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
+import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
+import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import org.bukkit.inventory.ItemStack;
 
-public class TypeAdapterMap
-				implements JsonSerializer<Map>, JsonDeserializer<Map> {
+import java.lang.reflect.Type;
 
-	public static final TypeAdapterMap INSTANCE = new TypeAdapterMap();
-	private static final Gson GSON = new GsonBuilder().registerTypeAdapter(Location.class, TypeAdapterLocation.INSTANCE).create();
+public class TypeAdapterMap implements JsonSerializer<Map>, JsonDeserializer<Map> {
 
-	private TypeAdapterMap() {
-	}
+    public static final TypeAdapterMap INSTANCE = new TypeAdapterMap();
 
-	@Override
-	public Map deserialize(JsonElement var1, Type var2,
-					JsonDeserializationContext var3) throws JsonParseException {
-		return GSON.fromJson(var1, DefaultMap.class);
-	}
+    private TypeAdapterMap() {
+    }
 
-	@Override
-	public JsonElement serialize(Map var1, Type var2,
-					JsonSerializationContext var3) {
-		return new JsonPrimitive(GSON.toJson(var1));
-	}
+    @Override public Map deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+        JsonObject o = json.getAsJsonObject();
+        String name = o.get("name").getAsString();
+        boolean enabled = o.get("enabled").getAsBoolean();
+        int deathHeight = o.get("deathHeight").getAsInt();
+        MapSize size = GsonSerializer.gson.fromJson(o.get("mapSize"), MapSize.class);
+        ItemStack icon = ItemBuilder
+                .item(new eu.darkcube.system.libs.com.google.gson.Gson().fromJson(o
+                        .get("icon")
+                        .toString(), eu.darkcube.system.libs.com.google.gson.JsonElement.class))
+                .build();
+        return new DefaultMap(name, enabled, deathHeight, icon, size, null);
+    }
+
+    @Override public JsonElement serialize(Map map, Type type, JsonSerializationContext context) {
+        JsonObject o = new JsonObject();
+        o.add("deathHeight", new JsonPrimitive(map.deathHeight()));
+        o.add("enabled", new JsonPrimitive(map.isEnabled()));
+        o.add("name", new JsonPrimitive(map.getName()));
+        o.add("icon", GsonSerializer.gson.fromJson(ItemBuilder.item(map.getIcon()).serialize().toString(), JsonElement.class));
+        o.add("mapSize", GsonSerializer.gson.toJsonTree(map.size()));
+        return o;
+    }
 }

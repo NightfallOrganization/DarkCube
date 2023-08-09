@@ -7,14 +7,14 @@
 
 package eu.darkcube.minigame.woolbattle.util;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SchedulerTicker extends BukkitRunnable {
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
 
-    public SchedulerTicker(WoolBattle woolbattle) {
+    public SchedulerTicker(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
     }
 

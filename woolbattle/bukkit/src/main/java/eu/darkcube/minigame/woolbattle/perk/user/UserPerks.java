@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.user;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -38,10 +38,10 @@ public class UserPerks {
         for (ActivationType type : ActivationType.values()) {
             PerkName[] perks = p.perks(type);
             for (int i = 0; i < perks.length; i++) {
-                Perk perk = WoolBattle.instance().perkRegistry().perks().get(perks[i]);
+                Perk perk = WoolBattleBukkit.instance().perkRegistry().perks().get(perks[i]);
                 if (perk == null) {
                     List<PerkName> listPerks = Arrays.asList(perks);
-                    perk = java.util.Arrays.stream(WoolBattle.instance().perkRegistry().perks(type))
+                    perk = java.util.Arrays.stream(WoolBattleBukkit.instance().perkRegistry().perks(type))
                             .filter(pe -> !listPerks.contains(pe.perkName())).findAny()
                             .orElseThrow(Error::new);
                     p.perk(type, i, perk.perkName());
@@ -68,7 +68,7 @@ public class UserPerks {
         byName.computeIfAbsent(perk.perkName(), (a) -> new ArrayList<>());
         byType.get(perk.activationType()).add(up);
         byName.get(perk.perkName()).add(up);
-        if (WoolBattle.instance().ingame().enabled()) {
+        if (WoolBattleBukkit.instance().ingame().enabled()) {
             up.currentPerkItem().setItem();
         }
     }

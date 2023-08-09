@@ -165,6 +165,10 @@ public class PServerStorage implements PServerPersistentDataStorage {
         return storage.updateNotifiers();
     }
 
+    @Override public void clearCache() {
+        storage.clearCache();
+    }
+
     @Override
     public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         storage.addUpdateNotifier(notifier);
@@ -241,6 +245,10 @@ public class PServerStorage implements PServerPersistentDataStorage {
     public CompletableFuture<Void> clearAsync() {
         clear();
         return CompletableFuture.completedFuture(null);
+    }
+
+    @Override public @NotNull CompletableFuture<Void> clearCacheAsync() {
+        return null;
     }
 
     @Override

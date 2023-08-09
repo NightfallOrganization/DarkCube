@@ -26,15 +26,16 @@ public class GsonSerializer {
     public static final Gson gson;
 
     static {
-        GsonBuilder b = new GsonBuilder().registerTypeAdapter(Location.class, TypeAdapterLocation.INSTANCE).registerTypeAdapter(Map.class, TypeAdapterMap.INSTANCE).disableHtmlEscaping();
+        GsonBuilder b = new GsonBuilder()
+                .registerTypeAdapter(Location.class, TypeAdapterLocation.INSTANCE)
+                .registerTypeHierarchyAdapter(Map.class, TypeAdapterMap.INSTANCE)
+                .disableHtmlEscaping();
         b.addSerializationExclusionStrategy(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
+            @Override public boolean shouldSkipField(FieldAttributes f) {
                 return f.getAnnotation(DontSerialize.class) != null;
             }
 
-            @Override
-            public boolean shouldSkipClass(Class<?> var1) {
+            @Override public boolean shouldSkipClass(Class<?> var1) {
                 return var1.isAnnotationPresent(DontSerialize.class);
             }
         });
@@ -42,9 +43,7 @@ public class GsonSerializer {
 //		JsonDocument.GSON = gson;
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface DontSerialize {
+    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface DontSerialize {
 
     }
 }

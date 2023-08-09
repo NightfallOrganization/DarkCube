@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -21,7 +21,7 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
             WBUser user = WBUser.getUser(p);
-            Ingame ingame = WoolBattle.instance().ingame();
+            Ingame ingame = WoolBattleBukkit.instance().ingame();
             if (ingame.isGlobalSpawnProtection || user.hasSpawnProtection()) {
                 e.setCancelled(true);
                 return;
@@ -33,7 +33,7 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
                     e.setCancelled(true);
                     break;
                 case SUFFOCATION:
-                    if (WoolBattle.instance().gameData().epGlitch()) {
+                    if (WoolBattleBukkit.instance().gameData().epGlitch()) {
                         int ticks = user.getTicksAfterLastHit();
                         if (ticks < 200) {
                             ticks += 60;

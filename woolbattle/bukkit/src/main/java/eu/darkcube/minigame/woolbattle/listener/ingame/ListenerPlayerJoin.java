@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.GameMode;
@@ -34,8 +34,8 @@ public class ListenerPlayerJoin extends Listener<PlayerJoinEvent> {
         p.setSaturation(0);
         e.setJoinMessage(null);
         user.resetTicksAfterLastHit();
-        WoolBattle.instance().teamManager()
-                .setTeam(user, WoolBattle.instance().teamManager().getSpectator());
+        WoolBattleBukkit.instance().teamManager()
+                .setTeam(user, WoolBattleBukkit.instance().teamManager().getSpectator());
         //		ingame.setSpectator(user);
     }
 }

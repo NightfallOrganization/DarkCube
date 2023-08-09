@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -22,7 +22,7 @@ import java.util.Collection;
 
 public class SetTeamCommand extends PServerExecutor {
 
-    public SetTeamCommand(WoolBattle woolbattle) {
+    public SetTeamCommand(WoolBattleBukkit woolbattle) {
         super("setteam", new String[0], b -> b.then(
                 Commands.argument("team", TeamArgument.teamArgument(woolbattle)).executes(context -> {
                     SetTeamCommand.setTeam(woolbattle, context.getSource(), Arrays.asList(context.getSource().asPlayer()), TeamArgument.team(context, "team"));
@@ -33,7 +33,7 @@ public class SetTeamCommand extends PServerExecutor {
                 }))));
     }
 
-    private static void setTeam(WoolBattle woolbattle, CommandSource source, Collection<Player> players,
+    private static void setTeam(WoolBattleBukkit woolbattle, CommandSource source, Collection<Player> players,
                                 Team team) {
         for (Player player : players) {
             WBUser user = WBUser.getUser(player);

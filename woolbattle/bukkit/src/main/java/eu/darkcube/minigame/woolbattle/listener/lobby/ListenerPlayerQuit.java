@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.lobby;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -16,9 +16,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
-    private final WoolBattle woolBattle;
+    private final WoolBattleBukkit woolBattle;
 
-    public ListenerPlayerQuit(WoolBattle woolBattle) {
+    public ListenerPlayerQuit(WoolBattleBukkit woolBattle) {
         this.woolBattle = woolBattle;
     }
 

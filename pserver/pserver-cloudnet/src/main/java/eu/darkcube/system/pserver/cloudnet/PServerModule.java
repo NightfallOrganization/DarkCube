@@ -21,77 +21,72 @@ import java.util.List;
 
 public class PServerModule extends DriverModule {
 
-	public static final String PLUGIN_NAME = new File(
-			PServerModule.class.getProtectionDomain().getCodeSource().getLocation()
-					.getPath()).getName();
-	private static PServerModule instance;
-	public Listener listener;
+    public static final String PLUGIN_NAME = new File(PServerModule.class
+            .getProtectionDomain()
+            .getCodeSource()
+            .getLocation()
+            .getPath()).getName();
+    private static PServerModule instance;
+    public Listener listener;
 
-	public String sqlDatabase;
+    public String sqlDatabase;
 
-	List<String> deploymentExclusions;
+    List<String> deploymentExclusions;
 
-	public PServerModule() {
-		PServerModule.instance = this;
-	}
+    public PServerModule() {
+        PServerModule.instance = this;
+    }
 
-	public static String getSelf() {
-		return PServerModule.getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode()
-				.getUniqueId();
-	}
+    public static String getSelf() {
+        return PServerModule.getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode().getUniqueId();
+    }
 
-	public static CloudNet getCloudNet() {
-		return CloudNet.getInstance();
-	}
+    public static CloudNet getCloudNet() {
+        return CloudNet.getInstance();
+    }
 
-	public static PServerModule getInstance() {
-		return PServerModule.instance;
-	}
+    public static PServerModule getInstance() {
+        return PServerModule.instance;
+    }
 
-	public static Collection<UniqueId> getUsedPServerIDs() {
-		return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getUsedPServerIDs();
-	}
+    public static Collection<UniqueId> getUsedPServerIDs() {
+        return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getUsedPServerIDs();
+    }
 
-	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.LOADED)
-	public void loadConfig() {
-		this.sqlDatabase = this.getConfig().getString("database", "h2");
-	}
+    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.LOADED) public void loadConfig() {
+        this.sqlDatabase = this.getConfig().getString("database", "h2");
+    }
 
-	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED)
-	public void load() {
-		ClassLoaderFixRelocation.load(this);
-	}
+    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED) public void load() {
+        ClassLoaderFixRelocation.load(this);
+    }
 
-	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED)
-	public void start() {
-		PServerModule.getCloudNet().getEventManager()
-				.registerListener((this.listener = new Listener()));
-	}
+    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED) public void start() {
+        PServerModule.getCloudNet().getEventManager().registerListener((this.listener = new Listener()));
+    }
 
-	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STOPPED)
-	public void stop() {
+    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STOPPED) public void stop() {
 
-	}
+    }
 
-	@ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.UNLOADED)
-	public void unload() {
+    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.UNLOADED) public void unload() {
 
-	}
+    }
 
-	public void addDeploymentExclusion(String exclusion) {
-		this.deploymentExclusions.add(exclusion);
-		this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
-		this.saveConfig();
-	}
+    public void addDeploymentExclusion(String exclusion) {
+        this.deploymentExclusions.add(exclusion);
+        this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
+        this.saveConfig();
+    }
 
-	public void removeDeploymentExclusion(String exclusion) {
-		this.deploymentExclusions.remove(exclusion);
-		this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
-		this.saveConfig();
-	}
+    public void removeDeploymentExclusion(String exclusion) {
+        this.deploymentExclusions.remove(exclusion);
+        this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
+        this.saveConfig();
+    }
 
-	public List<String> getDeploymentExclusions() {
-		return Collections.unmodifiableList(this.deploymentExclusions);
-	}
+    public List<String> getDeploymentExclusions() {
+        return Collections.unmodifiableList(this.deploymentExclusions);
+    }
 
 }

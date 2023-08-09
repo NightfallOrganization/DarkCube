@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.game;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
 import org.bukkit.event.Listener;
@@ -27,7 +27,7 @@ public abstract class GamePhase {
 	protected final void addListener(Listener... listeners) {
 		this.listeners.addAll(Arrays.asList(listeners));
 		if (enabled()) {
-			WoolBattle.registerListeners(listeners);
+			WoolBattleBukkit.registerListeners(listeners);
 		}
 	}
 
@@ -48,7 +48,7 @@ public abstract class GamePhase {
 		if (!this.enabled) {
 			this.enabled = true;
 			this.onEnable();
-			listeners.forEach(WoolBattle::registerListeners);
+			listeners.forEach(WoolBattleBukkit::registerListeners);
 			schedulers.forEach(ConfiguredScheduler::start);
 		}
 	}
@@ -56,7 +56,7 @@ public abstract class GamePhase {
 	public void disable() {
 		if (this.enabled) {
 			this.enabled = false;
-			listeners.forEach(WoolBattle::unregisterListeners);
+			listeners.forEach(WoolBattleBukkit::unregisterListeners);
 			schedulers.forEach(ConfiguredScheduler::stop);
 			this.onDisable();
 		}

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Material;
@@ -31,12 +31,12 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
                 return;
             }
         } else {
-            WoolBattle.instance().ingame().destroy(block, true);
+            WoolBattleBukkit.instance().ingame().destroy(block, true);
             return;
         }
         Material type = block.getType();
         if (type == Material.WOOL) {
-            WoolBattle.instance().ingame().destroy(block, true);
+            WoolBattleBukkit.instance().ingame().destroy(block, true);
             int tryadd = user.getWoolBreakAmount();
             int added = user.addWool(tryadd);
             if (added != 0) {
@@ -44,7 +44,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
             }
             return;
         }
-        if (!WoolBattle.instance().ingame().placedBlocks.contains(block)) {
+        if (!WoolBattleBukkit.instance().ingame().placedBlocks.contains(block)) {
             e.setCancelled(true);
         }
     }

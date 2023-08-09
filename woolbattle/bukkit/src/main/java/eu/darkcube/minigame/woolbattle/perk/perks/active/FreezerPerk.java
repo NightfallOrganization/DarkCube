@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -42,7 +42,7 @@ public class FreezerPerk extends Perk {
 		@Override
 		protected boolean activateRight(UserPerk perk) {
 			Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
-			snowball.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(),
+			snowball.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(),
 					perk.perk().perkName().toString()));
 			return true;
 		}

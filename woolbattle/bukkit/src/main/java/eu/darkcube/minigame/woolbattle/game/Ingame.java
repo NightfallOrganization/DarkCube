@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.game;
 
 import de.dytanic.cloudnet.driver.service.ServiceLifeCycle;
 import de.dytanic.cloudnet.wrapper.Wrapper;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAttackUser;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserKill;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserMayAttack;
@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 public class Ingame extends GamePhase {
 
     public final Map<WBUser, Team> lastTeam = new HashMap<>();
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     public Set<Block> placedBlocks = new HashSet<>();
     public Map<Block, DyeColor> breakedWool = new HashMap<>();
     public Map<WBUser, Integer> killstreak = new HashMap<>();
@@ -71,7 +71,7 @@ public class Ingame extends GamePhase {
     private int spawnprotectionTicksGlobal;
     private boolean startingIngame = false;
 
-    public Ingame(WoolBattle woolbattle) {
+    public Ingame(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         maxBlockArrowHits = woolbattle.getConfig("config").getInt("maxblockarrowhits");
         spawnprotectionTicks = woolbattle.getConfig("config").getInt("spawnprotectionticks");
@@ -559,7 +559,7 @@ public class Ingame extends GamePhase {
         Player p = user.getBukkitEntity();
         Scoreboard sb = new Scoreboard(user);
         p.setScoreboard(sb.getScoreboard());
-        WoolBattle.initScoreboard(sb, user);
+        WoolBattleBukkit.initScoreboard(sb, user);
         WBUser.onlineUsers().forEach(u -> {
             Scoreboard s = new Scoreboard(u);
             s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());

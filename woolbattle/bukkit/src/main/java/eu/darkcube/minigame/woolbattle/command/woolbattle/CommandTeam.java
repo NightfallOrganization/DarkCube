@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CommandTeam extends WBCommandExecutor {
-    public CommandTeam(WoolBattle woolbattle) {
+    public CommandTeam(WoolBattleBukkit woolbattle) {
 
         super("team", b -> b.then(Commands
                 .argument("mapSize", MapSizeArgument.mapSize(woolbattle, new MapSizeValidator(woolbattle)))
@@ -37,9 +37,9 @@ public class CommandTeam extends WBCommandExecutor {
     }
 
     private static class MapSizeValidator implements Predicate<MapSize> {
-        private final WoolBattle woolbattle;
+        private final WoolBattleBukkit woolbattle;
 
-        public MapSizeValidator(WoolBattle woolbattle) {
+        public MapSizeValidator(WoolBattleBukkit woolbattle) {
             this.woolbattle = woolbattle;
         }
 

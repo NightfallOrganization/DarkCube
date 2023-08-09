@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -49,12 +49,12 @@ public class GrapplingHookPerk extends Perk {
 		@Override
 		public void registered() {
 			super.registered();
-			WoolBattle.registerListeners(handle);
+			WoolBattleBukkit.registerListeners(handle);
 		}
 
 		@Override
 		public void unregistered() {
-			WoolBattle.unregisterListeners(handle);
+			WoolBattleBukkit.unregisterListeners(handle);
 			super.unregistered();
 		}
 
@@ -62,7 +62,7 @@ public class GrapplingHookPerk extends Perk {
 		protected boolean activateRight(UserPerk perk) {
 			FishHook hook = perk.owner().getBukkitEntity().launchProjectile(FishHook.class);
 			hook.setVelocity(hook.getVelocity().multiply(1.5));
-			hook.setMetadata("perk", new FixedMetadataValue(WoolBattle.instance(), perk));
+			hook.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(), perk));
 			return false;
 		}
 
@@ -141,7 +141,7 @@ public class GrapplingHookPerk extends Perk {
 				}
 				UserPerk userPerk = refUserPerk.get();
 				event.getEntity().setMetadata("perk",
-						new FixedMetadataValue(WoolBattle.instance(), userPerk));
+						new FixedMetadataValue(WoolBattleBukkit.instance(), userPerk));
 				event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(1.5));
 			}
 		}

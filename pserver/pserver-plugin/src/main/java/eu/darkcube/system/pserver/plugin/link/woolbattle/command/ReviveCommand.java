@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
@@ -18,7 +18,7 @@ public class ReviveCommand extends PServerExecutor {
         super("revive", new String[0], b -> b.then(
                 Commands.argument("player", EntityArgument.player()).executes(context -> {
                     WBUser user = WBUser.getUser(EntityArgument.getPlayer(context, "player"));
-                    if (WoolBattle.instance().ingame().revive(user)) {
+                    if (WoolBattleBukkit.instance().ingame().revive(user)) {
                         context.getSource().sendMessage(Message.WOOLBATTLE_REVIVED_PLAYER,
                                 user.getTeamPlayerName());
                     } else {

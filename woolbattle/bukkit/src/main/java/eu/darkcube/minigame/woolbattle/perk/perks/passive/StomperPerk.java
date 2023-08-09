@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -32,9 +32,9 @@ import java.util.HashSet;
 public class StomperPerk extends Perk {
     public static final PerkName STOMPER = new PerkName("STOMPER");
     private static final Key wasOnGround =
-            new Key(WoolBattle.instance(), "perk_stomper_was_on_ground");
-    private static final Key active = new Key(WoolBattle.instance(), "perk_stomper_active");
-    private static final Key startPos = new Key(WoolBattle.instance(), "perk_stomper_start_pos");
+            new Key(WoolBattleBukkit.instance(), "perk_stomper_was_on_ground");
+    private static final Key active = new Key(WoolBattleBukkit.instance(), "perk_stomper_active");
+    private static final Key startPos = new Key(WoolBattleBukkit.instance(), "perk_stomper_start_pos");
 
     public StomperPerk() {
         super(ActivationType.PASSIVE, STOMPER, new Cooldown(Unit.ACTIVATIONS, 0), 10,
@@ -84,7 +84,7 @@ public class StomperPerk extends Perk {
                     continue;
                 if (hit.contains(target))
                     continue;
-                if (!WoolBattle.instance().ingame().canAttack(user, target))
+                if (!WoolBattleBukkit.instance().ingame().canAttack(user, target))
                     continue;
                 if (target.getBukkitEntity().getLocation().distance(center) > radius)
                     continue;
@@ -92,7 +92,7 @@ public class StomperPerk extends Perk {
                     continue;
                 if (Math.abs(target.getBukkitEntity().getLocation().getY() - center.getY()) > 2.5)
                     continue;
-                if (!WoolBattle.instance().ingame().attack(user, target))
+                if (!WoolBattleBukkit.instance().ingame().attack(user, target))
                     continue;
                 target.getBukkitEntity().damage(0);
                 hit.add(target);

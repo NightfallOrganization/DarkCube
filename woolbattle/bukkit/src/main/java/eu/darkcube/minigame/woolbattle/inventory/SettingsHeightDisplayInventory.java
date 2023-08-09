@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class SettingsHeightDisplayInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-settings-height-display");
 
-    public SettingsHeightDisplayInventory(WoolBattle woolbattle, WBUser user) {
+    public SettingsHeightDisplayInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.HEIGHT_DISPLAY_SETTINGS_TITLE.getMessage(user), user);
     }
 

@@ -22,8 +22,7 @@ import java.util.function.Supplier;
 
 public interface PServerPersistentDataStorage extends PersistentDataStorage {
 
-    @Override
-    default @NotNull @UnmodifiableView PServerPersistentDataStorage unmodifiable() {
+    @Override default @NotNull @UnmodifiableView PServerPersistentDataStorage unmodifiable() {
         return new UnmodifiableStorage(this);
     }
 
@@ -37,8 +36,7 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      * @param data the data
      * @param <T>  the data type
      */
-    <T> @NotNull CompletableFuture<Void> setAsync(@NotNull Key key,
-                                                  @NotNull PersistentDataType<T> type, @NotNull T data);
+    <T> @NotNull CompletableFuture<Void> setAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data);
 
     /**
      * Removes some data
@@ -48,8 +46,7 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      * @param <T>  the data type
      * @return the removed data
      */
-    <T> @NotNull CompletableFuture<@Nullable T> removeAsync(@NotNull Key key,
-                                                            @NotNull PersistentDataType<T> type);
+    <T> @NotNull CompletableFuture<@Nullable T> removeAsync(@NotNull Key key, @NotNull PersistentDataType<T> type);
 
     /**
      * @param key  the key
@@ -57,8 +54,7 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      * @param <T>  the data type
      * @return saved data, null if not present
      */
-    <T> @NotNull CompletableFuture<@Nullable T> getAsync(@NotNull Key key,
-                                                         @NotNull PersistentDataType<T> type);
+    <T> @NotNull CompletableFuture<@Nullable T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type);
 
     /**
      * @param key          the key
@@ -67,8 +63,7 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      * @param <T>          the data type
      * @return the saved data, defaultValue if not present
      */
-    <T> @NotNull CompletableFuture<@NotNull T> getAsync(@NotNull Key key,
-                                                        @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue);
+    <T> @NotNull CompletableFuture<@NotNull T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue);
 
     /**
      * @param key  the key
@@ -76,8 +71,7 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      * @param data the data
      * @param <T>  the data type
      */
-    <T> @NotNull CompletableFuture<Void> setIfNotPresentAsync(@NotNull Key key,
-                                                              @NotNull PersistentDataType<T> type, @NotNull T data);
+    <T> @NotNull CompletableFuture<Void> setIfNotPresentAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data);
 
     /**
      * @param key the key
@@ -89,6 +83,8 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      * Clears this storage
      */
     @NotNull CompletableFuture<Void> clearAsync();
+
+    @NotNull CompletableFuture<Void> clearCacheAsync();
 
     /**
      * Loads all the data from a {@link JsonDocument}<br>
@@ -103,8 +99,7 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      */
     @NotNull CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync();
 
-    class UnmodifiableStorage extends UnmodifiablePersistentDataStorage
-            implements PServerPersistentDataStorage {
+    class UnmodifiableStorage extends UnmodifiablePersistentDataStorage implements PServerPersistentDataStorage {
         private final PServerPersistentDataStorage storage;
 
         public UnmodifiableStorage(PServerPersistentDataStorage storage) {
@@ -112,63 +107,56 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
             this.storage = storage;
         }
 
-        @Override
-        public @UnmodifiableView @NotNull PServerPersistentDataStorage unmodifiable() {
+        @Override public @UnmodifiableView @NotNull PServerPersistentDataStorage unmodifiable() {
             return this;
         }
 
-        @Override
-        public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
+        @Override public void clearCache() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
             return storage.keysAsync();
         }
 
-        @Override
-        public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type,
-                                                             T data) {
+        @Override public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type, T data) {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key,
-                                                                       PersistentDataType<T> type) {
+        @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key, PersistentDataType<T> type) {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key,
-                                                                    PersistentDataType<T> type) {
+        @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key, PersistentDataType<T> type) {
             return storage.getAsync(key, type);
         }
 
         @Override
-        public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key,
-                                                                   PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
+        public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key,
-                                                                         PersistentDataType<T> type, T data) {
+        @Override public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key, PersistentDataType<T> type, T data) {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public CompletableFuture<Boolean> hasAsync(Key key) {
+        @Override public CompletableFuture<Boolean> hasAsync(Key key) {
             return storage.hasAsync(key);
         }
 
-        @Override
-        public CompletableFuture<Void> clearAsync() {
+        @Override public CompletableFuture<Void> clearAsync() {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public CompletableFuture<Void> loadFromJsonDocumentAsync(JsonDocument document) {
+        @Override public @NotNull CompletableFuture<Void> clearCacheAsync() {
             throw new UnsupportedOperationException();
         }
 
-        @Override
-        public CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync() {
+        @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(JsonDocument document) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync() {
             return storage.storeToJsonDocumentAsync();
         }
     }

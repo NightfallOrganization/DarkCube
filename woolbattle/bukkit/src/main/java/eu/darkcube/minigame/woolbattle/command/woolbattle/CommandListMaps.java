@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
@@ -18,7 +18,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import java.util.Collection;
 
 public class CommandListMaps extends WBCommandExecutor {
-    public CommandListMaps(WoolBattle woolbattle) {
+    public CommandListMaps(WoolBattleBukkit woolbattle) {
         super("listMaps", b -> b
                 .executes(ctx -> listMaps(ctx, woolbattle.mapManager().getMaps()))
                 .then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle))

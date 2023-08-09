@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.team;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.database.Database;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
@@ -26,11 +26,11 @@ public class DefaultTeamManager implements TeamManager {
     private final Database database = CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("woolbattle_teams");
     private final Collection<Team> teams;
     private final Map<WBUser, Team> teamByUser;
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private final Map<MapSize, Collection<TeamType>> teamTypes = new HashMap<>();
     private Team spectator;
 
-    public DefaultTeamManager(WoolBattle woolbattle) {
+    public DefaultTeamManager(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         teams = new HashSet<>();
         teamByUser = new HashMap<>();
@@ -39,8 +39,7 @@ public class DefaultTeamManager implements TeamManager {
         loadTeams();
     }
 
-    @Override
-    public void save(TeamType teamType) {
+    @Override public void save(TeamType teamType) {
         MapSize size = teamType.mapSize();
         if (size == null) throw new IllegalStateException("MapSize null");
         JsonDocument document = database.get(size.toString());
@@ -58,13 +57,13 @@ public class DefaultTeamManager implements TeamManager {
         database.update(size.toString(), document);
     }
 
-    @Override
-    public void delete(TeamType teamType) {
+    @Override public void delete(TeamType teamType) {
         MapSize size = teamType.mapSize();
         if (size == null) throw new IllegalStateException("MapSize null");
         JsonDocument document = database.get(size.toString());
         if (document == null) throw new IllegalStateException("Already deleted " + teamType.getDisplayNameKey());
-        if (!document.contains(teamType.getDisplayNameKey())) throw new IllegalStateException("Already deleted " + teamType.getDisplayNameKey());
+        if (!document.contains(teamType.getDisplayNameKey()))
+            throw new IllegalStateException("Already deleted " + teamType.getDisplayNameKey());
         document.remove(teamType.getDisplayNameKey());
         teamTypes.get(size).remove(teamType);
         if (teamTypes.get(size).isEmpty()) teamTypes.remove(size);
@@ -117,8 +116,7 @@ public class DefaultTeamManager implements TeamManager {
         spectator = new DefaultTeam(spectatorType);
     }
 
-    @Override
-    public Team getTeam(UUID id) {
+    @Override public Team getTeam(UUID id) {
         for (Team team : teams) {
             if (team.getUniqueId().equals(id)) {
                 return team;
@@ -127,15 +125,16 @@ public class DefaultTeamManager implements TeamManager {
         return null;
     }
 
-    @Override
-    public Team getTeam(String displayNameKey) {
-        Set<Team> teams = getTeams().stream().filter(t -> t.getType().getDisplayNameKey().equals(displayNameKey)).collect(Collectors.toSet());
+    @Override public Team getTeam(String displayNameKey) {
+        Set<Team> teams = getTeams()
+                .stream()
+                .filter(t -> t.getType().getDisplayNameKey().equals(displayNameKey))
+                .collect(Collectors.toSet());
         for (Team team : teams) return team;
         return null;
     }
 
-    @Override
-    public Team getTeam(TeamType type) {
+    @Override public Team getTeam(TeamType type) {
         for (Team team : teams) {
             if (team.getType().equals(type)) {
                 return team;
@@ -144,30 +143,25 @@ public class DefaultTeamManager implements TeamManager {
         return spectator;
     }
 
-    @Override
-    public Team loadTeam(TeamType type) {
+    @Override public Team loadTeam(TeamType type) {
         Team team = new DefaultTeam(type);
         teams.add(team);
         return team;
     }
 
-    @Override
-    public void unloadTeam(Team team) {
+    @Override public void unloadTeam(Team team) {
         teams.remove(team);
     }
 
-    @Override
-    public Team getSpectator() {
+    @Override public Team getSpectator() {
         return spectator;
     }
 
-    @Override
-    public Team getTeam(WBUser user) {
+    @Override public Team getTeam(WBUser user) {
         return teamByUser.get(user);
     }
 
-    @Override
-    public void setTeam(WBUser user, Team team) {
+    @Override public void setTeam(WBUser user, Team team) {
         Team t = getTeam(user);
         for (Player p : Bukkit.getOnlinePlayers()) {
             WBUser u = WBUser.getUser(p);
@@ -188,8 +182,7 @@ public class DefaultTeamManager implements TeamManager {
         }
     }
 
-    @Override
-    public Collection<? extends Team> getTeams() {
+    @Override public Collection<? extends Team> getTeams() {
         return Collections.unmodifiableCollection(teams);
     }
 
@@ -207,11 +200,14 @@ public class DefaultTeamManager implements TeamManager {
             }
             break;
         }
-        return new TeamType(woolbattle, uid, mapSize, displayNameKey, weight, woolcolor, namecolor, enabled);
+        TeamType teamType = new TeamType(woolbattle, uid, mapSize, displayNameKey, weight, woolcolor, namecolor, enabled);
+        if (!teamTypes.containsKey(mapSize)) teamTypes.put(mapSize, new ArrayList<>());
+        teamTypes.get(mapSize).add(teamType);
+        save(teamType);
+        return teamType;
     }
 
-    @Override
-    public TeamType byDisplayNameKey(MapSize size, String displayNameKey) {
+    @Override public TeamType byDisplayNameKey(MapSize size, String displayNameKey) {
         for (Map.Entry<MapSize, Collection<TeamType>> entry : teamTypes.entrySet()) {
             if (size == null || entry.getKey().equals(size)) {
                 for (TeamType team : entry.getValue()) {
@@ -224,8 +220,7 @@ public class DefaultTeamManager implements TeamManager {
         return null;
     }
 
-    @Override
-    public Collection<TeamType> teamTypes() {
+    @Override public Collection<TeamType> teamTypes() {
         Collection<TeamType> teamTypes = new HashSet<>();
         teamTypes.add(spectator.getType());
         for (Collection<TeamType> t : this.teamTypes.values()) {
@@ -234,8 +229,7 @@ public class DefaultTeamManager implements TeamManager {
         return teamTypes;
     }
 
-    @Override
-    public Collection<TeamType> teamTypes(MapSize mapSize) {
+    @Override public Collection<TeamType> teamTypes(MapSize mapSize) {
         return teamTypes.getOrDefault(mapSize, Collections.emptyList());
     }
 }

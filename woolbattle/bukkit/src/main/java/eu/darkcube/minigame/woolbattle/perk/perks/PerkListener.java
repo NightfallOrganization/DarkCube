@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
@@ -33,7 +33,7 @@ public abstract class PerkListener implements Listener {
     public static boolean checkUsable(UserPerk perk) {
         WBUser user = perk.owner();
         if (user.woolCount() < perk.perk().cost() || perk.cooldown() > 0) {
-            WoolBattle.instance().ingame().playSoundNotEnoughWool(user);
+            WoolBattleBukkit.instance().ingame().playSoundNotEnoughWool(user);
             new Scheduler(perk.currentPerkItem()::setItem).runTask();
             return false;
         }

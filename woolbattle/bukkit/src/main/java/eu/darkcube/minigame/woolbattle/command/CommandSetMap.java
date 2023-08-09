@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -15,7 +15,7 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 import eu.darkcube.system.commandapi.v3.Commands;
 
 public class CommandSetMap extends WBCommandExecutor {
-    public CommandSetMap(WoolBattle woolbattle) {
+    public CommandSetMap(WoolBattleBukkit woolbattle) {
         super("setMap", b -> b
                 .then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(ctx -> {
                     Map map = MapArgument.getMap(ctx, "map");

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -60,9 +60,9 @@ public class MinePerk extends Perk {
             new Scheduler(userPerk.currentPerkItem()::setItem).runTask();
             event.setCancelled(true);
             activated(userPerk);
-            WoolBattle.instance().ingame().place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
+            WoolBattleBukkit.instance().ingame().place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
                 new Scheduler(() -> b.setType(Material.STONE_PLATE)).runTask();
-                WoolBattle.instance().ingame().setMetaData(b, "perk", userPerk);
+                WoolBattleBukkit.instance().ingame().setMetaData(b, "perk", userPerk);
             });
         }
 
@@ -74,12 +74,12 @@ public class MinePerk extends Perk {
             if (event.getAction() != Action.PHYSICAL) return;
             Block block = event.getClickedBlock();
             if (block == null) return;
-            UserPerk perk = WoolBattle.instance().ingame().getMetaData(block, "perk", null);
+            UserPerk perk = WoolBattleBukkit.instance().ingame().getMetaData(block, "perk", null);
             if (perk == null) return;
             if (!perk.perk().perkName().equals(MinePerk.MINE)) return;
 
             event.setCancelled(true);
-            WoolBattle.instance().ingame().destroy(block);
+            WoolBattleBukkit.instance().ingame().destroy(block);
             block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
 
             new Scheduler(() -> {
@@ -88,7 +88,7 @@ public class MinePerk extends Perk {
 
                 Vector velocity = playerLoc.subtract(blockLoc).normalize();
                 velocity.multiply(Math.pow(playerLoc.distance(blockLoc), 0.4) / 6);
-                if (WoolBattle.instance().ingame().attack(perk.owner(), user)) {
+                if (WoolBattleBukkit.instance().ingame().attack(perk.owner(), user)) {
                     p.damage(0);
                 }
                 velocity.setY(1.3);

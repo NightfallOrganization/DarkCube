@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -24,7 +24,7 @@ import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
 public class SettingsWoolDirectionInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-settings-wool-direction");
 
-    public SettingsWoolDirectionInventory(WoolBattle woolbattle, WBUser user) {
+    public SettingsWoolDirectionInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.WOOL_DIRECTION_SETTINGS_TITLE.getMessage(user), user);
     }
 

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
@@ -26,12 +26,12 @@ import java.util.Map;
 
 public class PerksTypeInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-perks-type");
-    private static final Key PERK = new Key(WoolBattle.instance(), "perk");
+    private static final Key PERK = new Key(WoolBattleBukkit.instance(), "perk");
     private final ActivationType type;
     private final int number;
     private final boolean done;
 
-    public PerksTypeInventory(WoolBattle woolbattle, WBUser user, ActivationType type, int number) {
+    public PerksTypeInventory(WoolBattleBukkit woolbattle, WBUser user, ActivationType type, int number) {
         super(woolbattle, TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
         this.type = type;
         this.number = number;
@@ -61,7 +61,7 @@ public class PerksTypeInventory extends WoolBattlePagedInventory {
 
     @Override
     protected void fillItems(Map<Integer, ItemStack> items) {
-        Perk[] perks = WoolBattle.instance().perkRegistry().perks(type);
+        Perk[] perks = WoolBattleBukkit.instance().perkRegistry().perks(type);
         List<PerkName> userPerks = Arrays.asList(user.perksStorage().perks(type));
         for (int i = 0; i < perks.length; i++) {
             ItemBuilder b = ItemBuilder.item(perks[i].defaultItem().getItem(user));

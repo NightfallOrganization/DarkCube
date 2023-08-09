@@ -6,12 +6,12 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.inventory.SettingsInventory;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 
 public class CommandSettings extends WBCommandExecutor {
-    public CommandSettings(WoolBattle woolbattle) {
+    public CommandSettings(WoolBattleBukkit woolbattle) {
         super("settings", b -> b.executes(ctx -> {
             WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
             user.setOpenInventory(new SettingsInventory(woolbattle, user));

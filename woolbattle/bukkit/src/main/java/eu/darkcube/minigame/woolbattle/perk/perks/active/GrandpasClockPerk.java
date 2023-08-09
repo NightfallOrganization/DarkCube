@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -32,9 +32,9 @@ public class GrandpasClockPerk extends Perk {
 	public static class ListenerGrandpasClock extends BasicPerkListener {
 
 		private static final Key DATA_OLD_POS =
-				new Key(WoolBattle.instance(), "grandpas_clock_old_pos");
+				new Key(WoolBattleBukkit.instance(), "grandpas_clock_old_pos");
 		private static final Key DATA_TICKER =
-				new Key(WoolBattle.instance(), "grandpas_clock_ticker");
+				new Key(WoolBattleBukkit.instance(), "grandpas_clock_ticker");
 
 		public ListenerGrandpasClock(Perk perk) {
 			super(perk);

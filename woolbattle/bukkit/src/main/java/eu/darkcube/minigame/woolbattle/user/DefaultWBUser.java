@@ -7,7 +7,7 @@
 package eu.darkcube.minigame.woolbattle.user;
 
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAddWool;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserRemoveWool;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserWoolCountUpdate;
@@ -43,11 +43,11 @@ import java.util.UUID;
 class DefaultWBUser implements WBUser {
 
     private static final Key KEY_WOOL_SUBTRACT_DIRECTION =
-            new Key(WoolBattle.instance(), "woolSubtractDirection");
+            new Key(WoolBattleBukkit.instance(), "woolSubtractDirection");
     private static final PersistentDataType<WoolSubtractDirection> TYPE_WOOL_SUBTRACT_DIRECTION =
             PersistentDataTypes.enumType(WoolSubtractDirection.class);
     private static final Key KEY_HEIGHT_DISPLAY =
-            new Key(WoolBattle.instance().getName(), "heightDisplay");
+            new Key(WoolBattleBukkit.instance().getName(), "heightDisplay");
     private static final PersistentDataType<HeightDisplay> TYPE_HEIGHT_DISPLAY =
             new PersistentDataType<HeightDisplay>() {
                 @Override
@@ -68,9 +68,9 @@ class DefaultWBUser implements WBUser {
                     return object.clone();
                 }
             };
-    private static final Key KEY_PARTICLES = new Key(WoolBattle.instance(), "particles");
+    private static final Key KEY_PARTICLES = new Key(WoolBattleBukkit.instance(), "particles");
     private static final PersistentDataType<Boolean> TYPE_PARTICLES = PersistentDataTypes.BOOLEAN;
-    private static final Key KEY_PERKS = new Key(WoolBattle.instance(), "perks");
+    private static final Key KEY_PERKS = new Key(WoolBattleBukkit.instance(), "perks");
     private static final PersistentDataType<PerkName> TYPE_PERK_NAME =
             PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new,
                     p -> p);
@@ -149,7 +149,7 @@ class DefaultWBUser implements WBUser {
                     return object.clone();
                 }
             };
-    private final WoolBattle woolbattle;
+    private final WoolBattleBukkit woolbattle;
     private final User user;
     private final UserPerks perks;
     private boolean trollmode;
@@ -162,7 +162,7 @@ class DefaultWBUser implements WBUser {
     private int projectileImmunityTicks;
     private int woolCount;
 
-    public DefaultWBUser(WoolBattle woolbattle, User user) {
+    public DefaultWBUser(WoolBattleBukkit woolbattle, User user) {
         this.woolbattle = woolbattle;
         this.user = user;
         user.getPersistentDataStorage().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY,

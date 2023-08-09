@@ -6,58 +6,71 @@
  */
 package eu.darkcube.system.version.v1_20_1;
 
-import com.destroystokyo.paper.event.brigadier.AsyncPlayerSendSuggestionsEvent;
-import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.tree.CommandNode;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.InternalCommandTabExecutor;
-import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
-import eu.darkcube.system.libs.com.mojang.brigadier.context.StringRange;
-import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.version.BukkitCommandAPI;
 import eu.darkcube.system.version.v1_20_1.commandapi.CommandConverter;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.command.CraftCommandMap;
 import org.bukkit.craftbukkit.v1_20_R1.command.VanillaCommandWrapper;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.SpigotConfig;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
 
 public class CommandAPI1_20_1 extends BukkitCommandAPI implements Listener {
-    private final Collection<VanillaCommandWrapper> custom = new ArrayList<>();
+    private final Map<VanillaCommandWrapper, VanillaCommandWrapper> custom = new HashMap<>();
+    private volatile boolean requireSync = false;
+    private int requireSyncTick = 0;
+
+    private static VanillaCommandWrapper[] wrappers(CommandExecutor command) {
+        final String prefix = command.getPrefix().toLowerCase(Locale.ROOT);
+        if (prefix.contains(" ")) throw new IllegalArgumentException("Can't register command with whitespace in prefix!");
+
+        for (String name : command.getNames()) {
+            if (name.contains(" ")) throw new IllegalArgumentException("Can't register command with whitespace in name!");
+        }
+
+        CommandConverter converter = new CommandConverter(command);
+        return converter.convert();
+    }
+
+    private void requireSync() {
+        requireSync = true;
+        requireSyncTick = MinecraftServer.getServer().getTickCount();
+    }
+
+    public void enabled(DarkCubeSystem system) {
+        new BukkitRunnable() {
+            @Override public void run() {
+                if (requireSync) {
+                    if (requireSyncTick + 10 >= MinecraftServer.getServer().getTickCount()) return;
+                    requireSync = false;
+                    ((CraftServer) Bukkit.getServer()).syncCommands();
+                }
+            }
+        }.runTaskTimer(system, 1, 1);
+    }
 
     @Override public String getSpigotUnknownCommandMessage() {
         return SpigotConfig.unknownCommandMessage;
-    }
-
-    public static com.mojang.brigadier.suggestion.Suggestions convert(Suggestions suggestions, int offset) {
-        return new com.mojang.brigadier.suggestion.Suggestions(convertRange(suggestions.getRange(), offset), suggestions
-                .getList()
-                .stream()
-                .map(s -> new Suggestion(convertRange(s.getRange(), offset), s.getText()))
-                .toList());
-    }
-
-    private static com.mojang.brigadier.context.StringRange convertRange(StringRange range, int offset) {
-        return new com.mojang.brigadier.context.StringRange(range.getStart() + offset, range.getEnd() + offset);
     }
 
     @Override public PluginCommand registerLegacy(Plugin plugin, Command command) {
@@ -84,57 +97,51 @@ public class CommandAPI1_20_1 extends BukkitCommandAPI implements Listener {
 
     @Override public void register(CommandExecutor command) {
         try {
+            unregister(command);
             VanillaCommandWrapper[] wrappers = wrappers(command);
 
+            CommandDispatcher<CommandSourceStack> mcd = MinecraftServer.getServer().vanillaCommandDispatcher.getDispatcher();
+
             for (VanillaCommandWrapper wrapper : wrappers) {
-                Bukkit.getCommandMap().getKnownCommands().put(wrapper.getName(), wrapper);
-                MinecraftServer.getServer().vanillaCommandDispatcher.getDispatcher().getRoot().addChild(wrapper.vanillaCommand);
+                Iterator<CommandNode<CommandSourceStack>> it = mcd.getRoot().getChildren().iterator();
+                while (it.hasNext()) {
+                    CommandNode<CommandSourceStack> node = it.next();
+                    if (node.getName().equals(wrapper.getName())) {
+                        org.bukkit.command.Command cmd = Bukkit.getCommandMap().getKnownCommands().get(node.getName());
+                        if (cmd == null) {
+                            Bukkit
+                                    .getCommandMap()
+                                    .getKnownCommands()
+                                    .put(node.getName(), new VanillaCommandWrapper(MinecraftServer.getServer().vanillaCommandDispatcher, node));
+                        }
+                        it.remove();
+                    }
+                }
+                org.bukkit.command.Command cmd = Bukkit.getCommandMap().getKnownCommands().put(wrapper.getName(), wrapper);
+
+                if (cmd != null) {
+                    Logger
+                            .getLogger("CommandAPI")
+                            .warning("Overridden command: " + cmd.getName() + " (" + cmd.getClass().getSimpleName() + ")");
+                    if (cmd instanceof VanillaCommandWrapper w) {
+                        custom.put(wrapper, w);
+                    } else {
+                        custom.put(wrapper, wrapper);
+                    }
+                } else {
+                    custom.put(wrapper, wrapper);
+                }
+                mcd.getRoot().addChild(wrapper.vanillaCommand);
             }
-//            final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-//            constructor.setAccessible(true);
-//
-//            final String[] aliases = command.getAliases();
-//            for (int i = 0; i < aliases.length; i++) aliases[i] = aliases[i].toLowerCase();
-//            final PluginCommand plugincommand = constructor.newInstance(name, DarkCubePlugin.systemPlugin());
-//            plugincommand.setAliases(Arrays.asList(aliases));
-//            plugincommand.setUsage("/" + name);
-//            plugincommand.setPermission(command.getPermission());
-//            plugincommand.setExecutor(this.executor);
-//            plugincommand.setTabCompleter(this.executor);
-//            //noinspection removal
-//            plugincommand.timings = co.aikar.timings.Timings.of(DarkCubeSystem.systemPlugin(), DarkCubeSystem
-//                    .systemPlugin()
-//                    .getName() + ":" + name);
-//            SimpleCommandMap commandMap = ((CraftServer) Bukkit.getServer()).getCommandMap();
-//            final Map<String, org.bukkit.command.Command> knownCommands = commandMap.getKnownCommands();
-//
-//            for (String n : command.getNames()) {
-//                final String registerName = prefix + ":" + n;
-//                this.checkAmbiguities(registerName, knownCommands, plugincommand);
-//            }
-//            for (String n : command.getNames()) {
-//                this.checkAmbiguities(n, knownCommands, plugincommand);
-//            }
             if (command.getPermission() != null) {
                 if (Bukkit.getPluginManager().getPermission(command.getPermission()) == null) {
                     Bukkit.getPluginManager().addPermission(new Permission(command.getPermission()));
                 }
             }
+            requireSync();
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    private static VanillaCommandWrapper[] wrappers(CommandExecutor command) {
-        final String prefix = command.getPrefix().toLowerCase(Locale.ROOT);
-        if (prefix.contains(" ")) throw new IllegalArgumentException("Can't register command with whitespace in prefix!");
-
-        for (String name : command.getNames()) {
-            if (name.contains(" ")) throw new IllegalArgumentException("Can't register command with whitespace in name!");
-        }
-
-        CommandConverter converter = new CommandConverter(command);
-        return converter.convert();
     }
 
     @Override public void unregister(CommandExecutor command) {
@@ -144,15 +151,30 @@ public class CommandAPI1_20_1 extends BukkitCommandAPI implements Listener {
             unregister(knownCommands, name.toLowerCase(Locale.ROOT));
             unregister(knownCommands, prefix + ":" + name.toLowerCase(Locale.ROOT));
         }
-        ((CraftServer) Bukkit.getServer()).syncCommands();
+        requireSync();
     }
 
     private void unregister(Map<String, org.bukkit.command.Command> knownCommands, String name) {
         org.bukkit.command.Command cmd = knownCommands.get(name);
         if (!(cmd instanceof VanillaCommandWrapper w)) return;
-        if (!custom.contains(w)) return;
-        custom.remove(w);
+        if (!custom.containsKey(w)) return;
+        VanillaCommandWrapper wrapper = custom.remove(w);
+        if (wrapper == w) wrapper = null;
         knownCommands.remove(name);
+        for (CommandNode<CommandSourceStack> node : new ArrayList<>(MinecraftServer.getServer().vanillaCommandDispatcher
+                .getDispatcher()
+                .getRoot()
+                .getChildren())) {
+            if (node.getName().equals(name)) {
+                MinecraftServer.getServer().vanillaCommandDispatcher.getDispatcher().getRoot().getChildren().remove(node);
+                if (wrapper != null) {
+                    Logger.getLogger("CommandAPI").warning("Reinstalling command: " + wrapper.getName());
+                    knownCommands.put(node.getName(), wrapper);
+                    MinecraftServer.getServer().vanillaCommandDispatcher.getDispatcher().getRoot().addChild(wrapper.vanillaCommand);
+                }
+                break;
+            }
+        }
     }
 
     @Override public double[] getEntityBB(Entity entity) {
@@ -207,14 +229,6 @@ public class CommandAPI1_20_1 extends BukkitCommandAPI implements Listener {
         if (work) {
             known.put(name, command);
             successfulNames.add(name);
-        }
-    }
-
-    private static class TabQueue {
-
-        private final Queue<Entry> entries = new ConcurrentLinkedQueue<>();
-
-        private record Entry(String commandLine, Suggestions suggestions) {
         }
     }
 }

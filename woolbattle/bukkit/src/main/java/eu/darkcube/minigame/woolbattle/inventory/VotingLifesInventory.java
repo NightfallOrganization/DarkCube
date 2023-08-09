@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.inventory;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
@@ -22,9 +22,9 @@ import java.util.Map;
 
 public class VotingLifesInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_voting_lifes");
-    private static final Key LIFES = new Key(WoolBattle.instance(), "voting_lifes");
+    private static final Key LIFES = new Key(WoolBattleBukkit.instance(), "voting_lifes");
 
-    public VotingLifesInventory(WoolBattle woolbattle, WBUser user) {
+    public VotingLifesInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);
     }
 
@@ -37,7 +37,7 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
         if (stringLifes == null)
             return;
         int lifes = Integer.parseInt(stringLifes);
-        WoolBattle.instance().lobby().VOTES_LIFES.put(user, lifes);
+        WoolBattleBukkit.instance().lobby().VOTES_LIFES.put(user, lifes);
         user.user().sendMessage(Message.VOTED_LIFES, lifes);
         recalculate();
     }
@@ -60,8 +60,8 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
         ItemBuilder builder = ItemBuilder.item(Item.LOBBY_VOTING_LIFES_ENTRY.getItem(user, lifes));
         ItemManager.setId(builder, LIFES, String.valueOf(lifes));
         int lifeVotes = -1;
-        if (WoolBattle.instance().lobby().VOTES_LIFES.containsKey(user)) {
-            lifeVotes = WoolBattle.instance().lobby().VOTES_LIFES.get(user);
+        if (WoolBattleBukkit.instance().lobby().VOTES_LIFES.containsKey(user)) {
+            lifeVotes = WoolBattleBukkit.instance().lobby().VOTES_LIFES.get(user);
         }
         if (lifeVotes == lifes) {
             builder.glow(true);

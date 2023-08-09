@@ -11,11 +11,13 @@ import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
+import java.util.Locale;
+
 public class CommandInfo extends WBCommandExecutor {
     public CommandInfo() {
         super("info", b -> b.executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");
-            String sb = "§aMap: " + map.getName() + "\nIcon: " + map.getIcon() +
+            String sb = "§aMap: " + map.getName() + "\nIcon: " + map.getIcon().getType().name().toLowerCase(Locale.ROOT) +
                     "DeathHeight: " + (map.ingameData() == null ? "Unknown" : map.deathHeight()) + "\nAktiviert: " +
                     map.isEnabled();
             ctx.getSource().sendMessage(

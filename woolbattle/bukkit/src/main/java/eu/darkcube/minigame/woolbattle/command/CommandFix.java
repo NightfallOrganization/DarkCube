@@ -6,14 +6,14 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.minigame.woolbattle.WoolBattle;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 
 public class CommandFix extends WBCommandExecutor {
     public CommandFix() {
-        super("fix", b -> b.requires(s -> WoolBattle.instance().ingame().enabled()).executes(ctx -> {
+        super("fix", b -> b.requires(s -> WoolBattleBukkit.instance().ingame().enabled()).executes(ctx -> {
             WBUser user = WBUser.getUser(ctx.getSource().asPlayer());
-            WoolBattle.instance().ingame().setPlayerItems(user);
+            WoolBattleBukkit.instance().ingame().setPlayerItems(user);
             return 0;
         }));
     }
