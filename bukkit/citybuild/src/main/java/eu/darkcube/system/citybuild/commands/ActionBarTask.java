@@ -28,7 +28,7 @@ public class ActionBarTask extends BukkitRunnable {
 			int health = healthManager.getHealth(player);
 			int maxHealth = healthManager.getMaxHealth(player);
 
-			Component message = Component.text("H", TextColor.fromHexString("#4e5c24"))
+			Component message = Component.text("ⲁ", TextColor.fromHexString("#4e5c24"))
 					.append(Component.text("[").color(TextColor.fromHexString("#7e7e7e")))
 					.append(Component.text(health).color(TextColor.fromHexString("#ff4c4c")))
 					.append(Component.text("/").color(TextColor.fromHexString("#7e7e7e")))

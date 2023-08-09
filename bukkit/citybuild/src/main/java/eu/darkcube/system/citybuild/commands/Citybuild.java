@@ -125,7 +125,7 @@ public class Citybuild extends JavaPlugin {
         actionBarTask.runTaskTimer(this, 0L, 3L);
 
         this.getServer().getPluginManager().registerEvents(new SchadensAnzeige(), this);
-        this.getServer().getPluginManager().registerEvents(new CraftingTableListener(), this);
+        this.getServer().getPluginManager().registerEvents(new CraftingTableListener(this), this);
         this.getServer().getPluginManager().registerEvents(new EntityHealListener(), this);
      //   this.getServer().getPluginManager().registerEvents(new KnockbackListener(), this);
         this.getServer().getPluginManager().registerEvents(new SoundListener(), this);

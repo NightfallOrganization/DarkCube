@@ -39,7 +39,7 @@ tasks {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    compileOnlyApi(project(":darkcubesystem"))
-    compileOnlyApi(parent!!.project("luckperms-prefixplugin"))
+    compileOnly(project(":darkcubesystem"))
+    compileOnly(parent!!.project("luckperms-prefixplugin"))
     implementation(project(":common:glyph-width-loader"))
 }
