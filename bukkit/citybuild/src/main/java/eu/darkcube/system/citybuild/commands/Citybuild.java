@@ -35,6 +35,8 @@ public class Citybuild extends JavaPlugin {
         instance = this;
     }
 
+    private CustomHealthManager healthManager;
+
     public static Citybuild getInstance() {
         return instance;
     }
@@ -57,13 +59,15 @@ public class Citybuild extends JavaPlugin {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+
         this.levelXPManager = new LevelXPManager(this);
-        CustomHealthManager healthManager = new CustomHealthManager(this);
+        healthManager = new CustomHealthManager(this);
         AttributeCommand attributeCommand = new AttributeCommand(this, healthManager);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule naturalRegeneration false");
         AroundDamageCommands aroundDamageCommands = new AroundDamageCommands(this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         this.defenseManager = new DefenseManager(this);
+
         instance.getCommand("gm").setExecutor(new GM());
         instance.getCommand("heal").setExecutor(new Heal(healthManager));
         instance.getCommand("day").setExecutor(new Day());
@@ -94,7 +98,6 @@ public class Citybuild extends JavaPlugin {
 
         CommandAPI.instance().register(glyphCommand);
 
-        (new ActionBarTask("Ⲓ", "Ⲕ")).runTaskTimer(this, 0L, 3L);
         this.customItemManager = new CustomItemManager(this);
         this.customItemManager.registerItems();
         ScoreboardHandler scoreboardHandler = new ScoreboardHandler();
@@ -118,8 +121,12 @@ public class Citybuild extends JavaPlugin {
         AroundDamageHandler aroundDamageHandler = new AroundDamageHandler(this, this.getAroundDamageKey());
         new BagListener(this);
 
+        ActionBarTask actionBarTask = new ActionBarTask(this, healthManager, levelXPManager);
+        actionBarTask.runTaskTimer(this, 0L, 3L);
+
+        this.getServer().getPluginManager().registerEvents(new SchadensAnzeige(), this);
+        this.getServer().getPluginManager().registerEvents(new CraftingTableListener(), this);
         this.getServer().getPluginManager().registerEvents(new EntityHealListener(), this);
-  //      this.getServer().getPluginManager().registerEvents(new SchadensAnzeige(), this);
      //   this.getServer().getPluginManager().registerEvents(new KnockbackListener(), this);
         this.getServer().getPluginManager().registerEvents(new SoundListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);
@@ -160,7 +167,9 @@ public class Citybuild extends JavaPlugin {
 
         customItemManager.unloadRecipes();
     }
-
+    public CustomHealthManager getHealthManager(){
+        return healthManager;
+    }
     public GlyphWidthManager glyphWidthManager() {
         return glyphWidthManager;
     }
