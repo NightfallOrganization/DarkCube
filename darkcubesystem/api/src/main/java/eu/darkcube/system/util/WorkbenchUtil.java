@@ -8,11 +8,16 @@
 package eu.darkcube.system.util;
 
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
 public interface WorkbenchUtil {
 
-    InventoryView openWorkbench(Player player, Component title);
+    InventoryView openWorkbench(Player player, Location location, boolean force, Component title);
+
+    default InventoryView openWorkbench(Player player, Component title) {
+        return openWorkbench(player, player.getLocation(), true, title);
+    }
 
 }

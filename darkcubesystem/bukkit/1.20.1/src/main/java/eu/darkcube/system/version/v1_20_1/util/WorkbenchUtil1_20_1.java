@@ -16,23 +16,25 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.level.Level;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
 public class WorkbenchUtil1_20_1 implements WorkbenchUtil {
-    @Override public InventoryView openWorkbench(Player player, Component name) {
+
+    @Override public InventoryView openWorkbench(Player player, Location location, boolean force, Component title) {
         CraftPlayer cp = (CraftPlayer) player;
 
-        BlockPos pos = CraftLocation.toBlockPosition(cp.getLocation());
+        BlockPos pos = CraftLocation.toBlockPosition(location);
         Level level = cp.getHandle().level();
         MenuProvider provider = new SimpleMenuProvider((syncId, inventory, p1) -> new CraftingMenu(syncId, inventory, ContainerLevelAccess.create(level, pos)), net.minecraft.network.chat.Component.literal(LegacyComponentSerializer
                 .legacySection()
-                .serialize(name)));
+                .serialize(title)));
 
         cp.getHandle().openMenu(provider);
-        cp.getHandle().containerMenu.checkReachable = false;
+        if (force) cp.getHandle().containerMenu.checkReachable = false;
         return cp.getHandle().containerMenu.getBukkitView();
     }
 }
