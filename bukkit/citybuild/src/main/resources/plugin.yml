@@ -1,4 +1,4 @@
-main: eu.darkcube.system.citybuild.commands.Citybuild
+main: eu.darkcube.system.citybuild.listener.Citybuild
 name: CityBuild
 author: EliteDarkness
 version: 1.0

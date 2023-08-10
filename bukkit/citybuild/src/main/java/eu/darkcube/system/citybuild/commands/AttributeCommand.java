@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import eu.darkcube.system.citybuild.listener.Citybuild;
+import eu.darkcube.system.citybuild.util.CustomHealthManager;
+import eu.darkcube.system.citybuild.util.DefenseManager;
+import eu.darkcube.system.citybuild.util.LevelXPManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -25,16 +29,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class AttributeCommand implements CommandExecutor, Listener {
-    private final JavaPlugin plugin;
+    private final Citybuild plugin;
     private NamespacedKey speedKey;
     private NamespacedKey strengthKey;
     private NamespacedKey hitSpeedKey;
@@ -43,7 +45,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
     private NamespacedKey defenseKey;
     private CustomHealthManager healthManager;
 
-    public AttributeCommand(JavaPlugin plugin, CustomHealthManager healthManager) {
+    public AttributeCommand(Citybuild plugin, CustomHealthManager healthManager) {
         this.plugin = plugin;// 35
         this.healthManager = healthManager;// 36
         this.speedKey = new NamespacedKey(plugin, "SpeedKey");
@@ -62,28 +64,37 @@ public class AttributeCommand implements CommandExecutor, Listener {
             String[] names = new String[]{"§dDefense", "§dStrength", "§dHealth", "§dSpeed", "§dAround Damage", "§dHit Speed"};
 
             for (int i = 0; i < customModelData.length; ++i) {
-                ItemStack item = new ItemStack(Material.FIREWORK_STAR); ItemMeta meta = item.getItemMeta();
-                meta.setCustomModelData(customModelData[i]); meta.setDisplayName(names[i]);
-                PersistentDataContainer dataContainer = player.getPersistentDataContainer(); int level = 0; switch (names[i]) {
+                ItemStack item = new ItemStack(Material.FIREWORK_STAR);
+                ItemMeta meta = item.getItemMeta();
+                meta.setCustomModelData(customModelData[i]);
+                meta.setDisplayName(names[i]);
+                PersistentDataContainer dataContainer = player.getPersistentDataContainer();
+                int level = 0;
+                switch (names[i]) {
                     case "§dDefense":
-                        level = dataContainer.getOrDefault(this.defenseKey, PersistentDataType.INTEGER, 0); break;
+                        level = dataContainer.getOrDefault(this.defenseKey, PersistentDataType.INTEGER, 0);
+                        break;
                     case "§dStrength":
-                        level = dataContainer.getOrDefault(this.strengthKey, PersistentDataType.INTEGER, 0); break;
+                        level = dataContainer.getOrDefault(this.strengthKey, PersistentDataType.INTEGER, 0);
+                        break;
                     case "§dHealth":
-                        level = dataContainer.getOrDefault(this.healthKey, PersistentDataType.INTEGER, 0); break;
+                        level = dataContainer.getOrDefault(this.healthKey, PersistentDataType.INTEGER, 0);
+                        break;
                     case "§dSpeed":
-                        level = dataContainer.getOrDefault(this.speedKey, PersistentDataType.INTEGER, 0); break;
+                        level = dataContainer.getOrDefault(this.speedKey, PersistentDataType.INTEGER, 0);
+                        break;
                     case "§dAround Damage":
-                        level = (int) Math.round(dataContainer.getOrDefault(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0)); break;
+                        level = (int) Math.round(dataContainer.getOrDefault(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0));
+                        break;
                     case "§dHit Speed":
                         level = dataContainer.getOrDefault(this.hitSpeedKey, PersistentDataType.INTEGER, 0);
                 }
 
                 List<String> lore = new ArrayList();
 
-                if(names[i].equals("§dSpeed")) {
+                if (names[i].equals("§dSpeed")) {
                     lore.add("§7Level: " + level + " §7/ 39");
-                } else if(names[i].equals("§dHit Speed")) {
+                } else if (names[i].equals("§dHit Speed")) {
                     lore.add("§7Level: " + level + " §7/ 37");
                 } else {
                     lore.add("§7Level: " + level);
@@ -130,10 +141,10 @@ public class AttributeCommand implements CommandExecutor, Listener {
 
                     case "§dSpeed":
                         double currentSpeed = levelManager.getAttribute(player, "speed");
-                        if(currentSpeed == 0){
+                        if (currentSpeed == 0) {
                             currentSpeed = 0.22f;
                         }
-                        if(currentSpeed >= 0.98f) {
+                        if (currentSpeed >= 0.98f) {
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                             player.sendMessage("§cDu hast bereits die maximale Geschwindigkeit erreicht!");
                             return;
@@ -173,7 +184,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
                     case "§dHit Speed":
                         PersistentDataContainer dataContainerHitSpeed = player.getPersistentDataContainer();
                         int currentClicksHitSpeed = (Integer) dataContainerHitSpeed.getOrDefault(this.hitSpeedKey, PersistentDataType.INTEGER, 0);
-                        if(currentClicksHitSpeed >= 37) {
+                        if (currentClicksHitSpeed >= 37) {
                             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
                             player.sendMessage("§cDu hast bereits die maximale Angriffsgeschwindigkeit erreicht!");
                             return;
@@ -207,12 +218,13 @@ public class AttributeCommand implements CommandExecutor, Listener {
 
                     case "§dAround Damage":
                         PersistentDataContainer dataContainerAroundDamage = player.getPersistentDataContainer();
-                        double currentAroundDamage; if (dataContainerAroundDamage.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {
-                        currentAroundDamage = (Double) dataContainerAroundDamage.get(this.aroundDamageKey, PersistentDataType.DOUBLE);
-                    } else {
-                        currentAroundDamage = 0.0;
-                        dataContainerAroundDamage.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
-                    }
+                        double currentAroundDamage;
+                        if (dataContainerAroundDamage.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {
+                            currentAroundDamage = (Double) dataContainerAroundDamage.get(this.aroundDamageKey, PersistentDataType.DOUBLE);
+                        } else {
+                            currentAroundDamage = 0.0;
+                            dataContainerAroundDamage.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
+                        }
 
                         dataContainerAroundDamage.set(this.aroundDamageKey, PersistentDataType.DOUBLE, currentAroundDamage + 1.0);
                         levelManager.addAP(player, -1);
@@ -225,7 +237,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
                         break;
 
                     case "§dDefense":
-                        DefenseManager defenseManager = new DefenseManager((Citybuild) this.plugin);
+                        DefenseManager defenseManager = new DefenseManager( this.plugin);
                         double currentDefense = defenseManager.getDefense(player);
                         defenseManager.addDefense(player, 1);
                         levelManager.addAP(player, -1);
