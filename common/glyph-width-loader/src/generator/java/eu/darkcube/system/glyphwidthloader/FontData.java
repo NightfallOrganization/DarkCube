@@ -97,6 +97,11 @@ public class FontData {
                 for (int x = 0; x < codepointMap[y].length; x++) {
                     int actualWidth = actualWidth(image, glyphWidth, glyphHeight, x, y);
                     int advance = (int) (0.5D + (double) ((float) actualWidth * scale)) + 1;
+
+                    if (codepointMap[y][x] == 32) {
+                        if (removeKeys.containsKey(32)) continue;
+                    }
+
                     widths.put(codepointMap[y][x], advance);
                     removeKeys.remove(codepointMap[y][x]);
                 }

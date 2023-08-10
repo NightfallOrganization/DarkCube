@@ -109,9 +109,9 @@ public class Generator {
         write(buffer, out, bitmapWidths);
         out.close();
 
-        try (Stream<Path> walk = Files.walk(tempDirectory)) {
-            walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-        }
+//        try (Stream<Path> walk = Files.walk(tempDirectory)) {
+//            walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+//        }
     }
 
     private static void write(ByteBuffer buffer, OutputStream out, Int2FloatMap widths) throws IOException {
