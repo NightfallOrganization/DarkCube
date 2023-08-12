@@ -6,26 +6,29 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.troll.CommandSetPerk;
 import eu.darkcube.minigame.woolbattle.command.troll.CommandSetPerkCooldown;
 import eu.darkcube.minigame.woolbattle.command.troll.CommandSetPerkCost;
 import eu.darkcube.minigame.woolbattle.command.troll.CommandToggle;
 
 public class CommandTroll extends WBCommandExecutor {
-	public CommandTroll() {
-		super("troll", b -> b.then(new CommandSetPerk().builder())
-				.then(new CommandSetPerkCooldown().builder())
-				.then(new CommandSetPerkCost().builder()).then(new CommandToggle().builder()));
-	}
-	//	public CommandTroll() {
-	//		super(WoolBattle.getInstance(), "troll", new Command[] {
-	//				new CommandSetPerkCooldown(), new CommandToggle(), new CommandSetPerkCost(), new CommandSetPerk(), new CommandVanish()
-	//		}, "Troll Hauptcommand");
-	//	}
-	//
-	//	@Override
-	//	public boolean execute(CommandSender arg0, String[] arg1) {
-	//		return false;
-	//	}
+    public CommandTroll(WoolBattleBukkit woolbattle) {
+        super("troll", b -> b
+                .then(new CommandSetPerk(woolbattle).builder())
+                .then(new CommandSetPerkCooldown(woolbattle).builder())
+                .then(new CommandSetPerkCost(woolbattle).builder())
+                .then(new CommandToggle().builder()));
+    }
+    //	public CommandTroll() {
+    //		super(WoolBattle.getInstance(), "troll", new Command[] {
+    //				new CommandSetPerkCooldown(), new CommandToggle(), new CommandSetPerkCost(), new CommandSetPerk(), new CommandVanish()
+    //		}, "Troll Hauptcommand");
+    //	}
+    //
+    //	@Override
+    //	public boolean execute(CommandSender arg0, String[] arg1) {
+    //		return false;
+    //	}
 
 }

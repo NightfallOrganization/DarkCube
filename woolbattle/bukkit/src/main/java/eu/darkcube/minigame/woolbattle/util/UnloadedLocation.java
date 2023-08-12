@@ -45,4 +45,8 @@ public class UnloadedLocation {
         if (loaded == null) loaded = new Location(loadedWorld, x, y, z, yaw, pitch);
         return loaded.clone();
     }
+
+    @Override public String toString() {
+        return "UnloadedLocation{" + "x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + ", world='" + world + '\'' + '}';
+    }
 }

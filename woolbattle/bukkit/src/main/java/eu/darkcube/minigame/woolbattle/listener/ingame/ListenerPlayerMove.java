@@ -23,13 +23,15 @@ import java.util.*;
 
 public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 
+    private final WoolBattleBukkit woolbattle;
     public Map<Player, Integer> ghostBlockFixCount = new HashMap<>();
 
-    @SuppressWarnings("deprecation")
-    @Override
-    @EventHandler
-    public void handle(PlayerMoveEvent e) {
-        SchedulerHeightDisplay.display(WoolBattleBukkit.instance(), WBUser.getUser(e.getPlayer()));
+    public ListenerPlayerMove(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @SuppressWarnings("deprecation") @Override @EventHandler public void handle(PlayerMoveEvent e) {
+        SchedulerHeightDisplay.display(woolbattle, WBUser.getUser(e.getPlayer()));
 
         if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {
             return;
@@ -52,8 +54,7 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
                     if (box.collides(pbox)) {
                         p.sendBlockChange(r.getLocation(), r.getType(), r.getData());
                     }
-                    if (box.collides(pbox) && (box.collidesVertically(pbox)
-                            || r.getType() != Material.WOOL)) {
+                    if (box.collides(pbox) && (box.collidesVertically(pbox) || r.getType() != Material.WOOL)) {
                         if (to.getY() % 1 != 0 && r.getLocation().getBlockY() == to.getBlockY()) {
                             flawless = false;
                         }
@@ -84,8 +85,7 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
                 }
             }
             if (y != -1) {
-                Location loc = new Location(to.getWorld(), to.getX(), y, to.getZ(), to.getYaw(),
-                        to.getPitch());
+                Location loc = new Location(to.getWorld(), to.getX(), y, to.getZ(), to.getYaw(), to.getPitch());
                 p.teleport(loc);
             }
         }

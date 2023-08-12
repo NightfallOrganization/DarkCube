@@ -15,23 +15,25 @@ import java.util.Collections;
 
 public class PerkSelector {
 
-	private final boolean all;
-	private final Perk perk;
+    private final boolean all;
+    private final Perk perk;
+    private final WoolBattleBukkit woolbattle;
 
-	public PerkSelector(boolean all, Perk perk) {
-		this.all = all;
-		this.perk = perk;
-	}
+    public PerkSelector(boolean all, Perk perk, WoolBattleBukkit woolbattle) {
+        this.all = all;
+        this.perk = perk;
+        this.woolbattle = woolbattle;
+    }
 
-	public Collection<Perk> select() {
-		return all ? selectAll() : Collections.singleton(selectOne());
-	}
+    public Collection<Perk> select() {
+        return all ? selectAll() : Collections.singleton(selectOne());
+    }
 
-	public Collection<Perk> selectAll() {
-		return new ArrayList<>(WoolBattleBukkit.instance().perkRegistry().perks().values());
-	}
+    public Collection<Perk> selectAll() {
+        return new ArrayList<>(woolbattle.perkRegistry().perks().values());
+    }
 
-	public Perk selectOne() {
-		return perk;
-	}
+    public Perk selectOne() {
+        return perk;
+    }
 }

@@ -9,9 +9,7 @@ package eu.darkcube.minigame.woolbattle.map;
 import de.dytanic.cloudnet.common.document.gson.JsonDocument;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer.DontSerialize;
-import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -42,47 +40,39 @@ public class DefaultMap implements Map, Serializable {
         icon = new ItemStack(Material.GRASS);
     }
 
-    @Override
-    public int deathHeight() {
+    @Override public int deathHeight() {
         return deathHeight;
     }
 
-    @Override
-    public void deathHeight(int deathHeight) {
+    @Override public void deathHeight(int deathHeight) {
         this.deathHeight = deathHeight;
         save();
     }
 
-    @Override
-    public boolean isEnabled() {
+    @Override public boolean isEnabled() {
         return enabled;
     }
 
-    @Override
-    public ItemStack getIcon() {
+    @Override public ItemStack getIcon() {
         return icon;
     }
 
-    @Override
-    public void setIcon(ItemStack icon) {
+    @Override public void setIcon(ItemStack icon) {
         this.icon = icon;
         save();
     }
 
-    @Override
-    public void enable() {
+    @Override public void enable() {
         enabled = true;
         save();
     }
 
-    @Override
-    public void disable() {
+    @Override public void disable() {
         enabled = false;
         save();
     }
 
-    @Override
-    public MapSize size() {
+    @Override public MapSize size() {
         return size;
     }
 
@@ -90,13 +80,11 @@ public class DefaultMap implements Map, Serializable {
         this.ingameData = ingameData;
     }
 
-    @Override
-    public @Nullable MapIngameData ingameData() {
+    @Override public @Nullable MapIngameData ingameData() {
         return ingameData;
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return name;
     }
 
@@ -109,6 +97,6 @@ public class DefaultMap implements Map, Serializable {
     }
 
     void save() {
-        ((DefaultMapManager) WoolBattleBukkit.instance().mapManager()).database.update(name, toDocument());
+        ((DefaultMapManager) WoolBattleBukkit.instance().mapManager()).save(this);
     }
 }

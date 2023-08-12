@@ -18,19 +18,19 @@ import org.bukkit.entity.Player;
 
 public class CommandRevive extends CommandExecutor {
 
-    public CommandRevive() {
-        super("woolbattle", "revive", "woolbattle.command.revive", new String[0], b -> b.then(
-                Commands.argument("player", EntityArgument.player()).executes(context -> {
+    public CommandRevive(WoolBattleBukkit woolbattle) {
+        super("woolbattle", "revive", "woolbattle.command.revive", new String[0], b -> b.then(Commands
+                .argument("player", EntityArgument.player())
+                .executes(context -> {
                     Player p = EntityArgument.getPlayer(context, "player");
                     WBUser user = WBUser.getUser(p);
-                    Ingame ingame = WoolBattleBukkit.instance().ingame();
+                    Ingame ingame = woolbattle.ingame();
                     if (!ingame.lastTeam.containsKey(user)) {
-                        context.getSource().sendMessage(
-                                Component.text("Konnte team für spieler nicht finden!"));
+                        context.getSource().sendMessage(Component.text("Konnte team für spieler nicht finden!"));
                         return 0;
                     }
                     Team team = ingame.lastTeam.get(user);
-                    WoolBattleBukkit.instance().teamManager().setTeam(user, team);
+                    woolbattle.teamManager().setTeam(user, team);
                     context.getSource().sendMessage(Component.text("Spieler wiederbelebt!"));
                     return 0;
                 })));

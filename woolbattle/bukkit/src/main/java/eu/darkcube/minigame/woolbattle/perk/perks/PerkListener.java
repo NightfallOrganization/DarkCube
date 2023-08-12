@@ -30,11 +30,11 @@ public abstract class PerkListener implements Listener {
      * @param perk the perk to check
      * @return if the given perk is usable
      */
-    public static boolean checkUsable(UserPerk perk) {
+    public static boolean checkUsable(UserPerk perk, WoolBattleBukkit woolbattle) {
         WBUser user = perk.owner();
         if (user.woolCount() < perk.perk().cost() || perk.cooldown() > 0) {
-            WoolBattleBukkit.instance().ingame().playSoundNotEnoughWool(user);
-            new Scheduler(perk.currentPerkItem()::setItem).runTask();
+            woolbattle.ingame().playSoundNotEnoughWool(user);
+            new Scheduler(woolbattle, perk.currentPerkItem()::setItem).runTask();
             return false;
         }
         return true;
@@ -50,22 +50,18 @@ public abstract class PerkListener implements Listener {
      * @param itemMatchRunnable the runnable to execute if the perk is usable match
      * @return if the checks are successful
      */
-    public static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk,
-                                      Consumer<UserPerk> itemMatchRunnable) {
+    public static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk, Consumer<UserPerk> itemMatchRunnable, WoolBattleBukkit woolbattle) {
         ItemBuilder builder = ItemBuilder.item(usedItem);
         if (!builder.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
             return false;
         }
-        @SuppressWarnings("DataFlowIssue")
-        int perkId =
-                builder.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
+        @SuppressWarnings("DataFlowIssue") int perkId = builder.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
         UserPerk userPerk = user.perks().perk(perkId);
         if (!userPerk.perk().equals(perk)) {
             return false;
         }
-        if (itemMatchRunnable != null)
-            itemMatchRunnable.accept(userPerk);
-        return checkUsable(userPerk);
+        if (itemMatchRunnable != null) itemMatchRunnable.accept(userPerk);
+        return checkUsable(userPerk, woolbattle);
     }
 
     public static void payForThePerk(UserPerk perk) {

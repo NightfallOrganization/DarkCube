@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.*;
 import eu.darkcube.minigame.woolbattle.perk.perks.other.*;
@@ -17,64 +18,65 @@ import java.util.Map;
 
 public class PerkRegistry {
 
-	private final Map<PerkName, Perk> perks = new HashMap<>();
-	private final Map<ActivationType, Perk[]> cache1 = new HashMap<>();
+    private final Map<PerkName, Perk> perks = new HashMap<>();
+    private final Map<ActivationType, Perk[]> cache1 = new HashMap<>();
 
-	public PerkRegistry() {
-		register(new SlimePlatformPerk());
-		register(new CapsulePerk());
-		register(new SwitcherPerk());
-		register(new LineBuilderPerk());
-		register(new WoolBombPerk());
-		register(new RonjasToiletFlushPerk());
-		register(new SafetyPlatformPerk());
-		register(new WallGeneratorPerk());
-		register(new BlinkPerk());
-		register(new GrandpasClockPerk());
-		register(new GhostPerk());
-		register(new GrabberPerk());
-		register(new MinigunPerk());
-		register(new BoosterPerk());
-		register(new GrapplingHookPerk());
-		register(new RopePerk());
-		register(new FreezerPerk());
-		register(new ExtraWoolPerk());
-		register(new RocketJumpPerk());
-		register(new LongJumpPerk());
-		register(new ArrowRainPerk());
-		register(new FastArrowPerk());
-		register(new TntArrowPerk());
-		register(new EnderPearlPerk());
-		register(new BowPerk());
-		register(new ArrowPerk());
-		register(new ShearsPerk());
-		register(new ArrowBombPerk());
-		register(new ProtectiveShieldPerk());
-		register(new DoubleJumpPerk());
-		register(new MinePerk());
-		register(new ElevatorPerk());
-		register(new ReflectorPerk());
-		register(new ScampPerk());
-		register(new SpiderPerk());
-		register(new HookArrowPerk());
-		register(new DrawArrowPerk());
-		register(new FreezeArrowPerk());
-		register(new BerserkerPerk());
-		register(new StomperPerk());
-	}
+    public PerkRegistry(WoolBattleBukkit woolbattle) {
+        register(new SlimePlatformPerk(woolbattle));
+        register(new CapsulePerk(woolbattle));
+        register(new SwitcherPerk(woolbattle));
+        register(new LineBuilderPerk(woolbattle));
+        register(new WoolBombPerk(woolbattle));
+        register(new RonjasToiletFlushPerk(woolbattle));
+        register(new SafetyPlatformPerk(woolbattle));
+        register(new WallGeneratorPerk(woolbattle));
+        register(new BlinkPerk(woolbattle));
+        register(new GrandpasClockPerk(woolbattle));
+        register(new GhostPerk(woolbattle));
+        register(new GrabberPerk(woolbattle));
+        register(new MinigunPerk(woolbattle));
+        register(new BoosterPerk(woolbattle));
+        register(new GrapplingHookPerk(woolbattle));
+        register(new RopePerk(woolbattle));
+        register(new FreezerPerk(woolbattle));
+        register(new ExtraWoolPerk());
+        register(new RocketJumpPerk());
+        register(new LongJumpPerk());
+        register(new ArrowRainPerk());
+        register(new FastArrowPerk());
+        register(new TntArrowPerk(woolbattle));
+        register(new EnderPearlPerk(woolbattle));
+        register(new BowPerk(woolbattle));
+        register(new ArrowPerk(woolbattle));
+        register(new ShearsPerk(woolbattle));
+        register(new ArrowBombPerk(woolbattle));
+        register(new ProtectiveShieldPerk(woolbattle));
+        register(new DoubleJumpPerk(woolbattle));
+        register(new MinePerk(woolbattle));
+        register(new ElevatorPerk());
+        register(new ReflectorPerk(woolbattle));
+        register(new ScampPerk());
+        register(new SpiderPerk(woolbattle));
+        register(new HookArrowPerk(woolbattle));
+        register(new DrawArrowPerk(woolbattle));
 
-	public void register(Perk perk) {
-		perks.put(perk.perkName(), perk);
-		cache1.remove(perk.activationType());
-	}
+        register(new FreezeArrowPerk(woolbattle));
+        register(new BerserkerPerk(woolbattle));
+        register(new StomperPerk(woolbattle));
+    }
 
-	public Perk[] perks(ActivationType activationType) {
-		return cache1.computeIfAbsent(activationType,
-				n -> perks.values().stream().filter(p -> p.activationType() == n)
-						.toArray(Perk[]::new)).clone();
-	}
+    public void register(Perk perk) {
+        perks.put(perk.perkName(), perk);
+        cache1.remove(perk.activationType());
+    }
 
-	public Map<PerkName, Perk> perks() {
-		return Collections.unmodifiableMap(perks);
-	}
+    public Perk[] perks(ActivationType activationType) {
+        return cache1
+                .computeIfAbsent(activationType, n -> perks.values().stream().filter(p -> p.activationType() == n).toArray(Perk[]::new))
+                .clone();
+    }
+
+    public Map<PerkName, Perk> perks() {
+        return Collections.unmodifiableMap(perks);
+    }
 }

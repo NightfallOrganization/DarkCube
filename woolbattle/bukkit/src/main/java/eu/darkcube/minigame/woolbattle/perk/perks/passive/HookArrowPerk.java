@@ -23,41 +23,40 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class HookArrowPerk extends Perk {
 
-	public static final PerkName HOOK_ARROW = new PerkName("HOOK_ARROW");
+    public static final PerkName HOOK_ARROW = new PerkName("HOOK_ARROW");
 
-	public HookArrowPerk() {
-		super(ActivationType.PASSIVE, HOOK_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 8,
-				CostType.PER_ACTIVATION, Item.PERK_HOOK_ARROW,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_HOOK_ARROW_COOLDOWN));
-		addListener(new HookArrowListener());
-	}
+    public HookArrowPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.PASSIVE, HOOK_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 8, CostType.PER_ACTIVATION, Item.PERK_HOOK_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_HOOK_ARROW_COOLDOWN, wb));
+        addListener(new HookArrowListener(woolbattle));
+    }
 
-	public class HookArrowListener implements Listener {
-		@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-		public void handle(BowArrowHitPlayerEvent event) {
-			if (event.arrow().hasMetadata("hookArrow")) {
-				int removed = event.shooter().removeWool(cost());
-				if (removed < cost()) {
-					event.shooter().addWool(removed);
-					return;
-				}
-				event.target().getBukkitEntity()
-						.teleport(event.shooter().getBukkitEntity(), TeleportCause.PLUGIN);
-			}
-		}
+    public class HookArrowListener implements Listener {
+        private final WoolBattleBukkit woolbattle;
 
-		@EventHandler
-		public void handle(BowShootArrowEvent event) {
-			for (UserPerk perk : event.user().perks().perks(perkName())) {
-				if (perk.cooldown() == 0) {
-					perk.cooldown(cooldown().cooldown());
-					event.arrow().setMetadata("hookArrow",
-							new FixedMetadataValue(WoolBattleBukkit.instance(), perk));
-					break;
-				}
-				perk.cooldown(perk.cooldown() - 1);
-			}
-		}
-	}
+        public HookArrowListener(WoolBattleBukkit woolbattle) {
+            this.woolbattle = woolbattle;
+        }
+
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true) public void handle(BowArrowHitPlayerEvent event) {
+            if (event.arrow().hasMetadata("hookArrow")) {
+                int removed = event.shooter().removeWool(cost());
+                if (removed < cost()) {
+                    event.shooter().addWool(removed);
+                    return;
+                }
+                event.target().getBukkitEntity().teleport(event.shooter().getBukkitEntity(), TeleportCause.PLUGIN);
+            }
+        }
+
+        @EventHandler public void handle(BowShootArrowEvent event) {
+            for (UserPerk perk : event.user().perks().perks(perkName())) {
+                if (perk.cooldown() == 0) {
+                    perk.cooldown(cooldown().cooldown());
+                    event.arrow().setMetadata("hookArrow", new FixedMetadataValue(woolbattle, perk));
+                    break;
+                }
+                perk.cooldown(perk.cooldown() - 1);
+            }
+        }
+    }
 }

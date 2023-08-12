@@ -26,29 +26,31 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class GrabberPerk extends Perk {
     public static final PerkName GRABBER = new PerkName("GRABBER");
 
-    public GrabberPerk() {
-        super(ActivationType.ACTIVE, GRABBER, 7, 10, Item.PERK_GRABBER,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_GRABBER_COOLDOWN));
-        addListener(new ListenerGrabber(this));
+    public GrabberPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, GRABBER, 7, 10, Item.PERK_GRABBER, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_GRABBER_COOLDOWN, woolbattle));
+        addListener(new ListenerGrabber(this, woolbattle));
     }
 
-    public static class ListenerGrabber extends BasicPerkListener {
+    private static class ListenerGrabber extends BasicPerkListener {
 
-        private static final Key DATA_GRABBED = new Key(WoolBattleBukkit.instance(), "grabber_grabbed");
-        private static final Key DATA_SCHEDULER =
-                new Key(WoolBattleBukkit.instance(), "grabber_scheduler");
-        private static final Key DATA_PERK = new Key(WoolBattleBukkit.instance(), "perk_grabber");
+        private final WoolBattleBukkit woolbattle;
+        private final Key DATA_GRABBED;
+        private final Key DATA_SCHEDULER;
+        private final Key DATA_PERK;
 
-        public ListenerGrabber(Perk perk) {
-            super(perk);
+        public ListenerGrabber(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
+            DATA_GRABBED = new Key(woolbattle, "grabber_grabbed");
+            DATA_SCHEDULER = new Key(woolbattle, "grabber_scheduler");
+            DATA_PERK = new Key(woolbattle, "perk_grabber");
         }
 
-        public static boolean hasTarget(WBUser user) {
+        public boolean hasTarget(WBUser user) {
             return user.user().getMetaDataStorage().has(DATA_GRABBED);
         }
 
-        public static boolean teleportTarget(WBUser user) {
+        public boolean teleportTarget(WBUser user) {
             if (!hasTarget(user)) {
                 return false;
             }
@@ -61,17 +63,12 @@ public class GrabberPerk extends Perk {
             return true;
         }
 
-        public static WBUser getTarget(WBUser user) {
-            return user.user().getMetaDataStorage().get(DATA_GRABBED);
-        }
-
-        public static void setTarget(WBUser user, WBUser target) {
+        public void setTarget(WBUser user, WBUser target) {
             user.user().getMetaDataStorage().set(DATA_GRABBED, target);
             user.user().getMetaDataStorage().<UserPerk>get(DATA_PERK).currentPerkItem().setItem();
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             WBUser user = perk.owner();
             if (teleportTarget(user)) {
                 return true;
@@ -80,43 +77,35 @@ public class GrabberPerk extends Perk {
                 return false;
             }
             payForThePerk(perk);
-            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler() {
+            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler(woolbattle) {
                 {
                     runTaskLater(TimeUnit.SECOND.itoTicks(5));
                 }
 
-                @Override
-                public void run() {
+                @Override public void run() {
                     perk.cooldown(perk.perk().cooldown().cooldown());
                     user.user().getMetaDataStorage().remove(DATA_GRABBED);
                     user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
-                    user.user().getMetaDataStorage().<UserPerk>remove(DATA_PERK).currentPerkItem()
-                            .setItem();
+                    user.user().getMetaDataStorage().<UserPerk>remove(DATA_PERK).currentPerkItem().setItem();
                 }
             });
             Player p = user.getBukkitEntity();
             Egg egg = p.getWorld().spawn(p.getEyeLocation(), Egg.class);
             egg.setShooter(p);
             egg.setVelocity(p.getLocation().getDirection().multiply(1.5));
-            egg.setMetadata("perk",
-                    new FixedMetadataValue(WoolBattleBukkit.instance(), GrabberPerk.GRABBER));
+            egg.setMetadata("perk", new FixedMetadataValue(woolbattle, GrabberPerk.GRABBER));
             user.user().getMetaDataStorage().set(DATA_PERK, perk);
             return false;
         }
 
-        @Override
-        protected void activated(UserPerk perk) {
+        @Override protected void activated(UserPerk perk) {
             perk.cooldown(perk.perk().cooldown().cooldown());
         }
 
-        @EventHandler
-        public void handle(EntityDamageByEntityEvent e) {
-            if (e.getDamager() instanceof Egg && e.getEntity() instanceof Player
-                    && ((Egg) e.getDamager()).getShooter() instanceof Player) {
+        @EventHandler public void handle(EntityDamageByEntityEvent e) {
+            if (e.getDamager() instanceof Egg && e.getEntity() instanceof Player && ((Egg) e.getDamager()).getShooter() instanceof Player) {
                 Egg egg = (Egg) e.getDamager();
-                if (egg.hasMetadata("perk") && egg.getMetadata("perk").get(0).value()
-                        .equals(GrabberPerk.GRABBER)) {
-                    WoolBattleBukkit wb = WoolBattleBukkit.instance();
+                if (egg.hasMetadata("perk") && egg.getMetadata("perk").get(0).value().equals(GrabberPerk.GRABBER)) {
                     Player target = (Player) e.getEntity();
                     WBUser targetUser = WBUser.getUser(target);
                     if (targetUser.projectileImmunityTicks() > 0) {
@@ -125,8 +114,10 @@ public class GrabberPerk extends Perk {
                     }
                     Player p = (Player) egg.getShooter();
                     WBUser user = WBUser.getUser(p);
-                    if (wb.ingame().attack(user, targetUser) || (
-                            user.getTeam() == targetUser.getTeam() && user != targetUser)) {
+                    if (woolbattle
+                            .ingame()
+                            .playerUtil()
+                            .attack(user, targetUser) || (user.getTeam() == targetUser.getTeam() && user != targetUser)) {
                         if (user.getTeam() == targetUser.getTeam() && user != targetUser) {
                             e.setCancelled(true);
                         }

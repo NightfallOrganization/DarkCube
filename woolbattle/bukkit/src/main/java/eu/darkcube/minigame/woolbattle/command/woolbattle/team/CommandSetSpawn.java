@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
+import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
@@ -22,10 +23,12 @@ import org.bukkit.entity.Player;
 
 public class CommandSetSpawn extends WBCommandExecutor {
     public CommandSetSpawn(WoolBattleBukkit woolbattle) {
-        super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(CommandSetSpawn::set)));
+        super("setSpawn", b -> b.then(Commands
+                .argument("map", MapArgument.mapArgument(woolbattle, MapArgument.ToStringFunction.function(ctx -> MapSizeArgument.mapSize(ctx, "mapSize"))))
+                .executes(ctx -> set(woolbattle, ctx))));
     }
 
-    private static int set(CommandContext<CommandSource> ctx) throws CommandSyntaxException {
+    private static int set(WoolBattleBukkit woolbattle, CommandContext<CommandSource> ctx) throws CommandSyntaxException {
         TeamType team = TeamTypeArgument.teamType(ctx, "team");
         Map map = MapArgument.getMap(ctx, "map");
         Player player = ctx.getSource().asPlayer();
@@ -39,43 +42,9 @@ public class CommandSetSpawn extends WBCommandExecutor {
         map.ingameData().spawn(team.getDisplayNameKey(), loc);
 
         player.sendMessage("§7Du hast den Spawn für die Map '" + map.getName() + "' neu gesetzt!");
+        woolbattle.mapLoader().save(map).thenRun(() -> {
+            player.sendMessage("§aErfolgreich gespeichert!");
+        });
         return 0;
     }
-    //
-    //	@Override
-    //	public boolean execute(CommandSender sender, String[] args) {
-    //		if (sender instanceof Player) {
-    //			if (args.length != 1 && args.length != 2) {
-    //				return false;
-    //			}
-    //			Player p = (Player) sender;
-    //			Team team = WoolBattle.getInstance().getTeamManager().getTeam(TeamType.byDisplayNameKey(getSpaced()));
-    //			if (team == null || team.getType().isDeleted()) {
-    //				p.sendMessage("§cEs konnte kein Team mit dem Namen '"
-    //								+ getSpaced() + "' gefunden werden.");
-    //				p.sendMessage("§aNach dem erstellen eines Teams muss der Server neugestartet werden um Spawns setzen zu können!");
-    //				return true;
-    //			}
-    //			Map map = WoolBattle.getInstance().getMapManager().getMap(args[0]);
-    //			if (map == null) {
-    //				p.sendMessage("§cEs konnte keine Map mit dem Namen '" + args[0]
-    //								+ "'gefunden werden.");
-    //				return true;
-    //			}
-    //			Location loc = p.getLocation();
-    //			if (args.length == 2) {
-    //				String mn = args[1];
-    //				if (mn.equalsIgnoreCase("true")) {
-    //					loc = Locations.getNiceLocation(loc);
-    //					p.teleport(loc);
-    //				}
-    //			}
-    //			p.sendMessage("§7Du hast den Spawn für die Map '" + map.getName()
-    //							+ "' neugesetzt!");
-    //			map.setSpawn(team.getType().getDisplayNameKey(), loc);
-    //			return true;
-    //		}
-    //		sender.sendMessage(Message.NO_PLAYER.getServerMessage());
-    //		return true;
-    //	}
 }

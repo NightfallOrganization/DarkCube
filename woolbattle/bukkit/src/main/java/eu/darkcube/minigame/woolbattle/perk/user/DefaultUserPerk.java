@@ -18,17 +18,19 @@ public class DefaultUserPerk implements UserPerk {
     private final Perk perk;
     private final WBUser owner;
     private final int perkSlot;
+    private final WoolBattleBukkit woolbattle;
     private int slot;
     private int cooldown;
 
-    public DefaultUserPerk(final WBUser owner, final Perk perk, final int id, final int perkSlot) {
-        this(owner, id, perkSlot, perk);
+    public DefaultUserPerk(final WBUser owner, final Perk perk, final int id, final int perkSlot, WoolBattleBukkit woolbattle) {
+        this(owner, id, perkSlot, perk, woolbattle);
     }
 
-    public DefaultUserPerk(final WBUser owner, final int id, final int perkSlot, final Perk perk) {
+    public DefaultUserPerk(final WBUser owner, final int id, final int perkSlot, final Perk perk, WoolBattleBukkit woolbattle) {
         this.id = id;
         this.perkSlot = perkSlot;
         this.perk = perk;
+        this.woolbattle = woolbattle;
         this.slot = owner.perksStorage().perkInvSlot(perk.activationType(), this.perkSlot);
         this.cooldown = 0;
         this.owner = owner;
@@ -47,26 +49,22 @@ public class DefaultUserPerk implements UserPerk {
         return perkSlot;
     }
 
-    @Override
-    public int id() {
+    @Override public int id() {
         return id;
     }
 
-    @Override
-    public Perk perk() {
+    @Override public Perk perk() {
         return perk;
     }
 
-    @Override
-    public PerkItem currentPerkItem() {
+    @Override public PerkItem currentPerkItem() {
         return new PerkItem(this::currentItem, this);
     }
 
-    @Override
-    public void slot(int slot) {
+    @Override public void slot(int slot) {
         int oldValue = this.slot;
         slotSilent(slot);
-        if (WoolBattleBukkit.instance().ingame().enabled()) {
+        if (woolbattle.ingame().enabled()) {
             if (oldValue == 100) {
                 owner().getBukkitEntity().getOpenInventory().setCursor(null);
             } else if (oldValue != -1 /* -1 for no slot set */) {
@@ -76,35 +74,29 @@ public class DefaultUserPerk implements UserPerk {
         }
     }
 
-    @Override
-    public int slot() {
+    @Override public int slot() {
         return slot;
     }
 
-    @Override
-    public int cooldown() {
+    @Override public int cooldown() {
         return this.cooldown;
     }
 
-    @Override
-    public void cooldown(int cooldown) {
+    @Override public void cooldown(int cooldown) {
         this.cooldown = Math.min(cooldown, perk.cooldown().cooldown());
-        if (WoolBattleBukkit.instance().ingame().enabled()) {
-            if (owner.getTeam().canPlay())
-                currentPerkItem().setItem();
+        if (woolbattle.ingame().enabled()) {
+            if (owner.getTeam().canPlay()) currentPerkItem().setItem();
         }
     }
 
-    @Override
-    public void slotSilent(int slot) {
+    @Override public void slotSilent(int slot) {
         this.slot = slot;
         PlayerPerks pp = owner().perksStorage();
         pp.perkInvSlot(perk().activationType(), perkSlot(), slot);
         owner().perksStorage(pp);
     }
 
-    @Override
-    public WBUser owner() {
+    @Override public WBUser owner() {
         return owner;
     }
 }

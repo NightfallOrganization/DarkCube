@@ -20,22 +20,20 @@ public class WoolBattleLink extends Link {
         super();
     }
 
-    @Override
-    protected void link() throws Throwable {
+    @Override protected void link() throws Throwable {
         WoolBattleBukkit woolbattle = WoolBattleBukkit.instance();
         StatsLink.enabled = false;
         CloudNetLink.shouldDisplay = false;
-        CommandAPI.getInstance().unregisterPrefixlessByPrefix("woolbattle");
-        CommandAPI.getInstance().register(new ForceMapCommand(woolbattle));
-        CommandAPI.getInstance().register(new SetLifesCommand(woolbattle));
-        CommandAPI.getInstance().register(new SetTeamCommand(woolbattle));
-        CommandAPI.getInstance().register(new TrollCommand());
-        CommandAPI.getInstance().register(new TimerCommand());
-        CommandAPI.getInstance().register(new ReviveCommand());
+        CommandAPI.instance().unregisterPrefixlessByPrefix("woolbattle");
+        CommandAPI.instance().register(new ForceMapCommand(woolbattle));
+        CommandAPI.instance().register(new SetLifesCommand(woolbattle));
+        CommandAPI.instance().register(new SetTeamCommand(woolbattle));
+        CommandAPI.instance().register(new TrollCommand(woolbattle));
+        CommandAPI.instance().register(new TimerCommand(woolbattle));
+        CommandAPI.instance().register(new ReviveCommand(woolbattle));
         System.out.println("§cDisabled woolbattle stats!");
     }
 
-    @Override
-    protected void unlink() {
+    @Override protected void unlink() {
     }
 }

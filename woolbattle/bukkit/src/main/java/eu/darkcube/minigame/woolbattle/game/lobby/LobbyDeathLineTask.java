@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.game.lobby;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -15,12 +16,12 @@ import org.bukkit.entity.Player;
 public class LobbyDeathLineTask extends Scheduler implements Scheduler.ConfiguredScheduler {
     private final Lobby lobby;
 
-    public LobbyDeathLineTask(Lobby lobby) {
+    public LobbyDeathLineTask(Lobby lobby, WoolBattleBukkit woolbattle) {
+        super(woolbattle);
         this.lobby = lobby;
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
         WBUser.onlineUsers().forEach(u -> {
             if (u.isTrollMode()) return;
             Player p = u.getBukkitEntity();
@@ -30,13 +31,11 @@ public class LobbyDeathLineTask extends Scheduler implements Scheduler.Configure
         });
     }
 
-    @Override
-    public void start() {
+    @Override public void start() {
         runTaskTimer(20);
     }
 
-    @Override
-    public void stop() {
+    @Override public void stop() {
         cancel();
     }
 }

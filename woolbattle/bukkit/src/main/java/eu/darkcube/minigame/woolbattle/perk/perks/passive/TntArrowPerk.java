@@ -22,49 +22,47 @@ import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class TntArrowPerk extends Perk {
-	public static final PerkName TNT_ARROW = new PerkName("TNT_ARROW");
+    public static final PerkName TNT_ARROW = new PerkName("TNT_ARROW");
 
-	public TntArrowPerk() {
-		super(ActivationType.PASSIVE, TNT_ARROW, new Cooldown(Unit.ACTIVATIONS, 7), false, 16,
-				CostType.PER_SHOT, Item.PERK_TNT_ARROW,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_TNT_ARROW_COOLDOWN));
-		addListener(new TntArrowListener());
-	}
+    public TntArrowPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.PASSIVE, TNT_ARROW, new Cooldown(Unit.ACTIVATIONS, 7), false, 16, CostType.PER_SHOT, Item.PERK_TNT_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_TNT_ARROW_COOLDOWN, wb));
+        addListener(new TntArrowListener(woolbattle));
+    }
 
-	private static class TntArrowListener implements Listener {
-		@EventHandler
-		public void handle(BowShootArrowEvent event) {
-			Arrow arrow = event.arrow();
-			for (UserPerk perk : event.user().perks().perks(TNT_ARROW)) {
-				if (perk.cooldown() > 0) {
-					perk.cooldown(perk.cooldown() - 1);
-					continue;
-				}
-				perk.cooldown(perk.perk().cooldown().cooldown());
-				new Scheduler() {
-					@Override
-					public void run() {
-						if (arrow.isDead() || !arrow.isValid()) {
-							this.cancel();
-							if (event.user().removeWool(perk.perk().cost()) != perk.perk().cost()) {
-								perk.currentPerkItem().setItem();
-								return;
-							}
+    private static class TntArrowListener implements Listener {
+        private final WoolBattleBukkit woolbattle;
 
-							TNTPrimed tnt =
-									arrow.getWorld().spawn(arrow.getLocation(), TNTPrimed.class);
+        private TntArrowListener(WoolBattleBukkit woolbattle) {
+            this.woolbattle = woolbattle;
+        }
 
-							tnt.setMetadata("boost",
-									new FixedMetadataValue(WoolBattleBukkit.instance(), 2));
-							tnt.setMetadata("source",
-									new FixedMetadataValue(WoolBattleBukkit.instance(), event.user()));
-							tnt.setIsIncendiary(false);
-							tnt.setFuseTicks(2);
-						}
-					}
-				}.runTaskTimer(1);
-			}
-		}
-	}
+        @EventHandler public void handle(BowShootArrowEvent event) {
+            Arrow arrow = event.arrow();
+            for (UserPerk perk : event.user().perks().perks(TNT_ARROW)) {
+                if (perk.cooldown() > 0) {
+                    perk.cooldown(perk.cooldown() - 1);
+                    continue;
+                }
+                perk.cooldown(perk.perk().cooldown().cooldown());
+                new Scheduler(woolbattle) {
+                    @Override public void run() {
+                        if (arrow.isDead() || !arrow.isValid()) {
+                            this.cancel();
+                            if (event.user().removeWool(perk.perk().cost()) != perk.perk().cost()) {
+                                perk.currentPerkItem().setItem();
+                                return;
+                            }
+
+                            TNTPrimed tnt = arrow.getWorld().spawn(arrow.getLocation(), TNTPrimed.class);
+
+                            tnt.setMetadata("boost", new FixedMetadataValue(woolbattle, 2));
+                            tnt.setMetadata("source", new FixedMetadataValue(woolbattle, event.user()));
+                            tnt.setIsIncendiary(false);
+                            tnt.setFuseTicks(2);
+                        }
+                    }
+                }.runTaskTimer(1);
+            }
+        }
+    }
 }

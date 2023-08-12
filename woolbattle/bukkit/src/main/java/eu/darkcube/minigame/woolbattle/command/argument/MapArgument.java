@@ -48,21 +48,19 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
     }
 
     public static MapArgument mapArgument(WoolBattleBukkit woolbattle) {
-        return mapArgument(woolbattle, woolbattle.gameData().mapSize());
+        return mapArgument(woolbattle, ToStringFunction.function(ctx -> woolbattle.gameData().mapSize()));
     }
 
     public static Map getMap(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
         return context.getArgument(name, MapSpec.class).parse(context);
     }
 
-    @Override
-    public MapSpec parse(StringReader reader) throws CommandSyntaxException {
+    @Override public MapSpec parse(StringReader reader) throws CommandSyntaxException {
         StringReader clone = new StringReader(reader);
         return new MapSpec(reader.readString(), clone);
     }
 
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         List<String> suggestions = new ArrayList<>();
         for (Map map : maps()) {
             suggestions.addAll(Arrays.asList(toStringFunction.toString(context, map)));
@@ -78,8 +76,7 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
 
         static ToStringFunction function(MapSize mapSize) {
             return new ToStringFunction() {
-                @Override
-                public <S> String[] toString(CommandContext<S> context, Map map) {
+                @Override public <S> String[] toString(CommandContext<S> context, Map map) {
                     if (!map.size().equals(mapSize)) return new String[0];
                     return new String[]{map.getName()};
                 }
@@ -88,8 +85,7 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
 
         static ToStringFunction function(Function<CommandContext<?>, MapSize> mapSizeSupplier) {
             return new ToStringFunction() {
-                @Override
-                public <S> String[] toString(CommandContext<S> context, Map map) {
+                @Override public <S> String[] toString(CommandContext<S> context, Map map) {
                     if (!map.size().equals(mapSizeSupplier.apply(context))) return new String[0];
                     return new String[]{map.getName()};
                 }
@@ -102,8 +98,7 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
     public interface FromStringFunction {
         static FromStringFunction of(Supplier<Map[]> maps, ToStringFunction f) {
             return new FromStringFunction() {
-                @Override
-                public <S> Map fromString(CommandContext<S> context, String string) {
+                @Override public <S> Map fromString(CommandContext<S> context, String string) {
                     Map[] a = maps.get();
                     for (Map map : a) {
                         String[] sa = f.toString(context, map);

@@ -12,10 +12,9 @@ import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
 
 public class ExtraWoolPerk extends Perk {
-	public static final PerkName EXTRA_WOOL = new PerkName("EXTRA_WOOL");
+    public static final PerkName EXTRA_WOOL = new PerkName("EXTRA_WOOL");
 
-	public ExtraWoolPerk() {
-		super(ActivationType.PASSIVE, EXTRA_WOOL, 0, 0, Item.PERK_EXTRA_WOOL,
-				(user, perk, id, perkSlot) -> new DefaultUserPerk(user, id, perkSlot, perk));
-	}
+    public ExtraWoolPerk() {
+        super(ActivationType.PASSIVE, EXTRA_WOOL, 0, 0, Item.PERK_EXTRA_WOOL, (user, perk, id, perkSlot, wb) -> new DefaultUserPerk(user, id, perkSlot, perk, wb));
+    }
 }

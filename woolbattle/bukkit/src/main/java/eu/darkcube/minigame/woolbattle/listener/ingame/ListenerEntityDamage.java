@@ -15,14 +15,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
-    @Override
-    @EventHandler
-    public void handle(EntityDamageEvent e) {
+    private final WoolBattleBukkit woolbattle;
+
+    public ListenerEntityDamage(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
             WBUser user = WBUser.getUser(p);
-            Ingame ingame = WoolBattleBukkit.instance().ingame();
-            if (ingame.isGlobalSpawnProtection || user.hasSpawnProtection()) {
+            Ingame ingame = woolbattle.ingame();
+            if (ingame.globalSpawnProtection() || user.hasSpawnProtection()) {
                 e.setCancelled(true);
                 return;
             }
@@ -33,7 +37,7 @@ public class ListenerEntityDamage extends Listener<EntityDamageEvent> {
                     e.setCancelled(true);
                     break;
                 case SUFFOCATION:
-                    if (WoolBattleBukkit.instance().gameData().epGlitch()) {
+                    if (woolbattle.gameData().epGlitch()) {
                         int ticks = user.getTicksAfterLastHit();
                         if (ticks < 200) {
                             ticks += 60;

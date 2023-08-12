@@ -21,21 +21,18 @@ import org.bukkit.util.Vector;
 public class RopePerk extends Perk {
     public static final PerkName ROPE = new PerkName("ROPE");
 
-    public RopePerk() {
-        super(ActivationType.ACTIVE, ROPE, 12, 12, Item.PERK_ROPE,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_ROPE_COOLDOWN));
-        addListener(new ListenerRope(this));
+    public RopePerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, ROPE, 12, 12, Item.PERK_ROPE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ROPE_COOLDOWN, woolbattle));
+        addListener(new ListenerRope(this, woolbattle));
     }
 
     public static class ListenerRope extends BasicPerkListener {
 
-        public ListenerRope(Perk perk) {
-            super(perk);
+        public ListenerRope(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             Player p = perk.owner().getBukkitEntity();
             Vector vec = p.getLocation().getDirection().setY(0).normalize();
             double ax = Math.abs(vec.getX());
@@ -54,14 +51,13 @@ public class RopePerk extends Perk {
                 setBlock(loc, perk.owner());
             }
 
-            p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5)
-                    .setDirection(p.getLocation().getDirection()));
+            p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5).setDirection(p.getLocation().getDirection()));
 
             return true;
         }
 
         private void setBlock(Location block, WBUser user) {
-            WoolBattleBukkit.instance().ingame().place(user, block.getBlock());
+            woolbattle.ingame().place(user, block.getBlock());
         }
     }
 }

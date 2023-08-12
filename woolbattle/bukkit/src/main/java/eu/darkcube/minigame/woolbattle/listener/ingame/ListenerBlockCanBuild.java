@@ -21,9 +21,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockCanBuildEvent;
 
 public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
-    @Override
-    @EventHandler
-    public void handle(BlockCanBuildEvent e) {
+    private final WoolBattleBukkit woolbattle;
+
+    public ListenerBlockCanBuild(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(BlockCanBuildEvent e) {
         if (e.getBlock().getType() != Material.AIR) {
             e.setBuildable(false);
             return;
@@ -31,9 +35,9 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
         if (e.getMaterial() == Material.WOOL) {
             e.setBuildable(true);
             Block block = CraftMagicNumbers.getBlock(e.getMaterial());
-            AxisAlignedBB box = block.a(((CraftWorld) e.getBlock().getWorld()).getHandle(),
-                    new BlockPosition(e.getBlock().getX(), e.getBlock().getY(),
-                            e.getBlock().getZ()), block.getBlockData());
+            AxisAlignedBB box = block.a(((CraftWorld) e.getBlock().getWorld()).getHandle(), new BlockPosition(e.getBlock().getX(), e
+                    .getBlock()
+                    .getY(), e.getBlock().getZ()), block.getBlockData());
             for (Entity ent : e.getBlock().getWorld().getEntities()) {
                 AxisAlignedBB entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
                 if (box.b(entityBox)) {
@@ -49,7 +53,7 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
     private boolean preventsBlockPlacement(Entity entity) {
         if (entity instanceof Player) {
             Player p = (Player) entity;
-            return !WoolBattleBukkit.instance().teamManager().getSpectator().contains(p.getUniqueId());
+            return !woolbattle.teamManager().getSpectator().contains(p.getUniqueId());
         }
         return false;
     }

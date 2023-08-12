@@ -28,20 +28,20 @@ import java.util.ArrayList;
 public class SlimePlatformPerk extends Perk {
     public static final PerkName SLIME_PLATFORM = new PerkName("SLIME_PLATFORM");
 
-    public SlimePlatformPerk() {
-        super(ActivationType.ACTIVE, SLIME_PLATFORM, 20, 18, Item.PERK_SLIME_PLATFORM,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_SLIME_PLATFORM_COOLDOWN));
-        addListener(new ListenerSlimePlatform(this));
+    public SlimePlatformPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, SLIME_PLATFORM, 20, 18, Item.PERK_SLIME_PLATFORM, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_SLIME_PLATFORM_COOLDOWN, woolbattle));
+        addListener(new ListenerSlimePlatform(this, woolbattle));
     }
 
     public static class ListenerSlimePlatform extends BasicPerkListener {
-        public ListenerSlimePlatform(Perk perk) {
-            super(perk);
+        private final WoolBattleBukkit woolbattle;
+
+        public ListenerSlimePlatform(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
 
             Player p = perk.owner().getBukkitEntity();
 
@@ -55,41 +55,32 @@ public class SlimePlatformPerk extends Perk {
             return true;
         }
 
-        @SuppressWarnings("deprecation")
-        private void setBlock(Location block, ArrayList<Block> l) {
+        @SuppressWarnings("deprecation") private void setBlock(Location block, ArrayList<Block> l) {
             if (block.getBlock().getType() == Material.AIR) {
-                WoolBattleBukkit.instance().ingame().place(block.getBlock(), b -> {
+                woolbattle.ingame().place(block.getBlock(), b -> {
                     BlockState state = b.getState();
                     state.setType(Material.STAINED_CLAY);
                     state.setData(Material.STAINED_CLAY.getNewData((byte) 13));
                     state.update(true);
                     l.add(b);
-                    WoolBattleBukkit.instance().ingame().setMetaData(b, "slime", l);
+                    woolbattle.ingame().setMetaData(b, "slime", l);
                 });
             }
         }
 
-        private boolean setBlock2(Location block) {
-            if (WoolBattleBukkit.instance().ingame().getMetaData(block.getBlock(), "slime", null) != null) {
-                WoolBattleBukkit.instance().ingame().destroy(block.getBlock());
-                return true;
+        private void setBlock2(Location block) {
+            if (woolbattle.ingame().getMetaData(block.getBlock(), "slime", null) != null) {
+                woolbattle.ingame().destroy(block.getBlock());
             }
-            return false;
         }
 
-        @EventHandler
-        public void moveEvent(PlayerMoveEvent e) {
+        @EventHandler public void moveEvent(PlayerMoveEvent e) {
 
             WBUser user = WBUser.getUser(e.getPlayer());
-            if (!user.getTeam().canPlay())
-                return;
+            if (!user.getTeam().canPlay()) return;
 
-            ArrayList<Block> mv =
-                    WoolBattleBukkit.instance().ingame().getMetaData(e.getTo().clone().subtract(0, 1, 0).getBlock(), "slime",
-                            null);
-            ArrayList<Block> mv2 =
-                    WoolBattleBukkit.instance().ingame().getMetaData(e.getTo().clone().subtract(0, 2, 0).getBlock(), "slime",
-                            null);
+            ArrayList<Block> mv = woolbattle.ingame().getMetaData(e.getTo().clone().subtract(0, 1, 0).getBlock(), "slime", null);
+            ArrayList<Block> mv2 = woolbattle.ingame().getMetaData(e.getTo().clone().subtract(0, 2, 0).getBlock(), "slime", null);
 
             if (mv != null || mv2 != null) {
 
@@ -98,8 +89,7 @@ public class SlimePlatformPerk extends Perk {
                     setBlock2(b.getLocation());
                 }
 
-                e.getPlayer().setVelocity(new Vector(0, 3, 0).add(
-                        e.getPlayer().getVelocity().multiply(new Vector(0.1, -0.4, 0.1))));
+                e.getPlayer().setVelocity(new Vector(0, 3, 0).add(e.getPlayer().getVelocity().multiply(new Vector(0.1, -0.4, 0.1))));
             }
 
         }

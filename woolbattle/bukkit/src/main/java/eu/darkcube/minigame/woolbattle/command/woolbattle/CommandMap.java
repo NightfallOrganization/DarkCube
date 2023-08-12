@@ -19,32 +19,13 @@ public class CommandMap extends WBCommandExecutor {
                 .argument("mapSize", MapSizeArgument.mapSize(woolbattle))
                 .then(Commands
                         .argument("map", MapArgument.mapArgument(woolbattle, MapArgument.ToStringFunction.function(ctx -> MapSizeArgument.mapSize(ctx, "mapSize"))))
-                        .then(new CommandDisable().builder())
-                        .then(new CommandEnable().builder())
+                        .then(new CommandDisable(woolbattle).builder())
+                        .then(new CommandEnable(woolbattle).builder())
                         .then(new CommandInfo().builder())
                         .then(new CommandSetDeathHeight().builder())
                         .then(new CommandSetIcon().builder())
                         .then(new CommandLoad(woolbattle).builder())
                         .then(new CommandDelete(woolbattle).builder()))));
     }
-    //	public CommandMap() {
-    //		super(WoolBattle.getInstance(), "map", new SubCommand[] {
-    //				new CommandSetIcon(), new CommandEnable(), new CommandDisable(), new CommandInfo(),
-    //				new CommandSetDeathHeight()
-    //		}, "Map HauptCommand", CommandArgument.MAP);
-    //	}
-    //
-    //	@Override
-    //	public boolean execute(CommandSender paramCommandSender, String[] paramArrayOfString) {
-    //		return false;
-    //	}
-    //
-    //	@Override
-    //	public List<String> onTabComplete(String[] args) {
-    //		if (args.length == 1) {
-    //			return Arrays.toSortedStringList(WoolBattle.getInstance().getMapManager().getMaps(), args[0]);
-    //		}
-    //		return super.onTabComplete(args);
-    //	}
 
 }

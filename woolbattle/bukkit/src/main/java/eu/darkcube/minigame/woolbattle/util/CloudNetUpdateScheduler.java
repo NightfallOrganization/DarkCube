@@ -7,11 +7,15 @@
 
 package eu.darkcube.minigame.woolbattle.util;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 
 public class CloudNetUpdateScheduler extends Scheduler {
-    @Override
-    public void run() {
+    public CloudNetUpdateScheduler(WoolBattleBukkit woolbattle) {
+        super(woolbattle);
+    }
+
+    @Override public void run() {
         CloudNetLink.update();
     }
 }

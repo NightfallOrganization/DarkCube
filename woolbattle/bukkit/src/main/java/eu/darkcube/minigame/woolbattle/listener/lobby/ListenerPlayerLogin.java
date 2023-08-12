@@ -18,6 +18,12 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
+    private final WoolBattleBukkit woolbattle;
+
+    public ListenerPlayerLogin(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
     public static PermissionInfo getPermissionInfo(Player p) {
         PermissionInfo pInfo = new PermissionInfo();
         for (PermissionAttachmentInfo info : p.getEffectivePermissions()) {
@@ -38,13 +44,11 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
         return pInfo;
     }
 
-    @Override
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void handle(PlayerLoginEvent e) {
+    @Override @EventHandler(priority = EventPriority.HIGHEST) public void handle(PlayerLoginEvent e) {
         Player p = e.getPlayer();
         PermissionInfo info = getPermissionInfo(p);
 
-        boolean full = WoolBattleBukkit.instance().maxPlayers() <= WBUser.onlineUsers().size();
+        boolean full = woolbattle.maxPlayers() <= WBUser.onlineUsers().size();
         boolean shouldKick = info.hasPermission && full;
 
         Player weakestLink = null;
@@ -87,14 +91,11 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
         public boolean hasPermission = false;
         public int priority = 0;
 
-        @Override
-        public String toString() {
-            return "PermissionInfo [hasPermission=" + hasPermission + ", priority=" + priority
-                    + "]";
+        @Override public String toString() {
+            return "PermissionInfo [hasPermission=" + hasPermission + ", priority=" + priority + "]";
         }
 
-        @Override
-        public int compareTo(PermissionInfo o) {
+        @Override public int compareTo(PermissionInfo o) {
             return hasPermission ? Integer.valueOf(priority).compareTo(o.priority) : -1;
         }
     }

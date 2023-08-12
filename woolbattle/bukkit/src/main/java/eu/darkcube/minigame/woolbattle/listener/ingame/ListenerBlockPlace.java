@@ -19,9 +19,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
-    @Override
-    @EventHandler
-    public void handle(BlockPlaceEvent e) {
+    private final WoolBattleBukkit woolbattle;
+
+    public ListenerBlockPlace(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(BlockPlaceEvent e) {
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         if (!user.isTrollMode()) {
@@ -43,7 +47,7 @@ public class ListenerBlockPlace extends Listener<BlockPlaceEvent> {
             }
         }
         Block block = e.getBlock();
-        Ingame ingame = WoolBattleBukkit.instance().ingame();
+        Ingame ingame = woolbattle.ingame();
         ingame.placedBlocks.add(block);
     }
 }

@@ -11,30 +11,21 @@ import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
 import eu.darkcube.minigame.woolbattle.map.*;
-import eu.darkcube.minigame.woolbattle.mysql.MySQL;
 import eu.darkcube.minigame.woolbattle.perk.PerkRegistry;
 import eu.darkcube.minigame.woolbattle.team.DefaultTeamManager;
-import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamManager;
 import eu.darkcube.minigame.woolbattle.translation.LanguageHelper;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.user.WBUserModifier;
-import eu.darkcube.minigame.woolbattle.util.*;
-import eu.darkcube.minigame.woolbattle.util.DependencyManager.Dependency;
+import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
+import eu.darkcube.minigame.woolbattle.util.CloudNetUpdateScheduler;
+import eu.darkcube.minigame.woolbattle.util.SchedulerTicker;
 import eu.darkcube.minigame.woolbattle.util.convertingrule.ConvertingRuleHelper;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
-import eu.darkcube.system.loader.PluginClassLoader;
-import eu.darkcube.system.loader.ReflectionClassLoader;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.data.UserModifier;
 import org.bukkit.Bukkit;
@@ -52,8 +43,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
     @Deprecated
     private static WoolBattleBukkit instance;
     private final Collection<MapSize> knownMapSizes = new HashSet<>();
-    private final PluginClassLoader pluginClassLoader;
-    private final WoolBattleListeners listeners = new WoolBattleListeners();
+    private final WoolBattleListeners listeners = new WoolBattleListeners(this);
     private final WoolBattleCommands commands = new WoolBattleCommands(this);
     public String atall;
     public String atteam;
@@ -68,35 +58,12 @@ public class WoolBattleBukkit extends DarkCubePlugin {
     private GameData gameData;
     private BukkitTask tickTask;
     private MapLoader mapLoader;
-    private MySQL mysql;
-//    private int maxPlayers;
 
     public WoolBattleBukkit() {
         super("woolbattle");
         Config.load(this);
-        this.pluginClassLoader = new ReflectionClassLoader(this);
+        CloudNetLink.init(this);
         WoolBattleBukkit.instance = this;
-    }
-
-    @Deprecated @ApiStatus.ScheduledForRemoval public static void initScoreboard(Scoreboard sb, WBUser owner) {
-        // Spectator is not included in "Team"
-        Collection<Team> teams = new HashSet<>(WoolBattleBukkit.instance().teamManager().getTeams());
-        teams.add(WoolBattleBukkit.instance().teamManager().getSpectator());
-        for (Team t : teams) {
-            ScoreboardTeam team = sb.createTeam(t.getType().getScoreboardTag());
-            String s = LegacyComponentSerializer.legacySection().serialize(Component.text("", t.getPrefixStyle()));
-
-            team.setPrefix(s);
-        }
-        for (ScoreboardObjective obj : ScoreboardObjective.values()) {
-            Objective o = sb.createObjective(obj.getKey(), "dummy");
-            o.setDisplayName(Message.getMessage(obj.getMessageKey(), owner.getLanguage()));
-        }
-        for (ObjectiveTeam team : ObjectiveTeam.values()) {
-            ScoreboardTeam t = sb.createTeam(team.getKey());
-            t.setPrefix(Message.getMessage(team.getMessagePrefix(), owner.getLanguage()));
-            t.setSuffix(Message.getMessage(team.getMessageSuffix(), owner.getLanguage()));
-        }
     }
 
     @Deprecated public static WoolBattleBukkit instance() {
@@ -108,7 +75,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
             if (l instanceof RegisterNotifyListener) {
                 ((RegisterNotifyListener) l).registered();
             }
-            WoolBattleBukkit.instance().getServer().getPluginManager().registerEvents(l, WoolBattleBukkit.instance());
+            instance.getServer().getPluginManager().registerEvents(l, instance);
         }
     }
 
@@ -123,8 +90,6 @@ public class WoolBattleBukkit extends DarkCubePlugin {
 
     @Override public void onLoad() {
 
-        new DependencyManager(this).loadDependencies(Dependency.values());
-
         LanguageHelper.load();
 
         ConvertingRuleHelper.load();
@@ -137,11 +102,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         this.createConfig("mysql");
 
         this.schedulers = new CopyOnWriteArrayList<>();
-        this.perkRegistry = new PerkRegistry();
-
-        // Load and connect mysql
-        this.mysql = new MySQL();
-        this.mysql.connect();
+        this.perkRegistry = new PerkRegistry(this);
 
         // Load Name and Tab prefix
         this.atall = this.getConfig("config").getString("at_all");
@@ -153,13 +114,13 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         // Init all GameStates
         this.lobby = new Lobby(this);
         this.ingame = new Ingame(this);
-        this.endgame = new Endgame();
+        this.endgame = new Endgame(this);
 
         VoidWorldPluginLoader.load();
     }
 
     @Override public void onEnable() {
-        mapLoader = new CloudNetMapLoader();
+        mapLoader = new CloudNetMapLoader(this);
         mapManager = new DefaultMapManager();
 
         this.userModifier = new WBUserModifier(this);
@@ -173,7 +134,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
 
         commands.enableAll();
 
-        new CloudNetUpdateScheduler().runTaskTimer(50);
+        new CloudNetUpdateScheduler(this).runTaskTimer(50);
     }
 
     @Override public void onDisable() {
@@ -181,7 +142,6 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         listeners.unregisterAll();
         UserAPI.getInstance().removeModifier(userModifier);
         this.tickTask.cancel();
-        this.mysql.disconnect();
     }
 
     public GameData gameData() {
@@ -194,10 +154,6 @@ public class WoolBattleBukkit extends DarkCubePlugin {
 
     public int maxPlayers() {
         return 20;
-    }
-
-    public PluginClassLoader pluginClassLoader() {
-        return this.pluginClassLoader;
     }
 
     public Lobby lobby() {

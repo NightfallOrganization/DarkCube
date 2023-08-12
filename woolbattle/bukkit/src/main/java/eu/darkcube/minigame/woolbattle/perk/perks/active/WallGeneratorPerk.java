@@ -23,31 +23,27 @@ import org.bukkit.util.Vector;
 public class WallGeneratorPerk extends Perk {
     public static final PerkName WALL_GENERATOR = new PerkName("WALL_GENERATOR");
 
-    public WallGeneratorPerk() {
-        super(ActivationType.ACTIVE, WALL_GENERATOR, 9, 1, CostType.PER_BLOCK,
-                Item.PERK_WALL_GENERATOR,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_WALL_GENERATOR_COOLDOWN));
-        addListener(new ListenerWallGenerator(this));
+    public WallGeneratorPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, WALL_GENERATOR, 9, 1, CostType.PER_BLOCK, Item.PERK_WALL_GENERATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_WALL_GENERATOR_COOLDOWN, woolbattle));
+        addListener(new ListenerWallGenerator(this, woolbattle));
     }
 
     public static class ListenerWallGenerator extends BasicPerkListener {
+        private static final int[][] ids = {{-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}};
+        private final WoolBattleBukkit woolbattle;
 
-        private static final int[][] ids =
-                {{-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}, {-2, -1, 0, 1, 2}};
-
-        public ListenerWallGenerator(Perk perk) {
-            super(perk);
+        public ListenerWallGenerator(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             new WallBlockPlacerScheduler(perk).runTaskTimer(1);
             return true;
         }
 
         private void deny(WBUser user, UserPerk perk) {
-            WoolBattleBukkit.instance().ingame().playSoundNotEnoughWool(user);
+            woolbattle.ingame().playSoundNotEnoughWool(user);
             setItem(perk);
         }
 
@@ -64,13 +60,13 @@ public class WallGeneratorPerk extends Perk {
             private int id1 = 0;
 
             public WallBlockPlacerScheduler(UserPerk perk) {
+                super(woolbattle);
                 this.perk = perk;
                 center = calculateCenter();
                 normal = calculateNormal();
             }
 
-            @Override
-            public void run() {
+            @Override public void run() {
                 WBUser user = perk.owner();
                 Player p = user.getBukkitEntity();
                 if (p.isSneaking()) {
@@ -116,7 +112,7 @@ public class WallGeneratorPerk extends Perk {
             }
 
             private void setBlock(Location loc, WBUser user) {
-                if (WoolBattleBukkit.instance().ingame().place(user, loc.getBlock())) {
+                if (woolbattle.ingame().place(user, loc.getBlock())) {
                     payForThePerk(perk);
                 }
             }

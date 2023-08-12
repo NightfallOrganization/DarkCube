@@ -73,7 +73,7 @@ public class TeamType implements Comparable<TeamType> {
         return invisibleTag;
     }
 
-    public String getIngameScoreboardTag() {
+    public String getLivesScoreboardTag() {
         return "ig" + getWeight();
     }
 

@@ -26,20 +26,17 @@ import org.bukkit.potion.PotionEffectType;
 public class LineBuilderPerk extends Perk {
     public static final PerkName LINE_BUILDER = new PerkName("LINE_BUILDER");
 
-    public LineBuilderPerk() {
-        super(ActivationType.ACTIVE, LINE_BUILDER, new Cooldown(Unit.TICKS, 10 * 20), true, 2,
-                CostType.PER_BLOCK, Item.PERK_LINE_BUILDER,
-                (user, perk, id, perkSlot) -> new LineBuilderUserPerk(user, id, perkSlot, perk));
-        addListener(new ListenerLineBuilder(this));
+    public LineBuilderPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, LINE_BUILDER, new Cooldown(Unit.TICKS, 10 * 20), true, 2, CostType.PER_BLOCK, Item.PERK_LINE_BUILDER, (user, perk, id, perkSlot, wb) -> new LineBuilderUserPerk(user, id, perkSlot, perk, woolbattle));
+        addListener(new ListenerLineBuilder(this, woolbattle));
     }
 
     public static class ListenerLineBuilder extends BasicPerkListener {
 
-        private static final Key DATA_SCHEDULER =
-                new Key(WoolBattleBukkit.instance(), "linebuilderScheduler");
+        private final Key DATA_SCHEDULER = new Key(woolbattle, "linebuilderScheduler");
 
-        public ListenerLineBuilder(Perk perk) {
-            super(perk);
+        public ListenerLineBuilder(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
         }
 
         public static Location getNiceLocation(Location loc) {
@@ -57,8 +54,7 @@ public class LineBuilderPerk extends Perk {
             float half = interval / 2f;
             y %= 360F;
 
-            if (y < 0)
-                y = 360F + y;
+            if (y < 0) y = 360F + y;
 
             for (float i = 360; i >= 0; i -= interval) {
                 float bound1 = i - half;
@@ -71,8 +67,7 @@ public class LineBuilderPerk extends Perk {
             return y;
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             WBUser user = perk.owner();
             if (!user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
                 user.user().getMetaDataStorage().set(DATA_SCHEDULER, new TheScheduler(perk));
@@ -82,13 +77,12 @@ public class LineBuilderPerk extends Perk {
             return false;
         }
 
-        @Override
-        protected boolean activateLeft(UserPerk perk) {
+        @Override protected boolean activateLeft(UserPerk perk) {
             perk.owner().user().getMetaDataStorage().remove(DATA_SCHEDULER);
             return false;
         }
 
-        private static class TheScheduler extends Scheduler {
+        private class TheScheduler extends Scheduler {
             private int lastLine = 0;
             private Line line = null;
             private int cooldownTicks = 0;
@@ -97,13 +91,13 @@ public class LineBuilderPerk extends Perk {
             private int tick = 0;
 
             public TheScheduler(UserPerk perk) {
+                super(woolbattle);
                 this.perk = perk;
                 this.user = perk.owner();
                 runTaskTimer(1);
             }
 
-            @Override
-            public void run() {
+            @Override public void run() {
                 tick++;
                 if (cooldownTicks > 1) {
                     cooldownTicks--;
@@ -126,16 +120,14 @@ public class LineBuilderPerk extends Perk {
                 }
                 if (tick % 3 == 1) {
                     payForThePerk(perk);
-                    cooldownTicks += TimeUnit.SECOND.toUnit(TimeUnit.TICKS);
+                    cooldownTicks += (int) TimeUnit.SECOND.toUnit(TimeUnit.TICKS);
                     if (line == null) {
-                        line = new Line(getNiceLocation(
-                                user.getBukkitEntity().getLocation()).getDirection());
+                        line = new Line(getNiceLocation(user.getBukkitEntity().getLocation()).getDirection());
                     }
                     Location next = line.getNextBlock(user.getBukkitEntity().getLocation());
                     line.addBlock(next);
-                    WoolBattleBukkit.instance().ingame().place(user, next.getBlock());
-                    user.getBukkitEntity().addPotionEffect(
-                            new PotionEffect(PotionEffectType.SLOW, 20, 10, false, false), true);
+                    woolbattle.ingame().place(user, next.getBlock());
+                    user.getBukkitEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10, false, false), true);
                 }
             }
         }
@@ -145,17 +137,15 @@ public class LineBuilderPerk extends Perk {
 
         private boolean useCooldownItem = false;
 
-        public LineBuilderUserPerk(WBUser owner, int id, int perkSlot, Perk perk) {
-            super(owner, id, perkSlot, perk, Item.PERK_LINE_BUILDER_COOLDOWN);
+        public LineBuilderUserPerk(WBUser owner, int id, int perkSlot, Perk perk, WoolBattleBukkit woolbattle) {
+            super(owner, id, perkSlot, perk, Item.PERK_LINE_BUILDER_COOLDOWN, woolbattle);
         }
 
-        @Override
-        public boolean useCooldownItem() {
+        @Override public boolean useCooldownItem() {
             return useCooldownItem;
         }
 
-        @Override
-        public void cooldown(int cooldown) {
+        @Override public void cooldown(int cooldown) {
             super.cooldown(cooldown);
             if (cooldown() >= perk().cooldown().cooldown()) {
                 useCooldownItem = true;

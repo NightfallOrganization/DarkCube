@@ -22,27 +22,25 @@ public class DefaultMapManager implements MapManager {
     private final java.util.Map<MapSize, java.util.Map<String, Map>> maps = new HashMap<>();
 
     public DefaultMapManager() {
-        for (JsonDocument document : database.documents()) {
+        for (java.util.Map.Entry<String, JsonDocument> entry : database.entries().entrySet()) {
+            JsonDocument document = entry.getValue();
             String mapJson = document.toJson();
             Map map = GsonSerializer.gson.fromJson(mapJson, Map.class);
             maps(map.size()).put(map.getName(), map);
         }
     }
 
-    @Override
-    public Map getMap(String name, MapSize mapSize) {
+    @Override public Map getMap(String name, MapSize mapSize) {
         return maps(mapSize).get(name);
     }
 
-    @Override
-    public Map createMap(String name, MapSize mapSize) {
+    @Override public Map createMap(String name, MapSize mapSize) {
         Map map = getMap(name, mapSize);
-        if (map != null)
-            return map;
+        if (map != null) return map;
         DefaultMap defaultMap = new DefaultMap(name, mapSize);
         map = defaultMap;
         maps(map.size()).put(name, map);
-        database.insert(name, defaultMap.toDocument());
+        database.insert(databaseKey(map), defaultMap.toDocument());
         return map;
     }
 
@@ -50,8 +48,7 @@ public class DefaultMapManager implements MapManager {
         return maps.computeIfAbsent(size, s -> new HashMap<>());
     }
 
-    @Override
-    public Collection<? extends Map> getMaps() {
+    @Override public Collection<? extends Map> getMaps() {
         Collection<Map> m = new ArrayList<>();
         for (java.util.Map<String, Map> value : maps.values()) {
             m.addAll(value.values());
@@ -59,14 +56,20 @@ public class DefaultMapManager implements MapManager {
         return Collections.unmodifiableCollection(m);
     }
 
-    @Override
-    public Collection<? extends Map> getMaps(MapSize mapSize) {
+    @Override public Collection<? extends Map> getMaps(MapSize mapSize) {
         return Collections.unmodifiableCollection(maps(mapSize).values());
     }
 
-    @Override
-    public void deleteMap(Map map) {
+    @Override public void deleteMap(Map map) {
         maps(map.size()).remove(map.getName());
-        database.delete(map.getName());
+        database.delete(databaseKey(map));
+    }
+
+    private String databaseKey(Map map) {
+        return map.getName() + "-" + map.size();
+    }
+
+    void save(DefaultMap map) {
+        database.update(databaseKey(map), map.toDocument());
     }
 }

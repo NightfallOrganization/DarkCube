@@ -61,7 +61,7 @@ public class PerksTypeInventory extends WoolBattlePagedInventory {
 
     @Override
     protected void fillItems(Map<Integer, ItemStack> items) {
-        Perk[] perks = WoolBattleBukkit.instance().perkRegistry().perks(type);
+        Perk[] perks = woolbattle.perkRegistry().perks(type);
         List<PerkName> userPerks = Arrays.asList(user.perksStorage().perks(type));
         for (int i = 0; i < perks.length; i++) {
             ItemBuilder b = ItemBuilder.item(perks[i].defaultItem().getItem(user));

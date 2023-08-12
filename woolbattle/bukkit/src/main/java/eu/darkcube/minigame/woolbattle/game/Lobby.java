@@ -25,7 +25,6 @@ import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
@@ -57,7 +56,7 @@ public class Lobby extends GamePhase {
 
     public Lobby(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
-        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle), new ListenerInteractMenuBack());
+        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(woolbattle), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle), new ListenerInteractMenuBack());
 
         this.VOTES_MAP = new HashMap<>();
         this.VOTES_EP_GLITCH = new HashMap<>();
@@ -68,11 +67,11 @@ public class Lobby extends GamePhase {
 
         this.timer.setSilent(this.MAX_TIMER_SECONDS * 20);
 
-        addScheduler(new LobbyDeathLineTask(this), new LobbyTimerTask(this, overrideTimer));
+        addScheduler(new LobbyDeathLineTask(this, woolbattle), new LobbyTimerTask(this, overrideTimer, woolbattle));
     }
 
-    @Override
-    public void onEnable() {
+    @Override public void onEnable() {
+        unloadGame();
         CloudNetLink.update();
         woolbattle.gameData(new GameData(woolbattle));
 
@@ -90,32 +89,32 @@ public class Lobby extends GamePhase {
         this.maxPlayerCount = -1;
     }
 
-    @Override
-    public void onDisable() {
+    @Override public void onDisable() {
     }
 
     public void unloadGame() {
+        if (woolbattle.gameData() == null) return;
         MapSize mapSize = woolbattle.gameData().mapSize();
         if (mapSize == null) return;
         for (Team team : new ArrayList<>(woolbattle.teamManager().getTeams())) {
             woolbattle.teamManager().unloadTeam(team);
         }
+        woolbattle.gameData().mapSize(null);
     }
 
     public void loadGame(MapSize mapSize) {
         unloadGame();
         woolbattle.gameData().mapSize(mapSize);
         int i = 0;
-        for (Team team : woolbattle.teamManager().getTeams()) {
-            if (team.getType().isEnabled())
-                i += team.getType().getMaxPlayers();
+        for (TeamType teamType : woolbattle.teamManager().teamTypes(mapSize)) {
+            Team team = woolbattle.teamManager().loadTeam(teamType);
+            if (team.getType().isEnabled()) i += team.getType().getMaxPlayers();
         }
+        if (i == 0) i = -1;
         maxPlayerCount = i;
-        for (TeamType type : woolbattle.teamManager().teamTypes(mapSize)) {
-            Team team = woolbattle.teamManager().loadTeam(type);
-            ICommandExecutor console = ICommandExecutor.create(Bukkit.getConsoleSender());
-            console.sendMessage(Component.text("loaded team ").append(team.getName(console)));
-        }
+        recalculateMap();
+        recalculateEpGlitch();
+        WBUser.onlineUsers().forEach(this::setupScoreboard);
     }
 
     public void setupScoreboard(WBUser user) {
@@ -130,6 +129,8 @@ public class Lobby extends GamePhase {
         for (WBUser u : WBUser.onlineUsers()) sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
 
         setupLobbyObjective(sb, user);
+
+        updateTimer(user);
     }
 
     private void setupLobbyObjective(Scoreboard sb, WBUser user) {
@@ -200,7 +201,16 @@ public class Lobby extends GamePhase {
     }
 
     public void recalculateMap() {
-        eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values().stream().filter(m -> m.vote.isEnabled()).collect(Collectors.toList()), woolbattle.mapManager().getMaps().stream().filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled).collect(Collectors.toSet()), woolbattle.gameData().map());
+        eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP
+                .values()
+                .stream()
+                .filter(m -> m.vote.isEnabled())
+                .collect(Collectors.toList()), woolbattle
+                .mapManager()
+                .getMaps()
+                .stream()
+                .filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
+                .collect(Collectors.toSet()), woolbattle.gameData().map());
 
         if (map != null && !map.isEnabled()) map = null;
 
@@ -225,7 +235,9 @@ public class Lobby extends GamePhase {
     }
 
     public Location getSpawn() {
-        if (this.spawn == null) this.spawn = woolbattle.persistentDataStorage().get(Config.SPAWN, PersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
+        if (this.spawn == null) this.spawn = woolbattle
+                .persistentDataStorage()
+                .get(Config.SPAWN, PersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
         return this.spawn.clone();
     }
 
@@ -252,5 +264,9 @@ public class Lobby extends GamePhase {
 
     public int maxTimerSeconds() {
         return MAX_TIMER_SECONDS;
+    }
+
+    public void updateTimer(WBUser user) {
+        new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey()).setSuffix(Component.text(Integer.toString(timer.getObject() / 20)));
     }
 }

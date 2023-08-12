@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class CloudNetMapIngameData implements MapIngameData {
     private final Map<String, UnloadedLocation> spawns = new HashMap<>();
+    @GsonSerializer.DontSerialize
     private String worldName;
     @GsonSerializer.DontSerialize
     private World world;
@@ -28,7 +29,7 @@ public class CloudNetMapIngameData implements MapIngameData {
         this.worldName = worldName;
     }
 
-    public World world() {
+    @Override public World world() {
         return world;
     }
 
@@ -53,5 +54,9 @@ public class CloudNetMapIngameData implements MapIngameData {
         UnloadedLocation loc = spawns.get(name);
         if (loc == null) return null;
         return loc.loaded();
+    }
+
+    @Override public String toString() {
+        return "CloudNetMapIngameData{" + "spawns=" + spawns + ", worldName='" + worldName + '\'' + '}';
     }
 }

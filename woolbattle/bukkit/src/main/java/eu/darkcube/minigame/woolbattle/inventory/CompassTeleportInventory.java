@@ -25,20 +25,18 @@ import java.util.UUID;
 
 public class CompassTeleportInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_compass_teleport");
-    private static final Key USER = new Key(WoolBattleBukkit.instance(), "tp_user_id");
+    private final Key USER;
 
     public CompassTeleportInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_COMPASS.getMessage(user), user);
+        USER = new Key(woolbattle, "tp_user_id");
     }
 
-    @Override
-    protected void inventoryClick(IInventoryClickEvent event) {
+    @Override protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
+        if (event.item() == null) return;
         String uid = ItemManager.getId(event.item(), USER);
-        if (uid == null)
-            return;
+        if (uid == null) return;
         UUID uuid = UUID.fromString(uid);
         WBUser user = WBUser.getUser(Bukkit.getPlayer(uuid));
         if (user == null) {
@@ -49,15 +47,16 @@ public class CompassTeleportInventory extends WoolBattlePagedInventory {
         this.user.getBukkitEntity().closeInventory();
     }
 
-    @Override
-    protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override protected void fillItems(Map<Integer, ItemStack> items) {
         int i = 0;
         for (WBUser user : WBUser.onlineUsers()) {
             if (user.getTeam().isSpectator()) {
                 continue;
             }
-            ItemBuilder b = ItemBuilder.item(Material.SKULL_ITEM)
-                    .meta(new SkullBuilderMeta(new UserProfile(null, user.getUniqueId()))).damage(3)
+            ItemBuilder b = ItemBuilder
+                    .item(Material.SKULL_ITEM)
+                    .meta(new SkullBuilderMeta(new UserProfile(null, user.getUniqueId())))
+                    .damage(3)
                     .displayname(user.getTeamPlayerName());
             ItemManager.setId(b, USER, user.getUniqueId().toString());
             items.put(i++, b.build());

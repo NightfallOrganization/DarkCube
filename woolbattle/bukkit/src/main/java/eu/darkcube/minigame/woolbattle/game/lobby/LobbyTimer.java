@@ -10,11 +10,8 @@ package eu.darkcube.minigame.woolbattle.game.lobby;
 import com.google.common.util.concurrent.AtomicDouble;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableObject;
 import eu.darkcube.minigame.woolbattle.util.observable.SimpleObservableInteger;
-import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
 public class LobbyTimer extends SimpleObservableInteger {
@@ -24,9 +21,7 @@ public class LobbyTimer extends SimpleObservableInteger {
         this.lobby = lobby;
     }
 
-    @Override
-    public void onChange(ObservableObject<Integer> instance, Integer oldValue,
-                         Integer newValue) {
+    @Override public void onChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
         if (lobby.enabled()) {
             if (newValue <= 1) {
                 Bukkit.getOnlinePlayers().forEach(p -> {
@@ -38,19 +33,15 @@ public class LobbyTimer extends SimpleObservableInteger {
                 return;
             }
             AtomicDouble exp = new AtomicDouble((float) newValue / (lobby.maxTimerSeconds() * 20F));
-            if (exp.get() >= 1) exp.set(0.9999);
+            if (exp.get() >= 0.9999) exp.set(0.9999);
             Bukkit.getOnlinePlayers().forEach(p -> {
                 p.setLevel(newValue / 20);
                 p.setExp((float) exp.get());
             });
-            WBUser.onlineUsers().forEach(
-                    user -> new Scoreboard(user).getTeam(ObjectiveTeam.TIME.getKey())
-                            .setSuffix(Component.text(Integer.toString(newValue / 20))));
+            WBUser.onlineUsers().forEach(lobby::updateTimer);
         }
     }
 
-    @Override
-    public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue,
-                               Integer newValue) {
+    @Override public void onSilentChange(ObservableObject<Integer> instance, Integer oldValue, Integer newValue) {
     }
 }

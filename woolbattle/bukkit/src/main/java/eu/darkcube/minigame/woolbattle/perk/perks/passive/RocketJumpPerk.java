@@ -17,26 +17,24 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.util.Vector;
 
 public class RocketJumpPerk extends Perk {
-	public static final PerkName ROCKET_JUMP = new PerkName("ROCKET_JUMP");
+    public static final PerkName ROCKET_JUMP = new PerkName("ROCKET_JUMP");
 
-	public RocketJumpPerk() {
-		super(ActivationType.PASSIVE, ROCKET_JUMP, 0, 0, Item.PERK_ROCKETJUMP,
-				(user, perk, id, perkSlot) -> new DefaultUserPerk(user, id, perkSlot, perk));
-		addListener(new ListenerRocketJump(this));
-	}
+    public RocketJumpPerk() {
+        super(ActivationType.PASSIVE, ROCKET_JUMP, 0, 0, Item.PERK_ROCKETJUMP, (user, perk, id, perkSlot, wb) -> new DefaultUserPerk(user, id, perkSlot, perk, wb));
+        addListener(new ListenerRocketJump(this));
+    }
 
-	public static class ListenerRocketJump extends PerkListener {
-		public ListenerRocketJump(Perk perk) {
-			super(perk);
-		}
+    public static class ListenerRocketJump extends PerkListener {
+        public ListenerRocketJump(Perk perk) {
+            super(perk);
+        }
 
-		@EventHandler
-		public void handle(DoubleJumpEvent event) {
-			for (UserPerk ignored : event.user().perks().perks(perk().perkName())) {
-				Vector velocity = event.velocity();
-				velocity.setY(velocity.getY() * 1.45);
-				event.velocity(velocity);
-			}
-		}
-	}
+        @EventHandler public void handle(DoubleJumpEvent event) {
+            for (UserPerk ignored : event.user().perks().perks(perk().perkName())) {
+                Vector velocity = event.velocity();
+                velocity.setY(velocity.getY() * 1.45);
+                event.velocity(velocity);
+            }
+        }
+    }
 }

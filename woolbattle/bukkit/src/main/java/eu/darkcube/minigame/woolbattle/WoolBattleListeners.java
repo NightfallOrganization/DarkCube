@@ -19,15 +19,15 @@ import java.util.List;
 public class WoolBattleListeners {
     private final List<Listener> listeners = new ArrayList<>();
 
-    public WoolBattleListeners() {
+    public WoolBattleListeners(WoolBattleBukkit woolbattle) {
         // Init listeners
         listeners.add(new ListenerInventoryClose());
-        listeners.add(new ListenerInventoryClick());
+        listeners.add(new ListenerInventoryClick(woolbattle));
         listeners.add(new ListenerPlayerInteract());
         listeners.add(new ListenerFoodLevelChange());
         listeners.add(new ListenerWeatherChange());
         listeners.add(new ListenerLaunchable());
-        listeners.add(new ListenerChat());
+        listeners.add(new ListenerChat(woolbattle));
         listeners.add(new ListenerAntiMonster());
     }
 

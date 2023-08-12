@@ -19,16 +19,17 @@ public class CloudNetLink {
     public static boolean shouldDisplay = true;
     private static boolean fullyLoaded = false;
     private static boolean isCloudnet;
+    private static WoolBattleBukkit woolbattle;
 
-    static {
+    public static void init(WoolBattleBukkit woolbattle) {
+        CloudNetLink.woolbattle = woolbattle;
         try {
             Wrapper.getInstance().getServiceId();
             CloudNetLink.isCloudnet = true;
             DarkCubeBukkit.autoConfigure(false);
-            new Scheduler(() -> {
+            new Scheduler(woolbattle, () -> {
                 fullyLoaded = true;
                 update();
-                System.out.println("Fully loaded!");
             }).runTask();
         } catch (Exception ex) {
             CloudNetLink.isCloudnet = false;
@@ -39,26 +40,29 @@ public class CloudNetLink {
         try {
             if (CloudNetLink.isCloudnet && CloudNetLink.shouldDisplay && fullyLoaded) {
                 GameState current = GameState.UNKNOWN;
-                if (WoolBattleBukkit.instance().lobby().enabled()) {
+                if (woolbattle.lobby().enabled()) {
                     current = GameState.LOBBY;
-                } else if (WoolBattleBukkit.instance().ingame().enabled()) {
+                } else if (woolbattle.ingame().enabled()) {
                     current = GameState.INGAME;
-                } else if (WoolBattleBukkit.instance().endgame().enabled()) {
+                } else if (woolbattle.endgame().enabled()) {
                     current = GameState.STOPPING;
                 }
                 DarkCubeBukkit.gameState(current);
-                DarkCubeBukkit.playingPlayers()
-                        .set(WoolBattleBukkit.instance().lobby().enabled()
-                                ? WBUser.onlineUsers().size()
-                                : (int) WBUser.onlineUsers().stream()
-                                .filter(u -> u.getTeam().canPlay()).count());
-                DarkCubeBukkit.maxPlayingPlayers().set(WoolBattleBukkit.instance().maxPlayers());
+                DarkCubeBukkit
+                        .playingPlayers()
+                        .set(woolbattle.lobby().enabled() ? WBUser.onlineUsers().size() : (int) WBUser
+                                .onlineUsers()
+                                .stream()
+                                .filter(u -> u.getTeam().canPlay())
+                                .count());
+                DarkCubeBukkit.maxPlayingPlayers().set(woolbattle.maxPlayers());
                 BridgeServerHelper.setMaxPlayers(1000);
-                String mapname = WoolBattleBukkit.instance().gameData().map() == null
-                        ? "Unknown Map"
-                        : WoolBattleBukkit.instance().gameData().map().getName();
-                DarkCubeBukkit.displayName("§d" + mapname + " §7(" + Wrapper.getInstance()
-                        .getCurrentServiceInfoSnapshot().getServiceId().getTaskName()
+                String mapname = woolbattle.gameData().map() == null ? "Unknown Map" : woolbattle.gameData().map().getName();
+                DarkCubeBukkit.displayName("§d" + mapname + " §7(" + Wrapper
+                        .getInstance()
+                        .getCurrentServiceInfoSnapshot()
+                        .getServiceId()
+                        .getTaskName()
                         .substring("woolbattle".length()) + ")");
                 Wrapper.getInstance().publishServiceInfoUpdate();
             }

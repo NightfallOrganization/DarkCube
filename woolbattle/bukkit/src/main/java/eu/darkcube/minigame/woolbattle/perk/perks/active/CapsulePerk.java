@@ -20,21 +20,20 @@ import org.bukkit.entity.Player;
 public class CapsulePerk extends Perk {
     public static final PerkName CAPSULE = new PerkName("CAPSULE");
 
-    public CapsulePerk() {
-        super(ActivationType.ACTIVE, CAPSULE, 30, 24, Item.PERK_CAPSULE,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_CAPSULE_COOLDOWN));
-        addListener(new ListenerCapsule(this));
+    public CapsulePerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, CAPSULE, 30, 24, Item.PERK_CAPSULE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_CAPSULE_COOLDOWN, woolbattle));
+        addListener(new ListenerCapsule(this, woolbattle));
     }
 
     public static class ListenerCapsule extends BasicPerkListener {
+        private final WoolBattleBukkit woolbattle;
 
-        public ListenerCapsule(Perk perk) {
-            super(perk);
+        public ListenerCapsule(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             Player p = perk.owner().getBukkitEntity();
             Location loc = p.getLocation();
             this.setBlock(perk.owner(), loc.subtract(0, 1, 0));
@@ -47,17 +46,16 @@ public class CapsulePerk extends Perk {
             this.setBlock2(perk.owner(), loc.add(0, 1, 0));
             this.setBlock2(perk.owner(), loc.add(0, 0, 2));
             this.setBlock2(perk.owner(), loc.subtract(0, 1, 0));
-            p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5)
-                    .setDirection(p.getLocation().getDirection()));
+            p.teleport(p.getLocation().getBlock().getLocation().add(.5, .25, .5).setDirection(p.getLocation().getDirection()));
             return true;
         }
 
         private void setBlock(WBUser user, Location block) {
-            WoolBattleBukkit.instance().ingame().place(user, block.getBlock(), 2, false);
+            woolbattle.ingame().place(user, block.getBlock(), 2, false);
         }
 
         private void setBlock2(WBUser user, Location block) {
-            WoolBattleBukkit.instance().ingame().place(user, block.getBlock(), 0, false);
+            woolbattle.ingame().place(user, block.getBlock(), 0, false);
         }
     }
 }

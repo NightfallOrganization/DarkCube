@@ -30,65 +30,61 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MinePerk extends Perk {
     public static final PerkName MINE = new PerkName("MINE");
 
-    public MinePerk() {
-        super(ActivationType.ACTIVE, MINE, 6, 7, Item.PERK_MINE,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_MINE_COOLDOWN));
-        addListener(new ListenerMine(this));
+    public MinePerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, MINE, 6, 7, Item.PERK_MINE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_MINE_COOLDOWN, woolbattle));
+        addListener(new ListenerMine(this, woolbattle));
     }
 
     public static class ListenerMine extends BasicPerkListener {
+        private final WoolBattleBukkit woolbattle;
 
-        public ListenerMine(Perk perk) {
-            super(perk);
+        public ListenerMine(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
         }
 
-        @EventHandler
-        public void handle(BlockPlaceEvent event) {
-            if (event.getItemInHand() == null)
-                return;
+        @EventHandler public void handle(BlockPlaceEvent event) {
+            if (event.getItemInHand() == null) return;
             ItemStack item = event.getItemInHand();
             WBUser user = WBUser.getUser(event.getPlayer());
             AtomicReference<UserPerk> perkRef = new AtomicReference<>(null);
-            if (!checkUsable(user, item, perk(), perkRef::set)) {
-                if (perkRef.get() != null)
-                    event.setCancelled(true);
+            if (!checkUsable(user, item, perk(), perkRef::set, woolbattle)) {
+                if (perkRef.get() != null) event.setCancelled(true);
                 return;
             }
             UserPerk userPerk = perkRef.get();
             userPerk.currentPerkItem().setItem();
-            new Scheduler(userPerk.currentPerkItem()::setItem).runTask();
+            new Scheduler(woolbattle, userPerk.currentPerkItem()::setItem).runTask();
             event.setCancelled(true);
             activated(userPerk);
-            WoolBattleBukkit.instance().ingame().place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
-                new Scheduler(() -> b.setType(Material.STONE_PLATE)).runTask();
-                WoolBattleBukkit.instance().ingame().setMetaData(b, "perk", userPerk);
+            woolbattle.ingame().place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
+                new Scheduler(woolbattle, () -> b.setType(Material.STONE_PLATE)).runTask();
+                woolbattle.ingame().setMetaData(b, "perk", userPerk);
             });
         }
 
-        @EventHandler
-        public void handle(PlayerInteractEvent event) {
+        @EventHandler public void handle(PlayerInteractEvent event) {
             Player p = event.getPlayer();
             WBUser user = WBUser.getUser(p);
             if (!user.getTeam().canPlay()) return;
             if (event.getAction() != Action.PHYSICAL) return;
             Block block = event.getClickedBlock();
             if (block == null) return;
-            UserPerk perk = WoolBattleBukkit.instance().ingame().getMetaData(block, "perk", null);
+            UserPerk perk = woolbattle.ingame().getMetaData(block, "perk", null);
             if (perk == null) return;
             if (!perk.perk().perkName().equals(MinePerk.MINE)) return;
 
             event.setCancelled(true);
-            WoolBattleBukkit.instance().ingame().destroy(block);
+            woolbattle.ingame().destroy(block);
             block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
 
-            new Scheduler(() -> {
+            new Scheduler(woolbattle, () -> {
                 Vector playerLoc = p.getLocation().toVector();
                 Vector blockLoc = block.getLocation().add(0.5, 0, 0.5).toVector();
 
                 Vector velocity = playerLoc.subtract(blockLoc).normalize();
                 velocity.multiply(Math.pow(playerLoc.distance(blockLoc), 0.4) / 6);
-                if (WoolBattleBukkit.instance().ingame().attack(perk.owner(), user)) {
+                if (woolbattle.ingame().playerUtil().attack(perk.owner(), user)) {
                     p.damage(0);
                 }
                 velocity.setY(1.3);
@@ -96,8 +92,7 @@ public class MinePerk extends Perk {
             }).runTaskLater(2);
         }
 
-        @Override
-        protected boolean mayActivate() {
+        @Override protected boolean mayActivate() {
             return false;
         }
     }

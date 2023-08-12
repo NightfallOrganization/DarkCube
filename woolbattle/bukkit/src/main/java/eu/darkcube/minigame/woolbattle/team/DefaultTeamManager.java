@@ -113,7 +113,7 @@ public class DefaultTeamManager implements TeamManager {
         DyeColor woolcolor = DyeColor.BLACK;
         ChatColor namecolor = ChatColor.GRAY;
         TeamType spectatorType = new TeamType(woolbattle, uniqueId, null, displayNameKey, weight, woolcolor, namecolor, false);
-        spectator = new DefaultTeam(spectatorType);
+        spectator = new DefaultTeam(spectatorType, woolbattle);
     }
 
     @Override public Team getTeam(UUID id) {
@@ -144,7 +144,7 @@ public class DefaultTeamManager implements TeamManager {
     }
 
     @Override public Team loadTeam(TeamType type) {
-        Team team = new DefaultTeam(type);
+        Team team = new DefaultTeam(type, woolbattle);
         teams.add(team);
         return team;
     }
@@ -177,7 +177,7 @@ public class DefaultTeamManager implements TeamManager {
         }
         teamByUser.put(user, team);
         if (woolbattle.ingame().enabled()) {
-            woolbattle.ingame().setPlayerItems(user);
+            woolbattle.ingame().playerUtil().setPlayerItems(user);
             woolbattle.ingame().checkGameEnd();
         }
     }

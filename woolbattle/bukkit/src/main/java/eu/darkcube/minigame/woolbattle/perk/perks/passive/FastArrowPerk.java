@@ -16,20 +16,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class FastArrowPerk extends Perk {
-	public static final PerkName FAST_ARROW = new PerkName("FAST_ARROW");
+    public static final PerkName FAST_ARROW = new PerkName("FAST_ARROW");
 
-	public FastArrowPerk() {
-		super(ActivationType.PASSIVE, FAST_ARROW, 0, 0, Item.PERK_FAST_ARROW,
-				(user, perk, id, perkSlot) -> new DefaultUserPerk(user, id, perkSlot, perk));
-		addListener(new FastArrowListener());
-	}
+    public FastArrowPerk() {
+        super(ActivationType.PASSIVE, FAST_ARROW, 0, 0, Item.PERK_FAST_ARROW, (user, perk, id, perkSlot, wb) -> new DefaultUserPerk(user, id, perkSlot, perk, wb));
+        addListener(new FastArrowListener());
+    }
 
-	private static class FastArrowListener implements Listener {
-		@EventHandler
-		public void handle(BowShootArrowEvent event) {
-			for (UserPerk ignored : event.user().perks().perks(FAST_ARROW)) {
-				event.arrow().setVelocity(event.arrow().getVelocity().multiply(1.6));
-			}
-		}
-	}
+    private static class FastArrowListener implements Listener {
+        @EventHandler public void handle(BowShootArrowEvent event) {
+            for (UserPerk ignored : event.user().perks().perks(FAST_ARROW)) {
+                event.arrow().setVelocity(event.arrow().getVelocity().multiply(1.6));
+            }
+        }
+    }
 }

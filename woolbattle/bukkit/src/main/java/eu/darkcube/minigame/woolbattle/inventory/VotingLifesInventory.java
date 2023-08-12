@@ -22,36 +22,36 @@ import java.util.Map;
 
 public class VotingLifesInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_voting_lifes");
-    private static final Key LIFES = new Key(WoolBattleBukkit.instance(), "voting_lifes");
+    private final Key LIFES = new Key(woolbattle, "voting_lifes");
 
     public VotingLifesInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);
+        complete();
     }
 
-    @Override
-    protected void inventoryClick(IInventoryClickEvent event) {
+    @Override protected boolean done() {
+        return super.done() && LIFES != null;
+    }
+
+    @Override protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
+        if (event.item() == null) return;
         String stringLifes = ItemManager.getId(event.item(), LIFES);
-        if (stringLifes == null)
-            return;
+        if (stringLifes == null) return;
         int lifes = Integer.parseInt(stringLifes);
-        WoolBattleBukkit.instance().lobby().VOTES_LIFES.put(user, lifes);
+        woolbattle.lobby().VOTES_LIFES.put(user, lifes);
         user.user().sendMessage(Message.VOTED_LIFES, lifes);
         recalculate();
     }
 
-    @Override
-    protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override protected void fillItems(Map<Integer, ItemStack> items) {
         set(IInventory.slot(3, 3), 3);
         set(IInventory.slot(3, 4), 10);
         set(IInventory.slot(3, 6), 20);
         set(IInventory.slot(3, 7), 30);
     }
 
-    @Override
-    protected void insertFallbackItems() {
+    @Override protected void insertFallbackItems() {
         fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING_LIFES.getItem(user));
         super.insertFallbackItems();
     }
@@ -60,8 +60,8 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
         ItemBuilder builder = ItemBuilder.item(Item.LOBBY_VOTING_LIFES_ENTRY.getItem(user, lifes));
         ItemManager.setId(builder, LIFES, String.valueOf(lifes));
         int lifeVotes = -1;
-        if (WoolBattleBukkit.instance().lobby().VOTES_LIFES.containsKey(user)) {
-            lifeVotes = WoolBattleBukkit.instance().lobby().VOTES_LIFES.get(user);
+        if (woolbattle.lobby().VOTES_LIFES.containsKey(user)) {
+            lifeVotes = woolbattle.lobby().VOTES_LIFES.get(user);
         }
         if (lifeVotes == lifes) {
             builder.glow(true);

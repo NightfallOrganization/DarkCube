@@ -19,6 +19,7 @@ public class SchedulerHeightDisplay extends Scheduler implements ConfiguredSched
     private final WoolBattleBukkit woolbattle;
 
     public SchedulerHeightDisplay(WoolBattleBukkit woolbattle) {
+        super(woolbattle);
         this.woolbattle = woolbattle;
     }
 

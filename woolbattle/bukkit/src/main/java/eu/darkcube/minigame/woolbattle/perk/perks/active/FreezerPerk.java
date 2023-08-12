@@ -25,55 +25,52 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class FreezerPerk extends Perk {
-	public static final PerkName FREEZER = new PerkName("FREEZER");
+    public static final PerkName FREEZER = new PerkName("FREEZER");
 
-	public FreezerPerk() {
-		super(ActivationType.ACTIVE, FREEZER, 6, 6, Item.PERK_FREEZER,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_FREEZER_COOLDOWN));
-		addListener(new ListenerFreezer(this));
-	}
+    public FreezerPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, FREEZER, 6, 6, Item.PERK_FREEZER, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_FREEZER_COOLDOWN, woolbattle));
+        addListener(new ListenerFreezer(this, woolbattle));
+    }
 
-	public static class ListenerFreezer extends BasicPerkListener {
-		public ListenerFreezer(Perk perk) {
-			super(perk);
-		}
+    public static class ListenerFreezer extends BasicPerkListener {
+        public ListenerFreezer(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+        }
 
-		@Override
-		protected boolean activateRight(UserPerk perk) {
-			Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
-			snowball.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(),
-					perk.perk().perkName().toString()));
-			return true;
-		}
+        @Override protected boolean activateRight(UserPerk perk) {
+            Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
+            snowball.setMetadata("perk", new FixedMetadataValue(woolbattle, perk.perk().perkName().toString()));
+            return true;
+        }
 
-		@EventHandler
-		public void handle(EntityDamageByEntityEvent event) {
-			if (!(event.getEntity() instanceof Player)) {
-				return;
-			}
-			if (event.getDamager().getType() != EntityType.SNOWBALL) {
-				return;
-			}
-			Snowball snowball = (Snowball) event.getDamager();
-			if (!(snowball.getShooter() instanceof Player)) {
-				return;
-			}
-			Player p = (Player) snowball.getShooter();
-			Player hit = (Player) event.getEntity();
-			if (snowball.getMetadata("perk").size() != 0 && snowball.getMetadata("perk").get(0)
-					.asString().equals(FreezerPerk.FREEZER.getName())) {
-				event.setCancelled(true);
-				WBUser user = WBUser.getUser(hit);
-				if (user.projectileImmunityTicks() > 0)
-					return;
-				if (user.getTeam().getType() != WBUser.getUser(p).getTeam().getType()) {
-					user.getBukkitEntity().addPotionEffect(
-							new PotionEffect(PotionEffectType.SLOW, TimeUnit.SECOND.itoTicks(3), 6,
-									true, false), true);
-				}
-			}
-		}
-	}
+        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+            if (!(event.getEntity() instanceof Player)) {
+                return;
+            }
+            if (event.getDamager().getType() != EntityType.SNOWBALL) {
+                return;
+            }
+            Snowball snowball = (Snowball) event.getDamager();
+            if (!(snowball.getShooter() instanceof Player)) {
+                return;
+            }
+            Player p = (Player) snowball.getShooter();
+            Player hit = (Player) event.getEntity();
+            if (!snowball.getMetadata("perk").isEmpty() && snowball
+                    .getMetadata("perk")
+                    .get(0)
+                    .asString()
+                    .equals(FreezerPerk.FREEZER.getName())) {
+                event.setCancelled(true);
+                WBUser user = WBUser.getUser(hit);
+                if (user.projectileImmunityTicks() > 0) return;
+                if (user.getTeam().getType() != WBUser.getUser(p).getTeam().getType()) {
+                    user
+                            .getBukkitEntity()
+                            .addPotionEffect(new PotionEffect(PotionEffectType.SLOW, TimeUnit.SECOND.itoTicks(3), 6, true, false), true);
+                }
+            }
+        }
+    }
 
 }

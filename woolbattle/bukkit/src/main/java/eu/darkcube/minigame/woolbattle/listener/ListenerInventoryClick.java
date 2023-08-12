@@ -16,10 +16,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
+    private final WoolBattleBukkit woolbattle;
 
-    @Override
-    @EventHandler
-    public void handle(InventoryClickEvent e) {
+    public ListenerInventoryClick(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player)) {
             return;
         }
@@ -32,7 +35,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
         if (itemId == null) {
             return;
         }
-        if (WoolBattleBukkit.instance().lobby().enabled() && e.getHotbarButton() != -1) {
+        if (woolbattle.lobby().enabled() && e.getHotbarButton() != -1) {
             e.setCancelled(true);
         }
 
@@ -40,8 +43,7 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
             return;
         }
         if (e.getRawSlot() != -1 && e.getRawSlot() != -999) {
-            EventInteract pe =
-                    new EventInteract(p, e.getCurrentItem(), e.getClickedInventory(), e.getClick());
+            EventInteract pe = new EventInteract(p, e.getCurrentItem(), e.getClickedInventory(), e.getClick());
             Bukkit.getPluginManager().callEvent(pe);
             e.setCancelled(pe.isCancelled());
             e.setCurrentItem(pe.getItem());

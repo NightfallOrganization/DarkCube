@@ -31,16 +31,18 @@ import java.util.HashSet;
 
 public class StomperPerk extends Perk {
     public static final PerkName STOMPER = new PerkName("STOMPER");
-    private static final Key wasOnGround =
-            new Key(WoolBattleBukkit.instance(), "perk_stomper_was_on_ground");
-    private static final Key active = new Key(WoolBattleBukkit.instance(), "perk_stomper_active");
-    private static final Key startPos = new Key(WoolBattleBukkit.instance(), "perk_stomper_start_pos");
 
-    public StomperPerk() {
-        super(ActivationType.PASSIVE, STOMPER, new Cooldown(Unit.ACTIVATIONS, 0), 10,
-                Item.PERK_STOMPER, DefaultUserPerk::new);
+    private final Key wasOnGround;
+    private final Key active;
+    private final Key startPos;
+
+    public StomperPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.PASSIVE, STOMPER, new Cooldown(Unit.ACTIVATIONS, 0), 10, Item.PERK_STOMPER, DefaultUserPerk::new);
+        wasOnGround = new Key(woolbattle, "perk_stomper_was_on_ground");
+        active = new Key(woolbattle, "perk_stomper_active");
+        startPos = new Key(woolbattle, "perk_stomper_start_pos");
         addListener(new StomperListener());
-        addScheduler(new StomperScheduler());
+        addScheduler(new StomperScheduler(woolbattle));
     }
 
     private static class ShockwaveScheduler extends Scheduler {
@@ -50,16 +52,18 @@ public class StomperPerk extends Perk {
         private final double maxRadius;
         private final Location center;
         private final Collection<WBUser> hit = new HashSet<>();
+        private final WoolBattleBukkit woolbattle;
         private double radius = 0;
 
-        public ShockwaveScheduler(WBUser user, Location center, double maxRadius) {
+        public ShockwaveScheduler(WBUser user, Location center, double maxRadius, WoolBattleBukkit woolbattle) {
+            super(woolbattle);
             this.user = user;
             this.center = center;
             this.maxRadius = maxRadius;
+            this.woolbattle = woolbattle;
         }
 
-        @Override
-        public void run() {
+        @Override public void run() {
             radius += speedBlocksPerTick;
             if (radius > maxRadius) {
                 cancel();
@@ -80,33 +84,23 @@ public class StomperPerk extends Perk {
                 center.subtract(x, y, z);
             }
             for (WBUser target : WBUser.onlineUsers()) {
-                if (!target.getTeam().canPlay())
-                    continue;
-                if (hit.contains(target))
-                    continue;
-                if (!WoolBattleBukkit.instance().ingame().canAttack(user, target))
-                    continue;
-                if (target.getBukkitEntity().getLocation().distance(center) > radius)
-                    continue;
-                if (target.getBukkitEntity().getLocation().distance(center) < radius - 2)
-                    continue;
-                if (Math.abs(target.getBukkitEntity().getLocation().getY() - center.getY()) > 2.5)
-                    continue;
-                if (!WoolBattleBukkit.instance().ingame().attack(user, target))
-                    continue;
+                if (!target.getTeam().canPlay()) continue;
+                if (hit.contains(target)) continue;
+                if (!woolbattle.ingame().playerUtil().canAttack(user, target)) continue;
+                if (target.getBukkitEntity().getLocation().distance(center) > radius) continue;
+                if (target.getBukkitEntity().getLocation().distance(center) < radius - 2) continue;
+                if (Math.abs(target.getBukkitEntity().getLocation().getY() - center.getY()) > 2.5) continue;
+                if (!woolbattle.ingame().playerUtil().attack(user, target)) continue;
                 target.getBukkitEntity().damage(0);
                 hit.add(target);
-                Vector v = target.getBukkitEntity().getLocation().toVector()
-                        .subtract(center.toVector());
-                if (v.length() == 0)
-                    continue;
+                Vector v = target.getBukkitEntity().getLocation().toVector().subtract(center.toVector());
+                if (v.length() == 0) continue;
                 v.normalize();
                 v.setY(v.getY() + 0.2);
                 if (v.length() != 0) {
                     v.normalize();
                     v.multiply(Math.pow(maxRadius - radius + 0.1, 0.3));
-                    if (target.getBukkitEntity().isOnGround())
-                        v.multiply(1.5);
+                    if (target.getBukkitEntity().isOnGround()) v.multiply(1.5);
                     target.getBukkitEntity().setVelocity(v);
                 }
             }
@@ -114,64 +108,60 @@ public class StomperPerk extends Perk {
     }
 
     public class StomperScheduler extends Scheduler implements ConfiguredScheduler {
+        private final WoolBattleBukkit woolbattle;
 
-        @Override
-        public void run() {
+        public StomperScheduler(WoolBattleBukkit woolbattle) {
+            super(woolbattle);
+            this.woolbattle = woolbattle;
+        }
+
+        @Override public void run() {
             for (WBUser user : WBUser.onlineUsers()) {
-                if (user.perks().count(STOMPER) == 0)
-                    continue;
-                if (user.getBukkitEntity().isOnGround())
-                    user.user().getMetaDataStorage().set(wasOnGround, true);
-                if (!user.getTeam().canPlay())
-                    continue;
-                if (!user.user().getMetaDataStorage().has(active))
-                    continue;
-                if (!user.getBukkitEntity().isOnGround() &&
-                        user.getBukkitEntity().getLocation().subtract(0, 0.5, 0).getBlock()
-                                .getType() == Material.AIR)
-                    continue;
+                if (user.perks().count(STOMPER) == 0) continue;
+                if (user.getBukkitEntity().isOnGround()) user.user().getMetaDataStorage().set(wasOnGround, true);
+                if (!user.getTeam().canPlay()) continue;
+                if (!user.user().getMetaDataStorage().has(active)) continue;
+                if (!user.getBukkitEntity().isOnGround() && user
+                        .getBukkitEntity()
+                        .getLocation()
+                        .subtract(0, 0.5, 0)
+                        .getBlock()
+                        .getType() == Material.AIR) continue;
                 int removed;
                 user.user().getMetaDataStorage().remove(active);
                 double starty = user.user().getMetaDataStorage().remove(startPos);
                 double diff = starty - user.getBukkitEntity().getLocation().getY();
-                if (diff < 2)
-                    continue;
+                if (diff < 2) continue;
                 if ((removed = user.removeWool(cost())) != cost()) {
                     user.addWool(removed);
                     continue;
                 }
                 double rad = Math.pow(diff, 0.6);
-                new ShockwaveScheduler(user, user.getBukkitEntity().getLocation(),
-                        rad).runTaskTimer(1);
+                new ShockwaveScheduler(user, user.getBukkitEntity().getLocation(), rad, woolbattle).runTaskTimer(1);
             }
         }
 
-        @Override
-        public void start() {
+        @Override public void start() {
             runTaskTimer(1);
         }
 
-        @Override
-        public void stop() {
+        @Override public void stop() {
             cancel();
         }
     }
 
     public class StomperListener implements Listener {
 
-        @EventHandler(priority = EventPriority.HIGHEST)
-        public void handle(PlayerMoveEvent event) {
+        @EventHandler(priority = EventPriority.HIGHEST) public void handle(PlayerMoveEvent event) {
             WBUser user = WBUser.getUser(event.getPlayer());
-            if (!user.getTeam().canPlay())
-                return;
-            if (user.perks().count(perkName()) == 0)
-                return;
+            if (!user.getTeam().canPlay()) return;
+            if (user.perks().count(perkName()) == 0) return;
             if (!user.user().getMetaDataStorage().has(active)) {
-                boolean og = user.user().getMetaDataStorage().has(wasOnGround) && user.user()
-                        .getMetaDataStorage().<Boolean>remove(wasOnGround);
-                if (!og && event.getFrom().subtract(0, 0.95, 0).getBlock().getType()
-                        == Material.AIR)
-                    return;
+                boolean og = user.user().getMetaDataStorage().has(wasOnGround) && user
+                        .user()
+                        .getMetaDataStorage()
+                        .<Boolean>remove(wasOnGround);
+                if (!og && event.getFrom().subtract(0, 0.95, 0).getBlock().getType() == Material.AIR) return;
             }
             if (event.getFrom().getY() - event.getTo().getY() < 0) {
                 user.user().getMetaDataStorage().set(active, true);

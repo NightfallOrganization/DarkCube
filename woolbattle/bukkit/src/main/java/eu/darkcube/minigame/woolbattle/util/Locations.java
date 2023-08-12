@@ -47,9 +47,9 @@ public class Locations extends Parser {
         Location l = loc.clone();
         l.setYaw(getNiceYaw(l.getYaw()));
         l.setPitch(getNicePitch(l.getPitch()));
-        l.setX(l.getBlockX() + .5);
-        l.setY(l.getBlockY());
-        l.setZ(l.getBlockZ() + .5);
+        l.setX(niceCoordinate(l.getX()));
+        l.setY(niceCoordinate(l.getY()));
+        l.setZ(niceCoordinate(l.getZ()));
         return l;
     }
 
@@ -148,6 +148,10 @@ public class Locations extends Parser {
 
     public static String serialize(Location loc) {
         return serialize(loc, false);
+    }
+
+    private static double niceCoordinate(double coordinate) {
+        return ((int) (coordinate * 2)) / 2D;
     }
 
 }

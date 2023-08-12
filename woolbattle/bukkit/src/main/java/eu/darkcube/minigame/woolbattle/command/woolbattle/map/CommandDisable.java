@@ -14,18 +14,17 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandDisable extends WBCommandExecutor {
-    public CommandDisable() {
+    public CommandDisable(WoolBattleBukkit woolbattle) {
         super("disable", b -> b.executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");
             if (!map.isEnabled()) {
-                ctx.getSource().sendMessage(Component.text("Diese Map ist bereits deaktiviert!")
-                        .color(NamedTextColor.RED));
+                ctx.getSource().sendMessage(Component.text("Diese Map ist bereits deaktiviert!").color(NamedTextColor.RED));
             } else {
                 map.disable();
-                WoolBattleBukkit.instance().lobby().recalculateMap();
-                ctx.getSource().sendMessage(
-                        Component.text("Du hast die Map '" + map.getName() + "' deaktiviert!")
-                                .color(NamedTextColor.GREEN));
+                woolbattle.lobby().recalculateMap();
+                ctx
+                        .getSource()
+                        .sendMessage(Component.text("Du hast die Map '" + map.getName() + "' deaktiviert!").color(NamedTextColor.GREEN));
             }
             return 0;
         }));

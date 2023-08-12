@@ -22,100 +22,101 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BasicPerkListener extends PerkListener implements RegisterNotifyListener {
 
-	private final Handle handle = new Handle();
+    protected final WoolBattleBukkit woolbattle;
+    private final Handle handle;
 
-	public BasicPerkListener(Perk perk) {
-		super(perk);
-	}
+    public BasicPerkListener(Perk perk, WoolBattleBukkit woolbattle) {
+        super(perk);
+        this.woolbattle = woolbattle;
+        this.handle = new Handle(woolbattle);
+    }
 
-	@Override
-	public void registered() {
-		WoolBattleBukkit.registerListeners(this.handle);
-	}
+    @Override public void registered() {
+        WoolBattleBukkit.registerListeners(this.handle);
+    }
 
-	@Override
-	public void unregistered() {
-		WoolBattleBukkit.unregisterListeners(this.handle);
-	}
+    @Override public void unregistered() {
+        WoolBattleBukkit.unregisterListeners(this.handle);
+    }
 
-	/**
-	 * Called when the perk is activated
-	 *
-	 * @param perk the perk
-	 *
-	 * @return if the perk was activated and cooldown should start
-	 */
-	protected boolean activate(UserPerk perk) {
-		return false;
-	}
+    /**
+     * Called when the perk is activated
+     *
+     * @param perk the perk
+     * @return if the perk was activated and cooldown should start
+     */
+    protected boolean activate(UserPerk perk) {
+        return false;
+    }
 
-	/**
-	 * Called when the perk is activated with a right click
-	 *
-	 * @param perk the perk
-	 *
-	 * @return if the perk was activated and cooldown should start
-	 */
-	protected boolean activateRight(UserPerk perk) {
-		return false;
-	}
+    /**
+     * Called when the perk is activated with a right click
+     *
+     * @param perk the perk
+     * @return if the perk was activated and cooldown should start
+     */
+    protected boolean activateRight(UserPerk perk) {
+        return false;
+    }
 
-	/**
-	 * Called when the perk is activated with a left click
-	 *
-	 * @param perk the perk
-	 *
-	 * @return if the perk was activated and cooldown should start
-	 */
-	protected boolean activateLeft(UserPerk perk) {
-		return false;
-	}
+    /**
+     * Called when the perk is activated with a left click
+     *
+     * @param perk the perk
+     * @return if the perk was activated and cooldown should start
+     */
+    protected boolean activateLeft(UserPerk perk) {
+        return false;
+    }
 
-	/**
-	 * Called when any of the activate methods return true. Default implementation is paying wool
-	 * and starting cooldown
-	 *
-	 * @param perk the perk
-	 */
-	protected void activated(UserPerk perk) {
-		payForThePerk(perk);
-		perk.cooldown(perk.perk().cooldown().cooldown());
-	}
+    /**
+     * Called when any of the activate methods return true. Default implementation is paying wool
+     * and starting cooldown
+     *
+     * @param perk the perk
+     */
+    protected void activated(UserPerk perk) {
+        payForThePerk(perk);
+        perk.cooldown(perk.perk().cooldown().cooldown());
+    }
 
-	protected boolean mayActivate() {
-		return true;
-	}
+    protected boolean mayActivate() {
+        return true;
+    }
 
-	private class Handle implements Listener {
+    private class Handle implements Listener {
 
-		@EventHandler
-		private void handle(LaunchableInteractEvent event) {
-			if (!mayActivate())
-				return;
-			ItemStack item = event.getItem();
-			if (item == null) {
-				return;
-			}
-			WBUser user = WBUser.getUser(event.getPlayer());
-			AtomicReference<UserPerk> refUserPerk = new AtomicReference<>();
-			if (!checkUsable(user, item, perk(), userPerk -> {
-				refUserPerk.set(userPerk);
-				if (event.getEntity() != null) {
-					event.getEntity().remove();
-					userPerk.currentPerkItem().setItem();
-					new Scheduler(userPerk.currentPerkItem()::setItem).runTask();
-				}
-				event.setCancelled(true);
-			})) {
-				return;
-			}
-			UserPerk userPerk = refUserPerk.get();
-			boolean left = event.getAction() == Action.LEFT_CLICK_AIR
-					|| event.getAction() == Action.LEFT_CLICK_BLOCK;
-			if (!activate(userPerk) && !(left ? activateLeft(userPerk) : activateRight(userPerk))) {
-				return;
-			}
-			activated(userPerk);
-		}
-	}
+        private final WoolBattleBukkit woolbattle;
+
+        private Handle(WoolBattleBukkit woolbattle) {
+            this.woolbattle = woolbattle;
+        }
+
+        @EventHandler private void handle(LaunchableInteractEvent event) {
+            if (!mayActivate()) return;
+            ItemStack item = event.getItem();
+            if (item == null) {
+                return;
+            }
+            WBUser user = WBUser.getUser(event.getPlayer());
+            AtomicReference<UserPerk> refUserPerk = new AtomicReference<>();
+            if (!checkUsable(user, item, perk(), userPerk -> {
+                refUserPerk.set(userPerk);
+                if (event.getEntity() != null) {
+                    event.getEntity().remove();
+                    userPerk.currentPerkItem().setItem();
+                    new Scheduler(woolbattle, userPerk.currentPerkItem()::setItem).runTask();
+                }
+                event.setCancelled(true);
+            }, woolbattle)) {
+                return;
+            }
+            UserPerk userPerk = refUserPerk.get();
+            boolean left = event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK;
+            if (!activate(userPerk) && !(left ? activateLeft(userPerk) : activateRight(userPerk))) {
+                return;
+            }
+            activated(userPerk);
+        }
+    }
 }

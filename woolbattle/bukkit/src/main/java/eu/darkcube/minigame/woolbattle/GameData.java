@@ -11,18 +11,21 @@ import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.function.Consumer;
 
 public class GameData {
     public static final boolean EP_GLITCH_DEFAULT = false;
-    private final WoolBattleBukkit woolBattle;
+    private final WoolBattleBukkit woolbattle;
     private MapSize mapSize;
     private Map forceMap;
     private Map votedMap;
     private boolean epGlitch = EP_GLITCH_DEFAULT;
     private int forceLifes = -1;
 
-    public GameData(WoolBattleBukkit woolBattle) {
-        this.woolBattle = woolBattle;
+    public GameData(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
     }
 
     public boolean epGlitch() {
@@ -47,8 +50,7 @@ public class GameData {
     }
 
     public void forceMap(Map forceMap) {
-        this.forceMap = forceMap;
-        reloadScoreboardMap();
+        updateMap(forceMap, m -> this.forceMap = m, true);
     }
 
     public MapSize mapSize() {
@@ -64,16 +66,42 @@ public class GameData {
     }
 
     public void votedMap(Map votedMap) {
-        this.votedMap = votedMap;
-        reloadScoreboardMap();
+        updateMap(votedMap, m -> this.votedMap = m, false);
     }
 
     public void reloadScoreboardEpGlitch() {
-        WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setEpGlitch(woolBattle, u));
+        WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setEpGlitch(woolbattle, u));
     }
 
-    public void reloadScoreboardMap() {
-        WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setMap(woolBattle, u));
+    private void updateMap(Map newMap, Consumer<Map> setter, boolean force) {
+        Map oldMap = map();
+        if (woolbattle.lobby().enabled()) {
+            setter.accept(newMap);
+            WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setMap(woolbattle, u));
+        } else if (woolbattle.ingame().enabled()) {
+            if (oldMap == null) throw new Error("Old Map is null");
+            if (newMap == oldMap) return;
+            Map map = map(newMap, force);
+            woolbattle.mapLoader().loadMap(map).thenRun(() -> {
+                setter.accept(map);
+                if (!woolbattle.ingame().enabled()) {
+                    woolbattle.mapLoader().unloadMap(map);
+                    return;
+                }
+                for (WBUser user : WBUser.onlineUsers()) {
+                    user.getBukkitEntity().teleport(user.getTeam().getSpawn(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                }
+                woolbattle.mapLoader().unloadMap(oldMap);
+            });
+        } else {
+            setter.accept(newMap);
+        }
+    }
+
+    private Map map(Map newMap, boolean force) {
+        if (force) return newMap;
+        if (forceMap != null) return forceMap;
+        return newMap;
     }
 
     public Map map() {

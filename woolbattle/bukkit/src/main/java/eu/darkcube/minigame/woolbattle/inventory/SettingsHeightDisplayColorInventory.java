@@ -30,42 +30,38 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SettingsHeightDisplayColorInventory extends WoolBattlePagedInventory {
-    public static final InventoryType TYPE =
-            InventoryType.of("woolbattle-settings-height-display-color");
-    private static final Key COLOR = new Key(WoolBattleBukkit.instance(), "height_display_color");
-    private static final PersistentDataType<ChatColor> COLOR_TYPE =
-            PersistentDataTypes.enumType(ChatColor.class);
+    public static final InventoryType TYPE = InventoryType.of("woolbattle-settings-height-display-color");
+    private static final PersistentDataType<ChatColor> COLOR_TYPE = PersistentDataTypes.enumType(ChatColor.class);
+    private final Key COLOR = new Key(woolbattle, "height_display_color");
     private final Scheduler scheduler;
     private int number = 0;
 
     public SettingsHeightDisplayColorInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.HEIGHT_DISPLAY_COLOR_SETTINGS_TITLE.getMessage(user), user);
-        scheduler = new Scheduler() {
-            @Override
-            public void run() {
+        scheduler = new Scheduler(woolbattle) {
+            @Override public void run() {
                 number--;
-                if (number < 0)
-                    number = 99;
+                if (number < 0) number = 99;
                 recalculate();
             }
         };
         scheduler.runTaskTimer(1);
+        complete();
     }
 
-    @Override
-    protected void startAnimation() {
+    @Override protected boolean done() {
+        return super.done() && COLOR != null;
+    }
+
+    @Override protected void startAnimation() {
         super.startAnimation();
     }
 
-    @Override
-    protected void fillItems(Map<Integer, ItemStack> items) {
-        List<ChatColor> colors =
-                Arrays.stream(ChatColor.values()).filter(ChatColor::isColor).sorted()
-                        .collect(Collectors.toList());
+    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+        List<ChatColor> colors = Arrays.stream(ChatColor.values()).filter(ChatColor::isColor).sorted().collect(Collectors.toList());
         ItemStack[] arr = colors.stream().map(c -> {
             ItemBuilder b = ItemBuilder.item(Material.PAPER);
-            b.displayname(
-                    LegacyComponentSerializer.legacySection().deserialize(c.toString() + number));
+            b.displayname(LegacyComponentSerializer.legacySection().deserialize(c.toString() + number));
             if (user.heightDisplay().getColor() == c) {
                 b.lore(Message.SELECTED.getMessage(user));
                 b.glow(true);
@@ -80,25 +76,20 @@ public class SettingsHeightDisplayColorInventory extends WoolBattlePagedInventor
         }
     }
 
-    @Override
-    protected void insertFallbackItems() {
+    @Override protected void insertFallbackItems() {
         super.insertFallbackItems();
         fallbackItems.put(IInventory.slot(1, 5), Item.SETTINGS_HEIGHT_DISPLAY_COLOR.getItem(user));
     }
 
-    @Override
-    protected void destroy() {
+    @Override protected void destroy() {
         super.destroy();
         scheduler.cancel();
     }
 
-    @Override
-    protected void inventoryClick(IInventoryClickEvent event) {
+    @Override protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
-        if (!event.item().persistentDataStorage().has(COLOR))
-            return;
+        if (event.item() == null) return;
+        if (!event.item().persistentDataStorage().has(COLOR)) return;
         ChatColor color = event.item().persistentDataStorage().get(COLOR, COLOR_TYPE);
         HeightDisplay display = user.heightDisplay();
         display.setColor(color);

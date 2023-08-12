@@ -64,7 +64,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
     protected void fillItems(Map<Integer, ItemStack> items) {
         ItemBuilder b1 = item(Item.GENERAL_VOTING_FOR.getItem(user));
         ItemBuilder b2 = item(Item.GENERAL_VOTING_AGAINST.getItem(user));
-        Vote<Boolean> vote = WoolBattleBukkit.instance().lobby().VOTES_EP_GLITCH.get(user);
+        Vote<Boolean> vote = woolbattle.lobby().VOTES_EP_GLITCH.get(user);
         if (vote != null) {
             if (vote.vote) {
                 b1.glow(true);

@@ -29,10 +29,9 @@ import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -41,8 +40,10 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 public class CommandImport extends WBCommandExecutor {
     public CommandImport(WoolBattleBukkit woolbattle) {
@@ -63,7 +64,7 @@ public class CommandImport extends WBCommandExecutor {
             CloudNetDriver.getInstance().getLocalTemplateStorage().copyAsync(template, directory).onComplete(suc -> {
                 if (suc) {
                     ctx.getSource().sendMessage(Component.text("Download of template successful"));
-                    new Scheduler() {
+                    new Scheduler(woolbattle) {
                         @Override public void run() {
                             try {
                                 startImport(woolbattle, ctx, directory);
@@ -98,6 +99,7 @@ public class CommandImport extends WBCommandExecutor {
         ctx.getSource().sendMessage(Component.text("Importing spawns"));
         importSpawns(ctx, woolbattle, directory, spawnsYml, mapSize);
         ctx.getSource().sendMessage(Component.text("Import complete"));
+        deleteDirectory(directory);
     }
 
     private static void importSpawns(CommandContext<CommandSource> ctx, WoolBattleBukkit woolbattle, Path directory, Path spawnsYml, MapSize mapSize) throws IOException {
@@ -125,7 +127,9 @@ public class CommandImport extends WBCommandExecutor {
             map.deathHeight(deathHeight);
             map.setIcon(icon);
             if (enabled) map.enable();
+            String originalName = null;
             CloudNetMapIngameData ingameData = new CloudNetMapIngameData();
+            ingameData.worldName(map.getName() + "-" + map.size());
             for (String nameKey : spawnsJson.keySet()) {
                 String locString = spawnsJson.get(nameKey).getAsString();
                 String[] a = locString.split(":");
@@ -134,35 +138,50 @@ public class CommandImport extends WBCommandExecutor {
                 String Z = a[2];
                 String Yaw = a[3];
                 String Pitch = a[4];
-                String worldName = a[5];
-                if (ingameData.worldName() == null) ingameData.worldName(worldName);
+                originalName = a[5];
                 double x = Double.parseDouble(X);
                 double y = Double.parseDouble(Y);
                 double z = Double.parseDouble(Z);
                 float yaw = Float.parseFloat(Yaw);
                 float pitch = Float.parseFloat(Pitch);
-                UnloadedLocation loc = new UnloadedLocation(x, y, z, yaw, pitch, worldName);
+                UnloadedLocation loc = new UnloadedLocation(x, y, z, yaw, pitch, ingameData.worldName());
                 ingameData.spawn(nameKey.toLowerCase(Locale.ROOT), loc);
             }
 
             Path target = Bukkit.getWorldContainer().toPath().normalize().toAbsolutePath().resolve(ingameData.worldName()).toAbsolutePath();
             ctx.getSource().sendMessage(Component.text("Copy world " + ingameData.worldName() + " to " + target.toAbsolutePath()));
-            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            Path worldDirectory = directory.resolve(originalName);
+            Files.walkFileTree(worldDirectory, new SimpleFileVisitor<Path>() {
                 @Override public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    Files.createDirectories(target.resolve(directory.relativize(dir).toString()));
+                    Files.createDirectories(target.resolve(worldDirectory.relativize(dir).toString()));
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.copy(file, target.resolve(directory.relativize(file).toString()));
+                    Files.copy(file, target.resolve(worldDirectory.relativize(file).toString()));
                     return FileVisitResult.CONTINUE;
                 }
             });
             World world = VoidWorldPlugin.instance().loadWorld(ingameData.worldName());
             ingameData.world(world);
             map.ingameData(ingameData);
+            Bukkit.unloadWorld(world, false);
+            woolbattle.mapLoader().save(map).thenRun(() -> {
+                map.ingameData(null);
+                try {
+                    deleteDirectory(target);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
+    }
 
+    private static void deleteDirectory(Path path) throws IOException {
+        try (Stream<Path> walk = Files.walk(path)) {
+            //noinspection ResultOfMethodCallIgnored
+            walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
     }
 
     private static MapSize importTeams(CommandContext<CommandSource> ctx, WoolBattleBukkit woolbattle, Path teamsYml) throws IOException {

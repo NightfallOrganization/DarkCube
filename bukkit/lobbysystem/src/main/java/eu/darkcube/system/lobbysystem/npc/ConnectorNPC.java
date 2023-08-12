@@ -51,8 +51,7 @@ public class ConnectorNPC {
     private static final PersistentDataType<List<String>> strings = PersistentDataTypes.list(PersistentDataTypes.STRING);
     private static final AtomicInteger uidCounter = new AtomicInteger();
     private static final PersistentDataType<List<ConnectorNPC>> type = PersistentDataTypes.list(new PersistentDataType<ConnectorNPC>() {
-        @Override
-        public ConnectorNPC deserialize(JsonDocument doc, String key) {
+        @Override public ConnectorNPC deserialize(JsonDocument doc, String key) {
             JsonDocument d = doc.getDocument(key);
             int id = d.getInt("id");
             String taskName = d.getString("task");
@@ -71,8 +70,7 @@ public class ConnectorNPC {
             return new ConnectorNPC(taskName, id, loc, permissions);
         }
 
-        @Override
-        public void serialize(JsonDocument doc, String key, ConnectorNPC data) {
+        @Override public void serialize(JsonDocument doc, String key, ConnectorNPC data) {
             JsonDocument d = new JsonDocument();
             d.append("task", data.taskName);
             strings.serialize(d, "permissions", data.permissions);
@@ -81,8 +79,7 @@ public class ConnectorNPC {
             doc.append(key, d);
         }
 
-        @Override
-        public ConnectorNPC clone(ConnectorNPC object) {
+        @Override public ConnectorNPC clone(ConnectorNPC object) {
             return new ConnectorNPC(object.taskName, object.id, object.location, object.permissions);
         }
     });
@@ -165,14 +162,12 @@ public class ConnectorNPC {
         }
         connectingPlayers.add(player);
         new BukkitRunnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 connectingPlayers.remove(player);
             }
         }.runTaskLater(Lobby.getInstance(), 20);
         new BukkitRunnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 User user = UserAPI.getInstance().getUser(player);
                 Info c = currentServer.server;
                 if (c == null) return;
@@ -242,7 +237,9 @@ public class ConnectorNPC {
             } else {
                 return Message.CONNECTOR_NPC_SERVER_STARTING.getMessageString(UserAPI.getInstance().getUser(p));
             }
-            return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(UserAPI.getInstance().getUser(p), online, maxplayers == -1 ? 100 : maxplayers);
+            return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(UserAPI
+                    .getInstance()
+                    .getUser(p), online, maxplayers == -1 ? 100 : maxplayers);
         });
         h.add("%%description%%", p -> {
             Info server = currentServer.server;
@@ -259,41 +256,36 @@ public class ConnectorNPC {
     }
 
     public static class Listener {
-        private static final Collection<ServiceInfoSnapshot> services = ConcurrentHashMap.newKeySet();
+        private static final Map<UUID, ServiceInfoSnapshot> services = new ConcurrentHashMap<>();
 
         static {
-            services.addAll(CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices());
+            for (ServiceInfoSnapshot service : CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices()) {
+                services.put(service.getServiceId().getUniqueId(), service);
+            }
         }
 
-        @EventListener
-        public void handle(CloudServiceInfoUpdateEvent event) {
-            boolean added = false;
-            for (ServiceInfoSnapshot service : services) {
-                if (service.getServiceId().getUniqueId().equals(event.getServiceInfo().getServiceId().getUniqueId())) {
-                    services.remove(service); // No ConcurrentModificationException because of ConcurrentHashMap
-                    services.add(event.getServiceInfo());
-                    added = true;
-                    break;
+        @EventListener public void handle(CloudServiceInfoUpdateEvent event) {
+            ServiceInfoSnapshot service = event.getServiceInfo();
+            services.computeIfPresent(service.getServiceId().getUniqueId(), (uuid, serviceInfoSnapshot) -> {
+                if (!AsyncExecutor.service().isShutdown()) {
+                    AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
                 }
-            }
-            if (added) if (!AsyncExecutor.service().isShutdown()) {
-                AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
-            }
+                return service;
+            });
         }
 
-        @EventListener
-        public void handle(CloudServiceConnectNetworkEvent event) {
-            services.add(event.getServiceInfo());
+        @EventListener public void handle(CloudServiceConnectNetworkEvent event) {
+            services.put(event.getServiceInfo().getServiceId().getUniqueId(), event.getServiceInfo());
             System.out.println("[ConnectorNPC] Server connected: " + event.getServiceInfo().getServiceId().getName());
             if (!AsyncExecutor.service().isShutdown()) {
                 AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
             }
         }
 
-        @EventListener
-        public void handle(CloudServiceDisconnectNetworkEvent event) {
+        @EventListener public void handle(CloudServiceDisconnectNetworkEvent event) {
             System.out.println("[ConnectorNPC] Server disconnected: " + event.getServiceInfo().getServiceId().getName());
-            services.remove(event.getServiceInfo());
+            ServiceInfoSnapshot snap = services.remove(event.getServiceInfo().getServiceId().getUniqueId());
+            if (snap == null) System.err.println("Failed to remove from services!!!");
             if (!AsyncExecutor.service().isShutdown()) {
                 AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
             }
@@ -359,7 +351,11 @@ public class ConnectorNPC {
         private volatile Info newServer = null;
 
         private void query() {
-            Collection<ServiceInfoSnapshot> servers = Listener.services.stream().filter(s -> s.getServiceId().getTaskName().equals(taskName)).collect(Collectors.toSet());
+            Collection<ServiceInfoSnapshot> servers = Listener.services
+                    .values()
+                    .stream()
+                    .filter(s -> s.getServiceId().getTaskName().equals(taskName))
+                    .collect(Collectors.toSet());
             Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
             for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
                 try {
@@ -379,7 +375,9 @@ public class ConnectorNPC {
 
                 GameState state = states.get(server);
                 String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
-                if (motd == null || motd.toLowerCase().contains("loading") || (state != GameState.INGAME && server.getProperty(DarkCubeServiceProperty.AUTOCONFIGURED).orElse(false))) {
+                if (motd == null || motd.toLowerCase().contains("loading") || (state != GameState.INGAME && server
+                        .getProperty(DarkCubeServiceProperty.AUTOCONFIGURED)
+                        .orElse(false))) {
                     servers.remove(server);
                     states.remove(server);
                     continue;
@@ -389,8 +387,7 @@ public class ConnectorNPC {
             Collections.sort(sortingInfos);
             this.newServer = sortingInfos.stream().findFirst().orElse(null);
             new BukkitRunnable() {
-                @Override
-                public void run() {
+                @Override public void run() {
                     server = newServer;
                     updateHologram();
                 }
@@ -408,8 +405,7 @@ public class ConnectorNPC {
                 this.motd = motd;
             }
 
-            @Override
-            public int compareTo(@NotNull ConnectorNPC.CurrentServer.Info o) {
+            @Override public int compareTo(@NotNull ConnectorNPC.CurrentServer.Info o) {
                 return minigame.compareTo(o.minigame);
             }
         }

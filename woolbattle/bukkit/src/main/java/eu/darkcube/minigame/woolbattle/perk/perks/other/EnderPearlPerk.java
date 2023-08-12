@@ -30,68 +30,54 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class EnderPearlPerk extends Perk {
     public static final PerkName ENDERPEARL = new PerkName("ENDERPEARL");
 
-    public EnderPearlPerk() {
-        super(ActivationType.MISC, ENDERPEARL, 5, 8, Item.DEFAULT_PEARL,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.DEFAULT_PEARL_COOLDOWN));
-        addListener(new ListenerEnderpearl(this));
+    public EnderPearlPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.MISC, ENDERPEARL, 5, 8, Item.DEFAULT_PEARL, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.DEFAULT_PEARL_COOLDOWN, woolbattle));
+        addListener(new ListenerEnderpearl(this, woolbattle));
     }
 
     public static class ListenerEnderpearl extends BasicPerkListener {
-        public ListenerEnderpearl(Perk perk) {
-            super(perk);
+        private final WoolBattleBukkit woolbattle;
+
+        public ListenerEnderpearl(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
-            EnderPearl enderPearl =
-                    perk.owner().getBukkitEntity().launchProjectile(EnderPearl.class);
-            enderPearl.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(), perk));
+        @Override protected boolean activateRight(UserPerk perk) {
+            EnderPearl enderPearl = perk.owner().getBukkitEntity().launchProjectile(EnderPearl.class);
+            enderPearl.setMetadata("perk", new FixedMetadataValue(woolbattle, perk));
             return true;
         }
 
-        @EventHandler
-        public void handle(EntityDamageByEntityEvent event) {
-            if (!(event.getEntity() instanceof Player))
-                return;
-            if (!(event.getDamager() instanceof EnderPearl))
-                return;
+        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+            if (!(event.getEntity() instanceof Player)) return;
+            if (!(event.getDamager() instanceof EnderPearl)) return;
             WBUser user = WBUser.getUser((Player) event.getEntity());
             EnderPearl enderPearl = (EnderPearl) event.getDamager();
-            if (!enderPearl.hasMetadata("perk"))
-                return;
-            if (!(enderPearl.getMetadata("perk").get(0).value() instanceof UserPerk))
-                return;
+            if (!enderPearl.hasMetadata("perk")) return;
+            if (!(enderPearl.getMetadata("perk").get(0).value() instanceof UserPerk)) return;
             UserPerk perk = (UserPerk) enderPearl.getMetadata("perk").get(0).value();
-            if (!perk.perk().equals(perk()))
-                return;
+            if (!perk.perk().equals(perk())) return;
             if (user.projectileImmunityTicks() == 0) {
-                if (!WoolBattleBukkit.instance().ingame().attack(perk.owner(), user)) {
+                if (!woolbattle.ingame().playerUtil().attack(perk.owner(), user)) {
                     event.setCancelled(true);
                 }
             }
         }
 
-        @EventHandler
-        public void handle(ProjectileHitEvent event) {
-            if (!(event.getEntity() instanceof EnderPearl))
-                return;
+        @EventHandler public void handle(ProjectileHitEvent event) {
+            if (!(event.getEntity() instanceof EnderPearl)) return;
             EnderPearl ep = (EnderPearl) event.getEntity();
-            if (!ep.hasMetadata("perk"))
-                return;
-            if (!(ep.getMetadata("perk").get(0).value() instanceof UserPerk))
-                return;
+            if (!ep.hasMetadata("perk")) return;
+            if (!(ep.getMetadata("perk").get(0).value() instanceof UserPerk)) return;
             UserPerk perk = (UserPerk) ep.getMetadata("perk").get(0).value();
-            if (!perk.perk().equals(perk()))
-                return;
+            if (!perk.perk().equals(perk())) return;
             Block b1 = ep.getLocation().getBlock();
             Block b2 = ep.getLocation().add(0, 1, 0).getBlock();
             Block b3 = ep.getLocation().add(0, 2, 0).getBlock();
             boolean elevate = checkTPUp(b1) || checkTPUp(b2) || checkTPUp(b3);
 
-            EventEnderPearl epe = new EventEnderPearl(perk.owner(),
-                    b1.getType() != Material.AIR || b2.getType() != Material.AIR
-                            || b3.getType() != Material.AIR, elevate);
+            EventEnderPearl epe = new EventEnderPearl(perk.owner(), b1.getType() != Material.AIR || b2.getType() != Material.AIR || b3.getType() != Material.AIR, elevate);
             Bukkit.getPluginManager().callEvent(epe);
             elevate = epe.elevate();
 
@@ -105,16 +91,14 @@ public class EnderPearlPerk extends Perk {
                 }
                 do {
                     block = block.getRelative(0, 1, 0);
-                } while (block.getType() != Material.AIR
-                        || block.getRelative(0, 1, 0).getType() != Material.AIR);
+                } while (block.getType() != Material.AIR || block.getRelative(0, 1, 0).getType() != Material.AIR);
                 tp(perk.owner().getBukkitEntity(), block.getLocation().add(0.5, 0.1, 0.5));
             }
         }
 
         private void tp(Player p, Location loc) {
-            new Scheduler() {
-                @Override
-                public void run() {
+            new Scheduler(woolbattle) {
+                @Override public void run() {
                     loc.setDirection(p.getLocation().getDirection());
                     p.teleport(loc);
                 }

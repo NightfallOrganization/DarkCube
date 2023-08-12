@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.game.ingame;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
@@ -18,26 +19,25 @@ public class SchedulerSpawnProtection extends Scheduler implements ConfiguredSch
     private final Ingame ingame;
     private int protectionTicks;
 
-    public SchedulerSpawnProtection(Ingame ingame) {
+    public SchedulerSpawnProtection(Ingame ingame, WoolBattleBukkit woolbattle) {
+        super(woolbattle);
         this.ingame = ingame;
-        protectionTicks = ingame.spawnprotectionTicksGlobal();
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
+        if (ingame.startingIngame()) return;
         if (protectionTicks == 1) {
             protectionTicks--;
-            ingame.isGlobalSpawnProtection = false;
+            ingame.globalSpawnProtection(false);
             for (WBUser user : WBUser.onlineUsers()) {
                 user.getBukkitEntity().setExp(0);
             }
         }
         if (protectionTicks > 1) {
-            ingame.isGlobalSpawnProtection = true;
+            ingame.globalSpawnProtection(true);
             this.protectionTicks--;
             for (WBUser user : WBUser.onlineUsers()) {
-                user.getBukkitEntity().setExp((float) this.protectionTicks
-                        / (float) ingame.spawnprotectionTicks());
+                user.getBukkitEntity().setExp((float) this.protectionTicks / (float) ingame.spawnprotectionTicksGlobal());
             }
         } else {
             for (WBUser user : WBUser.onlineUsers()) {
@@ -46,22 +46,23 @@ public class SchedulerSpawnProtection extends Scheduler implements ConfiguredSch
                 }
                 if (user.projectileImmunityTicks() > 0) {
                     user.projectileImmunityTicks(user.projectileImmunityTicks() - 1);
-                    ParticleEffect.VILLAGER_HAPPY.display(0.3F, 1F, 0.3F, 1, 2,
-                            user.getBukkitEntity().getLocation(),
-                            WBUser.onlineUsers().stream().filter(WBUser::particles)
-                                    .map(WBUser::getBukkitEntity).collect(Collectors.toList()));
+                    ParticleEffect.VILLAGER_HAPPY.display(0.3F, 1F, 0.3F, 1, 2, user.getBukkitEntity().getLocation(), WBUser
+                            .onlineUsers()
+                            .stream()
+                            .filter(WBUser::particles)
+                            .map(WBUser::getBukkitEntity)
+                            .collect(Collectors.toList()));
                 }
             }
         }
     }
 
-    @Override
-    public void start() {
+    @Override public void start() {
+        protectionTicks = ingame.spawnprotectionTicksGlobal();
         runTaskTimer(1);
     }
 
-    @Override
-    public void stop() {
+    @Override public void stop() {
         cancel();
     }
 }

@@ -19,17 +19,17 @@ public class WoolBattleCommands {
 
     public WoolBattleCommands(WoolBattleBukkit woolbattle) {
         commands.add(new CommandDisableStats());
-        commands.add(new CommandFix());
+        commands.add(new CommandFix(woolbattle));
         commands.add(new CommandIsStats());
         commands.add(new CommandSetMap(woolbattle));
         commands.add(new CommandSettings(woolbattle));
-        commands.add(new CommandTimer());
-        commands.add(new CommandTroll());
+        commands.add(new CommandTimer(woolbattle));
+        commands.add(new CommandTroll(woolbattle));
         commands.add(new CommandVoteLifes(woolbattle));
         commands.add(new CommandWoolBattle(woolbattle));
         commands.add(new CommandSetTeam(woolbattle));
         commands.add(new CommandSetLifes(woolbattle));
-        commands.add(new CommandRevive());
+        commands.add(new CommandRevive(woolbattle));
     }
 
     public void enableAll() {

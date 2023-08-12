@@ -14,12 +14,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 
 public class ListenerChangeBlock extends Listener<EntityChangeBlockEvent> {
-    @Override
-    @EventHandler
-    public void handle(EntityChangeBlockEvent e) {
+    private final WoolBattleBukkit woolbattle;
+
+    public ListenerChangeBlock(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(EntityChangeBlockEvent e) {
         if (e.getEntityType() == EntityType.FALLING_BLOCK) {
             if (e.getTo() == Material.WOOL) {
-                WoolBattleBukkit.instance().ingame().placedBlocks.add(e.getBlock());
+                woolbattle.ingame().placedBlocks.add(e.getBlock());
             } else {
                 e.setCancelled(true);
             }

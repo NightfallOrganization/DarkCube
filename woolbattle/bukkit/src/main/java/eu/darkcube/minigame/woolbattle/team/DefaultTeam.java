@@ -25,55 +25,50 @@ class DefaultTeam implements Team {
 
     private final UUID uuid;
     private final TeamType type;
+    private final WoolBattleBukkit woolbattle;
     private int lifes;
 
-    public DefaultTeam(TeamType type) {
+    public DefaultTeam(TeamType type, WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
         this.uuid = UUID.randomUUID();
         this.type = type;
     }
 
-    @Override
-    public int compareTo(Team o) {
+    @Override public int compareTo(Team o) {
         return getType().compareTo(o.getType());
     }
 
-    @Override
-    public UUID getUniqueId() {
+    @Override public UUID getUniqueId() {
         return uuid;
     }
 
-    @Override
-    public boolean isSpectator() {
+    @Override public boolean isSpectator() {
         return getType().getDisplayNameKey().equals("spectator");
     }
 
-    @Override
-    public boolean canPlay() {
+    @Override public boolean canPlay() {
         return !isSpectator();
     }
 
-    @Override
-    public Component getName(ICommandExecutor executor) {
-        return Message.getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey().toUpperCase(Locale.ROOT), executor.getLanguage()).style(getPrefixStyle());
+    @Override public Component getName(ICommandExecutor executor) {
+        return Message
+                .getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey().toUpperCase(Locale.ROOT), executor.getLanguage())
+                .style(getPrefixStyle());
     }
 
-    @Override
-    public Style getPrefixStyle() {
+    @Override public Style getPrefixStyle() {
         return AdventureSupport.convert(getType().getNameColor());
     }
 
-    @Override
-    public TeamType getType() {
+    @Override public TeamType getType() {
         return type;
     }
 
-    @Override
-    public Collection<? extends WBUser> getUsers() {
+    @Override public Collection<? extends WBUser> getUsers() {
         return WBUser.onlineUsers().stream().filter(user -> user.getTeam().equals(this)).collect(Collectors.toSet());
     }
 
-    @Override
-    public boolean contains(UUID user) {
+    @Override public boolean contains(UUID user) {
         for (WBUser u : getUsers()) {
             if (u.getUniqueId().equals(user)) {
                 return true;
@@ -82,34 +77,28 @@ class DefaultTeam implements Team {
         return false;
     }
 
-    @Override
-    public int getLifes() {
+    @Override public int getLifes() {
         return lifes;
     }
 
-    @Override
-    public void setLifes(int lifes) {
+    @Override public void setLifes(int lifes) {
         this.lifes = lifes;
-        WBUser.onlineUsers().forEach(u -> WoolBattleBukkit.instance().ingame().reloadScoreboardLifes(u));
+        woolbattle.ingame().playerUtil().reloadScoreboardLifes();
     }
 
-    @Override
-    public void setSpawn(Map map, Location location) {
+    @Override public void setSpawn(Map map, Location location) {
         map.ingameData().spawn(getType().getDisplayNameKey(), location);
     }
 
-    @Override
-    public Location getSpawn(Map map) {
+    @Override public Location getSpawn(Map map) {
         return map.ingameData().spawn(getType().getDisplayNameKey());
     }
 
-    @Override
-    public Location getSpawn() {
-        return getSpawn(WoolBattleBukkit.instance().gameData().map());
+    @Override public Location getSpawn() {
+        return getSpawn(woolbattle.gameData().map());
     }
 
-    @Override
-    public void setSpawn(Location location) {
-        setSpawn(WoolBattleBukkit.instance().gameData().map(), location);
+    @Override public void setSpawn(Location location) {
+        setSpawn(woolbattle.gameData().map(), location);
     }
 }

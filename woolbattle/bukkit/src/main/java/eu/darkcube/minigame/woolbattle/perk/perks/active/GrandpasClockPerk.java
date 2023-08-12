@@ -20,63 +20,51 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 
 public class GrandpasClockPerk extends Perk {
-	public static final PerkName GRANDPAS_CLOCK = new PerkName("GRANDPAS_CLOCK");
+    public static final PerkName GRANDPAS_CLOCK = new PerkName("GRANDPAS_CLOCK");
 
-	public GrandpasClockPerk() {
-		super(ActivationType.ACTIVE, GRANDPAS_CLOCK, 16, 18, Item.PERK_GRANDPAS_CLOCK,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_GRANDPAS_CLOCK_COOLDOWN));
-		addListener(new ListenerGrandpasClock(this));
-	}
+    public GrandpasClockPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, GRANDPAS_CLOCK, 16, 18, Item.PERK_GRANDPAS_CLOCK, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_GRANDPAS_CLOCK_COOLDOWN, woolbattle));
+        addListener(new ListenerGrandpasClock(this, woolbattle));
+    }
 
-	public static class ListenerGrandpasClock extends BasicPerkListener {
+    public static class ListenerGrandpasClock extends BasicPerkListener {
 
-		private static final Key DATA_OLD_POS =
-				new Key(WoolBattleBukkit.instance(), "grandpas_clock_old_pos");
-		private static final Key DATA_TICKER =
-				new Key(WoolBattleBukkit.instance(), "grandpas_clock_ticker");
+        private final Key DATA_OLD_POS = new Key(woolbattle, "grandpas_clock_old_pos");
+        private final Key DATA_TICKER = new Key(woolbattle, "grandpas_clock_ticker");
 
-		public ListenerGrandpasClock(Perk perk) {
-			super(perk);
-		}
+        public ListenerGrandpasClock(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+        }
 
-		@Override
-		protected boolean activate(UserPerk perk) {
-			WBUser user = perk.owner();
-			if (user.user().getMetaDataStorage().has(DATA_OLD_POS)) {
-				user.getBukkitEntity()
-						.teleport(user.user().getMetaDataStorage().<Location>remove(DATA_OLD_POS));
-				user.user().getMetaDataStorage().<Scheduler>remove(DATA_TICKER).cancel();
-				user.getBukkitEntity().playSound(user.getBukkitEntity().getBedSpawnLocation(),
-						Sound.ENDERMAN_TELEPORT, 100, 1);
-				return true;
-			}
-			user.user().getMetaDataStorage()
-					.set(DATA_OLD_POS, user.getBukkitEntity().getLocation());
-			user.user().getMetaDataStorage().set(DATA_TICKER, new Scheduler() {
-				private int count = 0;
+        @Override protected boolean activate(UserPerk perk) {
+            WBUser user = perk.owner();
+            if (user.user().getMetaDataStorage().has(DATA_OLD_POS)) {
+                user.getBukkitEntity().teleport(user.user().getMetaDataStorage().<Location>remove(DATA_OLD_POS));
+                user.user().getMetaDataStorage().<Scheduler>remove(DATA_TICKER).cancel();
+                user.getBukkitEntity().playSound(user.getBukkitEntity().getBedSpawnLocation(), Sound.ENDERMAN_TELEPORT, 100, 1);
+                return true;
+            }
+            user.user().getMetaDataStorage().set(DATA_OLD_POS, user.getBukkitEntity().getLocation());
+            user.user().getMetaDataStorage().set(DATA_TICKER, new Scheduler(woolbattle) {
+                private int count = 0;
 
-				{
-					runTaskTimer(10);
-				}
+                {
+                    runTaskTimer(10);
+                }
 
-				@Override
-				public void run() {
-					if (count++ == 6) {
-						user.getBukkitEntity().teleport(
-								user.user().getMetaDataStorage().<Location>remove(DATA_OLD_POS));
-						user.user().getMetaDataStorage().remove(DATA_TICKER);
-						user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(),
-								Sound.ENDERMAN_TELEPORT, 1, 1);
-						cancel();
-						activated(perk);
-						return;
-					}
-					user.getBukkitEntity()
-							.playSound(user.getBukkitEntity().getLocation(), Sound.CLICK, 100, 1);
-				}
-			});
-			return false;
-		}
-	}
+                @Override public void run() {
+                    if (count++ == 6) {
+                        user.getBukkitEntity().teleport(user.user().getMetaDataStorage().<Location>remove(DATA_OLD_POS));
+                        user.user().getMetaDataStorage().remove(DATA_TICKER);
+                        user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+                        cancel();
+                        activated(perk);
+                        return;
+                    }
+                    user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(), Sound.CLICK, 100, 1);
+                }
+            });
+            return false;
+        }
+    }
 }

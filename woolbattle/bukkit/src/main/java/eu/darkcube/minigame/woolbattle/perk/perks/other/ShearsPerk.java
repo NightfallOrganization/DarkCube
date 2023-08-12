@@ -6,16 +6,16 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
 
 public class ShearsPerk extends Perk {
-	public static final PerkName SHEARS = new PerkName("SHEARS");
+    public static final PerkName SHEARS = new PerkName("SHEARS");
 
-	public ShearsPerk() {
-		super(ActivationType.SECONDARY_WEAPON, SHEARS, 0, 0, Item.DEFAULT_SHEARS,
-				(user, perk, id, perkSlot) -> new DefaultUserPerk(user, id, perkSlot, perk));
-	}
+    public ShearsPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.SECONDARY_WEAPON, SHEARS, 0, 0, Item.DEFAULT_SHEARS, (user, perk, id, perkSlot, wb) -> new DefaultUserPerk(user, id, perkSlot, perk, woolbattle));
+    }
 }

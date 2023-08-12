@@ -23,20 +23,22 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.util.Vector;
 
 public class ListenerExplode extends Listener<EntityExplodeEvent> {
+    private final WoolBattleBukkit woolbattle;
 
-    @Override
-    @EventHandler
-    public void handle(EntityExplodeEvent e) {
+    public ListenerExplode(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(EntityExplodeEvent e) {
         Location mid = e.getEntity().getLocation();
         double x = mid.getX();
         double y = mid.getY();
         double z = mid.getZ();
         for (Block b : e.blockList()) {
-            if (WoolBattleBukkit.instance().ingame().destroy(b)) {
-                @SuppressWarnings("deprecation")
-                FallingBlock block = b.getWorld()
-                        .spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(),
-                                b.getData());
+            if (woolbattle.ingame().destroy(b)) {
+                @SuppressWarnings("deprecation") FallingBlock block = b
+                        .getWorld()
+                        .spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(), b.getData());
                 double vx = block.getLocation().getX() - x;
                 double vy = block.getLocation().getY() - y;
                 double vz = block.getLocation().getZ() - z;
@@ -48,18 +50,16 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
         e.blockList().clear();
     }
 
-    @EventHandler
-    public void handle(BlockExplodeEvent event) {
+    @EventHandler public void handle(BlockExplodeEvent event) {
         Location mid = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
         double x = mid.getX();
         double y = mid.getY();
         double z = mid.getZ();
         for (Block b : event.blockList()) {
-            if (WoolBattleBukkit.instance().ingame().destroy(b)) {
-                @SuppressWarnings("deprecation")
-                FallingBlock block = b.getWorld()
-                        .spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(),
-                                b.getData());
+            if (woolbattle.ingame().destroy(b)) {
+                @SuppressWarnings("deprecation") FallingBlock block = b
+                        .getWorld()
+                        .spawnFallingBlock(b.getLocation().add(0.5, 0.5, 0.5), b.getType(), b.getData());
                 double vx = block.getLocation().getX() - x;
                 double vy = block.getLocation().getY() - y;
                 double vz = block.getLocation().getZ() - z;
@@ -71,8 +71,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
         event.blockList().clear();
     }
 
-    @EventHandler
-    public void handle(EntityDamageByBlockEvent event) {
+    @EventHandler public void handle(EntityDamageByBlockEvent event) {
         if (event.getEntityType() != EntityType.PLAYER) {
             return;
         }
@@ -82,9 +81,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
         event.setCancelled(true);
     }
 
-    @SuppressWarnings("deprecation")
-    @EventHandler
-    public void handle(EntityDamageByEntityEvent event) {
+    @SuppressWarnings("deprecation") @EventHandler public void handle(EntityDamageByEntityEvent event) {
         if (event.getEntityType() != EntityType.PLAYER) {
             return;
         }
@@ -114,8 +111,7 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
                 double strength = 0;
                 strength += tnt.getMetadata("boost").get(0).asDouble();
 
-                double t = (tnt.getYield() - tnt.getLocation().distance(loc)) / (tnt.getYield() * 2)
-                        + 0.5;
+                double t = (tnt.getYield() - tnt.getLocation().distance(loc)) / (tnt.getYield() * 2) + 0.5;
                 strength *= t;
                 strength *= 1.2;
                 if (!p.isOnGround()) {
@@ -138,11 +134,14 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
                 velocity.setY(1 + (velocity.getY() * strengthY / 5));
                 velocity.setZ(velocity.getZ() * strengthZ);
                 p.setVelocity(velocity);
-                WoolBattleBukkit.instance().ingame().attack(attacker, user);
+                woolbattle.ingame().playerUtil().attack(attacker, user);
             }
         } else if (event.getDamager().getType() == EntityType.SNOWBALL) {
             Snowball bomb = (Snowball) event.getDamager();
-            if (bomb.getMetadata("perk").size() != 0 && bomb.getMetadata("perk").get(0).asString()
+            if (!bomb.getMetadata("perk").isEmpty() && bomb
+                    .getMetadata("perk")
+                    .get(0)
+                    .asString()
                     .equals(WoolBombPerk.WOOL_BOMB.getName())) {
                 event.setCancelled(true);
             }

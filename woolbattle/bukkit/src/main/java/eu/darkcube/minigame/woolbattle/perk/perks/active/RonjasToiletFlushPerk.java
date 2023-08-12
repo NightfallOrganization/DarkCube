@@ -27,32 +27,29 @@ import org.bukkit.util.Vector;
 public class RonjasToiletFlushPerk extends Perk {
     public static final PerkName RONJAS_TOILET_FLUSH = new PerkName("RONJAS_TOILET_FLUSH");
 
-    public RonjasToiletFlushPerk() {
-        super(ActivationType.ACTIVE, RONJAS_TOILET_FLUSH, 13, 12, Item.PERK_RONJAS_TOILET_SPLASH,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_RONJAS_TOILET_SPLASH_COOLDOWN));
-        addListener(new ListenerRonjasToiletFlush(this));
+    public RonjasToiletFlushPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, RONJAS_TOILET_FLUSH, 13, 12, Item.PERK_RONJAS_TOILET_SPLASH, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_RONJAS_TOILET_SPLASH_COOLDOWN, woolbattle));
+        addListener(new ListenerRonjasToiletFlush(this, woolbattle));
     }
 
     public static class ListenerRonjasToiletFlush extends BasicPerkListener {
 
         private static final double RANGE = 4;
+        private final WoolBattleBukkit woolbattle;
 
-        public ListenerRonjasToiletFlush(Perk perk) {
-            super(perk);
+        public ListenerRonjasToiletFlush(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+            this.woolbattle = woolbattle;
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             Egg egg = perk.owner().getBukkitEntity().launchProjectile(Egg.class);
-            egg.setMetadata("source", new FixedMetadataValue(WoolBattleBukkit.instance(), perk.owner()));
-            egg.setMetadata("perk", new FixedMetadataValue(WoolBattleBukkit.instance(),
-                    perk.perk().perkName().getName()));
+            egg.setMetadata("source", new FixedMetadataValue(woolbattle, perk.owner()));
+            egg.setMetadata("perk", new FixedMetadataValue(woolbattle, perk.perk().perkName().getName()));
             return true;
         }
 
-        @EventHandler
-        public void handle(ProjectileHitEvent e) {
+        @EventHandler public void handle(ProjectileHitEvent e) {
             if (e.getEntityType() == EntityType.EGG) {
                 Egg egg = (Egg) e.getEntity();
                 if (!isEggPerk(egg)) {
@@ -61,24 +58,26 @@ public class RonjasToiletFlushPerk extends Perk {
                 ParticleEffect.DRIP_WATER.display(.3F, 1F, .3F, 1, 250, egg.getLocation(), 50);
 
                 if (egg.getTicksLived() <= 3) {
-                    WBUser.onlineUsers().stream()
+                    WBUser
+                            .onlineUsers()
+                            .stream()
                             .filter(u -> !u.getTeam().isSpectator())
-                            .map(WBUser::getBukkitEntity).filter(bukkitEntity ->
-                                    bukkitEntity.getLocation().distance(egg.getLocation()) < RANGE)
+                            .map(WBUser::getBukkitEntity)
+                            .filter(bukkitEntity -> bukkitEntity.getLocation().distance(egg.getLocation()) < RANGE)
                             .forEach(t -> {
                                 Vector v = egg.getVelocity().multiply(1.3);
-                                v.setY(egg.getVelocity().getY()).normalize().multiply(3)
-                                        .setY(v.getY() + 1.2);
+                                v.setY(egg.getVelocity().getY()).normalize().multiply(3).setY(v.getY() + 1.2);
                                 t.setVelocity(v);
                             });
                 } else {
-                    WBUser.onlineUsers().stream()
+                    WBUser
+                            .onlineUsers()
+                            .stream()
                             .filter(u -> !u.getTeam().isSpectator())
                             .map(WBUser::getBukkitEntity)
                             .filter(bukkitEntity -> bukkitEntity.getWorld().equals(egg.getWorld()))
-                            .filter(bukkitEntity ->
-                                    bukkitEntity.getLocation().distance(egg.getLocation())
-                                            < RANGE + 1).forEach(t -> {
+                            .filter(bukkitEntity -> bukkitEntity.getLocation().distance(egg.getLocation()) < RANGE + 1)
+                            .forEach(t -> {
                                 double x = t.getLocation().getX() - egg.getLocation().getX();
                                 double y = t.getLocation().getY() - egg.getLocation().getY();
                                 double z = t.getLocation().getZ() - egg.getLocation().getZ();
@@ -88,11 +87,8 @@ public class RonjasToiletFlushPerk extends Perk {
             }
         }
 
-        @EventHandler
-        public void handle(EntityDamageByEntityEvent e) {
-            if (e.getEntityType() != EntityType.PLAYER
-                    || e.getDamager().getType() != EntityType.EGG)
-                return;
+        @EventHandler public void handle(EntityDamageByEntityEvent e) {
+            if (e.getEntityType() != EntityType.PLAYER || e.getDamager().getType() != EntityType.EGG) return;
             Player t = (Player) e.getEntity();
             Egg egg = (Egg) e.getDamager();
             if (!isEggPerk(egg)) {
@@ -104,7 +100,7 @@ public class RonjasToiletFlushPerk extends Perk {
                 e.setCancelled(true);
                 return;
             }
-            WoolBattleBukkit.instance().ingame().attack(user, target);
+            woolbattle.ingame().playerUtil().attack(user, target);
         }
 
         private boolean isEggPerk(Egg egg) {
@@ -114,8 +110,7 @@ public class RonjasToiletFlushPerk extends Perk {
             if (!egg.hasMetadata("perk")) {
                 return false;
             }
-            return egg.getMetadata("perk").get(0).asString()
-                    .equals(RonjasToiletFlushPerk.RONJAS_TOILET_FLUSH.getName());
+            return egg.getMetadata("perk").get(0).asString().equals(RonjasToiletFlushPerk.RONJAS_TOILET_FLUSH.getName());
         }
     }
 }

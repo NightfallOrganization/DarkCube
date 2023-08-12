@@ -42,113 +42,93 @@ import java.util.UUID;
 
 class DefaultWBUser implements WBUser {
 
-    private static final Key KEY_WOOL_SUBTRACT_DIRECTION =
-            new Key(WoolBattleBukkit.instance(), "woolSubtractDirection");
-    private static final PersistentDataType<WoolSubtractDirection> TYPE_WOOL_SUBTRACT_DIRECTION =
-            PersistentDataTypes.enumType(WoolSubtractDirection.class);
-    private static final Key KEY_HEIGHT_DISPLAY =
-            new Key(WoolBattleBukkit.instance().getName(), "heightDisplay");
-    private static final PersistentDataType<HeightDisplay> TYPE_HEIGHT_DISPLAY =
-            new PersistentDataType<HeightDisplay>() {
-                @Override
-                public HeightDisplay deserialize(JsonDocument doc, String key) {
-                    doc = doc.getDocument(key);
-                    return new HeightDisplay(doc.getBoolean("enabled"), doc.getInt("maxDistance"),
-                            doc.getChar("color"));
-                }
+    private static final Key KEY_WOOL_SUBTRACT_DIRECTION = new Key(WoolBattleBukkit.instance(), "woolSubtractDirection");
+    private static final PersistentDataType<WoolSubtractDirection> TYPE_WOOL_SUBTRACT_DIRECTION = PersistentDataTypes.enumType(WoolSubtractDirection.class);
+    private static final Key KEY_HEIGHT_DISPLAY = new Key(WoolBattleBukkit.instance().getName(), "heightDisplay");
+    private static final PersistentDataType<HeightDisplay> TYPE_HEIGHT_DISPLAY = new PersistentDataType<HeightDisplay>() {
+        @Override public HeightDisplay deserialize(JsonDocument doc, String key) {
+            doc = doc.getDocument(key);
+            return new HeightDisplay(doc.getBoolean("enabled"), doc.getInt("maxDistance"), doc.getChar("color"));
+        }
 
-                @Override
-                public void serialize(JsonDocument doc, String key, HeightDisplay data) {
-                    doc.append(key, JsonDocument.newDocument().append("enabled", data.enabled)
-                            .append("maxDistance", data.maxDistance).append("color", data.color));
-                }
+        @Override public void serialize(JsonDocument doc, String key, HeightDisplay data) {
+            doc.append(key, JsonDocument
+                    .newDocument()
+                    .append("enabled", data.enabled)
+                    .append("maxDistance", data.maxDistance)
+                    .append("color", data.color));
+        }
 
-                @Override
-                public HeightDisplay clone(HeightDisplay object) {
-                    return object.clone();
-                }
-            };
+        @Override public HeightDisplay clone(HeightDisplay object) {
+            return object.clone();
+        }
+    };
     private static final Key KEY_PARTICLES = new Key(WoolBattleBukkit.instance(), "particles");
     private static final PersistentDataType<Boolean> TYPE_PARTICLES = PersistentDataTypes.BOOLEAN;
     private static final Key KEY_PERKS = new Key(WoolBattleBukkit.instance(), "perks");
-    private static final PersistentDataType<PerkName> TYPE_PERK_NAME =
-            PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new,
-                    p -> p);
-    private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME =
-            PersistentDataTypes.list(TYPE_PERK_NAME);
-    private static final PersistentDataType<PlayerPerks> TYPE_PERKS =
-            new PersistentDataType<PlayerPerks>() {
-                @Override
-                public PlayerPerks deserialize(JsonDocument doc, String key) {
-                    doc = doc.getDocument(key);
-                    JsonDocument docPerks = doc.getDocument("perks");
-                    JsonDocument docPerkSlots = doc.getDocument("perkSlots");
-                    Map<ActivationType, PerkName[]> perks = new HashMap<>();
-                    Map<ActivationType, int[]> perkSlots = new HashMap<>();
-                    for (String documentKey : docPerks.keys()) {
-                        ActivationType type = ActivationType.valueOf(documentKey);
-                        PerkName[] array = TYPE_LIST_PERK_NAME.deserialize(docPerks, documentKey)
-                                .toArray(new PerkName[0]);
-                        perks.put(type, array);
-                    }
-                    for (String documentKey : docPerkSlots.keys()) {
-                        ActivationType type = ActivationType.valueOf(documentKey);
-                        int[] array = TYPE_INT_ARRAY.deserialize(docPerkSlots, documentKey);
-                        perkSlots.put(type, array);
-                    }
-                    return new DefaultPlayerPerks(perks, perkSlots);
-                }
+    private static final PersistentDataType<PerkName> TYPE_PERK_NAME = PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new, p -> p);
+    private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME = PersistentDataTypes.list(TYPE_PERK_NAME);
+    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<int[]>() {
+        @Override public int[] deserialize(JsonDocument doc, String key) {
+            byte[] bytes = doc.getBinary(key);
+            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
+            int len = buf.get();
+            int[] ar = new int[len];
+            for (int i = 0; buf.remaining() > 0; i++) {
+                ar[i] = buf.get();
+            }
+            return ar;
+        }
 
-                @Override
-                public void serialize(JsonDocument doc, String key, PlayerPerks data) {
-                    JsonDocument d = JsonDocument.newDocument();
-                    JsonDocument docPerks = new JsonDocument();
-                    JsonDocument docPerkSlots = new JsonDocument();
-                    for (ActivationType type : ActivationType.values()) {
-                        TYPE_LIST_PERK_NAME.serialize(docPerks, type.name(),
-                                Arrays.asList(data.perks(type)));
-                        TYPE_INT_ARRAY.serialize(docPerkSlots, type.name(),
-                                data.perkInvSlots(type));
-                    }
-                    d.append("perks", docPerks).append("perkSlots", docPerkSlots);
-                    doc.append(key, d);
-                }
+        @Override public void serialize(JsonDocument doc, String key, int[] data) {
+            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
+            IntBuffer ib = buf.asIntBuffer();
+            ib.put(data.length);
+            for (int i : data)
+                ib.put(i);
+            doc.append(key, buf.array());
+        }
 
-                @Override
-                public PlayerPerks clone(PlayerPerks object) {
-                    return object.clone();
-                }
-            };
-    private static final PersistentDataType<int[]> TYPE_INT_ARRAY =
-            new PersistentDataType<int[]>() {
-                @Override
-                public int[] deserialize(JsonDocument doc, String key) {
-                    byte[] bytes = doc.getBinary(key);
-                    IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
-                    int len = buf.get();
-                    int[] ar = new int[len];
-                    for (int i = 0; buf.remaining() > 0; i++) {
-                        ar[i] = buf.get();
-                    }
-                    return ar;
-                }
+        @Override public int[] clone(int[] object) {
+            return object.clone();
+        }
+    };
+    private static final PersistentDataType<PlayerPerks> TYPE_PERKS = new PersistentDataType<PlayerPerks>() {
+        @Override public PlayerPerks deserialize(JsonDocument doc, String key) {
+            doc = doc.getDocument(key);
+            JsonDocument docPerks = doc.getDocument("perks");
+            JsonDocument docPerkSlots = doc.getDocument("perkSlots");
+            Map<ActivationType, PerkName[]> perks = new HashMap<>();
+            Map<ActivationType, int[]> perkSlots = new HashMap<>();
+            for (String documentKey : docPerks.keys()) {
+                ActivationType type = ActivationType.valueOf(documentKey);
+                PerkName[] array = TYPE_LIST_PERK_NAME.deserialize(docPerks, documentKey).toArray(new PerkName[0]);
+                perks.put(type, array);
+            }
+            for (String documentKey : docPerkSlots.keys()) {
+                ActivationType type = ActivationType.valueOf(documentKey);
+                int[] array = TYPE_INT_ARRAY.deserialize(docPerkSlots, documentKey);
+                perkSlots.put(type, array);
+            }
+            return new DefaultPlayerPerks(perks, perkSlots);
+        }
 
-                @Override
-                public void serialize(JsonDocument doc, String key, int[] data) {
-                    ByteBuffer buf =
-                            ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
-                    IntBuffer ib = buf.asIntBuffer();
-                    ib.put(data.length);
-                    for (int i : data)
-                        ib.put(i);
-                    doc.append(key, buf.array());
-                }
+        @Override public void serialize(JsonDocument doc, String key, PlayerPerks data) {
+            JsonDocument d = JsonDocument.newDocument();
+            JsonDocument docPerks = new JsonDocument();
+            JsonDocument docPerkSlots = new JsonDocument();
+            for (ActivationType type : ActivationType.values()) {
+                TYPE_LIST_PERK_NAME.serialize(docPerks, type.name(), Arrays.asList(data.perks(type)));
+                TYPE_INT_ARRAY.serialize(docPerkSlots, type.name(), data.perkInvSlots(type));
+            }
+            d.append("perks", docPerks).append("perkSlots", docPerkSlots);
+            doc.append(key, d);
+        }
 
-                @Override
-                public int[] clone(int[] object) {
-                    return object.clone();
-                }
-            };
+        @Override public PlayerPerks clone(PlayerPerks object) {
+            return object.clone();
+        }
+    };
     private final WoolBattleBukkit woolbattle;
     private final User user;
     private final UserPerks perks;
@@ -165,127 +145,99 @@ class DefaultWBUser implements WBUser {
     public DefaultWBUser(WoolBattleBukkit woolbattle, User user) {
         this.woolbattle = woolbattle;
         this.user = user;
-        user.getPersistentDataStorage().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY,
-                HeightDisplay.getDefault());
+        user.getPersistentDataStorage().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay.getDefault());
         user.getPersistentDataStorage().setIfNotPresent(KEY_PARTICLES, TYPE_PARTICLES, true);
-        user.getPersistentDataStorage()
-                .setIfNotPresent(KEY_PERKS, TYPE_PERKS, new DefaultPlayerPerks());
-        user.getPersistentDataStorage()
-                .setIfNotPresent(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION,
-                        WoolSubtractDirection.getDefault());
+        user.getPersistentDataStorage().setIfNotPresent(KEY_PERKS, TYPE_PERKS, new DefaultPlayerPerks());
+        user
+                .getPersistentDataStorage()
+                .setIfNotPresent(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection.getDefault());
         spawnProtectionTicks = 0;
         trollmode = false;
         kills = 0;
         deaths = 0;
-        perks = new UserPerks(this);
+        perks = new UserPerks(woolbattle, this);
     }
 
-    @Override
-    public User user() {
+    @Override public User user() {
         return user;
     }
 
-    @Override
-    public UUID getUniqueId() {
+    @Override public UUID getUniqueId() {
         return user.getUniqueId();
     }
 
-    @Override
-    public String getPlayerName() {
+    @Override public String getPlayerName() {
         return user.getName();
     }
 
-    @Override
-    public Component getTeamPlayerName() {
+    @Override public Component getTeamPlayerName() {
         return Component.text(user.getName()).style(getTeam().getPrefixStyle());
     }
 
-    @Override
-    public Language getLanguage() {
-        return user.getLanguage();
+    @Override public Language getLanguage() {
+        return user.language();
     }
 
-    @Override
-    public void setLanguage(Language language) {
-        user.setLanguage(language);
+    @Override public void setLanguage(Language language) {
+        user.language(language);
     }
 
-    @Override
-    public Team getTeam() {
+    @Override public Team getTeam() {
         return woolbattle.teamManager().getTeam(this);
     }
 
-    @Override
-    public void setTeam(Team team) {
+    @Override public void setTeam(Team team) {
         woolbattle.teamManager().setTeam(this, team);
     }
 
-    @Override
-    public UserPerks perks() {
+    @Override public UserPerks perks() {
         return perks;
     }
 
-    @Override
-    public PlayerPerks perksStorage() {
-        return user.getPersistentDataStorage().get(KEY_PERKS, TYPE_PERKS, DefaultPlayerPerks::new)
-                .clone();
+    @Override public PlayerPerks perksStorage() {
+        return user.getPersistentDataStorage().get(KEY_PERKS, TYPE_PERKS, DefaultPlayerPerks::new).clone();
     }
 
-    @Override
-    public void perksStorage(PlayerPerks perks) {
+    @Override public void perksStorage(PlayerPerks perks) {
         user.getPersistentDataStorage().set(KEY_PERKS, TYPE_PERKS, perks.clone());
     }
 
-    @Override
-    public boolean particles() {
+    @Override public boolean particles() {
         return user.getPersistentDataStorage().get(KEY_PARTICLES, TYPE_PARTICLES, () -> true);
     }
 
-    @Override
-    public void particles(boolean particles) {
+    @Override public void particles(boolean particles) {
         user.getPersistentDataStorage().set(KEY_PARTICLES, TYPE_PARTICLES, particles);
     }
 
-    @Override
-    public HeightDisplay heightDisplay() {
-        return user.getPersistentDataStorage()
-                .get(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay::getDefault).clone();
+    @Override public HeightDisplay heightDisplay() {
+        return user.getPersistentDataStorage().get(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay::getDefault).clone();
     }
 
-    @Override
-    public void heightDisplay(HeightDisplay heightDisplay) {
-        user.getPersistentDataStorage()
-                .set(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, heightDisplay.clone());
+    @Override public void heightDisplay(HeightDisplay heightDisplay) {
+        user.getPersistentDataStorage().set(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, heightDisplay.clone());
     }
 
-    @Override
-    public WoolSubtractDirection woolSubtractDirection() {
-        return user.getPersistentDataStorage()
-                .get(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION,
-                        WoolSubtractDirection::getDefault);
+    @Override public WoolSubtractDirection woolSubtractDirection() {
+        return user
+                .getPersistentDataStorage()
+                .get(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection::getDefault);
     }
 
-    @Override
-    public void woolSubtractDirection(WoolSubtractDirection woolSubtractDirection) {
-        user.getPersistentDataStorage()
-                .set(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION,
-                        woolSubtractDirection);
+    @Override public void woolSubtractDirection(WoolSubtractDirection woolSubtractDirection) {
+        user.getPersistentDataStorage().set(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, woolSubtractDirection);
     }
 
-    @Override
-    public int woolCount() {
+    @Override public int woolCount() {
         return woolCount;
     }
 
-    @Override
-    public int addWool(int count) {
+    @Override public int addWool(int count) {
         return addWool(count, false);
     }
 
-    @Override
-    public int addWool(int count, boolean dropIfFull) {
-        if (count == 0)
-            return 0;
+    @Override public int addWool(int count, boolean dropIfFull) {
+        if (count == 0) return 0;
         int maxAdd = getMaxWoolSize() - woolCount;
         if (maxAdd < 0) {
             removeWool(-maxAdd);
@@ -300,8 +252,7 @@ class DefaultWBUser implements WBUser {
         }
         int addCount = Math.min(event.amount(), maxAdd);
         int dropCount = event.amount() - addCount;
-        if (event.isCancelled())
-            return 0;
+        if (event.isCancelled()) return 0;
         int added = 0;
         ItemStack item = getSingleWoolItem();
         Inventory inv = getBukkitEntity().getInventory();
@@ -313,8 +264,7 @@ class DefaultWBUser implements WBUser {
             inv.addItem(i);
         }
         woolCount += added;
-        EventUserWoolCountUpdate eventUserWoolCountUpdate =
-                new EventUserWoolCountUpdate(this, woolCount);
+        EventUserWoolCountUpdate eventUserWoolCountUpdate = new EventUserWoolCountUpdate(this, woolCount);
         Bukkit.getPluginManager().callEvent(eventUserWoolCountUpdate);
         if (event.dropRemaining()) {
             while (dropCount > 0) {
@@ -322,171 +272,138 @@ class DefaultWBUser implements WBUser {
                 i.setAmount(Math.min(64, dropCount));
                 dropCount -= 64;
                 added += i.getAmount();
-                getBukkitEntity().getWorld()
-                        .dropItemNaturally(getBukkitEntity().getLocation().add(0, 0.5, 0), i);
+                getBukkitEntity().getWorld().dropItemNaturally(getBukkitEntity().getLocation().add(0, 0.5, 0), i);
             }
         }
         return added;
     }
 
-    @Override
-    public int removeWool(int count) {
+    @Override public int removeWool(int count) {
         return removeWool(count, true);
     }
 
-    @Override
-    public int removeWool(int count, boolean updateInventory) {
-        if (count == 0)
-            return 0;
+    @Override public int removeWool(int count, boolean updateInventory) {
+        if (count == 0) return 0;
         EventUserRemoveWool event = new EventUserRemoveWool(this, count);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled())
-            return 0;
+        if (event.isCancelled()) return 0;
         int removeCount = Math.min(woolCount, event.amount());
         woolCount -= removeCount;
         if (updateInventory) {
             ItemStack singleItem = getSingleWoolItem();
-            ItemManager.removeItems(this, getBukkitEntity().getInventory(), singleItem,
-                    removeCount);
+            ItemManager.removeItems(this, getBukkitEntity().getInventory(), singleItem, removeCount);
         }
-        EventUserWoolCountUpdate eventUserWoolCountUpdate =
-                new EventUserWoolCountUpdate(this, woolCount);
+        EventUserWoolCountUpdate eventUserWoolCountUpdate = new EventUserWoolCountUpdate(this, woolCount);
         Bukkit.getPluginManager().callEvent(eventUserWoolCountUpdate);
         return removeCount;
     }
 
-    @Override
-    public int getMaxWoolSize() {
+    @Override public int getMaxWoolSize() {
         return 64 * 3 * (1 + perkCount(ExtraWoolPerk.EXTRA_WOOL));
     }
 
-    @Override
-    public int getWoolBreakAmount() {
+    @Override public int getWoolBreakAmount() {
         return 2 * (1 + perkCount(ExtraWoolPerk.EXTRA_WOOL));
     }
 
-    @Override
-    public int getSpawnProtectionTicks() {
+    @Override public int getSpawnProtectionTicks() {
         return spawnProtectionTicks;
     }
 
-    @Override
-    public void setSpawnProtectionTicks(int ticks) {
+    @Override public void setSpawnProtectionTicks(int ticks) {
         this.spawnProtectionTicks = ticks;
         getBukkitEntity().setExp((float) getSpawnProtectionTicks() / (float) woolbattle.ingame().spawnprotectionTicks());
     }
 
-    @Override
-    public boolean hasSpawnProtection() {
+    @Override public boolean hasSpawnProtection() {
         return getSpawnProtectionTicks() > 0;
     }
 
-    @Override
-    public boolean isTrollMode() {
+    @Override public boolean isTrollMode() {
         return trollmode;
     }
 
-    @Override
-    public void setTrollMode(boolean trollmode) {
+    @Override public void setTrollMode(boolean trollmode) {
         this.trollmode = trollmode;
         woolbattle.sendMessage("§aTrollmode " + (trollmode ? "§aAn" : "§cAus"), getBukkitEntity());
     }
 
-    @Override
-    public CraftPlayer getBukkitEntity() {
+    @Override public CraftPlayer getBukkitEntity() {
         return (CraftPlayer) user.asPlayer();
     }
 
-    @Override
-    public IInventory getOpenInventory() {
+    @Override public IInventory getOpenInventory() {
         return openInventory;
     }
 
-    @Override
-    public void setOpenInventory(IInventory id) {
+    @Override public void setOpenInventory(IInventory id) {
         this.openInventory = id;
-        if (this.openInventory != null)
-            this.openInventory.open(this.getBukkitEntity());
+        if (this.openInventory != null) this.openInventory.open(this.getBukkitEntity());
     }
 
-    @Override
-    public ItemStack getSingleWoolItem() {
+    @Override public ItemStack getSingleWoolItem() {
         return new ItemStack(Material.WOOL, 1, getTeam().getType().getWoolColor().getWoolData());
     }
 
-    @Override
-    public WBUser getLastHit() {
+    @Override public WBUser getLastHit() {
         return lastHit;
     }
 
-    @Override
-    public void setLastHit(WBUser user) {
+    @Override public void setLastHit(WBUser user) {
         this.lastHit = user;
     }
 
-    @Override
-    public int getTicksAfterLastHit() {
+    @Override public int getTicksAfterLastHit() {
         return ticksAfterLastHit;
     }
 
-    @Override
-    public void setTicksAfterLastHit(int ticks) {
+    @Override public void setTicksAfterLastHit(int ticks) {
         ticksAfterLastHit = ticks;
     }
 
-    @Override
-    public int projectileImmunityTicks() {
+    @Override public int projectileImmunityTicks() {
         return projectileImmunityTicks;
     }
 
-    @Override
-    public void projectileImmunityTicks(int projectileImmunityTicks) {
+    @Override public void projectileImmunityTicks(int projectileImmunityTicks) {
         this.projectileImmunityTicks = projectileImmunityTicks;
     }
 
-    @Override
-    public int getKills() {
+    @Override public int getKills() {
         return kills;
     }
 
-    @Override
-    public void setKills(int kills) {
+    @Override public void setKills(int kills) {
         this.kills = kills;
         if (getBukkitEntity() != null) {
             getBukkitEntity().setLevel(kills);
         }
     }
 
-    @Override
-    public int getDeaths() {
+    @Override public int getDeaths() {
         return deaths;
     }
 
-    @Override
-    public void setDeaths(int deaths) {
+    @Override public void setDeaths(int deaths) {
         this.deaths = deaths;
     }
 
-    @Override
-    public double getKD() {
+    @Override public double getKD() {
         return getDeaths() != 0 ? (double) getKills() / (double) getDeaths() : getKills();
     }
 
     private int perkCount(@SuppressWarnings("SameParameterValue") PerkName perk) {
         int c = 0;
         for (UserPerk p : perks.perks())
-            if (p.perk().perkName().equals(perk))
-                c++;
+            if (p.perk().perkName().equals(perk)) c++;
         return c;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
         return obj instanceof WBUser && getUniqueId().equals(((WBUser) obj).getUniqueId());
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return getPlayerName();
     }
 }

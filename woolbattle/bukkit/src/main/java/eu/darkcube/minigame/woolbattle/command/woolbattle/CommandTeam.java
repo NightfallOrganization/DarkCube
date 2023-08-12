@@ -43,8 +43,7 @@ public class CommandTeam extends WBCommandExecutor {
             this.woolbattle = woolbattle;
         }
 
-        @Override
-        public boolean test(MapSize mapSize) {
+        @Override public boolean test(MapSize mapSize) {
             return woolbattle
                     .teamManager()
                     .teamTypes()
@@ -59,8 +58,7 @@ public class CommandTeam extends WBCommandExecutor {
     private static class MapSizeToString implements TeamTypeArgument.ToStringFunction {
         private final TeamTypeArgument.ToStringFunction parent = TeamTypeArgument.ToStringFunction.function();
 
-        @Override
-        public <S> String[] toString(CommandContext<S> context, TeamType teamType) {
+        @Override public <S> String[] toString(CommandContext<S> context, TeamType teamType) {
             MapSize mapSize = MapSizeArgument.mapSize(context, "mapSize");
             if (mapSize.equals(teamType.mapSize())) {
                 return parent.toString(context, teamType);

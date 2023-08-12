@@ -21,10 +21,9 @@ public class CommandListMaps extends WBCommandExecutor {
     public CommandListMaps(WoolBattleBukkit woolbattle) {
         super("listMaps", b -> b
                 .executes(ctx -> listMaps(ctx, woolbattle.mapManager().getMaps()))
-                .then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle))
-                        .executes(ctx -> listMaps(ctx, woolbattle.mapManager().getMaps(MapSizeArgument.mapSize(ctx, "mapSize"))))
-                )
-        );
+                .then(Commands
+                        .argument("mapSize", MapSizeArgument.mapSize(woolbattle))
+                        .executes(ctx -> listMaps(ctx, woolbattle.mapManager().getMaps(MapSizeArgument.mapSize(ctx, "mapSize"))))));
     }
 
     private static int listMaps(CommandContext<CommandSource> ctx, Collection<? extends Map> maps) {
@@ -33,8 +32,7 @@ public class CommandListMaps extends WBCommandExecutor {
             c = Component.text("Es sind keine Maps erstellt");
         } else {
             for (Map map : maps) {
-                c = c.append(Component.text(" - " + map.serialize()))
-                        .append(Component.newline());
+                c = c.append(Component.text(" - " + map.getName() + " (" + map.size() + ")")).append(Component.newline());
             }
         }
         ctx.getSource().sendMessage(c);

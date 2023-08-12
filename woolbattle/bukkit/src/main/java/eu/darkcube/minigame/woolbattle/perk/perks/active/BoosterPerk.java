@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.BasicPerkListener;
@@ -16,30 +17,25 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class BoosterPerk extends Perk {
-	public static final PerkName BOOSTER = new PerkName("BOOSTER");
+    public static final PerkName BOOSTER = new PerkName("BOOSTER");
 
-	public BoosterPerk() {
-		super(ActivationType.ACTIVE, BOOSTER, 18, 12, Item.PERK_BOOSTER,
-				(user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-						Item.PERK_BOOSTER_COOLDOWN));
-		addListener(new ListenerBooster(this));
-	}
+    public BoosterPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, BOOSTER, 18, 12, Item.PERK_BOOSTER, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_BOOSTER_COOLDOWN, woolbattle));
+        addListener(new ListenerBooster(this, woolbattle));
+    }
 
-	public static class ListenerBooster extends BasicPerkListener {
+    public static class ListenerBooster extends BasicPerkListener {
 
-		public ListenerBooster(Perk perk) {
-			super(perk);
-		}
+        public ListenerBooster(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
+        }
 
-		@Override
-		protected boolean activateRight(UserPerk perk) {
-			Player p = perk.owner().getBukkitEntity();
-			Vector velo =
-					p.getLocation().getDirection().setY(p.getLocation().getDirection().getY() + 0.3)
-							.multiply(2.7);
-			velo.setY(velo.getY() / 1.8);
-			p.setVelocity(velo);
-			return true;
-		}
-	}
+        @Override protected boolean activateRight(UserPerk perk) {
+            Player p = perk.owner().getBukkitEntity();
+            Vector velo = p.getLocation().getDirection().setY(p.getLocation().getDirection().getY() + 0.3).multiply(2.7);
+            velo.setY(velo.getY() / 1.8);
+            p.setVelocity(velo);
+            return true;
+        }
+    }
 }

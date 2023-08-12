@@ -6,60 +6,66 @@
  */
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+
 public class Scheduler implements Runnable {
 
-	private SchedulerTask task;
-	private int weight;
-	private Runnable run;
+    private final WoolBattleBukkit woolbattle;
+    private SchedulerTask task;
+    private int weight;
+    private Runnable run;
 
-	public Scheduler() {
-		run = this;
-	}
+    public Scheduler(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+        run = this;
+    }
 
-	public Scheduler(Runnable run) {
-		this.run = run;
-	}
+    public Scheduler(WoolBattleBukkit woolbattle, Runnable run) {
+        this.woolbattle = woolbattle;
+        this.run = run;
+    }
 
-	public void cancel() {
-		if (!isCancelled())
-			task.cancel();
-		task = null;
-	}
+    public void cancel() {
+        if (!isCancelled()) task.cancel();
+        task = null;
+    }
 
-	public void setWeight(int weight) {
-		this.weight = weight;
-		if (task != null)
-			task.setWeight(weight);
+    public void setWeight(int weight) {
+        this.weight = weight;
+        if (task != null) task.setWeight(weight);
+    }
+
+	public WoolBattleBukkit woolbattle() {
+		return woolbattle;
 	}
 
 	public boolean isCancelled() {
-		return task == null;
-	}
+        return task == null;
+    }
 
-	public void runTask() {
-		runTaskLater(0);
-	}
+    public void runTask() {
+        runTaskLater(0);
+    }
 
-	public void runTaskLater(long delay) {
-		task = new SchedulerTask(this, delay, Integer.valueOf(weight));
-	}
+    public void runTaskLater(long delay) {
+        task = new SchedulerTask(this, delay, Integer.valueOf(weight));
+    }
 
-	public void runTaskTimer(long repeat) {
-		runTaskTimer(0, repeat);
-	}
+    public void runTaskTimer(long repeat) {
+        runTaskTimer(0, repeat);
+    }
 
-	public void runTaskTimer(long delay, long repeat) {
-		task = new SchedulerTask(this, delay, repeat, weight);
-	}
+    public void runTaskTimer(long delay, long repeat) {
+        task = new SchedulerTask(this, delay, repeat, weight);
+    }
 
-	@Override
-	public void run() {
-		run.run();
-	}
+    @Override public void run() {
+        run.run();
+    }
 
-	public interface ConfiguredScheduler {
-		void start();
+    public interface ConfiguredScheduler {
+        void start();
 
-		void stop();
-	}
+        void stop();
+    }
 }

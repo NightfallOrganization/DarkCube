@@ -31,59 +31,50 @@ import java.util.Random;
 public class MinigunPerk extends Perk {
     public static final PerkName MINIGUN = new PerkName("MINIGUN");
 
-    public MinigunPerk() {
-        super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN,
-                (user, perk, id, perkSlot) -> new CooldownUserPerk(user, id, perkSlot, perk,
-                        Item.PERK_MINIGUN_COOLDOWN));
-        addListener(new ListenerMinigun(this));
+    public MinigunPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_MINIGUN_COOLDOWN, woolbattle));
+        addListener(new ListenerMinigun(this, woolbattle));
     }
 
     public static class ListenerMinigun extends BasicPerkListener {
 
-        private static final Key DATA_SCHEDULER =
-                new Key(WoolBattleBukkit.instance(), "minigunScheduler");
+        private final Key DATA_SCHEDULER = new Key(woolbattle, "minigunScheduler");
 
-        public ListenerMinigun(Perk perk) {
-            super(perk);
+        public ListenerMinigun(Perk perk, WoolBattleBukkit woolbattle) {
+            super(perk, woolbattle);
         }
 
-        @Override
-        protected boolean activateRight(UserPerk perk) {
+        @Override protected boolean activateRight(UserPerk perk) {
             WBUser user = perk.owner();
             if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
                 return false;
             }
-            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler() {
+            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler(woolbattle) {
                 private int count = 0;
 
                 {
                     runTaskTimer(3);
                 }
 
-                @Override
-                public void cancel() {
+                @Override public void cancel() {
                     perk.cooldown(perk.perk().cooldown().cooldown());
                     super.cancel();
                 }
 
-                @Override
-                public void run() {
+                @Override public void run() {
                     Player p = user.getBukkitEntity();
                     ItemStack item = p.getItemInHand();
 
-                    if (count >= 20 || item == null || !item.equals(
-                            perk.currentPerkItem().calculateItem())) {
+                    if (count >= 20 || item == null || !item.equals(perk.currentPerkItem().calculateItem())) {
                         stop(user);
                         return;
                     }
                     count++;
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 3, false, false),
-                            true);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 3, false, false), true);
                     Snowball s = p.getWorld().spawn(p.getEyeLocation(), Snowball.class);
                     s.setShooter(p);
                     s.setVelocity(p.getLocation().getDirection().multiply(2.5));
-                    s.setMetadata("type", new FixedMetadataValue(WoolBattleBukkit.instance(), "minigun"
-                    ));
+                    s.setMetadata("type", new FixedMetadataValue(woolbattle, "minigun"));
                     payForThePerk(perk);
                 }
             });
@@ -91,8 +82,7 @@ public class MinigunPerk extends Perk {
             return false;
         }
 
-        @EventHandler
-        public void handle(EntityDamageByEntityEvent event) {
+        @EventHandler public void handle(EntityDamageByEntityEvent event) {
             if (event.getEntity() instanceof Player) {
                 WBUser target = WBUser.getUser((Player) event.getEntity());
                 if (event.getDamager() instanceof Snowball) {
@@ -101,19 +91,22 @@ public class MinigunPerk extends Perk {
                         Player p = (Player) ball.getShooter();
                         WBUser user = WBUser.getUser(p);
 
-                        if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString()
-                                .equals("minigun")) {
+                        if (ball.hasMetadata("type") && ball.getMetadata("type").get(0).asString().equals("minigun")) {
                             event.setCancelled(true);
                             if (target.projectileImmunityTicks() > 0) {
                                 return;
                             }
-                            if (!WoolBattleBukkit.instance().ingame().attack(user, target)) {
+                            if (!woolbattle.ingame().playerUtil().attack(user, target)) {
                                 return;
                             }
                             target.getBukkitEntity().damage(0);
 
-                            target.getBukkitEntity().setVelocity(
-                                    ball.getVelocity().setY(0).normalize()
+                            target
+                                    .getBukkitEntity()
+                                    .setVelocity(ball
+                                            .getVelocity()
+                                            .setY(0)
+                                            .normalize()
                                             .multiply(.47 + new Random().nextDouble() / 70 + 1.1)
                                             .setY(.400023));
                         }
@@ -122,8 +115,7 @@ public class MinigunPerk extends Perk {
             }
         }
 
-        @EventHandler
-        public void handle(PlayerItemHeldEvent event) {
+        @EventHandler public void handle(PlayerItemHeldEvent event) {
             WBUser user = WBUser.getUser(event.getPlayer());
             stop(user);
         }

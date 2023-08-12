@@ -21,14 +21,12 @@ public class ListenerDeathMove extends Listener<PlayerMoveEvent> {
         this.woolbattle = woolbattle;
     }
 
-    @Override
-    @EventHandler
-    public void handle(PlayerMoveEvent e) {
+    @Override @EventHandler public void handle(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         if (!user.getTeam().isSpectator()) {
             if (p.getLocation().getY() <= this.woolbattle.gameData().map().deathHeight()) {
-                this.woolbattle.ingame().kill(user);
+                this.woolbattle.ingame().playerUtil().kill(user);
             }
             return;
         }

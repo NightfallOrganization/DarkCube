@@ -12,7 +12,6 @@ import eu.darkcube.minigame.woolbattle.event.perk.other.PlayerHitPlayerEvent;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
-import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.system.util.data.Key;
@@ -25,26 +24,30 @@ import java.util.Random;
 public class ReflectorPerk extends Perk {
     public static final PerkName REFLECTOR = new PerkName("REFLECTOR");
 
-    public ReflectorPerk() {
+    public ReflectorPerk(WoolBattleBukkit woolbattle) {
         super(ActivationType.PASSIVE, REFLECTOR, 70, 15, Item.PERK_REFLECTOR, DefaultUserPerk::new);
-        addListener(new ReflectorListener());
+        addListener(new ReflectorListener(woolbattle));
     }
 
     private final class ReflectorListener implements Listener {
         private final Random random = new Random();
-        private final Key KEY_STORED_KNOCKBACK =
-                new Key(WoolBattleBukkit.instance(), "reflectorStoredKnockback");
+        private final WoolBattleBukkit woolbattle;
+        private final Key KEY_STORED_KNOCKBACK;
+
+        public ReflectorListener(WoolBattleBukkit woolbattle) {
+            this.woolbattle = woolbattle;
+            KEY_STORED_KNOCKBACK = new Key(woolbattle, "reflectorStoredKnockback");
+        }
 
         private boolean attack(WBUser user, WBUser target) {
             if (user.user().getMetaDataStorage().has(KEY_STORED_KNOCKBACK)) {
                 if (random.nextDouble() < 0.5) {
                     double stored = user.user().getMetaDataStorage().get(KEY_STORED_KNOCKBACK);
-                    Vector v = target.getBukkitEntity().getLocation().toVector()
-                            .subtract(user.getBukkitEntity().getLocation().toVector());
+                    Vector v = target.getBukkitEntity().getLocation().toVector().subtract(user.getBukkitEntity().getLocation().toVector());
                     v.normalize();
                     v.multiply(stored);
                     v.setY(.4500023);
-                    if (WoolBattleBukkit.instance().ingame().attack(user, target)) {
+                    if (woolbattle.ingame().playerUtil().attack(user, target)) {
                         user.user().getMetaDataStorage().remove(KEY_STORED_KNOCKBACK);
                         target.getBukkitEntity().damage(0);
                         target.getBukkitEntity().setVelocity(v);
@@ -56,7 +59,7 @@ public class ReflectorPerk extends Perk {
         }
 
         private void store(WBUser user) {
-            for (UserPerk perk : user.perks().perks(perkName())) {
+            for (int i = 0; i < user.perks().count(perkName()); i++) {
                 if (user.user().getMetaDataStorage().has(KEY_STORED_KNOCKBACK)) {
                     double stored = user.user().getMetaDataStorage().get(KEY_STORED_KNOCKBACK);
                     double exp = 0.65;
@@ -68,16 +71,14 @@ public class ReflectorPerk extends Perk {
             }
         }
 
-        @EventHandler
-        public void handle(PlayerHitPlayerEvent event) {
+        @EventHandler public void handle(PlayerHitPlayerEvent event) {
             store(event.target());
             if (attack(event.attacker(), event.target())) {
                 event.setCancelled(true);
             }
         }
 
-        @EventHandler
-        public void handle(BowArrowHitPlayerEvent event) {
+        @EventHandler public void handle(BowArrowHitPlayerEvent event) {
             store(event.target());
             if (attack(event.shooter(), event.target())) {
                 event.setCancelled(true);

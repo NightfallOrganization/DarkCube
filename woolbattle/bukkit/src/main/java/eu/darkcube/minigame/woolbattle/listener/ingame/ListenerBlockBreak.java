@@ -17,10 +17,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 
 public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
+    private final WoolBattleBukkit woolbattle;
 
-    @Override
-    @EventHandler
-    public synchronized void handle(BlockBreakEvent e) {
+    public ListenerBlockBreak(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public synchronized void handle(BlockBreakEvent e) {
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         Block block = e.getBlock();
@@ -31,12 +34,12 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
                 return;
             }
         } else {
-            WoolBattleBukkit.instance().ingame().destroy(block, true);
+            woolbattle.ingame().destroy(block, true);
             return;
         }
         Material type = block.getType();
         if (type == Material.WOOL) {
-            WoolBattleBukkit.instance().ingame().destroy(block, true);
+            woolbattle.ingame().destroy(block, true);
             int tryadd = user.getWoolBreakAmount();
             int added = user.addWool(tryadd);
             if (added != 0) {
@@ -44,7 +47,7 @@ public class ListenerBlockBreak extends Listener<BlockBreakEvent> {
             }
             return;
         }
-        if (!WoolBattleBukkit.instance().ingame().placedBlocks.contains(block)) {
+        if (!woolbattle.ingame().placedBlocks.contains(block)) {
             e.setCancelled(true);
         }
     }

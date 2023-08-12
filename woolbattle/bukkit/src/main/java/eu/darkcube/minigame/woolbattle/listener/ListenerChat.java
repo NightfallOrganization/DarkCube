@@ -19,24 +19,27 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.stream.Collectors;
 
 public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
+    private final WoolBattleBukkit woolbattle;
 
-    @Override
-    @EventHandler
-    public void handle(AsyncPlayerChatEvent e) {
-        WoolBattleBukkit main = WoolBattleBukkit.instance();
+    public ListenerChat(WoolBattleBukkit woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
+    @Override @EventHandler public void handle(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
         String msg = e.getMessage();
         boolean atall = false;
-        boolean replace = !main.lobby().enabled();
+        boolean replace = !woolbattle.lobby().enabled();
         boolean startsatall = false;
-        if (main.ingame().enabled()) {
-            startsatall = msg.startsWith(main.atall);
-            boolean startsatteam = msg.startsWith(main.atteam);
+        if (woolbattle.ingame().enabled()) {
+            startsatall = msg.startsWith(woolbattle.atall);
+            boolean startsatteam = msg.startsWith(woolbattle.atteam);
             atall = startsatall || user.getTeam().getUsers().size() == 1;
-            if (msg.length() >= main.atall.length() + 1) {
-                if ((startsatall && msg.substring(main.atall.length()).charAt(0) == ' ') || (
-                        startsatteam && msg.substring(main.atall.length()).charAt(0) == ' ')) {
+            if (msg.length() >= woolbattle.atall.length() + 1) {
+                if ((startsatall && msg.substring(woolbattle.atall.length()).charAt(0) == ' ') || (startsatteam && msg
+                        .substring(woolbattle.atall.length())
+                        .charAt(0) == ' ')) {
                     msg = msg.replaceFirst(" ", "");
                 }
             }
@@ -50,34 +53,38 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
         }
         String color = user.getTeam().getType().getNameColor().toString();
         e.setCancelled(true);
-        if (msg.length() == 0 || (startsatall && msg.substring(2).length() == 0)) {
+        if (msg.isEmpty() || (startsatall && msg.substring(2).isEmpty())) {
             return;
         }
-        msg = getMessage(p, msg, atall, color, main, startsatall);
+        msg = getMessage(p, msg, atall, color, woolbattle, startsatall);
         if (user.getTeam().isSpectator()) {
-            main.sendMessageWithoutPrefix(msg,
-                    user.getTeam().getUsers().stream().map(u -> Bukkit.getPlayer(u.getUniqueId()))
-                            .collect(Collectors.toSet()));
-            main.sendConsoleWithoutPrefix(msg);
+            woolbattle.sendMessageWithoutPrefix(msg, user
+                    .getTeam()
+                    .getUsers()
+                    .stream()
+                    .map(u -> Bukkit.getPlayer(u.getUniqueId()))
+                    .collect(Collectors.toSet()));
+            woolbattle.sendConsoleWithoutPrefix(msg);
         } else {
             for (WBUser t : WBUser.onlineUsers()) {
                 String pmsg = msg;
                 if (atall && replace) {
-                    pmsg = pmsg.replaceFirst(main.atall, LegacyComponentSerializer.legacySection()
+                    pmsg = pmsg.replaceFirst(woolbattle.atall, LegacyComponentSerializer
+                            .legacySection()
                             .serialize(Message.AT_ALL.getMessage(t)));
                     t.getBukkitEntity().sendMessage(pmsg);
                 } else if (t.getTeam().getType().equals(user.getTeam().getType())) {
                     t.getBukkitEntity().sendMessage(pmsg);
                 }
             }
-            main.sendConsoleWithoutPrefix(msg);
+            woolbattle.sendConsoleWithoutPrefix(msg);
         }
     }
 
-    private String getMessage(Player p, String msg, boolean atall, String color, WoolBattleBukkit main,
-                              boolean satall) {
-        return color + (atall && main.ingame().enabled() ? main.atall : "") + color + p.getName()
-                + ChatColor.RESET + ": " + (satall ? msg.substring(main.atall.length()) : msg);
+    private String getMessage(Player p, String msg, boolean atall, String color, WoolBattleBukkit main, boolean satall) {
+        return color + (atall && main
+                .ingame()
+                .enabled() ? main.atall : "") + color + p.getName() + ChatColor.RESET + ": " + (satall ? msg.substring(main.atall.length()) : msg);
     }
 
 }

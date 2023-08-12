@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
-import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.system.annotations.Api;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 public class SchedulerTask implements Comparable<SchedulerTask> {
@@ -26,7 +26,7 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
         this.repeat = repeat;
         this.delay = delay;
         this.lastExecution = MinecraftServer.currentTick + delay - repeat;
-        WoolBattleBukkit.instance().schedulers().add(this);
+        scheduler.woolbattle().schedulers().add(this);
     }
 
     SchedulerTask(Scheduler scheduler, long delay, Integer weight) {
@@ -43,15 +43,15 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
         return repeat != 0;
     }
 
-    public long getRepeat() {
+    @Api public long getRepeat() {
         return repeat;
     }
 
-    public long getDelay() {
+    @Api public long getDelay() {
         return delay;
     }
 
-    public int getWeight() {
+    @Api public int getWeight() {
         return weight;
     }
 
@@ -60,7 +60,7 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
     }
 
     public final void cancel() {
-        WoolBattleBukkit.instance().schedulers().remove(this);
+        scheduler.woolbattle().schedulers().remove(this);
         scheduler = null;
         delay = 0;
         repeat = 0;
@@ -83,13 +83,11 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
     }
 
     public long getNextExecution() {
-        if (repeat != 0)
-            return getLastExecution() + repeat;
+        if (repeat != 0) return getLastExecution() + repeat;
         return getLastExecution();
     }
 
-    @Override
-    public int compareTo(SchedulerTask o) {
+    @Override public int compareTo(SchedulerTask o) {
         return weight.compareTo(o.weight);
     }
 }

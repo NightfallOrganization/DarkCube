@@ -14,7 +14,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 
 public class CommandEnable extends WBCommandExecutor {
-    public CommandEnable() {
+    public CommandEnable(WoolBattleBukkit woolbattle) {
         super("enable", b -> b.executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");
             if (map.isEnabled()) {
@@ -22,7 +22,7 @@ public class CommandEnable extends WBCommandExecutor {
                         .color(NamedTextColor.RED));
             } else {
                 map.enable();
-                WoolBattleBukkit.instance().lobby().recalculateMap();
+                woolbattle.lobby().recalculateMap();
                 ctx.getSource().sendMessage(
                         Component.text("Du hast die Map '" + map.getName() + "' aktiviert!")
                                 .color(NamedTextColor.GREEN));

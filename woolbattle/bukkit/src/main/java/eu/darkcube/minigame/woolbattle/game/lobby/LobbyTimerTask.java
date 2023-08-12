@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.game.lobby;
 
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
@@ -17,17 +18,17 @@ public class LobbyTimerTask extends Scheduler implements Scheduler.ConfiguredSch
     private final ObservableInteger overrideTimer;
     private boolean announced = false;
 
-    public LobbyTimerTask(Lobby lobby, ObservableInteger overrideTimer) {
+    public LobbyTimerTask(Lobby lobby, ObservableInteger overrideTimer, WoolBattleBukkit woolbattle) {
+        super(woolbattle);
         this.lobby = lobby;
         this.overrideTimer = overrideTimer;
     }
 
-    @Override
-    public void run() {
-        if (lobby.maxPlayerCount() == 0 && !this.announced) {
+    @Override public void run() {
+        if (lobby.maxPlayerCount() == -1 && !this.announced) {
             this.announced = true;
             lobby.woolbattle().sendConsole("It does not seem that any teams have been set up");
-        } else if (lobby.maxPlayerCount() != 0) {
+        } else if (lobby.maxPlayerCount() != -1) {
             final int online = Bukkit.getOnlinePlayers().size();
             if (online >= lobby.minPlayerCount()) {
                 if (overrideTimer.getObject() != 0) {
@@ -45,13 +46,11 @@ public class LobbyTimerTask extends Scheduler implements Scheduler.ConfiguredSch
         }
     }
 
-    @Override
-    public void start() {
+    @Override public void start() {
         runTaskTimer(1);
     }
 
-    @Override
-    public void stop() {
+    @Override public void stop() {
         cancel();
     }
 }
