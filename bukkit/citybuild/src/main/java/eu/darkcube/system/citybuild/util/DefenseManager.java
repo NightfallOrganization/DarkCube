@@ -12,7 +12,7 @@
 
 package eu.darkcube.system.citybuild.util;
 
-import eu.darkcube.system.citybuild.listener.Citybuild;
+import eu.darkcube.system.citybuild.Citybuild;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;

@@ -5,16 +5,14 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.citybuild.listener;
+package eu.darkcube.system.citybuild;
 
+import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.citybuild.commands.*;
-import eu.darkcube.system.citybuild.scheduler.ActionBarTask;
+import eu.darkcube.system.citybuild.listener.*;
+import eu.darkcube.system.citybuild.util.ActionBarUtil;
 import eu.darkcube.system.citybuild.scheduler.RingOfHealingEffectApplier;
-import eu.darkcube.system.citybuild.scheduler.ScoreboardUpdater;
-import eu.darkcube.system.citybuild.util.CustomHealthManager;
-import eu.darkcube.system.citybuild.util.CustomItemManager;
-import eu.darkcube.system.citybuild.util.DefenseManager;
-import eu.darkcube.system.citybuild.util.LevelXPManager;
+import eu.darkcube.system.citybuild.util.*;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
 import org.bukkit.Bukkit;
@@ -22,21 +20,27 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Iterator;
-
-public class Citybuild extends JavaPlugin {
+public class Citybuild extends DarkCubePlugin {
 
     private static Citybuild instance;
     private final GlyphWidthManager glyphWidthManager = new GlyphWidthManager();
     private final GlyphCommand glyphCommand = new GlyphCommand(this);
+    private final ResourcePackCommand resourcePackCommand = new ResourcePackCommand(this);
     private LevelXPManager levelXPManager;
-    private PlayerOnlineTimeTrackerListener playerOnlineTimeTrackerListener;
+    private ActionBarUtil actionBarUtil;
     private CustomItemManager customItemManager;
     private DefenseManager defenseManager;
+    private ResourcePackUtil resourcePackUtil = new ResourcePackUtil(this);
     private NamespacedKey aroundDamageKey;
+    private ScoreboardManager scoreboardManager;
 
     public Citybuild() {
+        super("metropolis");
         instance = this;
+    }
+
+    public ResourcePackUtil resourcePackUtil() {
+        return resourcePackUtil;
     }
 
     private CustomHealthManager healthManager;
@@ -53,9 +57,6 @@ public class Citybuild extends JavaPlugin {
         return this.aroundDamageKey;
     }
 
-    public PlayerOnlineTimeTrackerListener getPlayerOnlineTimeTracker() {
-        return playerOnlineTimeTrackerListener;
-    }
 
     @Override public void onEnable() {
         try {
@@ -65,12 +66,14 @@ public class Citybuild extends JavaPlugin {
         }
 
         this.levelXPManager = new LevelXPManager(this);
+        LevelXPManager levelXPManager = new LevelXPManager(this);
         healthManager = new CustomHealthManager(this);
         AttributeCommand attributeCommand = new AttributeCommand(this, healthManager);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule naturalRegeneration false");
         AroundDamageCommands aroundDamageCommands = new AroundDamageCommands(this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         this.defenseManager = new DefenseManager(this);
+        scoreboardManager = new ScoreboardManager(this, levelXPManager);
 
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("heal").setExecutor(new HealCommand(healthManager));
@@ -101,23 +104,15 @@ public class Citybuild extends JavaPlugin {
         instance.getCommand("myregeneration").setExecutor(new MyRegenCommand(healthManager));
 
         CommandAPI.instance().register(glyphCommand);
+        CommandAPI.instance().register(resourcePackCommand);
 
         this.customItemManager = new CustomItemManager(this);
         this.customItemManager.registerItems();
-        ScoreboardListener scoreboardListener = new ScoreboardListener();
-        this.playerOnlineTimeTrackerListener = new PlayerOnlineTimeTrackerListener(scoreboardListener);
-        Iterator var6 = this.getServer().getOnlinePlayers().iterator();
-
-        while(var6.hasNext()) {
-            Player player = (Player)var6.next();
-            scoreboardListener.showPlayerLevelScoreboard(player);
-        }
 
         FlyCommand flyCommand = new FlyCommand();// 98
         this.getServer().getPluginManager().registerEvents(flyCommand, this);
         this.getCommand("fly").setExecutor(flyCommand);
         (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);
-        LevelXPManager levelXPManager = new LevelXPManager(this);
         MonsterLevelListener monsterLevelListener = new MonsterLevelListener(levelXPManager, healthManager);
         this.getServer().getPluginManager().registerEvents(monsterLevelListener, this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
@@ -125,13 +120,13 @@ public class Citybuild extends JavaPlugin {
         AroundDamageListener aroundDamageListener = new AroundDamageListener(this, this.getAroundDamageKey());
         new BagListener(this);
 
-        ActionBarTask actionBarTask = new ActionBarTask(this, healthManager, levelXPManager);
-        actionBarTask.runTaskTimer(this, 0L, 3L);
+        actionBarUtil = new ActionBarUtil(this, healthManager, levelXPManager);
 
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, this::updateScoreboardsForAllOnlinePlayers, 0L, 90000L);
         this.getServer().getPluginManager().registerEvents(new SchadensAnzeigeListener(), this);
         this.getServer().getPluginManager().registerEvents(new CraftingTableListener(this), this);
         this.getServer().getPluginManager().registerEvents(new EntityHealListener(), this);
-     //   this.getServer().getPluginManager().registerEvents(new KnockbackListener(), this);
+        //   this.getServer().getPluginManager().registerEvents(new KnockbackListener(), this);
         this.getServer().getPluginManager().registerEvents(new SoundListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);
         this.getServer().getPluginManager().registerEvents(aroundDamageListener, this);
@@ -160,20 +155,34 @@ public class Citybuild extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new RingOfHealingListener(this), this);
         this.getServer().getPluginManager().registerEvents(new EnderBagListener(), this);
         this.getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
-        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(scoreboardListener), this);
-        this.getServer().getPluginManager().registerEvents(new PlayerLevelChangeListener(scoreboardListener), this);
-        this.getServer().getPluginManager().registerEvents(this.playerOnlineTimeTrackerListener, this);
-        (new ScoreboardUpdater(scoreboardListener)).runTaskTimer(this, 0L, 9000L);
+        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
     }
 
     @Override public void onDisable() {
         CommandAPI.instance().unregister(glyphCommand);
+        CommandAPI.instance().unregister(resourcePackCommand);
 
         customItemManager.unloadRecipes();
     }
-    public CustomHealthManager getHealthManager(){
+
+    public void setScoreboardForPlayer(Player player) {
+        scoreboardManager.createScoreboard(player);
+    }
+
+    public void updateScoreboardsForAllOnlinePlayers() {
+        for (Player player : getServer().getOnlinePlayers()) {
+            setScoreboardForPlayer(player);
+        }
+    }
+
+    public ActionBarUtil actionBarUtil() {
+        return actionBarUtil;
+    }
+
+    public CustomHealthManager getHealthManager() {
         return healthManager;
     }
+
     public GlyphWidthManager glyphWidthManager() {
         return glyphWidthManager;
     }

@@ -8,6 +8,7 @@
 package eu.darkcube.system.citybuild.util;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -43,6 +44,10 @@ public class LevelXPManager implements Listener {
             newXP -= getXPForLevel(currentLevel + 1);
             currentLevel++;
             currentAP += 2; // AP um 2 erhöhen, wenn Level erhöht wird
+
+            // Sendet den Titel mit dem neuen Level
+            player.sendTitle("§6Level: §e" + currentLevel, "", 10, 70, 20);
+            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 1f, 1f);
         }
 
         pdc.set(xpKey, PersistentDataType.DOUBLE, newXP);
@@ -52,6 +57,7 @@ public class LevelXPManager implements Listener {
         double progress = newXP / getXPForLevel(currentLevel + 1);
         player.setExp((float) progress);
     }
+
 
     public void resetXP(Player player) {
         NamespacedKey xpKey = new NamespacedKey(plugin, "xp");

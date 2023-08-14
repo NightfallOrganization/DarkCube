@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.citybuild.listener;
 
+import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.Overlay;
 import eu.darkcube.system.util.WorkbenchUtil;
 import eu.darkcube.system.version.VersionSupport;

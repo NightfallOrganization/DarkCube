@@ -27,7 +27,7 @@ public class InventoryClickListener implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		if (event.getView().getTitle().equals("§f\uDAFF\uDFEFḇ")) {
+		if (event.getView().getTitle().equals("\uDAFF\uDFEF§fḇ")) {
 			event.setCancelled(true);
 
 			if (event.getCurrentItem().getType() == Material.DEEPSLATE_TILE_SLAB &&

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import eu.darkcube.system.citybuild.listener.Citybuild;
+import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
 import eu.darkcube.system.citybuild.util.DefenseManager;
 import eu.darkcube.system.citybuild.util.LevelXPManager;

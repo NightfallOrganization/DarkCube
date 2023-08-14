@@ -39,41 +39,61 @@ public class ResetLevelCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        Player target;
 
-            levelXPManager.resetXP(player);
-            levelXPManager.resetAP(player);
-            healthManager.resetHealth(player);
-            healthManager.resetMaxHealth(player);
-            healthManager.resetRegen(player);
-            healthManager.resetAroundDamage(player);
-
-            levelXPManager.resetAttribute(player, "speed");
-            levelXPManager.resetAttribute(player, "strength");
-            levelXPManager.resetAttribute(player, "aroundDamage");
-            levelXPManager.resetAttribute(player, "hitSpeed");
-
-            defenseManager.resetDefense(player);
-
-            player.setWalkSpeed(0.2f);
-            player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getModifiers().forEach(player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)::removeModifier);
-            player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getModifiers().forEach(player.getAttribute(Attribute.GENERIC_ATTACK_SPEED)::removeModifier);
-
-            // Attribute Keys auf 0 zurücksetzen
-            PersistentDataContainer dataContainer = player.getPersistentDataContainer();
-            dataContainer.set(this.speedKey, PersistentDataType.INTEGER, 0);
-            dataContainer.set(this.strengthKey, PersistentDataType.INTEGER, 0);
-            dataContainer.set(this.hitSpeedKey, PersistentDataType.INTEGER, 0);
-            dataContainer.set(this.healthKey, PersistentDataType.INTEGER, 0);
-            dataContainer.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
-            dataContainer.set(this.defenseKey, PersistentDataType.INTEGER, 0);
-
-            player.sendMessage("§7Dein Level wurde §azurückgesetzt");
-            return true;
-        } else {
-            sender.sendMessage("§7Dieser Befehl kann nur von einem §aSpieler §7ausgeführt werden");
-            return false;
+        if(args.length == 0) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("§7Gib den Spielernamen an, den du zurücksetzen möchtest.");
+                return false;
+            }
+            target = (Player) sender;
         }
+        else {
+            target = sender.getServer().getPlayer(args[0]);
+            if (target == null) {
+                sender.sendMessage("§7Spieler nicht gefunden.");
+                return false;
+            }
+        }
+
+        resetPlayerAttributes(target);
+
+        if (target == sender) {
+            target.sendMessage("§7Dein Level wurde §azurückgesetzt");
+        } else {
+            target.sendMessage("§7Dein Level wurde von " + sender.getName() + " §azurückgesetzt");
+            sender.sendMessage("§7Das Level von " + target.getName() + " wurde §azurückgesetzt");
+        }
+
+        return true;
     }
+
+    private void resetPlayerAttributes(Player target) {
+        levelXPManager.resetXP(target);
+        levelXPManager.resetAP(target);
+        healthManager.resetHealth(target);
+        healthManager.resetMaxHealth(target);
+        healthManager.resetRegen(target);
+        healthManager.resetAroundDamage(target);
+
+        levelXPManager.resetAttribute(target, "speed");
+        levelXPManager.resetAttribute(target, "strength");
+        levelXPManager.resetAttribute(target, "aroundDamage");
+        levelXPManager.resetAttribute(target, "hitSpeed");
+
+        defenseManager.resetDefense(target);
+
+        target.setWalkSpeed(0.2f);
+        target.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getModifiers().forEach(target.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)::removeModifier);
+        target.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getModifiers().forEach(target.getAttribute(Attribute.GENERIC_ATTACK_SPEED)::removeModifier);
+
+        PersistentDataContainer dataContainer = target.getPersistentDataContainer();
+        dataContainer.set(this.speedKey, PersistentDataType.INTEGER, 0);
+        dataContainer.set(this.strengthKey, PersistentDataType.INTEGER, 0);
+        dataContainer.set(this.hitSpeedKey, PersistentDataType.INTEGER, 0);
+        dataContainer.set(this.healthKey, PersistentDataType.INTEGER, 0);
+        dataContainer.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
+        dataContainer.set(this.defenseKey, PersistentDataType.INTEGER, 0);
+    }
+
 }

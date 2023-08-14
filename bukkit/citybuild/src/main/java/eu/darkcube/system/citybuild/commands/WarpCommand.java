@@ -7,6 +7,7 @@
 package eu.darkcube.system.citybuild.commands;
 
 import eu.darkcube.system.citybuild.util.Overlay;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,7 +27,9 @@ public class WarpCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        Inventory inv = Bukkit.createInventory(null, 45, Overlay.WARP_INVENTORY.component());
+
+        // TODO: Sei kein idiot
+        Inventory inv = Bukkit.createInventory(null, 45, LegacyComponentSerializer.legacySection().serialize(Overlay.WARP_INVENTORY.component()));
 
         // Create ItemStacks
         ItemStack grassBlock = new ItemStack(Material.GRASS_BLOCK);

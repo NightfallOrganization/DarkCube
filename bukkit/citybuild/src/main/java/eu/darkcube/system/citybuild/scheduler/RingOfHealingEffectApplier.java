@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.citybuild.scheduler;
 
-import eu.darkcube.system.citybuild.listener.Citybuild;
+import eu.darkcube.system.citybuild.Citybuild;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
