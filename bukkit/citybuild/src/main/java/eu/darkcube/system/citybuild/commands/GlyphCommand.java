@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.citybuild.commands;
 
-import eu.darkcube.system.citybuild.listener.Citybuild;
+import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.FloatArgumentType;

@@ -7,10 +7,11 @@
 
 package eu.darkcube.system.citybuild.listener;
 
+import eu.darkcube.system.citybuild.Citybuild;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
@@ -18,32 +19,20 @@ import java.util.UUID;
 
 public class PlayerJoinListener implements Listener {
 
-	private ScoreboardListener scoreboardListener;
-	private HashMap<UUID, Long> joinTimes;
+    private final Citybuild citybuild;
 
-	public PlayerJoinListener(ScoreboardListener scoreboardListener) {
-		this.scoreboardListener = scoreboardListener;
-		joinTimes = new HashMap<>();
-	}
+    public PlayerJoinListener(Citybuild citybuild) {
+        this.citybuild = citybuild;
+    }
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		scoreboardListener.showPlayerLevelScoreboard(player);
-		joinTimes.put(player.getUniqueId(), System.currentTimeMillis());
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        citybuild.resourcePackUtil().sendResourcePack(player);
+        citybuild.setScoreboardForPlayer(player);
+    }
 
-		// Erzwinge Ressourcenpaket-Download
-		String texturePackUrl = "";
-		player.setResourcePack(texturePackUrl);
-	}
-
-	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		joinTimes.remove(player.getUniqueId());
-	}
-//	@EventHandler
-//	public void handle(ReloadSinglePrefixEvent event) {
-//		event.setNewPrefix("Test");
-//	}
+    @EventHandler public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+    }
 }

@@ -7,8 +7,7 @@
 
 package eu.darkcube.system.citybuild.listener;
 
-import eu.darkcube.system.Plugin;
-import net.md_5.bungee.api.ChatColor;
+import eu.darkcube.system.citybuild.Citybuild;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

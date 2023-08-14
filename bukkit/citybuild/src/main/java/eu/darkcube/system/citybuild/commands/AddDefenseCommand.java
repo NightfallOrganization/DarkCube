@@ -5,7 +5,7 @@
 
 package eu.darkcube.system.citybuild.commands;
 
-import eu.darkcube.system.citybuild.listener.Citybuild;
+import eu.darkcube.system.citybuild.Citybuild;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

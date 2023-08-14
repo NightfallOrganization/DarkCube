@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.citybuild.listener;
 
+import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
 import eu.darkcube.system.citybuild.util.LevelXPManager;
 import org.bukkit.Bukkit;
@@ -131,11 +132,16 @@ public class MonsterLevelListener implements Listener {
 				xp *= xpMultiplier;
 
 				levelXPManager.addXP(topDamager, xp);
+
+				// XP-Wert anzeigen
+				SchadensAnzeigeListener schadensAnzeigeListener = new SchadensAnzeigeListener();
+				schadensAnzeigeListener.zeigeXPWert(entity.getLocation(), xp);
 			}
 
 			damageMap.remove(entity);  // Entfernt das Monster aus der Schadensverfolgung, da es jetzt tot ist
 		}
 	}
+
 
 
 	@EventHandler
@@ -240,7 +246,7 @@ public class MonsterLevelListener implements Listener {
 		double x = Math.abs(location.getX());
 		double z = Math.abs(location.getZ());
 		int distance = (int) Math.max(x, z); // Verwenden Sie den größeren der beiden Werte
-		return Math.max(1, distance / 100);
+		return Math.max(1, distance / 300);
 	}
 
 	private void applyLevelToMonster(Monster monster, int level) {

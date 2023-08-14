@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.citybuild.listener;
 
+import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,6 +40,7 @@ public class SchadensAnzeigeListener implements Listener {
         }
     }
 
+
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();
@@ -51,15 +53,53 @@ public class SchadensAnzeigeListener implements Listener {
 
             if (previousHealthMap.containsKey(entity.getUniqueId())) {
                 int previousHealth = previousHealthMap.get(entity.getUniqueId());
+
                 Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), () -> {
                     CustomHealthManager healthManager = Citybuild.getInstance().getHealthManager();
                     int newHealth = healthManager.getMonsterHealth((LivingEntity) entity);
                     int schaden = previousHealth - newHealth;
 
-                    zeigeSchadenswert(entity.getLocation(), schaden, isCritical);
+                    // Überprüfen, ob dieser Schaden ausreicht, um das Monster zu töten
+                    if (previousHealth - event.getFinalDamage() > 0) {
+                        zeigeSchadenswert(entity.getLocation(), schaden, isCritical);
+                    }
+
                     previousHealthMap.remove(entity.getUniqueId());
                 }, 1L);
             }
+        }
+    }
+
+
+    public void zeigeXPWert(Location loc, double xp) {
+        double xOffset = (random.nextDouble() * 2 - 1) * 0.5;
+        double zOffset = (random.nextDouble() * 2 - 1) * 0.5;
+
+        loc.add(xOffset, 1.0, zOffset);
+
+        ArmorStand as = loc.getWorld().spawn(loc, ArmorStand.class, armorStand -> {
+            armorStand.setVisible(false);
+            armorStand.setGravity(false);
+            armorStand.setCustomNameVisible(true);
+            armorStand.setCustomName(formatXPValue(xp));
+            armorStand.setInvulnerable(true);
+            armorStand.setMarker(true);
+        });
+
+        Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), as::remove, 10L);
+    }
+
+    private String formatXPValue(double value) {
+        if (value == 0) {
+            return "+ XP";
+        } else if (value < 1) {
+            String formattedValue = String.format("%.3f", value).replaceAll("0+$", "");
+            if (formattedValue.endsWith(".")) {
+                formattedValue = formattedValue.substring(0, formattedValue.length() - 1);
+            }
+            return "§a+" + formattedValue + " XP";
+        } else {
+            return "§a+" + value + " XP";
         }
     }
 
