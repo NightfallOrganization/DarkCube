@@ -7,17 +7,12 @@
 
 package eu.darkcube.system.version.v1_8_8.provider.via;
 
-import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
-import com.viaversion.viaversion.libs.fastutil.ints.IntList;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.StringRange;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import org.bukkit.entity.Player;
-
-import java.util.List;
 
 @ApiStatus.Internal public class ViaTabExecutor {
 

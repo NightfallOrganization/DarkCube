@@ -15,7 +15,6 @@ import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.Key;
@@ -152,8 +151,8 @@ public class Ingame extends GamePhase {
     @Override public void onEnable() {
         this.startingIngame = true;
 
-        CloudNetLink.update();
-
+        woolbattle.lobbySystemLink().update();
+        
         CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(woolbattle.gameData().map());
         woolbattle.sendMessage(Message.STARTING_GAME);
         for (WBUser user : WBUser.onlineUsers()) {

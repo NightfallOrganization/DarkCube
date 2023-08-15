@@ -32,7 +32,7 @@ includeSubProjects("darkcubesystem:libs", "brigadier", "gson", "annotations")
 includeSubProjects("darkcubesystem:libs:adventure", "adventure-api", "adventure-key", "adventure-nbt", "adventure-platform-api", "adventure-platform-bukkit", "adventure-platform-facet", "adventure-platform-viaversion", "adventure-text-serializer-bungeecord", "adventure-text-serializer-gson", "adventure-text-serializer-gson-legacy-impl", "adventure-text-serializer-legacy", "adventure-text-serializer-plain", "examination-api", "examination-string")
 includeSubProjects("darkcubesystem:bukkit", "1.8.8", "1.20.1")
 
-includeSubProjects("woolbattle", "bukkit", "module")
+includeSubProjects("woolbattle", "bukkit", "module", "api")
 
 //includeSubProjects("darkcubesystem", "1.8.8", "1.19.3", "core", "module")
 include("bukkit:darkessentials")

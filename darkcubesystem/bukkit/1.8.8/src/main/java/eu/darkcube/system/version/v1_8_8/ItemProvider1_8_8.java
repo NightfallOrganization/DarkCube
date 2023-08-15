@@ -9,7 +9,6 @@ package eu.darkcube.system.version.v1_8_8;
 
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
-import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

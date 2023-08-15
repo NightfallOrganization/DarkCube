@@ -22,6 +22,7 @@ allprojects {
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = StandardCharsets.UTF_8.name()
+        options.setIncremental(true)
         options.isDeprecation = true
 //        options.isFork = true
     }

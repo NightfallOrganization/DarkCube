@@ -6,19 +6,32 @@
  */
 
 plugins {
+    id("com.github.johnrengelman.shadow")
     id("java-library")
 }
 
-tasks.withType<Jar>().configureEach {
-    archiveBaseName = "woolbattle"
+tasks {
+    shadowJar.configure {
+        archiveClassifier = ""
+    }
+    jar.configure {
+        archiveClassifier = "pure"
+    }
+    assemble.configure {
+        dependsOn(shadowJar)
+    }
+    withType<Jar>().configureEach {
+        archiveBaseName = "woolbattle"
+    }
 }
 
 dependencies {
-    compileOnlyApi(project(":darkcubesystem:bukkit"))
-    compileOnlyApi(project(":bukkit:statsapi"))
+    compileOnly(project(":darkcubesystem:bukkit"))
+    compileOnly(project(":bukkit:statsapi"))
     compileOnly(project(":pserver:pserver-api"))
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
-//    compileOnly("mysql:mysql-connector-java:5.1.14")
+    compileOnlyApi(parent!!.project("api"))
+    runtimeOnly(parent!!.project("api"))
     compileOnlyApi(libs.cloudnetBridge)
     compileOnlyApi(libs.cloudnetWrapper)
 }

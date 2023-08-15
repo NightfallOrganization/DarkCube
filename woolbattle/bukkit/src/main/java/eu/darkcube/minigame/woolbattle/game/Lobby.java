@@ -20,7 +20,10 @@ import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.minigame.woolbattle.util.*;
+import eu.darkcube.minigame.woolbattle.util.Item;
+import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
+import eu.darkcube.minigame.woolbattle.util.ScoreboardObjective;
+import eu.darkcube.minigame.woolbattle.util.Vote;
 import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
@@ -72,7 +75,7 @@ public class Lobby extends GamePhase {
 
     @Override public void onEnable() {
         unloadGame();
-        CloudNetLink.update();
+        woolbattle.lobbySystemLink().update();
         woolbattle.gameData(new GameData(woolbattle));
 
         this.setTimer(60 * 20);
@@ -157,7 +160,6 @@ public class Lobby extends GamePhase {
 
     public void setupPlayer(WBUser user, @Deprecated /*TODO*/boolean fullSetup) {
         Player p = user.getBukkitEntity();
-        CloudNetLink.update();
 
         woolbattle.teamManager().setTeam(user, woolbattle.teamManager().getSpectator());
 
@@ -198,6 +200,7 @@ public class Lobby extends GamePhase {
         } else {
             setTimer(getTimer());
         }
+        woolbattle.lobbySystemLink().update();
     }
 
     public void recalculateMap() {

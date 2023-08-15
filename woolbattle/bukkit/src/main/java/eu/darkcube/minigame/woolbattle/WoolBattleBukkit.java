@@ -6,6 +6,8 @@
  */
 package eu.darkcube.minigame.woolbattle;
 
+import eu.darkcube.minigame.woolbattle.api.LobbySystemLinkImpl;
+import eu.darkcube.minigame.woolbattle.api.WoolBattleApiImpl;
 import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
@@ -18,8 +20,6 @@ import eu.darkcube.minigame.woolbattle.translation.LanguageHelper;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.user.WBUserModifier;
-import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
-import eu.darkcube.minigame.woolbattle.util.CloudNetUpdateScheduler;
 import eu.darkcube.minigame.woolbattle.util.SchedulerTicker;
 import eu.darkcube.minigame.woolbattle.util.convertingrule.ConvertingRuleHelper;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
@@ -45,6 +45,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
     private final Collection<MapSize> knownMapSizes = new HashSet<>();
     private final WoolBattleListeners listeners = new WoolBattleListeners(this);
     private final WoolBattleCommands commands = new WoolBattleCommands(this);
+    private final LobbySystemLinkImpl lobbySystemLink = new LobbySystemLinkImpl(this);
     public String atall;
     public String atteam;
     private PerkRegistry perkRegistry;
@@ -61,8 +62,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
 
     public WoolBattleBukkit() {
         super("woolbattle");
+        new WoolBattleApiImpl(this); // This is all we need to do to initialize the Api
         Config.load(this);
-        CloudNetLink.init(this);
         WoolBattleBukkit.instance = this;
     }
 
@@ -134,14 +135,19 @@ public class WoolBattleBukkit extends DarkCubePlugin {
 
         commands.enableAll();
 
-        new CloudNetUpdateScheduler(this).runTaskTimer(50);
+        lobbySystemLink.enable();
     }
 
     @Override public void onDisable() {
+        lobbySystemLink.disable();
         commands.disableAll();
         listeners.unregisterAll();
         UserAPI.getInstance().removeModifier(userModifier);
         this.tickTask.cancel();
+    }
+
+    public LobbySystemLinkImpl lobbySystemLink() {
+        return lobbySystemLink;
     }
 
     public GameData gameData() {
@@ -153,7 +159,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
     }
 
     public int maxPlayers() {
-        return 20;
+        return lobby.maxPlayerCount();
     }
 
     public Lobby lobby() {

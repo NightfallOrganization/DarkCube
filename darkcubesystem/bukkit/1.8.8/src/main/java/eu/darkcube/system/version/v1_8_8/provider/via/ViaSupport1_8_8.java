@@ -20,7 +20,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompl
 import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
-import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestion;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;

@@ -8,7 +8,6 @@
 package eu.darkcube.system.pserver.plugin.link.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.pserver.plugin.link.Link;
@@ -21,16 +20,15 @@ public class WoolBattleLink extends Link {
     }
 
     @Override protected void link() throws Throwable {
-        WoolBattleBukkit woolbattle = WoolBattleBukkit.instance();
+        WoolBattleBukkit api = WoolBattleBukkit.instance();
         StatsLink.enabled = false;
-        CloudNetLink.shouldDisplay = false;
         CommandAPI.instance().unregisterPrefixlessByPrefix("woolbattle");
-        CommandAPI.instance().register(new ForceMapCommand(woolbattle));
-        CommandAPI.instance().register(new SetLifesCommand(woolbattle));
-        CommandAPI.instance().register(new SetTeamCommand(woolbattle));
-        CommandAPI.instance().register(new TrollCommand(woolbattle));
-        CommandAPI.instance().register(new TimerCommand(woolbattle));
-        CommandAPI.instance().register(new ReviveCommand(woolbattle));
+        CommandAPI.instance().register(new ForceMapCommand(api));
+        CommandAPI.instance().register(new SetLifesCommand(api));
+        CommandAPI.instance().register(new SetTeamCommand(api));
+        CommandAPI.instance().register(new TrollCommand(api));
+        CommandAPI.instance().register(new TimerCommand(api));
+        CommandAPI.instance().register(new ReviveCommand(api));
         System.out.println("§cDisabled woolbattle stats!");
     }
 

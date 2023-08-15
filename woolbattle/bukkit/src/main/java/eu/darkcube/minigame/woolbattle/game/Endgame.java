@@ -14,7 +14,6 @@ import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerPlayerQuit;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.minigame.woolbattle.util.CloudNetLink;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,7 +32,7 @@ public class Endgame extends GamePhase {
     }
 
     @Override public void onEnable() {
-        CloudNetLink.update();
+        woolbattle.lobbySystemLink().update();
         //		main.getSchedulers().clear();
 
         Team winner = woolbattle.ingame().winner;

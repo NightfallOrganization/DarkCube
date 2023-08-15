@@ -11,6 +11,7 @@ import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.function.Consumer;
@@ -104,7 +105,7 @@ public class GameData {
         return newMap;
     }
 
-    public Map map() {
+    public @Nullable Map map() {
         return forceMap != null ? forceMap : votedMap;
     }
 }
