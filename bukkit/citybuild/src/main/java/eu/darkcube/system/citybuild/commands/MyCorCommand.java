@@ -1,25 +1,32 @@
+/*
+ * Copyright (c) 2023. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.citybuild.commands;
 
-import eu.darkcube.system.citybuild.util.LevelXPManager;
+import eu.darkcube.system.citybuild.util.CorManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class MyAPCommand implements CommandExecutor {
+public class MyCorCommand implements CommandExecutor {
 
-    private LevelXPManager levelXPManager;
+    private CorManager corManager;
 
-    public MyAPCommand(LevelXPManager levelXPManager) {
-        this.levelXPManager = levelXPManager;
+    public MyCorCommand(CorManager corManager) {
+        this.corManager = corManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            int ap = levelXPManager.getAP(player);
-            player.sendMessage("§7Du hast §d" + ap + "Ḣ §7AP");
+            int cor = corManager.getCor(player);
+            player.sendMessage("§7Du hast §fḡ §e" + cor + " §7Cor");
             return true;
         } else {
             sender.sendMessage("§7Dieser Befehl kann nur von einem §aSpieler §7ausgeführt werden");

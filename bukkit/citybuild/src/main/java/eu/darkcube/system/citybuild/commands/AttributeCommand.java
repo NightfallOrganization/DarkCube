@@ -54,7 +54,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
         this.healthKey = new NamespacedKey(plugin, "HealthKey");
         this.aroundDamageKey = new NamespacedKey(plugin, "AroundDamageKey");
         this.defenseKey = new NamespacedKey(plugin, "DefenseKey");
-    }// 43
+    }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player player) {
@@ -133,7 +133,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
             }
 
             String displayName = clickedItem.getItemMeta().getDisplayName();
-            LevelXPManager levelManager = new LevelXPManager(this.plugin);
+            LevelXPManager levelManager = new LevelXPManager(this.plugin, plugin.getCorManager());
             int playerAP = levelManager.getAP(player);
             if (playerAP > 0) {
                 PersistentDataContainer dataContainer = player.getPersistentDataContainer();

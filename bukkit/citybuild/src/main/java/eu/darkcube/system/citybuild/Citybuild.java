@@ -7,6 +7,15 @@
 
 package eu.darkcube.system.citybuild;
 
+import com.github.juliarn.npclib.api.Npc;
+import com.github.juliarn.npclib.api.NpcActionController;
+import com.github.juliarn.npclib.api.Platform;
+import com.github.juliarn.npclib.api.event.AttackNpcEvent;
+import com.github.juliarn.npclib.api.event.ShowNpcEvent;
+import com.github.juliarn.npclib.api.protocol.meta.EntityMetadataFactory;
+import com.github.juliarn.npclib.bukkit.BukkitPlatform;
+import com.github.juliarn.npclib.bukkit.BukkitWorldAccessor;
+import com.github.juliarn.npclib.bukkit.protocol.BukkitProtocolAdapter;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.citybuild.commands.*;
 import eu.darkcube.system.citybuild.listener.*;
@@ -17,7 +26,12 @@ import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Citybuild extends DarkCubePlugin {
@@ -27,12 +41,14 @@ public class Citybuild extends DarkCubePlugin {
     private final GlyphCommand glyphCommand = new GlyphCommand(this);
     private final ResourcePackCommand resourcePackCommand = new ResourcePackCommand(this);
     private LevelXPManager levelXPManager;
+    private NPCManagement npcManagement;
     private ActionBarUtil actionBarUtil;
     private CustomItemManager customItemManager;
     private DefenseManager defenseManager;
     private ResourcePackUtil resourcePackUtil = new ResourcePackUtil(this);
     private NamespacedKey aroundDamageKey;
     private ScoreboardManager scoreboardManager;
+    private CorManager corManager;
 
     public Citybuild() {
         super("metropolis");
@@ -64,17 +80,25 @@ public class Citybuild extends DarkCubePlugin {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
-        this.levelXPManager = new LevelXPManager(this);
-        LevelXPManager levelXPManager = new LevelXPManager(this);
+        this.npcManagement = new NPCManagement(this);
+        this.levelXPManager = new LevelXPManager(this, corManager);
+        LevelXPManager levelXPManager = new LevelXPManager(this, corManager);
         healthManager = new CustomHealthManager(this);
         AttributeCommand attributeCommand = new AttributeCommand(this, healthManager);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule naturalRegeneration false");
         AroundDamageCommands aroundDamageCommands = new AroundDamageCommands(this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         this.defenseManager = new DefenseManager(this);
-        scoreboardManager = new ScoreboardManager(this, levelXPManager);
+        scoreboardManager = new ScoreboardManager(this, levelXPManager, corManager);
+        CustomSword customSword = new CustomSword(this);
+        corManager = new CorManager(this);
 
+        instance.getCommand("setcor").setExecutor(new SetCorCommand(corManager));
+        instance.getCommand("addcor").setExecutor(new AddCorCommand(corManager));
+        instance.getCommand("mycor").setExecutor(new MyCorCommand(corManager));
+        instance.getCommand("resetdurability").setExecutor(new ResetDurabilityCommand(customSword));
+        instance.getCommand("spawnupgrader").setExecutor(new SpawnUpgraderCommand(this));
+        instance.getCommand("additemlevel").setExecutor(new AddItemLevelCommand(this, customSword));
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("heal").setExecutor(new HealCommand(healthManager));
         instance.getCommand("day").setExecutor(new DayCommand());
@@ -108,6 +132,8 @@ public class Citybuild extends DarkCubePlugin {
 
         this.customItemManager = new CustomItemManager(this);
         this.customItemManager.registerItems();
+
+        new CustomSword(this);
 
         FlyCommand flyCommand = new FlyCommand();// 98
         this.getServer().getPluginManager().registerEvents(flyCommand, this);
@@ -162,6 +188,7 @@ public class Citybuild extends DarkCubePlugin {
         CommandAPI.instance().unregister(glyphCommand);
         CommandAPI.instance().unregister(resourcePackCommand);
 
+        npcManagement.unload();
         customItemManager.unloadRecipes();
     }
 
@@ -173,6 +200,14 @@ public class Citybuild extends DarkCubePlugin {
         for (Player player : getServer().getOnlinePlayers()) {
             setScoreboardForPlayer(player);
         }
+    }
+
+    public CorManager getCorManager() {
+        return this.corManager;
+    }
+
+    public NPCManagement npcManagement() {
+        return npcManagement;
     }
 
     public ActionBarUtil actionBarUtil() {

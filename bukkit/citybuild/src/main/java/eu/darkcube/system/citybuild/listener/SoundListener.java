@@ -39,7 +39,7 @@ public class SoundListener implements Listener {
             // Wenn das Entity nicht ein Spieler war
             if(!(event.getEntity() instanceof Player)) {
                 // Sound beim Töten abspielen
-
+//                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
             }
         }
     }
