@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.util.data;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 
@@ -19,11 +19,10 @@ import java.util.function.Supplier;
 public class LocalPersistentDataStorage implements PersistentDataStorage {
     private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
     private final Map<Key, Object> cache = new HashMap<>();
-    private final Collection<@NotNull UpdateNotifier> updateNotifiers =
-            new CopyOnWriteArrayList<>();
-    private final JsonDocument data = new JsonDocument();
+    private final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
+    private final Document.Mutable data = Document.newJsonDocument();
 
-    public void appendDocument(JsonDocument document) {
+    public void appendDocument(Document document) {
         try {
             lock.writeLock().lock();
             for (String key : document.keys()) {
@@ -36,13 +35,11 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         }
     }
 
-    @Override
-    public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
+    @Override public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
         return new UnmodifiablePersistentDataStorage(this);
     }
 
-    @Override
-    public @NotNull Collection<Key> keys() {
+    @Override public @NotNull Collection<Key> keys() {
         List<Key> keys = new ArrayList<>();
         try {
             lock.readLock().lock();
@@ -55,8 +52,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         return Collections.unmodifiableCollection(keys);
     }
 
-    @Override
-    public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.writeLock().lock();
             data = type.clone(data);
@@ -71,8 +67,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         notifyNotifiers();
     }
 
-    @Override
-    public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         T ret;
         try {
             lock.writeLock().lock();
@@ -80,8 +75,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
                 return null;
             }
             if (type != null) {
-                @SuppressWarnings("unchecked")
-                T old = (T) cache.remove(key);
+                @SuppressWarnings("unchecked") T old = (T) cache.remove(key);
                 if (old == null) {
                     old = type.deserialize(data, key.toString());
                 }
@@ -99,8 +93,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         return ret;
     }
 
-    @Override
-    public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
@@ -127,8 +120,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         }
     }
 
-    @Override
-    public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
+    @Override public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
@@ -161,8 +153,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         return ret;
     }
 
-    @Override
-    public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.readLock().lock();
             if (this.data.contains(key.toString())) {
@@ -185,8 +176,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         notifyNotifiers();
     }
 
-    @Override
-    public boolean has(@NotNull Key key) {
+    @Override public boolean has(@NotNull Key key) {
         try {
             lock.readLock().lock();
             return data.contains(key.toString());
@@ -195,8 +185,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         }
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         try {
             lock.writeLock().lock();
             clearData();
@@ -207,8 +196,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         notifyNotifiers();
     }
 
-    @Override
-    public void loadFromJsonDocument(JsonDocument document) {
+    @Override public void loadFromJsonDocument(Document document) {
         try {
             lock.writeLock().lock();
             clearData();
@@ -220,28 +208,24 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         notifyNotifiers();
     }
 
-    @Override
-    public JsonDocument storeToJsonDocument() {
+    @Override public Document storeToJsonDocument() {
         try {
             lock.readLock().lock();
-            return JsonDocument.newDocument().append(data);
+            return data.immutableCopy();
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    @Override
-    public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
+    @Override public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
         return Collections.unmodifiableCollection(updateNotifiers);
     }
 
-    @Override
-    public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.add(notifier);
     }
 
-    @Override
-    public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.remove(notifier);
     }
 

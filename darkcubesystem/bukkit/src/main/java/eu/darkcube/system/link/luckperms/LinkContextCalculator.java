@@ -6,17 +6,17 @@
  */
 package eu.darkcube.system.link.luckperms;
 
-import de.dytanic.cloudnet.wrapper.Wrapper;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.luckperms.api.context.ContextCalculator;
 import net.luckperms.api.context.ContextConsumer;
 import org.bukkit.entity.Player;
 
 public class LinkContextCalculator implements ContextCalculator<Player> {
-	private final String task = Wrapper.getInstance().getServiceId().getTaskName();
+    private final String task = InjectionLayer.boot().instance(ServiceInfoHolder.class).serviceInfo().serviceId().taskName();
 
-	@Override
-	public void calculate(@NotNull Player target, @NotNull ContextConsumer consumer) {
-		consumer.accept("cloudtask", task);
-	}
+    @Override public void calculate(@NotNull Player target, @NotNull ContextConsumer consumer) {
+        consumer.accept("cloudtask", task);
+    }
 }

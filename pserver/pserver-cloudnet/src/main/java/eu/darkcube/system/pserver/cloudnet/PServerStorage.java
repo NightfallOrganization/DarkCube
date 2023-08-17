@@ -6,9 +6,7 @@
  */
 package eu.darkcube.system.pserver.cloudnet;
 
-import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.concurrent.ITaskListener;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -19,9 +17,7 @@ import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.LocalPersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -32,36 +28,32 @@ public class PServerStorage implements PServerPersistentDataStorage {
     private final UniqueId pserver;
     private final AtomicBoolean saving = new AtomicBoolean(false);
     private final AtomicBoolean saveAgain = new AtomicBoolean(false);
-    private final PersistentDataType<JsonDocument> unsafeStorageModify =
-            new PersistentDataType<JsonDocument>() {
-                @Override
-                public JsonDocument deserialize(JsonDocument doc, String key) {
-                    doc = doc.clone();
-                    for (String docKey : new ArrayList<>(doc.keys())) {
-                        if (!docKey.equals(key)) {
-                            doc.remove(docKey);
-                        }
-                    }
-                    return doc;
+    private final PersistentDataType<Document> unsafeStorageModify = new PersistentDataType<Document>() {
+        @Override public Document deserialize(Document doc, String key) {
+            Document.Mutable mutableDoc = doc.mutableCopy();
+            for (String docKey : doc.keys()) {
+                if (!docKey.equals(key)) {
+                    mutableDoc.remove(docKey);
                 }
+            }
+            return mutableDoc;
+        }
 
-                @Override
-                public void serialize(JsonDocument doc, String key, JsonDocument data) {
-                    doc.append(data);
-                }
+        @Override public void serialize(Document.Mutable doc, String key, Document data) {
+            doc.append(data);
+        }
 
-                @Override
-                public JsonDocument clone(JsonDocument object) {
-                    return object.clone();
-                }
-            };
+        @Override public Document clone(Document object) {
+            return object.immutableCopy();
+        }
+    };
 
     public PServerStorage(NodePServerProvider provider, UniqueId pserver) {
         this.provider = provider;
         this.pserver = pserver;
         storage = new LocalPersistentDataStorage();
         if (!provider.pserverData().contains(pserver.toString())) {
-            provider.pserverData().insert(pserver.toString(), JsonDocument.newDocument());
+            provider.pserverData().insert(pserver.toString(), Document.newJsonDocument());
         }
         storage.loadFromJsonDocument(provider.pserverData().get(pserver.toString()));
         storage.addUpdateNotifier(storage -> save());
@@ -80,88 +72,58 @@ public class PServerStorage implements PServerPersistentDataStorage {
     }
 
     private void save0() {
-        provider.pserverData().updateAsync(pserver.toString(), storeToJsonDocument())
-                .addListener(new ITaskListener<Boolean>() {
-                    @Override
-                    public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
-                        if (saveAgain.compareAndSet(true, false)) {
-                            save0();
-                        } else
-                            saving.set(false);
-                    }
-
-                    @Override
-                    public void onCancelled(ITask<Boolean> task) {
-                        if (saveAgain.compareAndSet(true, false)) {
-                            save0();
-                        } else
-                            saving.set(false);
-                        new CancellationException("Task cancelled").printStackTrace();
-                    }
-
-                    @Override
-                    public void onFailure(ITask<Boolean> task, Throwable th) {
-                        if (saveAgain.compareAndSet(true, false)) {
-                            save0();
-                        } else
-                            saving.set(false);
-                        th.printStackTrace();
-                    }
-                });
+        CompletableFuture<Boolean> fut = provider.pserverData().insertAsync(pserver.toString(), storeToJsonDocument());
+        fut.exceptionally(th -> {
+            th.printStackTrace();
+            return null;
+        }).thenAccept(suc -> {
+            if (saveAgain.compareAndSet(true, false)) {
+                save0();
+            } else saving.set(false);
+        });
     }
 
-    @Override
-    public @NotNull @Unmodifiable Collection<Key> keys() {
+    @Override public @NotNull @Unmodifiable Collection<Key> keys() {
         return storage.keys();
     }
 
-    @Override
-    public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         storage.set(key, type, data);
     }
 
-    @Override
-    public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         return storage.remove(key, type);
     }
 
-    @Override
-    public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         return storage.get(key, type);
     }
 
-    @Override
-    public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue) {
+    @Override public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue) {
         return storage.get(key, type, defaultValue);
     }
 
-    @Override
-    public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         storage.setIfNotPresent(key, type, data);
     }
 
-    @Override
-    public boolean has(@NotNull Key key) {
+    @Override public boolean has(@NotNull Key key) {
         return storage.has(key);
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         storage.clear();
     }
 
-    @Override
-    public void loadFromJsonDocument(JsonDocument document) {
+    @Override public void loadFromJsonDocument(Document document) {
         storage.loadFromJsonDocument(document);
     }
 
-    @Override
-    public JsonDocument storeToJsonDocument() {
+    @Override public Document storeToJsonDocument() {
         return storage.storeToJsonDocument();
     }
 
-    @Override
-    public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
+    @Override public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
         return storage.updateNotifiers();
     }
 
@@ -169,80 +131,66 @@ public class PServerStorage implements PServerPersistentDataStorage {
         storage.clearCache();
     }
 
-    @Override
-    public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         storage.addUpdateNotifier(notifier);
     }
 
-    @Override
-    public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
         storage.removeUpdateNotifier(notifier);
     }
 
-    public void append(JsonDocument document) {
+    public void append(Document document) {
         storage.appendDocument(document);
     }
 
-    public JsonDocument remove(Key key) {
+    public Document remove(Key key) {
         return storage.remove(key, unsafeStorageModify);
     }
 
-    public JsonDocument getDef(Key key, JsonDocument def) {
+    public Document getDef(Key key, Document def) {
         return storage.get(key, unsafeStorageModify, () -> def);
     }
 
-    public JsonDocument get(Key key) {
+    public Document get(Key key) {
         return storage.get(key, unsafeStorageModify);
     }
 
-    public void setIfNotPresent(Key key, JsonDocument data) {
+    public void setIfNotPresent(Key key, Document data) {
         storage.setIfNotPresent(key, unsafeStorageModify, data);
     }
 
-    @Override
-    public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
+    @Override public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
         return CompletableFuture.completedFuture(storage.keys());
     }
 
-    @Override
-    public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type,
-                                                         T data) {
+    @Override public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type, T data) {
         set(key, type, data);
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override
-    public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key,
-                                                                   PersistentDataType<T> type) {
+    @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key, PersistentDataType<T> type) {
         return CompletableFuture.completedFuture(remove(key, type));
     }
 
-    @Override
-    public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key,
-                                                                PersistentDataType<T> type) {
+    @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key, PersistentDataType<T> type) {
         return CompletableFuture.completedFuture(get(key, type));
     }
 
     @Override
-    public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type,
-                                                               Supplier<@NotNull T> defaultValue) {
+    public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
         return CompletableFuture.completedFuture(get(key, type, defaultValue));
     }
 
-    @Override
-    public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key,
-                                                                     PersistentDataType<T> type, T data) {
+    @Override public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key, PersistentDataType<T> type, T data) {
         setIfNotPresent(key, type, data);
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override
-    public CompletableFuture<Boolean> hasAsync(Key key) {
+    @Override public CompletableFuture<Boolean> hasAsync(Key key) {
         return CompletableFuture.completedFuture(has(key));
     }
 
-    @Override
-    public CompletableFuture<Void> clearAsync() {
+    @Override public CompletableFuture<Void> clearAsync() {
         clear();
         return CompletableFuture.completedFuture(null);
     }
@@ -251,14 +199,12 @@ public class PServerStorage implements PServerPersistentDataStorage {
         return null;
     }
 
-    @Override
-    public CompletableFuture<Void> loadFromJsonDocumentAsync(JsonDocument document) {
+    @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(Document document) {
         loadFromJsonDocument(document);
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override
-    public CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync() {
+    @Override public CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
         return CompletableFuture.completedFuture(storeToJsonDocument());
     }
 }

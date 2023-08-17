@@ -12,8 +12,8 @@ import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsElo {
 
-	default Component insertElo(Stats stats, double elo, long placementElo) {
-		return StatsUtil.insertElo(stats, elo, placementElo);
-	}
+    default Component insertElo(Stats stats, double elo, long placementElo) {
+        return StatsUtil.insertElo(stats, elo, placementElo);
+    }
 
 }

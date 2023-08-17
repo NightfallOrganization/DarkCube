@@ -6,9 +6,12 @@
  */
 package eu.darkcube.system.lobbysystem;
 
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.provider.CloudServiceProvider;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
-import eu.darkcube.system.loader.ReflectionClassLoader;
 import eu.darkcube.system.lobbysystem.command.CommandLobbysystem;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.CommandBuild;
 import eu.darkcube.system.lobbysystem.gadget.listener.ListenerGrapplingHook;
@@ -35,11 +38,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Lobby extends Plugin {
 
     private static Lobby instance;
+    private ServiceRegistry serviceRegistry = InjectionLayer.boot().instance(ServiceRegistry.class);
     private DataManager dataManager;
     private NPCManagement npcManagement;
     private NPCManagement.NPC woolbattleNpc;
@@ -55,13 +58,10 @@ public class Lobby extends Plugin {
         return Lobby.instance;
     }
 
-    @Override
-    public void onLoad() {
-        new DependencyManager(new ReflectionClassLoader(this)).loadDependencies();
+    @Override public void onLoad() {
     }
 
-    @Override
-    public void onDisable() {
+    @Override public void onDisable() {
         Bukkit.getOnlinePlayers().stream().map(UserAPI.getInstance()::getUser).map(UserWrapper::fromUser).forEach(LobbyUser::stopJaR);
         if (PServerSupport.isSupported()) {
             SkullCache.unregister();
@@ -69,8 +69,7 @@ public class Lobby extends Plugin {
         ConnectorNPC.clear();
     }
 
-    @Override
-    public void onEnable() {
+    @Override public void onEnable() {
         this.npcManagement = new NPCManagement(this);
 
         UserWrapper userWrapper = new UserWrapper();
@@ -86,9 +85,13 @@ public class Lobby extends Plugin {
             ex.printStackTrace();
         }
         List<String> languageEntries = new ArrayList<>();
-        languageEntries.addAll(Arrays.stream(Message.values()).map(Message::key).collect(Collectors.toList()));
-        languageEntries.addAll(Arrays.stream(Item.values()).map(i -> Message.PREFIX_ITEM + i.getKey()).collect(Collectors.toList()));
-        languageEntries.addAll(Arrays.stream(Item.values()).filter(i -> i.getBuilder().lore().size() > 0).map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey()).collect(Collectors.toList()));
+        languageEntries.addAll(Arrays.stream(Message.values()).map(Message::key).toList());
+        languageEntries.addAll(Arrays.stream(Item.values()).map(i -> Message.PREFIX_ITEM + i.getKey()).toList());
+        languageEntries.addAll(Arrays
+                .stream(Item.values())
+                .filter(i -> !i.getBuilder().lore().isEmpty())
+                .map(i -> Message.PREFIX_ITEM + Message.PREFIX_LORE + i.getKey())
+                .toList());
         Language.validateEntries(languageEntries.toArray(new String[0]), s -> Message.KEY_PREFIX + s);
 
         this.dataManager = new DataManager();
@@ -96,8 +99,8 @@ public class Lobby extends Plugin {
         this.woolbattleNpc = WoolBattleNPC.create();
         this.dailyRewardNpc = DailyRewardNPC.create();
 
-        CommandAPI.getInstance().register(new CommandBuild());
-        CommandAPI.getInstance().register(new CommandLobbysystem());
+        CommandAPI.instance().register(new CommandBuild());
+        CommandAPI.instance().register(new CommandLobbysystem());
 
         for (World world : Bukkit.getWorlds()) {
             world.setGameRuleValue("randomTickSpeed", "0");
@@ -114,10 +117,10 @@ public class Lobby extends Plugin {
         new ListenerInventoryClick();
         new ListenerInventoryClose();
         new ListenerInteract();
-        new ListenerLobbySwitcher();
+        new ListenerLobbySwitcher(this);
         new ListenerWoolBattleNPC();
         new ListenerConnectorNPC();
-        new ListenerMinigameServer();
+        new ListenerMinigameServer(this);
         new ListenerItemDropPickup();
         new ListenerFish();
         new ListenerGadget();
@@ -133,8 +136,7 @@ public class Lobby extends Plugin {
             SkullCache.register();
         }
         new BukkitRunnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 if (!dataManager.isWinter()) {
                     return;
                 }
@@ -149,8 +151,7 @@ public class Lobby extends Plugin {
             world.setThundering(false);
         }
         new BukkitRunnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 ConnectorNPC.load();
             }
         }.runTask(this);
@@ -236,8 +237,19 @@ public class Lobby extends Plugin {
         return this.jaRManager;
     }
 
-    @Override
-    public String getCommandPrefix() {
+    public ServiceRegistry serviceRegistry() {
+        return serviceRegistry;
+    }
+
+    public PlayerManager playerManager() {
+        return serviceRegistry.firstProvider(PlayerManager.class);
+    }
+
+    public CloudServiceProvider cloudServiceProvider() {
+        return serviceRegistry.firstProvider(CloudServiceProvider.class);
+    }
+
+    @Override public String getCommandPrefix() {
         return "§aLobbySystem";
     }
 }

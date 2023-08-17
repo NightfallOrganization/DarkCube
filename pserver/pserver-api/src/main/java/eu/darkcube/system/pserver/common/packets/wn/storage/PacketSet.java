@@ -6,28 +6,28 @@
  */
 package eu.darkcube.system.pserver.common.packets.wn.storage;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 public class PacketSet extends Packet {
-	private final UniqueId id;
-	private final JsonDocument data;
+    private final UniqueId id;
+    private final Document data;
 
-	public PacketSet(UniqueId id, JsonDocument data) {
-		this.id = id;
-		this.data = data;
-	}
+    public PacketSet(UniqueId id, Document data) {
+        this.id = id;
+        this.data = data;
+    }
 
-	public UniqueId id() {
-		return id;
-	}
+    public UniqueId id() {
+        return id;
+    }
 
-	public JsonDocument data() {
-		return data;
-	}
+    public Document data() {
+        return data;
+    }
 
-	public static class Response extends Packet {
+    public static class Response extends Packet {
 
-	}
+    }
 }

@@ -47,19 +47,19 @@ include("bukkit:skyland")
 include("bukkit:vanillaaddons")
 //include "bukkit:smash"
 include("bukkit:statsapi")
-include("bungee")
-include("bungee:cmd-bauserver")
-include("bungee:friendsystem")
-include("bungee:partysystem")
-include("bungee:werbung")
+//include("bungee")
+//include("bungee:cmd-bauserver")
+//include("bungee:friendsystem")
+//include("bungee:partysystem")
+//include("bungee:werbung")
 //include "cloudban"
 //include "cloudban:cloudban-bukkit"
 //include "cloudban:cloudban-bungee"
 //include "cloudban:cloudban-common"
 //include "cloudban:cloudban-module"
-include("cloudnet")
-include("cloudnet:cloudnet-database-mysql")
-include("cloudnet:stats-cloudnet")
+//include("cloudnet")
+//include("cloudnet:cloudnet-database-mysql")
+//include("cloudnet:stats-cloudnet")
 include("common")
 include("common:labymod-emotes")
 include("common:glyph-width-loader")
@@ -68,8 +68,8 @@ include("pserver:pserver-api")
 include("pserver:pserver-bukkit")
 include("pserver:pserver-cloudnet")
 include("pserver:pserver-plugin")
-includeSubProjects("replay", "api", "module")
-includeSubProjects("replay:bukkit", "1.8.8")
+//includeSubProjects("replay", "api", "module")
+//includeSubProjects("replay:bukkit", "1.8.8")
 
 fun includeSubProjects(rootProject: String, vararg subProjects: String) {
     include(rootProject)

@@ -10,19 +10,20 @@ import com.github.juliarn.npclib.api.flag.NpcFlag;
 import com.github.unldenis.hologram.line.Line;
 import com.github.unldenis.hologram.line.TextLine;
 import com.github.unldenis.hologram.placeholder.Placeholders;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.event.EventListener;
-import de.dytanic.cloudnet.driver.event.events.service.CloudServiceConnectNetworkEvent;
-import de.dytanic.cloudnet.driver.event.events.service.CloudServiceDisconnectNetworkEvent;
-import de.dytanic.cloudnet.driver.event.events.service.CloudServiceInfoUpdateEvent;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.driver.document.Document;
+import eu.cloudnetservice.driver.event.EventListener;
+import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.event.events.service.CloudServiceLifecycleChangeEvent;
+import eu.cloudnetservice.driver.event.events.service.CloudServiceUpdateEvent;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.provider.CloudServiceProvider;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.driver.service.ServiceLifeCycle;
 import eu.darkcube.system.DarkCubeServiceProperty;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.npc.ConnectorNPC.CurrentServer.Info;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.MinigameServerSortingInfo;
-import eu.darkcube.system.lobbysystem.util.UUIDManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
@@ -51,8 +52,8 @@ public class ConnectorNPC {
     private static final PersistentDataType<List<String>> strings = PersistentDataTypes.list(PersistentDataTypes.STRING);
     private static final AtomicInteger uidCounter = new AtomicInteger();
     private static final PersistentDataType<List<ConnectorNPC>> type = PersistentDataTypes.list(new PersistentDataType<ConnectorNPC>() {
-        @Override public ConnectorNPC deserialize(JsonDocument doc, String key) {
-            JsonDocument d = doc.getDocument(key);
+        @Override public ConnectorNPC deserialize(Document doc, String key) {
+            Document d = doc.readDocument(key);
             int id = d.getInt("id");
             String taskName = d.getString("task");
             List<String> permissions;
@@ -70,8 +71,8 @@ public class ConnectorNPC {
             return new ConnectorNPC(taskName, id, loc, permissions);
         }
 
-        @Override public void serialize(JsonDocument doc, String key, ConnectorNPC data) {
-            JsonDocument d = new JsonDocument();
+        @Override public void serialize(Document.Mutable doc, String key, ConnectorNPC data) {
+            Document.Mutable d = Document.newJsonDocument();
             d.append("task", data.taskName);
             strings.serialize(d, "permissions", data.permissions);
             d.append("id", data.id);
@@ -85,7 +86,7 @@ public class ConnectorNPC {
     });
 
     static {
-        CloudNetDriver.getInstance().getEventManager().registerListener(new Listener());
+        InjectionLayer.boot().instance(EventManager.class).registerListener(new Listener());
     }
 
     private final Location location;
@@ -171,7 +172,7 @@ public class ConnectorNPC {
                 User user = UserAPI.getInstance().getUser(player);
                 Info c = currentServer.server;
                 if (c == null) return;
-                UUIDManager.getManager().getPlayerExecutor(user.getUniqueId()).connect(c.server.getServiceId().getName());
+                Lobby.getInstance().playerManager().playerExecutor(user.getUniqueId()).connect(c.server.serviceId().name());
             }
         }.runTask(Lobby.getInstance());
     }
@@ -259,14 +260,14 @@ public class ConnectorNPC {
         private static final Map<UUID, ServiceInfoSnapshot> services = new ConcurrentHashMap<>();
 
         static {
-            for (ServiceInfoSnapshot service : CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices()) {
-                services.put(service.getServiceId().getUniqueId(), service);
+            for (ServiceInfoSnapshot service : InjectionLayer.boot().instance(CloudServiceProvider.class).services()) {
+                services.put(service.serviceId().uniqueId(), service);
             }
         }
 
-        @EventListener public void handle(CloudServiceInfoUpdateEvent event) {
-            ServiceInfoSnapshot service = event.getServiceInfo();
-            services.computeIfPresent(service.getServiceId().getUniqueId(), (uuid, serviceInfoSnapshot) -> {
+        @EventListener public void handle(CloudServiceUpdateEvent event) {
+            ServiceInfoSnapshot service = event.serviceInfo();
+            services.computeIfPresent(service.serviceId().uniqueId(), (uuid, serviceInfoSnapshot) -> {
                 if (!AsyncExecutor.service().isShutdown()) {
                     AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
                 }
@@ -274,20 +275,20 @@ public class ConnectorNPC {
             });
         }
 
-        @EventListener public void handle(CloudServiceConnectNetworkEvent event) {
-            services.put(event.getServiceInfo().getServiceId().getUniqueId(), event.getServiceInfo());
-            System.out.println("[ConnectorNPC] Server connected: " + event.getServiceInfo().getServiceId().getName());
-            if (!AsyncExecutor.service().isShutdown()) {
-                AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
-            }
-        }
-
-        @EventListener public void handle(CloudServiceDisconnectNetworkEvent event) {
-            System.out.println("[ConnectorNPC] Server disconnected: " + event.getServiceInfo().getServiceId().getName());
-            ServiceInfoSnapshot snap = services.remove(event.getServiceInfo().getServiceId().getUniqueId());
-            if (snap == null) System.err.println("Failed to remove from services!!!");
-            if (!AsyncExecutor.service().isShutdown()) {
-                AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
+        @EventListener public void handle(CloudServiceLifecycleChangeEvent event) {
+            if (event.newLifeCycle() == ServiceLifeCycle.RUNNING) {
+                services.put(event.serviceInfo().serviceId().uniqueId(), event.serviceInfo());
+                System.out.println("[ConnectorNPC] Server connected: " + event.serviceInfo().serviceId().name());
+                if (!AsyncExecutor.service().isShutdown()) {
+                    AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
+                }
+            } else if (event.lastLifeCycle() == ServiceLifeCycle.RUNNING) {
+                System.out.println("[ConnectorNPC] Server disconnected: " + event.serviceInfo().serviceId().name());
+                ServiceInfoSnapshot snap = services.remove(event.serviceInfo().serviceId().uniqueId());
+                if (snap == null) System.err.println("Failed to remove from services!!!");
+                if (!AsyncExecutor.service().isShutdown()) {
+                    AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
+                }
             }
         }
     }
@@ -354,12 +355,12 @@ public class ConnectorNPC {
             Collection<ServiceInfoSnapshot> servers = Listener.services
                     .values()
                     .stream()
-                    .filter(s -> s.getServiceId().getTaskName().equals(taskName))
+                    .filter(s -> s.serviceId().taskName().equals(taskName))
                     .collect(Collectors.toSet());
             Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
             for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
                 try {
-                    GameState state = server.getProperty(DarkCubeServiceProperty.GAME_STATE).orElse(null);
+                    GameState state = server.readProperty(DarkCubeServiceProperty.GAME_STATE);
                     if (state == null) {
                         continue;
                     }
@@ -370,14 +371,14 @@ public class ConnectorNPC {
             }
             List<Info> sortingInfos = new ArrayList<>();
             for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-                int playingPlayers = server.getProperty(DarkCubeServiceProperty.PLAYING_PLAYERS).orElse(-1);
-                int maxPlayingPlayers = server.getProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS).orElse(-1);
+                int playingPlayers = server.readProperty(DarkCubeServiceProperty.PLAYING_PLAYERS);
+                int maxPlayingPlayers = server.readProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS);
 
                 GameState state = states.get(server);
-                String motd = server.getProperty(DarkCubeServiceProperty.DISPLAY_NAME).orElse(null);
-                if (motd == null || motd.toLowerCase().contains("loading") || (state != GameState.INGAME && server
-                        .getProperty(DarkCubeServiceProperty.AUTOCONFIGURED)
-                        .orElse(false))) {
+                String motd = server.readProperty(DarkCubeServiceProperty.DISPLAY_NAME);
+                if (motd == null || motd
+                        .toLowerCase()
+                        .contains("loading") || (state != GameState.INGAME && server.readProperty(DarkCubeServiceProperty.AUTOCONFIGURED))) {
                     servers.remove(server);
                     states.remove(server);
                     continue;

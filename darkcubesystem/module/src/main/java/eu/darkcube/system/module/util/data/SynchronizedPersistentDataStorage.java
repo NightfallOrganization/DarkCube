@@ -6,9 +6,8 @@
  */
 package eu.darkcube.system.module.util.data;
 
-import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.concurrent.ITaskListener;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.common.concurrent.Task;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
@@ -33,7 +32,7 @@ import java.util.function.Supplier;
 public class SynchronizedPersistentDataStorage implements PersistentDataStorage {
     private final Key key;
     private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
-    private final JsonDocument data = new JsonDocument();
+    private final Document.Mutable data = Document.newJsonDocument();
     private final Map<Key, Object> cache = new HashMap<>();
     private final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
     private final AtomicBoolean saving = new AtomicBoolean(false);
@@ -68,7 +67,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
                 return;
             }
             cache.put(key, data);
-            JsonDocument d = JsonDocument.newDocument();
+            Document.Mutable d = Document.newJsonDocument();
             type.serialize(d, key.toString(), data);
             this.data.append(d);
             new PacketNodeWrapperDataSet(this.key, d).sendAsync();
@@ -85,7 +84,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
             if (!data.contains(key.toString())) {
                 return null;
             }
-            @SuppressWarnings("unchecked") T old = (T) cache.remove(key);
+            T old = (T) cache.remove(key);
             if (old == null && type != null) {
                 old = type.deserialize(data, key.toString());
             }
@@ -103,7 +102,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
         } finally {
@@ -112,7 +110,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
             if (!data.contains(key.toString())) {
@@ -130,7 +127,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
         } finally {
@@ -140,7 +136,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
             if (data.contains(key.toString())) {
@@ -149,7 +144,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
                 return type.clone(value);
             }
             T val = type.clone(defaultValue.get());
-            JsonDocument d = JsonDocument.newDocument();
+            Document.Mutable d = Document.newJsonDocument();
             type.serialize(d, key.toString(), val);
             this.data.append(d);
             new PacketNodeWrapperDataSet(this.key, d).sendAsync();
@@ -177,7 +172,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
                 return;
             }
             data = type.clone(data);
-            JsonDocument d = JsonDocument.newDocument();
+            Document.Mutable d = Document.newJsonDocument();
             type.serialize(d, key.toString(), data);
             this.data.append(d);
             new PacketNodeWrapperDataSet(this.key, d).sendAsync();
@@ -201,30 +196,28 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.writeLock().lock();
             clearData();
-            new PacketNodeWrapperDataClearSet(key, JsonDocument.newDocument()).sendAsync();
+            new PacketNodeWrapperDataClearSet(key, Document.newJsonDocument()).sendAsync();
         } finally {
             lock.writeLock().unlock();
         }
         notifyNotifiers();
     }
 
-    @Override public void loadFromJsonDocument(JsonDocument document) {
+    @Override public void loadFromJsonDocument(Document document) {
         try {
             lock.writeLock().lock();
             clearData();
-            document = document.clone();
             data.append(document);
-            new PacketNodeWrapperDataClearSet(key, document).sendAsync();
+            new PacketNodeWrapperDataClearSet(key, data).sendAsync();
         } finally {
             lock.writeLock().unlock();
         }
         notifyNotifiers();
     }
 
-    public void append(JsonDocument document) {
+    public void append(Document document) {
         try {
             lock.writeLock().lock();
-            document = document.clone();
             data.append(document);
             new PacketNodeWrapperDataSet(key, document).sendAsync();
         } finally {
@@ -233,10 +226,10 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override public JsonDocument storeToJsonDocument() {
+    @Override public Document storeToJsonDocument() {
         try {
             lock.readLock().lock();
-            return JsonDocument.newDocument().append(data);
+            return Document.newJsonDocument().append(data);
         } finally {
             lock.readLock().unlock();
         }
@@ -265,65 +258,82 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
 
     private void save() {
         if (saving.compareAndSet(false, true)) {
-            SynchronizedPersistentDataStorages.database.containsAsync(key.toString()).addListener(new ITaskListener<Boolean>() {
-                @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
-                    if (aBoolean) {
-                        saveAgain.set(false);
-                        SynchronizedPersistentDataStorages.database
-                                .updateAsync(key.toString(), storeToJsonDocument())
-                                .addListener(new ITaskListener<Boolean>() {
-                                    @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
-                                        saving.set(false);
-                                        if (saveAgain.compareAndSet(true, false)) {
-                                            save();
-                                        }
-                                    }
-
-                                    @Override public void onCancelled(ITask<Boolean> task) {
-                                        new Error("Task cancelled").printStackTrace();
-                                    }
-
-                                    @Override public void onFailure(ITask<Boolean> task, Throwable th) {
-                                        th.printStackTrace();
-                                        saving.set(false);
-                                        save();
-                                    }
-                                });
-                    } else {
-                        saveAgain.set(false);
-                        SynchronizedPersistentDataStorages.database
-                                .insertAsync(key.toString(), storeToJsonDocument())
-                                .addListener(new ITaskListener<Boolean>() {
-                                    @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
-                                        saving.set(false);
-                                        if (saveAgain.compareAndSet(true, false)) {
-                                            save();
-                                        }
-                                    }
-
-                                    @Override public void onCancelled(ITask<Boolean> task) {
-                                        new Error("Task cancelled").printStackTrace();
-                                    }
-
-                                    @Override public void onFailure(ITask<Boolean> task, Throwable th) {
-                                        th.printStackTrace();
-                                        saving.set(false);
-                                        save();
-                                    }
-                                });
-                    }
-                }
-
-                @Override public void onCancelled(ITask<Boolean> task) {
-                    new Error("Task cancelled").printStackTrace();
-                }
-
-                @Override public void onFailure(ITask<Boolean> task, Throwable th) {
-                    th.printStackTrace();
+            Task<Boolean> fut = SynchronizedPersistentDataStorages.database.insertAsync(key.toString(), storeToJsonDocument());
+            fut.thenAccept(success -> {
+                if (success) {
                     saving.set(false);
+                    if (saveAgain.compareAndSet(true, false)) {
+                        save();
+                    }
+                } else {
+                    System.out.println("Failed to save - trying again");
                     save();
                 }
             });
+            fut.exceptionally(t -> {
+                saving.set(false);
+                t.printStackTrace();
+                return null;
+            });
+//            .addListener(new ITaskListener<Boolean>() {
+//                @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+//                    if (aBoolean) {
+//                        saveAgain.set(false);
+//                        SynchronizedPersistentDataStorages.database
+//                                .updateAsync(key.toString(), storeToJsonDocument())
+//                                .addListener(new ITaskListener<Boolean>() {
+//                                    @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+//                                        saving.set(false);
+//                                        if (saveAgain.compareAndSet(true, false)) {
+//                                            save();
+//                                        }
+//                                    }
+//
+//                                    @Override public void onCancelled(ITask<Boolean> task) {
+//                                        new Error("Task cancelled").printStackTrace();
+//                                    }
+//
+//                                    @Override public void onFailure(ITask<Boolean> task, Throwable th) {
+//                                        th.printStackTrace();
+//                                        saving.set(false);
+//                                        save();
+//                                    }
+//                                });
+//                    } else {
+//                        saveAgain.set(false);
+//                        SynchronizedPersistentDataStorages.database
+//                                .insertAsync(key.toString(), storeToJsonDocument())
+//                                .addListener(new ITaskListener<Boolean>() {
+//                                    @Override public void onComplete(ITask<Boolean> task, Boolean aBoolean) {
+//                                        saving.set(false);
+//                                        if (saveAgain.compareAndSet(true, false)) {
+//                                            save();
+//                                        }
+//                                    }
+//
+//                                    @Override public void onCancelled(ITask<Boolean> task) {
+//                                        new Error("Task cancelled").printStackTrace();
+//                                    }
+//
+//                                    @Override public void onFailure(ITask<Boolean> task, Throwable th) {
+//                                        th.printStackTrace();
+//                                        saving.set(false);
+//                                        save();
+//                                    }
+//                                });
+//                    }
+//                }
+//
+//                @Override public void onCancelled(ITask<Boolean> task) {
+//                    new Error("Task cancelled").printStackTrace();
+//                }
+//
+//                @Override public void onFailure(ITask<Boolean> task, Throwable th) {
+//                    th.printStackTrace();
+//                    saving.set(false);
+//                    save();
+//                }
+//            });
         } else {
             saveAgain.set(true);
             if (!saving.get()) {

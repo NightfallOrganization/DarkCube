@@ -6,8 +6,8 @@
  */
 package eu.darkcube.system.pserver.bukkit;
 
-import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.common.concurrent.Task;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -41,13 +41,8 @@ public class PServerStorage implements PServerPersistentDataStorage {
         }
     }
 
-    private static <T> CompletableFuture<T> wrap(ITask<T> task) {
-        CompletableFuture<T> fut = new CompletableFuture<>();
-        task
-                .onComplete(fut::complete)
-                .onCancelled(t -> fut.completeExceptionally(new CancellationException("Task cancelled")))
-                .onFailure(fut::completeExceptionally);
-        return fut;
+    private static <T> CompletableFuture<T> wrap(Task<T> task) {
+        return task;
     }
 
     @Override public @Unmodifiable @NotNull Collection<Key> keys() {
@@ -67,7 +62,7 @@ public class PServerStorage implements PServerPersistentDataStorage {
     }
 
     @Override public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue) {
-        return get(getAsync(key, type, defaultValue));
+        return get(getAsync(key, type, defaultValue)); // TODO nullability
     }
 
     @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
@@ -82,11 +77,11 @@ public class PServerStorage implements PServerPersistentDataStorage {
         get(clearAsync());
     }
 
-    @Override public void loadFromJsonDocument(JsonDocument document) {
+    @Override public void loadFromJsonDocument(Document document) {
         get(loadFromJsonDocumentAsync(document));
     }
 
-    @Override public JsonDocument storeToJsonDocument() {
+    @Override public Document storeToJsonDocument() {
         return get(storeToJsonDocumentAsync());
     }
 
@@ -110,68 +105,68 @@ public class PServerStorage implements PServerPersistentDataStorage {
     }
 
     @Override public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type, T data) {
-        JsonDocument document = JsonDocument.newDocument();
+        Document.Mutable document = Document.newJsonDocument();
         type.serialize(document, key.toString(), data);
-        return wrap(new PacketSet(pserver, document).sendQueryAsync(PacketSet.Response.class).map(p -> null));
+        return new PacketSet(pserver, document).sendQueryAsync(PacketSet.Response.class).thenApply(p -> null);
     }
 
     @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key, PersistentDataType<T> type) {
-        return wrap(new PacketRemove(pserver, key).sendQueryAsync(PacketRemove.Response.class).map(p -> {
+        return new PacketRemove(pserver, key).sendQueryAsync(PacketRemove.Response.class).thenApply(p -> {
             if (p.data() != null) {
                 return type.deserialize(p.data(), key.toString());
             }
             return null;
-        }));
+        });
     }
 
     @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key, PersistentDataType<T> type) {
-        return wrap(new PacketGet(pserver, key).sendQueryAsync(PacketGet.Response.class).map(p -> {
+        return new PacketGet(pserver, key).sendQueryAsync(PacketGet.Response.class).thenApply(p -> {
             if (p.data() != null) {
                 return type.deserialize(p.data(), key.toString());
             }
             return null;
-        }));
+        });
     }
 
     @Override
     public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
-        JsonDocument doc = JsonDocument.newDocument();
+        Document.Mutable doc = Document.newJsonDocument();
         type.serialize(doc, key.toString(), defaultValue.get());
-        return wrap(new PacketGetDef(pserver, key, doc).sendQueryAsync(PacketGetDef.Response.class).map(p -> {
+        return new PacketGetDef(pserver, key, doc).sendQueryAsync(PacketGetDef.Response.class).thenApply(p -> {
             if (p.data() != null) {
                 return type.deserialize(p.data(), key.toString());
             }
             return null;
-        }));
+        });
     }
 
     @Override public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key, PersistentDataType<T> type, T data) {
-        JsonDocument doc = JsonDocument.newDocument();
+        Document.Mutable doc = Document.newJsonDocument();
         type.serialize(doc, key.toString(), data);
-        return wrap(new PacketSetIfNotPresent(pserver, key, doc).sendQueryAsync(PacketSetIfNotPresent.Response.class).map(p -> null));
+        return new PacketSetIfNotPresent(pserver, key, doc).sendQueryAsync(PacketSetIfNotPresent.Response.class).thenApply(p -> null);
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> hasAsync(Key key) {
-        return wrap(new PacketHas(pserver, key).sendQueryAsync(PacketHas.Response.class).map(PacketHas.Response::has));
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> hasAsync(@NotNull Key key) {
+        return new PacketHas(pserver, key).sendQueryAsync(PacketHas.Response.class).thenApply(PacketHas.Response::has);
     }
 
-    @Override public CompletableFuture<Void> clearAsync() {
-        return wrap(new PacketClear(pserver).sendQueryAsync(PacketClear.Response.class).map(p -> null));
+    @Override public @NotNull CompletableFuture<Void> clearAsync() {
+        return new PacketClear(pserver).sendQueryAsync(PacketClear.Response.class).thenApply(p -> null);
     }
 
     @Override public @NotNull CompletableFuture<Void> clearCacheAsync() {
-        return wrap(new PacketClearCache(pserver).sendQueryAsync(PacketClearCache.Response.class).map(p -> null));
+        return new PacketClearCache(pserver).sendQueryAsync(PacketClearCache.Response.class).thenApply(p -> null);
     }
 
-    @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(JsonDocument document) {
-        return wrap(new PacketLoadFromDocument(pserver, document.clone())
+    @Override public @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(Document document) {
+        return new PacketLoadFromDocument(pserver, document.immutableCopy())
                 .sendQueryAsync(PacketLoadFromDocument.Response.class)
-                .map(p -> null));
+                .thenApply(p -> null);
     }
 
-    @Override public CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync() {
-        return wrap(new PacketStoreToDocument(pserver)
+    @Override public @NotNull CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
+        return new PacketStoreToDocument(pserver)
                 .sendQueryAsync(PacketStoreToDocument.Response.class)
-                .map(PacketStoreToDocument.Response::data));
+                .thenApply(PacketStoreToDocument.Response::data);
     }
 }

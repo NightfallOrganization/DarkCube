@@ -6,20 +6,20 @@
  */
 package eu.darkcube.minigame.woolbattle.module;
 
-import de.dytanic.cloudnet.CloudNet;
-import de.dytanic.cloudnet.driver.module.ModuleLifeCycle;
-import de.dytanic.cloudnet.driver.module.ModuleTask;
-import de.dytanic.cloudnet.driver.module.driver.DriverModule;
-import de.dytanic.cloudnet.driver.template.TemplateStorage;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.module.ModuleLifeCycle;
+import eu.cloudnetservice.driver.module.ModuleTask;
+import eu.cloudnetservice.driver.module.driver.DriverModule;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
+import eu.cloudnetservice.driver.template.TemplateStorage;
 
 import java.nio.file.Paths;
 
 public class WoolBattle extends DriverModule {
 
-	@ModuleTask(order = 0, event = ModuleLifeCycle.STARTED)
-	public void start() {
-		CloudNet.getInstance().getServicesRegistry()
-				.registerService(TemplateStorage.class, "woolbattle",
-						new WoolBattleTemplateStorage(Paths.get("local/woolbattle")));
-	}
+    private ServiceRegistry serviceRegistry = InjectionLayer.boot().instance(ServiceRegistry.class);
+
+    @ModuleTask(order = 0, lifecycle = ModuleLifeCycle.STARTED) public void start() {
+        serviceRegistry.registerProvider(TemplateStorage.class, "woolbattle", new WoolBattleTemplateStorage(Paths.get("local/woolbattle")));
+    }
 }

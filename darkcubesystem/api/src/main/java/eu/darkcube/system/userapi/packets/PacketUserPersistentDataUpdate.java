@@ -7,26 +7,26 @@
 
 package eu.darkcube.system.userapi.packets;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.packetapi.Packet;
 
 import java.util.UUID;
 
 public class PacketUserPersistentDataUpdate extends Packet {
 
-	private final UUID uuid;
-	private final JsonDocument data;
+    private final UUID uuid;
+    private final Document data;
 
-	public PacketUserPersistentDataUpdate(UUID uuid, JsonDocument data) {
-		this.uuid = uuid;
-		this.data = data;
-	}
+    public PacketUserPersistentDataUpdate(UUID uuid, Document data) {
+        this.uuid = uuid;
+        this.data = data;
+    }
 
-	public UUID getUniqueId() {
-		return uuid;
-	}
+    public UUID getUniqueId() {
+        return uuid;
+    }
 
-	public JsonDocument getData() {
-		return data;
-	}
+    public Document getData() {
+        return data;
+    }
 }

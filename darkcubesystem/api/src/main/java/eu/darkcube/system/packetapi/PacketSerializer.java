@@ -6,30 +6,27 @@
  */
 package eu.darkcube.system.packetapi;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import eu.darkcube.system.libs.com.google.gson.JsonSyntaxException;
+import eu.cloudnetservice.driver.network.buffer.DataBuf;
 
 public class PacketSerializer {
 
-	public static JsonDocument serialize(Packet packet) {
-		if (packet != null) {
-			return JsonDocument.newDocument().append("packetClass", packet.getClass().getName())
-					.append("packet", packet);
-		}
-		return null;
-	}
+    public static DataBuf.Mutable serialize(Packet packet, DataBuf.Mutable buf) {
+        if (packet != null) {
+            return buf.writeString(packet.getClass().getName()).writeObject(packet);
+        }
+        return buf;
+    }
 
-	@SuppressWarnings("unchecked")
-	public static Class<? extends Packet> getClass(JsonDocument doc) {
-		try {
-			return (Class<? extends Packet>) Class.forName(doc.getString("packetClass"));
-		} catch (ClassNotFoundException ignored) {
-		}
-		return null;
-	}
+    public static Packet readPacket(DataBuf buf) {
+        Class<? extends Packet> cls = getClass(buf);
+        return buf.readObject(cls);
+    }
 
-	public static <T extends Packet> T getPacket(JsonDocument doc, Class<T> clazz)
-	throws JsonSyntaxException {
-		return doc.get("packet", clazz);
-	}
+    public static Class<? extends Packet> getClass(DataBuf doc) {
+        try {
+            return (Class<? extends Packet>) Class.forName(doc.readString());
+        } catch (ClassNotFoundException ignored) {
+        }
+        return null;
+    }
 }

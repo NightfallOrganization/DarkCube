@@ -7,9 +7,10 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceTemplate;
-import de.dytanic.cloudnet.driver.template.TemplateStorage;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceTemplate;
+import eu.cloudnetservice.driver.template.TemplateStorage;
+import eu.cloudnetservice.driver.template.TemplateStorageProvider;
 import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
 import eu.darkcube.system.commandapi.v3.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
@@ -62,27 +63,21 @@ public class CloudTemplateArgument implements ArgumentType<ServiceTemplate> {
     }
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        CompletableFuture<Suggestions> f = new CompletableFuture<>();
-        CloudNetDriver.getInstance().getAvailableTemplateStoragesAsync().onComplete(s -> {
+        TemplateStorageProvider provider = InjectionLayer.boot().instance(TemplateStorageProvider.class);
+        return provider.availableTemplateStoragesAsync().thenCompose(s -> {
             Collection<CompletableFuture<Collection<ServiceTemplate>>> templatesFutures = new ArrayList<>();
-            for (TemplateStorage storage : s) {
-                CompletableFuture<Collection<ServiceTemplate>> future = new CompletableFuture<>();
-                storage
-                        .getTemplatesAsync()
-                        .onComplete(future::complete)
-                        .onFailure(future::completeExceptionally)
-                        .onCancelled(collectionITask -> future.cancel(false));
-                templatesFutures.add(future);
+            for (String storageName : s) {
+                TemplateStorage storage = provider.templateStorage(storageName);
+                templatesFutures.add(storage.templatesAsync());
             }
-            CompletableFuture.allOf(templatesFutures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            return CompletableFuture.allOf(templatesFutures.toArray(new CompletableFuture[0])).thenApply(v -> {
                 Collection<ServiceTemplate> built = new ArrayList<>();
                 for (CompletableFuture<Collection<ServiceTemplate>> fut : templatesFutures) {
                     built.addAll(fut.getNow(null));
                 }
                 ISuggestionProvider.suggest(built.stream().map(ServiceTemplate::toString), builder);
-                f.complete(builder.build());
+                return builder.build();
             });
-        }).onFailure(f::completeExceptionally).onCancelled(collectionITask -> f.cancel(true));
-        return f;
+        });
     }
 }

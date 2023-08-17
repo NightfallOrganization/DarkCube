@@ -80,7 +80,7 @@ public class CommandGamemodeConnector extends LobbyCommandExecutor {
                 .then(Commands.literal("create").then(Commands.argument("task", ServiceTaskArgument.serviceTask()).executes(ctx -> {
                     Player player = ctx.getSource().asPlayer();
                     Location loc = Locations.getNiceLocation(player.getLocation());
-                    ConnectorNPC npc = new ConnectorNPC(ServiceTaskArgument.getServiceTask(ctx, "task").getName(), loc);
+                    ConnectorNPC npc = new ConnectorNPC(ServiceTaskArgument.getServiceTask(ctx, "task").name(), loc);
                     npc.show();
                     ConnectorNPC.save();
                     ctx.getSource().sendMessage(Message.CONNECTOR_NPC_CREATED, npc.key());

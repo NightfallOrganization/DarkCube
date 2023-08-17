@@ -12,10 +12,10 @@ import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsWinLoss {
 
-	default Component insertWinLoss(Stats stats, long wins, long losses, double ratio,
-			long placementWins, long placementLosses, long placementRatio) {
-		return StatsUtil.insertWins(stats, wins, placementWins)
-				.append(StatsUtil.insertLosses(stats, losses, placementLosses))
-				.append(StatsUtil.insertWinLossRatio(stats, ratio, placementRatio));
-	}
+    default Component insertWinLoss(Stats stats, long wins, long losses, double ratio, long placementWins, long placementLosses, long placementRatio) {
+        return StatsUtil
+                .insertWins(stats, wins, placementWins)
+                .append(StatsUtil.insertLosses(stats, losses, placementLosses))
+                .append(StatsUtil.insertWinLossRatio(stats, ratio, placementRatio));
+    }
 }

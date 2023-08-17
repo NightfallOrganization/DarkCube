@@ -6,68 +6,55 @@
  */
 package eu.darkcube.system.pserver.cloudnet;
 
-import de.dytanic.cloudnet.driver.event.EventListener;
-import de.dytanic.cloudnet.driver.service.ServiceEnvironmentType;
-import de.dytanic.cloudnet.event.service.CloudServicePreStartEvent;
-import de.dytanic.cloudnet.event.service.CloudServicePreStopEvent;
-import de.dytanic.cloudnet.service.ICloudService;
+import eu.cloudnetservice.driver.event.EventListener;
+import eu.cloudnetservice.driver.event.events.service.CloudServiceLifecycleChangeEvent;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceEnvironmentType;
+import eu.cloudnetservice.driver.service.ServiceLifeCycle;
+import eu.cloudnetservice.driver.util.ModuleHelper;
+import eu.cloudnetservice.node.event.service.CloudServicePreProcessStartEvent;
+import eu.cloudnetservice.node.service.CloudService;
 import eu.darkcube.system.pserver.common.ServiceInfoUtil;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Listener {
 
-    @EventListener public void handle(CloudServicePreStartEvent e) {
-        if (e.getCloudService().getServiceInfoSnapshot().getServiceId().getEnvironment() == ServiceEnvironmentType.MINECRAFT_SERVER) {
-            try {
-                this.copy(e.getCloudService());
-            } catch (IOException ex) {
-                ex.printStackTrace();
+    @EventListener public void handle(CloudServicePreProcessStartEvent e) {
+        if (e.serviceConfiguration().serviceId().environment().equals(ServiceEnvironmentType.MINECRAFT_SERVER)) {
+            this.copy(e.service());
+        }
+    }
+
+    @EventListener public void handle(CloudServiceLifecycleChangeEvent e) {
+        if (e.lastLifeCycle() == ServiceLifeCycle.RUNNING) {
+            UniqueId id = ServiceInfoUtil.getInstance().getUniqueId(e.serviceInfo());
+            if (id != null) {
+                NodePServerProvider.instance().unload(id);
+                e.serviceInfo().provider().deployResources(false);
             }
         }
     }
 
-    @EventListener public void handle(CloudServicePreStopEvent e) {
-        UniqueId id = ServiceInfoUtil.getInstance().getUniqueId(e.getCloudService().getServiceInfoSnapshot());
-        if (id != null) {
-            NodePServerProvider.instance().unload(id);
-            e.getCloudService().deployResources(false);
+    private void copy(CloudService service) {
+        try {
+            Path file = this.getFile(service);
+            Files.deleteIfExists(file);
+            ModuleHelper moduleHelper = InjectionLayer.boot().instance(ModuleHelper.class);
+            moduleHelper.copyJarContainingClass(Listener.class, file);
+        } catch (IOException e) {
+            Logger.getGlobal().log(Level.SEVERE, "error during copy for pserver", e);
         }
     }
 
-    //	@EventListener
-    //	public void handle(CloudServiceInfoUpdateEvent e) {
-    //		ServiceInfoSnapshot info = e.getServiceInfo();
-    //		for (NodePServerExecutor ps : NodePServerProvider.getInstance().getPServers()) {
-    //			if (ps.getServiceId() != null) {
-    //				if (ps.getServiceId().getUniqueId().equals(info.getServiceId().getUniqueId())) {
-    //					ps.setSnapshot(info);
-    //					break;
-    //				}
-    //			}
-    //		}
-    //	}
-
-    private void copy(ICloudService service) throws IOException {
-        Path file = this.getFile(service);
-        URLConnection con = getClass().getProtectionDomain().getCodeSource().getLocation().openConnection();
-        InputStream in = con.getInputStream();
-        Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
-        in.close();
-        //		DefaultModuleHelper.copyCurrentModuleInstanceFromClass(Listener.class, file);
+    private Path getFile(CloudService service) throws IOException {
+        Path plugins = service.pluginDirectory();
+        Files.createDirectories(plugins);
+        return plugins.resolve(PServerModule.PLUGIN_NAME);
     }
-
-    private Path getFile(ICloudService service) throws IOException {
-        //		Path folder = new File(service.getDirectoryPath().toFile(), "plugins");
-        Path folder = service.getDirectoryPath().resolve("plugins");
-        Files.createDirectories(folder);
-        return folder.resolve(PServerModule.PLUGIN_NAME);
-    }
-
 }

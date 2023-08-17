@@ -7,9 +7,10 @@
 package eu.darkcube.system.pserver.cloudnet;
 
 import com.google.common.reflect.TypeToken;
-import de.dytanic.cloudnet.CloudNet;
+import eu.cloudnetservice.driver.document.DocumentFactory;
+import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.packetapi.PacketAPI;
-import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.cloudnet.packethandler.*;
@@ -19,17 +20,20 @@ import eu.darkcube.system.pserver.common.packets.wn.storage.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class ClassLoaderFixRelocation {
 
     public static void load(PServerModule module) {
-        module.getLogger().info("Enabling module PServer");
+        Logger.getLogger("PServer").info("Enabling module PServer");
         NodeServiceInfoUtil.init();
         NodePServerProvider.init();
         NodeUniqueIdProvider.init();
         DatabaseProvider.register("pserver", new PServerDatabase());
 
-        CloudNet.getInstance().getCommandMap().registerCommand(new CommandPServers());
+        // TODO
+//        CloudNet.getInstance().getCommandMap().registerCommand(new CommandPServers());
 
         PacketAPI pm = PacketAPI.getInstance();
         pm.registerHandler(PacketType.class, new HandlerType());
@@ -56,7 +60,7 @@ public class ClassLoaderFixRelocation {
         pm.registerHandler(PacketAccessLevelSet.class, new HandlerAccessLevelSet());
         pm.registerHandler(PacketAccessLevel.class, new HandlerAccessLevel());
 
-		pm.registerHandler(PacketClearCache.class,new HandlerClearCache());
+        pm.registerHandler(PacketClearCache.class, new HandlerClearCache());
         pm.registerHandler(PacketClear.class, new HandlerClear());
         pm.registerHandler(PacketGet.class, new HandlerGet());
         pm.registerHandler(PacketGetDef.class, new HandlerGetDef());
@@ -68,14 +72,21 @@ public class ClassLoaderFixRelocation {
         pm.registerHandler(PacketSetIfNotPresent.class, new HandlerSetIfNotPresent());
         pm.registerHandler(PacketStoreToDocument.class, new HandlerStoreToDocument());
 
-        module.getLogger().info("PServer initializing!");
+        Logger.getLogger("PServer").info("PServer initializing!");
 
-        module.deploymentExclusions = module.getConfig().get("deploymentExclusions", new TypeToken<List<String>>() {
+        InjectionLayer.boot().instance(EventManager.class).registerListener((PServerModule.getInstance().listener = new Listener()));
 
-            private static final long serialVersionUID = 1L;
+        module.deploymentExclusions = module
+                .readConfig(DocumentFactory.json())
+                .readObject("deploymentExclusions", new TypeToken<List<String>>() {
 
-        }.getType(), Collections.singletonList("paper.jar"));
-        module.saveConfig();
+                    private static final long serialVersionUID = 1L;
+
+                }.getType(), Collections.singletonList("paper.jar"))
+                .stream()
+                .map(Pattern::compile)
+                .toList();
+//        module.saveConfig();
     }
 
 }

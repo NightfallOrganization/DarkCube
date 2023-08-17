@@ -7,17 +7,20 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.DriverEnvironment;
-import de.dytanic.cloudnet.driver.channel.ChannelMessage;
-import de.dytanic.cloudnet.driver.channel.ChannelMessageSender;
-import de.dytanic.cloudnet.driver.channel.ChannelMessageTarget;
-import de.dytanic.cloudnet.driver.event.EventListener;
-import de.dytanic.cloudnet.driver.event.events.channel.ChannelMessageReceiveEvent;
-import de.dytanic.cloudnet.driver.serialization.ProtocolBuffer;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
-import de.dytanic.cloudnet.ext.bridge.player.executor.PlayerExecutor;
-import de.dytanic.cloudnet.ext.bridge.server.BridgeServerHelper;
+import eu.cloudnetservice.driver.ComponentInfo;
+import eu.cloudnetservice.driver.DriverEnvironment;
+import eu.cloudnetservice.driver.channel.ChannelMessage;
+import eu.cloudnetservice.driver.channel.ChannelMessageSender;
+import eu.cloudnetservice.driver.channel.ChannelMessageTarget;
+import eu.cloudnetservice.driver.event.EventListener;
+import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.event.events.channel.ChannelMessageReceiveEvent;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.network.buffer.DataBuf;
+import eu.cloudnetservice.modules.bridge.BridgeServiceHelper;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
+import eu.cloudnetservice.modules.bridge.player.executor.PlayerExecutor;
+import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
@@ -59,7 +62,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         if (PServerProvider.instance().isPServer()) return; // Do not enable if we are a PServer
         updateTask.runTaskTimer(50);
         fullyLoaded = false;
-        CloudNetDriver.getInstance().getEventManager().registerListener(requestListener);
+        InjectionLayer.boot().instance(EventManager.class).registerListener(requestListener);
         new Scheduler(woolbattle, this::setFullyLoaded).runTask();
         DarkCubeBukkit.autoConfigure(false);
         enabled = true;
@@ -67,7 +70,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
 
     public void disable() {
         if (!enabled) return;
-        CloudNetDriver.getInstance().getEventManager().unregisterListener(requestListener);
+        InjectionLayer.boot().instance(EventManager.class).unregisterListener(requestListener);
         updateTask.cancel();
         enabled = false;
     }
@@ -83,9 +86,11 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         DarkCubeBukkit.gameState(gameState());
         DarkCubeBukkit.playingPlayers().set(playingPlayers());
         DarkCubeBukkit.maxPlayingPlayers().set(woolbattle.maxPlayers());
-        BridgeServerHelper.setMaxPlayers(1000); // Unlimited spectators
+        ServiceInfoHolder serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
+        BridgeServiceHelper serviceHelper = InjectionLayer.ext().instance(BridgeServiceHelper.class);
+        serviceHelper.maxPlayers().set(1000);
         DarkCubeBukkit.displayName("LobbyV2");
-        BridgeServerHelper.updateServiceInfo();
+        serviceInfoHolder.publishServiceInfoUpdate();
     }
 
     private Component displayName(@NotNull Map map) {
@@ -114,101 +119,96 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     }
 
     private void requestIds(ChannelMessageSender sender) {
-        ProtocolBuffer buffer = ProtocolBuffer.create();
+        DataBuf.Mutable buffer = DataBuf.empty();
         boolean gameSizeLoaded = woolbattle.gameData().mapSize() != null;
 
         if (gameSizeLoaded) fillGameSize(buffer);
         else fillGameSizeUnknown(buffer);
 
-        ChannelMessage message = ChannelMessage
-                .builder()
-                .target(sender.getType(), sender.getName())
-                .channel(CHANNEL)
-                .buffer(buffer)
-                .build();
+        ChannelMessage message = ChannelMessage.builder().target(sender.type(), sender.name()).channel(CHANNEL).buffer(buffer).build();
         message.send();
     }
 
-    private void fillGameSizeUnknown(ProtocolBuffer buffer) {
+    private void fillGameSizeUnknown(DataBuf.Mutable buffer) {
         java.util.Map<MapSize, Collection<Map>> maps = new HashMap<>();
         for (Map map : woolbattle.mapManager().getMaps()) {
             if (!map.isEnabled()) continue;
             maps.computeIfAbsent(map.size(), k -> new ArrayList<>()).add(map);
         }
-        buffer.writeByte(0); // 0 to indicate that we have not selected a GameSize
-        buffer.writeVarInt(maps.size()); // Count
+        buffer.writeByte((byte) 0); // 0 to indicate that we have not selected a GameSize
+        buffer.writeInt(maps.size()); // Count
 
         for (java.util.Map.Entry<MapSize, Collection<Map>> entry : maps.entrySet()) {
             fillGameSizeUnknownMaps(buffer, entry.getKey(), entry.getValue()); // Fill every single map
         }
     }
 
-    private void fillGameSizeUnknownMaps(ProtocolBuffer buffer, MapSize size, Collection<Map> maps) {
-        buffer.writeVarInt(size.teams() * size.teamSize()); // Max players for following maps
+    private void fillGameSizeUnknownMaps(DataBuf.Mutable buffer, MapSize size, Collection<Map> maps) {
+        buffer.writeInt(size.teams() * size.teamSize()); // Max players for following maps
         buffer.writeString(size.toString()); // Textual representation of the GameSize
-        buffer.writeVarInt(maps.size()); // Count, again
+        buffer.writeInt(maps.size()); // Count, again
 
         for (Map map : maps) {
             buffer.writeString(map.getName());
         }
     }
 
-    private void fillGameSize(ProtocolBuffer buffer) {
+    private void fillGameSize(DataBuf.Mutable buffer) {
         MapSize size = woolbattle.gameData().mapSize();
         Map map = woolbattle.gameData().map();
         String mapName = map == null ? null : map.getName();
 
-        buffer.writeByte(1); // 1 to indicate that we have selected a GameSize
+        buffer.writeByte((byte) 1); // 1 to indicate that we have selected a GameSize
         buffer.writeString(size.toString()); // Textual representation of the GameSize
-        buffer.writeVarInt(size.teams() * size.teamSize()); // Max player count
-        buffer.writeOptionalString(mapName); // Text to display
+        buffer.writeInt(size.teams() * size.teamSize()); // Max player count
+        buffer.writeByte((byte) (mapName == null ? 0 : 1));
+        if (mapName != null) buffer.writeString(mapName); // Text to display
     }
 
     private void connectionFailed(@NotNull ChannelMessageSender sender, int requestId, @NotNull String reason, @NotNull String arg) {
-        ProtocolBuffer buffer = ProtocolBuffer.create();
-        buffer.writeVarInt(requestId);
+        DataBuf.Mutable buffer = DataBuf.empty();
+        buffer.writeInt(requestId);
         buffer.writeString(reason);
         buffer.writeString(arg);
         send("connection_failed", sender, buffer);
     }
 
     private void connectionSuccess(@NotNull ChannelMessageSender sender, int requestId) {
-        ProtocolBuffer buffer = ProtocolBuffer.create();
-        buffer.writeVarInt(requestId);
+        DataBuf.Mutable buffer = DataBuf.empty();
+        buffer.writeInt(requestId);
         send("connection_success", sender, buffer);
     }
 
     private void workingOnRequest(@NotNull ChannelMessageSender sender, int requestId) {
-        ProtocolBuffer buffer = ProtocolBuffer.create();
-        buffer.writeVarInt(requestId);
+        DataBuf.Mutable buffer = DataBuf.empty();
+        buffer.writeInt(requestId);
         send("working_on_request", sender, buffer);
     }
 
-    private void send(@NotNull String message, @NotNull ChannelMessageSender target, @Nullable ProtocolBuffer buffer) {
-        DriverEnvironment environment = target.getType();
-        ChannelMessageTarget.Type type = environment == DriverEnvironment.CLOUDNET ? ChannelMessageTarget.Type.NODE : ChannelMessageTarget.Type.SERVICE;
-        ChannelMessageTarget realTarget = new ChannelMessageTarget(type, target.getName());
+    private void send(@NotNull String message, @NotNull ChannelMessageSender target, @Nullable DataBuf buffer) {
+        DriverEnvironment environment = target.type();
+        ChannelMessageTarget.Type type = environment == DriverEnvironment.NODE ? ChannelMessageTarget.Type.NODE : ChannelMessageTarget.Type.SERVICE;
+        ChannelMessageTarget realTarget = ChannelMessageTarget.of(type, target.name());
         send(message, realTarget, buffer);
     }
 
-    private void send(@NotNull String message, @NotNull ChannelMessageTarget target, @Nullable ProtocolBuffer buffer) {
+    private void send(@NotNull String message, @NotNull ChannelMessageTarget target, @Nullable DataBuf buffer) {
         ChannelMessage channelMessage = ChannelMessage.builder().target(target).channel(CHANNEL).message(message).buffer(buffer).build();
-        CloudNetDriver.getInstance().getMessenger().sendChannelMessage(channelMessage);
+        channelMessage.send();
     }
 
     private class RequestListener {
 
         @EventListener public void handle(ChannelMessageReceiveEvent event) {
-            if (!event.getChannel().equals(CHANNEL)) return;
-            @Nullable String msg = event.getMessage();
-            if (msg == null) return;
-            @NotNull ChannelMessageSender sender = event.getSender();
+            if (!event.channel().equals(CHANNEL)) return;
+            @NotNull String msg = event.message();
+            @NotNull ChannelMessageSender sender = event.sender();
             if (msg.equals("request_ids")) {
                 schedule(() -> requestIds(sender));
             } else if (msg.equals("connect_player")) {
-                @NotNull ProtocolBuffer buffer = event.getBuffer();
-                int requestId = buffer.readVarInt();
-                @NotNull UUID uuid = buffer.readUUID();
+                @NotNull DataBuf buffer = event.content();
+                int requestId = buffer.readInt();
+                @NotNull UUID uuid = buffer.readUniqueId();
                 @NotNull String mapSizeString = buffer.readString();
                 @NotNull String mapString = buffer.readString();
 
@@ -241,9 +241,9 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
                     } else {
                         woolbattle.lobby().loadGame(mapSize);
                     }
-                    IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
-                    PlayerExecutor executor = playerManager.getPlayerExecutor(uuid);
-                    executor.connect(CloudNetDriver.getInstance().getComponentName());
+                    PlayerManager playerManager = InjectionLayer.boot().instance(PlayerManager.class);
+                    PlayerExecutor executor = playerManager.playerExecutor(uuid);
+                    executor.connect(InjectionLayer.boot().instance(ComponentInfo.class).componentName());
                 });
             }
         }

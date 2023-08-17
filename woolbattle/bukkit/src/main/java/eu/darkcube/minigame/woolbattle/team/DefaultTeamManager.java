@@ -6,9 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle.team;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.database.Database;
+import eu.cloudnetservice.driver.database.Database;
+import eu.cloudnetservice.driver.database.DatabaseProvider;
+import eu.cloudnetservice.driver.document.Document;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class DefaultTeamManager implements TeamManager {
 
-    private final Database database = CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("woolbattle_teams");
+    private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_teams");
     private final Collection<Team> teams;
     private final Map<WBUser, Team> teamByUser;
     private final WoolBattleBukkit woolbattle;
@@ -42,36 +43,35 @@ public class DefaultTeamManager implements TeamManager {
     @Override public void save(TeamType teamType) {
         MapSize size = teamType.mapSize();
         if (size == null) throw new IllegalStateException("MapSize null");
-        JsonDocument document = database.get(size.toString());
+        Document document = database.get(size.toString());
         if (document == null) {
-            document = JsonDocument.newDocument();
+            document = Document.newJsonDocument();
             database.insert(size.toString(), document);
         }
-        JsonDocument doc = JsonDocument.newDocument();
+        Document.Mutable doc = Document.newJsonDocument();
         doc.append("weight", teamType.getWeight());
         doc.append("woolColor", teamType.getWoolColor().name().toLowerCase(Locale.ROOT));
         doc.append("nameColor", teamType.getNameColor().name().toLowerCase(Locale.ROOT));
         doc.append("enabled", teamType.isEnabled());
 
-        document.append(teamType.getDisplayNameKey(), doc);
-        database.update(size.toString(), document);
+        database.insert(size.toString(), document.mutableCopy().append(teamType.getDisplayNameKey(), doc));
     }
 
     @Override public void delete(TeamType teamType) {
         MapSize size = teamType.mapSize();
         if (size == null) throw new IllegalStateException("MapSize null");
-        JsonDocument document = database.get(size.toString());
+        Document document = database.get(size.toString());
         if (document == null) throw new IllegalStateException("Already deleted " + teamType.getDisplayNameKey());
         if (!document.contains(teamType.getDisplayNameKey()))
             throw new IllegalStateException("Already deleted " + teamType.getDisplayNameKey());
-        document.remove(teamType.getDisplayNameKey());
+        document = document.mutableCopy().remove(teamType.getDisplayNameKey());
         teamTypes.get(size).remove(teamType);
         if (teamTypes.get(size).isEmpty()) teamTypes.remove(size);
-        if (!document.isEmpty()) database.update(size.toString(), document);
+        if (!document.empty()) database.insert(size.toString(), document);
         else database.delete(size.toString());
     }
 
-    private void loadTeam(MapSize mapSize, String key, JsonDocument document) {
+    private void loadTeam(MapSize mapSize, String key, Document document) {
         int uniqueId = 1;
         int weight = document.getInt("weight");
         DyeColor woolcolor = DyeColor.valueOf(document.getString("woolColor").toUpperCase(Locale.ROOT));
@@ -93,17 +93,17 @@ public class DefaultTeamManager implements TeamManager {
     }
 
     private void loadTeams() {
-        for (Map.Entry<String, JsonDocument> entry : database.entries().entrySet()) {
+        for (Map.Entry<String, Document> entry : database.entries().entrySet()) {
             loadMapSize(entry.getKey(), entry.getValue());
         }
     }
 
-    private void loadMapSize(String sizeString, JsonDocument document) {
+    private void loadMapSize(String sizeString, Document document) {
         MapSize size = MapSize.fromString(sizeString);
         if (size == null) return;
         woolbattle.knownMapSizes().add(size);
         teamTypes.put(size, new ArrayList<>());
-        for (String key : document.keys()) loadTeam(size, key, document.getDocument(key));
+        for (String key : document.keys()) loadTeam(size, key, document.readDocument(key));
     }
 
     private void loadSpectator() {

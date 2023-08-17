@@ -6,9 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle.map;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.database.Database;
+import eu.cloudnetservice.driver.database.Database;
+import eu.cloudnetservice.driver.database.DatabaseProvider;
+import eu.cloudnetservice.driver.document.Document;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
 
 import java.util.ArrayList;
@@ -18,13 +19,13 @@ import java.util.HashMap;
 
 public class DefaultMapManager implements MapManager {
 
-    final Database database = CloudNetDriver.getInstance().getDatabaseProvider().getDatabase("woolbattle_maps");
+    final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps");
     private final java.util.Map<MapSize, java.util.Map<String, Map>> maps = new HashMap<>();
 
     public DefaultMapManager() {
-        for (java.util.Map.Entry<String, JsonDocument> entry : database.entries().entrySet()) {
-            JsonDocument document = entry.getValue();
-            String mapJson = document.toJson();
+        for (java.util.Map.Entry<String, Document> entry : database.entries().entrySet()) {
+            Document document = entry.getValue();
+            String mapJson = document.serializeToString();
             Map map = GsonSerializer.gson.fromJson(mapJson, Map.class);
             maps(map.size()).put(map.getName(), map);
         }
@@ -70,6 +71,6 @@ public class DefaultMapManager implements MapManager {
     }
 
     void save(DefaultMap map) {
-        database.update(databaseKey(map), map.toDocument());
+        database.insert(databaseKey(map), map.toDocument());
     }
 }

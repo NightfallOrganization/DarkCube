@@ -22,6 +22,8 @@ tasks {
     assemble {
         dependsOn(reobfJar)
     }
+    reobfJar {
+    }
     compileJava {
         options.release = 17
     }

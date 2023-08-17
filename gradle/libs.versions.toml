@@ -23,6 +23,8 @@ cloudnetDriver = { group = "eu.cloudnetservice.cloudnet", name = "driver", versi
 cloudnetBridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
 cloudnet = { group = "eu.cloudnetservice.cloudnet", name = "node", version.ref = "cloudnet" }
 cloudnetWrapper = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "cloudnet" }
+cloudnetInjectApi = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-api", version.ref = "cloudnet" }
+cloudnetInjectProcessor = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-processor", version.ref = "cloudnet" }
 
 [bundles]
 

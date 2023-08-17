@@ -11,12 +11,8 @@ import eu.darkcube.system.packetapi.PacketHandler;
 import eu.darkcube.system.pserver.cloudnet.NodePServerProvider;
 import eu.darkcube.system.pserver.common.packets.wn.PacketType;
 
-import java.util.concurrent.ExecutionException;
-
 public class HandlerType implements PacketHandler<PacketType> {
-	@Override
-	public Packet handle(PacketType packet) throws ExecutionException, InterruptedException {
-		return new PacketType.Response(
-				NodePServerProvider.instance().pserver(packet.id()).get().type().get());
-	}
+    @Override public Packet handle(PacketType packet) {
+        return new PacketType.Response(NodePServerProvider.instance().pserver(packet.id()).join().type().join());
+    }
 }

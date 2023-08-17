@@ -7,10 +7,10 @@
 
 package eu.darkcube.system.module;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.module.ModuleLifeCycle;
-import de.dytanic.cloudnet.driver.module.ModuleTask;
-import de.dytanic.cloudnet.driver.module.driver.DriverModule;
+import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.module.ModuleLifeCycle;
+import eu.cloudnetservice.driver.module.ModuleTask;
+import eu.cloudnetservice.driver.module.driver.DriverModule;
 import eu.darkcube.system.module.userapi.UserAPI;
 import eu.darkcube.system.module.util.data.SynchronizedPersistentDataStorages;
 import eu.darkcube.system.packetapi.PacketAPI;
@@ -18,16 +18,17 @@ import eu.darkcube.system.packetapi.PacketAPI;
 import java.io.File;
 
 public class DarkCubeSystemModule extends DriverModule {
-	public static final String PLUGIN_NAME = new File(
-			DarkCubeSystemModule.class.getProtectionDomain().getCodeSource().getLocation()
-					.getPath()).getName();
+    public static final String PLUGIN_NAME = new File(DarkCubeSystemModule.class
+            .getProtectionDomain()
+            .getCodeSource()
+            .getLocation()
+            .getPath()).getName();
 
-	@ModuleTask(order = 0, event = ModuleLifeCycle.STARTED)
-	public void start() {
-		PacketAPI.init();
-		UserAPI userAPI = new UserAPI();
-		CloudNetDriver.getInstance().getEventManager().registerListener(userAPI);
-		CloudNetDriver.getInstance().getEventManager().registerListener(new Listener());
-		SynchronizedPersistentDataStorages.init();
-	}
+    @ModuleTask(order = 0, lifecycle = ModuleLifeCycle.STARTED) public void start(EventManager eventManager) {
+        PacketAPI.init();
+        UserAPI userAPI = new UserAPI();
+        eventManager.registerListener(userAPI);
+        eventManager.registerListener(new Listener());
+        SynchronizedPersistentDataStorages.init();
+    }
 }

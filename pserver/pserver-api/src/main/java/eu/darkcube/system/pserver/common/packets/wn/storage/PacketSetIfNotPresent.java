@@ -6,35 +6,35 @@
  */
 package eu.darkcube.system.pserver.common.packets.wn.storage;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.util.data.Key;
 
 public class PacketSetIfNotPresent extends Packet {
-	private final UniqueId id;
-	private final Key key;
-	private final JsonDocument data;
+    private final UniqueId id;
+    private final Key key;
+    private final Document data;
 
-	public PacketSetIfNotPresent(UniqueId id, Key key, JsonDocument data) {
-		this.id = id;
-		this.key = key;
-		this.data = data;
-	}
+    public PacketSetIfNotPresent(UniqueId id, Key key, Document data) {
+        this.id = id;
+        this.key = key;
+        this.data = data;
+    }
 
-	public UniqueId id() {
-		return id;
-	}
+    public UniqueId id() {
+        return id;
+    }
 
-	public Key key() {
-		return key;
-	}
+    public Key key() {
+        return key;
+    }
 
-	public JsonDocument data() {
-		return data;
-	}
+    public Document data() {
+        return data;
+    }
 
-	public static class Response extends Packet {
+    public static class Response extends Packet {
 
-	}
+    }
 }

@@ -6,28 +6,31 @@
  */
 package eu.darkcube.system;
 
-import de.dytanic.cloudnet.driver.service.property.DefaultJsonServiceProperty;
-import de.dytanic.cloudnet.driver.service.property.ServiceProperty;
+import eu.cloudnetservice.driver.document.property.DocProperty;
 import eu.darkcube.system.util.GameState;
 
 public class DarkCubeServiceProperty {
 
-	public static final ServiceProperty<Boolean> AUTOCONFIGURED =
-			DefaultJsonServiceProperty.createFromClass("autoconfigured", Boolean.class);
-	public static final ServiceProperty<GameState> GAME_STATE =
-			DefaultJsonServiceProperty.createFromClass("gameState", GameState.class)
-					.forbidModification();
-	public static final ServiceProperty<Integer> PLAYING_PLAYERS =
-			DefaultJsonServiceProperty.createFromClass("playingPlayers", Integer.class)
-					.forbidModification();
-	public static final ServiceProperty<Integer> SPECTATING_PLAYERS =
-			DefaultJsonServiceProperty.createFromClass("spectatingPlayers", Integer.class)
-					.forbidModification();
-	public static final ServiceProperty<Integer> MAX_PLAYING_PLAYERS =
-			DefaultJsonServiceProperty.createFromClass("maxPlayingPlayers", Integer.class)
-					.forbidModification();
-	public static final ServiceProperty<String> DISPLAY_NAME =
-			DefaultJsonServiceProperty.createFromClass("displayName", String.class)
-					.forbidModification();
+    public static final DocProperty<Boolean> AUTOCONFIGURED = DocProperty
+            .property("autoconfigured", Boolean.class)
+            .withDefault(false)
+            .asReadOnly();
+    public static final DocProperty<GameState> GAME_STATE = DocProperty
+            .property("gameState", GameState.class)
+            .withDefault(null)
+            .asReadOnly();
+    public static final DocProperty<Integer> PLAYING_PLAYERS = DocProperty
+            .property("playingPlayers", Integer.class)
+            .withDefault(-1)
+            .asReadOnly();
+    public static final DocProperty<Integer> SPECTATING_PLAYERS = DocProperty
+            .property("spectatingPlayers", Integer.class)
+            .withDefault(-1)
+            .asReadOnly();
+    public static final DocProperty<Integer> MAX_PLAYING_PLAYERS = DocProperty
+            .property("maxPlayingPlayers", Integer.class)
+            .withDefault(-1)
+            .asReadOnly();
+    public static final DocProperty<String> DISPLAY_NAME = DocProperty.property("displayName", String.class).withDefault(null).asReadOnly();
 
 }

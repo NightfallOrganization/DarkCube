@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.util.data;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 import eu.darkcube.system.packetapi.PacketAPI;
@@ -92,23 +92,20 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
     private final Key key;
     private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
     private final Map<Key, Object> cache = new HashMap<>();
-    private final Collection<@NotNull UpdateNotifier> updateNotifiers =
-            new CopyOnWriteArrayList<>();
-    private final JsonDocument data = new JsonDocument();
+    private final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
+    private final Document.Mutable data = Document.newJsonDocument();
 
     public SynchronizedPersistentDataStorage(Key key) {
         this.key = key;
-        this.data.append(new PacketWrapperNodeQuery(key).sendQuery().cast(PacketData.class).data());
+        this.data.append(new PacketWrapperNodeQuery(key).sendQuery(PacketData.class).data());
         storages.add(new WeakReference<>(this));
     }
 
-    @Override
-    public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
+    @Override public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
         return new UnmodifiablePersistentDataStorage(this);
     }
 
-    @Override
-    public @NotNull Collection<Key> keys() {
+    @Override public @NotNull Collection<Key> keys() {
         List<Key> keys = new ArrayList<>();
         try {
             lock.readLock().lock();
@@ -121,8 +118,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return Collections.unmodifiableCollection(keys);
     }
 
-    @Override
-    public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.writeLock().lock();
             data = type.clone(data);
@@ -130,7 +126,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
                 return;
             }
             cache.put(key, data);
-            JsonDocument d = JsonDocument.newDocument();
+            Document.Mutable d = Document.newJsonDocument();
             type.serialize(d, key.toString(), data);
             this.data.append(d);
             new PacketWrapperNodeDataSet(this.key, d).sendAsync();
@@ -140,15 +136,13 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         T ret;
         try {
             lock.writeLock().lock();
             if (!data.contains(key.toString())) {
                 return null;
             }
-            @SuppressWarnings("unchecked")
             T old = (T) cache.remove(key);
             if (old == null) {
                 old = type.deserialize(data, key.toString());
@@ -163,12 +157,10 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return ret;
     }
 
-    @Override
-    public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
         } finally {
@@ -177,7 +169,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
             if (!data.contains(key.toString())) {
@@ -191,12 +182,10 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override
-    public @NotNull <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
+    @Override public @NotNull <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
         } finally {
@@ -206,7 +195,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
             if (data.contains(key.toString())) {
@@ -215,7 +203,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
                 return type.clone(value);
             }
             T val = type.clone(defaultValue.get());
-            JsonDocument d = JsonDocument.newDocument();
+            Document.Mutable d = Document.newJsonDocument();
             type.serialize(d, key.toString(), val);
             this.data.append(d);
             new PacketWrapperNodeDataSet(this.key, d).sendAsync();
@@ -228,8 +216,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return ret;
     }
 
-    @Override
-    public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.readLock().lock();
             if (this.data.contains(key.toString())) {
@@ -244,7 +231,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
                 return;
             }
             data = type.clone(data);
-            JsonDocument d = JsonDocument.newDocument();
+            Document.Mutable d = Document.newJsonDocument();
             type.serialize(d, key.toString(), data);
             this.data.append(d);
             new PacketWrapperNodeDataSet(this.key, d).sendAsync();
@@ -255,8 +242,7 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public boolean has(@NotNull Key key) {
+    @Override public boolean has(@NotNull Key key) {
         try {
             lock.readLock().lock();
             return data.contains(key.toString());
@@ -265,12 +251,11 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         try {
             lock.writeLock().lock();
             clearData();
-            new PacketWrapperNodeDataClearSet(key, JsonDocument.newDocument()).sendAsync();
+            new PacketWrapperNodeDataClearSet(key, Document.newJsonDocument()).sendAsync();
         } finally {
             lock.writeLock().unlock();
         }
@@ -282,12 +267,11 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         for (String s : new ArrayList<>(data.keys())) data.remove(s);
     }
 
-    @Override
-    public void loadFromJsonDocument(JsonDocument document) {
+    @Override public void loadFromJsonDocument(Document document) {
         try {
             lock.writeLock().lock();
             clearData();
-            document = document.clone();
+            document = document.immutableCopy();
             new PacketWrapperNodeDataClearSet(key, document).sendAsync();
             data.append(document);
         } finally {
@@ -296,18 +280,16 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override
-    public JsonDocument storeToJsonDocument() {
+    @Override public Document storeToJsonDocument() {
         try {
             lock.readLock().lock();
-            return JsonDocument.newDocument().append(data);
+            return data.immutableCopy();
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    @Override
-    public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
+    @Override public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
         return Collections.unmodifiableCollection(updateNotifiers);
     }
 
@@ -320,13 +302,11 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override
-    public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.add(notifier);
     }
 
-    @Override
-    public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.remove(notifier);
     }
 

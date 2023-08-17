@@ -7,8 +7,9 @@
 
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceTemplate;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceTemplate;
+import eu.cloudnetservice.driver.template.TemplateStorageProvider;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
 import eu.darkcube.minigame.woolbattle.command.argument.CloudTemplateArgument;
@@ -49,19 +50,15 @@ public class CommandImport extends WBCommandExecutor {
     public CommandImport(WoolBattleBukkit woolbattle) {
         super("import", b -> b.then(Commands.argument("template", CloudTemplateArgument.template()).executes(ctx -> {
             ServiceTemplate template = CloudTemplateArgument.template(ctx, "template");
-            Path directory = woolbattle
-                    .getDataFolder()
-                    .toPath()
-                    .resolve("importing")
-                    .resolve(template.getPrefix())
-                    .resolve(template.getName());
+            Path directory = woolbattle.getDataFolder().toPath().resolve("importing").resolve(template.prefix()).resolve(template.name());
             try {
                 Files.createDirectories(directory);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             ctx.getSource().sendMessage(Component.text("Starting download of template"));
-            CloudNetDriver.getInstance().getLocalTemplateStorage().copyAsync(template, directory).onComplete(suc -> {
+            TemplateStorageProvider provider = InjectionLayer.boot().instance(TemplateStorageProvider.class);
+            provider.templateStorage(template.storageName()).pullAsync(template, directory).thenAccept(suc -> {
                 if (suc) {
                     ctx.getSource().sendMessage(Component.text("Download of template successful"));
                     new Scheduler(woolbattle) {

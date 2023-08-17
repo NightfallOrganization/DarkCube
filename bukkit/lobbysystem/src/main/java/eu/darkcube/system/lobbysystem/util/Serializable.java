@@ -7,15 +7,16 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
+import eu.cloudnetservice.driver.document.DocumentFactory;
 
 public interface Serializable {
-	
-	default String serialize() {
-		return GsonSerializer.gson.toJson(this);
-	}
-	
-	default JsonDocument serializeToDocument() {
-		return JsonDocument.newDocument(serialize());
-	}
+
+    default String serialize() {
+        return GsonSerializer.gson.toJson(this);
+    }
+
+    default Document serializeToDocument() {
+        return DocumentFactory.json().parse(serialize());
+    }
 }

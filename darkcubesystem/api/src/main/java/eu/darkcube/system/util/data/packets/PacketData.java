@@ -6,17 +6,17 @@
  */
 package eu.darkcube.system.util.data.packets;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.packetapi.Packet;
 
 public class PacketData extends Packet {
-	private final JsonDocument data;
+    private final Document data;
 
-	public PacketData(JsonDocument data) {
-		this.data = data;
-	}
+    public PacketData(Document data) {
+        this.data = data;
+    }
 
-	public JsonDocument data() {
-		return data;
-	}
+    public Document data() {
+        return data;
+    }
 }

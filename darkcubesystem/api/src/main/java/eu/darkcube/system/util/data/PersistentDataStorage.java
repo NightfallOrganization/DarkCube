@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.util.data;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -35,8 +35,7 @@ public interface PersistentDataStorage {
      * @param data the data
      * @param <T>  the data type
      */
-    <T>
-    void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data);
+    <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data);
 
     /**
      * Removes some data
@@ -63,8 +62,7 @@ public interface PersistentDataStorage {
      * @param <T>          the data type
      * @return the saved data, defaultValue if not present
      */
-    @NotNull <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type,
-                       @NotNull Supplier<@NotNull T> defaultValue);
+    @NotNull <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue);
 
     /**
      * @param key  the key
@@ -72,8 +70,7 @@ public interface PersistentDataStorage {
      * @param data the data
      * @param <T>  the data type
      */
-    <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type,
-                             @NotNull T data);
+    <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data);
 
     /**
      * @param key the key
@@ -87,17 +84,17 @@ public interface PersistentDataStorage {
     void clear();
 
     /**
-     * Loads all the data from a {@link JsonDocument}<br>
+     * Loads all the data from a {@link Document}<br>
      * <b>This will NOT be cleared, the data will be ADDED to the current data</b>
      *
      * @param document the document to load the data from
      */
-    void loadFromJsonDocument(JsonDocument document);
+    void loadFromJsonDocument(Document document);
 
     /**
      * @return a jsonDocument with all the data
      */
-    JsonDocument storeToJsonDocument();
+    Document storeToJsonDocument();
 
     /**
      * @return an unmodifiable view of all {@link UpdateNotifier}s

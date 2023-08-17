@@ -6,24 +6,22 @@
  */
 package eu.darkcube.system.util.data;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 
 /**
  * @param <T> the data type
- *
  * @author DasBabyPixel
  */
 public interface PersistentDataType<T> {
 
-	T deserialize(JsonDocument doc, String key);
+    T deserialize(Document doc, String key);
 
-	void serialize(JsonDocument doc, String key, T data);
+    void serialize(Document.Mutable doc, String key, T data);
 
-	/**
-	 * @param object the object to clone
-	 *
-	 * @return a new cloned object, or the same if immutable
-	 */
-	T clone(T object);
+    /**
+     * @param object the object to clone
+     * @return a new cloned object, or the same if immutable
+     */
+    T clone(T object);
 
 }

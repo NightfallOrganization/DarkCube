@@ -6,30 +6,29 @@
  */
 package eu.darkcube.system.pserver.common.packets.wn;
 
-import de.dytanic.cloudnet.driver.service.ServiceId;
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 public class PacketGetUniqueId extends Packet {
-	private final ServiceId serviceId;
+    private final String serviceId;
 
-	public PacketGetUniqueId(ServiceId serviceId) {
-		this.serviceId = serviceId;
-	}
+    public PacketGetUniqueId(String serviceId) {
+        this.serviceId = serviceId;
+    }
 
-	public ServiceId serviceId() {
-		return serviceId;
-	}
+    public String serviceId() {
+        return serviceId;
+    }
 
-	public static class Response extends Packet {
-		private final UniqueId id;
+    public static class Response extends Packet {
+        private final UniqueId id;
 
-		public Response(UniqueId id) {
-			this.id = id;
-		}
+        public Response(UniqueId id) {
+            this.id = id;
+        }
 
-		public UniqueId id() {
-			return id;
-		}
-	}
+        public UniqueId id() {
+            return id;
+        }
+    }
 }

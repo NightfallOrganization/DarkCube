@@ -9,13 +9,16 @@ package eu.darkcube.system.version.v1_20_1;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.DocumentFactory;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.*;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile.Texture;
-import eu.darkcube.system.libs.com.google.gson.*;
+import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.system.libs.com.google.gson.GsonBuilder;
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.TypeAdapter;
 import eu.darkcube.system.libs.com.google.gson.stream.JsonReader;
 import eu.darkcube.system.libs.com.google.gson.stream.JsonToken;
 import eu.darkcube.system.libs.com.google.gson.stream.JsonWriter;
@@ -157,9 +160,9 @@ public class ItemBuilder1_20_1 extends AbstractItemBuilder {
                 lmeta.setColor(null);
             }
             if (meta.getPersistentDataContainer().has(persistentDataKey)) {
-                storage.loadFromJsonDocument(JsonDocument.newDocument(meta
-                        .getPersistentDataContainer()
-                        .get(persistentDataKey, PersistentDataType.STRING)));
+                storage.loadFromJsonDocument(DocumentFactory
+                        .json()
+                        .parse(meta.getPersistentDataContainer().get(persistentDataKey, PersistentDataType.STRING)));
                 meta.getPersistentDataContainer().remove(persistentDataKey);
             }
             this.item.setItemMeta(meta);
@@ -263,8 +266,9 @@ public class ItemBuilder1_20_1 extends AbstractItemBuilder {
                     throw new UnsupportedOperationException("Meta not supported for this mc version: " + builderMeta);
                 }
             }
-            if (!storage.storeToJsonDocument().isEmpty())
-                meta.getPersistentDataContainer().set(persistentDataKey, PersistentDataType.STRING, storage.storeToJsonDocument().toJson());
+            if (!storage.storeToJsonDocument().empty()) meta
+                    .getPersistentDataContainer()
+                    .set(persistentDataKey, PersistentDataType.STRING, storage.storeToJsonDocument().serializeToString());
             item.setItemMeta(meta);
         }
         return item;

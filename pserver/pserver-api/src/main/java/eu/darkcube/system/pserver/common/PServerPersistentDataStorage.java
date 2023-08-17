@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.pserver.common;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -92,12 +92,12 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
      *
      * @param document the document to load the data from
      */
-    @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(@NotNull JsonDocument document);
+    @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(@NotNull Document document);
 
     /**
      * @return a jsonDocument with all the data
      */
-    @NotNull CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync();
+    @NotNull CompletableFuture<@NotNull Document> storeToJsonDocumentAsync();
 
     class UnmodifiableStorage extends UnmodifiablePersistentDataStorage implements PServerPersistentDataStorage {
         private final PServerPersistentDataStorage storage;
@@ -109,10 +109,6 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
 
         @Override public @UnmodifiableView @NotNull PServerPersistentDataStorage unmodifiable() {
             return this;
-        }
-
-        @Override public void clearCache() {
-            throw new UnsupportedOperationException();
         }
 
         @Override public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
@@ -152,11 +148,11 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
             throw new UnsupportedOperationException();
         }
 
-        @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(JsonDocument document) {
+        @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(Document document) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public CompletableFuture<@NotNull JsonDocument> storeToJsonDocumentAsync() {
+        @Override public CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
             return storage.storeToJsonDocumentAsync();
         }
     }

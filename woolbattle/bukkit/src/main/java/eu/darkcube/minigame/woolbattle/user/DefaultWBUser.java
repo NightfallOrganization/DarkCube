@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.user;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAddWool;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserRemoveWool;
@@ -46,14 +46,14 @@ class DefaultWBUser implements WBUser {
     private static final PersistentDataType<WoolSubtractDirection> TYPE_WOOL_SUBTRACT_DIRECTION = PersistentDataTypes.enumType(WoolSubtractDirection.class);
     private static final Key KEY_HEIGHT_DISPLAY = new Key(WoolBattleBukkit.instance().getName(), "heightDisplay");
     private static final PersistentDataType<HeightDisplay> TYPE_HEIGHT_DISPLAY = new PersistentDataType<HeightDisplay>() {
-        @Override public HeightDisplay deserialize(JsonDocument doc, String key) {
-            doc = doc.getDocument(key);
-            return new HeightDisplay(doc.getBoolean("enabled"), doc.getInt("maxDistance"), doc.getChar("color"));
+        @Override public HeightDisplay deserialize(Document doc, String key) {
+            doc = doc.readDocument(key);
+            return new HeightDisplay(doc.getBoolean("enabled"), doc.getInt("maxDistance"), doc.getString("color").charAt(0));
         }
 
-        @Override public void serialize(JsonDocument doc, String key, HeightDisplay data) {
-            doc.append(key, JsonDocument
-                    .newDocument()
+        @Override public void serialize(Document.Mutable doc, String key, HeightDisplay data) {
+            doc.append(key, Document
+                    .newJsonDocument()
                     .append("enabled", data.enabled)
                     .append("maxDistance", data.maxDistance)
                     .append("color", data.color));
@@ -68,36 +68,11 @@ class DefaultWBUser implements WBUser {
     private static final Key KEY_PERKS = new Key(WoolBattleBukkit.instance(), "perks");
     private static final PersistentDataType<PerkName> TYPE_PERK_NAME = PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new, p -> p);
     private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME = PersistentDataTypes.list(TYPE_PERK_NAME);
-    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<int[]>() {
-        @Override public int[] deserialize(JsonDocument doc, String key) {
-            byte[] bytes = doc.getBinary(key);
-            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
-            int len = buf.get();
-            int[] ar = new int[len];
-            for (int i = 0; buf.remaining() > 0; i++) {
-                ar[i] = buf.get();
-            }
-            return ar;
-        }
-
-        @Override public void serialize(JsonDocument doc, String key, int[] data) {
-            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
-            IntBuffer ib = buf.asIntBuffer();
-            ib.put(data.length);
-            for (int i : data)
-                ib.put(i);
-            doc.append(key, buf.array());
-        }
-
-        @Override public int[] clone(int[] object) {
-            return object.clone();
-        }
-    };
     private static final PersistentDataType<PlayerPerks> TYPE_PERKS = new PersistentDataType<PlayerPerks>() {
-        @Override public PlayerPerks deserialize(JsonDocument doc, String key) {
-            doc = doc.getDocument(key);
-            JsonDocument docPerks = doc.getDocument("perks");
-            JsonDocument docPerkSlots = doc.getDocument("perkSlots");
+        @Override public PlayerPerks deserialize(Document doc, String key) {
+            doc = doc.readDocument(key);
+            Document docPerks = doc.readDocument("perks");
+            Document docPerkSlots = doc.readDocument("perkSlots");
             Map<ActivationType, PerkName[]> perks = new HashMap<>();
             Map<ActivationType, int[]> perkSlots = new HashMap<>();
             for (String documentKey : docPerks.keys()) {
@@ -113,10 +88,10 @@ class DefaultWBUser implements WBUser {
             return new DefaultPlayerPerks(perks, perkSlots);
         }
 
-        @Override public void serialize(JsonDocument doc, String key, PlayerPerks data) {
-            JsonDocument d = JsonDocument.newDocument();
-            JsonDocument docPerks = new JsonDocument();
-            JsonDocument docPerkSlots = new JsonDocument();
+        @Override public void serialize(Document.Mutable doc, String key, PlayerPerks data) {
+            Document.Mutable d = Document.newJsonDocument();
+            Document.Mutable docPerks = Document.newJsonDocument();
+            Document.Mutable docPerkSlots = Document.newJsonDocument();
             for (ActivationType type : ActivationType.values()) {
                 TYPE_LIST_PERK_NAME.serialize(docPerks, type.name(), Arrays.asList(data.perks(type)));
                 TYPE_INT_ARRAY.serialize(docPerkSlots, type.name(), data.perkInvSlots(type));
@@ -126,6 +101,31 @@ class DefaultWBUser implements WBUser {
         }
 
         @Override public PlayerPerks clone(PlayerPerks object) {
+            return object.clone();
+        }
+    };
+    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<int[]>() {
+        @Override public int[] deserialize(Document doc, String key) {
+            byte[] bytes = doc.readObject(key, byte[].class);
+            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
+            int len = buf.get();
+            int[] ar = new int[len];
+            for (int i = 0; buf.remaining() > 0; i++) {
+                ar[i] = buf.get();
+            }
+            return ar;
+        }
+
+        @Override public void serialize(Document.Mutable doc, String key, int[] data) {
+            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
+            IntBuffer ib = buf.asIntBuffer();
+            ib.put(data.length);
+            for (int i : data)
+                ib.put(i);
+            doc.append(key, buf.array());
+        }
+
+        @Override public int[] clone(int[] object) {
             return object.clone();
         }
     };

@@ -6,24 +6,24 @@
  */
 package eu.darkcube.system.util.data.packets;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.util.data.Key;
 
 public class PacketNodeWrapperDataClearSet extends Packet {
-	private final Key key;
-	private final JsonDocument data;
+    private final Key key;
+    private final Document data;
 
-	public PacketNodeWrapperDataClearSet(Key key, JsonDocument data) {
-		this.key = key;
-		this.data = data;
-	}
+    public PacketNodeWrapperDataClearSet(Key key, Document data) {
+        this.key = key;
+        this.data = data;
+    }
 
-	public JsonDocument data() {
-		return data;
-	}
+    public Document data() {
+        return data;
+    }
 
-	public Key key() {
-		return key;
-	}
+    public Key key() {
+        return key;
+    }
 }

@@ -6,25 +6,23 @@
  */
 package eu.darkcube.system.pserver.common;
 
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.driver.service.property.DefaultJsonServiceProperty;
-import de.dytanic.cloudnet.driver.service.property.ServiceProperty;
+import eu.cloudnetservice.driver.document.property.DocProperty;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 
 public abstract class ServiceInfoUtil {
 
-	public static final ServiceProperty<UniqueId> property_uid =
-			DefaultJsonServiceProperty.createFromClass("pserver_unique_id", UniqueId.class);
-	private static ServiceInfoUtil instance;
+    public static final DocProperty<UniqueId> property_uid = DocProperty.property("pserver_unique_id", UniqueId.class);
+    private static ServiceInfoUtil instance;
 
-	public ServiceInfoUtil() {
-		instance = this;
-	}
+    public ServiceInfoUtil() {
+        instance = this;
+    }
 
-	public static ServiceInfoUtil getInstance() {
-		return instance;
-	}
+    public static ServiceInfoUtil getInstance() {
+        return instance;
+    }
 
-	public UniqueId getUniqueId(ServiceInfoSnapshot snapshot) {
-		return snapshot.getProperty(property_uid).orElse(null);
-	}
+    public UniqueId getUniqueId(ServiceInfoSnapshot snapshot) {
+        return snapshot.readPropertyOrDefault(property_uid, null);
+    }
 }

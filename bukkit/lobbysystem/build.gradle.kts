@@ -55,4 +55,6 @@ dependencies {
     compileOnly(libs.annotations)
     compileOnly(libs.cloudnetBridge)
     compileOnly(libs.luckperms)
+    compileOnly(libs.cloudnetInjectApi)
+    annotationProcessor(libs.cloudnetInjectProcessor)
 }

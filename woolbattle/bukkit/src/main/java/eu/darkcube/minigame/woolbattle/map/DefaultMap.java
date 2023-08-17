@@ -6,7 +6,8 @@
  */
 package eu.darkcube.minigame.woolbattle.map;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
+import eu.cloudnetservice.driver.document.DocumentFactory;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer.DontSerialize;
 import eu.darkcube.minigame.woolbattle.util.Serializable;
@@ -92,8 +93,8 @@ public class DefaultMap implements Map, Serializable {
         return Serializable.super.serialize();
     }
 
-    JsonDocument toDocument() {
-        return JsonDocument.newDocument(serialize());
+    Document toDocument() {
+        return DocumentFactory.json().parse(serialize());
     }
 
     void save() {

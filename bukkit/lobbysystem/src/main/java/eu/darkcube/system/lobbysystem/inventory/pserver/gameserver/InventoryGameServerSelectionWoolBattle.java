@@ -6,8 +6,9 @@
  */
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceTask;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
+import eu.cloudnetservice.driver.service.ServiceTask;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
@@ -23,44 +24,43 @@ import java.util.stream.Collectors;
 
 public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerSelection {
 
-	private static final InventoryType type_gameserver_selection_woolbattle =
-			InventoryType.of("gameserver_selection_woolbattle");
+    private static final InventoryType type_gameserver_selection_woolbattle = InventoryType.of("gameserver_selection_woolbattle");
 
-	public InventoryGameServerSelectionWoolBattle(User user) {
-		super(user, Item.GAMESERVER_SELECTION_WOOLBATTLE,
-				InventoryGameServerSelectionWoolBattle.type_gameserver_selection_woolbattle,
-				new Sup(), new Func());
-	}
+    public InventoryGameServerSelectionWoolBattle(User user) {
+        super(user, Item.GAMESERVER_SELECTION_WOOLBATTLE, InventoryGameServerSelectionWoolBattle.type_gameserver_selection_woolbattle, new Sup(), new Func());
+    }
 
-	public static class Func implements BiFunction<User, ServiceTask, ItemBuilder> {
+    public static class Func implements BiFunction<User, ServiceTask, ItemBuilder> {
 
-		private static final Pattern pattern = Pattern.compile("\\d");
+        private static final Pattern pattern = Pattern.compile("\\d");
 
-		@Override
-		public ItemBuilder apply(User user, ServiceTask t) {
-			Matcher matcher = Func.pattern.matcher(t.getName());
-			String text;
-			if (matcher.find()) {
-				text = t.getName().substring(matcher.start());
-			} else {
-				text = "Invalid Task!";
-			}
-			return ItemBuilder.item(Item.GAMESERVER_WOOLBATTLE.getItem(user, text));
-		}
+        @Override public ItemBuilder apply(User user, ServiceTask t) {
+            Matcher matcher = Func.pattern.matcher(t.name());
+            String text;
+            if (matcher.find()) {
+                text = t.name().substring(matcher.start());
+            } else {
+                text = "Invalid Task!";
+            }
+            return ItemBuilder.item(Item.GAMESERVER_WOOLBATTLE.getItem(user, text));
+        }
 
-	}
+    }
 
-	public static class Sup implements Supplier<Collection<ServiceTask>> {
+    public static class Sup implements Supplier<Collection<ServiceTask>> {
 
-		@Override
-		public Collection<ServiceTask> get() {
-			final CloudNetDriver cnd = CloudNetDriver.getInstance();
-			return Lobby.getInstance().getDataManager().getWoolBattleTasks().stream()
-					.filter(s -> cnd.getServiceTaskProvider().isServiceTaskPresent(s))
-					.map(s -> cnd.getServiceTaskProvider().getServiceTask(s))
-					.collect(Collectors.toList());
-		}
+        @Override public Collection<ServiceTask> get() {
+            ServiceTaskProvider prov = InjectionLayer.boot().instance(ServiceTaskProvider.class);
+            return Lobby
+                    .getInstance()
+                    .getDataManager()
+                    .getWoolBattleTasks()
+                    .stream()
+                    .filter(s -> prov.serviceTask(s) != null)
+                    .map(prov::serviceTask)
+                    .collect(Collectors.toList());
+        }
 
-	}
+    }
 
 }

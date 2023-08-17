@@ -8,7 +8,7 @@ package eu.darkcube.system.version.v1_8_8;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.DocumentFactory;
 import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.*;
 import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
@@ -124,7 +124,7 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
                     tag.setString("system:persistent_data_storage", s);
                 }
                 if (tag.hasKey("system:persistent_data_storage")) {
-                    storage.loadFromJsonDocument(JsonDocument.newDocument(tag.getString("system:persistent_data_storage")));
+                    storage.loadFromJsonDocument(DocumentFactory.json().parse(tag.getString("system:persistent_data_storage")));
                 }
 
                 if (item.getType() == Material.MONSTER_EGG && tag.hasKey("EntityTag")) {
@@ -186,8 +186,7 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
             for (BuilderMeta builderMeta : metas) {
                 if (builderMeta instanceof FireworkBuilderMeta) {
                     ((FireworkEffectMeta) meta).setEffect(((FireworkBuilderMeta) builderMeta).fireworkEffect());
-                } else if (builderMeta instanceof SkullBuilderMeta) {
-                    SkullBuilderMeta bmeta = (SkullBuilderMeta) builderMeta;
+                } else if (builderMeta instanceof SkullBuilderMeta bmeta) {
                     UserProfile owner = bmeta.owningPlayer();
                     Texture texture = owner.texture();
                     GameProfile profile = new GameProfile(owner.uniqueId() == null ? UUID.randomUUID() : owner.uniqueId(), owner.name());
@@ -217,7 +216,7 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
             item.setItemMeta(meta);
             net.minecraft.server.v1_8_R3.ItemStack mci = CraftItemStack.asNMSCopy(item);
             NBTTagCompound tag = mci.getTag() == null ? new NBTTagCompound() : mci.getTag();
-            tag.setString("System:persistentDataStorage", storage.storeToJsonDocument().toJson());
+            tag.setString("System:persistentDataStorage", storage.storeToJsonDocument().serializeToString());
             mci.setTag(tag);
             item = CraftItemStack.asBukkitCopy(mci);
         } else {

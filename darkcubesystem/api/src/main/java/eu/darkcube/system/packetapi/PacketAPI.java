@@ -6,167 +6,180 @@
  */
 package eu.darkcube.system.packetapi;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import de.dytanic.cloudnet.common.concurrent.ITask;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.channel.ChannelMessage;
-import de.dytanic.cloudnet.driver.event.EventListener;
-import de.dytanic.cloudnet.driver.event.events.channel.ChannelMessageReceiveEvent;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.common.concurrent.Task;
+import eu.cloudnetservice.driver.channel.ChannelMessage;
+import eu.cloudnetservice.driver.event.EventListener;
+import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.event.events.channel.ChannelMessageReceiveEvent;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.network.buffer.DataBuf;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+
+import java.time.Duration;
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 public class PacketAPI {
 
-	public static final String CHANNEL = "darkCubePacketAPI";
-	private static PacketAPI instance;
+    private static final String CHANNEL = "darkcube:packetapi";
+    private static final String MESSAGE_PACKET = "packet";
+    private static final byte TYPE_NO_RESPONSE = 0;
+    private static final byte TYPE_QUERY = 1;
+    private static final byte TYPE_QUERY_RESPONSE = 2;
+    private static PacketAPI instance;
 
-	static {
-		instance = new PacketAPI();
-	}
+    static {
+        instance = new PacketAPI();
+    }
 
-	private Listener listener;
-	private BiMap<Class<? extends Packet>, PacketHandler<?>> handlers = HashBiMap.create();
+    private Listener listener;
+    private EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
+    private BiMap<Class<? extends Packet>, PacketHandler<?>> handlers = HashBiMap.create();
+    private Cache<UUID, QueryEntry<? extends Packet>> queries = Caffeine
+            .newBuilder()
+            .expireAfterWrite(Duration.ofSeconds(10))
+            .scheduler(Scheduler.systemScheduler())
+            .removalListener((UUID $, QueryEntry<? extends Packet> value, RemovalCause cause) -> {
+                if (cause.wasEvicted() && value != null) {
+                    value.task().completeExceptionally(new TimeoutException());
+                }
+            })
+            .build();
 
-	private PacketAPI() {
-		this.listener = new Listener();
-		load();
-	}
+    private PacketAPI() {
+        this.listener = new Listener();
+        load();
+    }
 
-	public static PacketAPI getInstance() {
-		return instance;
-	}
+    public static PacketAPI getInstance() {
+        return instance;
+    }
 
-	public static void init() {
+    public static void init() {
+    }
 
-	}
+    void load() {
+        eventManager.registerListener(listener);
+    }
 
-	void load() {
-		CloudNetDriver.getInstance().getEventManager().registerListener(listener);
-	}
+    void unload() {
+        eventManager.unregisterListener(listener);
+    }
 
-	void unload() {
-		CloudNetDriver.getInstance().getEventManager().unregisterListener(listener);
-	}
+    public void sendPacket(Packet packet) {
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().send();
+    }
 
-	public void sendPacket(Packet packet) {
-		preparePacket(packet).sendSingleQuery();
-	}
+    public void sendPacketAsync(Packet packet) {
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().send();
+    }
 
-	public void sendPacketAsync(Packet packet) {
-		preparePacket(packet).send();
-	}
+    public void sendPacket(Packet packet, ServiceInfoSnapshot snapshot) {
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetService(snapshot.name()).build().send();
+    }
 
-	public void sendPacket(Packet packet, ServiceInfoSnapshot snapshot) {
-		preparePacket(packet, snapshot).sendSingleQuery();
-	}
+    public void sendPacketAsync(Packet packet, ServiceInfoSnapshot snapshot) {
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetService(snapshot.name()).build().send();
+    }
 
-	public void sendPacketAsync(Packet packet, ServiceInfoSnapshot snapshot) {
-		preparePacket(packet, snapshot).send();
-	}
+    public <T extends Packet> T sendPacketQuery(Packet packet, Class<T> responsePacketType) {
+        return sendPacketQueryAsync(packet, responsePacketType).join();
+    }
 
-	public Packet sendPacketQuery(Packet packet, ServiceInfoSnapshot snapshot) {
-		ChannelMessage msg = preparePacket(packet, snapshot).sendSingleQuery();
-		if (msg == null)
-			return null;
-		return PacketSerializer.getPacket(msg.getJson(), PacketSerializer.getClass(msg.getJson()));
-	}
+    public <T extends Packet> Task<T> sendPacketQueryAsync(Packet packet, Class<T> responsePacketType) {
+        var uuid = UUID.randomUUID();
+        var task = new Task<T>();
+        var entry = new QueryEntry<T>(task, responsePacketType);
+        queries.put(uuid, entry);
+        preparePacket(packet, uuid, TYPE_QUERY).targetAll().build().send();
+        return task;
+    }
 
-	public ITask<Packet> sendPacketQueryAsync(Packet packet, ServiceInfoSnapshot snapshot) {
-		return preparePacket(packet, snapshot).sendSingleQueryAsync()
-				.map(m -> PacketSerializer.getPacket(m.getJson(),
-						PacketSerializer.getClass(m.getJson())));
-	}
+    private ChannelMessage.Builder preparePacket(Packet packet, UUID uuid, byte type) {
+        var buf = DataBuf.empty();
+        buf.writeByte(type);
+        if (type == TYPE_QUERY || type == TYPE_QUERY_RESPONSE) {
+            buf.writeUniqueId(uuid);
+        }
+        PacketSerializer.serialize(packet, buf);
+        return prepareMessage(buf);
+    }
 
-	public ITask<Packet> sendPacketQueryAsync(Packet packet) {
-		return preparePacket(packet).sendSingleQueryAsync()
-				.map(m -> PacketSerializer.getPacket(m.getJson(),
-						PacketSerializer.getClass(m.getJson())));
-	}
+    private ChannelMessage.Builder prepareMessage(DataBuf buffer) {
+        return ChannelMessage.builder().channel(CHANNEL).message(MESSAGE_PACKET).buffer(buffer);
+    }
 
-	public Packet sendPacketQuery(Packet packet) {
-		ChannelMessage msg = preparePacket(packet).sendSingleQuery();
-		if (msg == null)
-			return null;
-		return PacketSerializer.getPacket(msg.getJson(), PacketSerializer.getClass(msg.getJson()));
-	}
+    public <T extends Packet> void registerHandler(Class<T> clazz, PacketHandler<T> handler) {
+        handlers.put(clazz, handler);
+    }
 
-	public <T extends Packet> T sendPacketQuery(Packet packet, Class<T> responsePacketType) {
-		ChannelMessage msg = preparePacket(packet).sendSingleQuery();
-		if (msg == null)
-			return null;
-		return PacketSerializer.getPacket(msg.getJson(), responsePacketType);
-	}
+    public void unregisterHandler(PacketHandler<?> handler) {
+        handlers.inverse().remove(handler);
+    }
 
-	public <T extends Packet> ITask<T> sendPacketQueryAsync(Packet packet,
-			Class<T> responsePacketType) {
-		return preparePacket(packet).sendSingleQueryAsync()
-				.map(m -> PacketSerializer.getPacket(m.getJson(), responsePacketType));
-	}
+    private record QueryEntry<T>(Task<T> task, Class<T> resultType) {
+        void complete(Packet packet) {
+            task.complete(resultType.cast(packet));
+        }
+    }
 
-	private JsonDocument prepareDocument(Packet packet) {
-		return PacketSerializer.serialize(packet);
-	}
+    public class Listener {
 
-	private ChannelMessage preparePacket(Packet packet, ServiceInfoSnapshot snapshot) {
-		return ChannelMessage.builder().targetService(snapshot.getName()).channel(CHANNEL)
-				.json(prepareDocument(packet)).build();
-	}
+        @EventListener public void handle(ChannelMessageReceiveEvent e) {
+            if (!e.channel().equals(CHANNEL)) return;
+            if (!e.message().equals(MESSAGE_PACKET)) return;
 
-	private ChannelMessage preparePacket(Packet packet) {
-		return ChannelMessage.builder().targetAll().channel(CHANNEL).json(prepareDocument(packet))
-				.build();
-	}
+            DataBuf content = e.content();
+            try {
+                content.startTransaction();
+                byte messageType = content.readByte();
 
-	public <T extends Packet> void registerHandler(Class<T> clazz, PacketHandler<T> handler) {
-		handlers.put(clazz, handler);
-	}
+                boolean query = messageType == TYPE_QUERY;
+                boolean queryResponse = messageType == TYPE_QUERY_RESPONSE;
+                UUID queryId = query || queryResponse ? content.readUniqueId() : null;
 
-	public void unregisterHandler(PacketHandler<?> handler) {
-		handlers.inverse().remove(handler);
-	}
+                if (queryResponse) {
+                    QueryEntry<? extends Packet> entry = queries.getIfPresent(queryId);
+                    if (entry == null) return;
+                    Packet packet = PacketSerializer.readPacket(content);
+                    entry.complete(packet);
+                    return;
+                }
 
-	public class Listener {
-		@EventListener
-		public void handle(ChannelMessageReceiveEvent e) {
-			if (!e.getChannel().equals(CHANNEL)) {
-				return;
-			}
-			try {
-				JsonDocument doc;
-				Packet received = null;
+                Class<? extends Packet> packetClass = PacketSerializer.getClass(content);
+                if (handlers.containsKey(packetClass)) {
+                    try {
+                        Packet received = content.readObject(packetClass);
+                        PacketHandler<Packet> handler = (PacketHandler<Packet>) handlers.get(packetClass);
+                        Packet response = handler.handle(received);
 
-				Class<? extends Packet> packetClass = PacketSerializer.getClass(e.getData());
-				if (handlers.containsKey(packetClass)) {
-					try {
-						received = PacketSerializer.getPacket(e.getData(), packetClass);
-						@SuppressWarnings("unchecked")
-						PacketHandler<Packet> handler =
-								(PacketHandler<Packet>) handlers.get(packetClass);
-						Packet response = handler.handle(received);
-						doc = PacketSerializer.serialize(response);
-					} catch (Throwable ex) {
-						ex.printStackTrace();
-						doc = null;
-					}
-				} else {
-					doc = null;
-				}
-				if (doc != null) {
-					if (e.isQuery()) {
-						e.setQueryResponse(
-								ChannelMessage.buildResponseFor(e.getChannelMessage()).json(doc)
-										.build());
-					} else {
-						CloudNetDriver.getInstance().getLogger().warning(
-								"[PacketAPI] Invalid packet. Handler for " + received.getClass()
-										.getName() + " returned a response, but no response was "
-										+ "requested by that packet.");
-					}
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+                        if (query) {
+                            DataBuf.Mutable buf = DataBuf.empty();
+                            buf.writeByte(TYPE_QUERY_RESPONSE);
+                            buf.writeUniqueId(queryId);
+                            PacketSerializer.serialize(response, buf);
+                            prepareMessage(buf).target(e.sender().toTarget()).build().send();
+                        } else if (response != null) {
+                            Logger
+                                    .getLogger("PacketAPI")
+                                    .warning("Gave a response packet to a Packet that isn't a query packet! Handler: " + handler
+                                            .getClass()
+                                            .getName());
+                        }
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            } finally {
+                if (content.accessible()) content.redoTransaction();
+            }
+        }
+    }
 }

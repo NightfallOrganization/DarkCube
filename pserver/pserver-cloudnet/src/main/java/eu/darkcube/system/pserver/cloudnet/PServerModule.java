@@ -6,10 +6,10 @@
  */
 package eu.darkcube.system.pserver.cloudnet;
 
-import de.dytanic.cloudnet.CloudNet;
-import de.dytanic.cloudnet.driver.module.ModuleLifeCycle;
-import de.dytanic.cloudnet.driver.module.ModuleTask;
-import de.dytanic.cloudnet.driver.module.driver.DriverModule;
+import eu.cloudnetservice.driver.document.DocumentFactory;
+import eu.cloudnetservice.driver.module.ModuleLifeCycle;
+import eu.cloudnetservice.driver.module.ModuleTask;
+import eu.cloudnetservice.driver.module.driver.DriverModule;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.common.UniqueId;
@@ -18,6 +18,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class PServerModule extends DriverModule {
 
@@ -30,19 +32,10 @@ public class PServerModule extends DriverModule {
     public Listener listener;
 
     public String sqlDatabase;
-
-    List<String> deploymentExclusions;
+    List<Pattern> deploymentExclusions;
 
     public PServerModule() {
         PServerModule.instance = this;
-    }
-
-    public static String getSelf() {
-        return PServerModule.getCloudNet().getCurrentNetworkClusterNodeInfoSnapshot().getNode().getUniqueId();
-    }
-
-    public static CloudNet getCloudNet() {
-        return CloudNet.getInstance();
     }
 
     public static PServerModule getInstance() {
@@ -53,40 +46,28 @@ public class PServerModule extends DriverModule {
         return DatabaseProvider.get("pserver").cast(PServerDatabase.class).getUsedPServerIDs();
     }
 
-    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.LOADED) public void loadConfig() {
-        this.sqlDatabase = this.getConfig().getString("database", "h2");
+    @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.LOADED) public void loadConfig() {
+        PServerConfiguration configuration = this.readConfig(PServerConfiguration.class, () -> new PServerConfiguration("h2", Set.of("paper.jar", "server.properties", "help.yml", "commands.yml", "eula.txt", "bukkit.yml", "banned-ips.json", "banned-players.json", "paper.yml", "whitelist.json", "permissions.yml", "webif.yml", "usercache.json", "ops.json", "")), DocumentFactory.json());
+        this.sqlDatabase = configuration.database();
     }
 
-    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED) public void load() {
+    @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.STARTED) public void load() {
         ClassLoaderFixRelocation.load(this);
     }
 
-    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STARTED) public void start() {
-        PServerModule.getCloudNet().getEventManager().registerListener((this.listener = new Listener()));
-    }
+//    public void addDeploymentExclusion(String exclusion) {
+//        this.deploymentExclusions.add(Pattern.compile(exclusion));
+//        this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
+//        this.saveConfig();
+//    }
+//
+//    public void removeDeploymentExclusion(String exclusion) {
+//        this.deploymentExclusions.remove(exclusion);
+//        this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
+//        this.saveConfig();
+//    }
 
-    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.STOPPED) public void stop() {
-
-    }
-
-    @ModuleTask(order = Byte.MAX_VALUE, event = ModuleLifeCycle.UNLOADED) public void unload() {
-
-    }
-
-    public void addDeploymentExclusion(String exclusion) {
-        this.deploymentExclusions.add(exclusion);
-        this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
-        this.saveConfig();
-    }
-
-    public void removeDeploymentExclusion(String exclusion) {
-        this.deploymentExclusions.remove(exclusion);
-        this.getConfig().append("deploymentExclusions", this.deploymentExclusions);
-        this.saveConfig();
-    }
-
-    public List<String> getDeploymentExclusions() {
+    public List<Pattern> getDeploymentExclusions() {
         return Collections.unmodifiableList(this.deploymentExclusions);
     }
-
 }

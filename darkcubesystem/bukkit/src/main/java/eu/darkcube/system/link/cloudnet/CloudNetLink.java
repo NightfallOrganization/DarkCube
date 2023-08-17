@@ -6,8 +6,9 @@
  */
 package eu.darkcube.system.link.cloudnet;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.wrapper.Wrapper;
+import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.link.Link;
@@ -18,35 +19,32 @@ import org.bukkit.event.HandlerList;
 import java.util.logging.Logger;
 
 public class CloudNetLink extends Link {
-	private final Logger logger = Logger.getLogger("CloudNetLink");
-	private Listener listener;
+    private final Logger logger = Logger.getLogger("CloudNetLink");
+    private Listener listener;
 
-	public CloudNetLink() throws Throwable {
-	}
+    public CloudNetLink() throws Throwable {
+    }
 
-	@Override
-	protected void link() {
-		CloudNetDriver.getInstance().getEventManager().registerListener(listener = new Listener());
-		CloudNetDriver.getInstance().getTaskExecutor()
-				.execute(Wrapper.getInstance()::publishServiceInfoUpdate);
+    @Override protected void link() {
+        EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
+        eventManager.registerListener(listener = new Listener());
+        InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();
 
-	}
+    }
 
-	@Override
-	protected void onEnable() {
-		Bukkit.getPluginManager().registerEvents(listener, DarkCubeSystem.getInstance());
-		Bukkit.getScheduler().runTask(DarkCubeSystem.getInstance(), () -> {
-			if (DarkCubeBukkit.autoConfigure()) {
-				DarkCubeBukkit.gameState(GameState.INGAME);
-				Wrapper.getInstance().publishServiceInfoUpdate();
-			}
-		});
-	}
+    @Override protected void onEnable() {
+        Bukkit.getPluginManager().registerEvents(listener, DarkCubeSystem.getInstance());
+        Bukkit.getScheduler().runTask(DarkCubeSystem.getInstance(), () -> {
+            if (DarkCubeBukkit.autoConfigure()) {
+                DarkCubeBukkit.gameState(GameState.INGAME);
+                InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();
+            }
+        });
+    }
 
-	@Override
-	protected void unlink() {
-		CloudNetDriver.getInstance().getEventManager().unregisterListener(listener);
-		HandlerList.unregisterAll(listener);
-		listener = null;
-	}
+    @Override protected void unlink() {
+        InjectionLayer.boot().instance(EventManager.class).unregisterListener(listener);
+        HandlerList.unregisterAll(listener);
+        listener = null;
+    }
 }

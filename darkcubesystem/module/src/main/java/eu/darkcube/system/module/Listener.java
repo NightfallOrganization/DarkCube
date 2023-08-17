@@ -7,33 +7,41 @@
 
 package eu.darkcube.system.module;
 
-import de.dytanic.cloudnet.driver.event.EventListener;
-import de.dytanic.cloudnet.driver.service.ServiceEnvironmentType;
-import de.dytanic.cloudnet.driver.util.DefaultModuleHelper;
-import de.dytanic.cloudnet.event.service.CloudServicePreStartEvent;
-import de.dytanic.cloudnet.service.ICloudService;
+import eu.cloudnetservice.driver.event.EventListener;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceEnvironmentType;
+import eu.cloudnetservice.driver.util.ModuleHelper;
+import eu.cloudnetservice.node.event.service.CloudServicePreProcessStartEvent;
+import eu.cloudnetservice.node.service.CloudService;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Listener {
 
-	@EventListener
-	public void handle(CloudServicePreStartEvent e) {
-		if (e.getCloudService().getServiceInfoSnapshot().getServiceId().getEnvironment()
-				== ServiceEnvironmentType.MINECRAFT_SERVER) {
-			this.copy(e.getCloudService());
-		}
-	}
+    @EventListener public void handle(CloudServicePreProcessStartEvent e) {
+        if (e.serviceConfiguration().serviceId().environment().equals(ServiceEnvironmentType.MINECRAFT_SERVER)) {
+            this.copy(e.service());
+        }
+    }
 
-	private void copy(ICloudService service) {
-		File file = this.getFile(service);
-		file.delete();
-		DefaultModuleHelper.copyCurrentModuleInstanceFromClass(Listener.class, file.toPath());
-	}
+    private void copy(CloudService service) {
+        try {
+            Path file = this.getFile(service);
+            Files.deleteIfExists(file);
+            ModuleHelper moduleHelper = InjectionLayer.boot().instance(ModuleHelper.class);
+            moduleHelper.copyJarContainingClass(Listener.class, file);
+        } catch (IOException e) {
+            Logger.getGlobal().log(Level.SEVERE, "error during copy for system", e);
+        }
+    }
 
-	private File getFile(ICloudService service) {
-		File folder = new File(service.getDirectoryPath().toFile(), "plugins");
-		folder.mkdirs();
-		return new File(folder, DarkCubeSystemModule.PLUGIN_NAME);
-	}
+    private Path getFile(CloudService service) throws IOException {
+        Path plugins = service.pluginDirectory();
+        Files.createDirectories(plugins);
+        return plugins.resolve(DarkCubeSystemModule.PLUGIN_NAME);
+    }
 }

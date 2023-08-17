@@ -12,10 +12,10 @@ import eu.darkcube.system.stats.api.StatsUtil;
 
 public interface StatsKillDeath {
 
-	default Component insertKillDeath(Stats stats, long kills, long deaths, double ratio,
-			long placementKills, long placementDeaths, long placementRatio) {
-		return StatsUtil.insertKills(stats, kills, placementKills)
-				.append(StatsUtil.insertDeaths(stats, deaths, placementDeaths))
-				.append(StatsUtil.insertKillDeathRatio(stats, ratio, placementRatio));
-	}
+    default Component insertKillDeath(Stats stats, long kills, long deaths, double ratio, long placementKills, long placementDeaths, long placementRatio) {
+        return StatsUtil
+                .insertKills(stats, kills, placementKills)
+                .append(StatsUtil.insertDeaths(stats, deaths, placementDeaths))
+                .append(StatsUtil.insertKillDeathRatio(stats, ratio, placementRatio));
+    }
 }

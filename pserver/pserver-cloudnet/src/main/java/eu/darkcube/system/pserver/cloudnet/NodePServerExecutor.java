@@ -6,15 +6,16 @@
  */
 package eu.darkcube.system.pserver.cloudnet;
 
-import de.dytanic.cloudnet.CloudNet;
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
-import de.dytanic.cloudnet.common.logging.ILogger;
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceConfiguration;
-import de.dytanic.cloudnet.driver.service.ServiceDeployment;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.driver.service.ServiceTemplate;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import eu.cloudnetservice.driver.document.Document;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
+import eu.cloudnetservice.driver.service.ServiceConfiguration;
+import eu.cloudnetservice.driver.service.ServiceDeployment;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.driver.service.ServiceTemplate;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
+import eu.cloudnetservice.node.cluster.NodeServerProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
@@ -31,8 +32,12 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 
 import java.lang.ref.SoftReference;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 public class NodePServerExecutor implements PServerExecutor {
     private static final Key K_ACCESS_LEVEL = new Key("PServer", "accessLevel");
@@ -41,12 +46,15 @@ public class NodePServerExecutor implements PServerExecutor {
     private static final PersistentDataType<Type> T_TYPE = PersistentDataTypes.enumType(Type.class);
     private static final Key K_TASK = new Key("PServer", "task");
     private static final PersistentDataType<String> T_TASK = PersistentDataTypes.STRING;
-    private static final ILogger logger = CloudNetDriver.getInstance().getLogger();
+    private static final Logger logger = Logger.getGlobal();
     private final UniqueId id;
     private final Set<UUID> owners = new CopyOnWriteArraySet<>();
     private final PServerStorage storage;
     private final AtomicReference<State> state = new AtomicReference<>(State.OFFLINE);
     private final Deque<ConnectionRequest> requestConnection = new ConcurrentLinkedDeque<>();
+    private ServiceTaskProvider serviceTaskProvider = InjectionLayer.boot().instance(ServiceTaskProvider.class);
+    private NodeServerProvider nodeServerProvider = InjectionLayer.boot().instance(NodeServerProvider.class);
+    private PlayerManager playerManager = InjectionLayer.boot().instance(ServiceRegistry.class).firstProvider(PlayerManager.class);
     private volatile int onlinePlayers = -1;
     private volatile String serverName = null;
     private volatile long startedAt = -1;
@@ -59,7 +67,7 @@ public class NodePServerExecutor implements PServerExecutor {
 
         owners.addAll(DatabaseProvider.get("pserver").cast(PServerDatabase.class).getOwners(id));
 
-        JsonDocument doc = storage.storeToJsonDocument();
+        Document.Mutable doc = storage.storeToJsonDocument().mutableCopy();
         if (doc.contains("private")) {
             boolean priv = doc.getBoolean("private");
             doc.remove("private");
@@ -82,18 +90,18 @@ public class NodePServerExecutor implements PServerExecutor {
         storage.addUpdateNotifier(s -> sendUpdate());
     }
 
-    public NodePServerExecutor(NodePServerProvider provider, UniqueId id, Type type, String taskName) {
+    public NodePServerExecutor(@NotNull NodePServerProvider provider, @NotNull UniqueId id, @NotNull Type type, @NotNull String taskName) {
         this.id = id;
         this.storage = new PServerStorage(provider, id);
         this.storage.set(K_TYPE, T_TYPE, type);
-        if (taskName != null) this.storage.set(K_TASK, T_TASK, taskName);
+        this.storage.set(K_TASK, T_TASK, taskName);
     }
 
     private void sendUpdate() {
         this.createSnapshot().thenAccept(s -> new PacketUpdate(s).sendAsync());
     }
 
-    @Override public CompletableFuture<Boolean> start() {
+    @Override public @NotNull CompletableFuture<Boolean> start() {
         CompletableFuture<Boolean> fut = new CompletableFuture<>();
         if (state.compareAndSet(State.OFFLINE, State.STARTING)) {
             NodePServerProvider.instance().executor.execute(() -> {
@@ -105,56 +113,49 @@ public class NodePServerExecutor implements PServerExecutor {
             String taskName = taskName().getNow(null);
             if (taskName == null) taskName = NodePServerProvider.pserverTaskName;
             ServiceConfiguration.Builder confb = ServiceConfiguration
-                    .builder()
-                    .task(Objects.requireNonNull(CloudNetDriver.getInstance().getServiceTaskProvider().getServiceTask(taskName)))
-                    .task(NodePServerProvider.pserverTaskName)
+                    .builder(serviceTaskProvider.serviceTask(taskName))
+                    .taskName(NodePServerProvider.pserverTaskName)
                     .staticService(false)
-                    .addTemplates(NodePServerProvider.instance().globalTemplate())
-                    .addGroups("pserver-global");
-            if (type().getNow(null).equals(Type.WORLD)) {
-                confb.addGroups("pserver-world");
-                confb.addTemplates(NodePServerProvider.instance().worldTemplate());
+                    .modifyTemplates(templates -> templates.add(NodePServerProvider.instance().globalTemplate()))
+                    .modifyGroups(g -> g.add("pserver-global"));
+            if (type().join().equals(Type.WORLD)) {
+                confb.modifyGroups(g -> g.add("pserver-world"));
+                confb.modifyTemplates(t -> t.add(NodePServerProvider.instance().worldTemplate()));
                 ServiceTemplate template = PServerProvider.template(id);
                 NodePServerProvider.instance().storage().create(template);
-                confb.addTemplates(template);
-                ServiceDeployment deployment = new ServiceDeployment(template, PServerModule.getInstance().getDeploymentExclusions());
-                confb.addDeployments(deployment);
+                confb.modifyTemplates(t -> t.add(template));
+                ServiceDeployment deployment = ServiceDeployment
+                        .builder()
+                        .template(template)
+                        .excludes(PServerModule.getInstance().getDeploymentExclusions())
+                        .build();
+                confb.deployments(Collections.singleton(deployment));
             }
-            confb.node(CloudNet.getInstance().getConfig().getIdentity().getUniqueId());
+            confb.node(nodeServerProvider.localNode().info().uniqueId());
             ServiceConfiguration configuration = confb.build();
-            configuration.createNewServiceAsync().onComplete(snapshot -> {
-                this.snapshot = snapshot;
-                String serverName = snapshot.getName();
-                snapshot.provider().startAsync().onComplete(v -> {
+            configuration.createNewServiceAsync().thenAccept(result -> {
+                this.snapshot = result.serviceInfo();
+                String serverName = snapshot.name();
+                snapshot.provider().startAsync().thenRun(() -> {
                     this.serverName = serverName;
                     sendUpdate();
                     logger.info("[PServer] Started PServer " + this.serverName + " (" + this.id + ")");
                     fut.complete(true);
-                }).onFailure(t -> {
+                }).exceptionally(t -> {
                     snapshot.provider().deleteAsync();
                     startedAt = -1;
                     this.snapshot = null;
                     fut.completeExceptionally(t);
-                }).onCancelled(t -> {
-                    snapshot.provider().deleteAsync();
-                    startedAt = -1;
-                    this.snapshot = null;
-                    fut.completeExceptionally(new CancellationException("Task cancelled!"));
+                    return null;
                 });
-            }).onFailure(t -> {
+            }).exceptionally(t -> {
                 startedAt = -1;
                 NodePServerProvider.instance().executor.execute(() -> {
                     NodePServerProvider.instance().weakpservers.computeIfAbsent(id, id1 -> new SoftReference<>(this, NodePServerProvider.instance().referenceQueue));
                     NodePServerProvider.instance().pservers.remove(id);
                 });
                 fut.completeExceptionally(t);
-            }).onCancelled(t -> {
-                startedAt = -1;
-                NodePServerProvider.instance().executor.execute(() -> {
-                    NodePServerProvider.instance().weakpservers.computeIfAbsent(id, id1 -> new SoftReference<>(this, NodePServerProvider.instance().referenceQueue));
-                    NodePServerProvider.instance().pservers.remove(id);
-                });
-                fut.completeExceptionally(new CancellationException("Task cancelled!"));
+                return null;
             });
         } else {
             fut.complete(false);
@@ -162,7 +163,7 @@ public class NodePServerExecutor implements PServerExecutor {
         return fut;
     }
 
-    @Override public CompletableFuture<Void> stop() {
+    @Override public @NotNull CompletableFuture<Void> stop() {
         CompletableFuture<Void> fut = new CompletableFuture<>();
         if (state.compareAndSet(State.STARTING, State.STOPPING)) {
             new PacketStop(this.createSnapshot().getNow(null)).sendAsync();
@@ -170,64 +171,56 @@ public class NodePServerExecutor implements PServerExecutor {
             sendUpdate();
             stopFuture = fut;
             logger.info("[PServer] Killing PServer " + serverName + " (" + id + ")");
-            snapshot
-                    .provider()
-                    .deleteAsync()
-                    .onComplete(v -> {
-                        logger.info("[PServer] Killed PServer " + serverName + " (" + id + ")");
-                        snapshot = null;
-                        startedAt = -1;
-                        NodePServerProvider.instance().executor.execute(() -> {
-                            NodePServerProvider.instance().weakpservers.computeIfAbsent(id, id1 -> new SoftReference<>(this, NodePServerProvider.instance().referenceQueue));
-                            NodePServerProvider.instance().pservers.remove(id);
-                        });
-                    })
-                    .onFailure(fut::completeExceptionally)
-                    .onCancelled(t -> fut.completeExceptionally(new CancellationException("Task cancelled!")));
+            snapshot.provider().deleteAsync().thenRun(() -> {
+                logger.info("[PServer] Killed PServer " + serverName + " (" + id + ")");
+                snapshot = null;
+                startedAt = -1;
+                NodePServerProvider.instance().executor.execute(() -> {
+                    NodePServerProvider.instance().weakpservers.computeIfAbsent(id, id1 -> new SoftReference<>(this, NodePServerProvider.instance().referenceQueue));
+                    NodePServerProvider.instance().pservers.remove(id);
+                });
+            }).exceptionally(t -> {
+                fut.completeExceptionally(t);
+                return null;
+            });
         } else if (state.compareAndSet(State.RUNNING, State.STOPPING)) {
             new PacketStop(this.createSnapshot().getNow(null)).sendAsync();
             serverName = null;
             sendUpdate();
             stopFuture = fut;
             logger.info("[PServer] Stopping PServer " + serverName + " (" + id + ")");
-            snapshot
-                    .provider()
-                    .stopAsync()
-                    .onComplete(v -> {
-                        snapshot
-                                .provider()
-                                .deleteAsync()
-                                .onComplete(v2 -> {
-                                    logger.info("[PServer] Stopped PServer " + serverName + " (" + id + ")");
-                                    if (!state.compareAndSet(State.STOPPING, State.OFFLINE)) {
-                                        logger.error("[PServer] PServer was stopping but state wasn't stopping");
-                                    } else {
-                                        NodePServerProvider.instance().executor.execute(() -> {
-                                            NodePServerProvider.instance().weakpservers.computeIfAbsent(id, id1 -> new SoftReference<>(this, NodePServerProvider.instance().referenceQueue));
-                                            NodePServerProvider.instance().pservers.remove(id);
-                                        });
-                                        sendUpdate();
-                                    }
-                                    startedAt = -1;
-                                    snapshot = null;
-                                    fut.complete(null);
-                                })
-                                .onFailure(fut::completeExceptionally)
-                                .onCancelled(t -> fut.completeExceptionally(new CancellationException("Task cancelled!")));
-                    })
-                    .onFailure(fut::completeExceptionally)
-                    .onCancelled(t -> fut.completeExceptionally(new CancellationException("Task cancelled!")));
+            snapshot.provider().stopAsync().thenRun(() -> snapshot.provider().deleteAsync().thenRun(() -> {
+                logger.info("[PServer] Stopped PServer " + serverName + " (" + id + ")");
+                if (!state.compareAndSet(State.STOPPING, State.OFFLINE)) {
+                    logger.severe("[PServer] PServer was stopping but state wasn't stopping");
+                } else {
+                    NodePServerProvider.instance().executor.execute(() -> {
+                        NodePServerProvider.instance().weakpservers.computeIfAbsent(id, id1 -> new SoftReference<>(this, NodePServerProvider.instance().referenceQueue));
+                        NodePServerProvider.instance().pservers.remove(id);
+                    });
+                    sendUpdate();
+                }
+                startedAt = -1;
+                snapshot = null;
+                fut.complete(null);
+            }).exceptionally(t -> {
+                fut.completeExceptionally(t);
+                return null;
+            })).exceptionally(t -> {
+                fut.completeExceptionally(t);
+                return null;
+            });
         } else {
             return stopFuture;
         }
         return fut;
     }
 
-    @Override public CompletableFuture<Boolean> accessLevel(AccessLevel level) {
+    @Override public @NotNull CompletableFuture<Boolean> accessLevel(@NotNull AccessLevel level) {
         return storage().setAsync(K_ACCESS_LEVEL, T_ACCESS_LEVEL, level).thenApply(p -> true);
     }
 
-    @Override public CompletableFuture<Boolean> addOwner(UUID uuid) {
+    @Override public @NotNull CompletableFuture<Boolean> addOwner(UUID uuid) {
         if (owners.add(uuid)) {
             DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, uuid);
             new PacketAddOwner(id, uuid).sendAsync();
@@ -236,7 +229,7 @@ public class NodePServerExecutor implements PServerExecutor {
         return CompletableFuture.completedFuture(true);
     }
 
-    @Override public CompletableFuture<Boolean> removeOwner(UUID uuid) {
+    @Override public @NotNull CompletableFuture<Boolean> removeOwner(UUID uuid) {
         if (owners.remove(uuid)) {
             DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, uuid);
             new PacketRemoveOwner(id, uuid).sendAsync();
@@ -283,11 +276,11 @@ public class NodePServerExecutor implements PServerExecutor {
         return storage;
     }
 
-    @Override public CompletableFuture<Long> startedAt() {
+    @Override public @NotNull CompletableFuture<Long> startedAt() {
         return CompletableFuture.completedFuture(startedAt);
     }
 
-    @Override public CompletableFuture<Long> ontime() {
+    @Override public @NotNull CompletableFuture<Long> ontime() {
         return startedAt().thenApply(s -> System.currentTimeMillis() - s);
     }
 
@@ -327,10 +320,9 @@ public class NodePServerExecutor implements PServerExecutor {
         if (state == State.RUNNING) {
             String serverName = this.serverName;
             if (requestConnection.isEmpty() || serverName == null) return;
-            IPlayerManager pm = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
             ConnectionRequest request;
             while ((request = requestConnection.poll()) != null) {
-                pm.getPlayerExecutor(request.player).connect(serverName);
+                playerManager.playerExecutor(request.player).connect(serverName);
                 request.future.complete(true);
             }
         } else if (state == State.STOPPING || state == State.OFFLINE) {
@@ -351,14 +343,6 @@ public class NodePServerExecutor implements PServerExecutor {
         workRequestedConnections();
     }
 
-    private static class ConnectionRequest {
-        private final UUID player;
-        private final CompletableFuture<Boolean> future;
-
-        public ConnectionRequest(UUID player, CompletableFuture<Boolean> future) {
-            this.player = player;
-            this.future = future;
-        }
+    private record ConnectionRequest(UUID player, CompletableFuture<Boolean> future) {
     }
-
 }

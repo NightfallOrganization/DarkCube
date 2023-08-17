@@ -6,19 +6,19 @@
  */
 package eu.darkcube.system.pserver.bukkit.event;
 
-import de.dytanic.cloudnet.driver.event.Event;
+import eu.cloudnetservice.driver.event.Event;
 import eu.darkcube.system.pserver.common.PServerExecutor;
 
 public abstract class PServerEvent extends Event {
 
-	private final PServerExecutor pserver;
+    private final PServerExecutor pserver;
 
-	public PServerEvent(PServerExecutor pserver) {
-		super();
-		this.pserver = pserver;
-	}
+    public PServerEvent(PServerExecutor pserver) {
+        super();
+        this.pserver = pserver;
+    }
 
-	public PServerExecutor pserver() {
-		return pserver;
-	}
+    public PServerExecutor pserver() {
+        return pserver;
+    }
 }

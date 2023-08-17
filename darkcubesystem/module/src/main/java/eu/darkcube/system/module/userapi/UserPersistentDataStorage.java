@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.module.userapi;
 
-import de.dytanic.cloudnet.common.document.gson.JsonDocument;
+import eu.cloudnetservice.driver.document.Document;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class UserPersistentDataStorage {
-	final JsonDocument data = new JsonDocument();
-	final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
+    final Document.Mutable data = Document.newJsonDocument();
+    final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
 }

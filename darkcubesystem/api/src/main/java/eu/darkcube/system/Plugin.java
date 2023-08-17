@@ -97,7 +97,9 @@ public abstract class Plugin extends JavaPlugin implements Named {
     }
 
     public final void sendConsole(String msg, String iprefix) {
-        this.sendMessageBridge(("§7> " + this.getCommandPrefix() + ("§6 " + iprefix + " §7| ").replace("  ", " ") + msg).replace("§r", "§r§7").replace("§f", "§7"), Bukkit.getConsoleSender());
+        this.sendMessageBridge(("§7> " + this.getCommandPrefix() + ("§6 " + iprefix + " §7| ").replace("  ", " ") + msg)
+                .replace("§r", "§r§7")
+                .replace("§f", "§7"), Bukkit.getConsoleSender());
     }
 
     public final void sendConsole(String msg) {
@@ -108,8 +110,7 @@ public abstract class Plugin extends JavaPlugin implements Named {
         this.sendMessageBridgePrefix(msg);
     }
 
-    public final void sendMessageWithoutPrefix(String msg,
-                                               Collection<? extends CommandSender> receivers) {
+    public final void sendMessageWithoutPrefix(String msg, Collection<? extends CommandSender> receivers) {
         receivers.forEach(r -> this.sendMessageBridge(msg, r));
     }
 
