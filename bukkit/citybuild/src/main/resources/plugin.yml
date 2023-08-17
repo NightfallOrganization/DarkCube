@@ -59,6 +59,20 @@ commands:
     description: Zeigt die aktuelle benutzerdefinierte Defense des Spielers an
   myregeneration:
     description: Zeigt den Regenerationswert des Spielers an
+  additemlevel:
+    description: Erhöht das ItemLevel des Gegenstands in der Hand des Spielers
+  itemlevel:
+    description: Zeigt das Level des Items im Hauptslot des Spielers an
+  resetdurability:
+    description: Setzt die Haltbarkeit des gehaltenen CustomSword-Items zurück
+  spawnupgrader:
+    description: Spawnt einen Upgrader NPC
+  mycor:
+    description: Zeigt die aktuellen Cor des Spielers an
+  addcor:
+    description: Gibt dem Spieler Cor
+  setcor:
+    description: Setzt dem Spieler Cor
 
 permissions:
   gm.use:
@@ -114,4 +128,18 @@ permissions:
   mydefense.use:
     default: op
   myregeneration.use:
+    default: op
+  additemlevel.use:
+    default: op
+  itemlevel.use:
+    default: op
+  resetdurability.use:
+    default: op
+  spawnupgrader.use:
+    default: op
+  mycor.use:
+    default: not op
+  addcore.use:
+    default: op
+  setcore.use:
     default: op

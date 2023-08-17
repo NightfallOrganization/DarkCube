@@ -1,10 +1,3 @@
-/*
- * Copyright (c) 2023. [DarkCube]
- * All rights reserved.
- * You may not use or redistribute this software or any associated files without permission.
- * The above copyright notice shall be included in all copies of this software.
- */
-
 package eu.darkcube.system.citybuild.util;
 
 import eu.darkcube.system.citybuild.Citybuild;
@@ -24,27 +17,92 @@ public class ScoreboardManager {
 
     private final Citybuild plugin;
     private final LevelXPManager levelManager;
+    private Map<UUID, Objective> playerObjectives = new HashMap<>();
+    private final CorManager corManager;
 
-    public ScoreboardManager(Citybuild plugin, LevelXPManager levelManager) {
+    public ScoreboardManager(Citybuild plugin, LevelXPManager levelManager, CorManager corManager) {
         this.plugin = plugin;
         this.levelManager = levelManager;
+        this.corManager = corManager;
     }
-
-    private Map<UUID, Objective> playerObjectives = new HashMap<>();
 
     public void createScoreboard(Player player) {
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = board.registerNewObjective("playerStats", "dummy", ChatColor.GRAY + "« " + ChatColor.DARK_GREEN + "Dark" + ChatColor.GREEN + "Cube" + ChatColor.GRAY + ".eu »");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
+        setupDefaultScores(obj, player);
+
+        playerObjectives.put(player.getUniqueId(), obj);
+        player.setScoreboard(board);
+    }
+
+
+    public void updatePlayerLevel(Player player) {
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective obj = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+
+        if (obj == null || !obj.getName().equals("playerStats")) {
+            return;
+        }
+
+        String levelPrefix = ChatColor.WHITE + "Ḥ" + ChatColor.GRAY + " ┃ ";
+
+        // Entfernen Sie alle Einträge, die mit dem Level-Prefix beginnen und nur eine Zahl dahinter haben
+        for (String entry : scoreboard.getEntries()) {
+            if (entry.startsWith(levelPrefix) && isNumeric(entry.substring(levelPrefix.length()))) {
+                scoreboard.resetScores(entry);
+            }
+        }
+
+        int playerLevel = levelManager.getLevel(player);
+        Score lvl = obj.getScore(levelPrefix + playerLevel);
+        lvl.setScore(2);
+    }
+
+
+    private boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
+    }
+
+
+    public void updatePlayerCor(Player player) {
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective obj = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+
+        if (obj == null || !obj.getName().equals("playerStats")) {
+            return;
+        }
+
+        String corPrefix = ChatColor.WHITE + "ḡ" + ChatColor.GRAY + " ┃ ";
+
+        // Remove any entries starting with the Cor prefix and followed by just a number
+        for (String entry : scoreboard.getEntries()) {
+            if (entry.startsWith(corPrefix) && isNumeric(entry.substring(corPrefix.length()))) {
+                scoreboard.resetScores(entry);
+            }
+        }
+
+        int playerCor = corManager.getCor(player);
+        Score corScore = obj.getScore(corPrefix + playerCor);
+        corScore.setScore(5);
+    }
+
+
+    private void setupDefaultScores(Objective obj, Player player) {
         // Header
-        Score headerSpacer = obj.getScore(" "); // Lücke
+        Score headerSpacer = obj.getScore(" ");
         headerSpacer.setScore(10);
 
         // Gilde
-        Score gilde = obj.getScore(ChatColor.GRAY + "➥ " + ChatColor.GREEN + "Gilde:");
+        Score gilde = obj.getScore(ChatColor.GRAY + "» " + ChatColor.GREEN + "Gilde:");
         gilde.setScore(9);
-        Score gildenname = obj.getScore(ChatColor.GRAY + "» " + getGildenNameForPlayer(player));
+        Score gildenname = obj.getScore(ChatColor.WHITE + "ḥ" + ChatColor.GRAY + " ┃ " + getGildenNameForPlayer(player));
         gildenname.setScore(8);
 
         // Lücke zwischen Gilde und Cor
@@ -52,9 +110,9 @@ public class ScoreboardManager {
         gildeToCorSpacer.setScore(7);
 
         // Cor
-        Score cor = obj.getScore(ChatColor.GRAY + "➥ " + ChatColor.GREEN + "Cor:");
+        Score cor = obj.getScore(ChatColor.GRAY + "» " + ChatColor.GREEN + "Cor:");
         cor.setScore(6);
-        Score betrag = obj.getScore(ChatColor.GRAY + "» " + getBetragForPlayer(player));
+        Score betrag = obj.getScore(ChatColor.WHITE + "ḡ" + ChatColor.GRAY + " ┃ " + corManager.getCor(player));
         betrag.setScore(5);
 
         // Lücke zwischen Cor und Level
@@ -62,49 +120,18 @@ public class ScoreboardManager {
         corToLevelSpacer.setScore(4);
 
         // Level
-        Score level = obj.getScore(ChatColor.GRAY + "➥ " + ChatColor.GREEN + "Level:");
+        Score level = obj.getScore(ChatColor.GRAY + "» " + ChatColor.GREEN + "Level:");
         level.setScore(3);
-        int playerLevel = levelManager.getLevel(player); // Spielerlevel holen
-        Score lvl = obj.getScore(ChatColor.GRAY + "» " + playerLevel);
+        int playerLevel = levelManager.getLevel(player);
+        Score lvl = obj.getScore(ChatColor.WHITE + "Ḥ" + ChatColor.GRAY + " ┃ " + playerLevel);
         lvl.setScore(2);
-
-        playerObjectives.put(player.getUniqueId(), obj);
-        player.setScoreboard(board);
     }
 
-    public void updatePlayerLevel(Player player) {
-        Objective obj = playerObjectives.get(player.getUniqueId());
-        if (obj != null) {
-            int playerLevel = levelManager.getLevel(player);
-            // Das Score-Objekt für die Level-Zeile abrufen und aktualisieren
-            Score lvl = obj.getScore(ChatColor.GRAY + "» " + playerLevel);
-            lvl.setScore(2); // Hier ist 2 der Platz des Levels auf dem Scoreboard. Ändere dies entsprechend, wenn es sich ändert.
-        }
-    }
-
-    // Beispiel-Methoden, du musst diese mit den tatsächlichen Daten ersetzen
     private String getGildenNameForPlayer(Player player) {
-        // Hole den Gildenname des Spielers
         return "[Gildenname]";
     }
 
     private String getBetragForPlayer(Player player) {
-        // Hole den Betrag des Spielers
         return "[Betrag]";
-    }
-
-    private String getLevelForPlayer(Player player) {
-        // Hole das Level des Spielers
-        return "[LvL]";
-    }
-
-    private String getTimeForBooster(Player player) {
-        // Hole die Booster-Zeit des Spielers
-        return "[Time]";
-    }
-
-    private String getCombatTimerForPlayer(Player player) {
-        // Hole den Combat-Timer des Spielers
-        return "[Timer]";
     }
 }

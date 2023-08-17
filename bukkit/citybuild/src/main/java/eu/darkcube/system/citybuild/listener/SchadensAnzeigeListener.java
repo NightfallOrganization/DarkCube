@@ -11,6 +11,7 @@ import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -86,10 +87,14 @@ public class SchadensAnzeigeListener implements Listener {
             armorStand.setMarker(true);
         });
 
+        // Hier wird der Sound abgespielt
+        loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f);
+
         Bukkit.getScheduler().runTaskLater(Citybuild.getInstance(), as::remove, 10L);
     }
 
     private String formatXPValue(double value) {
+        // Dieser Soundaufruf wurde entfernt, weil er hier nicht benötigt wird
         if (value == 0) {
             return "+ XP";
         } else if (value < 1) {

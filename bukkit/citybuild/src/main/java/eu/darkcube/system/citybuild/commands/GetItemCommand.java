@@ -8,6 +8,7 @@
 package eu.darkcube.system.citybuild.commands;
 
 import eu.darkcube.system.citybuild.util.CustomItemManager;
+import eu.darkcube.system.citybuild.util.CustomSword;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -32,6 +33,7 @@ public class GetItemCommand implements CommandExecutor {
             inventory.setItem(2, CustomItemManager.getEnderBag());
             inventory.setItem(3, CustomItemManager.getRingOfHealing());
             inventory.setItem(4, CustomItemManager.getRingOfSpeed());
+			inventory.setItem(5, CustomSword.getCustomSword(1)); // Setze das Level nach Belieben.
 
             player.openInventory(inventory);
 
