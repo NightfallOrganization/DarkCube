@@ -36,50 +36,6 @@ public class CommandPServers {
     @Inject
     private PlayerManager playerManager;
 
-    @CommandMethod("pservers deploymentExclusions remove <exclusion>")
-    public void deploymentExclusionsRemove(CommandSource source, @Argument("exclusion") String exclusion) {
-        if (PServerModule.getInstance().removeDeploymentExclusion(exclusion)) {
-            source.sendMessage("Removed deploymentExclusion");
-        } else {
-            source.sendMessage("Exclusion doesn't exist");
-        }
-    }
-
-    @CommandMethod("pservers deploymentExclusions add <exclusion>")
-    public void deploymentExclusionsAdd(CommandSource source, @Argument("exclusion") String exclusion) {
-        if (PServerModule.getInstance().addDeploymentExclusion(exclusion)) {
-            source.sendMessage("Added deploymentExclusion");
-        } else {
-            source.sendMessage("Exclusion already exists");
-        }
-    }
-
-    @CommandMethod("pservers deploymentExclusions list") public void deploymentExclusionsList(CommandSource source) {
-        Collection<String> c = PServerModule.getInstance().compiledDeploymentExclusions().stream().map(Pattern::pattern).toList();
-        source.sendMessage("DeploymentExclusions: (" + c.size() + ")");
-        for (String s : c) {
-            source.sendMessage(" - " + s);
-        }
-    }
-
-    @CommandMethod("pservers create new") public void createNew(CommandSource source) {
-        PServerExecutor ps = new PServerBuilder()
-                .type(PServerExecutor.Type.WORLD)
-                .accessLevel(PServerExecutor.AccessLevel.PUBLIC)
-                .create()
-                .join();
-        source.sendMessage("PServer created! ID: " + ps.id() + ", Name:" + " " + ps.serverName().join());
-    }
-
-    @CommandMethod("pservers create by <task>") public void createBy(CommandSource source, @Argument("task") ServiceTask task) {
-        PServerBuilder b = new PServerBuilder()
-                .taskName(task.name())
-                .type(PServerExecutor.Type.GAMEMODE)
-                .accessLevel(PServerExecutor.AccessLevel.PUBLIC);
-        PServerExecutor executor = b.create().join();
-        source.sendMessage("PServer created: ID: " + executor.id() + ", Name: " + executor.serverName().join());
-    }
-
     @Parser(suggestions = "uniqueid") public PServerExecutor pserverExecutorParser(CommandContext<CommandSource> ctx, Queue<String> input) {
         UniqueId uniqueId = uniqueIdParser(ctx, input);
         PServerExecutor ex = PServerProvider.instance().pserver(uniqueId).join();
@@ -101,11 +57,12 @@ public class CommandPServers {
         }
     }
 
-    @Suggestions("onlinePlayerUUIDs") public List<String> suggestOnlinePlayerUUIDs() {
+    @Suggestions("onlinePlayerUUIDs") public List<String> suggestOnlinePlayerUUIDs(CommandContext<CommandSource> ctx, String input) {
         return playerManager.onlinePlayers().uniqueIds().stream().map(UUID::toString).toList();
     }
 
-    @Parser(suggestions = "onlinePlayerUUIDs") public UUID playerParser(CommandContext<CommandSource> ctx, Queue<String> input) {
+    @Parser(name = "playerParser", suggestions = "onlinePlayerUUIDs")
+    public UUID playerParser(CommandContext<CommandSource> ctx, Queue<String> input) {
         var string = input.remove();
         try {
             return UUID.fromString(string);
@@ -114,7 +71,51 @@ public class CommandPServers {
         }
     }
 
-    @CommandMethod("pservers list") public void list(CommandSource source) {
+    @CommandMethod("pservers|pserver|ps deploymentExclusions remove <exclusion>")
+    public void deploymentExclusionsRemove(CommandSource source, @Argument("exclusion") String exclusion) {
+        if (PServerModule.getInstance().removeDeploymentExclusion(exclusion)) {
+            source.sendMessage("Removed deploymentExclusion");
+        } else {
+            source.sendMessage("Exclusion doesn't exist");
+        }
+    }
+
+    @CommandMethod("pservers|pserver|ps deploymentExclusions add <exclusion>")
+    public void deploymentExclusionsAdd(CommandSource source, @Argument("exclusion") String exclusion) {
+        if (PServerModule.getInstance().addDeploymentExclusion(exclusion)) {
+            source.sendMessage("Added deploymentExclusion");
+        } else {
+            source.sendMessage("Exclusion already exists");
+        }
+    }
+
+    @CommandMethod("pservers|pserver|ps deploymentExclusions list") public void deploymentExclusionsList(CommandSource source) {
+        Collection<String> c = PServerModule.getInstance().compiledDeploymentExclusions().stream().map(Pattern::pattern).toList();
+        source.sendMessage("DeploymentExclusions: (" + c.size() + ")");
+        for (String s : c) {
+            source.sendMessage(" - " + s);
+        }
+    }
+
+    @CommandMethod("pservers|pserver|ps create new") public void createNew(CommandSource source) {
+        PServerExecutor ps = new PServerBuilder()
+                .type(PServerExecutor.Type.WORLD)
+                .accessLevel(PServerExecutor.AccessLevel.PUBLIC)
+                .create()
+                .join();
+        source.sendMessage("PServer created! ID: " + ps.id() + ", Name:" + " " + ps.serverName().join());
+    }
+
+    @CommandMethod("pservers|pserver|ps create by <task>") public void createBy(CommandSource source, @Argument("task") ServiceTask task) {
+        PServerBuilder b = new PServerBuilder()
+                .taskName(task.name())
+                .type(PServerExecutor.Type.GAMEMODE)
+                .accessLevel(PServerExecutor.AccessLevel.PUBLIC);
+        PServerExecutor executor = b.create().join();
+        source.sendMessage("PServer created: ID: " + executor.id() + ", Name: " + executor.serverName().join());
+    }
+
+    @CommandMethod("pservers|pserver|ps list") public void list(CommandSource source) {
         Collection<? extends PServerExecutor> pservers = PServerProvider.instance().pservers().join();
         source.sendMessage("PServers: (" + pservers.size() + ")");
         pservers.forEach(ps -> {
@@ -122,7 +123,8 @@ public class CommandPServers {
         });
     }
 
-    @CommandMethod("pservers server <id>") public void displayServer(CommandSource source, @Argument("id") PServerExecutor executor) {
+    @CommandMethod("pservers|pserver|ps server <id>")
+    public void displayServer(CommandSource source, @Argument("id") PServerExecutor executor) {
         Collection<String> messages = new ArrayList<>();
         messages.add("* ID: " + executor.id());
         messages.add("* Online: " + executor.onlinePlayers().join());
@@ -133,7 +135,8 @@ public class CommandPServers {
         source.sendMessage(messages);
     }
 
-    @CommandMethod("pservers server <id> start") public void start(CommandSource source, @Argument("id") PServerExecutor executor) {
+    @CommandMethod("pservers|pserver|ps server <id> start")
+    public void start(CommandSource source, @Argument("id") PServerExecutor executor) {
         executor.start().whenComplete((bool, t) -> {
             if (t != null) source.sendMessage("An error occurred while starting the PServer");
             else if (bool) source.sendMessage("PServer started! (Name: " + executor.serverName().join() + ")");
@@ -142,12 +145,13 @@ public class CommandPServers {
         });
     }
 
-    @CommandMethod("pservers server <id> stop") public void stop(CommandSource source, @Argument("id") PServerExecutor executor) {
-        executor.stop().thenRun(() -> source.sendMessage("PServer stopped"));
+    @CommandMethod("pservers|pserver|ps server <id> stop")
+    public void stop(CommandSource source, @Argument("id") PServerExecutor executor) {
+        executor.stop();
     }
 
-    @CommandMethod("pservers server <id> addOwner <player>")
-    public void addOwner(CommandSource source, @Argument("id") PServerExecutor executor, @Argument(value = "player", parserName = "onlinePlayerUUIDs") UUID player) {
+    @CommandMethod("pservers|pserver|ps server <id> addOwner <player>")
+    public void addOwner(CommandSource source, @Argument("id") PServerExecutor executor, @Argument(value = "player", parserName = "playerParser") UUID player) {
         if (executor.owners().join().contains(player)) {
             source.sendMessage("Player is already an Owner of this PServer");
             return;
@@ -159,8 +163,8 @@ public class CommandPServers {
         });
     }
 
-    @CommandMethod("pservers server <id> removeOwner <player>")
-    public void removeOwner(CommandSource source, @Argument("id") PServerExecutor executor, @Argument(value = "player", parserName = "onlinePlayerUUIDs") UUID player) {
+    @CommandMethod("pservers|pserver|ps server <id> removeOwner <player>")
+    public void removeOwner(CommandSource source, @Argument("id") PServerExecutor executor, @Argument(value = "player", parserName = "playerParser") UUID player) {
         Collection<UUID> owners = executor.owners().join();
         if (!owners.contains(player)) {
             source.sendMessage("Player is not an owner of this PServer");
@@ -173,7 +177,7 @@ public class CommandPServers {
         });
     }
 
-    @CommandMethod("pservers server <id> listOwners")
+    @CommandMethod("pservers|pserver|ps server <id> listOwners")
     public void listOwners(CommandSource source, @Argument("id") PServerExecutor executor) {
         Collection<UUID> owners = executor.owners().join();
         String serverName = executor.serverName().join();

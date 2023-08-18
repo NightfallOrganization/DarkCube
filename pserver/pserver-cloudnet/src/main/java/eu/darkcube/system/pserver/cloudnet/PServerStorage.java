@@ -159,52 +159,54 @@ public class PServerStorage implements PServerPersistentDataStorage {
         storage.setIfNotPresent(key, unsafeStorageModify, data);
     }
 
-    @Override public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
+    @Override public @NotNull CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
         return CompletableFuture.completedFuture(storage.keys());
     }
 
-    @Override public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type, T data) {
+    @Override public @NotNull <T> CompletableFuture<Void> setAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         set(key, type, data);
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key, PersistentDataType<T> type) {
+    @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         return CompletableFuture.completedFuture(remove(key, type));
     }
 
-    @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key, PersistentDataType<T> type) {
+    @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         return CompletableFuture.completedFuture(get(key, type));
     }
 
     @Override
-    public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
+    public @NotNull <T> CompletableFuture<@NotNull T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue) {
         return CompletableFuture.completedFuture(get(key, type, defaultValue));
     }
 
-    @Override public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key, PersistentDataType<T> type, T data) {
+    @Override
+    public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         setIfNotPresent(key, type, data);
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override public CompletableFuture<Boolean> hasAsync(Key key) {
+    @Override public @NotNull CompletableFuture<Boolean> hasAsync(@NotNull Key key) {
         return CompletableFuture.completedFuture(has(key));
     }
 
-    @Override public CompletableFuture<Void> clearAsync() {
+    @Override public @NotNull CompletableFuture<Void> clearAsync() {
         clear();
         return CompletableFuture.completedFuture(null);
     }
 
     @Override public @NotNull CompletableFuture<Void> clearCacheAsync() {
-        return null;
+        storage.clearCache();
+        return CompletableFuture.completedFuture(null);
     }
 
-    @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(Document document) {
+    @Override public @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(@NotNull Document document) {
         loadFromJsonDocument(document);
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override public CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
+    @Override public @NotNull CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
         return CompletableFuture.completedFuture(storeToJsonDocument());
     }
 }

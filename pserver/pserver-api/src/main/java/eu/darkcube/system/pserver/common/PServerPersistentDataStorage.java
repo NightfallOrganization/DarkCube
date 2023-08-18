@@ -111,36 +111,38 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
             return this;
         }
 
-        @Override public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
+        @Override public @NotNull CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
             return storage.keysAsync();
         }
 
-        @Override public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type, T data) {
+        @Override
+        public @NotNull <T> CompletableFuture<Void> setAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key, PersistentDataType<T> type) {
+        @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(@NotNull Key key, @NotNull PersistentDataType<T> type) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key, PersistentDataType<T> type) {
+        @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type) {
             return storage.getAsync(key, type);
         }
 
         @Override
-        public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
+        public @NotNull <T> CompletableFuture<@NotNull T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key, PersistentDataType<T> type, T data) {
+        @Override
+        public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public CompletableFuture<Boolean> hasAsync(Key key) {
+        @Override public @NotNull CompletableFuture<Boolean> hasAsync(@NotNull Key key) {
             return storage.hasAsync(key);
         }
 
-        @Override public CompletableFuture<Void> clearAsync() {
+        @Override public @NotNull CompletableFuture<Void> clearAsync() {
             throw new UnsupportedOperationException();
         }
 
@@ -148,11 +150,11 @@ public interface PServerPersistentDataStorage extends PersistentDataStorage {
             throw new UnsupportedOperationException();
         }
 
-        @Override public CompletableFuture<Void> loadFromJsonDocumentAsync(Document document) {
+        @Override public @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(@NotNull Document document) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
+        @Override public @NotNull CompletableFuture<@NotNull Document> storeToJsonDocumentAsync() {
             return storage.storeToJsonDocumentAsync();
         }
     }

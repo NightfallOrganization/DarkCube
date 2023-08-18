@@ -167,12 +167,13 @@ public class NodePServerExecutor implements PServerExecutor {
         CompletableFuture<Void> fut = new CompletableFuture<>();
         if (state.compareAndSet(State.STARTING, State.STOPPING)) {
             new PacketStop(this.createSnapshot().getNow(null)).sendAsync();
+            String oldServerName = serverName;
             serverName = null;
             sendUpdate();
             stopFuture = fut;
-            logger.info("[PServer] Killing PServer " + serverName + " (" + id + ")");
+            logger.info("[PServer] Killing PServer " + oldServerName + " (" + id + ")");
             snapshot.provider().deleteAsync().thenRun(() -> {
-                logger.info("[PServer] Killed PServer " + serverName + " (" + id + ")");
+                logger.info("[PServer] Killed PServer " + oldServerName + " (" + id + ")");
                 snapshot = null;
                 startedAt = -1;
                 NodePServerProvider.instance().executor.execute(() -> {
@@ -185,12 +186,13 @@ public class NodePServerExecutor implements PServerExecutor {
             });
         } else if (state.compareAndSet(State.RUNNING, State.STOPPING)) {
             new PacketStop(this.createSnapshot().getNow(null)).sendAsync();
+            String oldServerName = serverName;
             serverName = null;
             sendUpdate();
             stopFuture = fut;
-            logger.info("[PServer] Stopping PServer " + serverName + " (" + id + ")");
+            logger.info("[PServer] Stopping PServer " + oldServerName + " (" + id + ")");
             snapshot.provider().stopAsync().thenRun(() -> snapshot.provider().deleteAsync().thenRun(() -> {
-                logger.info("[PServer] Stopped PServer " + serverName + " (" + id + ")");
+                logger.info("[PServer] Stopped PServer " + oldServerName + " (" + id + ")");
                 if (!state.compareAndSet(State.STOPPING, State.OFFLINE)) {
                     logger.severe("[PServer] PServer was stopping but state wasn't stopping");
                 } else {

@@ -100,17 +100,17 @@ public class PServerStorage implements PServerPersistentDataStorage {
         notifiers.remove(notifier);
     }
 
-    @Override public CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
+    @Override public @NotNull CompletableFuture<@NotNull @Unmodifiable Collection<Key>> keysAsync() {
         return wrap(new PacketKeys(pserver).sendQueryAsync(PacketKeys.Response.class)).thenApply(Response::keys);
     }
 
-    @Override public @NotNull <T> CompletableFuture<Void> setAsync(Key key, PersistentDataType<T> type, T data) {
+    @Override public @NotNull <T> CompletableFuture<Void> setAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         Document.Mutable document = Document.newJsonDocument();
         type.serialize(document, key.toString(), data);
         return new PacketSet(pserver, document).sendQueryAsync(PacketSet.Response.class).thenApply(p -> null);
     }
 
-    @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(Key key, PersistentDataType<T> type) {
+    @Override public @NotNull <T> CompletableFuture<@Nullable T> removeAsync(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         return new PacketRemove(pserver, key).sendQueryAsync(PacketRemove.Response.class).thenApply(p -> {
             if (p.data() != null) {
                 return type.deserialize(p.data(), key.toString());
@@ -119,7 +119,7 @@ public class PServerStorage implements PServerPersistentDataStorage {
         });
     }
 
-    @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(Key key, PersistentDataType<T> type) {
+    @Override public @NotNull <T> CompletableFuture<@Nullable T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         return new PacketGet(pserver, key).sendQueryAsync(PacketGet.Response.class).thenApply(p -> {
             if (p.data() != null) {
                 return type.deserialize(p.data(), key.toString());
@@ -129,7 +129,7 @@ public class PServerStorage implements PServerPersistentDataStorage {
     }
 
     @Override
-    public @NotNull <T> CompletableFuture<@NotNull T> getAsync(Key key, PersistentDataType<T> type, Supplier<@NotNull T> defaultValue) {
+    public @NotNull <T> CompletableFuture<@NotNull T> getAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<@NotNull T> defaultValue) {
         Document.Mutable doc = Document.newJsonDocument();
         type.serialize(doc, key.toString(), defaultValue.get());
         return new PacketGetDef(pserver, key, doc).sendQueryAsync(PacketGetDef.Response.class).thenApply(p -> {
@@ -140,7 +140,8 @@ public class PServerStorage implements PServerPersistentDataStorage {
         });
     }
 
-    @Override public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(Key key, PersistentDataType<T> type, T data) {
+    @Override
+    public @NotNull <T> CompletableFuture<Void> setIfNotPresentAsync(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         Document.Mutable doc = Document.newJsonDocument();
         type.serialize(doc, key.toString(), data);
         return new PacketSetIfNotPresent(pserver, key, doc).sendQueryAsync(PacketSetIfNotPresent.Response.class).thenApply(p -> null);
@@ -158,7 +159,7 @@ public class PServerStorage implements PServerPersistentDataStorage {
         return new PacketClearCache(pserver).sendQueryAsync(PacketClearCache.Response.class).thenApply(p -> null);
     }
 
-    @Override public @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(Document document) {
+    @Override public @NotNull CompletableFuture<Void> loadFromJsonDocumentAsync(@NotNull Document document) {
         return new PacketLoadFromDocument(pserver, document.immutableCopy())
                 .sendQueryAsync(PacketLoadFromDocument.Response.class)
                 .thenApply(p -> null);

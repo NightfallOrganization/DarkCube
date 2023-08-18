@@ -7,11 +7,11 @@
 package eu.darkcube.system.pserver.cloudnet;
 
 import eu.cloudnetservice.driver.event.EventListener;
-import eu.cloudnetservice.driver.event.events.service.CloudServiceLifecycleChangeEvent;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.service.ServiceEnvironmentType;
 import eu.cloudnetservice.driver.service.ServiceLifeCycle;
 import eu.cloudnetservice.driver.util.ModuleHelper;
+import eu.cloudnetservice.node.event.service.CloudServicePreLifecycleEvent;
 import eu.cloudnetservice.node.event.service.CloudServicePreProcessStartEvent;
 import eu.cloudnetservice.node.service.CloudService;
 import eu.darkcube.system.pserver.common.ServiceInfoUtil;
@@ -31,12 +31,12 @@ public class Listener {
         }
     }
 
-    @EventListener public void handle(CloudServiceLifecycleChangeEvent e) {
-        if (e.lastLifeCycle() == ServiceLifeCycle.RUNNING) {
+    @EventListener public void handle(CloudServicePreLifecycleEvent e) {
+        if (e.serviceInfo().lifeCycle() == ServiceLifeCycle.RUNNING) {
             UniqueId id = ServiceInfoUtil.getInstance().getUniqueId(e.serviceInfo());
             if (id != null) {
+                // Resources are automatically deployed because of autoDeleteOnStop
                 NodePServerProvider.instance().unload(id);
-                e.serviceInfo().provider().deployResources(false);
             }
         }
     }
