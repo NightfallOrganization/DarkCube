@@ -7,15 +7,6 @@
 
 package eu.darkcube.system.citybuild;
 
-import com.github.juliarn.npclib.api.Npc;
-import com.github.juliarn.npclib.api.NpcActionController;
-import com.github.juliarn.npclib.api.Platform;
-import com.github.juliarn.npclib.api.event.AttackNpcEvent;
-import com.github.juliarn.npclib.api.event.ShowNpcEvent;
-import com.github.juliarn.npclib.api.protocol.meta.EntityMetadataFactory;
-import com.github.juliarn.npclib.bukkit.BukkitPlatform;
-import com.github.juliarn.npclib.bukkit.BukkitWorldAccessor;
-import com.github.juliarn.npclib.bukkit.protocol.BukkitProtocolAdapter;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.citybuild.commands.*;
 import eu.darkcube.system.citybuild.listener.*;
@@ -26,13 +17,7 @@ import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerLevelChangeEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Citybuild extends DarkCubePlugin {
 
@@ -90,11 +75,15 @@ public class Citybuild extends DarkCubePlugin {
         AroundDamageCommands aroundDamageCommands = new AroundDamageCommands(this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         this.defenseManager = new DefenseManager(this);
+        corManager = new CorManager(this);
         scoreboardManager = new ScoreboardManager(this, levelXPManager, corManager);
         CustomSword customSword = new CustomSword(this);
-        corManager = new CorManager(this);
         damageManager = new DamageManager();
+        SkillManager skillManager = new SkillManager(this);
 
+        instance.getCommand("skill").setExecutor(new SkillCommand(skillManager));
+        instance.getCommand("myskills").setExecutor(new MySkillsCommand(skillManager));
+        instance.getCommand("addskillslot").setExecutor(new AddSkillSlotCommand(skillManager));
         instance.getCommand("adddamage").setExecutor(new AddDamageCommand(this));
         instance.getCommand("mydamage").setExecutor(new MyDamageCommand(damageManager));
         instance.getCommand("setcor").setExecutor(new SetCorCommand(corManager));
@@ -124,7 +113,7 @@ public class Citybuild extends DarkCubePlugin {
         instance.getCommand("attribute").setExecutor(attributeCommand);
         instance.getCommand("addhealth").setExecutor(new AddHealthCommand(healthManager));
         instance.getCommand("myhealth").setExecutor(new MyHealthCommand(healthManager));
-        instance.getCommand("addregeneration").setExecutor(new RegenerationCommand(healthManager));
+        instance.getCommand("addregeneration").setExecutor(new AddRegenerationCommand(healthManager));
         instance.getCommand("addarounddamage").setExecutor(aroundDamageCommands);
         instance.getCommand("myarounddamage").setExecutor(aroundDamageCommands);
         instance.getCommand("adddefense").setExecutor(new AddDefenseCommand(this));
@@ -143,7 +132,7 @@ public class Citybuild extends DarkCubePlugin {
         this.getServer().getPluginManager().registerEvents(flyCommand, this);
         this.getCommand("fly").setExecutor(flyCommand);
         (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);
-        MonsterLevelListener monsterLevelListener = new MonsterLevelListener(levelXPManager, healthManager);
+        MonsterStatsManager monsterLevelListener = new MonsterStatsManager(levelXPManager, healthManager);
         this.getServer().getPluginManager().registerEvents(monsterLevelListener, this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         AroundDamageListener aroundDamageListenerWithKey = new AroundDamageListener(this, this.getAroundDamageKey());

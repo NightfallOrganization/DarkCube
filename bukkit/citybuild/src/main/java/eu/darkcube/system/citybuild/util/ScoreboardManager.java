@@ -27,16 +27,21 @@ public class ScoreboardManager {
     }
 
     public void createScoreboard(Player player) {
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective obj = board.registerNewObjective("playerStats", "dummy", ChatColor.GRAY + "« " + ChatColor.DARK_GREEN + "Dark" + ChatColor.GREEN + "Cube" + ChatColor.GRAY + ".eu »");
+        Scoreboard board = player.getScoreboard();
+        if (board == Bukkit.getScoreboardManager().getMainScoreboard()) {
+            board = Bukkit.getScoreboardManager().getNewScoreboard();
+            player.setScoreboard(board);
+        }
+        Objective obj = board.getObjective("playerStats");
+        if (obj == null) {
+            obj = board.registerNewObjective("playerStats", "dummy", ChatColor.GRAY + "« " + ChatColor.DARK_GREEN + "Dark" + ChatColor.GREEN + "Cube" + ChatColor.GRAY + ".eu »");
+        }
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         setupDefaultScores(obj, player);
 
         playerObjectives.put(player.getUniqueId(), obj);
-        player.setScoreboard(board);
     }
-
 
     public void updatePlayerLevel(Player player) {
         Scoreboard scoreboard = player.getScoreboard();
@@ -60,16 +65,14 @@ public class ScoreboardManager {
         lvl.setScore(2);
     }
 
-
     private boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);
             return true;
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     }
-
 
     public void updatePlayerCor(Player player) {
         Scoreboard scoreboard = player.getScoreboard();
@@ -92,7 +95,6 @@ public class ScoreboardManager {
         Score corScore = obj.getScore(corPrefix + playerCor);
         corScore.setScore(5);
     }
-
 
     private void setupDefaultScores(Objective obj, Player player) {
         // Header

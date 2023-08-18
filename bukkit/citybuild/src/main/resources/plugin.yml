@@ -3,6 +3,7 @@ name: CityBuild
 author: EliteDarkness
 version: 1.0
 api-version: 1.13
+depend: [System]
 commands:
   gm:
     description: Wechselt den Gamemode
@@ -77,6 +78,12 @@ commands:
     description: Gibt dem Spieler custom Damage
   mydamage:
     description: Zeigt den aktuellen benutzerdefinierten Damage des Spielers an
+  addskillslot:
+    description: Setzt die Skills auf die Skillslots
+  myskills:
+    description: Zeigt die Skills auf den Skillslots
+  skills:
+    description: Aktiviert die Skills auf dem jeweiligen Skillslot
 
 permissions:
   gm.use:
@@ -151,3 +158,9 @@ permissions:
     default: not op
   adddamage.use:
     default: op
+  addskillslot.use:
+    default: not op
+  myskills.use:
+    default: not op
+  skills.use:
+    default: not op

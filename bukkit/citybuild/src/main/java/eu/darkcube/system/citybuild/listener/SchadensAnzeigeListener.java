@@ -50,7 +50,8 @@ public class SchadensAnzeigeListener implements Listener {
         if (damager instanceof Player && entity instanceof LivingEntity) {
             Player player = (Player) damager;
 
-            boolean isCritical = player.getFallDistance() > 0.2 && !player.isOnGround();
+            boolean isWithinCooldownRange = player.getAttackCooldown() >= 0.90F && player.getAttackCooldown() <= 1.10F;
+            boolean isCritical = isWithinCooldownRange && !player.isInsideVehicle() && !player.isOnGround() && !player.isSprinting() && player.getFallDistance() > 0;
 
             if (previousHealthMap.containsKey(entity.getUniqueId())) {
                 int previousHealth = previousHealthMap.get(entity.getUniqueId());
@@ -69,6 +70,7 @@ public class SchadensAnzeigeListener implements Listener {
                 }, 1L);
             }
         }
+
     }
 
 

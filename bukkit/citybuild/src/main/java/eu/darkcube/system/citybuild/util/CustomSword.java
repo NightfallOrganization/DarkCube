@@ -25,26 +25,14 @@ public class CustomSword implements Listener {
     public final NamespacedKey itemLevelKey;
     public final NamespacedKey durabilityKey;
     public final NamespacedKey maxDurabilityKey;
+    public final NamespacedKey itemDamageKey;
 
     public CustomSword(JavaPlugin plugin) {
         this.plugin = plugin;
         this.itemLevelKey = new NamespacedKey(plugin, "item_level");
         this.durabilityKey = new NamespacedKey(plugin, "durability");
         this.maxDurabilityKey = new NamespacedKey(plugin, "max_durability");
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-    private double getAttackDamageForLevel(int level) {
-        return level * 2;
-    }
-
-    private void setSwordAttackDamage(ItemStack item, double damage) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            AttributeModifier damageModifier = new AttributeModifier(UUID.randomUUID(), "generic.attack_damage", damage, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
-            meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damageModifier);
-            item.setItemMeta(meta);
-        }
+        this.itemDamageKey = new NamespacedKey(plugin, "item_damage");
     }
 
     public void increaseItemLevel(ItemStack item, int levelToAdd) {
@@ -56,8 +44,23 @@ public class CustomSword implements Listener {
             meta.getPersistentDataContainer().set(itemLevelKey, PersistentDataType.INTEGER, newLevel);
             item.setItemMeta(meta);
             updateSwordLore(item, newLevel);
-            setSwordAttackDamage(item, getAttackDamageForLevel(newLevel));
         }
+    }
+
+    public void setSwordDamage(ItemStack item, int damage) {
+        if (item != null && item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+            meta.getPersistentDataContainer().set(itemDamageKey, PersistentDataType.INTEGER, damage);
+            item.setItemMeta(meta);
+        }
+    }
+
+    public int getSwordDamage(ItemStack item) {
+        if (item != null && item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+            return meta.getPersistentDataContainer().getOrDefault(itemDamageKey, PersistentDataType.INTEGER, 0);
+        }
+        return 0;
     }
 
     public ItemStack create(int level) {
@@ -66,24 +69,19 @@ public class CustomSword implements Listener {
 
         if (meta != null) {
             meta.setDisplayName("§7« §fNormal Sword §7»");
-
-            // Set item level
             meta.getPersistentDataContainer().set(itemLevelKey, PersistentDataType.INTEGER, level);
-
-            // Set item durability
             int durability = 200;
             int maxDurability = getMaxDurabilityForLevel(level);
             meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER, durability);
             meta.getPersistentDataContainer().set(maxDurabilityKey, PersistentDataType.INTEGER, maxDurability);
             meta.setUnbreakable(true);
             meta.setCustomModelData(3);
+            setSwordDamage(customSword, 100);
 
-            // Set the lore for the item
             List<String> lore = new ArrayList<>();
             lore.add(" ");
             lore.add("§7§m      §7« §bStats §7»§m      ");
             lore.add(" ");
-            lore.add("§7Damage: §a" + getAttackDamageForLevel(level)); // Zeigt den Attack Damage in der Lore an
             lore.add("§7Durability: §a" + durability + " §7/ §a" + maxDurability);
             lore.add(" ");
             lore.add("§7§m      §7« §dReqir §7»§7§m      ");
@@ -94,7 +92,6 @@ public class CustomSword implements Listener {
             meta.setLore(lore);
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             customSword.setItemMeta(meta);
-            setSwordAttackDamage(customSword, getAttackDamageForLevel(level));
         }
 
         return customSword;
@@ -125,7 +122,6 @@ public class CustomSword implements Listener {
             lore.add(" ");
             lore.add("§7§m      §7« §bStats §7»§m      ");
             lore.add(" ");
-            lore.add("§7Damage: §a" + getAttackDamageForLevel(level));
             lore.add("§7Durability: §a" + durability + " §7/ §a" + maxDurability);
             lore.add(" ");
             lore.add("§7§m      §7« §dReqir §7»§7§m      ");
@@ -137,7 +133,6 @@ public class CustomSword implements Listener {
             item.setItemMeta(meta);
         }
     }
-
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
