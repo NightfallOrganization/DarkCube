@@ -3,6 +3,7 @@ package eu.darkcube.system.citybuild.commands;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
 import eu.darkcube.system.citybuild.util.DefenseManager;
 import eu.darkcube.system.citybuild.util.LevelXPManager;
+import eu.darkcube.system.citybuild.util.DamageManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
@@ -18,23 +19,27 @@ public class ResetLevelCommand implements CommandExecutor {
     private LevelXPManager levelXPManager;
     private CustomHealthManager healthManager;
     private DefenseManager defenseManager;
+    private DamageManager damageManager; // Hinzugefügt
     private NamespacedKey speedKey;
     private NamespacedKey strengthKey;
     private NamespacedKey hitSpeedKey;
     private NamespacedKey healthKey;
     private NamespacedKey aroundDamageKey;
     private NamespacedKey defenseKey;
+    private NamespacedKey damageKey; // Hinzugefügt
 
-    public ResetLevelCommand(LevelXPManager levelXPManager, CustomHealthManager healthManager, DefenseManager defenseManager, JavaPlugin plugin) {
+    public ResetLevelCommand(LevelXPManager levelXPManager, CustomHealthManager healthManager, DefenseManager defenseManager, DamageManager damageManager, JavaPlugin plugin) {
         this.levelXPManager = levelXPManager;
         this.healthManager = healthManager;
         this.defenseManager = defenseManager;
+        this.damageManager = damageManager; // Hinzugefügt
         this.speedKey = new NamespacedKey(plugin, "SpeedKey");
         this.strengthKey = new NamespacedKey(plugin, "StrengthKey");
         this.hitSpeedKey = new NamespacedKey(plugin, "HitSpeedKey");
         this.healthKey = new NamespacedKey(plugin, "HealthKey");
         this.aroundDamageKey = new NamespacedKey(plugin, "AroundDamageKey");
         this.defenseKey = new NamespacedKey(plugin, "DefenseKey");
+        this.damageKey = new NamespacedKey(plugin, "Damage"); // Hinzugefügt
     }
 
     @Override
@@ -83,6 +88,12 @@ public class ResetLevelCommand implements CommandExecutor {
 
         defenseManager.resetDefense(target);
 
+        // Setzen Sie den Damage-Wert des Spielers zurück
+        damageManager.resetDamage(target); // Falls Sie eine resetDamage-Methode in Ihrem DamageManager haben
+        // Oder setzen Sie den Wert direkt zurück:
+        PersistentDataContainer data = target.getPersistentDataContainer();
+        data.set(damageKey, PersistentDataType.DOUBLE, 0.0);
+
         target.setWalkSpeed(0.2f);
         target.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getModifiers().forEach(target.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)::removeModifier);
         target.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getModifiers().forEach(target.getAttribute(Attribute.GENERIC_ATTACK_SPEED)::removeModifier);
@@ -95,5 +106,4 @@ public class ResetLevelCommand implements CommandExecutor {
         dataContainer.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
         dataContainer.set(this.defenseKey, PersistentDataType.INTEGER, 0);
     }
-
 }
