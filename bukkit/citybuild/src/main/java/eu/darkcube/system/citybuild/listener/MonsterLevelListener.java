@@ -9,6 +9,7 @@ package eu.darkcube.system.citybuild.listener;
 
 import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
+import eu.darkcube.system.citybuild.util.DamageManager;
 import eu.darkcube.system.citybuild.util.LevelXPManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -36,6 +37,7 @@ public class MonsterLevelListener implements Listener {
     private LevelXPManager levelXPManager;
     private CustomHealthManager healthManager;
     private final Map<LivingEntity, Map<Player, Double>> damageMap = new HashMap<>();
+    private DamageManager damageManager = new DamageManager();
 
     public MonsterLevelListener(LevelXPManager levelXPManager, CustomHealthManager healthManager) {
         this.levelXPManager = levelXPManager;
@@ -132,13 +134,19 @@ public class MonsterLevelListener implements Listener {
         }
     }
 
-    @EventHandler public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
+    @EventHandler
+    public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Player) {
             Player player = (Player) event.getDamager();
             LivingEntity target = (LivingEntity) event.getEntity();
 
-            damageMap.computeIfAbsent(target, k -> new HashMap<>()).merge(player, event.getFinalDamage(), Double::sum);
+            // Erhalte den benutzerdefinierten Schadenswert des Spielers
+            double playerDamage = damageManager.getDamage(player);
+            if (playerDamage > 0) {
+                event.setDamage(playerDamage);
+            }
 
+            damageMap.computeIfAbsent(target, k -> new HashMap<>()).merge(player, event.getFinalDamage(), Double::sum);
             int currentHealth = healthManager.getMonsterHealth(target);
             int newHealth = currentHealth - (int) event.getFinalDamage();
 
@@ -150,11 +158,10 @@ public class MonsterLevelListener implements Listener {
                     updateMonsterName((Monster) target);
                 }
                 event.setDamage(0.1);  // Setzen Sie den Schaden temporär auf einen geringen Wert
-
-//				player.sendMessage("Das Monster hat jetzt noch " + newHealth + " Health.");
             }
         }
     }
+
 
     @EventHandler public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Arrow) {

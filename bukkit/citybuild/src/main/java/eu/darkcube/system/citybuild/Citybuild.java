@@ -49,6 +49,7 @@ public class Citybuild extends DarkCubePlugin {
     private NamespacedKey aroundDamageKey;
     private ScoreboardManager scoreboardManager;
     private CorManager corManager;
+    private DamageManager damageManager;
 
     public Citybuild() {
         super("metropolis");
@@ -92,7 +93,10 @@ public class Citybuild extends DarkCubePlugin {
         scoreboardManager = new ScoreboardManager(this, levelXPManager, corManager);
         CustomSword customSword = new CustomSword(this);
         corManager = new CorManager(this);
+        damageManager = new DamageManager();
 
+        instance.getCommand("adddamage").setExecutor(new AddDamageCommand(this));
+        instance.getCommand("mydamage").setExecutor(new MyDamageCommand(damageManager));
         instance.getCommand("setcor").setExecutor(new SetCorCommand(corManager));
         instance.getCommand("addcor").setExecutor(new AddCorCommand(corManager));
         instance.getCommand("mycor").setExecutor(new MyCorCommand(corManager));
@@ -114,7 +118,7 @@ public class Citybuild extends DarkCubePlugin {
         instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
         instance.getCommand("addxp").setExecutor(new AddXPCommand(this.levelXPManager));
         instance.getCommand("mylevel").setExecutor(new MyLevelCommand(this.levelXPManager));
-        instance.getCommand("resetlevel").setExecutor(new ResetLevelCommand(this.levelXPManager, healthManager, this.defenseManager, this));
+        instance.getCommand("resetlevel").setExecutor(new ResetLevelCommand(this.levelXPManager, healthManager, this.defenseManager, damageManager, this));
         instance.getCommand("myxp").setExecutor(new MyXPCommand(this.levelXPManager));
         instance.getCommand("myap").setExecutor(new MyAPCommand(this.levelXPManager));
         instance.getCommand("attribute").setExecutor(attributeCommand);
@@ -203,7 +207,11 @@ public class Citybuild extends DarkCubePlugin {
     }
 
     public CorManager getCorManager() {
-        return this.corManager;
+        return corManager;
+    }
+
+    public DamageManager getDamageManager() {
+        return damageManager;
     }
 
     public NPCManagement npcManagement() {

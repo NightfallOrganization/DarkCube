@@ -73,6 +73,10 @@ commands:
     description: Gibt dem Spieler Cor
   setcor:
     description: Setzt dem Spieler Cor
+  adddamage:
+    description: Gibt dem Spieler custom Damage
+  mydamage:
+    description: Zeigt den aktuellen benutzerdefinierten Damage des Spielers an
 
 permissions:
   gm.use:
@@ -142,4 +146,8 @@ permissions:
   addcore.use:
     default: op
   setcore.use:
+    default: op
+  mydamage.use:
+    default: not op
+  adddamage.use:
     default: op

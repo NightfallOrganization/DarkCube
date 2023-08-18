@@ -16,32 +16,32 @@ public class AddDefenseCommand implements CommandExecutor {
     private Citybuild plugin;
 
     public AddDefenseCommand(Citybuild plugin) {
-        this.plugin = plugin;// 15
-    }// 16
+        this.plugin = plugin;
+    }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length != 2) {// 20
-            sender.sendMessage("§7Falsche Anzahl von Argumenten! Verwendung: §a/adddefense <Spielername> <Defense>");// 21
-            return false;// 22
+        if (args.length != 2) {
+            sender.sendMessage("§7Falsche Anzahl von Argumenten! Verwendung: §a/adddefense <Spielername> <Defense>");
+            return false;
         } else {
-            String playerName = args[0];// 25
+            String playerName = args[0];
 
             int defenseToAdd;
             try {
-                defenseToAdd = Integer.parseInt(args[1]);// 28
-            } catch (NumberFormatException var8) {// 29
+                defenseToAdd = Integer.parseInt(args[1]);
+            } catch (NumberFormatException var8) {
                 sender.sendMessage("§7Ungültiger §aDefense-Wert§7! Bitte geben Sie eine Zahl ein");// 30
-                return false;// 31
+                return false;
             }
 
-            Player targetPlayer = Bukkit.getServer().getPlayer(playerName);// 34
-            if (targetPlayer == null) {// 35
-                sender.sendMessage("§7Spieler nicht gefunden");// 36
-                return true;// 37
+            Player targetPlayer = Bukkit.getServer().getPlayer(playerName);
+            if (targetPlayer == null) {
+                sender.sendMessage("§7Spieler nicht gefunden");
+                return true;
             } else {
-                this.plugin.getDefenseManager().addDefense(targetPlayer, defenseToAdd);// 39
-                sender.sendMessage("§7Es wurden §a" + defenseToAdd + " §7Defense zum Spieler §a" + targetPlayer.getName() + " §7hinzugefügt");// 40
-                return true;// 41
+                this.plugin.getDefenseManager().addDefense(targetPlayer, defenseToAdd);
+                sender.sendMessage("§7Es wurden §a" + defenseToAdd + " §7Defense zum Spieler §a" + targetPlayer.getName() + " §7hinzugefügt");
+                return true;
             }
         }
     }
