@@ -30,53 +30,53 @@ public class WrapperPServerExecutor implements PServerExecutor {
         this.storage = new PServerStorage(id);
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> start() {
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> start() {
         return new PacketStart(id).sendQueryAsync(PacketStart.Response.class).thenApply(PacketStart.Response::success);
     }
 
-    @Override public CompletableFuture<Void> stop() {
+    @Override public @NotNull CompletableFuture<Void> stop() {
         return new PacketStop(id).sendQueryAsync(PacketStop.Response.class).thenApply(p -> null);
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> accessLevel(AccessLevel level) {
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> accessLevel(@NotNull AccessLevel level) {
         return new PacketAccessLevelSet(id, level)
                 .sendQueryAsync(PacketAccessLevelSet.Response.class)
                 .thenApply(PacketAccessLevelSet.Response::success);
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> addOwner(UUID uuid) {
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> addOwner(UUID uuid) {
         return new PacketAddOwner(id, uuid).sendQueryAsync(PacketAddOwner.Response.class).thenApply(PacketAddOwner.Response::success);
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> removeOwner(UUID uuid) {
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> removeOwner(UUID uuid) {
         return new PacketRemoveOwner(id, uuid).sendQueryAsync(PacketAddOwner.Response.class).thenApply(PacketAddOwner.Response::success);
     }
 
-    @Override public CompletableFuture<@NotNull PServerSnapshot> createSnapshot() {
+    @Override public @NotNull CompletableFuture<@NotNull PServerSnapshot> createSnapshot() {
         return new PacketCreateSnapshot(id)
                 .sendQueryAsync(PacketCreateSnapshot.Response.class)
                 .thenApply(PacketCreateSnapshot.Response::snapshot);
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> connectPlayer(UUID player) {
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> connectPlayer(UUID player) {
         return new PacketConnectPlayer(id, player)
                 .sendQueryAsync(PacketConnectPlayer.Response.class)
                 .thenApply(PacketConnectPlayer.Response::success);
     }
 
-    @Override public UniqueId id() {
+    @Override public @NotNull UniqueId id() {
         return id;
     }
 
-    @Override public CompletableFuture<@NotNull State> state() {
+    @Override public @NotNull CompletableFuture<@NotNull State> state() {
         return new PacketState(id).sendQueryAsync(PacketState.Response.class).thenApply(Response::state);
     }
 
-    @Override public CompletableFuture<@NotNull Type> type() {
+    @Override public @NotNull CompletableFuture<@NotNull Type> type() {
         return new PacketType(id).sendQueryAsync(PacketType.Response.class).thenApply(PacketType.Response::type);
     }
 
-    @Override public CompletableFuture<@NotNull AccessLevel> accessLevel() {
+    @Override public @NotNull CompletableFuture<@NotNull AccessLevel> accessLevel() {
         return new PacketAccessLevel(id)
                 .sendQueryAsync(PacketAccessLevel.Response.class)
                 .thenApply(PacketAccessLevel.Response::accessLevel);
@@ -86,29 +86,29 @@ public class WrapperPServerExecutor implements PServerExecutor {
         return storage;
     }
 
-    @Override public CompletableFuture<@NotNull Long> startedAt() {
+    @Override public @NotNull CompletableFuture<@NotNull Long> startedAt() {
         return new PacketStartedAt(id).sendQueryAsync(PacketStartedAt.Response.class).thenApply(PacketStartedAt.Response::startedAt);
     }
 
-    @Override public CompletableFuture<@NotNull Long> ontime() {
+    @Override public @NotNull CompletableFuture<@NotNull Long> ontime() {
         return new PacketOntime(id).sendQueryAsync(PacketOntime.Response.class).thenApply(PacketOntime.Response::ontime);
     }
 
-    @Override public CompletableFuture<@NotNull Integer> onlinePlayers() {
+    @Override public @NotNull CompletableFuture<@NotNull Integer> onlinePlayers() {
         return new PacketOnlinePlayers(id)
                 .sendQueryAsync(PacketOnlinePlayers.Response.class)
                 .thenApply(PacketOnlinePlayers.Response::onlinePlayers);
     }
 
-    @Override public CompletableFuture<@Nullable String> serverName() {
+    @Override public @NotNull CompletableFuture<@Nullable String> serverName() {
         return new PacketServerName(id).sendQueryAsync(PacketServerName.Response.class).thenApply(PacketServerName.Response::serverName);
     }
 
-    @Override public CompletableFuture<@NotNull @Unmodifiable Collection<@NotNull UUID>> owners() {
+    @Override public @NotNull CompletableFuture<@NotNull @Unmodifiable Collection<@NotNull UUID>> owners() {
         return new PacketOwners(id).sendQueryAsync(PacketOwners.Response.class).thenApply(PacketOwners.Response::owners);
     }
 
-    @Override public CompletableFuture<@Nullable String> taskName() {
+    @Override public @NotNull CompletableFuture<@Nullable String> taskName() {
         return new PacketTaskName(id).sendQueryAsync(PacketTaskName.Response.class).thenApply(PacketTaskName.Response::taskName);
     }
 }

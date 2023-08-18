@@ -6,256 +6,182 @@
  */
 package eu.darkcube.system.pserver.cloudnet.command;
 
+import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.CommandDescription;
+import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.CommandPermission;
+import cloud.commandframework.annotations.parsers.Parser;
+import cloud.commandframework.annotations.suggestions.Suggestions;
+import cloud.commandframework.context.CommandContext;
+import dev.derklaro.aerogel.Inject;
+import eu.cloudnetservice.driver.service.ServiceTask;
+import eu.cloudnetservice.modules.bridge.player.CloudOfflinePlayer;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
+import eu.cloudnetservice.node.command.annotation.CommandAlias;
+import eu.cloudnetservice.node.command.exception.ArgumentNotAvailableException;
+import eu.cloudnetservice.node.command.source.CommandSource;
+import eu.darkcube.system.pserver.cloudnet.PServerModule;
+import eu.darkcube.system.pserver.common.PServerBuilder;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.pserver.common.UniqueId;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+@CommandAlias({"pserver", "ps"}) @CommandDescription("PServer Management") @CommandPermission("darkcube.command.pserver")
 public class CommandPServers {
 
-//    private static final IPlayerManager playerManager = CloudNetDriver
-//            .getInstance()
-//            .getServicesRegistry()
-//            .getFirstService(IPlayerManager.class);
+    @Inject
+    private PlayerManager playerManager;
 
-    public CommandPServers() {
-//		super(SubCommandBuilder.create().prefix(exactStringIgnoreCase("deploymentExclusions"))
-//				.generateCommand(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							String exclusion = (String) args.argument("exclusion").orElse(null);
-//							PServerModule.getInstance().addDeploymentExclusion(exclusion);
-//							sender.sendMessage("Added exclusion " + exclusion);
-//						}, SubCommand::async, exactStringIgnoreCase("add"),
-//						dynamicString("exclusion", "Exclusion already exists",
-//								e -> !PServerModule.getInstance().getDeploymentExclusions()
-//										.contains(e))).generateCommand(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							String exclusion = (String) args.argument("exclusion").orElse(null);
-//							PServerModule.getInstance().removeDeploymentExclusion(exclusion);
-//							sender.sendMessage("Removed exclusion " + exclusion);
-//						}, SubCommand::async, exactStringIgnoreCase("remove"),
-//						dynamicString("exclusion", "Exclusion does not exist",
-//								e -> PServerModule.getInstance().getDeploymentExclusions()
-//										.contains(e),
-//								() -> PServerModule.getInstance().getDeploymentExclusions()))
-//				.generateCommand(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							Collection<String> c =
-//									PServerModule.getInstance().getDeploymentExclusions();
-//							sender.sendMessage("DeploymentExclusions: (" + c.size() + ")");
-//							for (String s : c) {
-//								sender.sendMessage(" - " + s);
-//							}
-//						}, SubCommand::async, exactStringIgnoreCase("list")).removeLastPrefix()
-//				.prefix(exactStringIgnoreCase("create")).generateCommand(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							try {
-//								PServerExecutor ps = new PServerBuilder().type(Type.WORLD)
-//										.accessLevel(AccessLevel.PUBLIC).create().get();
-//								sender.sendMessage(
-//										"PServer created! ID: " + ps.id().toString() + ", Name:"
-//												+ " " + ps.serverName().get());
-//							} catch (InterruptedException | ExecutionException e) {
-//								throw new RuntimeException(e);
-//							}
-//						}, SubCommand::async, exactStringIgnoreCase("new")).generateCommand(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							String taskn = (String) args.argument("task").orElse(null);
-//							if (taskn == null || !CloudNet.getInstance().getServiceTaskProvider()
-//									.isServiceTaskPresent(taskn)) {
-//								sender.sendMessage("Task nicht gefunden!");
-//								return;
-//							}
-//							PServerBuilder b =
-//									new PServerBuilder().taskName(taskn).type(Type.GAMEMODE)
-//											.accessLevel(AccessLevel.PUBLIC);
-//							PServerExecutor ps;
-//							try {
-//								ps = b.create().get();
-//								sender.sendMessage(
-//										"PServer created! ID: " + ps.id().toString() + ", Name: "
-//												+ ps.serverName().get());
-//							} catch (InterruptedException | ExecutionException e) {
-//								throw new RuntimeException(e);
-//							}
-//						}, SubCommand::async, exactStringIgnoreCase("by"),
-//						dynamicString("task", "Task nicht gefunden",
-//								s -> CloudNet.getInstance().getServiceTaskProvider()
-//										.isServiceTaskPresent(s),
-//								() -> CloudNet.getInstance().getServiceTaskProvider()
-//										.getPermanentServiceTasks().stream()
-//										.map(ServiceTask::getName).collect(Collectors.toList())))
-//				.clearPrefixes().generateCommand(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							try {
-//								sender.sendMessage(
-//										"PServers: (" + PServerProvider.instance().pservers().get()
-//												.size() + ")");
-//							} catch (InterruptedException | ExecutionException e) {
-//								throw new RuntimeException(e);
-//							}
-//							try {
-//								PServerProvider.instance().pservers().get().forEach(ps -> {
-//									try {
-//										sender.sendMessage(
-//												" - " + ps.id() + " (" + ps.serverName().get()
-//														+ ")");
-//									} catch (InterruptedException | ExecutionException e) {
-//										throw new RuntimeException(e);
-//									}
-//								});
-//							} catch (InterruptedException | ExecutionException e) {
-//								throw new RuntimeException(e);
-//							}
-//						}, SubCommand::async, exactStringIgnoreCase("list"))
-//				.prefix(exactStringIgnoreCase("server"))
-//				.prefix(dynamicString("id", "Invalid PServer ID",
-//						s -> NodePServerProvider.instance().getAllTemplateIDs().contains(s),
-//						() -> NodePServerProvider.instance().getAllTemplateIDs())).preExecute(
-//						(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//							UniqueId id = new UniqueId(args.argument("id").orElse("").toString());
-//							PServerExecutor ps;
-//							try {
-//								ps = PServerProvider.instance().pserver(id).get();
-//							} catch (InterruptedException | ExecutionException e) {
-//								throw new RuntimeException(e);
-//							}
-//							if (ps == null) {
-//								sender.sendMessage("Invalid PServer: Errors expected!");
-//							}
-//							internalProperties.put("ps", ps);
-//						}).applyHandler(CommandPServers::applyCommands)
-//
-//				.getSubCommands(), "pservers", "ps");
-//		super.prefix = "pserver";
-//		super.permission = "cloudnet.command.pserver";
-//		super.description = "PServer Managing";
+    @CommandMethod("pservers deploymentExclusions remove <exclusion>")
+    public void deploymentExclusionsRemove(CommandSource source, @Argument("exclusion") String exclusion) {
+        if (PServerModule.getInstance().removeDeploymentExclusion(exclusion)) {
+            source.sendMessage("Removed deploymentExclusion");
+        } else {
+            source.sendMessage("Exclusion doesn't exist");
+        }
     }
 
-//	private static void applyCommands(SubCommandBuilder builder) {
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					displayInformation(sender, (PServerExecutor) internalProperties.get("ps"));
-//				});
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
-//					boolean bool;
-//					try {
-//						bool = ps.start().get();
-//						if (bool) {
-//							sender.sendMessage(
-//									"PServer started! (Name: " + ps.serverName().get() + ")");
-//						} else {
-//							sender.sendMessage(
-//									"PServer could not start! (Name: " + ps.serverName().get()
-//											+ ")");
-//						}
-//					} catch (InterruptedException | ExecutionException e) {
-//						throw new RuntimeException(e);
-//					}
-//				}, SubCommand::async, exactStringIgnoreCase("start"));
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
-//					ps.stop();
-//				}, SubCommand::async, exactStringIgnoreCase("stop"));
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
-//					ps.stop();
-//					try {
-//						sender.sendMessage(
-//								"PServer stopped and removed! (Name: " + ps.serverName().get()
-//										+ ")");
-//					} catch (InterruptedException | ExecutionException e) {
-//						throw new RuntimeException(e);
-//					}
-//				}, SubCommand::async, exactStringIgnoreCase("remove"));
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					String name = (String) args.argument("player").orElse(null);
-//					ICloudPlayer player = playerManager.getFirstOnlinePlayer(name);
-//					PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
-//					try {
-//						Collection<UUID> owners = ps.owners().get();
-//						UUID uuid = player.getUniqueId();
-//						if (owners.contains(uuid)) {
-//							sender.sendMessage("Player is already an Owner of this PServer");
-//							return;
-//						}
-//						//			ps.addOwner(uuid);
-//						ps.addOwner(uuid);
-//						sender.sendMessage("Added Player to list of Owners of this PServer");
-//					} catch (InterruptedException | ExecutionException e) {
-//						throw new RuntimeException(e);
-//					}
-//				}, SubCommand::async, exactStringIgnoreCase("addOwner"),
-//				dynamicString("player", "Player not found!",
-//						s -> playerManager.getFirstOnlinePlayer(s) != null,
-//						() -> playerManager.onlinePlayers().asNames()));
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					String name = (String) args.argument("player").orElse(null);
-//					PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
-//					Collection<UUID> owners;
-//					try {
-//						owners = ps.owners().get();
-//					} catch (InterruptedException | ExecutionException e) {
-//						throw new RuntimeException(e);
-//					}
-//					ICloudOfflinePlayer player = null;
-//					try {
-//						player = playerManager.getOfflinePlayer(UUID.fromString(name));
-//					} catch (Exception ex) {
-//						player = playerManager.getFirstOfflinePlayer(name);
-//					}
-//					if (player == null) {
-//						sender.sendMessage("Player not found!");
-//						return;
-//					}
-//					if (owners.contains(player.getUniqueId())) {
-//						try {
-//							ps.removeOwner(player.getUniqueId()).get();
-//						} catch (InterruptedException | ExecutionException e) {
-//							throw new RuntimeException(e);
-//						}
-//						sender.sendMessage(
-//								"Removed Player from list of Owners of this PServer! (" + name
-//										+ ")");
-//					} else {
-//						sender.sendMessage(
-//								"This Player is not an Owner of this PServer! (" + name + ")");
-//					}
-//				}, s -> s.async(), exactStringIgnoreCase("removeOwner"),
-//				dynamicString("player", () -> {
-//					return playerManager.onlinePlayers().asUUIDs().stream().map(UUID::toString)
-//							.collect(Collectors.toList());
-//				}));
-//		builder.generateCommand(
-//				(subCommand, sender, command, args, commandLine, properties, internalProperties) -> {
-//					PServerExecutor ps = (PServerExecutor) internalProperties.get("ps");
-//					Collection<UUID> owners;
-//					String serverName;
-//					try {
-//						owners = ps.owners().get();
-//						serverName = ps.serverName().get();
-//					} catch (InterruptedException | ExecutionException e) {
-//						throw new RuntimeException(e);
-//					}
-//					sender.sendMessage("Owners of " + serverName + ": (" + owners.size() + ")");
-//					for (UUID uuid : owners) {
-//						sender.sendMessage(
-//								" - " + playerManager.getOfflinePlayer(uuid).getName() + " (" + uuid
-//										+ ")");
-//					}
-//				}, SubCommand::async, exactStringIgnoreCase("listOwners"));
-//	}
-//
-//    private static void displayInformation(ICommandSender sender, PServerExecutor ps) {
-//        try {
-//            sender.sendMessage("* ID: " + ps.id().toString(), "* Online: " + ps
-//                    .onlinePlayers()
-//                    .get(), "* Ontime: " + TimeUnit.MILLISECONDS.toSeconds(ps.ontime().get()) + "s", "* ServerName: " + ps
-//                    .serverName()
-//                    .get(), "* Owners: " + ps.owners().get().toString(), "* State: " + ps.state().get().toString());
-//        } catch (InterruptedException | ExecutionException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @CommandMethod("pservers deploymentExclusions add <exclusion>")
+    public void deploymentExclusionsAdd(CommandSource source, @Argument("exclusion") String exclusion) {
+        if (PServerModule.getInstance().addDeploymentExclusion(exclusion)) {
+            source.sendMessage("Added deploymentExclusion");
+        } else {
+            source.sendMessage("Exclusion already exists");
+        }
+    }
+
+    @CommandMethod("pservers deploymentExclusions list") public void deploymentExclusionsList(CommandSource source) {
+        Collection<String> c = PServerModule.getInstance().compiledDeploymentExclusions().stream().map(Pattern::pattern).toList();
+        source.sendMessage("DeploymentExclusions: (" + c.size() + ")");
+        for (String s : c) {
+            source.sendMessage(" - " + s);
+        }
+    }
+
+    @CommandMethod("pservers create new") public void createNew(CommandSource source) {
+        PServerExecutor ps = new PServerBuilder()
+                .type(PServerExecutor.Type.WORLD)
+                .accessLevel(PServerExecutor.AccessLevel.PUBLIC)
+                .create()
+                .join();
+        source.sendMessage("PServer created! ID: " + ps.id() + ", Name:" + " " + ps.serverName().join());
+    }
+
+    @CommandMethod("pservers create by <task>") public void createBy(CommandSource source, @Argument("task") ServiceTask task) {
+        PServerBuilder b = new PServerBuilder()
+                .taskName(task.name())
+                .type(PServerExecutor.Type.GAMEMODE)
+                .accessLevel(PServerExecutor.AccessLevel.PUBLIC);
+        PServerExecutor executor = b.create().join();
+        source.sendMessage("PServer created: ID: " + executor.id() + ", Name: " + executor.serverName().join());
+    }
+
+    @Parser(suggestions = "uniqueid") public PServerExecutor pserverExecutorParser(CommandContext<CommandSource> ctx, Queue<String> input) {
+        UniqueId uniqueId = uniqueIdParser(ctx, input);
+        PServerExecutor ex = PServerProvider.instance().pserver(uniqueId).join();
+        if (ex == null) throw new ArgumentNotAvailableException("PServer nicht gefunden: " + uniqueId);
+        return ex;
+    }
+
+    @Suggestions("uniqueid") public List<String> suggestUniqueIds(CommandContext<CommandSource> ctx, String input) {
+        return PServerProvider.instance().pservers().join().stream().map(PServerExecutor::id).map(UniqueId::toString).toList();
+    }
+
+    @Parser(suggestions = "uniqueid") public UniqueId uniqueIdParser(CommandContext<CommandSource> ctx, Queue<String> input) {
+        var string = input.remove();
+        try {
+            UUID uuid = UUID.fromString(string);
+            return new UniqueId(uuid.toString());
+        } catch (IllegalArgumentException ex) {
+            throw new ArgumentNotAvailableException("Invalid UniqueId");
+        }
+    }
+
+    @Suggestions("onlinePlayerUUIDs") public List<String> suggestOnlinePlayerUUIDs() {
+        return playerManager.onlinePlayers().uniqueIds().stream().map(UUID::toString).toList();
+    }
+
+    @Parser(suggestions = "onlinePlayerUUIDs") public UUID playerParser(CommandContext<CommandSource> ctx, Queue<String> input) {
+        var string = input.remove();
+        try {
+            return UUID.fromString(string);
+        } catch (IllegalArgumentException ex) {
+            throw new ArgumentNotAvailableException("Invalid UniqueId");
+        }
+    }
+
+    @CommandMethod("pservers list") public void list(CommandSource source) {
+        Collection<? extends PServerExecutor> pservers = PServerProvider.instance().pservers().join();
+        source.sendMessage("PServers: (" + pservers.size() + ")");
+        pservers.forEach(ps -> {
+            source.sendMessage(" - " + ps.id() + " (" + ps.serverName().join() + ")");
+        });
+    }
+
+    @CommandMethod("pservers server <id>") public void displayServer(CommandSource source, @Argument("id") PServerExecutor executor) {
+        Collection<String> messages = new ArrayList<>();
+        messages.add("* ID: " + executor.id());
+        messages.add("* Online: " + executor.onlinePlayers().join());
+        messages.add("* Ontime: " + TimeUnit.MILLISECONDS.toSeconds(executor.ontime().join()) + "s");
+        messages.add("* ServerName: " + executor.serverName().join());
+        messages.add("* Owners: " + executor.owners().join());
+        messages.add("* State: " + executor.state().join());
+        source.sendMessage(messages);
+    }
+
+    @CommandMethod("pservers server <id> start") public void start(CommandSource source, @Argument("id") PServerExecutor executor) {
+        executor.start().whenComplete((bool, t) -> {
+            if (t != null) source.sendMessage("An error occurred while starting the PServer");
+            else if (bool) source.sendMessage("PServer started! (Name: " + executor.serverName().join() + ")");
+            else source.sendMessage("PServer could not start! (Name: " + executor.serverName().join() + ")");
+
+        });
+    }
+
+    @CommandMethod("pservers server <id> stop") public void stop(CommandSource source, @Argument("id") PServerExecutor executor) {
+        executor.stop().thenRun(() -> source.sendMessage("PServer stopped"));
+    }
+
+    @CommandMethod("pservers server <id> addOwner <player>")
+    public void addOwner(CommandSource source, @Argument("id") PServerExecutor executor, @Argument(value = "player", parserName = "onlinePlayerUUIDs") UUID player) {
+        if (executor.owners().join().contains(player)) {
+            source.sendMessage("Player is already an Owner of this PServer");
+            return;
+        }
+        executor.addOwner(player).whenComplete((bool, t) -> {
+            if (t != null) source.sendMessage("An error occurred while adding player to the list of owners");
+            else if (bool) source.sendMessage("Added player to the list of Owners of this PServer");
+            else source.sendMessage("Could not add owner!");
+        });
+    }
+
+    @CommandMethod("pservers server <id> removeOwner <player>")
+    public void removeOwner(CommandSource source, @Argument("id") PServerExecutor executor, @Argument(value = "player", parserName = "onlinePlayerUUIDs") UUID player) {
+        Collection<UUID> owners = executor.owners().join();
+        if (!owners.contains(player)) {
+            source.sendMessage("Player is not an owner of this PServer");
+            return;
+        }
+        executor.removeOwner(player).whenComplete((bool, t) -> {
+            if (t != null) source.sendMessage("An error occurred while removing player from the list of owners");
+            else if (bool) source.sendMessage("Removed player from the list of Owners of this PServer");
+            else source.sendMessage("Could not remove owner!");
+        });
+    }
+
+    @CommandMethod("pservers server <id> listOwners")
+    public void listOwners(CommandSource source, @Argument("id") PServerExecutor executor) {
+        Collection<UUID> owners = executor.owners().join();
+        String serverName = executor.serverName().join();
+        source.sendMessage("Owners of " + serverName + ": (" + owners.size() + ")");
+        for (UUID uuid : owners) {
+            CloudOfflinePlayer offlinePlayer = playerManager.offlinePlayer(uuid);
+            String playerName = offlinePlayer == null ? "Unknown Player" : offlinePlayer.name();
+            source.sendMessage(" - " + playerName + " (" + uuid + ")");
+        }
+    }
 }

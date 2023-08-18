@@ -6,19 +6,13 @@
  */
 
 plugins {
-    java
+    id("java-library")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 sourceSets {
     create("generator") {
-    }
-}
-
-tasks.withType<JavaExec>().configureEach {
-    if (name.endsWith("main()")) {
-        notCompatibleWithConfigurationCache("JavaExec created by IntelliJ")
     }
 }
 

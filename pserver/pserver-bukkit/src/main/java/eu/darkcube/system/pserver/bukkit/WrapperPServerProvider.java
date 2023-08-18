@@ -47,16 +47,16 @@ public class WrapperPServerProvider extends PServerProvider {
         return self != null;
     }
 
-    @Override public PServerExecutor currentPServer() throws IllegalStateException {
+    @Override public @NotNull PServerExecutor currentPServer() throws IllegalStateException {
         if (self == null) throw new IllegalStateException();
         return self;
     }
 
-    @Override public CompletableFuture<@Nullable WrapperPServerExecutor> pserver(UniqueId pserver) {
+    @Override public @NotNull CompletableFuture<@Nullable WrapperPServerExecutor> pserver(@NotNull UniqueId pserver) {
         return CompletableFuture.completedFuture(new WrapperPServerExecutor(pserver));
     }
 
-    @Override public CompletableFuture<@NotNull Boolean> pserverExists(UniqueId pserver) {
+    @Override public @NotNull CompletableFuture<@NotNull Boolean> pserverExists(@NotNull UniqueId pserver) {
         return new PacketExists(pserver).sendQueryAsync(PacketExists.Response.class).thenApply(Response::exists);
     }
 

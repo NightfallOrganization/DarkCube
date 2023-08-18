@@ -127,7 +127,7 @@ public class NodePServerExecutor implements PServerExecutor {
                 ServiceDeployment deployment = ServiceDeployment
                         .builder()
                         .template(template)
-                        .excludes(PServerModule.getInstance().getDeploymentExclusions())
+                        .excludes(PServerModule.getInstance().compiledDeploymentExclusions())
                         .build();
                 confb.deployments(Collections.singleton(deployment));
             }

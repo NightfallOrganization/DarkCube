@@ -20,6 +20,12 @@ allprojects {
         extension.toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
 
+    tasks.withType<JavaExec>().configureEach {
+        if (name.endsWith("main()")) {
+            notCompatibleWithConfigurationCache("JavaExec created by IntelliJ")
+        }
+    }
+
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = StandardCharsets.UTF_8.name()
         options.setIncremental(true)

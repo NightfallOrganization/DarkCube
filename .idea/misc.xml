@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="7">
-      <item index="0" class="java.lang.String" itemvalue="de.dytanic.cloudnet.driver.event.EventListener" />
-      <item index="1" class="java.lang.String" itemvalue="de.dytanic.cloudnet.driver.module.ModuleTask" />
-      <item index="2" class="java.lang.String" itemvalue="dev.derklaro.aerogel.Inject" />
-      <item index="3" class="java.lang.String" itemvalue="eu.cloudnetservice.driver.module.ModuleTask" />
-      <item index="4" class="java.lang.String" itemvalue="eu.darkcube.system.annotations.Api" />
-      <item index="5" class="java.lang.String" itemvalue="net.md_5.bungee.event.EventHandler" />
-      <item index="6" class="java.lang.String" itemvalue="org.bukkit.event.EventHandler" />
+    <list size="10">
+      <item index="0" class="java.lang.String" itemvalue="cloud.commandframework.annotations.CommandMethod" />
+      <item index="1" class="java.lang.String" itemvalue="cloud.commandframework.annotations.parsers.Parser" />
+      <item index="2" class="java.lang.String" itemvalue="cloud.commandframework.annotations.suggestions.Suggestions" />
+      <item index="3" class="java.lang.String" itemvalue="de.dytanic.cloudnet.driver.event.EventListener" />
+      <item index="4" class="java.lang.String" itemvalue="de.dytanic.cloudnet.driver.module.ModuleTask" />
+      <item index="5" class="java.lang.String" itemvalue="dev.derklaro.aerogel.Inject" />
+      <item index="6" class="java.lang.String" itemvalue="eu.cloudnetservice.driver.module.ModuleTask" />
+      <item index="7" class="java.lang.String" itemvalue="eu.darkcube.system.annotations.Api" />
+      <item index="8" class="java.lang.String" itemvalue="net.md_5.bungee.event.EventHandler" />
+      <item index="9" class="java.lang.String" itemvalue="org.bukkit.event.EventHandler" />
     </list>
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onLoad" />
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onEnable" />

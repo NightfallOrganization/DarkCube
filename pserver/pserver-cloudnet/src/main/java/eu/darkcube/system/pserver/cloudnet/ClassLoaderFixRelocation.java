@@ -6,11 +6,11 @@
  */
 package eu.darkcube.system.pserver.cloudnet;
 
-import com.google.common.reflect.TypeToken;
-import eu.cloudnetservice.driver.document.DocumentFactory;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.node.command.CommandProvider;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.cloudnet.packethandler.*;
@@ -18,10 +18,7 @@ import eu.darkcube.system.pserver.cloudnet.packethandler.storage.*;
 import eu.darkcube.system.pserver.common.packets.wn.*;
 import eu.darkcube.system.pserver.common.packets.wn.storage.*;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 public class ClassLoaderFixRelocation {
 
@@ -75,18 +72,7 @@ public class ClassLoaderFixRelocation {
         Logger.getLogger("PServer").info("PServer initializing!");
 
         InjectionLayer.boot().instance(EventManager.class).registerListener((PServerModule.getInstance().listener = new Listener()));
-
-        module.deploymentExclusions = module
-                .readConfig(DocumentFactory.json())
-                .readObject("deploymentExclusions", new TypeToken<List<String>>() {
-
-                    private static final long serialVersionUID = 1L;
-
-                }.getType(), Collections.singletonList("paper.jar"))
-                .stream()
-                .map(Pattern::compile)
-                .toList();
-//        module.saveConfig();
+        InjectionLayer.boot().instance(CommandProvider.class).register(CommandPServers.class);
     }
 
 }
