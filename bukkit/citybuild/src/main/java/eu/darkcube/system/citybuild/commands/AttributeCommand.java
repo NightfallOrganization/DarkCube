@@ -6,11 +6,13 @@
 package eu.darkcube.system.citybuild.commands;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import eu.darkcube.system.citybuild.Citybuild;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
+import eu.darkcube.system.citybuild.util.DamageManager;
 import eu.darkcube.system.citybuild.util.DefenseManager;
 import eu.darkcube.system.citybuild.util.LevelXPManager;
 import org.bukkit.Bukkit;
@@ -44,10 +46,12 @@ public class AttributeCommand implements CommandExecutor, Listener {
     private NamespacedKey aroundDamageKey;
     private NamespacedKey defenseKey;
     private CustomHealthManager healthManager;
+    private DamageManager damageManager;
 
     public AttributeCommand(Citybuild plugin, CustomHealthManager healthManager) {
-        this.plugin = plugin;// 35
-        this.healthManager = healthManager;// 36
+        this.plugin = plugin;
+        this.healthManager = healthManager;
+        this.damageManager = damageManager;
         this.speedKey = new NamespacedKey(plugin, "SpeedKey");
         this.strengthKey = new NamespacedKey(plugin, "StrengthKey");
         this.hitSpeedKey = new NamespacedKey(plugin, "HitSpeedKey");
@@ -165,10 +169,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
                         break;
 
                     case "§dStrength":
-                        double currentStrength = levelManager.getAttribute(player, "strength");
-                        levelManager.setAttribute(player, "strength", currentStrength + 1.0);
-                        AttributeModifier strengthModifier = new AttributeModifier(UUID.randomUUID(), "StrengthModifier", currentStrength + 1.0, Operation.ADD_NUMBER, EquipmentSlot.HAND);
-                        player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(strengthModifier);
+                        new DamageManager().addDamage(player, 5);  // Benutzerdefinierter Schaden um 3 erhöhen
                         levelManager.addAP(player, -1);
                         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         PersistentDataContainer dataContainerStrength = player.getPersistentDataContainer();
@@ -180,6 +181,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
                         metaStrength.setLore(loreStrength);
                         clickedItem.setItemMeta(metaStrength);
                         break;
+
 
                     case "§dHit Speed":
                         PersistentDataContainer dataContainerHitSpeed = player.getPersistentDataContainer();

@@ -32,4 +32,5 @@ public class DamageManager {
         PersistentDataContainer data = player.getPersistentDataContainer();
         return data.getOrDefault(DAMAGE_KEY, PersistentDataType.DOUBLE, 0.0);
     }
+
 }

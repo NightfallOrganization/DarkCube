@@ -111,17 +111,17 @@ public class CustomHealthManager {
     }
 
     public void resetAroundDamage(Player player) {
-        this.setAroundDamage(player, 0.0);// 109
-    }// 110
+        this.setAroundDamage(player, 0.0);
+    }
 
     public void setAroundDamage(Player player, double value) {
-        PersistentDataContainer data = player.getPersistentDataContainer();// 113
-        if (!data.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {// 115
-            data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);// 116
+        PersistentDataContainer data = player.getPersistentDataContainer();
+        if (!data.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {
+            data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
         }
 
-        data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, value);// 118
-    }// 119
+        data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, value);
+    }
 
     public void setMonsterHealth(LivingEntity monster, int health) {
         PersistentDataContainer data = monster.getPersistentDataContainer();
@@ -149,13 +149,4 @@ public class CustomHealthManager {
         return 0;
     }
 
-    public double getAroundDamage(Player player) {
-        PersistentDataContainer data = player.getPersistentDataContainer();// 122
-        if (data.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {// 123
-            return (Double)data.get(this.aroundDamageKey, PersistentDataType.DOUBLE);// 124
-        } else {
-            data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);// 127
-            return 0.0;// 128
-        }
-    }
 }

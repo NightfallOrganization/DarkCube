@@ -5,9 +5,10 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.citybuild.listener;
+package eu.darkcube.system.citybuild.util;
 
 import eu.darkcube.system.citybuild.Citybuild;
+import eu.darkcube.system.citybuild.listener.SchadensAnzeigeListener;
 import eu.darkcube.system.citybuild.util.CustomHealthManager;
 import eu.darkcube.system.citybuild.util.DamageManager;
 import eu.darkcube.system.citybuild.util.LevelXPManager;
@@ -24,7 +25,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -32,14 +32,14 @@ import org.bukkit.entity.Monster;
 
 import java.util.Random;
 
-public class MonsterLevelListener implements Listener {
+public class MonsterStatsManager implements Listener {
 
     private LevelXPManager levelXPManager;
     private CustomHealthManager healthManager;
     private final Map<LivingEntity, Map<Player, Double>> damageMap = new HashMap<>();
     private DamageManager damageManager = new DamageManager();
 
-    public MonsterLevelListener(LevelXPManager levelXPManager, CustomHealthManager healthManager) {
+    public MonsterStatsManager(LevelXPManager levelXPManager, CustomHealthManager healthManager) {
         this.levelXPManager = levelXPManager;
         this.healthManager = healthManager;
     }
@@ -49,14 +49,6 @@ public class MonsterLevelListener implements Listener {
     private static final UUID SPEED_MODIFIER_UUID = UUID.randomUUID();
 
     @EventHandler public void onCreatureSpawn(CreatureSpawnEvent event) {
-        Entity entity = event.getEntity();
-
-        // Storniert das Spawnen, wenn die Kreatur friedlich ist
-        if (entity instanceof Animals || entity instanceof Villager || entity instanceof Golem || entity instanceof Bat || entity instanceof Squid) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (event.getEntity() instanceof Zombie) {
             Zombie zombie = (Zombie) event.getEntity();
             if (zombie.isBaby()) {
@@ -135,20 +127,30 @@ public class MonsterLevelListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player) {
-            Player player = (Player) event.getDamager();
-            LivingEntity target = (LivingEntity) event.getEntity();
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        // Spieler fügt Schaden zu
+        if (event.getDamager() instanceof Player player) {
+            LivingEntity target = (LivingEntity) event.getEntity(); // TODO entity might not be a living entity
 
-            // Erhalte den benutzerdefinierten Schadenswert des Spielers
             double playerDamage = damageManager.getDamage(player);
+
+            // Überprüfen, ob es ein Critical Hit war
+            if (!player.isInsideVehicle() && !player.isOnGround() && !player.isSprinting() && player.getFallDistance() > 0 && player.getAttackCooldown() == 1.0F) {
+                playerDamage *= 1.25; // 25% mehr Schaden für Crit
+            }
+
+            // Variieren Sie den Schaden um bis zu ±5%
+            Random rand = new Random();
+            double variation = 1 + (rand.nextDouble() * 0.1 - 0.05); // Dies ergibt einen Wert zwischen 0.95 und 1.05
+            playerDamage *= variation;
+
             if (playerDamage > 0) {
                 event.setDamage(playerDamage);
             }
 
             damageMap.computeIfAbsent(target, k -> new HashMap<>()).merge(player, event.getFinalDamage(), Double::sum);
             int currentHealth = healthManager.getMonsterHealth(target);
-            int newHealth = currentHealth - (int) event.getFinalDamage();
+            int newHealth = currentHealth - (int) Math.ceil(event.getFinalDamage());
 
             if (newHealth <= 0) {
                 target.setHealth(0);
@@ -160,14 +162,39 @@ public class MonsterLevelListener implements Listener {
                 event.setDamage(0.1);  // Setzen Sie den Schaden temporär auf einen geringen Wert
             }
         }
-    }
 
+        if (event.getDamager() instanceof Monster monster) {
+            LivingEntity target = (LivingEntity) event.getEntity();
 
-    @EventHandler public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Arrow) {
-            Arrow arrow = (Arrow) event.getDamager();
-            if (arrow.getShooter() instanceof Skeleton) {
-                Skeleton skeleton = (Skeleton) arrow.getShooter();
+            // Abrufen des Levels des Monsters
+            String customName = monster.getCustomName();
+            int level = 1; // Standardwert, falls kein Level gefunden wird
+            if (customName != null) {
+                int levelStartIndex = customName.indexOf("§e") + 2;  // +2 to skip "§e"
+                int levelEndIndex = customName.indexOf(" ", levelStartIndex);
+                String levelString = customName.substring(levelStartIndex, levelEndIndex);
+                try {
+                    level = Integer.parseInt(levelString); // Erstes Gruppenmatch ist das Level
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            double monsterDamage = level * 2; // Dies setzt den Schaden entsprechend dem Level des Monsters
+
+            // Wenn das Ziel ein Spieler ist, wird der Schaden entsprechend angepasst.
+            if (target instanceof Player player) {
+                int currentHealth = healthManager.getHealth(player);
+                healthManager.setHealth(player, currentHealth - level);
+            }
+
+            event.setDamage(monsterDamage);
+
+        }
+
+        // Skelett schießt einen Pfeil
+        else if (event.getDamager() instanceof Arrow arrow) {
+            if (arrow.getShooter() instanceof Skeleton skeleton) {
 
                 // Abrufen des Levels des Skeletts
                 String customName = skeleton.getCustomName();
@@ -186,8 +213,10 @@ public class MonsterLevelListener implements Listener {
                 double damage = event.getDamage() + level; // oder andere Anpassungen
                 event.setDamage(damage);
             }
-        } else if (event.getDamager() instanceof Creeper) {
-            Creeper creeper = (Creeper) event.getDamager();
+        }
+
+        // Creeper Explosion
+        else if (event.getDamager() instanceof Creeper creeper) {
 
             // Abrufen des Levels des Creepers
             String customName = creeper.getCustomName();
@@ -207,6 +236,7 @@ public class MonsterLevelListener implements Listener {
             event.setDamage(damage);
         }
     }
+
 
     @EventHandler public void onMonsterDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Monster) {
@@ -238,8 +268,8 @@ public class MonsterLevelListener implements Listener {
 
     private void applyLevelToMonster(Monster monster, int level) {
         double maxHealth = level * 20;
-        healthManager.setMonsterHealth(monster, (int) maxHealth);
-        healthManager.setMonsterMaxHealth(monster, (int) maxHealth);
+        healthManager.setMonsterHealth(monster, (int) maxHealth * 2);
+        healthManager.setMonsterMaxHealth(monster, (int) maxHealth * 2);
         updateMonsterName(monster);
         monster.setCustomName("§6Level §e" + level + " §7- §c100%");
         monster.setCustomNameVisible(true);
@@ -261,7 +291,6 @@ public class MonsterLevelListener implements Listener {
         if (monster instanceof Skeleton) {
             Skeleton skeleton = (Skeleton) monster;
             ItemStack bow = new ItemStack(Material.BOW);
-            modifyBowDamage(bow, level); // or whatever value you want
             skeleton.getEquipment().setItemInMainHand(bow);
         }
 
@@ -270,17 +299,6 @@ public class MonsterLevelListener implements Listener {
             if (level >= 10) {
                 equipRandomArmor(livingEntity, level);
             }
-        }
-    }
-
-    private void modifyBowDamage(ItemStack bow, int level) {
-        ItemMeta meta = bow.getItemMeta();
-
-        if (meta != null) {
-            int enchantmentLevel = level / 20; // Anpassen nach Bedarf
-            enchantmentLevel = Math.min(enchantmentLevel, 5); // Power-Enchantment kann maximal Level 5 sein
-            meta.addEnchant(Enchantment.ARROW_DAMAGE, enchantmentLevel, true);
-            bow.setItemMeta(meta);
         }
     }
 

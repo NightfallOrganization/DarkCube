@@ -6,11 +6,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class RegenerationCommand implements CommandExecutor {
+public class AddRegenerationCommand implements CommandExecutor {
 
     private CustomHealthManager healthManager;
 
-    public RegenerationCommand(CustomHealthManager healthManager) {
+    public AddRegenerationCommand(CustomHealthManager healthManager) {
         this.healthManager = healthManager;
     }
 
@@ -23,11 +23,11 @@ public class RegenerationCommand implements CommandExecutor {
                 try {
                     regenToAdd = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
-                    sender.sendMessage("Ungültiger Regenerationswert: " + args[1]);
+                    sender.sendMessage("§7Ungültiger Regenerationswert: " + args[1]);
                     return true;
                 }
                 healthManager.addRegen(targetPlayer, regenToAdd);
-                sender.sendMessage("Regeneration hinzugefügt zu " + targetPlayer.getName() + ": " + regenToAdd);
+                sender.sendMessage("§7Es wurden §a" + regenToAdd + " §7Regeneration zum Spieler §a" + targetPlayer.getName() + " §7hinzugefügt");
             } else {
                 sender.sendMessage("Spieler nicht gefunden: " + args[0]);
             }
