@@ -7,44 +7,59 @@
 
 package eu.darkcube.system.citybuild.util;
 
-import eu.darkcube.system.citybuild.skills.Skill;
-import eu.darkcube.system.citybuild.skills.SkillDash;
+import eu.darkcube.system.citybuild.skills.*;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SkillManager {
+
+    public static final String SKILL_PREFIX = "SKILLSLOT_";
     private JavaPlugin plugin;
-    private Map<String, Skill> skillMap;
+
+    private Map<String, Skill> skillMap = new HashMap<>();
 
     public SkillManager(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.skillMap = new HashMap<>();
         registerSkills();
     }
 
     private void registerSkills() {
         skillMap.put("Dash", new SkillDash());
-        // Weitere Skills können hier registriert werden
+        skillMap.put("VerticalDash", new SkillVerticalDash());
+        skillMap.put("WindBlades", new SkillWindBlades());
+        skillMap.put("Attraction", new SkillAttraction());
+        skillMap.put("Summoner", new SkillSummoner());
     }
 
-    public Skill getSkillByName(String name) {
-        return skillMap.get(name);
+    public Skill getSkillByName(String skillName) {
+        return skillMap.get(skillName);
     }
-
-    private List<String> validSkills = new ArrayList<>(Arrays.asList("Dash"));  // Beispiel-Skill
 
     public boolean isValidSkill(String skill) {
-        return validSkills.contains(skill);
+        return skillMap.containsKey(skill);
+    }
+
+    public String getSlotOfSkill(Player player, String skillName) {
+        PersistentDataContainer container = player.getPersistentDataContainer();
+        for (int i = 1; i <= 4; i++) {
+            String skill = container.get(getKeyName(i), PersistentDataType.STRING);
+            if (skill != null && skill.equals(skillName)) {
+                return skill;
+            }
+        }
+        return "Unskilled";
     }
 
     public void assignSkillToSlot(Player player, String skill, int slot) {
         PersistentDataContainer container = player.getPersistentDataContainer();
 
+        // Remove skill if it's already assigned to a slot
         for (int i = 1; i <= 4; i++) {
             if (skill.equals(container.get(getKeyName(i), PersistentDataType.STRING))) {
                 container.set(getKeyName(i), PersistentDataType.STRING, "Unskilled");
@@ -62,6 +77,6 @@ public class SkillManager {
     }
 
     private NamespacedKey getKeyName(int slot) {
-        return new NamespacedKey(plugin, "SKILLSLOT_" + slot);
+        return new NamespacedKey(plugin, SKILL_PREFIX + slot);
     }
 }

@@ -29,14 +29,14 @@ public class MySkillsCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
+        sender.sendMessage(" ");
+        sender.sendMessage("§7§nMeine Skills:");
+        sender.sendMessage(" ");
         for (int i = 1; i <= 4; i++) {
             String skill = skillManager.getSkillFromSlot(player, i);
-            if (skill.equals("Unskilled")) {
-                sender.sendMessage("§7Skill " + i + ": None");
-            } else {
-                sender.sendMessage("§7Skill " + i + ": " + skill);
-            }
+            sender.sendMessage("§7Slot " + i + ": §a" + (skill.equals("Unskilled") ? "§7Empty" : skill));
         }
+        sender.sendMessage(" ");
 
         return true;
     }

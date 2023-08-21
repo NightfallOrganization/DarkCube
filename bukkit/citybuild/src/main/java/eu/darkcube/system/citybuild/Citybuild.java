@@ -66,6 +66,8 @@ public class Citybuild extends DarkCubePlugin {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+
+        SkillManager skillManager = new SkillManager(this);
         this.npcManagement = new NPCManagement(this);
         this.levelXPManager = new LevelXPManager(this, corManager);
         LevelXPManager levelXPManager = new LevelXPManager(this, corManager);
@@ -79,9 +81,9 @@ public class Citybuild extends DarkCubePlugin {
         scoreboardManager = new ScoreboardManager(this, levelXPManager, corManager);
         CustomSword customSword = new CustomSword(this);
         damageManager = new DamageManager();
-        SkillManager skillManager = new SkillManager(this);
 
-        instance.getCommand("skill").setExecutor(new SkillCommand(skillManager));
+        instance.getCommand("useskillslot").setExecutor(new UseSkillSlotCommand(skillManager));
+        instance.getCommand("useskill").setExecutor(new UseSkillCommand(skillManager));
         instance.getCommand("myskills").setExecutor(new MySkillsCommand(skillManager));
         instance.getCommand("addskillslot").setExecutor(new AddSkillSlotCommand(skillManager));
         instance.getCommand("adddamage").setExecutor(new AddDamageCommand(this));
@@ -129,11 +131,9 @@ public class Citybuild extends DarkCubePlugin {
         new CustomSword(this);
 
         FlyCommand flyCommand = new FlyCommand();// 98
-        this.getServer().getPluginManager().registerEvents(flyCommand, this);
         this.getCommand("fly").setExecutor(flyCommand);
         (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);
         MonsterStatsManager monsterLevelListener = new MonsterStatsManager(levelXPManager, healthManager);
-        this.getServer().getPluginManager().registerEvents(monsterLevelListener, this);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         AroundDamageListener aroundDamageListenerWithKey = new AroundDamageListener(this, this.getAroundDamageKey());
         AroundDamageListener aroundDamageListener = new AroundDamageListener(this, this.getAroundDamageKey());
@@ -141,11 +141,14 @@ public class Citybuild extends DarkCubePlugin {
 
         actionBarUtil = new ActionBarUtil(this, healthManager, levelXPManager);
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, this::updateScoreboardsForAllOnlinePlayers, 0L, 90000L);
+
+        this.getServer().getPluginManager().registerEvents(new SkillClickListener(skillManager), this);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this::updateScoreboardsForAllOnlinePlayers, 0L, 90000L);
         this.getServer().getPluginManager().registerEvents(new SchadensAnzeigeListener(), this);
+        this.getServer().getPluginManager().registerEvents(flyCommand, this);
+        this.getServer().getPluginManager().registerEvents(monsterLevelListener, this);
         this.getServer().getPluginManager().registerEvents(new CraftingTableListener(this), this);
         this.getServer().getPluginManager().registerEvents(new EntityHealListener(), this);
-        //   this.getServer().getPluginManager().registerEvents(new KnockbackListener(), this);
         this.getServer().getPluginManager().registerEvents(new SoundListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerJoinHealthSetupListener(healthManager), this);
         this.getServer().getPluginManager().registerEvents(aroundDamageListener, this);

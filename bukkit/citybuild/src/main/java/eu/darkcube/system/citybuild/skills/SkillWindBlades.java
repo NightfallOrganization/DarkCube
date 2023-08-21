@@ -8,31 +8,25 @@
 package eu.darkcube.system.citybuild.skills;
 
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import java.util.HashMap;
 
-public class SkillDash extends Skill {
+public class SkillWindBlades extends Skill {
 
-    private static final long COOLDOWN_IN_SECONDS = 10; // Zum Beispiel 10 Sekunden
+    private static final long COOLDOWN_IN_SECONDS = 10; // 10 Sekunden als Beispiel. Sie können dies anpassen.
     private HashMap<Player, Long> cooldowns;
 
-    public SkillDash() {
-        super("Dash");
+    public SkillWindBlades() {
+        super("Windklingen");
         this.cooldowns = new HashMap<>();
     }
 
     @Override
     public void activate(Player player) {
         if (canUse(player)) {
-            Vector direction = player.getLocation().getDirection();
-
-            // Begrenze die Y-Komponente des Vektors.
-            if (direction.getY() > 0.4) {
-                direction.setY(0.4);
-            }
-
-            player.setVelocity(direction.multiply(2));
-            player.sendMessage("§7Dash Skill §aactivated§7!");
+            // Hier fügen Sie die spezifische Funktionalität für den Windklingen-Skill hinzu.
+            // Zum Beispiel könnten die Windklingen einen Schaden um den Spieler herum verursachen.
+            // Dies ist nur ein Platzhalter und sollte durch die tatsächliche Fähigkeit ersetzt werden.
+            player.sendMessage("§7Windklingen Skill §aaktiviert§7!");
 
             cooldowns.put(player, System.currentTimeMillis());
         } else {
@@ -40,7 +34,6 @@ public class SkillDash extends Skill {
             player.sendMessage("§7Du musst noch §a" + timeLeft + " §7Sekunden warten, bevor du diesen Skill wieder verwenden kannst");
         }
     }
-
 
     private boolean canUse(Player player) {
         if (!cooldowns.containsKey(player)) {

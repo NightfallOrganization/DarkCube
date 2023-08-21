@@ -8,31 +8,25 @@
 package eu.darkcube.system.citybuild.skills;
 
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import java.util.HashMap;
 
-public class SkillDash extends Skill {
+public class SkillSummoner extends Skill {
 
-    private static final long COOLDOWN_IN_SECONDS = 10; // Zum Beispiel 10 Sekunden
+    private static final long COOLDOWN_IN_SECONDS = 15; // Zum Beispiel 15 Sekunden
     private HashMap<Player, Long> cooldowns;
 
-    public SkillDash() {
-        super("Dash");
+    public SkillSummoner() {
+        super("Beschwörer");
         this.cooldowns = new HashMap<>();
     }
 
     @Override
     public void activate(Player player) {
         if (canUse(player)) {
-            Vector direction = player.getLocation().getDirection();
+            // Hier könnten Sie den Beschwörungs-Effekt hinzufügen. Zum Beispiel:
+            // player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE); // Einen Zombie beschwören
 
-            // Begrenze die Y-Komponente des Vektors.
-            if (direction.getY() > 0.4) {
-                direction.setY(0.4);
-            }
-
-            player.setVelocity(direction.multiply(2));
-            player.sendMessage("§7Dash Skill §aactivated§7!");
+            player.sendMessage("§7Beschwörer Skill §aaktiviert§7!"); // Nachricht an den Spieler
 
             cooldowns.put(player, System.currentTimeMillis());
         } else {
@@ -40,7 +34,6 @@ public class SkillDash extends Skill {
             player.sendMessage("§7Du musst noch §a" + timeLeft + " §7Sekunden warten, bevor du diesen Skill wieder verwenden kannst");
         }
     }
-
 
     private boolean canUse(Player player) {
         if (!cooldowns.containsKey(player)) {
