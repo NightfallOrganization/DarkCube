@@ -9,6 +9,17 @@ package eu.darkcube.system.citybuild.skills;
 
 import org.bukkit.entity.Player;
 
-public interface Skill {
-    void execute(Player player);
+public abstract class Skill {
+    protected String name;
+
+    public Skill(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    // Diese Methode wird überschrieben, um den spezifischen Effekt des Skills zu definieren
+    public abstract void activate(Player player);
 }

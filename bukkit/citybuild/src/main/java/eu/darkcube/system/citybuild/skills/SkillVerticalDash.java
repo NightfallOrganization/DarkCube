@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import java.util.HashMap;
 
-public class SkillDash extends Skill {
+public class SkillVerticalDash extends Skill {
 
     private static final long COOLDOWN_IN_SECONDS = 10; // Zum Beispiel 10 Sekunden
     private HashMap<Player, Long> cooldowns;
 
-    public SkillDash() {
-        super("Dash");
+    public SkillVerticalDash() {
+        super("VerticalDash");
         this.cooldowns = new HashMap<>();
     }
 
@@ -25,14 +25,14 @@ public class SkillDash extends Skill {
     public void activate(Player player) {
         if (canUse(player)) {
             Vector direction = player.getLocation().getDirection();
+            direction.setY(0); // Y-Komponente ignorieren
+            direction.normalize();
 
-            // Begrenze die Y-Komponente des Vektors.
-            if (direction.getY() > 0.4) {
-                direction.setY(0.4);
-            }
+            Vector velocity = direction.multiply(1);
+            velocity.setY(1.5);
 
-            player.setVelocity(direction.multiply(2));
-            player.sendMessage("§7Dash Skill §aactivated§7!");
+            player.setVelocity(velocity);
+            player.sendMessage("§7VerticalDash Skill §aactivated§7!");
 
             cooldowns.put(player, System.currentTimeMillis());
         } else {

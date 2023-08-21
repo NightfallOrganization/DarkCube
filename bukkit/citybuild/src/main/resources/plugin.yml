@@ -82,8 +82,10 @@ commands:
     description: Setzt die Skills auf die Skillslots
   myskills:
     description: Zeigt die Skills auf den Skillslots
-  skills:
-    description: Aktiviert die Skills auf dem jeweiligen Skillslot
+  useskill:
+    description: Aktiviere einen benutzerdefinierten Skill
+  useskillslot:
+    description: Aktiviere einen Skill auf einen Skillslot
 
 permissions:
   gm.use:
@@ -162,5 +164,7 @@ permissions:
     default: not op
   myskills.use:
     default: not op
-  skills.use:
+  useskill.use:
+    default: not op
+  useskillslot.use:
     default: not op
