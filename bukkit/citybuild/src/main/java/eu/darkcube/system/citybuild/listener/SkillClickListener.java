@@ -60,7 +60,7 @@ public class SkillClickListener implements Listener {
         // Speichern Sie den Timer in der Map
         clickResetTasks.put(player, resetTask);
         long currentTime = System.currentTimeMillis();
-        if (lastClickTime.containsKey(player) && (currentTime - lastClickTime.get(player)) < 200) {
+        if (lastClickTime.containsKey(player) && (currentTime - lastClickTime.get(player)) < 10) {
             return;
         }
 
@@ -70,18 +70,18 @@ public class SkillClickListener implements Listener {
         switch (event.getAction()) {
             case RIGHT_CLICK_AIR:
             case RIGHT_CLICK_BLOCK:
-                pattern.add("R");
+                pattern.add("Ḧ");
                 break;
             case LEFT_CLICK_AIR:
             case LEFT_CLICK_BLOCK:
-                pattern.add("L");
+                pattern.add("ḧ");
                 break;
             default:
                 return;
         }
 
         // Muster bereinigen, wenn es nur Linksklicks enthält
-        while (pattern.size() > 0 && pattern.getFirst().equals("L")) {
+        while (pattern.size() > 0 && pattern.getFirst().equals("ḧ")) {
             pattern.poll();
         }
 
@@ -100,13 +100,13 @@ public class SkillClickListener implements Listener {
 
         // Check if the pattern matches one of the desired combinations
         int slot = -1;
-        if (pattern.equals(makePattern("R", "R", "R"))) {
+        if (pattern.equals(makePattern("Ḧ", "Ḧ", "Ḧ"))) {
             slot = 1;
-        } else if (pattern.equals(makePattern("R", "L", "R"))) {
+        } else if (pattern.equals(makePattern("Ḧ", "ḧ", "Ḧ"))) {
             slot = 2;
-        } else if (pattern.equals(makePattern("R", "R", "L"))) {
+        } else if (pattern.equals(makePattern("Ḧ", "Ḧ", "ḧ"))) {
             slot = 3;
-        } else if (pattern.equals(makePattern("R", "L", "L"))) {
+        } else if (pattern.equals(makePattern("Ḧ", "ḧ", "ḧ"))) {
             slot = 4;
         }
 
@@ -140,12 +140,12 @@ public class SkillClickListener implements Listener {
         boolean startAdding = false; // Ein Flag, um zu überprüfen, ob wir beginnen sollen, zum StringBuilder hinzuzufügen
 
         for (String action : pattern) {
-            if (action.equals("R")) {
+            if (action.equals("Ḧ")) {
                 startAdding = true;
             }
 
             if (startAdding) {
-                patternString.append(action).append("-");
+                patternString.append(action).append("Ḩ");
             }
         }
 
@@ -155,7 +155,7 @@ public class SkillClickListener implements Listener {
         }
 
         // Zeigen Sie es als Titel für den Spieler
-        player.sendTitle(ChatColor.GOLD + patternString.toString(), "", 10, 40, 10);
+        player.sendTitle("§x§4§e§5§c§2§4" + patternString.toString(), "", 3, 40, 3);
     }
 
     private LinkedList<String> makePattern(String... actions) {
