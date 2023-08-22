@@ -7,6 +7,7 @@
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class Scheduler implements Runnable {
 
@@ -15,12 +16,12 @@ public class Scheduler implements Runnable {
     private int weight;
     private Runnable run;
 
-    public Scheduler(WoolBattleBukkit woolbattle) {
+    public Scheduler(@NotNull WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         run = this;
     }
 
-    public Scheduler(WoolBattleBukkit woolbattle, Runnable run) {
+    public Scheduler(@NotNull WoolBattleBukkit woolbattle, @NotNull Runnable run) {
         this.woolbattle = woolbattle;
         this.run = run;
     }
@@ -35,11 +36,11 @@ public class Scheduler implements Runnable {
         if (task != null) task.setWeight(weight);
     }
 
-	public WoolBattleBukkit woolbattle() {
-		return woolbattle;
-	}
+    public WoolBattleBukkit woolbattle() {
+        return woolbattle;
+    }
 
-	public boolean isCancelled() {
+    public boolean isCancelled() {
         return task == null;
     }
 

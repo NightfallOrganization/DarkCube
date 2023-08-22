@@ -106,7 +106,7 @@ class DefaultWBUser implements WBUser {
     };
     private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<int[]>() {
         @Override public int[] deserialize(Document doc, String key) {
-            byte[] bytes = doc.readObject(key, byte[].class);
+            byte[] bytes = PersistentDataTypes.BYTE_ARRAY.deserialize(doc, key);
             IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
             int len = buf.get();
             int[] ar = new int[len];
@@ -122,7 +122,7 @@ class DefaultWBUser implements WBUser {
             ib.put(data.length);
             for (int i : data)
                 ib.put(i);
-            doc.append(key, buf.array());
+            PersistentDataTypes.BYTE_ARRAY.serialize(doc, key, buf.array());
         }
 
         @Override public int[] clone(int[] object) {

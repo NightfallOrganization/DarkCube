@@ -2,3 +2,4 @@ name: ChangePermissionMessage
 main: eu.darkcube.system.changepermissionmessage.Main
 version: 1.0
 author: DasBabyPixel
+api-version: 1.13
