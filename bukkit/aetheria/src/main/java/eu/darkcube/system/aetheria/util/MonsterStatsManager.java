@@ -8,10 +8,9 @@
 package eu.darkcube.system.aetheria.util;
 
 import eu.darkcube.system.aetheria.Aetheria;
-import eu.darkcube.system.aetheria.listener.SchadensAnzeigeListener;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -19,46 +18,87 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
-
-import org.bukkit.entity.Monster;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class MonsterStatsManager implements Listener {
-
-    private LevelXPManager levelXPManager;
-    private CustomHealthManager healthManager;
-    private final Map<LivingEntity, Map<Player, Double>> damageMap = new HashMap<>();
-    private DamageManager damageManager = new DamageManager();
-
-    public MonsterStatsManager(LevelXPManager levelXPManager, CustomHealthManager healthManager) {
-        this.levelXPManager = levelXPManager;
-        this.healthManager = healthManager;
-    }
 
     private static final String WORLD_NAME = "Beastrealm";
     private static final double HEALTH_UPDATE_THRESHOLD = 10.0;
     private static final UUID SPEED_MODIFIER_UUID = UUID.randomUUID();
 
+    private final NamespacedKey levelKey;
+    private CustomHealthManager healthManager;
+
+    public MonsterStatsManager(Aetheria aetheria, CustomHealthManager healthManager) {
+        this.healthManager = healthManager;
+        this.levelKey = new NamespacedKey(aetheria, "level");
+    }
+
+    /**
+     * Gets the level of the entity
+     *
+     * @param entity the entity to get the level from
+     * @return the level of the entity, -1 if the entity has no level
+     */
+    public int level(Entity entity) {
+        return entity.getPersistentDataContainer().getOrDefault(levelKey, PersistentDataType.INTEGER, -1);
+    }
+
+    /**
+     * Sets the level for an entity
+     */
+    public void level(Entity entity, int level) {
+        entity.getPersistentDataContainer().set(levelKey, PersistentDataType.INTEGER, level);
+        double maxHealth = level * 20;
+        healthManager.setHealth(entity, (int) maxHealth * 2);
+        healthManager.setMaxHealth(entity, (int) maxHealth * 2);
+        updateMonsterName(entity);
+        entity.setCustomName("§6Level §e" + level + " §7- §c100%");
+        entity.setCustomNameVisible(true);
+
+        // Equip skeleton with bow if monster is a skeleton
+        if (entity instanceof Skeleton skeleton) {
+            ItemStack bow = new ItemStack(Material.BOW);
+            skeleton.getEquipment().setItemInMainHand(bow);
+        }
+
+        if (entity instanceof LivingEntity livingEntity) {
+            if (level >= 10) {
+                equipRandomArmor(livingEntity, level);
+            }
+
+            // Modifikator für Geschwindigkeitserhöhung setzen
+            AttributeInstance attributeSpeed = livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+            if (attributeSpeed != null) {
+                attributeSpeed.setBaseValue(0.35); // Setze Geschwindigkeit auf den gewünschten Wert.
+            }
+
+            // Set the attack damage based on level
+            AttributeInstance attributeAttack = livingEntity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+            if (attributeAttack != null) {
+                attributeAttack.setBaseValue(level);
+            }
+        }
+    }
+
     @EventHandler public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getEntity() instanceof Zombie) {
-            Zombie zombie = (Zombie) event.getEntity();
-            if (zombie.isBaby()) {
+        if (event.getEntity() instanceof Zombie zombie) {
+            if (!zombie.isAdult()) {
                 event.setCancelled(true);
                 return;
             }
         }
 
-        if (!(event.getEntity() instanceof Monster)) {
+        if (!(event.getEntity() instanceof Monster monster)) {
             return;
         }
 
-        Monster monster = (Monster) event.getEntity();
         World world = monster.getWorld();
         if (!world.getName().equals(WORLD_NAME)) {
             return;
@@ -67,193 +107,9 @@ public class MonsterStatsManager implements Listener {
         Location spawnLocation = monster.getLocation();
         int level = calculateMonsterLevel(spawnLocation);
 
-        applyLevelToMonster(monster, level);
+        level(monster, level);
         equipMonster(monster, level);
 
-    }
-
-    @EventHandler public void onEntityDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Monster)) {
-            return;
-        }
-
-        Monster monster = (Monster) event.getEntity();
-        World world = monster.getWorld();
-        if (!world.getName().equals(WORLD_NAME)) {
-            return;
-        }
-
-        Bukkit.getScheduler().runTaskLater(Aetheria.getInstance(), () -> {
-            updateMonsterName(monster);
-        }, 1L);
-    }
-
-    @EventHandler public void onEntityDeath(EntityDeathEvent event) {
-        LivingEntity entity = event.getEntity();
-
-        if (!(entity instanceof Monster)) {
-            return;
-        }
-
-        World world = entity.getWorld();
-        if (!world.getName().equals("Beastrealm")) {
-            return;
-        }
-
-        // Holt die Schadensmap für das aktuelle Monster
-        Map<Player, Double> playerDamages = damageMap.get(entity);
-        if (playerDamages != null) {
-            // Ermittelt den Spieler, der dem Monster den meisten Schaden zugefügt hat
-            Player topDamager = playerDamages.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
-
-            if (topDamager != null) {
-                int level = calculateMonsterLevel(entity.getLocation());
-                double xp = levelXPManager.getXPForLevel(level);
-                double xpMultiplier = 0.005;
-                xp *= xpMultiplier;
-
-                levelXPManager.addXP(topDamager, xp);
-
-                // XP-Wert anzeigen
-                SchadensAnzeigeListener schadensAnzeigeListener = new SchadensAnzeigeListener();
-                schadensAnzeigeListener.zeigeXPWert(entity.getLocation(), xp);
-            }
-
-            damageMap.remove(entity);  // Entfernt das Monster aus der Schadensverfolgung, da es jetzt tot ist
-        }
-    }
-
-    @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        // Spieler fügt Schaden zu
-        if (event.getDamager() instanceof Player player) {
-            LivingEntity target = (LivingEntity) event.getEntity(); // TODO entity might not be a living entity
-
-            double playerDamage = damageManager.getDamage(player);
-
-            // Überprüfen, ob es ein Critical Hit war
-            if (!player.isInsideVehicle() && !player.isOnGround() && !player.isSprinting() && player.getFallDistance() > 0 && player.getAttackCooldown() == 1.0F) {
-                playerDamage *= 1.25; // 25% mehr Schaden für Crit
-            }
-
-            // Variieren Sie den Schaden um bis zu ±5%
-            Random rand = new Random();
-            double variation = 1 + (rand.nextDouble() * 0.1 - 0.05); // Dies ergibt einen Wert zwischen 0.95 und 1.05
-            playerDamage *= variation;
-
-            if (playerDamage > 0) {
-                event.setDamage(playerDamage);
-            }
-
-            damageMap.computeIfAbsent(target, k -> new HashMap<>()).merge(player, event.getFinalDamage(), Double::sum);
-            int currentHealth = healthManager.getMonsterHealth(target);
-            int newHealth = currentHealth - (int) Math.ceil(event.getFinalDamage());
-
-            if (newHealth <= 0) {
-                target.setHealth(0);
-            } else {
-                healthManager.setMonsterHealth(target, newHealth);
-                if (target instanceof Monster) {
-                    updateMonsterName((Monster) target);
-                }
-                event.setDamage(0.1);  // Setzen Sie den Schaden temporär auf einen geringen Wert
-            }
-        }
-
-        if (event.getDamager() instanceof Monster monster) {
-            LivingEntity target = (LivingEntity) event.getEntity();
-
-            // Abrufen des Levels des Monsters
-            String customName = monster.getCustomName();
-            int level = 1; // Standardwert, falls kein Level gefunden wird
-            if (customName != null) {
-                int levelStartIndex = customName.indexOf("§e") + 2;  // +2 to skip "§e"
-                int levelEndIndex = customName.indexOf(" ", levelStartIndex);
-                String levelString = customName.substring(levelStartIndex, levelEndIndex);
-                try {
-                    level = Integer.parseInt(levelString); // Erstes Gruppenmatch ist das Level
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            double monsterDamage = level * 2; // Dies setzt den Schaden entsprechend dem Level des Monsters
-
-            // Wenn das Ziel ein Spieler ist, wird der Schaden entsprechend angepasst.
-            if (target instanceof Player player) {
-                int currentHealth = healthManager.getHealth(player);
-                healthManager.setHealth(player, currentHealth - level);
-            }
-
-            event.setDamage(monsterDamage);
-
-        }
-
-        // Skelett schießt einen Pfeil
-        else if (event.getDamager() instanceof Arrow arrow) {
-            if (arrow.getShooter() instanceof Skeleton skeleton) {
-
-                // Abrufen des Levels des Skeletts
-                String customName = skeleton.getCustomName();
-                int level = 1; // Standardwert, falls kein Level gefunden wird
-                if (customName != null) {
-                    int levelStartIndex = customName.indexOf("§e") + 2;  // +2 to skip "§e"
-                    int levelEndIndex = customName.indexOf(" ", levelStartIndex);
-                    String levelString = customName.substring(levelStartIndex, levelEndIndex);
-                    try {
-                        level = Integer.parseInt(levelString); // Erstes Gruppenmatch ist das Level
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                double damage = event.getDamage() + level; // oder andere Anpassungen
-                event.setDamage(damage);
-            }
-        }
-
-        // Creeper Explosion
-        else if (event.getDamager() instanceof Creeper creeper) {
-
-            // Abrufen des Levels des Creepers
-            String customName = creeper.getCustomName();
-            int level = 1; // Standardwert, falls kein Level gefunden wird
-            if (customName != null) {
-                int levelStartIndex = customName.indexOf("§e") + 2;  // +2 to skip "§e"
-                int levelEndIndex = customName.indexOf(" ", levelStartIndex);
-                String levelString = customName.substring(levelStartIndex, levelEndIndex);
-                try {
-                    level = Integer.parseInt(levelString); // Erstes Gruppenmatch ist das Level
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            double damage = event.getDamage() + level; // oder andere Anpassungen
-            event.setDamage(damage);
-        }
-    }
-
-
-    @EventHandler public void onMonsterDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Monster) {
-            Monster monster = (Monster) event.getEntity();
-            int currentHealth = healthManager.getMonsterHealth(monster);
-            int newHealth = currentHealth - (int) event.getFinalDamage();
-            if (newHealth <= 0) {
-                monster.setHealth(0);
-            } else {
-                healthManager.setMonsterHealth(monster, newHealth);
-                updateMonsterName(monster);
-                event.setDamage(0.1);  // Setzen Sie den Schaden temporär auf einen geringen Wert
-            }
-        }
-    }
-
-    @EventHandler public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-        if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.CUSTOM) {
-            event.setCancelled(true);
-        }
     }
 
     private int calculateMonsterLevel(Location location) {
@@ -263,45 +119,9 @@ public class MonsterStatsManager implements Listener {
         return Math.max(1, distance / 300);
     }
 
-    private void applyLevelToMonster(Monster monster, int level) {
-        double maxHealth = level * 20;
-        healthManager.setMonsterHealth(monster, (int) maxHealth * 2);
-        healthManager.setMonsterMaxHealth(monster, (int) maxHealth * 2);
-        updateMonsterName(monster);
-        monster.setCustomName("§6Level §e" + level + " §7- §c100%");
-        monster.setCustomNameVisible(true);
-
-        // Modifikator für Geschwindigkeitserhöhung setzen
-        AttributeInstance attributeSpeed = monster.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        if (attributeSpeed != null) {
-            attributeSpeed.setBaseValue(0.35); // Setze Geschwindigkeit auf den gewünschten Wert.
-        }
-
-        // Set the attack damage based on level
-        AttributeInstance attributeAttack = monster.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-        if (attributeAttack != null) {
-            double attackDamage = level; // You can adjust this to fit your game's balance
-            attributeAttack.setBaseValue(attackDamage);
-        }
-
-        // Equip skeleton with bow if monster is a skeleton
-        if (monster instanceof Skeleton) {
-            Skeleton skeleton = (Skeleton) monster;
-            ItemStack bow = new ItemStack(Material.BOW);
-            skeleton.getEquipment().setItemInMainHand(bow);
-        }
-
-        if (monster instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) monster;
-            if (level >= 10) {
-                equipRandomArmor(livingEntity, level);
-            }
-        }
-    }
-
-    private void updateMonsterName(Monster monster) {
-        double maxHealth = healthManager.getMonsterMaxHealth(monster);
-        double currentHealth = healthManager.getMonsterHealth(monster);
+    public void updateMonsterName(Entity monster) {
+        double maxHealth = healthManager.getMaxHealth(monster);
+        double currentHealth = healthManager.getHealth(monster);
         double healthPercentage = (currentHealth / maxHealth) * 100;
 
         String customName = monster.getCustomName();

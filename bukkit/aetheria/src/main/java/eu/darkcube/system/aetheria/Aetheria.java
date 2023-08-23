@@ -29,11 +29,14 @@ public class Aetheria extends DarkCubePlugin {
     private ActionBarUtil actionBarUtil;
     private CustomItemManager customItemManager;
     private DefenseManager defenseManager;
-    private ResourcePackUtil resourcePackUtil = new ResourcePackUtil(this);
+    private ResourcePackUtil resourcePackUtil;
     private NamespacedKey aroundDamageKey;
     private ScoreboardManager scoreboardManager;
     private CorManager corManager;
+    private SchadensAnzeige schadensAnzeige;
+    private CustomSwordManager customSwordManager;
     private DamageManager damageManager;
+    private MonsterStatsManager monsterStatsManager;
     private CustomHealthManager healthManager;
 
     public Aetheria() {
@@ -41,7 +44,7 @@ public class Aetheria extends DarkCubePlugin {
         instance = this;
     }
 
-    public static Aetheria getInstance() {
+    @Deprecated public static Aetheria getInstance() {
         return instance;
     }
 
@@ -58,6 +61,7 @@ public class Aetheria extends DarkCubePlugin {
     }
 
     @Override public void onEnable() {
+        resourcePackUtil = new ResourcePackUtil(this);
         try {
             glyphWidthManager.loadGlyphDataFromClassLoader(getClassLoader(), "glyph-widths.bin");
         } catch (Throwable e) {
@@ -76,8 +80,9 @@ public class Aetheria extends DarkCubePlugin {
         this.defenseManager = new DefenseManager(this);
         corManager = new CorManager(this);
         scoreboardManager = new ScoreboardManager(this, levelXPManager, corManager);
-        CustomSword customSword = new CustomSword(this);
-        damageManager = new DamageManager();
+        customSwordManager = new CustomSwordManager(this);
+        damageManager = new DamageManager(this);
+        this.schadensAnzeige = new SchadensAnzeige();
 
         instance.getCommand("useskillslot").setExecutor(new UseSkillSlotCommand(skillManager));
         instance.getCommand("useskill").setExecutor(new UseSkillCommand(skillManager));
@@ -88,9 +93,9 @@ public class Aetheria extends DarkCubePlugin {
         instance.getCommand("setcor").setExecutor(new SetCorCommand(corManager));
         instance.getCommand("addcor").setExecutor(new AddCorCommand(corManager));
         instance.getCommand("mycor").setExecutor(new MyCorCommand(corManager));
-        instance.getCommand("resetdurability").setExecutor(new ResetDurabilityCommand(customSword));
+        instance.getCommand("resetdurability").setExecutor(new ResetDurabilityCommand(customSwordManager));
         instance.getCommand("spawnupgrader").setExecutor(new SpawnUpgraderCommand(this));
-        instance.getCommand("additemlevel").setExecutor(new AddItemLevelCommand(this, customSword));
+        instance.getCommand("additemlevel").setExecutor(new AddItemLevelCommand(this, customSwordManager));
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("heal").setExecutor(new HealCommand(healthManager));
         instance.getCommand("day").setExecutor(new DayCommand());
@@ -102,7 +107,7 @@ public class Aetheria extends DarkCubePlugin {
         instance.getCommand("trash").setExecutor(new TrashCommand());
         instance.getCommand("warp").setExecutor(new WarpCommand());
         instance.getCommand("spawn").setExecutor(new SpawnCommand());
-        instance.getCommand("getitem").setExecutor(new GetItemCommand());
+        instance.getCommand("getitem").setExecutor(new GetItemCommand(this));
         instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
         instance.getCommand("addxp").setExecutor(new AddXPCommand(this.levelXPManager));
         instance.getCommand("mylevel").setExecutor(new MyLevelCommand(this.levelXPManager));
@@ -127,12 +132,10 @@ public class Aetheria extends DarkCubePlugin {
         this.customItemManager = new CustomItemManager(this);
         this.customItemManager.registerItems();
 
-        new CustomSword(this);
-
         FlyCommand flyCommand = new FlyCommand();// 98
         this.getCommand("fly").setExecutor(flyCommand);
         (new RingOfHealingEffectApplier(this)).runTaskTimer(this, 0L, 1L);
-        MonsterStatsManager monsterLevelListener = new MonsterStatsManager(levelXPManager, healthManager);
+        monsterStatsManager = new MonsterStatsManager(this, healthManager);
         this.aroundDamageKey = new NamespacedKey(this, "AroundDamage");
         AroundDamageListener aroundDamageListenerWithKey = new AroundDamageListener(this, this.getAroundDamageKey());
         AroundDamageListener aroundDamageListener = new AroundDamageListener(this, this.getAroundDamageKey());
@@ -142,9 +145,10 @@ public class Aetheria extends DarkCubePlugin {
 
         this.getServer().getPluginManager().registerEvents(new SkillClickListener(skillManager), this);
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this::updateScoreboardsForAllOnlinePlayers, 0L, 90000L);
-        this.getServer().getPluginManager().registerEvents(new SchadensAnzeigeListener(), this);
+        this.getServer().getPluginManager().registerEvents(damageManager, this);
+        this.getServer().getPluginManager().registerEvents(schadensAnzeige, this);
         this.getServer().getPluginManager().registerEvents(flyCommand, this);
-        this.getServer().getPluginManager().registerEvents(monsterLevelListener, this);
+        this.getServer().getPluginManager().registerEvents(monsterStatsManager, this);
         this.getServer().getPluginManager().registerEvents(new CraftingTableListener(this), this);
         this.getServer().getPluginManager().registerEvents(new EntityHealListener(), this);
         this.getServer().getPluginManager().registerEvents(new SoundListener(), this);
@@ -196,6 +200,18 @@ public class Aetheria extends DarkCubePlugin {
         }
     }
 
+    public MonsterStatsManager monsterStatsManager() {
+        return monsterStatsManager;
+    }
+
+    public LevelXPManager levelXPManager() {
+        return levelXPManager;
+    }
+
+    public CustomSwordManager customSwordManager() {
+        return customSwordManager;
+    }
+
     public CorManager getCorManager() {
         return corManager;
     }
@@ -210,6 +226,10 @@ public class Aetheria extends DarkCubePlugin {
 
     public ActionBarUtil actionBarUtil() {
         return actionBarUtil;
+    }
+
+    public SchadensAnzeige schadensAnzeige() {
+        return schadensAnzeige;
     }
 
     public CustomHealthManager getHealthManager() {

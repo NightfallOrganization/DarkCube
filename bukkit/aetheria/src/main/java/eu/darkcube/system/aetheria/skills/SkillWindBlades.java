@@ -8,20 +8,20 @@
 package eu.darkcube.system.aetheria.skills;
 
 import org.bukkit.entity.Player;
+
 import java.util.HashMap;
 
 public class SkillWindBlades extends Skill {
 
     private static final long COOLDOWN_IN_SECONDS = 10; // 10 Sekunden als Beispiel. Sie können dies anpassen.
-    private HashMap<Player, Long> cooldowns;
+    private HashMap<Player, Long> cooldowns; // TODO use persistent data storage
 
     public SkillWindBlades() {
         super("Windklingen");
         this.cooldowns = new HashMap<>();
     }
 
-    @Override
-    public void activate(Player player) {
+    @Override public void activate(Player player) {
         if (canUse(player)) {
             // Hier fügen Sie die spezifische Funktionalität für den Windklingen-Skill hinzu.
             // Zum Beispiel könnten die Windklingen einen Schaden um den Spieler herum verursachen.

@@ -22,13 +22,13 @@ import java.util.UUID;
 
 public class ScoreboardManager {
 
-    private final Aetheria plugin;
+    private final Aetheria aetheria;
     private final LevelXPManager levelManager;
     private final CorManager corManager;
     private Map<UUID, Objective> playerObjectives = new HashMap<>();
 
-    public ScoreboardManager(Aetheria plugin, LevelXPManager levelManager, CorManager corManager) {
-        this.plugin = plugin;
+    public ScoreboardManager(Aetheria aetheria, LevelXPManager levelManager, CorManager corManager) {
+        this.aetheria = aetheria;
         this.levelManager = levelManager;
         this.corManager = corManager;
     }

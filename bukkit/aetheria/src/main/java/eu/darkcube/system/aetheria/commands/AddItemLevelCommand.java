@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.aetheria.commands;
 
-import eu.darkcube.system.aetheria.util.CustomSword;
+import eu.darkcube.system.aetheria.util.CustomSwordManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,11 +17,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AddItemLevelCommand implements CommandExecutor {
     private final JavaPlugin plugin;
-    private final CustomSword customSword;
+    private final CustomSwordManager customSwordManager;
 
-    public AddItemLevelCommand(JavaPlugin plugin, CustomSword customSword) {
+    public AddItemLevelCommand(JavaPlugin plugin, CustomSwordManager customSwordManager) {
         this.plugin = plugin;
-        this.customSword = customSword;
+        this.customSwordManager = customSwordManager;
     }
 
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -39,7 +39,7 @@ public class AddItemLevelCommand implements CommandExecutor {
 
         try {
             int levelToAdd = Integer.parseInt(args[0]);
-            customSword.increaseItemLevel(itemInHand, levelToAdd);
+            customSwordManager.increaseItemLevel(itemInHand, levelToAdd);
             player.sendMessage("§7Das Item-Level wurde erfolgreich erhöht!");
         } catch (NumberFormatException e) {
             player.sendMessage("§7Bitte gib eine gültige Zahl als Level ein");

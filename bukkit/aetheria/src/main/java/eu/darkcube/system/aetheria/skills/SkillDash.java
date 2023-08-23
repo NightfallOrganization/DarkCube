@@ -9,20 +9,20 @@ package eu.darkcube.system.aetheria.skills;
 
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
 import java.util.HashMap;
 
 public class SkillDash extends Skill {
 
     private static final long COOLDOWN_IN_SECONDS = 10; // Zum Beispiel 10 Sekunden
-    private HashMap<Player, Long> cooldowns;
+    private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillDash() {
         super("Dash");
         this.cooldowns = new HashMap<>();
     }
 
-    @Override
-    public void activate(Player player) {
+    @Override public void activate(Player player) {
         if (canUse(player)) {
             Vector direction = player.getLocation().getDirection();
 
@@ -40,7 +40,6 @@ public class SkillDash extends Skill {
             player.sendMessage("§7Du musst noch §a" + timeLeft + " §7Sekunden warten, bevor du diesen Skill wieder verwenden kannst");
         }
     }
-
 
     private boolean canUse(Player player) {
         if (!cooldowns.containsKey(player)) {

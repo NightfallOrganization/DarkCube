@@ -33,7 +33,6 @@ public class ResetLevelCommand implements CommandExecutor {
     private NamespacedKey healthKey;
     private NamespacedKey aroundDamageKey;
     private NamespacedKey defenseKey;
-    private NamespacedKey damageKey; // Hinzugefügt
 
     public ResetLevelCommand(LevelXPManager levelXPManager, CustomHealthManager healthManager, DefenseManager defenseManager, DamageManager damageManager, JavaPlugin plugin) {
         this.levelXPManager = levelXPManager;
@@ -46,7 +45,6 @@ public class ResetLevelCommand implements CommandExecutor {
         this.healthKey = new NamespacedKey(plugin, "HealthKey");
         this.aroundDamageKey = new NamespacedKey(plugin, "AroundDamageKey");
         this.defenseKey = new NamespacedKey(plugin, "DefenseKey");
-        this.damageKey = new NamespacedKey(plugin, "Damage"); // Hinzugefügt
     }
 
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -94,10 +92,7 @@ public class ResetLevelCommand implements CommandExecutor {
         defenseManager.resetDefense(target);
 
         // Setzen Sie den Damage-Wert des Spielers zurück
-        damageManager.resetDamage(target); // Falls Sie eine resetDamage-Methode in Ihrem DamageManager haben
-        // Oder setzen Sie den Wert direkt zurück:
-        PersistentDataContainer data = target.getPersistentDataContainer();
-        data.set(damageKey, PersistentDataType.DOUBLE, 0.0);
+        damageManager.resetDamage(target);
 
         target.setWalkSpeed(0.2f);
         target

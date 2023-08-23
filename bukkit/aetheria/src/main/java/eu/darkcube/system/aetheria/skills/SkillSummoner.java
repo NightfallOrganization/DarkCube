@@ -8,20 +8,20 @@
 package eu.darkcube.system.aetheria.skills;
 
 import org.bukkit.entity.Player;
+
 import java.util.HashMap;
 
 public class SkillSummoner extends Skill {
 
     private static final long COOLDOWN_IN_SECONDS = 15; // Zum Beispiel 15 Sekunden
-    private HashMap<Player, Long> cooldowns;
+    private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillSummoner() {
         super("Beschwörer");
         this.cooldowns = new HashMap<>();
     }
 
-    @Override
-    public void activate(Player player) {
+    @Override public void activate(Player player) {
         if (canUse(player)) {
             // Hier könnten Sie den Beschwörungs-Effekt hinzufügen. Zum Beispiel:
             // player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE); // Einen Zombie beschwören

@@ -174,7 +174,7 @@ public class AttributeCommand implements CommandExecutor, Listener {
                         break;
 
                     case "§dStrength":
-                        new DamageManager().addDamage(player, 5);  // Benutzerdefinierter Schaden um 3 erhöhen
+                        plugin.getDamageManager().addDamage(player, 5);  // Benutzerdefinierter Schaden um 3 erhöhen
                         levelManager.addAP(player, -1);
                         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                         PersistentDataContainer dataContainerStrength = player.getPersistentDataContainer();

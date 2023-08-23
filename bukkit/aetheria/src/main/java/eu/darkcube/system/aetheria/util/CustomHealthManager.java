@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.aetheria.util;
 
+import eu.darkcube.system.aetheria.Aetheria;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CustomHealthManager {
@@ -22,9 +22,9 @@ public class CustomHealthManager {
     private final NamespacedKey maxHealthKey;
     private final NamespacedKey regenKey;
     private final NamespacedKey aroundDamageKey;
-    private final JavaPlugin plugin;
+    private final Aetheria plugin;
 
-    public CustomHealthManager(JavaPlugin plugin) {
+    public CustomHealthManager(Aetheria plugin) {
         this.plugin = plugin;
         this.healthKey = new NamespacedKey(plugin, "health");
         this.maxHealthKey = new NamespacedKey(plugin, "max_health");
@@ -48,60 +48,34 @@ public class CustomHealthManager {
         }.runTaskTimer(this.plugin, 0L, 100L);  // 100 ticks = 5 seconds
     }
 
-    public void setHealth(Player player, int health) {
-        PersistentDataContainer data = player.getPersistentDataContainer();
-        data.set(healthKey, PersistentDataType.INTEGER, health);
-    }
-
-    public int getHealth(Player player) {
-        PersistentDataContainer data = player.getPersistentDataContainer();
-        if (data.has(healthKey, PersistentDataType.INTEGER)) {
-            return data.get(healthKey, PersistentDataType.INTEGER);
-        }
-        return 0;
-    }
-
-    public void resetRegen(Player player) {
+    public void resetRegen(Entity player) {
         setRegen(player, 1);
     }
 
-    public void resetHealth(Player player) {
+    public void resetHealth(Entity player) {
         setHealth(player, 20);  // Setzt die Gesundheit auf den Standardwert von 20
     }
 
-    public void resetMaxHealth(Player player) {
+    public void resetMaxHealth(Entity player) {
         setMaxHealth(player, 20);  // Hier setzen wir das Maximum Health auf den Standardwert 20
     }
 
-    public void setMaxHealth(Player player, int maxHealth) {
-        PersistentDataContainer data = player.getPersistentDataContainer();
-        data.set(maxHealthKey, PersistentDataType.INTEGER, maxHealth);
-    }
-
-    public void addMaxHealth(Player player, int healthToAdd) {
+    public void addMaxHealth(Entity player, int healthToAdd) {
         int currentMaxHealth = getMaxHealth(player);
         setMaxHealth(player, currentMaxHealth + healthToAdd);
     }
 
-    public int getMaxHealth(Player player) {
-        PersistentDataContainer data = player.getPersistentDataContainer();
-        if (data.has(maxHealthKey, PersistentDataType.INTEGER)) {
-            return data.get(maxHealthKey, PersistentDataType.INTEGER);
-        }
-        return 0;
-    }
-
-    public void setRegen(Player player, int regen) {
+    public void setRegen(Entity player, int regen) {
         PersistentDataContainer data = player.getPersistentDataContainer();
         data.set(regenKey, PersistentDataType.INTEGER, regen);
     }
 
-    public void addRegen(Player player, int regenToAdd) {
+    public void addRegen(Entity player, int regenToAdd) {
         int currentRegen = getRegen(player);
         setRegen(player, currentRegen + regenToAdd);
     }
 
-    public int getRegen(Player player) {
+    public int getRegen(Entity player) {
         PersistentDataContainer data = player.getPersistentDataContainer();
         if (data.has(regenKey, PersistentDataType.INTEGER)) {
             return data.get(regenKey, PersistentDataType.INTEGER);
@@ -109,11 +83,11 @@ public class CustomHealthManager {
         return 0;
     }
 
-    public void resetAroundDamage(Player player) {
+    public void resetAroundDamage(Entity player) {
         this.setAroundDamage(player, 0.0);
     }
 
-    public void setAroundDamage(Player player, double value) {
+    public void setAroundDamage(Entity player, double value) {
         PersistentDataContainer data = player.getPersistentDataContainer();
         if (!data.has(this.aroundDamageKey, PersistentDataType.DOUBLE)) {
             data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, 0.0);
@@ -122,17 +96,17 @@ public class CustomHealthManager {
         data.set(this.aroundDamageKey, PersistentDataType.DOUBLE, value);
     }
 
-    public void setMonsterHealth(LivingEntity monster, int health) {
+    public void setHealth(Entity monster, int health) {
         PersistentDataContainer data = monster.getPersistentDataContainer();
         data.set(healthKey, PersistentDataType.INTEGER, health);
     }
 
-    public void setMonsterMaxHealth(LivingEntity monster, int health) {
+    public void setMaxHealth(Entity monster, int health) {
         PersistentDataContainer data = monster.getPersistentDataContainer();
         data.set(maxHealthKey, PersistentDataType.INTEGER, health);
     }
 
-    public int getMonsterHealth(LivingEntity monster) {
+    public int getHealth(Entity monster) {
         PersistentDataContainer data = monster.getPersistentDataContainer();
         if (data.has(healthKey, PersistentDataType.INTEGER)) {
             return data.get(healthKey, PersistentDataType.INTEGER);
@@ -140,7 +114,7 @@ public class CustomHealthManager {
         return 0;
     }
 
-    public int getMonsterMaxHealth(LivingEntity monster) {
+    public int getMaxHealth(Entity monster) {
         PersistentDataContainer data = monster.getPersistentDataContainer();
         if (data.has(maxHealthKey, PersistentDataType.INTEGER)) {
             return data.get(maxHealthKey, PersistentDataType.INTEGER);
