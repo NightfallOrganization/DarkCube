@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class SkillVerticalDash extends Skill {
 
     private static final long COOLDOWN_IN_SECONDS = 10; // Zum Beispiel 10 Sekunden
-    private HashMap<Player, Long> cooldowns;
+    private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillVerticalDash() {
         super("VerticalDash");

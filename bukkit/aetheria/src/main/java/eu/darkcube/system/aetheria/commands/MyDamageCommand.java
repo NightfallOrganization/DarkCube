@@ -20,10 +20,10 @@ public class MyDamageCommand implements CommandExecutor {
         this.damageManager = damageManager;
     }
 
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player player) {
             double damage = this.damageManager.getDamage(player);
-            player.sendMessage("§7Du hast §a" + damage + " §7Damage");
+            player.sendMessage("§7Du hast §a" + Math.round(damage) + " §7Damage");
             return true;
         } else {
             sender.sendMessage("§7Dieser Befehl kann nur von einem §aSpieler §7ausgeführt werden");

@@ -8,39 +8,32 @@
 package eu.darkcube.system.aetheria.listener;
 
 import eu.darkcube.system.aetheria.Aetheria;
-import eu.darkcube.system.aetheria.util.SkillManager;
 import eu.darkcube.system.aetheria.skills.Skill;
-import org.bukkit.Material;
+import eu.darkcube.system.aetheria.util.SkillManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 public class SkillClickListener implements Listener {
     private SkillManager skillManager;
     private HashMap<Player, LinkedList<String>> clickPatterns = new HashMap<>();
-    private HashMap<Player, Long> lastClickTime = new HashMap<>();
+    private HashMap<Player, Long> lastClickTime = new HashMap<>(); // TODO use persistent data storage
     private HashMap<Player, BukkitTask> clickResetTasks = new HashMap<>();
 
     public SkillClickListener(SkillManager skillManager) {
         this.skillManager = skillManager;
     }
 
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    @EventHandler public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-
-        // Überprüfen, ob der Spieler ein Item in der Hand hat
-        if (player.getInventory().getItemInMainHand() == null || player.getInventory().getItemInMainHand().getType() == Material.AIR) {
-            return;
-        }
 
         if (clickResetTasks.containsKey(player)) {
             clickResetTasks.get(player).cancel();
@@ -49,8 +42,7 @@ public class SkillClickListener implements Listener {
 
         // Erstellen Sie einen neuen Timer für den Spieler, um den Klickzustand nach 3 Sekunden zurückzusetzen
         BukkitTask resetTask = new BukkitRunnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 clickPatterns.remove(player);  // Hier setzen wir das Klicken zurück
                 clickResetTasks.remove(player); // Entfernen Sie den Timer aus der Map, da er bereits ausgeführt wurde
             }
@@ -67,24 +59,17 @@ public class SkillClickListener implements Listener {
         LinkedList<String> pattern = clickPatterns.getOrDefault(player, new LinkedList<>());
 
         switch (event.getAction()) {
-            case RIGHT_CLICK_AIR:
-            case RIGHT_CLICK_BLOCK:
-                pattern.add("Ḧ");
-                break;
-            case LEFT_CLICK_AIR:
-            case LEFT_CLICK_BLOCK:
-                pattern.add("ḧ");
-                break;
-            default:
+            case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> pattern.add("Ḧ");
+            case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> pattern.add("ḧ");
+            default -> {
                 return;
+            }
         }
 
         // Muster bereinigen, wenn es nur Linksklicks enthält
-        while (pattern.size() > 0 && pattern.getFirst().equals("ḧ")) {
+        while (!pattern.isEmpty() && pattern.getFirst().equals("ḧ")) {
             pattern.poll();
         }
-
-
 
         clickPatterns.put(player, pattern);
 
@@ -122,18 +107,7 @@ public class SkillClickListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerAnimate(PlayerAnimationEvent event) {
-        if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-            Player player = event.getPlayer();
-            // Behandeln Sie dies als Rechtsklick in die Luft
-            // Hier können Sie Ihren bisherigen Code zum Hinzufügen zum Klickmuster und zum Überprüfen des Musters einfügen.
-            // Und nach dem Hinzufügen eines Klicks zum Muster:
-            showClickPatternTitle(player, clickPatterns.get(player)); // Da wir hier keinen lokalen "pattern" haben, rufen wir es direkt aus der Map auf.
-        }
-    }
-
-    private void showClickPatternTitle(Player player, LinkedList<String> pattern) {
+    private void showClickPatternTitle(Player player, List<String> pattern) {
         // Erzeugen Sie einen String aus dem aktuellen Muster
         StringBuilder patternString = new StringBuilder();
         boolean startAdding = false; // Ein Flag, um zu überprüfen, ob wir beginnen sollen, zum StringBuilder hinzuzufügen
@@ -149,19 +123,17 @@ public class SkillClickListener implements Listener {
         }
 
         // Entfernen Sie das letzte "-" Zeichen
-        if (patternString.length() > 0) {
+        if (!patternString.isEmpty()) {
             patternString.setLength(patternString.length() - 1);
         }
 
         // Zeigen Sie es als Titel für den Spieler
-        player.sendTitle("§x§4§e§5§c§2§4" + patternString.toString(), "", 3, 40, 3);
+        player.sendTitle("§x§4§e§5§c§2§4" + patternString, "", 3, 40, 3);
     }
 
     private LinkedList<String> makePattern(String... actions) {
         LinkedList<String> pattern = new LinkedList<>();
-        for (String action : actions) {
-            pattern.add(action);
-        }
+        Collections.addAll(pattern, actions);
         return pattern;
     }
 }

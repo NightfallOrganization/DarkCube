@@ -8,35 +8,38 @@
 package eu.darkcube.system.aetheria.skills;
 
 import eu.darkcube.system.aetheria.Aetheria;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import java.util.HashMap;
-import org.bukkit.util.Vector;
-import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Particle;
-import org.bukkit.Color;
+import org.bukkit.util.Vector;
+
+import java.util.HashMap;
 
 public class SkillAttraction extends Skill {
 
     private static final long COOLDOWN_IN_SECONDS = 20; // Zum Beispiel 15 Sekunden
-    private HashMap<Player, Long> cooldowns;
+    private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillAttraction() {
         super("Schwarzes Loch");
         this.cooldowns = new HashMap<>();
     }
 
-    @Override
-    public void activate(Player player) {
+    @Override public void activate(Player player) {
         if (canUse(player)) {
             Vector direction = player.getLocation().getDirection().setY(0).normalize().multiply(5);
             Location targetLocation = player.getLocation().add(direction);
             Block targetBlock = targetLocation.getBlock();
 
             // Normales Gras und Tall_Gras ignorieren
-            while(targetBlock.getType().isAir() || targetBlock.getType().name().equals("GRASS") || targetBlock.getType().name().equals("TALL_GRASS")) {
+            while (targetBlock.getType().isAir() || targetBlock.getType().name().equals("GRASS") || targetBlock
+                    .getType()
+                    .name()
+                    .equals("TALL_GRASS")) {
                 targetBlock = targetBlock.getRelative(0, -1, 0);
             }
 
@@ -48,11 +51,15 @@ public class SkillAttraction extends Skill {
                 new BukkitRunnable() {
                     int ticksRun = 0; // Die Anzahl der Ticks, die der Runnable bereits ausgeführt wurde
 
-                    @Override
-                    public void run() {
+                    @Override public void run() {
                         for (Entity entity : player.getNearbyEntities(15, 15, 15)) {
                             if (!(entity instanceof Player)) {
-                                Vector directionToTarget = finalTargetBlock.getLocation().toVector().subtract(entity.getLocation().toVector()).normalize().multiply(0.5);
+                                Vector directionToTarget = finalTargetBlock
+                                        .getLocation()
+                                        .toVector()
+                                        .subtract(entity.getLocation().toVector())
+                                        .normalize()
+                                        .multiply(0.5);
                                 entity.setVelocity(directionToTarget);
                             }
                         }
@@ -61,8 +68,6 @@ public class SkillAttraction extends Skill {
                         if (ticksRun >= 20 * 5) {  // 5 Sekunden (20 Ticks = 1 Sekunde)
                             this.cancel();  // Stoppt den Runnable, nachdem er 5 Sekunden lang ausgeführt wurde
                         }
-
-
 
                         // Partikel-Effekt hinzufügen
                         double angle = 2 * Math.PI * ticksRun / 20.0; // Ein voller Kreis pro Sekunde
@@ -95,11 +100,14 @@ public class SkillAttraction extends Skill {
                                 double x = Math.cos(offsetAngle) * radius;
                                 double z = Math.sin(offsetAngle) * radius;
 
-                                player.getWorld().spawnParticle(Particle.REDSTONE, finalTargetBlock.getLocation().add(x, 1.5, z), 1, 0, 0, 0, 0, dustOptions);
+                                player
+                                        .getWorld()
+                                        .spawnParticle(Particle.REDSTONE, finalTargetBlock
+                                                .getLocation()
+                                                .add(x, 1.5, z), 1, 0, 0, 0, 0, dustOptions);
                             }
                         }
                     }
-
 
                 }.runTaskTimer(Aetheria.getInstance(), 0L, 1L);  // startet sofort und wiederholt sich jeden Tick
 
@@ -112,7 +120,6 @@ public class SkillAttraction extends Skill {
             player.sendMessage("§7Du musst noch §a" + timeLeft + " §7Sekunden warten, bevor du diesen Skill wieder verwenden kannst");
         }
     }
-
 
     private boolean canUse(Player player) {
         if (!cooldowns.containsKey(player)) {

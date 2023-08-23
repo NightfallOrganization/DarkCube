@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) 2023. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.aetheria.commands;
 
-import eu.darkcube.system.aetheria.util.CustomSword;
+import eu.darkcube.system.aetheria.util.CustomSwordManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,30 +18,30 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class ResetDurabilityCommand implements CommandExecutor {
 
-    private final CustomSword customSword;
+    private final CustomSwordManager customSwordManager;
 
-    public ResetDurabilityCommand(CustomSword customSword) {
-        this.customSword = customSword;
+    public ResetDurabilityCommand(CustomSwordManager customSwordManager) {
+        this.customSwordManager = customSwordManager;
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+    @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage("§cDieser Befehl kann nur von einem Spieler ausgeführt werden!");
             return true;
         }
 
-        Player player = (Player) sender;
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (item != null && item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
-            if (meta.getPersistentDataContainer().has(customSword.durabilityKey, PersistentDataType.INTEGER)) {
-                int maxDurability = customSword.getMaxDurabilityOfSword(item);
-                meta.getPersistentDataContainer().set(customSword.durabilityKey, PersistentDataType.INTEGER, maxDurability);
+            if (meta.getPersistentDataContainer().has(customSwordManager.durabilityKey, PersistentDataType.INTEGER)) {
+                int maxDurability = customSwordManager.getMaxDurabilityOfSword(item);
+                meta.getPersistentDataContainer().set(customSwordManager.durabilityKey, PersistentDataType.INTEGER, maxDurability);
                 item.setItemMeta(meta);
                 player.sendMessage("§aDurability wurde zurückgesetzt!");
-                customSword.updateSwordLore(item, meta.getPersistentDataContainer().getOrDefault(customSword.itemLevelKey, PersistentDataType.INTEGER, 0));
+                customSwordManager.updateSwordLore(item, meta
+                        .getPersistentDataContainer()
+                        .getOrDefault(customSwordManager.itemLevelKey, PersistentDataType.INTEGER, 0));
                 return true;
             }
         }

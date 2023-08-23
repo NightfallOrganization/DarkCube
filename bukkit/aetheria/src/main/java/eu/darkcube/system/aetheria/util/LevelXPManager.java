@@ -14,16 +14,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class LevelXPManager implements Listener {
 
-    private JavaPlugin plugin;
+    private Aetheria aetheria;
     private ScoreboardManager scoreboardManager;
 
-    public LevelXPManager(JavaPlugin plugin, CorManager corManager) {
-        this.plugin = plugin;
-        this.scoreboardManager = new ScoreboardManager((Aetheria) plugin, this, corManager);
+    public LevelXPManager(Aetheria aetheria, CorManager corManager) {
+        this.aetheria = aetheria;
+        this.scoreboardManager = new ScoreboardManager(aetheria, this, corManager);
     }
 
     public int getXPForLevel(int level) {
@@ -33,9 +32,9 @@ public class LevelXPManager implements Listener {
     }
 
     public void addXP(Player player, double amount) {
-        NamespacedKey xpKey = new NamespacedKey(plugin, "xp");
-        NamespacedKey levelKey = new NamespacedKey(plugin, "level");
-        NamespacedKey apKey = new NamespacedKey(plugin, "ap"); // Neuer AP Schlüssel
+        NamespacedKey xpKey = new NamespacedKey(aetheria, "xp");
+        NamespacedKey levelKey = new NamespacedKey(aetheria, "level");
+        NamespacedKey apKey = new NamespacedKey(aetheria, "ap"); // Neuer AP Schlüssel
 
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         double currentXP = pdc.getOrDefault(xpKey, PersistentDataType.DOUBLE, 0.0);
@@ -68,8 +67,8 @@ public class LevelXPManager implements Listener {
     }
 
     public void resetXP(Player player) {
-        NamespacedKey xpKey = new NamespacedKey(plugin, "xp");
-        NamespacedKey levelKey = new NamespacedKey(plugin, "level");
+        NamespacedKey xpKey = new NamespacedKey(aetheria, "xp");
+        NamespacedKey levelKey = new NamespacedKey(aetheria, "level");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         pdc.set(xpKey, PersistentDataType.DOUBLE, 0.0);
         pdc.set(levelKey, PersistentDataType.INTEGER, 0);
@@ -78,25 +77,25 @@ public class LevelXPManager implements Listener {
     }
 
     public void resetAP(Player player) {
-        NamespacedKey apKey = new NamespacedKey(plugin, "ap");
+        NamespacedKey apKey = new NamespacedKey(aetheria, "ap");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         pdc.set(apKey, PersistentDataType.INTEGER, 0);
     }
 
     public double getXP(Player player) {
-        NamespacedKey xpKey = new NamespacedKey(plugin, "xp");
+        NamespacedKey xpKey = new NamespacedKey(aetheria, "xp");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         return pdc.getOrDefault(xpKey, PersistentDataType.DOUBLE, 0.0);
     }
 
     public int getAP(Player player) {
-        NamespacedKey apKey = new NamespacedKey(plugin, "ap");
+        NamespacedKey apKey = new NamespacedKey(aetheria, "ap");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         return pdc.getOrDefault(apKey, PersistentDataType.INTEGER, 0);
     }
 
     public void addAP(Player player, int amount) {
-        NamespacedKey apKey = new NamespacedKey(plugin, "ap");
+        NamespacedKey apKey = new NamespacedKey(aetheria, "ap");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         int currentAP = pdc.getOrDefault(apKey, PersistentDataType.INTEGER, 0);
         int newAP = currentAP + amount;
@@ -108,25 +107,25 @@ public class LevelXPManager implements Listener {
     }
 
     public void resetAttribute(Player player, String attributeKey) {
-        NamespacedKey key = new NamespacedKey(plugin, attributeKey);
+        NamespacedKey key = new NamespacedKey(aetheria, attributeKey);
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         pdc.set(key, PersistentDataType.DOUBLE, 0.0);
     }
 
     public double getAttribute(Player player, String attributeKey) {
-        NamespacedKey key = new NamespacedKey(plugin, attributeKey);
+        NamespacedKey key = new NamespacedKey(aetheria, attributeKey);
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         return pdc.getOrDefault(key, PersistentDataType.DOUBLE, 0.0);
     }
 
     public void setAttribute(Player player, String attributeKey, double value) {
-        NamespacedKey key = new NamespacedKey(plugin, attributeKey);
+        NamespacedKey key = new NamespacedKey(aetheria, attributeKey);
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         pdc.set(key, PersistentDataType.DOUBLE, value);
     }
 
     public int getLevel(Player player) {
-        NamespacedKey levelKey = new NamespacedKey(plugin, "level");
+        NamespacedKey levelKey = new NamespacedKey(aetheria, "level");
         PersistentDataContainer pdc = player.getPersistentDataContainer();
         return pdc.getOrDefault(levelKey, PersistentDataType.INTEGER, 0);
     }
