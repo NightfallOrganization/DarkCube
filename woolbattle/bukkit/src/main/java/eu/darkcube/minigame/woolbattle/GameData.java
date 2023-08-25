@@ -50,7 +50,7 @@ public class GameData {
         return forceMap;
     }
 
-    public void forceMap(Map forceMap) {
+    public void forceMap(@Nullable Map forceMap) {
         updateMap(forceMap, m -> this.forceMap = m, true);
     }
 
@@ -66,7 +66,7 @@ public class GameData {
         return votedMap;
     }
 
-    public void votedMap(Map votedMap) {
+    public void votedMap(@Nullable Map votedMap) {
         updateMap(votedMap, m -> this.votedMap = m, false);
     }
 
@@ -74,7 +74,7 @@ public class GameData {
         WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setEpGlitch(woolbattle, u));
     }
 
-    private void updateMap(Map newMap, Consumer<Map> setter, boolean force) {
+    private void updateMap(@Nullable Map newMap, Consumer<@Nullable Map> setter, boolean force) {
         Map oldMap = map();
         if (woolbattle.lobby().enabled()) {
             setter.accept(newMap);
@@ -83,23 +83,27 @@ public class GameData {
             if (oldMap == null) throw new Error("Old Map is null");
             if (newMap == oldMap) return;
             Map map = map(newMap, force);
-            woolbattle.mapLoader().loadMap(map).thenRun(() -> {
-                setter.accept(map);
-                if (!woolbattle.ingame().enabled()) {
-                    woolbattle.mapLoader().unloadMap(map);
-                    return;
-                }
-                for (WBUser user : WBUser.onlineUsers()) {
-                    user.getBukkitEntity().teleport(user.getTeam().getSpawn(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                }
-                woolbattle.mapLoader().unloadMap(oldMap);
-            });
+            if (map == null) {
+                System.out.println("Ignoring trying to set the map to null while Ingame");
+            } else {
+                woolbattle.mapLoader().loadMap(map).thenRun(() -> {
+                    setter.accept(map);
+                    if (!woolbattle.ingame().enabled()) {
+                        woolbattle.mapLoader().unloadMap(map);
+                        return;
+                    }
+                    for (WBUser user : WBUser.onlineUsers()) {
+                        user.getBukkitEntity().teleport(user.getTeam().getSpawn(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    }
+                    woolbattle.mapLoader().unloadMap(oldMap);
+                });
+            }
         } else {
             setter.accept(newMap);
         }
     }
 
-    private Map map(Map newMap, boolean force) {
+    private Map map(@Nullable Map newMap, boolean force) {
         if (force) return newMap;
         if (forceMap != null) return forceMap;
         return newMap;

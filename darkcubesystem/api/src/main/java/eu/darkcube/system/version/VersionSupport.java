@@ -29,5 +29,4 @@ public class VersionSupport {
         version = ReflectionUtils.instantiateObject(cls);
         version.init();
     }
-
 }

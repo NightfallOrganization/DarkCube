@@ -27,21 +27,23 @@ public class Scheduler implements Runnable {
     }
 
     public void cancel() {
-        if (!isCancelled()) task.cancel();
-        task = null;
+        if (isRunning()) {
+            task.cancel();
+            task = null;
+        }
     }
 
-    public void setWeight(int weight) {
+    public void weight(int weight) {
         this.weight = weight;
-        if (task != null) task.setWeight(weight);
+        if (task != null) task.weight(weight);
     }
 
     public WoolBattleBukkit woolbattle() {
         return woolbattle;
     }
 
-    public boolean isCancelled() {
-        return task == null;
+    public boolean isRunning() {
+        return task != null;
     }
 
     public void runTask() {

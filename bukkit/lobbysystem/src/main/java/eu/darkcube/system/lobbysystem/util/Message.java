@@ -10,77 +10,78 @@ import eu.darkcube.system.BaseMessage;
 
 public enum Message implements BaseMessage {
 
-	LOADED,
-	SERVER_NOT_STARTED,
-	INVENTORY_NAME_DAILY_REWARD,
-	REWARD_COINS,
-	REWARD_ALREADY_USED,
-	PSERVER_ITEM_TITLE,
-	CLICK_TO_JOIN,
-	PSERVER_NOT_PUBLIC,
-	CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE,
-	PSERVEROWN_STATUS,
-	STATE_OFFLINE,
-	STATE_STARTING,
-	STATE_RUNNING,
-	STATE_STOPPING,
-	STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER,
-	CONNECTOR_NPC_NOT_FOUND,
-	CONNECTOR_NPC_REMOVED,
-	CONNECTOR_NPC_CREATED,
-	CONNECTOR_NPC_PERMISSION_ADDED,
-	CONNECTOR_NPC_PERMISSION_REMOVED,
-	CONNECTOR_NPC_PERMISSION_LIST,
-	CONNECTOR_NPC_SERVER_STARTING,
-	CONNECTOR_NPC_SERVER_ONLINE,
-	CONNECTOR_NPC_SERVER_DESCRIPTION,
-	STATE_LOBBY,
-	STATE_INGAME,
-	GAMESERVER_STATE;
+    LOADED,
+    SERVER_NOT_STARTED,
+    INVENTORY_NAME_DAILY_REWARD,
+    REWARD_COINS,
+    REWARD_ALREADY_USED,
+    PSERVER_ITEM_TITLE,
+    CLICK_TO_JOIN,
+    PSERVER_NOT_PUBLIC,
+    CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE,
+    PSERVEROWN_STATUS,
+    STATE_OFFLINE,
+    STATE_STARTING,
+    STATE_RUNNING,
+    STATE_STOPPING,
+    STOP_OTHER_PSERVER_BEFORE_STARTING_ANOTHER,
+    CONNECTOR_NPC_NOT_FOUND,
+    CONNECTOR_NPC_REMOVED,
+    CONNECTOR_NPC_CREATED,
+    CONNECTOR_NPC_V2_SET,
+    CONNECTOR_NPC_V2_UNSET,
+    CONNECTOR_NPC_PERMISSION_ADDED,
+    CONNECTOR_NPC_PERMISSION_REMOVED,
+    CONNECTOR_NPC_PERMISSION_LIST,
+    CONNECTOR_NPC_SERVER_STARTING,
+    CONNECTOR_NPC_SERVER_ONLINE,
+    CONNECTOR_NPC_SERVER_DESCRIPTION,
+    SERVER_NOT_FOUND,
+    STATE_LOBBY,
+    STATE_INGAME,
+    GAMESERVER_STATE;
 
-	public static final String PREFIX_ITEM = "ITEM_";
-	public static final String PREFIX_LORE = "LORE_";
-	public static final String KEY_PREFIX = "LOBBY_";
+    public static final String PREFIX_ITEM = "ITEM_";
+    public static final String PREFIX_LORE = "LORE_";
+    public static final String KEY_PREFIX = "LOBBY_";
 
-	private final String key;
+    private final String key;
 
-	Message() {
-		key = name();
-	}
+    Message() {
+        key = name();
+    }
 
-	@Override
-	public String getPrefixModifier() {
-		return KEY_PREFIX;
-	}
+    @Override public String getPrefixModifier() {
+        return KEY_PREFIX;
+    }
 
-	@Override
-	public String key() {
-		return key;
-	}
+    @Override public String key() {
+        return key;
+    }
 
-	// public static final String getMessage(String key, Language language,
-	// String... replacements) {
-	// try {
-	// String msg = language.getBundle().getString(key);
-	// if (msg.equals("[]")) {
-	// return " ";
-	// }
-	// for (int i = 0; msg.contains("{}")
-	// && i < replacements.length; i++) {
-	// msg = msg.replaceFirst("\\{\\}", replacements[i]);
-	// }
-	// return ChatColor.translateAlternateColorCodes('&', msg);
-	// } catch (Exception ex) {
-	// StringBuilder builder = new StringBuilder();
-	// builder.append(key);
-	// if (replacements.length > 0) {
-	// for (int i = 0; i + 1 < replacements.length; i++) {
-	// builder.append(replacements[i]).append(',');
-	// }
-	// builder.append(replacements[replacements.length
-	// - 1]).append(']');
-	// }
-	// return builder.toString();
-	// }
-	// }
+    // public static final String getMessage(String key, Language language,
+    // String... replacements) {
+    // try {
+    // String msg = language.getBundle().getString(key);
+    // if (msg.equals("[]")) {
+    // return " ";
+    // }
+    // for (int i = 0; msg.contains("{}")
+    // && i < replacements.length; i++) {
+    // msg = msg.replaceFirst("\\{\\}", replacements[i]);
+    // }
+    // return ChatColor.translateAlternateColorCodes('&', msg);
+    // } catch (Exception ex) {
+    // StringBuilder builder = new StringBuilder();
+    // builder.append(key);
+    // if (replacements.length > 0) {
+    // for (int i = 0; i + 1 < replacements.length; i++) {
+    // builder.append(replacements[i]).append(',');
+    // }
+    // builder.append(replacements[replacements.length
+    // - 1]).append(']');
+    // }
+    // return builder.toString();
+    // }
+    // }
 }

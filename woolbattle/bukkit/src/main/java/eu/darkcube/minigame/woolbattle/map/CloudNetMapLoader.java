@@ -14,6 +14,7 @@ import eu.cloudnetservice.driver.template.TemplateStorageProvider;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -53,7 +54,7 @@ public class CloudNetMapLoader implements MapLoader {
         }
     }
 
-    @Override public CompletableFuture<Void> loadMap(Map map) {
+    @Override public CompletableFuture<Void> loadMap(@NotNull Map map) {
         if (map.ingameData() != null) throw new IllegalStateException("Map already loaded");
         DefaultMap dmap = (DefaultMap) map;
         Path rootFolder = Paths.get("anything").toAbsolutePath().normalize().getParent();
@@ -98,7 +99,7 @@ public class CloudNetMapLoader implements MapLoader {
         });
     }
 
-    @Override public CompletableFuture<Void> save(Map map) {
+    @Override public CompletableFuture<Void> save(@NotNull Map map) {
         MapIngameData ingameData = map.ingameData();
         if (ingameData == null) throw new IllegalArgumentException("Map not loaded");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -139,7 +140,7 @@ public class CloudNetMapLoader implements MapLoader {
         });
     }
 
-    @Override public void unloadMap(Map map) {
+    @Override public void unloadMap(@NotNull Map map) {
         DefaultMap dmap = (DefaultMap) map;
         World world = dmap.ingameData().world();
         dmap.ingameData(null);

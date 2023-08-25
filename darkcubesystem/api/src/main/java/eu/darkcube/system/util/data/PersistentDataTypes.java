@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public class PersistentDataTypes {
-    public static final PersistentDataType<BigInteger> BIGINTEGER = new PersistentDataType<BigInteger>() {
+    public static final PersistentDataType<BigInteger> BIGINTEGER = new PersistentDataType<>() {
         @Override public BigInteger deserialize(Document doc, String key) {
             return doc.readObject(key, BigInteger.class);
         }
@@ -29,7 +29,21 @@ public class PersistentDataTypes {
             return object;
         }
     };
-    public static final PersistentDataType<Document> DOCUMENT = new PersistentDataType<Document>() {
+    public static final PersistentDataType<UUID> UUID = new PersistentDataType<>() {
+        @Override public UUID deserialize(Document doc, String key) {
+            long[] a = doc.readObject(key, long[].class);
+            return new UUID(a[0], a[1]);
+        }
+
+        @Override public void serialize(Document.Mutable doc, String key, UUID data) {
+            doc.append(key, new long[]{data.getMostSignificantBits(), data.getLeastSignificantBits()});
+        }
+
+        @Override public UUID clone(UUID object) {
+            return object;
+        }
+    };
+    public static final PersistentDataType<Document> DOCUMENT = new PersistentDataType<>() {
         @Override public Document deserialize(Document doc, String key) {
             return doc.readDocument(key);
         }
@@ -42,7 +56,7 @@ public class PersistentDataTypes {
             return object.immutableCopy();
         }
     };
-    public static final PersistentDataType<String> STRING = new PersistentDataType<String>() {
+    public static final PersistentDataType<String> STRING = new PersistentDataType<>() {
         @Override public String deserialize(Document doc, String key) {
             return doc.getString(key);
         }
@@ -55,7 +69,7 @@ public class PersistentDataTypes {
             return object;
         }
     };
-    public static final PersistentDataType<byte[]> BYTE_ARRAY = new PersistentDataType<byte[]>() {
+    public static final PersistentDataType<byte[]> BYTE_ARRAY = new PersistentDataType<>() {
         @Override public byte[] deserialize(Document doc, String key) {
             return doc.readObject(key, byte[].class);
         }
@@ -68,7 +82,7 @@ public class PersistentDataTypes {
             return object.clone();
         }
     };
-    public static final PersistentDataType<Boolean> BOOLEAN = new PersistentDataType<Boolean>() {
+    public static final PersistentDataType<Boolean> BOOLEAN = new PersistentDataType<>() {
         @Override public Boolean deserialize(Document doc, String key) {
             return doc.getBoolean(key);
         }
@@ -81,7 +95,7 @@ public class PersistentDataTypes {
             return object;
         }
     };
-    public static final PersistentDataType<Integer> INTEGER = new PersistentDataType<Integer>() {
+    public static final PersistentDataType<Integer> INTEGER = new PersistentDataType<>() {
 
         @Override public Integer deserialize(Document doc, String key) {
             return doc.getInt(key);
@@ -95,7 +109,7 @@ public class PersistentDataTypes {
             return object;
         }
     };
-    public static final PersistentDataType<Long> LONG = new PersistentDataType<Long>() {
+    public static final PersistentDataType<Long> LONG = new PersistentDataType<>() {
         @Override public Long deserialize(Document doc, String key) {
             return doc.getLong(key);
         }
@@ -108,7 +122,7 @@ public class PersistentDataTypes {
             return object;
         }
     };
-    public static final PersistentDataType<Double> DOUBLE = new PersistentDataType<Double>() {
+    public static final PersistentDataType<Double> DOUBLE = new PersistentDataType<>() {
         @Override public Double deserialize(Document doc, String key) {
             return doc.getDouble(key);
         }
@@ -121,7 +135,7 @@ public class PersistentDataTypes {
             return object;
         }
     };
-    public static final PersistentDataType<Location> LOCATION = new PersistentDataType<Location>() {
+    public static final PersistentDataType<Location> LOCATION = new PersistentDataType<>() {
 
         @Override public Location deserialize(Document doc, String key) {
             Document d = doc.readDocument(key);
@@ -130,7 +144,7 @@ public class PersistentDataTypes {
             double z = d.getDouble("z");
             float yaw = d.getFloat("yaw");
             float pitch = d.getFloat("pitch");
-            World world = Bukkit.getWorld(UUID.fromString(d.getString("world")));
+            World world = Bukkit.getWorld(java.util.UUID.fromString(d.getString("world"))); // TODO Upgrade
             return new Location(world, x, y, z, yaw, pitch);
         }
 

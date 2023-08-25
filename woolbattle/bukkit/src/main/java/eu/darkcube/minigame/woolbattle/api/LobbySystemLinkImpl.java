@@ -7,20 +7,20 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
-import eu.cloudnetservice.driver.ComponentInfo;
-import eu.cloudnetservice.driver.DriverEnvironment;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import eu.cloudnetservice.driver.channel.ChannelMessage;
 import eu.cloudnetservice.driver.channel.ChannelMessageSender;
-import eu.cloudnetservice.driver.channel.ChannelMessageTarget;
+import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.event.events.channel.ChannelMessageReceiveEvent;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.network.buffer.DataBuf;
 import eu.cloudnetservice.modules.bridge.BridgeServiceHelper;
-import eu.cloudnetservice.modules.bridge.player.PlayerManager;
-import eu.cloudnetservice.modules.bridge.player.executor.PlayerExecutor;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
+import eu.darkcube.minigame.woolbattle.GameData;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
@@ -29,29 +29,46 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.GameState;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.time.Duration;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class LobbySystemLinkImpl implements LobbySystemLink {
-    private static final String CHANNEL = "lobbysystem_connector";
 
     private final WoolBattleBukkit woolbattle;
     private final UpdateTask updateTask;
     private final RequestListener requestListener = new RequestListener();
+    private final Cache<UUID, ConnectionRequest> connectionRequests;
     private boolean fullyLoaded = false;
     private boolean enabled = false;
 
     public LobbySystemLinkImpl(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         this.updateTask = new UpdateTask(woolbattle);
+        this.connectionRequests = Caffeine
+                .newBuilder()
+                .scheduler(com.github.benmanes.caffeine.cache.Scheduler.systemScheduler())
+                .expireAfterWrite(Duration.ofSeconds(10))
+                .removalListener(newRemovalListener())
+                .build();
+    }
+
+    private RemovalListener<UUID, ConnectionRequest> newRemovalListener() {
+        return (ignoredUUID, value, cause) -> {
+            if (cause.wasEvicted()) { // Connection timeout
+                schedule(() -> {
+                    woolbattle.lobby().checkUnload();
+                });
+            }
+        };
     }
 
     @Override public boolean enabled() {
@@ -83,17 +100,67 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     @Override public void update() {
         if (!fullyLoaded) return;
         if (!enabled) return;
-        DarkCubeBukkit.gameState(gameState());
+        GameState gameState = gameState();
+        DarkCubeBukkit.gameState(gameState);
         DarkCubeBukkit.playingPlayers().set(playingPlayers());
         DarkCubeBukkit.maxPlayingPlayers().set(woolbattle.maxPlayers());
         ServiceInfoHolder serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
         BridgeServiceHelper serviceHelper = InjectionLayer.ext().instance(BridgeServiceHelper.class);
         serviceHelper.maxPlayers().set(1000);
         DarkCubeBukkit.displayName("LobbyV2");
+        DarkCubeBukkit.extra(root -> {
+            Document.Mutable doc = Document.newJsonDocument();
+            GameData gameData = woolbattle.gameData();
+            @Nullable MapSize gameDataSize = gameData.mapSize();
+            if (gameState == GameState.LOBBY) {
+                if (gameDataSize == null) {
+                    Set<MapSize> knownByMaps = woolbattle.mapManager().getMaps().stream().map(Map::size).collect(Collectors.toSet());
+                    for (MapSize mapSize : knownByMaps) {
+                        write(doc, mapSize);
+                    }
+                } else {
+                    @Nullable Map map = gameData.map();
+                    if (map == null) {
+                        write(doc, gameDataSize);
+                    } else {
+                        write(doc, map);
+                    }
+                }
+            }
+
+            root.append("LobbyV2", doc);
+        });
         serviceInfoHolder.publishServiceInfoUpdate();
     }
 
-    private Component displayName(@NotNull Map map) {
+    public Cache<UUID, ConnectionRequest> connectionRequests() {
+        return connectionRequests;
+    }
+
+    private void write(@NotNull Document.Mutable doc, @NotNull MapSize mapSize) {
+        Map map = woolbattle.mapManager().defaultRandomPersistentMap(mapSize);
+        if (map == null) return;
+        write(doc, map);
+    }
+
+    private void write(@NotNull Document.Mutable doc, @NotNull Map map) {
+        doc.append(map.size().toString(), createEntry(map));
+    }
+
+    @NotNull private Document createEntry(@NotNull Map map) {
+        MapSize mapSize = map.size();
+        Document.Mutable protocol = Document.newJsonDocument();
+        protocol.append("mapSize", mapSize);
+
+        Document.Mutable entry = Document.newJsonDocument();
+        entry.append("displayName", GsonComponentSerializer.gson().serialize(displayName(map)));
+        entry.append("onlinePlayers", 0);
+        entry.append("maxPlayers", mapSize.teams() * mapSize.teamSize());
+        entry.append("document", protocol);
+        return entry;
+    }
+
+    @NotNull private Component displayName(@NotNull Map map) {
         return Component
                 .text(map.getName(), NamedTextColor.LIGHT_PURPLE)
                 .append(Component.space())
@@ -118,132 +185,57 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         else new Scheduler(woolbattle, runnable).runTask();
     }
 
-    private void requestIds(ChannelMessageSender sender) {
-        DataBuf.Mutable buffer = DataBuf.empty();
-        boolean gameSizeLoaded = woolbattle.gameData().mapSize() != null;
-
-        if (gameSizeLoaded) fillGameSize(buffer);
-        else fillGameSizeUnknown(buffer);
-
-        ChannelMessage message = ChannelMessage.builder().target(sender.type(), sender.name()).channel(CHANNEL).buffer(buffer).build();
-        message.send();
-    }
-
-    private void fillGameSizeUnknown(DataBuf.Mutable buffer) {
-        java.util.Map<MapSize, Collection<Map>> maps = new HashMap<>();
-        for (Map map : woolbattle.mapManager().getMaps()) {
-            if (!map.isEnabled()) continue;
-            maps.computeIfAbsent(map.size(), k -> new ArrayList<>()).add(map);
-        }
-        buffer.writeByte((byte) 0); // 0 to indicate that we have not selected a GameSize
-        buffer.writeInt(maps.size()); // Count
-
-        for (java.util.Map.Entry<MapSize, Collection<Map>> entry : maps.entrySet()) {
-            fillGameSizeUnknownMaps(buffer, entry.getKey(), entry.getValue()); // Fill every single map
-        }
-    }
-
-    private void fillGameSizeUnknownMaps(DataBuf.Mutable buffer, MapSize size, Collection<Map> maps) {
-        buffer.writeInt(size.teams() * size.teamSize()); // Max players for following maps
-        buffer.writeString(size.toString()); // Textual representation of the GameSize
-        buffer.writeInt(maps.size()); // Count, again
-
-        for (Map map : maps) {
-            buffer.writeString(map.getName());
-        }
-    }
-
-    private void fillGameSize(DataBuf.Mutable buffer) {
-        MapSize size = woolbattle.gameData().mapSize();
-        Map map = woolbattle.gameData().map();
-        String mapName = map == null ? null : map.getName();
-
-        buffer.writeByte((byte) 1); // 1 to indicate that we have selected a GameSize
-        buffer.writeString(size.toString()); // Textual representation of the GameSize
-        buffer.writeInt(size.teams() * size.teamSize()); // Max player count
-        buffer.writeByte((byte) (mapName == null ? 0 : 1));
-        if (mapName != null) buffer.writeString(mapName); // Text to display
-    }
-
-    private void connectionFailed(@NotNull ChannelMessageSender sender, int requestId, @NotNull String reason, @NotNull String arg) {
-        DataBuf.Mutable buffer = DataBuf.empty();
-        buffer.writeInt(requestId);
-        buffer.writeString(reason);
-        buffer.writeString(arg);
-        send("connection_failed", sender, buffer);
-    }
-
-    private void connectionSuccess(@NotNull ChannelMessageSender sender, int requestId) {
-        DataBuf.Mutable buffer = DataBuf.empty();
-        buffer.writeInt(requestId);
-        send("connection_success", sender, buffer);
-    }
-
-    private void workingOnRequest(@NotNull ChannelMessageSender sender, int requestId) {
-        DataBuf.Mutable buffer = DataBuf.empty();
-        buffer.writeInt(requestId);
-        send("working_on_request", sender, buffer);
-    }
-
-    private void send(@NotNull String message, @NotNull ChannelMessageSender target, @Nullable DataBuf buffer) {
-        DriverEnvironment environment = target.type();
-        ChannelMessageTarget.Type type = environment == DriverEnvironment.NODE ? ChannelMessageTarget.Type.NODE : ChannelMessageTarget.Type.SERVICE;
-        ChannelMessageTarget realTarget = ChannelMessageTarget.of(type, target.name());
-        send(message, realTarget, buffer);
-    }
-
-    private void send(@NotNull String message, @NotNull ChannelMessageTarget target, @Nullable DataBuf buffer) {
-        ChannelMessage channelMessage = ChannelMessage.builder().target(target).channel(CHANNEL).message(message).buffer(buffer).build();
-        channelMessage.send();
+    public record ConnectionRequest(UUID player) {
     }
 
     private class RequestListener {
 
+        private void response(ChannelMessageSender target, UUID requestId, int status, @Nullable String message) {
+            DataBuf.Mutable buffer = DataBuf.empty().writeUniqueId(requestId).writeInt(status);
+            if (message != null) buffer.writeString(message);
+            ChannelMessage
+                    .builder()
+                    .target(target.toTarget())
+                    .channel("darkcube_lobbysystem_v2")
+                    .message("connection_request_status")
+                    .buffer(buffer)
+                    .build()
+                    .send();
+        }
+
         @EventListener public void handle(ChannelMessageReceiveEvent event) {
-            if (!event.channel().equals(CHANNEL)) return;
+            if (!event.channel().equals("darkcube_lobbysystem_v2")) return;
             @NotNull String msg = event.message();
             @NotNull ChannelMessageSender sender = event.sender();
-            if (msg.equals("request_ids")) {
-                schedule(() -> requestIds(sender));
-            } else if (msg.equals("connect_player")) {
+            if (msg.equals("start_connection_request")) {
                 @NotNull DataBuf buffer = event.content();
-                int requestId = buffer.readInt();
-                @NotNull UUID uuid = buffer.readUniqueId();
-                @NotNull String mapSizeString = buffer.readString();
-                @NotNull String mapString = buffer.readString();
-
-                @Nullable MapSize mapSize = MapSize.fromString(mapSizeString);
+                @NotNull UUID requestId = buffer.readUniqueId();
+                @NotNull UUID playerUniqueId = buffer.readUniqueId();
+                @NotNull Document protocolDocument = buffer.readObject(Document.class);
+                @Nullable MapSize mapSize = protocolDocument.readObject("mapSize", MapSize.class);
                 if (mapSize == null) {
-                    connectionFailed(sender, requestId, "invalid_target", mapSizeString);
+                    response(sender, requestId, 0, "invalid_protocol");
                     return;
                 }
-
-                @Nullable Map map = woolbattle.mapManager().getMap(mapString, mapSize);
-                if (map == null) {
-                    connectionFailed(sender, requestId, "invalid_target_map", mapString);
-                    return;
-                }
-
-                workingOnRequest(sender, requestId);
-
+                ConnectionRequest connectionRequest = new ConnectionRequest(playerUniqueId);
+                connectionRequests.put(requestId, connectionRequest);
+                response(sender, requestId, 1, null);
                 schedule(() -> {
                     if (!woolbattle.lobby().enabled()) {
-                        connectionFailed(sender, requestId, "user_defined", "game_already_started");
+                        response(sender, requestId, 0, "out_of_date");
                         return;
                     }
                     @Nullable MapSize loadedMapSize = woolbattle.gameData().mapSize();
                     if (loadedMapSize != null) {
                         if (!loadedMapSize.equals(mapSize)) {
-                            connectionFailed(sender, requestId, "invalid_data", mapSizeString);
+                            response(sender, requestId, 0, "out_of_date");
                             return;
                         }
                         // Game is already loaded with the MapSize. Only joining is left to do
                     } else {
                         woolbattle.lobby().loadGame(mapSize);
                     }
-                    PlayerManager playerManager = InjectionLayer.boot().instance(PlayerManager.class);
-                    PlayerExecutor executor = playerManager.playerExecutor(uuid);
-                    executor.connect(InjectionLayer.boot().instance(ComponentInfo.class).componentName());
+                    response(sender, requestId, 2, null);
                 });
             }
         }

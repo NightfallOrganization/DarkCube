@@ -17,11 +17,8 @@ import eu.cloudnetservice.modules.bridge.event.BridgeProxyPlayerLoginEvent;
 import eu.cloudnetservice.modules.bridge.player.CloudOfflinePlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import eu.darkcube.system.packetapi.PacketAPI;
-import eu.darkcube.system.userapi.packets.PacketQueryUser;
+import eu.darkcube.system.userapi.packets.*;
 import eu.darkcube.system.userapi.packets.PacketQueryUser.Result;
-import eu.darkcube.system.userapi.packets.PacketUserPersistentDataRemove;
-import eu.darkcube.system.userapi.packets.PacketUserPersistentDataSet;
-import eu.darkcube.system.userapi.packets.PacketUserPersistentDataUpdate;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +31,6 @@ public class UserAPI {
 
     private final ConcurrentHashMap<UUID, ModuleUser> users = new ConcurrentHashMap<>();
     private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("userapi_users");
-    private final PlayerManager playerManager = InjectionLayer.boot().instance(ServiceRegistry.class).firstProvider(PlayerManager.class);
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
 
     public UserAPI() {
@@ -42,15 +38,15 @@ public class UserAPI {
             modifyUser(packet.getUniqueId(), user -> {
                 user.getStorage().lock.writeLock().lock();
                 user.getStorage().data.append(packet.getData());
+                new PacketUserPersistentDataMerge(user.getUniqueId(), user.getStorage().data.immutableCopy()).sendAsync();
                 user.getStorage().lock.writeLock().unlock();
-                new PacketUserPersistentDataUpdate(user.getUniqueId(), user.getStorage().data.immutableCopy()).sendAsync();
             });
             return null;
         });
         PacketAPI.getInstance().registerHandler(PacketUserPersistentDataRemove.class, packet -> {
             modifyUser(packet.getUniqueId(), user -> {
                 user.getStorage().data.remove(packet.getKey().toString());
-                new PacketUserPersistentDataUpdate(user.getUniqueId(), user.getStorage().data.immutableCopy()).sendAsync();
+                new PacketNWUserPersistentDataRemove(user.getUniqueId(), packet.getKey()).sendAsync();
             });
             return null;
         });
@@ -101,6 +97,7 @@ public class UserAPI {
         entry.append("name", user.getName());
         entry.append("uuid", user.getUniqueId().toString());
         user.getStorage().lock.readLock().lock();
+        runnable.run();
         entry.append("persistentData", user.getStorage().data.immutableCopy());
         user.getStorage().lock.readLock().unlock();
         database.insertAsync(user.getUniqueId().toString(), entry);
@@ -124,7 +121,11 @@ public class UserAPI {
             }
         }
         if (useCloud) {
-            CloudOfflinePlayer player = playerManager.offlinePlayer(uuid);
+            CloudOfflinePlayer player = InjectionLayer
+                    .boot()
+                    .instance(ServiceRegistry.class)
+                    .firstProvider(PlayerManager.class)
+                    .offlinePlayer(uuid);
             if (player != null) {
                 name = player.name();
             } else {

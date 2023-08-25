@@ -11,23 +11,16 @@ import com.github.unldenis.hologram.line.Line;
 import com.github.unldenis.hologram.line.TextLine;
 import com.github.unldenis.hologram.placeholder.Placeholders;
 import eu.cloudnetservice.driver.document.Document;
-import eu.cloudnetservice.driver.event.EventListener;
-import eu.cloudnetservice.driver.event.EventManager;
-import eu.cloudnetservice.driver.event.events.service.CloudServiceLifecycleChangeEvent;
-import eu.cloudnetservice.driver.event.events.service.CloudServiceUpdateEvent;
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.cloudnetservice.driver.provider.CloudServiceProvider;
-import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
-import eu.cloudnetservice.driver.service.ServiceLifeCycle;
-import eu.darkcube.system.DarkCubeServiceProperty;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.npc.ConnectorNPC.CurrentServer.Info;
 import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.lobbysystem.util.MinigameServerSortingInfo;
+import eu.darkcube.system.lobbysystem.util.server.DefaultServerInformationV2;
+import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.lobbysystem.util.server.ServerManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.AsyncExecutor;
-import eu.darkcube.system.util.GameState;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -36,12 +29,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConnectorNPC {
@@ -51,11 +44,12 @@ public class ConnectorNPC {
     private static final NpcFlag<ConnectorNPC> flagConnectorNpc = NpcFlag.flag("connectorNpc", null);
     private static final PersistentDataType<List<String>> strings = PersistentDataTypes.list(PersistentDataTypes.STRING);
     private static final AtomicInteger uidCounter = new AtomicInteger();
-    private static final PersistentDataType<List<ConnectorNPC>> type = PersistentDataTypes.list(new PersistentDataType<ConnectorNPC>() {
+    private static final PersistentDataType<List<ConnectorNPC>> type = PersistentDataTypes.list(new PersistentDataType<>() {
         @Override public ConnectorNPC deserialize(Document doc, String key) {
             Document d = doc.readDocument(key);
             int id = d.getInt("id");
             String taskName = d.getString("task");
+            String v2Key = d.getString("v2key");
             List<String> permissions;
             if (d.contains("permissions")) {
                 permissions = strings.deserialize(d, "permissions");
@@ -68,7 +62,7 @@ public class ConnectorNPC {
                 permissions = new ArrayList<>();
             }
             Location loc = PersistentDataTypes.LOCATION.deserialize(d, "location");
-            return new ConnectorNPC(taskName, id, loc, permissions);
+            return new ConnectorNPC(taskName, id, loc, permissions, v2Key);
         }
 
         @Override public void serialize(Document.Mutable doc, String key, ConnectorNPC data) {
@@ -76,18 +70,15 @@ public class ConnectorNPC {
             d.append("task", data.taskName);
             strings.serialize(d, "permissions", data.permissions);
             d.append("id", data.id);
+            if (data.v2Key != null) d.append("v2key", data.v2Key);
             PersistentDataTypes.LOCATION.serialize(d, "location", data.location);
             doc.append(key, d);
         }
 
         @Override public ConnectorNPC clone(ConnectorNPC object) {
-            return new ConnectorNPC(object.taskName, object.id, object.location, object.permissions);
+            return new ConnectorNPC(object.taskName, object.id, object.location, object.permissions, object.v2Key);
         }
     });
-
-    static {
-        InjectionLayer.boot().instance(EventManager.class).registerListener(new Listener());
-    }
 
     private final Location location;
     private final String taskName;
@@ -99,12 +90,14 @@ public class ConnectorNPC {
     private NPCManagement.NPC npc;
     private CHologram hologram;
     private NPCKnockbackThread npcKnockbackThread;
+    private String v2Key = null;
 
-    private ConnectorNPC(String taskName, int id, Location location, List<String> permissions) {
+    private ConnectorNPC(String taskName, int id, Location location, List<String> permissions, String v2Key) {
         this.taskName = taskName;
         this.id = id;
         this.location = location;
         this.permissions.addAll(permissions);
+        this.v2Key = v2Key;
     }
 
     public ConnectorNPC(String taskName, Location location) {
@@ -170,9 +163,9 @@ public class ConnectorNPC {
         new BukkitRunnable() {
             @Override public void run() {
                 User user = UserAPI.getInstance().getUser(player);
-                Info c = currentServer.server;
+                ServerInformation c = currentServer.server;
                 if (c == null) return;
-                Lobby.getInstance().playerManager().playerExecutor(user.getUniqueId()).connect(c.server.serviceId().name());
+                c.connectPlayer(user.getUniqueId());
             }
         }.runTask(Lobby.getInstance());
     }
@@ -183,21 +176,16 @@ public class ConnectorNPC {
         NPCManagement.Builder builder = Lobby.getInstance().npcManagement().builder();
         if (uid == -1) uid = uidCounter.incrementAndGet();
         builder.profileHelper().skin(new DailyRewardNPC.DailyRewardSkin()).name("§8NPC-" + uid);
-        builder.trackingRule((n, player) -> {
-            if (!permissions.isEmpty()) {
-                for (String permission : permissions) {
-                    if (player.hasPermission(permission)) return true;
-                }
-                return false;
-            }
-            return true;
+        builder.trackingRule((ignoredNpc, player) -> {
+            if (permissions.isEmpty()) return true;
+            for (String permission : permissions) if (player.hasPermission(permission)) return true;
+            return false;
         });
         npc = builder.build();
         npc.flagValue(flagConnectorNpc, this);
         npc.location(location);
         hologram = createHologram(location);
         (npcKnockbackThread = new NPCKnockbackThread(npc)).runTaskTimer(Lobby.getInstance(), 5, 5);
-        AsyncExecutor.service().submit(currentServer::query);
     }
 
     private void updateHologram() {
@@ -216,12 +204,6 @@ public class ConnectorNPC {
     }
 
     private CHologram createHologram(Location location) {
-//        Hologram hologram = new Hologram(Lobby.getInstance(), location, new TextBlockStandardLoader());
-//        Placeholders placeholders = hologramPlaceholders();
-//        TextLine line = new TextLine(new Line(Lobby.getInstance()), "test");
-//        TextLine line2 = new TextLine(new Line(Lobby.getInstance()), "%%online%%", placeholders);
-//        TextLine line3 = new TextLine(new Line(Lobby.getInstance()), "%%description%%", placeholders);
-//        hologram.load(line, line2, line3);
         CHologram hologram = new CHologram(hologramPlaceholders());
         hologram.location(location);
         return hologram;
@@ -230,22 +212,24 @@ public class ConnectorNPC {
     private Placeholders hologramPlaceholders() {
         Placeholders h = new Placeholders(Placeholders.STRING);
         h.add("%%online%%", p -> {
-            int online, maxplayers;
-            Info info = currentServer.server;
-            if (info != null) {
-                online = info.minigame.onPlayers;
-                maxplayers = info.minigame.maxPlayers;
-            } else {
+            ServerInformation info = currentServer.server;
+            if (info == null) {
                 return Message.CONNECTOR_NPC_SERVER_STARTING.getMessageString(UserAPI.getInstance().getUser(p));
             }
+            int online = info.onlinePlayers();
+            int maxPlayers = info.maxPlayers();
             return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(UserAPI
                     .getInstance()
-                    .getUser(p), online, maxplayers == -1 ? 100 : maxplayers);
+                    .getUser(p), online, maxPlayers == -1 ? 100 : maxPlayers);
         });
         h.add("%%description%%", p -> {
-            Info server = currentServer.server;
+            ServerInformation server = currentServer.server;
             if (server != null) {
-                return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(UserAPI.getInstance().getUser(p), server.motd);
+                Component displayName = server.displayName();
+                return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(UserAPI.getInstance().getUser(p), Component
+                        .empty()
+                        .append(displayName == null ? Component.text(server.taskName()) : displayName)
+                        .applyFallbackStyle(Style.style(NamedTextColor.LIGHT_PURPLE)));
             }
             return " ";
         });
@@ -256,40 +240,43 @@ public class ConnectorNPC {
         return hologram;
     }
 
-    public static class Listener {
-        private static final Map<UUID, ServiceInfoSnapshot> services = new ConcurrentHashMap<>();
+    public String v2Key() {
+        return v2Key;
+    }
 
-        static {
-            for (ServiceInfoSnapshot service : InjectionLayer.boot().instance(CloudServiceProvider.class).services()) {
-                services.put(service.serviceId().uniqueId(), service);
+    public void v2Key(String v2key) {
+        this.v2Key = v2key;
+    }
+
+    public void update() {
+        currentServer.update(Lobby.getInstance().serverManager().informations());
+    }
+
+    public static class UpdateListener implements ServerManager.UpdateListener {
+        @Override public void update(Collection<? extends ServerInformation> informations) {
+            for (ConnectorNPC npc : npcs) {
+                npc.currentServer.update(informations);
             }
         }
+    }
 
-        @EventListener public void handle(CloudServiceUpdateEvent event) {
-            ServiceInfoSnapshot service = event.serviceInfo();
-            services.computeIfPresent(service.serviceId().uniqueId(), (uuid, serviceInfoSnapshot) -> {
-                if (!AsyncExecutor.service().isShutdown()) {
-                    AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
-                }
-                return service;
-            });
-        }
+    public class CurrentServer {
 
-        @EventListener public void handle(CloudServiceLifecycleChangeEvent event) {
-            if (event.newLifeCycle() == ServiceLifeCycle.RUNNING) {
-                services.put(event.serviceInfo().serviceId().uniqueId(), event.serviceInfo());
-                System.out.println("[ConnectorNPC] Server connected: " + event.serviceInfo().serviceId().name());
-                if (!AsyncExecutor.service().isShutdown()) {
-                    AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
-                }
-            } else if (event.lastLifeCycle() == ServiceLifeCycle.RUNNING) {
-                System.out.println("[ConnectorNPC] Server disconnected: " + event.serviceInfo().serviceId().name());
-                ServiceInfoSnapshot snap = services.remove(event.serviceInfo().serviceId().uniqueId());
-                if (snap == null) System.err.println("Failed to remove from services!!!");
-                if (!AsyncExecutor.service().isShutdown()) {
-                    AsyncExecutor.service().submit(() -> npcs.forEach(n -> n.currentServer.query()));
-                }
+        private volatile ServerInformation server = null;
+
+        private void update(Collection<? extends ServerInformation> informations) {
+            Stream<? extends ServerInformation> stream = informations
+                    .stream()
+                    .filter(ServerInformation.filterByTask(taskName))
+                    .filter(ServerInformation.ONLINE_FILTER);
+            if (v2Key != null) {
+                stream = stream.filter(i -> {
+                    if (!(i instanceof DefaultServerInformationV2 v2)) return false;
+                    return v2.key().equals(v2Key);
+                });
             }
+            server = stream.min(ServerInformation.COMPARATOR).orElse(null);
+            updateHologram();
         }
     }
 
@@ -343,72 +330,6 @@ public class ConnectorNPC {
         public void hide(Player player) {
             online.hide(player);
             if (descriptionVisible) description.hide(player);
-        }
-    }
-
-    public class CurrentServer {
-
-        private volatile Info server = null;
-        private volatile Info newServer = null;
-
-        private void query() {
-            Collection<ServiceInfoSnapshot> servers = Listener.services
-                    .values()
-                    .stream()
-                    .filter(s -> s.serviceId().taskName().equals(taskName))
-                    .collect(Collectors.toSet());
-            Map<ServiceInfoSnapshot, GameState> states = new HashMap<>();
-            for (ServiceInfoSnapshot server : new ArrayList<>(servers)) {
-                try {
-                    GameState state = server.readProperty(DarkCubeServiceProperty.GAME_STATE);
-                    if (state == null) {
-                        continue;
-                    }
-                    states.put(server, state);
-                } catch (Exception ex) {
-                    servers.remove(server);
-                }
-            }
-            List<Info> sortingInfos = new ArrayList<>();
-            for (ServiceInfoSnapshot server : new HashSet<>(servers)) {
-                int playingPlayers = server.readProperty(DarkCubeServiceProperty.PLAYING_PLAYERS);
-                int maxPlayingPlayers = server.readProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS);
-
-                GameState state = states.get(server);
-                String motd = server.readProperty(DarkCubeServiceProperty.DISPLAY_NAME);
-                if (motd == null || motd
-                        .toLowerCase()
-                        .contains("loading") || (state != GameState.INGAME && server.readProperty(DarkCubeServiceProperty.AUTOCONFIGURED))) {
-                    servers.remove(server);
-                    states.remove(server);
-                    continue;
-                }
-                sortingInfos.add(new Info(new MinigameServerSortingInfo(playingPlayers, maxPlayingPlayers, state), server, "§d" + motd));
-            }
-            Collections.sort(sortingInfos);
-            this.newServer = sortingInfos.stream().findFirst().orElse(null);
-            new BukkitRunnable() {
-                @Override public void run() {
-                    server = newServer;
-                    updateHologram();
-                }
-            }.runTask(Lobby.getInstance());
-        }
-
-        class Info implements Comparable<Info> {
-            private final MinigameServerSortingInfo minigame;
-            private final ServiceInfoSnapshot server;
-            private final String motd;
-
-            public Info(MinigameServerSortingInfo minigame, ServiceInfoSnapshot server, String motd) {
-                this.minigame = minigame;
-                this.server = server;
-                this.motd = motd;
-            }
-
-            @Override public int compareTo(@NotNull ConnectorNPC.CurrentServer.Info o) {
-                return minigame.compareTo(o.minigame);
-            }
         }
     }
 }

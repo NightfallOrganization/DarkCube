@@ -96,6 +96,10 @@ public class Lobby extends GamePhase {
     }
 
     public void unloadGame() {
+        unloadGame(true);
+    }
+
+    public void unloadGame(boolean publishUpdate) {
         if (woolbattle.gameData() == null) return;
         MapSize mapSize = woolbattle.gameData().mapSize();
         if (mapSize == null) return;
@@ -103,10 +107,14 @@ public class Lobby extends GamePhase {
             woolbattle.teamManager().unloadTeam(team);
         }
         woolbattle.gameData().mapSize(null);
+        woolbattle.gameData().votedMap(null);
+        woolbattle.gameData().forceMap(null);
+        System.out.println("Unloaded Game");
+        if (publishUpdate) woolbattle.lobbySystemLink().update();
     }
 
     public void loadGame(MapSize mapSize) {
-        unloadGame();
+        unloadGame(false);
         woolbattle.gameData().mapSize(mapSize);
         int i = 0;
         for (TeamType teamType : woolbattle.teamManager().teamTypes(mapSize)) {
@@ -118,6 +126,18 @@ public class Lobby extends GamePhase {
         recalculateMap();
         recalculateEpGlitch();
         WBUser.onlineUsers().forEach(this::setupScoreboard);
+        woolbattle.lobbySystemLink().update();
+        System.out.println("Loaded game " + mapSize);
+    }
+
+    public void checkUnload() {
+        int online = Bukkit.getOnlinePlayers().size();
+        if (online != 0) return;
+        woolbattle.lobbySystemLink().connectionRequests().cleanUp();
+        if (!woolbattle.lobbySystemLink().connectionRequests().asMap().isEmpty()) return;
+        if (woolbattle.gameData().mapSize() == null) return;
+        if (!enabled()) return;
+        unloadGame(true);
     }
 
     public void setupScoreboard(WBUser user) {
@@ -210,7 +230,7 @@ public class Lobby extends GamePhase {
                 .filter(m -> m.vote.isEnabled())
                 .collect(Collectors.toList()), woolbattle
                 .mapManager()
-                .getMaps()
+                .getMaps(woolbattle.gameData().mapSize())
                 .stream()
                 .filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
                 .collect(Collectors.toSet()), woolbattle.gameData().map());

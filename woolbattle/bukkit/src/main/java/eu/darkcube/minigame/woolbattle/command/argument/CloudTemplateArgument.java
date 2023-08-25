@@ -68,9 +68,9 @@ public class CloudTemplateArgument implements ArgumentType<ServiceTemplate> {
             Collection<CompletableFuture<Collection<ServiceTemplate>>> templatesFutures = new ArrayList<>();
             for (String storageName : s) {
                 TemplateStorage storage = provider.templateStorage(storageName);
-                templatesFutures.add(storage.templatesAsync());
+                if (storage != null) templatesFutures.add(storage.templatesAsync());
             }
-            return CompletableFuture.allOf(templatesFutures.toArray(new CompletableFuture[0])).thenApply(v -> {
+            return CompletableFuture.allOf(templatesFutures.toArray(new CompletableFuture[0])).thenApply(ignored -> {
                 Collection<ServiceTemplate> built = new ArrayList<>();
                 for (CompletableFuture<Collection<ServiceTemplate>> fut : templatesFutures) {
                     built.addAll(fut.getNow(null));

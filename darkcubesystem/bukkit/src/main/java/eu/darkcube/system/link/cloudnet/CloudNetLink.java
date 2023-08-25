@@ -16,25 +16,23 @@ import eu.darkcube.system.util.GameState;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
-import java.util.logging.Logger;
-
 public class CloudNetLink extends Link {
-    private final Logger logger = Logger.getLogger("CloudNetLink");
+    private final DarkCubeSystem system;
     private Listener listener;
 
-    public CloudNetLink() throws Throwable {
+    public CloudNetLink(DarkCubeSystem system) throws Throwable {
+        this.system = system;
     }
 
     @Override protected void link() {
         EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
         eventManager.registerListener(listener = new Listener());
         InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();
-
     }
 
     @Override protected void onEnable() {
-        Bukkit.getPluginManager().registerEvents(listener, DarkCubeSystem.getInstance());
-        Bukkit.getScheduler().runTask(DarkCubeSystem.getInstance(), () -> {
+        Bukkit.getPluginManager().registerEvents(listener, system);
+        Bukkit.getScheduler().runTask(system, () -> {
             if (DarkCubeBukkit.autoConfigure()) {
                 DarkCubeBukkit.gameState(GameState.INGAME);
                 InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();

@@ -12,12 +12,12 @@ import eu.darkcube.system.version.BukkitVersion;
 import eu.darkcube.system.version.v1_8_8.provider.via.ViaSupport1_8_8;
 
 public class Version extends BukkitVersion {
-    @Override
-    public void init() {
+    @Override public void init() {
         super.init();
         this.classifier = "1_8_8";
         this.commandApi = new CommandAPI1_8_8();
         this.itemProvider = new ItemProvider1_8_8();
+        this.protocolVersion = 47;
         try {
             provider.register(ViaSupport.class, new ViaSupport1_8_8());
         } catch (Throwable t) {
@@ -25,8 +25,7 @@ public class Version extends BukkitVersion {
         }
     }
 
-    @Override
-    public void enabled(DarkCubeSystem system) {
+    @Override public void enabled(DarkCubeSystem system) {
         super.enabled(system);
         ViaSupport support = provider.service(ViaSupport.class);
         if (support.supported()) ((ViaSupport1_8_8) support).enable();

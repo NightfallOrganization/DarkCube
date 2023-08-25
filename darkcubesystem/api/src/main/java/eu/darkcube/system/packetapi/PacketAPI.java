@@ -24,6 +24,7 @@ import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PacketAPI {
@@ -174,7 +175,7 @@ public class PacketAPI {
                                             .getName());
                         }
                     } catch (Throwable ex) {
-                        ex.printStackTrace();
+                        Logger.getLogger("PacketAPI").log(Level.SEVERE, "Packet Handling Failed", ex);
                     }
                 }
             } finally {

@@ -16,46 +16,44 @@ import eu.darkcube.system.lobbysystem.npc.NPCManagement;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 public class ListenerConnectorNPC extends BaseListener {
-    @EventHandler
-    public void handle(PlayerNPCInteractEvent e) {
+    private final Lobby lobby;
+
+    public ListenerConnectorNPC(Lobby lobby) {
+        this.lobby = lobby;
+    }
+
+    @EventHandler public void handle(PlayerNPCInteractEvent e) {
         NPCManagement.NPC npc = e.npc();
         ConnectorNPC n = ConnectorNPC.get(npc);
         if (n == null) return;
         n.connect(e.getPlayer());
     }
 
-    @EventHandler
-    public void handle(NPCHideEvent e) {
+    @EventHandler public void handle(NPCHideEvent e) {
         NPCManagement.NPC npc = e.npc();
         ConnectorNPC c = ConnectorNPC.get(npc);
         if (c == null) return;
-        c.hologram().hide(e.player());
+        Runnable r = () -> c.hologram().hide(e.player());
+
+        if (Bukkit.isPrimaryThread()) r.run();
+        else Bukkit.getScheduler().runTask(lobby, r);
     }
 
-    @EventHandler
-    public void handle(PlayerHologramShowEvent event) {
-        System.out.println("show hologram " + event.getHologram());
+    @EventHandler public void handle(PlayerHologramShowEvent event) {
     }
 
-    @EventHandler
-    public void handle(NPCShowEvent e) {
+    @EventHandler public void handle(NPCShowEvent e) {
         Player player = e.player();
         NPCManagement.NPC npc = e.npc();
         ConnectorNPC c = ConnectorNPC.get(npc);
         if (c == null) return;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                c.hologram().show(e.player());
-            }
-        }.runTask(Lobby.getInstance());
         Runnable r = () -> {
+            c.hologram().show(e.player());
             Scoreboard s = player.getScoreboard();
             if (s == Bukkit.getScoreboardManager().getMainScoreboard()) {
                 s = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -67,6 +65,6 @@ public class ListenerConnectorNPC extends BaseListener {
             team.addEntry(npc.name());
         };
         if (Bukkit.isPrimaryThread()) r.run();
-        else Bukkit.getScheduler().runTask(Lobby.getInstance(), r);
+        else Bukkit.getScheduler().runTask(lobby, r);
     }
 }

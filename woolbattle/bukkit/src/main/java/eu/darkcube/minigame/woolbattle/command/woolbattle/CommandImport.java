@@ -40,11 +40,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class CommandImport extends WBCommandExecutor {
     public CommandImport(WoolBattleBukkit woolbattle) {
@@ -58,8 +57,16 @@ public class CommandImport extends WBCommandExecutor {
             }
             ctx.getSource().sendMessage(Component.text("Starting download of template"));
             TemplateStorageProvider provider = InjectionLayer.boot().instance(TemplateStorageProvider.class);
-            provider.templateStorage(template.storageName()).pullAsync(template, directory).thenAccept(suc -> {
-                if (suc) {
+
+            provider.templateStorage(template.storageName()).openZipInputStreamAsync(template).whenComplete((zip, throwable) -> {
+                if (zip != null) {
+                    try {
+                        saveZip(zip, directory);
+                    } catch (IOException e) {
+                        ctx.getSource().sendMessage(Component.text("Unzipping failed"));
+                        e.printStackTrace();
+                        return;
+                    }
                     ctx.getSource().sendMessage(Component.text("Download of template successful"));
                     new Scheduler(woolbattle) {
                         @Override public void run() {
@@ -72,10 +79,27 @@ public class CommandImport extends WBCommandExecutor {
                     }.runTask();
                 } else {
                     ctx.getSource().sendMessage(Component.text("Download failed"));
+                    if (throwable != null) throwable.printStackTrace();
                 }
             });
             return 0;
         })));
+    }
+
+    private static void saveZip(ZipInputStream zip, Path directory) throws IOException {
+        for (ZipEntry ze; (ze = zip.getNextEntry()) != null; ) {
+            Path resolvedPath = directory.resolve(ze.getName()).normalize();
+            if (!resolvedPath.startsWith(directory)) {
+                // see: https://snyk.io/research/zip-slip-vulnerability
+                throw new RuntimeException("Entry with an illegal path: " + ze.getName());
+            }
+            if (ze.isDirectory()) {
+                Files.createDirectories(resolvedPath);
+            } else {
+                Files.createDirectories(resolvedPath.getParent());
+                Files.copy(zip, resolvedPath);
+            }
+        }
     }
 
     private static void startImport(WoolBattleBukkit woolbattle, CommandContext<CommandSource> ctx, Path directory) throws IOException {
@@ -84,11 +108,13 @@ public class CommandImport extends WBCommandExecutor {
         Path teamsYml = WoolBattle.resolve("teams.yml");
         if (!Files.exists(teamsYml)) {
             ctx.getSource().sendMessage(Component.text("No teams.yml found. Invalid template!"));
+            System.out.println("Looked in " + teamsYml.toAbsolutePath());
             return;
         }
         Path spawnsYml = WoolBattle.resolve("spawns.yml");
         if (!Files.exists(spawnsYml)) {
             ctx.getSource().sendMessage(Component.text("No spawns.yml found. Invalid template!"));
+            System.out.println("Looked in " + spawnsYml.toAbsolutePath());
             return;
         }
         ctx.getSource().sendMessage(Component.text("Importing teams"));
@@ -120,13 +146,9 @@ public class CommandImport extends WBCommandExecutor {
                     .getAsByte());
             ItemStack icon = ItemBuilder.item(oldIcon.getMaterial()).damage(oldIcon.getId()).build();
             JsonObject spawnsJson = json.get("spawns").getAsJsonObject();
-            DefaultMap map = (DefaultMap) woolbattle.mapManager().createMap(name, mapSize);
-            map.deathHeight(deathHeight);
-            map.setIcon(icon);
-            if (enabled) map.enable();
             String originalName = null;
             CloudNetMapIngameData ingameData = new CloudNetMapIngameData();
-            ingameData.worldName(map.getName() + "-" + map.size());
+            ingameData.worldName(name + "-" + mapSize);
             for (String nameKey : spawnsJson.keySet()) {
                 String locString = spawnsJson.get(nameKey).getAsString();
                 String[] a = locString.split(":");
@@ -144,11 +166,22 @@ public class CommandImport extends WBCommandExecutor {
                 UnloadedLocation loc = new UnloadedLocation(x, y, z, yaw, pitch, ingameData.worldName());
                 ingameData.spawn(nameKey.toLowerCase(Locale.ROOT), loc);
             }
-
             Path target = Bukkit.getWorldContainer().toPath().normalize().toAbsolutePath().resolve(ingameData.worldName()).toAbsolutePath();
+            Path worldDirectory = directory.resolve(Objects.toString(originalName));
+            if (!Files.exists(worldDirectory)) {
+                ctx
+                        .getSource()
+                        .sendMessage(Component.text("Skipped map because its world folder doesn't exist: " + name + "(" + worldDirectory + ")"));
+                continue;
+            }
+
+            DefaultMap map = (DefaultMap) woolbattle.mapManager().createMap(name, mapSize);
+            map.deathHeight(deathHeight);
+            map.setIcon(icon);
+            if (enabled) map.enable();
+
             ctx.getSource().sendMessage(Component.text("Copy world " + ingameData.worldName() + " to " + target.toAbsolutePath()));
-            Path worldDirectory = directory.resolve(originalName);
-            Files.walkFileTree(worldDirectory, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(worldDirectory, new SimpleFileVisitor<>() {
                 @Override public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                     Files.createDirectories(target.resolve(worldDirectory.relativize(dir).toString()));
                     return FileVisitResult.CONTINUE;

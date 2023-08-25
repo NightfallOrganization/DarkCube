@@ -11,7 +11,9 @@ import eu.cloudnetservice.driver.database.DatabaseProvider;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.userapi.packets.PacketNWUserPersistentDataRemove;
 import eu.darkcube.system.userapi.packets.PacketQueryUser;
+import eu.darkcube.system.userapi.packets.PacketUserPersistentDataMerge;
 import eu.darkcube.system.userapi.packets.PacketUserPersistentDataUpdate;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
@@ -63,6 +65,14 @@ public class BukkitUserAPI extends AbstractUserAPI {
         }
         PacketAPI.getInstance().registerHandler(PacketUserPersistentDataUpdate.class, packet -> {
             ifLoaded(packet.getUniqueId(), user -> user.getPersistentDataStorage().loadFromJsonDocument(packet.getData()));
+            return null;
+        });
+        PacketAPI.getInstance().registerHandler(PacketUserPersistentDataMerge.class, packet -> {
+            ifLoaded(packet.getUniqueId(), user -> user.getPersistentDataStorage().merge(packet.getData()));
+            return null;
+        });
+        PacketAPI.getInstance().registerHandler(PacketNWUserPersistentDataRemove.class, packet -> {
+            ifLoaded(packet.uniqueId(), u -> u.getPersistentDataStorage().remove(packet.key()));
             return null;
         });
         new BukkitRunnable() {

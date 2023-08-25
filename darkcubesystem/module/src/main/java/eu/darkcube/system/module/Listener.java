@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 public class Listener {
 
     @EventListener public void handle(CloudServicePreProcessStartEvent e) {
-        if (e.serviceConfiguration().serviceId().environment().equals(ServiceEnvironmentType.MINECRAFT_SERVER)) {
+        ServiceEnvironmentType env = e.serviceConfiguration().serviceId().environment();
+        if (env.equals(ServiceEnvironmentType.MINECRAFT_SERVER) || env.equals(ServiceEnvironmentType.VELOCITY)) {
             this.copy(e.service());
         }
     }

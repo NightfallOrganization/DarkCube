@@ -14,6 +14,12 @@ public interface MapManager {
 
     Map createMap(String name, MapSize mapSize);
 
+    /**
+     * @param mapSize the {@link MapSize}
+     * @return a random map for the given MapSize that always gets returned by this method until the next reboot
+     */
+    Map defaultRandomPersistentMap(MapSize mapSize);
+
     Collection<? extends Map> getMaps();
 
     Collection<? extends Map> getMaps(MapSize mapSize);

@@ -22,9 +22,7 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         this.woolBattle = woolBattle;
     }
 
-    @Override
-    @EventHandler
-    public void handle(PlayerQuitEvent e) {
+    @Override @EventHandler public void handle(PlayerQuitEvent e) {
         WBUser user = WBUser.getUser(e.getPlayer());
         Lobby lobby = woolBattle.lobby();
         lobby.VOTES_MAP.remove(user);
@@ -37,5 +35,6 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
 
         WBUser.onlineUsers().forEach(ScoreboardHelper::setOnline);
         e.setQuitMessage(null);
+        woolBattle.lobby().checkUnload();
     }
 }

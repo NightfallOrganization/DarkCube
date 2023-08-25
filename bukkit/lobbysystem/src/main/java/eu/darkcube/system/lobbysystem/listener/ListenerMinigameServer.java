@@ -10,6 +10,9 @@ package eu.darkcube.system.lobbysystem.listener;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
+import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,14 +34,12 @@ public class ListenerMinigameServer extends BaseListener {
         if (item == null) {
             return;
         }
-        String itemid = ItemBuilder.item(item).persistentDataStorage().get(MinigameInventory.minigameServer, PersistentDataTypes.STRING);
-        if (itemid == null || itemid.isEmpty()) {
-            return;
-        }
+        UUID uuid = ItemBuilder.item(item).persistentDataStorage().get(MinigameInventory.minigameServer, PersistentDataTypes.UUID);
+        if (uuid == null) return;
+
         p.closeInventory();
-        lobby
-                .playerManager()
-                .playerExecutor(p.getUniqueId())
-                .connect(lobby.cloudServiceProvider().service(UUID.fromString(itemid)).name()); // TODO async and nullable
+        ServerInformation information = lobby.serverManager().byUniqueId(uuid);
+        if (information != null) information.connectPlayer(p.getUniqueId());
+        else UserAPI.getInstance().getUser(p).sendMessage(Message.SERVER_NOT_FOUND.getMessage(p));
     }
 }

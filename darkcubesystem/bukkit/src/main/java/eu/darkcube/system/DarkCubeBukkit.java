@@ -7,17 +7,20 @@
 package eu.darkcube.system;
 
 import eu.cloudnetservice.driver.ComponentInfo;
+import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.GameState;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public final class DarkCubeBukkit {
 
     private static final AtomicInteger playingPlayers = new AtomicInteger();
     private static final AtomicInteger spectatingPlayers = new AtomicInteger();
     private static final AtomicInteger maxPlayingPlayers = new AtomicInteger(-1);
+    private static final Document.Mutable extra = Document.newJsonDocument();
     private static volatile GameState gameState = GameState.UNKNOWN;
     private static volatile String displayName = InjectionLayer.boot().instance(ComponentInfo.class).componentName();
     private static volatile boolean autoConfigure = true;
@@ -56,5 +59,17 @@ public final class DarkCubeBukkit {
 
     public static @NotNull AtomicInteger spectatingPlayers() {
         return spectatingPlayers;
+    }
+
+    public static void extra(Consumer<Document.Mutable> modifier) {
+        synchronized (extra) {
+            modifier.accept(extra);
+        }
+    }
+
+    public static Document extra() {
+        synchronized (extra) {
+            return extra.immutableCopy();
+        }
     }
 }

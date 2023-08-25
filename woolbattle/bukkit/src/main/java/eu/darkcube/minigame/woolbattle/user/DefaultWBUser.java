@@ -68,6 +68,31 @@ class DefaultWBUser implements WBUser {
     private static final Key KEY_PERKS = new Key(WoolBattleBukkit.instance(), "perks");
     private static final PersistentDataType<PerkName> TYPE_PERK_NAME = PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new, p -> p);
     private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME = PersistentDataTypes.list(TYPE_PERK_NAME);
+    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<>() {
+        @Override public int[] deserialize(Document doc, String key) {
+            byte[] bytes = PersistentDataTypes.BYTE_ARRAY.deserialize(doc, key);
+            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
+            int len = buf.get();
+            int[] ar = new int[len];
+            for (int i = 0; buf.remaining() > 0; i++) {
+                ar[i] = buf.get();
+            }
+            return ar;
+        }
+
+        @Override public void serialize(Document.Mutable doc, String key, int[] data) {
+            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
+            IntBuffer ib = buf.asIntBuffer();
+            ib.put(data.length);
+            for (int i : data)
+                ib.put(i);
+            PersistentDataTypes.BYTE_ARRAY.serialize(doc, key, buf.array());
+        }
+
+        @Override public int[] clone(int[] object) {
+            return object.clone();
+        }
+    };
     private static final PersistentDataType<PlayerPerks> TYPE_PERKS = new PersistentDataType<PlayerPerks>() {
         @Override public PlayerPerks deserialize(Document doc, String key) {
             doc = doc.readDocument(key);
@@ -101,31 +126,6 @@ class DefaultWBUser implements WBUser {
         }
 
         @Override public PlayerPerks clone(PlayerPerks object) {
-            return object.clone();
-        }
-    };
-    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<int[]>() {
-        @Override public int[] deserialize(Document doc, String key) {
-            byte[] bytes = PersistentDataTypes.BYTE_ARRAY.deserialize(doc, key);
-            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
-            int len = buf.get();
-            int[] ar = new int[len];
-            for (int i = 0; buf.remaining() > 0; i++) {
-                ar[i] = buf.get();
-            }
-            return ar;
-        }
-
-        @Override public void serialize(Document.Mutable doc, String key, int[] data) {
-            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
-            IntBuffer ib = buf.asIntBuffer();
-            ib.put(data.length);
-            for (int i : data)
-                ib.put(i);
-            PersistentDataTypes.BYTE_ARRAY.serialize(doc, key, buf.array());
-        }
-
-        @Override public int[] clone(int[] object) {
             return object.clone();
         }
     };

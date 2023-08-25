@@ -30,6 +30,7 @@ import com.github.juliarn.npclib.ext.labymod.LabyModExtension;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.event.NPCHideEvent;
 import eu.darkcube.system.lobbysystem.event.NPCShowEvent;
 import eu.darkcube.system.lobbysystem.event.PlayerNPCInteractEvent;
 import org.bukkit.Bukkit;
@@ -59,14 +60,22 @@ public class NPCManagement {
         platform.eventManager().registerEventHandler(AttackNpcEvent.class, event -> {
             PlayerNPCInteractEvent.Hand hand = PlayerNPCInteractEvent.Hand.MAIN_HAND;
             PlayerNPCInteractEvent.EntityUseAction useAction = PlayerNPCInteractEvent.EntityUseAction.ATTACK;
-            Bukkit.getPluginManager().callEvent(new PlayerNPCInteractEvent(event.player(), event.npc().flagValueOrDefault(flagNPC), hand, useAction));
+            Bukkit
+                    .getPluginManager()
+                    .callEvent(new PlayerNPCInteractEvent(event.player(), event.npc().flagValueOrDefault(flagNPC), hand, useAction));
         });
         platform.eventManager().registerEventHandler(InteractNpcEvent.class, event -> {
             PlayerNPCInteractEvent.Hand hand = event.hand() == InteractNpcEvent.Hand.MAIN_HAND ? PlayerNPCInteractEvent.Hand.MAIN_HAND : PlayerNPCInteractEvent.Hand.OFF_HAND;
             PlayerNPCInteractEvent.EntityUseAction useAction = PlayerNPCInteractEvent.EntityUseAction.INTERACT;
-            Bukkit.getPluginManager().callEvent(new PlayerNPCInteractEvent(event.player(), event.npc().flagValueOrDefault(flagNPC), hand, useAction));
+            Bukkit
+                    .getPluginManager()
+                    .callEvent(new PlayerNPCInteractEvent(event.player(), event.npc().flagValueOrDefault(flagNPC), hand, useAction));
         });
-        platform.eventManager().registerEventHandler(HideNpcEvent.class, event -> Bukkit.getPluginManager().callEvent(new NPCShowEvent(event.npc().flagValueOrDefault(flagNPC), event.player())));
+        platform
+                .eventManager()
+                .registerEventHandler(HideNpcEvent.class, event -> Bukkit
+                        .getPluginManager()
+                        .callEvent(new NPCHideEvent(event.npc().flagValueOrDefault(flagNPC), event.player())));
         platform.eventManager().registerEventHandler(ShowNpcEvent.Post.class, event -> {
             Player player = event.player();
             event.npc().changeMetadata(EntityMetadataFactory.skinLayerMetaFactory(), true).schedule(player);
@@ -241,9 +250,12 @@ public class NPCManagement {
             return this;
         }
 
-        @Override
-        public Builder clone() {
-            return new Builder().lookAtPlayer(lookAtPlayer).hitWhenPlayerHits(hitWhenPlayerHits).sneakWhenPlayerSneaks(sneakWhenPlayerSneaks).trackingRule(trackingRule);
+        @Override public Builder clone() {
+            return new Builder()
+                    .lookAtPlayer(lookAtPlayer)
+                    .hitWhenPlayerHits(hitWhenPlayerHits)
+                    .sneakWhenPlayerSneaks(sneakWhenPlayerSneaks)
+                    .trackingRule(trackingRule);
         }
 
         private void apply(@NotNull Npc.Builder<World, Player, ItemStack, Plugin> builder) {
@@ -265,7 +277,8 @@ public class NPCManagement {
             if (uuid == null) uuid = UUID.randomUUID();
             name = profileHelper.name == null ? name : profileHelper.name;
             if (name == null) name = uuid.toString().replace("-", "").substring(0, 16);
-            if (profileHelper.skin != null) profileProperties.add(ProfileProperty.property("textures", profileHelper.skin.value, profileHelper.skin.signature));
+            if (profileHelper.skin != null)
+                profileProperties.add(ProfileProperty.property("textures", profileHelper.skin.value, profileHelper.skin.signature));
 
             Profile.Resolved profile = Profile.resolved(name, uuid, profileProperties);
 

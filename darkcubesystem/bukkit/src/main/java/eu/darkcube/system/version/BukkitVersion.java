@@ -17,32 +17,32 @@ public class BukkitVersion implements Version {
     protected CommandAPI commandApi;
     protected ItemProvider itemProvider;
     protected Provider provider;
+    protected int protocolVersion = -1;
 
-    @Override
-    public void init() {
+    @Override public void init() {
         provider = Provider.newProvider();
     }
 
     public void enabled(DarkCubeSystem system) {
     }
 
-    @Override
-    public CommandAPI commandApi() {
+    public int protocolVersion() {
+        return protocolVersion;
+    }
+
+    @Override public CommandAPI commandApi() {
         return commandApi;
     }
 
-    @Override
-    public ItemProvider itemProvider() {
+    @Override public ItemProvider itemProvider() {
         return itemProvider;
     }
 
-    @Override
-    public String getClassifier() {
+    @Override public String getClassifier() {
         return classifier;
     }
 
-    @Override
-    public Provider provider() {
+    @Override public Provider provider() {
         return provider;
     }
 }

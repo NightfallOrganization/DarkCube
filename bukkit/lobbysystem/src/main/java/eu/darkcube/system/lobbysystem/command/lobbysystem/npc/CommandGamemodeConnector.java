@@ -39,6 +39,27 @@ public class CommandGamemodeConnector extends LobbyCommandExecutor {
                                     return 0;
                                 }))
                                 .then(Commands
+                                        .literal("v2")
+                                        .then(Commands
+                                                .literal("set")
+                                                .then(Commands.argument("v2key", StringArgumentType.word()).executes(ctx -> {
+                                                    ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
+                                                    String v2key = StringArgumentType.getString(ctx, "v2key");
+                                                    npc.v2Key(v2key);
+                                                    npc.update();
+                                                    ConnectorNPC.save();
+                                                    ctx.getSource().sendMessage(Message.CONNECTOR_NPC_V2_SET);
+                                                    return 0;
+                                                })))
+                                        .then(Commands.literal("unset").executes(ctx -> {
+                                            ConnectorNPC npc = ctx.getArgument("connector", ConnectorNPC.class);
+                                            npc.v2Key(null);
+                                            npc.update();
+                                            ConnectorNPC.save();
+                                            ctx.getSource().sendMessage(Message.CONNECTOR_NPC_V2_UNSET);
+                                            return 0;
+                                        })))
+                                .then(Commands
                                         .literal("addPermission")
                                         .then(Commands.argument("permission", StringArgumentType.string()).executes(ctx -> {
                                             String permission = StringArgumentType.getString(ctx, "permission");

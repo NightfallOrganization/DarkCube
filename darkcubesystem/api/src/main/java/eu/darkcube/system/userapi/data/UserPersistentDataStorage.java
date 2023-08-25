@@ -63,6 +63,21 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
         new PacketUserPersistentDataSet(user.getUniqueId(), d).sendAsync();
     }
 
+    public void remove(Key key) {
+        boolean changed = false;
+        try {
+            user.lock();
+            if (data.contains(key.toString())) {
+                changed = true;
+                data.remove(key.toString());
+                caches.remove(key);
+            }
+        } finally {
+            user.unlock();
+        }
+        if (changed) notifyNotifiers();
+    }
+
     @Override public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         T ret;
         try {
@@ -138,6 +153,17 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
             this.data.clear();
             this.caches.clear();
             this.data.append(document);
+        } finally {
+            user.unlock();
+        }
+        notifyNotifiers();
+    }
+
+    public void merge(Document data) {
+        try {
+            user.lock();
+            this.data.append(data);
+            this.caches.clear();
         } finally {
             user.unlock();
         }

@@ -12,7 +12,6 @@ import eu.darkcube.system.inventoryapi.item.attribute.Attribute;
 import eu.darkcube.system.inventoryapi.item.attribute.AttributeModifier;
 import eu.darkcube.system.inventoryapi.item.meta.BuilderMeta;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
-import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.version.VersionSupport;
 import org.bukkit.Material;
@@ -123,19 +122,23 @@ import java.util.Set;
     @Api ItemBuilder lore(Component line, int index);
 
     /**
+     * Adds lore
+     *
      * @param lines the lore
      * @return this builder
      * @deprecated Use {@link ItemBuilder#lore(Component...)}
      */
-    @Api @Deprecated ItemBuilder lore(String... lines);
+    @Api @Deprecated(forRemoval = true) ItemBuilder lore(String... lines);
 
     /**
+     * Sets lore
+     *
      * @param lines the lore
      * @return this builder
      * @deprecated Use {@link ItemBuilder#lore(Collection)}
      */
 
-    @Api @Deprecated ItemBuilder lores(Collection<String> lines);
+    @Api @Deprecated(forRemoval = true) ItemBuilder lores(Collection<String> lines);
 
     @Api ItemBuilder setLore(Collection<Component> lore);
 

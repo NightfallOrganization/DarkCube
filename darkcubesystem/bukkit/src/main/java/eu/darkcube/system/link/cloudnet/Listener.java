@@ -11,6 +11,7 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.wrapper.event.ServiceInfoPropertiesConfigureEvent;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import eu.darkcube.system.DarkCubeBukkit;
+import eu.darkcube.system.DarkCubeServiceProperty;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -20,12 +21,13 @@ public class Listener implements org.bukkit.event.Listener {
     @EventListener public void handle(ServiceInfoPropertiesConfigureEvent event) {
         event
                 .propertyHolder()
-                .append("gameState", DarkCubeBukkit.gameState().toString())
-                .append("playingPlayers", DarkCubeBukkit.playingPlayers().get())
-                .append("spectatingPlayers", DarkCubeBukkit.spectatingPlayers().get())
-                .append("maxPlayingPlayers", DarkCubeBukkit.maxPlayingPlayers().get())
-                .append("displayName", DarkCubeBukkit.displayName())
-                .append("autoconfigured", DarkCubeBukkit.autoConfigure());
+                .writeProperty(DarkCubeServiceProperty.GAME_STATE, DarkCubeBukkit.gameState())
+                .writeProperty(DarkCubeServiceProperty.PLAYING_PLAYERS, DarkCubeBukkit.playingPlayers().get())
+                .writeProperty(DarkCubeServiceProperty.SPECTATING_PLAYERS, DarkCubeBukkit.spectatingPlayers().get())
+                .writeProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS, DarkCubeBukkit.maxPlayingPlayers().get())
+                .writeProperty(DarkCubeServiceProperty.DISPLAY_NAME, DarkCubeBukkit.displayName())
+                .writeProperty(DarkCubeServiceProperty.AUTOCONFIGURED, DarkCubeBukkit.autoConfigure())
+                .writeProperty(DarkCubeServiceProperty.EXTRA, DarkCubeBukkit.extra());
     }
 
     @EventHandler public void handle(PlayerJoinEvent event) {

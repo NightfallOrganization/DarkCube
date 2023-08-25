@@ -22,112 +22,93 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 class AsyncWrapperUser implements User {
-	private final AtomicReference<BukkitUser> reference = new AtomicReference<>();
-	private final UUID uuid;
+    private final AtomicReference<BukkitUser> reference = new AtomicReference<>();
+    private final UUID uuid;
 
-	AsyncWrapperUser(BukkitUser user) {
-		this.uuid = user.getUniqueId();
-		this.reference.set(user);
-	}
+    AsyncWrapperUser(BukkitUser user) {
+        this.uuid = user.getUniqueId();
+        this.reference.set(user);
+    }
 
-	@Override
-	public @NotNull Iterable<? extends Audience> audiences() {
-		return user(BukkitUser::audiences);
-	}
+    @Override public @NotNull Iterable<? extends Audience> audiences() {
+        return user(BukkitUser::audiences);
+    }
 
-	private void user(Consumer<BukkitUser> consumer) {
-		user(u -> {
-			consumer.accept(u);
-			return u;
-		});
-	}
+    private void user(Consumer<BukkitUser> consumer) {
+        user(u -> {
+            consumer.accept(u);
+            return u;
+        });
+    }
 
-	private <T> T user(Function<BukkitUser, T> function) {
-		BukkitUserAPI api = BukkitUserAPI.getInstance();
-		BukkitUser user = reference.get();
-		BukkitUser cur = api.users.get(uuid);
-		if (cur != user) {
-			if (cur != null) {
-				user = cur;
-			} else {
-				cur = api.users.get(uuid);
-				if (cur == null) {
-					DarkCubePlugin.systemPlugin().getLogger().warning(
-							"[UserAPI] User was loaded by accessing object. This most likely "
-									+ "indicates a memory leak! Use User#isLoaded before you use a "
-									+ "User object if the user is not online!");
-					new Exception().printStackTrace();
-					user = api.getUser(uuid).reference.get();
-				} else {
-					user = cur;
-				}
-				reference.set(user);
-			}
-		}
-		try {
-			user.lock();
-			return function.apply(user);
-		} finally {
-			user.unlock();
-		}
-	}
+    private <T> T user(Function<BukkitUser, T> function) {
+        BukkitUserAPI api = BukkitUserAPI.getInstance();
+        BukkitUser user = reference.get();
+        BukkitUser cur = api.users.get(uuid);
+        if (cur != user) {
+            if (cur != null) {
+                user = cur;
+            } else {
+                cur = api.users.get(uuid);
+                if (cur == null) {
+                    DarkCubePlugin
+                            .systemPlugin()
+                            .getLogger()
+                            .warning("[UserAPI] User was loaded by accessing object. This most likely " + "indicates a memory leak! Use User#isLoaded before you use a " + "User object if the user is not online!");
+                    new Exception().printStackTrace();
+                    user = api.getUser(uuid).reference.get();
+                } else {
+                    user = cur;
+                }
+                reference.set(user);
+            }
+        }
+        try {
+            user.lock();
+            return function.apply(user);
+        } finally {
+            user.unlock();
+        }
+    }
 
-	//	public void lock() {
-	//		user(BukkitUser::lock);
-	//	}
-	//
-	//	public void unlock() {
-	//		user(BukkitUser::unlock);
-	//	}
+    @Override public UUID getUniqueId() {
+        return uuid;
+    }
 
-	@Override
-	public UUID getUniqueId() {
-		return uuid;
-	}
+    @Override public String getName() {
+        return user(User::getName);
+    }
 
-	@Override
-	public String getName() {
-		return user(User::getName);
-	}
+    @Override public Player asPlayer() {
+        return user(User::asPlayer);
+    }
 
-	@Override
-	public Player asPlayer() {
-		return user(User::asPlayer);
-	}
+    @Override public Language language() {
+        return user(u -> (Language) u.language());
+    }
 
-	@Override
-	public Language language() {
-		return user(User::getLanguage);
-	}
+    @Override public void language(Language language) {
+        user((Consumer<BukkitUser>) u -> u.language(language));
+    }
 
-	@Override
-	public void language(Language language) {
-		user((Consumer<BukkitUser>) u -> u.setLanguage(language));
-	}
+    @Override public BigInteger getCubes() {
+        return user(User::getCubes);
+    }
 
-	@Override
-	public BigInteger getCubes() {
-		return user(User::getCubes);
-	}
+    @Override public void setCubes(BigInteger cubes) {
+        user((Consumer<BukkitUser>) u -> u.setCubes(cubes));
+    }
 
-	@Override
-	public void setCubes(BigInteger cubes) {
-		user((Consumer<BukkitUser>) u -> u.setCubes(cubes));
-	}
+    @Override public BasicMetaDataStorage getMetaDataStorage() {
+        return user(BukkitUser::getMetaDataStorage);
+    }
 
-	@Override
-	public BasicMetaDataStorage getMetaDataStorage() {
-		return user(BukkitUser::getMetaDataStorage);
-	}
+    @Override public UserPersistentDataStorage getPersistentDataStorage() {
+        return user(BukkitUser::getPersistentDataStorage);
+    }
 
-	@Override
-	public UserPersistentDataStorage getPersistentDataStorage() {
-		return user(BukkitUser::getPersistentDataStorage);
-	}
-
-	@Override
-	public boolean isLoaded() {
-		return UserAPI.getInstance().isUserLoaded(uuid);
-	}
+    @Override public boolean isLoaded() {
+        return UserAPI.getInstance().isUserLoaded(uuid);
+    }
 
 }

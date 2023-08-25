@@ -26,6 +26,7 @@ import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.*;
+import eu.darkcube.system.lobbysystem.util.server.ServerManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
@@ -48,6 +49,7 @@ public class Lobby extends Plugin {
     private NPCManagement.NPC woolbattleNpc;
     private NPCManagement.NPC dailyRewardNpc;
     private JaRManager jaRManager;
+    private ServerManager serverManager;
 
     public Lobby() {
         super("LobbySystem");
@@ -56,9 +58,6 @@ public class Lobby extends Plugin {
 
     public static Lobby getInstance() {
         return Lobby.instance;
-    }
-
-    @Override public void onLoad() {
     }
 
     @Override public void onDisable() {
@@ -71,6 +70,8 @@ public class Lobby extends Plugin {
 
     @Override public void onEnable() {
         this.npcManagement = new NPCManagement(this);
+        this.serverManager = new ServerManager(this);
+        this.serverManager.registerListener(new ConnectorNPC.UpdateListener());
 
         UserWrapper userWrapper = new UserWrapper();
         UserAPI.getInstance().addModifier(userWrapper);
@@ -119,7 +120,7 @@ public class Lobby extends Plugin {
         new ListenerInteract();
         new ListenerLobbySwitcher(this);
         new ListenerWoolBattleNPC();
-        new ListenerConnectorNPC();
+        new ListenerConnectorNPC(this);
         new ListenerMinigameServer(this);
         new ListenerItemDropPickup();
         new ListenerFish();
@@ -235,6 +236,10 @@ public class Lobby extends Plugin {
 
     public JaRManager getJaRManager() {
         return this.jaRManager;
+    }
+
+    public ServerManager serverManager() {
+        return serverManager;
     }
 
     public ServiceRegistry serviceRegistry() {

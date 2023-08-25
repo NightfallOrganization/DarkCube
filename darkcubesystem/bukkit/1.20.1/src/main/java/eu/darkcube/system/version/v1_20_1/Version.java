@@ -21,6 +21,7 @@ public class Version extends BukkitVersion {
         this.commandApi = new CommandAPI1_20_1();
         this.itemProvider = new ItemProvider1_20_1();
         this.classifier = "1_20_1";
+        this.protocolVersion = Bukkit.getUnsafe().getProtocolVersion();
         provider.register(ViaSupport.class, ViaSupport.wrapper(null)); // Unsupported
         provider.register(WorkbenchUtil.class, new WorkbenchUtil1_20_1());
     }

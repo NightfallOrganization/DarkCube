@@ -7,9 +7,10 @@
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 
-public class SchedulerTask implements Comparable<SchedulerTask> {
+public final class SchedulerTask implements Comparable<SchedulerTask> {
 
     private long delay;
     private long repeat;
@@ -17,11 +18,11 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
     private Integer weight;
     private Scheduler scheduler;
 
-    SchedulerTask(Scheduler scheduler, long delay) {
+    SchedulerTask(@NotNull Scheduler scheduler, long delay) {
         this(scheduler, delay, 0);
     }
 
-    SchedulerTask(Scheduler scheduler, long delay, long repeat) {
+    SchedulerTask(@NotNull Scheduler scheduler, long delay, long repeat) {
         this.scheduler = scheduler;
         this.repeat = repeat;
         this.delay = delay;
@@ -29,37 +30,38 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
         scheduler.woolbattle().schedulers().add(this);
     }
 
-    SchedulerTask(Scheduler scheduler, long delay, Integer weight) {
+    SchedulerTask(@NotNull Scheduler scheduler, long delay, Integer weight) {
         this(scheduler, delay);
-        setWeight(weight);
+        weight(weight);
     }
 
-    SchedulerTask(Scheduler scheduler, long delay, long repeat, Integer weight) {
+    SchedulerTask(@NotNull Scheduler scheduler, long delay, long repeat, Integer weight) {
         this(scheduler, delay, repeat);
-        setWeight(weight);
+        weight(weight);
     }
 
-    public boolean isRepeating() {
+    @Api public boolean repeating() {
         return repeat != 0;
     }
 
-    @Api public long getRepeat() {
+    @Api public long repeat() {
         return repeat;
     }
 
-    @Api public long getDelay() {
+    @Api public long delay() {
         return delay;
     }
 
-    @Api public int getWeight() {
+    @Api public int weight() {
         return weight;
     }
 
-    public void setWeight(Integer weight) {
+    public void weight(Integer weight) {
         this.weight = weight == null ? 0 : weight;
     }
 
-    public final void cancel() {
+    public void cancel() {
+        if (scheduler == null) return;
         scheduler.woolbattle().schedulers().remove(this);
         scheduler = null;
         delay = 0;
@@ -69,22 +71,22 @@ public class SchedulerTask implements Comparable<SchedulerTask> {
     public void run() {
         lastExecution = MinecraftServer.currentTick;
         scheduler.run();
-        if (!isRepeating()) {
-            this.cancel();
+        if (!repeating()) {
+            scheduler.cancel();
         }
     }
 
-    public final boolean canExecute() {
-        return scheduler != null && MinecraftServer.currentTick >= getNextExecution();
+    public boolean canExecute() {
+        return scheduler != null && MinecraftServer.currentTick >= nextExecution();
     }
 
-    public long getLastExecution() {
+    public long lastExecution() {
         return lastExecution;
     }
 
-    public long getNextExecution() {
-        if (repeat != 0) return getLastExecution() + repeat;
-        return getLastExecution();
+    public long nextExecution() {
+        if (repeat != 0) return lastExecution() + repeat;
+        return lastExecution();
     }
 
     @Override public int compareTo(SchedulerTask o) {

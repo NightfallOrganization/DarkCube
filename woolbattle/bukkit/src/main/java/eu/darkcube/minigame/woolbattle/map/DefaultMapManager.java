@@ -16,11 +16,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DefaultMapManager implements MapManager {
 
-    final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps");
+    private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps");
     private final java.util.Map<MapSize, java.util.Map<String, Map>> maps = new HashMap<>();
+    private final java.util.Map<MapSize, Map> defaultMaps = new HashMap<>();
 
     public DefaultMapManager() {
         for (java.util.Map.Entry<String, Document> entry : database.entries().entrySet()) {
@@ -28,6 +30,20 @@ public class DefaultMapManager implements MapManager {
             String mapJson = document.serializeToString();
             Map map = GsonSerializer.gson.fromJson(mapJson, Map.class);
             maps(map.size()).put(map.getName(), map);
+        }
+        recalculateDefaults();
+    }
+
+    private void recalculateDefaults() {
+        defaultMaps.clear();
+        for (java.util.Map.Entry<MapSize, java.util.Map<String, Map>> entry : maps.entrySet()) {
+            entry
+                    .getValue()
+                    .values()
+                    .stream()
+                    .skip(ThreadLocalRandom.current().nextInt(entry.getValue().size()))
+                    .findFirst()
+                    .ifPresent(map -> defaultMaps.put(entry.getKey(), map));
         }
     }
 
@@ -42,7 +58,12 @@ public class DefaultMapManager implements MapManager {
         map = defaultMap;
         maps(map.size()).put(name, map);
         database.insert(databaseKey(map), defaultMap.toDocument());
+        recalculateDefaults();
         return map;
+    }
+
+    @Override public Map defaultRandomPersistentMap(MapSize mapSize) {
+        return defaultMaps.get(mapSize);
     }
 
     private java.util.Map<String, Map> maps(MapSize size) {
@@ -64,6 +85,7 @@ public class DefaultMapManager implements MapManager {
     @Override public void deleteMap(Map map) {
         maps(map.size()).remove(map.getName());
         database.delete(databaseKey(map));
+        recalculateDefaults();
     }
 
     private String databaseKey(Map map) {

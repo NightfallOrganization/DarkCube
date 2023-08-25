@@ -22,6 +22,7 @@ public class CommandWoolBattle extends WBCommandExecutor {
                 .then(new CommandListMaps(woolbattle).builder())
                 .then(new CommandLoadWorld(woolbattle).builder())
                 .then(new CommandLoadGame(woolbattle).builder())
+                .then(new CommandUnloadGame(woolbattle).builder())
                 .then(new CommandSetSpawn(woolbattle).builder()));
     }
 

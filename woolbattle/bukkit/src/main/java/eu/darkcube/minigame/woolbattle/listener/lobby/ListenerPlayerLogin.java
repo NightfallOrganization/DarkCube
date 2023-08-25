@@ -7,8 +7,10 @@
 package eu.darkcube.minigame.woolbattle.listener.lobby;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.minigame.woolbattle.api.LobbySystemLinkImpl;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +18,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
     private final WoolBattleBukkit woolbattle;
@@ -44,8 +49,28 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
         return pInfo;
     }
 
+    private boolean handleRequest(Player player) {
+        for (Map.Entry<UUID, LobbySystemLinkImpl.ConnectionRequest> entry : woolbattle
+                .lobbySystemLink()
+                .connectionRequests()
+                .asMap()
+                .entrySet()) {
+            if (entry.getValue().player().equals(player.getUniqueId())) {
+                woolbattle.lobbySystemLink().connectionRequests().invalidate(entry.getKey());
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override @EventHandler(priority = EventPriority.HIGHEST) public void handle(PlayerLoginEvent e) {
         Player p = e.getPlayer();
+
+        if (!handleRequest(p)) {
+            e.disallow(Result.KICK_OTHER, "Please join via the Lobby NPCs");
+            return;
+        }
+
         PermissionInfo info = getPermissionInfo(p);
 
         boolean full = woolbattle.maxPlayers() <= WBUser.onlineUsers().size();
@@ -80,7 +105,7 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
             return;
         }
         if (full) {
-            e.disallow(Result.KICK_BANNED, "§cDieser Server ist voll!");
+            e.setResult(Result.KICK_FULL);
         }
         //		if (Main.getInstance().getMaxPlayers() <= Main.getInstance().getUserWrapper().getUsers().size()) {
         //			e.disallow(Result.KICK_FULL, e.getKickMessage());
@@ -95,8 +120,8 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
             return "PermissionInfo [hasPermission=" + hasPermission + ", priority=" + priority + "]";
         }
 
-        @Override public int compareTo(PermissionInfo o) {
-            return hasPermission ? Integer.valueOf(priority).compareTo(o.priority) : -1;
+        @Override public int compareTo(@NotNull PermissionInfo o) {
+            return hasPermission ? Integer.compare(priority, o.priority) : -1;
         }
     }
 }

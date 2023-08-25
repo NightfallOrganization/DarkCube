@@ -9,12 +9,16 @@ protocollib = "4.8.0"
 viaversion = "4.7.0"
 annotations = "24.0.1"
 hologramlib = "2.6.0-SNAPSHOT"
+velocity = "3.1.1"
 
 [libraries]
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 hologramlib = { group = "com.github.unldenis.hologram", name = "hologram-lib", version.ref = "hologramlib" }
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
 viaversion = { group = "com.viaversion", name = "viaversion-api", version.ref = "viaversion" }
 viaversion-common = { group = "com.viaversion", name = "viaversion-common", version.ref = "viaversion" }
+viaversion-velocity = { group = "com.viaversion", name = "viaversion-velocity", version.ref = "viaversion" }
+viaversion-bukkit = { group = "com.viaversion", name = "viaversion-bukkit", version.ref = "viaversion" }
 protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }

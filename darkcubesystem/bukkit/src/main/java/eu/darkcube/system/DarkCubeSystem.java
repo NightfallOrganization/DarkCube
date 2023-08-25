@@ -6,8 +6,12 @@
  */
 package eu.darkcube.system;
 
+import eu.cloudnetservice.driver.ComponentInfo;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.arguments.EntityOptions;
+import eu.darkcube.system.internal.PacketDeclareProtocolVersion;
+import eu.darkcube.system.internal.PacketRequestProtocolVersionDeclaration;
 import eu.darkcube.system.link.LinkManager;
 import eu.darkcube.system.link.cloudnet.CloudNetLink;
 import eu.darkcube.system.link.luckperms.LuckPermsLink;
@@ -27,17 +31,11 @@ import org.bukkit.event.player.PlayerKickEvent;
 import java.util.Objects;
 
 public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
-    private static DarkCubeSystem instance;
     private final LinkManager linkManager = new LinkManager();
 
     public DarkCubeSystem() {
         super("system");
         DarkCubePlugin.systemPlugin(this);
-        instance = this;
-    }
-
-    public static DarkCubeSystem getInstance() {
-        return instance;
     }
 
     // Suppress the conversion warnings as the LuckPermsLink has to be lazily loaded with a new inner class
@@ -48,7 +46,7 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
         PacketAPI.init();
         CommandAPI.init(this);
         linkManager.addLink(() -> new LuckPermsLink());
-        linkManager.addLink(CloudNetLink::new);
+        linkManager.addLink(() -> new CloudNetLink(this));
     }
 
     @Override public void onDisable() {
@@ -67,9 +65,21 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
         if (v instanceof BukkitVersion) {
             ((BukkitVersion) v).enabled(this);
         }
+        PacketAPI.getInstance().registerHandler(PacketRequestProtocolVersionDeclaration.class, packet -> {
+            declareVersion();
+            return null;
+        });
+        declareVersion();
     }
 
-    @EventHandler private void handle(PlayerKickEvent event) {
+    public void declareVersion() {
+        new PacketDeclareProtocolVersion(InjectionLayer
+                .boot()
+                .instance(ComponentInfo.class)
+                .componentName(), ((BukkitVersion) VersionSupport.version()).protocolVersion()).sendAsync();
+    }
+
+    @EventHandler public void handle(PlayerKickEvent event) {
         if (Objects.equals(event.getReason(), "disconnect.spam")) {
             event.setCancelled(true);
         }
