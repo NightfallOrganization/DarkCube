@@ -117,8 +117,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
     @Override protected void insertArrowItems() {
         this.arrowSlots.put(PageArrow.PREVIOUS, new Integer[]{IInventory.slot(3, 2), IInventory.slot(4, 2)});
         this.arrowSlots.put(PageArrow.NEXT, new Integer[]{IInventory.slot(3, 8), IInventory.slot(4, 8)});
-        this.arrowItem.put(PageArrow.NEXT, Item.ARROW_NEXT.getItem(user.getUser()));
-        this.arrowItem.put(PageArrow.PREVIOUS, Item.ARROW_PREVIOUS.getItem(user.getUser()));
+        super.insertArrowItems();
     }
 
     @Override protected void insertDefaultItems0() {

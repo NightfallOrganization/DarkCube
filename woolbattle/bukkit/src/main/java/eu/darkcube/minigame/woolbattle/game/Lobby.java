@@ -28,6 +28,7 @@ import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
+import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
@@ -109,6 +110,7 @@ public class Lobby extends GamePhase {
         woolbattle.gameData().mapSize(null);
         woolbattle.gameData().votedMap(null);
         woolbattle.gameData().forceMap(null);
+        DarkCubeBukkit.extra(doc -> doc.append("configured", false));
         System.out.println("Unloaded Game");
         if (publishUpdate) woolbattle.lobbySystemLink().update();
     }
@@ -123,15 +125,20 @@ public class Lobby extends GamePhase {
         }
         if (i == 0) i = -1;
         maxPlayerCount = i;
+        woolbattle.gameData().votedMap(woolbattle.mapManager().defaultRandomPersistentMap(mapSize));
         recalculateMap();
         recalculateEpGlitch();
         WBUser.onlineUsers().forEach(this::setupScoreboard);
+        DarkCubeBukkit.extra(doc -> doc.append("configured", true));
         woolbattle.lobbySystemLink().update();
         System.out.println("Loaded game " + mapSize);
     }
 
     public void checkUnload() {
-        int online = Bukkit.getOnlinePlayers().size();
+        checkUnload(Bukkit.getOnlinePlayers().size());
+    }
+
+    public void checkUnload(int online) {
         if (online != 0) return;
         woolbattle.lobbySystemLink().connectionRequests().cleanUp();
         if (!woolbattle.lobbySystemLink().connectionRequests().asMap().isEmpty()) return;

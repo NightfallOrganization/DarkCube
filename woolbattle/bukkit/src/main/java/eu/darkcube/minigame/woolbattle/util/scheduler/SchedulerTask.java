@@ -72,7 +72,7 @@ public final class SchedulerTask implements Comparable<SchedulerTask> {
         lastExecution = MinecraftServer.currentTick;
         scheduler.run();
         if (!repeating()) {
-            scheduler.cancel();
+            cancel();
         }
     }
 

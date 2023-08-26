@@ -71,7 +71,15 @@ public class PersistentDataTypes {
     };
     public static final PersistentDataType<byte[]> BYTE_ARRAY = new PersistentDataType<>() {
         @Override public byte[] deserialize(Document doc, String key) {
-            return doc.readObject(key, byte[].class);
+            try {
+                return doc.readObject(key, byte[].class);
+            } catch (Throwable throwable) {
+                try {
+                    return Base64.getDecoder().decode(doc.getString(key));
+                } catch (Throwable ignored) {
+                    throw throwable;
+                }
+            }
         }
 
         @Override public void serialize(Document.Mutable doc, String key, byte[] data) {

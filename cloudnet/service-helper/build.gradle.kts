@@ -6,20 +6,11 @@
  */
 
 plugins {
-    id ("java-library")
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-tasks.withType<Jar>().configureEach {
-    archiveBaseName = "woolbattle"
+    id("java-library")
 }
 
 dependencies {
     compileOnly(libs.cloudnet)
     compileOnly(libs.cloudnetBridge)
-    compileOnly(rootProject.project("darkcubesystem").project("libs").project("annotations"))
+    compileOnly(rootProject.project("darkcubesystem"))
 }

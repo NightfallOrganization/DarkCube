@@ -12,6 +12,7 @@ import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -35,6 +36,6 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
 
         WBUser.onlineUsers().forEach(ScoreboardHelper::setOnline);
         e.setQuitMessage(null);
-        woolBattle.lobby().checkUnload();
+        woolBattle.lobby().checkUnload(Bukkit.getOnlinePlayers().size() - 1);
     }
 }

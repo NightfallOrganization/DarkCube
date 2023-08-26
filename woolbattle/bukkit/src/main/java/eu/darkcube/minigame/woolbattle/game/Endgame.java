@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Endgame extends GamePhase {
 
@@ -55,7 +54,7 @@ public class Endgame extends GamePhase {
                 .stream()
                 .filter(u -> u.getKills() != 0)
                 .sorted((o1, o2) -> Double.compare(o2.getKD(), o1.getKD()))
-                .collect(Collectors.toList());
+                .toList();
 
         int players = users.size();
         if (players >= 1) {
@@ -85,9 +84,12 @@ public class Endgame extends GamePhase {
                 }
                 this.countdownTicks--;
                 if (this.countdownTicks <= 0) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.kickPlayer("§cGame Over");
+                    }
                     Endgame.this.disable();
-                    this.cancel();
                     woolbattle.lobby().enable();
+                    this.cancel();
                 }
             }
         }.runTaskTimer(1);

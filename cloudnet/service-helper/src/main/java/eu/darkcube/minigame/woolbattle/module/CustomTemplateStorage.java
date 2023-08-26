@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.module;
 
 import eu.cloudnetservice.driver.service.ServiceTemplate;
@@ -12,36 +13,34 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public final class WoolBattleTemplateStorage extends LocalTemplateStorage {
+public class CustomTemplateStorage extends LocalTemplateStorage {
 
-    public static final String WOOLBATTLE_TEMPLATE_STORAGE = "woolbattle";
-    private final Path storageDirectory;
+    private final ServiceHelperConfig.CustomStorage customStorage;
 
-    public WoolBattleTemplateStorage(Path storageDirectory) {
-        super(storageDirectory);
-        this.storageDirectory = storageDirectory;
+    public CustomTemplateStorage(ServiceHelperConfig.CustomStorage customStorage) {
+        super(customStorage.path());
+        this.customStorage = customStorage;
     }
 
     @Override public @NotNull String name() {
-        return WOOLBATTLE_TEMPLATE_STORAGE;
+        return customStorage.name();
     }
 
     @Override public @NotNull Collection<ServiceTemplate> templates() {
         try {
-            return Files.list(this.storageDirectory).filter(Files::isDirectory).flatMap(directory -> {
+            return Files.list(customStorage.path()).filter(Files::isDirectory).flatMap(directory -> {
                 try {
                     return Files.list(directory);
                 } catch (IOException exception) {
                     return null;
                 }
             }).filter(Objects::nonNull).filter(Files::isDirectory).map(path -> {
-                var relative = this.storageDirectory.relativize(path);
+                var relative = customStorage.path().relativize(path);
                 return ServiceTemplate
                         .builder()
                         .storage(name())

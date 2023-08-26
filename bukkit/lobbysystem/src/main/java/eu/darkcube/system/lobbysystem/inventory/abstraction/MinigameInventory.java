@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     public static final Key minigameServer = new Key(Lobby.getInstance(), "minigameserver");
-    private boolean done = false;
+    private boolean done;
     private Item minigameItem;
     private Listener listener = new Listener();
 
