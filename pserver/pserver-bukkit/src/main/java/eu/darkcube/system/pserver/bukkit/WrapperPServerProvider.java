@@ -65,14 +65,7 @@ public class WrapperPServerProvider extends PServerProvider {
                 .sendQueryAsync(PacketCreate.Response.class)
                 .thenApply(PacketCreate.Response::snapshot)
                 .thenApply(PServerSnapshot::uniqueId)
-                .thenApply(this::pserver)
-                .thenApply(f -> {
-                    try {
-                        return f.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                .thenCompose(this::pserver);
     }
 
     @Override public CompletableFuture<Collection<? extends PServerExecutor>> pservers() {

@@ -10,10 +10,7 @@ import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
 import eu.cloudnetservice.driver.registry.ServiceRegistry;
-import eu.cloudnetservice.driver.service.ServiceConfiguration;
-import eu.cloudnetservice.driver.service.ServiceDeployment;
-import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
-import eu.cloudnetservice.driver.service.ServiceTemplate;
+import eu.cloudnetservice.driver.service.*;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import eu.cloudnetservice.node.cluster.NodeServerProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -104,16 +101,21 @@ public class NodePServerExecutor implements PServerExecutor {
     @Override public @NotNull CompletableFuture<Boolean> start() {
         CompletableFuture<Boolean> fut = new CompletableFuture<>();
         if (state.compareAndSet(State.OFFLINE, State.STARTING)) {
-            NodePServerProvider.instance().executor.execute(() -> {
-                NodePServerProvider.instance().pservers.put(id, this);
-            });
+            NodePServerProvider.instance().executor.execute(() -> NodePServerProvider.instance().pservers.put(id, this));
             startedAt = System.currentTimeMillis();
-            new PacketStart(this.createSnapshot().getNow(null)).sendAsync();
             sendUpdate();
             String taskName = taskName().getNow(null);
             if (taskName == null) taskName = NodePServerProvider.pserverTaskName;
+            @Nullable ServiceTask task = serviceTaskProvider.serviceTask(taskName);
+            if (task == null) {
+                state.compareAndSet(State.STARTING, State.OFFLINE);
+                sendUpdate();
+                fut.complete(false);
+                return fut;
+            }
+            new PacketStart(this.createSnapshot().join()).sendAsync();
             ServiceConfiguration.Builder confb = ServiceConfiguration
-                    .builder(serviceTaskProvider.serviceTask(taskName))
+                    .builder(task)
                     .taskName(NodePServerProvider.pserverTaskName)
                     .staticService(false)
                     .modifyTemplates(templates -> templates.add(NodePServerProvider.instance().globalTemplate()))

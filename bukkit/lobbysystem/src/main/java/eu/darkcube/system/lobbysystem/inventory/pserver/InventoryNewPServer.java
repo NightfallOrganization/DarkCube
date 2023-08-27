@@ -21,56 +21,47 @@ import eu.darkcube.system.userapi.User;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class InventoryNewPServer extends LobbyAsyncPagedInventory {
 
-	private static final InventoryType type_new_pserver = InventoryType.of("new_pserver");
+    private static final InventoryType type_new_pserver = InventoryType.of("new_pserver");
 
-	public InventoryNewPServer(User user) {
-		super(InventoryNewPServer.type_new_pserver, Item.INVENTORY_NEW_PSERVER.getDisplayName(user),
-				user);
-	}
+    public InventoryNewPServer(User user) {
+        super(InventoryNewPServer.type_new_pserver, Item.INVENTORY_NEW_PSERVER.getDisplayName(user), user);
+    }
 
-	@Override
-	protected void inventoryClick(IInventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.item() == null)
-			return;
-		String itemid = Item.getItemId(event.item());
-		if (itemid == null)
-			return;
-		if (itemid.equals(Item.GAME_PSERVER.getItemId())) {
-			UserWrapper.fromUser(event.user())
-					.setOpenInventory(new InventoryGameServersSelection(event.user()));
-		} else if (itemid.equals(Item.WORLD_PSERVER.getItemId())) {
-			UserWrapper.fromUser(event.user()).setOpenInventory(
-					new InventoryLoading(Component.text("Creating Server..."), event.user(), u -> {
-						try {
-							PServerExecutor ex =
-									new PServerBuilder().type(Type.WORLD).create().get();
-							ex.addOwner(event.user().getUniqueId());
-							Thread.sleep(1000);
-							return new InventoryPServerConfiguration(event.user(), ex.id());
-						} catch (InterruptedException | ExecutionException e) {
-							throw new RuntimeException(e);
-						}
-					}));
-		}
-	}
+    @Override protected void inventoryClick(IInventoryClickEvent event) {
+        event.setCancelled(true);
+        if (event.item() == null) return;
+        String itemid = Item.getItemId(event.item());
+        if (itemid == null) return;
+        if (itemid.equals(Item.GAME_PSERVER.getItemId())) {
+            UserWrapper.fromUser(event.user()).setOpenInventory(new InventoryGameServersSelection(event.user()));
+        } else if (itemid.equals(Item.WORLD_PSERVER.getItemId())) {
+            UserWrapper
+                    .fromUser(event.user())
+                    .setOpenInventory(new InventoryLoading(Component.text("Creating Server..."), event.user(), u -> {
+                        PServerExecutor ex = new PServerBuilder().type(Type.WORLD).create().join();
+                        ex.addOwner(event.user().getUniqueId()).join();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return new InventoryPServerConfiguration(event.user(), ex.id());
+                    }));
+        }
+    }
 
-	@Override
-	protected void fillItems(Map<Integer, ItemStack> items) {
-		super.fillItems(items);
-		items.put(this.getPageSize() / 2 - 1, Item.WORLD_PSERVER.getItem(this.user.getUser()));
-		items.put(this.getPageSize() / 2 + 1, Item.GAME_PSERVER.getItem(this.user.getUser()));
-	}
+    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+        super.fillItems(items);
+        items.put(this.getPageSize() / 2 - 1, Item.WORLD_PSERVER.getItem(this.user.getUser()));
+        items.put(this.getPageSize() / 2 + 1, Item.GAME_PSERVER.getItem(this.user.getUser()));
+    }
 
-	@Override
-	protected void insertFallbackItems() {
-		this.fallbackItems.put(IInventory.slot(1, 5),
-				Item.INVENTORY_NEW_PSERVER.getItem(this.user.getUser()));
-		super.insertFallbackItems();
-	}
+    @Override protected void insertFallbackItems() {
+        this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_NEW_PSERVER.getItem(this.user.getUser()));
+        super.insertFallbackItems();
+    }
 
 }

@@ -35,7 +35,7 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
         private static final Pattern pattern = Pattern.compile("\\d");
 
         @Override public ItemBuilder apply(User user, ServiceTask t) {
-            Matcher matcher = Func.pattern.matcher(t.name());
+            Matcher matcher = pattern.matcher(t.name());
             String text;
             if (matcher.find()) {
                 text = t.name().substring(matcher.start());

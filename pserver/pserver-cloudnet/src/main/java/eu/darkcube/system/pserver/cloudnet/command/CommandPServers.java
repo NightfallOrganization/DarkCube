@@ -14,6 +14,7 @@ import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.context.CommandContext;
 import dev.derklaro.aerogel.Inject;
+import dev.derklaro.aerogel.Singleton;
 import eu.cloudnetservice.driver.service.ServiceTask;
 import eu.cloudnetservice.modules.bridge.player.CloudOfflinePlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
@@ -30,7 +31,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-@CommandAlias({"pserver", "ps"}) @CommandDescription("PServer Management") @CommandPermission("darkcube.command.pserver")
+@Singleton @CommandAlias({"pserver", "ps"}) @CommandDescription("PServer Management") @CommandPermission("darkcube.command.pserver")
 public class CommandPServers {
 
     @Inject

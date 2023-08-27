@@ -30,7 +30,6 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
@@ -80,37 +79,32 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
         }
         final int pagesize = this.getPageSize();
 
-        try {
-            Collection<UniqueId> col = PServerProvider.instance().pservers(user.getUser().getUniqueId()).get();
-            pservercount = Math.max(pservercount, col.size());
-            Iterator<UniqueId> it = col.iterator();
+        Collection<UniqueId> col = PServerProvider.instance().pservers(user.getUser().getUniqueId()).join();
+        pservercount = Math.max(pservercount, col.size());
+        Iterator<UniqueId> it = col.iterator();
 
-            for (int slot = 0; slot < pservercount; slot++) {
-                UniqueId pserverId = it.hasNext() ? it.next() : null;
-                ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
+        for (int slot = 0; slot < pservercount; slot++) {
+            UniqueId pserverId = it.hasNext() ? it.next() : null;
+            ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
 
-                if (item == null) {
-                    item = ItemBuilder.item(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
-                } else {
-                    Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
-                    PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
-                    PServerExecutor.State state = ps == null ? PServerExecutor.State.OFFLINE : ps.state().get();
-                    Message mstate = state == PServerExecutor.State.OFFLINE ? Message.STATE_OFFLINE : state == PServerExecutor.State.RUNNING ? Message.STATE_RUNNING : state == PServerExecutor.State.STARTING ? Message.STATE_STARTING : state == PServerExecutor.State.STOPPING ? Message.STATE_STOPPING : null;
-                    if (mstate == null) throw new IllegalStateException();
-                    item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(), mstate));
-                }
-
-                if (pserverId != null) item
-                        .persistentDataStorage()
-                        .set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING, pserverId.toString());
-
-                items.put(slot, item.build());
+            if (item == null) {
+                item = ItemBuilder.item(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
+            } else {
+                Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
+                PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
+                PServerExecutor.State state = ps == null ? PServerExecutor.State.OFFLINE : ps.state().join();
+                Message mstate = state == PServerExecutor.State.OFFLINE ? Message.STATE_OFFLINE : state == PServerExecutor.State.RUNNING ? Message.STATE_RUNNING : state == PServerExecutor.State.STARTING ? Message.STATE_STARTING : state == PServerExecutor.State.STOPPING ? Message.STATE_STOPPING : null;
+                if (mstate == null) throw new IllegalStateException();
+                item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(), mstate));
             }
-            for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize; slot < pagesize; slot++) {
-                items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+
+            if (pserverId != null)
+                item.persistentDataStorage().set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING, pserverId.toString());
+
+            items.put(slot, item.build());
+        }
+        for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize; slot < pagesize; slot++) {
+            items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
         }
     }
 

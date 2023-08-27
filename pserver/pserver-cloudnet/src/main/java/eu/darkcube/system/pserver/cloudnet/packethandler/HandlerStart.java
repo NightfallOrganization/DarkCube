@@ -12,11 +12,8 @@ import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.packets.wn.PacketStart;
 import eu.darkcube.system.pserver.common.packets.wn.PacketStart.Response;
 
-import java.util.concurrent.ExecutionException;
-
 public class HandlerStart implements PacketHandler<PacketStart> {
-	@Override
-	public Packet handle(PacketStart packet) throws ExecutionException, InterruptedException {
-		return new Response(PServerProvider.instance().pserver(packet.id()).get().start().get());
-	}
+    @Override public Packet handle(PacketStart packet) {
+        return new Response(PServerProvider.instance().pserver(packet.id()).join().start().join());
+    }
 }

@@ -7,6 +7,7 @@
 package eu.darkcube.system.lobbysystem.user;
 
 import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
@@ -93,7 +94,7 @@ public class LobbyUser {
         return this.openInventory;
     }
 
-    public LobbyUser setOpenInventory(IInventory openInventory) {
+    public LobbyUser setOpenInventory(@NotNull IInventory openInventory) {
         if (this.openInventory != null && openInventory.getClass().equals(this.openInventory.getClass())) {
             this.disableAnimations(true);
         }

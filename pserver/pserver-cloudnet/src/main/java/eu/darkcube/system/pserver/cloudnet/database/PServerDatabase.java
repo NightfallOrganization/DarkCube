@@ -70,12 +70,12 @@ public class PServerDatabase extends Database {
 
     public boolean contains(UniqueId pserver) {
         String cmd = String.format(COMMANDS[5], pserver.toString());
-        return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::first));
+        return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::next));
     }
 
     public boolean contains(UUID owner, UniqueId pserver) {
         String cmd = String.format(COMMANDS[2], owner.toString(), pserver.toString());
-        return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::first));
+        return Boolean.TRUE.equals(executeQuery(cmd, ResultSet::next));
     }
 
     private boolean insert(UUID owner, UniqueId pserver) {

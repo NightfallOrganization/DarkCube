@@ -71,12 +71,9 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
         if (itemid == null) return;
         if (itemid.equals(Item.PSERVER_DELETE.getItemId())) {
             user.setOpenInventory(new InventoryConfirm(getTitle(), user.getUser(), () -> {
-                try {
-                    PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
-                    ps.removeOwner(user.getUser().getUniqueId()).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
+                ps.removeOwner(user.getUser().getUniqueId()).join();
+                user.getUser().asPlayer().closeInventory();
             }, () -> user.setOpenInventory(new InventoryPServerConfiguration(user.getUser(), pserverId))));
         } else if (itemid.equals(Item.START_PSERVER.getItemId())) {
             user.getUser().asPlayer().closeInventory();
@@ -173,5 +170,4 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
         }
         this.recalculate();
     }
-
 }

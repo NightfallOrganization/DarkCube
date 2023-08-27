@@ -23,28 +23,23 @@ import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Material;
 
-import java.util.concurrent.ExecutionException;
-
 public class PServerDataManager {
 
     public static ItemBuilder getDisplayItem(User user, UniqueId pserverId) {
         if (pserverId != null) {
-            try {
-                PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
-                Type type = ps.type().get();
+            PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
+            Type type = ps.type().join();
+            String taskName = ps.taskName().join();
 
-                if (type == Type.GAMEMODE) {
-                    ItemBuilder b = getDisplayItemGamemode(user, ps.taskName().get());
-                    b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
-                    return b;
-                }
-                ItemBuilder b = ItemBuilder.item(SkullCache.getCachedItem(user.getUniqueId()));
-                b.displayname(Item.WORLD_PSERVER.getDisplayName(user));
+            if (type == Type.GAMEMODE) {
+                ItemBuilder b = getDisplayItemGamemode(user, taskName);
                 b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
                 return b;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
             }
+            ItemBuilder b = ItemBuilder.item(SkullCache.getCachedItem(user.getUniqueId()));
+            b.displayname(Item.WORLD_PSERVER.getDisplayName(user));
+            b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
+            return b;
         }
         return null;
     }

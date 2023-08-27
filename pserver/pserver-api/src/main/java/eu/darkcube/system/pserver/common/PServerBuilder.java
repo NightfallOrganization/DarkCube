@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.pserver.common;
 
+import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 
@@ -13,46 +14,51 @@ import java.util.concurrent.CompletableFuture;
 
 public final class PServerBuilder {
 
-	private AccessLevel accessLevel = AccessLevel.PUBLIC;
-	private Type type = Type.WORLD;
-	private String taskName = null;
+    private AccessLevel accessLevel = AccessLevel.PUBLIC;
+    private Type type = Type.WORLD;
+    private String taskName = null;
 
-	public PServerBuilder() {
-	}
+    public PServerBuilder() {
+    }
 
-	public AccessLevel accessLevel() {
-		return accessLevel;
-	}
+    @Api public PServerBuilder(AccessLevel accessLevel, Type type, String taskName) {
+        this.accessLevel = accessLevel;
+        this.type = type;
+        this.taskName = taskName;
+    }
 
-	public PServerBuilder accessLevel(AccessLevel accessLevel) {
-		this.accessLevel = accessLevel;
-		return this;
-	}
+    public AccessLevel accessLevel() {
+        return accessLevel;
+    }
 
-	public Type type() {
-		return type;
-	}
+    public PServerBuilder accessLevel(AccessLevel accessLevel) {
+        this.accessLevel = accessLevel;
+        return this;
+    }
 
-	public PServerBuilder type(Type type) {
-		this.type = type;
-		return this;
-	}
+    public Type type() {
+        return type;
+    }
 
-	public String taskName() {
-		return taskName;
-	}
+    public PServerBuilder type(Type type) {
+        this.type = type;
+        return this;
+    }
 
-	public PServerBuilder taskName(String taskName) {
-		this.taskName = taskName;
-		return this;
-	}
+    public String taskName() {
+        return taskName;
+    }
 
-	public CompletableFuture<? extends PServerExecutor> create() {
-		return PServerProvider.instance().createPServer(this);
-	}
+    public PServerBuilder taskName(String taskName) {
+        this.taskName = taskName;
+        return this;
+    }
 
-	@Override
-	public PServerBuilder clone() {
-		return new PServerBuilder().type(type).taskName(taskName).accessLevel(accessLevel);
-	}
+    public CompletableFuture<? extends PServerExecutor> create() {
+        return PServerProvider.instance().createPServer(this);
+    }
+
+    @Override public PServerBuilder clone() {
+        return new PServerBuilder().type(type).taskName(taskName).accessLevel(accessLevel);
+    }
 }

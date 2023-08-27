@@ -117,6 +117,14 @@ public class PacketAPI {
         return ChannelMessage.builder().channel(CHANNEL).message(MESSAGE_PACKET).buffer(buffer);
     }
 
+    public void registerGroup(HandlerGroup group) {
+        handlers.putAll(group.handlers());
+    }
+
+    public void unregisterGroup(HandlerGroup group) {
+        handlers.keySet().removeAll(group.handlers().keySet());
+    }
+
     public <T extends Packet> void registerHandler(Class<T> clazz, PacketHandler<T> handler) {
         handlers.put(clazz, handler);
     }

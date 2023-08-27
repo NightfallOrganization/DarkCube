@@ -12,13 +12,8 @@ import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.packets.wn.PacketRemoveOwner;
 import eu.darkcube.system.pserver.common.packets.wn.PacketRemoveOwner.Response;
 
-import java.util.concurrent.ExecutionException;
-
 public class HandlerRemoveOwner implements PacketHandler<PacketRemoveOwner> {
-	@Override
-	public Packet handle(PacketRemoveOwner packet) throws ExecutionException, InterruptedException {
-		return new Response(
-				PServerProvider.instance().pserver(packet.id()).get().removeOwner(packet.owner())
-						.get());
-	}
+    @Override public Packet handle(PacketRemoveOwner packet) {
+        return new Response(PServerProvider.instance().pserver(packet.id()).join().removeOwner(packet.owner()).join());
+    }
 }

@@ -28,93 +28,88 @@ import org.bukkit.inventory.ItemStack;
 
 public class ListenerInventoryClick extends BaseListener {
 
-	@EventHandler
-	public void handle(InventoryClickEvent e) {
-		Player p = (Player) e.getWhoClicked();
-		LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
-		if (user.isBuildMode()) {
-			return;
-		}
-		e.setCancelled(true);
-		ItemStack item = e.getCurrentItem();
-		if (item == null) {
-			return;
-		}
-		String itemid = Item.getItemId(item);
-		language:
-		{
-			String languageId = ItemBuilder.item(item).persistentDataStorage()
-					.get(InventorySettings.language, PersistentDataTypes.STRING);
-			if (languageId == null || languageId.isEmpty())
-				break language;
-			Language language = Language.fromString(languageId);
-			int i = 0;
-			for (; i < Language.values().length; i++) {
-				if (Language.values()[i] == language) {
-					i++;
-					break;
-				}
-			}
-			i %= Language.values().length;
-			language = Language.values()[i];
-			user.getUser().setLanguage(language);
-			user.disableSounds(true);
-			Lobby.getInstance().setItems(user);
-			user.setOpenInventory(new InventorySettings(user.getUser()));
-			p.setFlying(true);
-			user.disableSounds(false);
-		}
-		if (itemid == null || itemid.isEmpty()) {
-			return;
-		}
-		boolean close = false;
-		if (itemid.equals(Item.INVENTORY_COMPASS_SPAWN.getItemId())) {
-			user.teleport(Lobby.getInstance().getDataManager().getSpawn());
-			close = true;
-		} else if (itemid.equals(Item.INVENTORY_COMPASS_WOOLBATTLE.getItemId())
-				&& !(user.getOpenInventory() instanceof InventoryWoolBattle)) {
-			user.teleport(Lobby.getInstance().getDataManager().getWoolBattleSpawn());
-			close = true;
-		} else if (itemid.equals(Item.INVENTORY_COMPASS_JUMPANDRUN.getItemId())) {
-			user.teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn());
-			close = true;
-		} else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItemId())) {
-			user.setAnimations(false);
-			user.setOpenInventory(new InventorySettings(user.getUser()));
-		} else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_OFF.getItemId())) {
-			user.setAnimations(true);
-			user.setOpenInventory(new InventorySettings(user.getUser()));
-		} else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_ON.getItemId())) {
-			user.setSounds(false);
-			user.setOpenInventory(new InventorySettings(user.getUser()));
-		} else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_OFF.getItemId())) {
-			user.setSounds(true);
-			user.setOpenInventory(new InventorySettings(user.getUser()));
-		}
+    @EventHandler public void handle(InventoryClickEvent e) {
+        Player p = (Player) e.getWhoClicked();
+        LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
+        if (user.isBuildMode()) {
+            return;
+        }
+        e.setCancelled(true);
+        ItemStack item = e.getCurrentItem();
+        if (item == null) {
+            return;
+        }
+        String itemid = Item.getItemId(item);
+        language:
+        {
+            String languageId = ItemBuilder.item(item).persistentDataStorage().get(InventorySettings.language, PersistentDataTypes.STRING);
+            if (languageId == null || languageId.isEmpty()) break language;
+            Language language = Language.fromString(languageId);
+            int i = 0;
+            for (; i < Language.values().length; i++) {
+                if (Language.values()[i] == language) {
+                    i++;
+                    break;
+                }
+            }
+            i %= Language.values().length;
+            language = Language.values()[i];
+            user.getUser().setLanguage(language);
+            user.disableSounds(true);
+            Lobby.getInstance().setItems(user);
+            user.setOpenInventory(new InventorySettings(user.getUser()));
+            p.setFlying(true);
+            user.disableSounds(false);
+        }
+        if (itemid == null || itemid.isEmpty()) {
+            return;
+        }
+        boolean close = false;
+        if (itemid.equals(Item.INVENTORY_COMPASS_SPAWN.getItemId())) {
+            user.teleport(Lobby.getInstance().getDataManager().getSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_COMPASS_WOOLBATTLE.getItemId()) && !(user.getOpenInventory() instanceof InventoryWoolBattle)) {
+            user.teleport(Lobby.getInstance().getDataManager().getWoolBattleSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_COMPASS_JUMPANDRUN.getItemId())) {
+            user.teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItemId())) {
+            user.setAnimations(false);
+            user.setOpenInventory(new InventorySettings(user.getUser()));
+        } else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_OFF.getItemId())) {
+            user.setAnimations(true);
+            user.setOpenInventory(new InventorySettings(user.getUser()));
+        } else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_ON.getItemId())) {
+            user.setSounds(false);
+            user.setOpenInventory(new InventorySettings(user.getUser()));
+        } else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_OFF.getItemId())) {
+            user.setSounds(true);
+            user.setOpenInventory(new InventorySettings(user.getUser()));
+        }
 
-		// PagedInventories
-		IInventory inv = user.getOpenInventory();
+        // PagedInventories
+        IInventory inv = user.getOpenInventory();
 
-		if (inv instanceof InventoryConfirm) {
-			InventoryConfirm cinv = (InventoryConfirm) inv;
-			if (itemid.equals(Item.CONFIRM.getItemId())) {
-				cinv.onConfirm.run();
-			} else if (itemid.equals(Item.CANCEL.getItemId())) {
-				cinv.onCancel.run();
-			}
-		}
+        if (inv instanceof InventoryConfirm cinv) {
+            if (itemid.equals(Item.CONFIRM.getItemId())) {
+                cinv.onConfirm.run();
+            } else if (itemid.equals(Item.CANCEL.getItemId())) {
+                cinv.onCancel.run();
+            }
+        }
 
-		if (inv instanceof InventoryPServer) {
-			if (itemid.equals(Item.INVENTORY_PSERVER_PRIVATE.getItemId())) {
-				user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
-			}
-		} else if (inv instanceof InventoryPServerOwn) {
-			if (itemid.equals(Item.INVENTORY_PSERVER_PUBLIC.getItemId())) {
-				user.setOpenInventory(new InventoryPServer(user));
-			}
-		}
-		if (close) {
-			p.closeInventory();
-		}
-	}
+        if (inv instanceof InventoryPServer) {
+            if (itemid.equals(Item.INVENTORY_PSERVER_PRIVATE.getItemId())) {
+                user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
+            }
+        } else if (inv instanceof InventoryPServerOwn) {
+            if (itemid.equals(Item.INVENTORY_PSERVER_PUBLIC.getItemId())) {
+                user.setOpenInventory(new InventoryPServer(user));
+            }
+        }
+        if (close) {
+            p.closeInventory();
+        }
+    }
 }

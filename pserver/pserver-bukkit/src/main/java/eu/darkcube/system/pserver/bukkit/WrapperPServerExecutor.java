@@ -49,7 +49,9 @@ public class WrapperPServerExecutor implements PServerExecutor {
     }
 
     @Override public @NotNull CompletableFuture<@NotNull Boolean> removeOwner(UUID uuid) {
-        return new PacketRemoveOwner(id, uuid).sendQueryAsync(PacketAddOwner.Response.class).thenApply(PacketAddOwner.Response::success);
+        return new PacketRemoveOwner(id, uuid)
+                .sendQueryAsync(PacketRemoveOwner.Response.class)
+                .thenApply(PacketRemoveOwner.Response::success);
     }
 
     @Override public @NotNull CompletableFuture<@NotNull PServerSnapshot> createSnapshot() {
