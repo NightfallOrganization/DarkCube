@@ -30,12 +30,12 @@ public class WBUserModifier implements UserModifier {
     }
 
     @SuppressWarnings("DataFlowIssue") @Override public void onLoad(User user) {
-        user.getPersistentDataStorage().clearCache();
+        user.persistentData().clearCache();
         DefaultWBUser u = new DefaultWBUser(woolbattle, user);
         int oldDataVersion = 0;
         int dataVersion = 0;
-        if (user.getPersistentDataStorage().has(DATA_VERSION)) {
-            oldDataVersion = dataVersion = user.getPersistentDataStorage().get(DATA_VERSION, PersistentDataTypes.INTEGER);
+        if (user.persistentData().has(DATA_VERSION)) {
+            oldDataVersion = dataVersion = user.persistentData().get(DATA_VERSION, PersistentDataTypes.INTEGER);
         }
         if (dataVersion == 0) {
             // Removed: We would load mysql here, but we don't use it anymore
@@ -46,19 +46,19 @@ public class WBUserModifier implements UserModifier {
             dataVersion = 2;
         }
         if (oldDataVersion != dataVersion) {
-            user.getPersistentDataStorage().set(DATA_VERSION, PersistentDataTypes.INTEGER, dataVersion);
+            user.persistentData().set(DATA_VERSION, PersistentDataTypes.INTEGER, dataVersion);
         }
-        user.getMetaDataStorage().set(USER, u);
+        user.metadata().set(USER, u);
         u.perks().reloadFromStorage();
     }
 
     @Override public void onUnload(User user) {
-        user.getMetaDataStorage().remove(USER);
-        user.getPersistentDataStorage().clearCache();
+        user.metadata().remove(USER);
+        user.persistentData().clearCache();
     }
 
     private void migrateFrom1To2(DefaultWBUser user) {
-        logger.info("[WoolBattle] Migrating user " + user.user().getName() + " from version 1 to 2");
+        logger.info("[WoolBattle] Migrating user " + user.user().name() + " from version 1 to 2");
         PlayerPerks perks = user.perksStorage();
         perks.perk(ActivationType.DOUBLE_JUMP, 0, DoubleJumpPerk.DOUBLE_JUMP);
         perks.perkInvSlot(ActivationType.DOUBLE_JUMP, 0, -1);
