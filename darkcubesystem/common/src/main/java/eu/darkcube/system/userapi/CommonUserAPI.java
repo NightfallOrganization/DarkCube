@@ -28,7 +28,13 @@ public abstract class CommonUserAPI implements UserAPI {
     protected final CommonRemoteUserPacketHandler packetHandler = new CommonRemoteUserPacketHandler(this);
 
     public CommonUserAPI() {
-        userCache = Caffeine.newBuilder().softValues().removalListener(new UserCacheRemovalListener()).build(this::loadUser);
+        userCache = Caffeine.newBuilder().softValues().removalListener(new UserCacheRemovalListener()).build(uniqueId -> {
+            CommonUser user = loadUser(uniqueId);
+            for (UserModifier modifier : modifiers) {
+                modifier.onLoad(user);
+            }
+            return user;
+        });
         UserAPIHolder.instance(this);
         packetHandler.registerHandlers();
     }

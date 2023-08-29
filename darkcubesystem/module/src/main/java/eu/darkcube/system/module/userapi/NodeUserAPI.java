@@ -12,7 +12,7 @@ import dev.derklaro.aerogel.Singleton;
 import eu.cloudnetservice.driver.database.Database;
 import eu.cloudnetservice.driver.database.DatabaseProvider;
 import eu.cloudnetservice.driver.document.Document;
-import eu.cloudnetservice.driver.registry.injection.Service;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
 import eu.cloudnetservice.modules.bridge.player.CloudOfflinePlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import eu.darkcube.system.userapi.*;
@@ -25,8 +25,8 @@ import java.util.UUID;
     private final UserLocalPacketHandlers packetHandlers = new UserLocalPacketHandlers(this);
     private final NodeDataSaver dataSaver;
 
-    @Inject public NodeUserAPI(DatabaseProvider databaseProvider, @Service PlayerManager playerManager) {
-        this.playerManager = playerManager;
+    @Inject public NodeUserAPI(DatabaseProvider databaseProvider, ServiceRegistry serviceRegistry) {
+        this.playerManager = serviceRegistry.firstProvider(PlayerManager.class);
         this.database = databaseProvider.database("userapi_users");
         this.dataSaver = new NodeDataSaver(this.database);
     }
@@ -39,7 +39,7 @@ import java.util.UUID;
         if (offlinePlayer != null) name = offlinePlayer.name();
         else if (data.contains("name")) name = data.getString("name");
         else name = uniqueId.toString().substring(0, 16);
-        CommonPersistentDataStorage persistentData = new UserLocalPersistentDataStorage(uniqueId, data);
+        CommonPersistentDataStorage persistentData = new UserLocalPersistentDataStorage(uniqueId, name, data.readDocument("persistentData"));
         persistentData.addUpdateNotifier(this.dataSaver.saveNotifier());
         CommonUserData userData = new CommonUserData(uniqueId, name, persistentData);
         return new NodeUser(userData);

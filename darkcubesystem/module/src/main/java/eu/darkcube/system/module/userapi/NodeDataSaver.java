@@ -55,7 +55,11 @@ class NodeDataSaver {
     }
 
     void save(UserLocalPersistentDataStorage storage) {
-        save(storage.uniqueId(), storage.storeToJsonDocument());
+        Document.Mutable data = Document.newJsonDocument();
+        data.append("name", storage.name());
+        data.append("uuid", storage.uniqueId());
+        data.append("persistentData", storage.storeToJsonDocument());
+        save(storage.uniqueId(), data);
     }
 
     private void save(UUID uniqueId, Document document) {
