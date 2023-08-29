@@ -12,5 +12,5 @@ plugins {
 dependencies {
     compileOnly(libs.cloudnet)
     compileOnly(libs.cloudnetBridge)
-    compileOnly(parent!!.project("api"))
+    compileOnlyApi(parent!!.project("common"))
 }

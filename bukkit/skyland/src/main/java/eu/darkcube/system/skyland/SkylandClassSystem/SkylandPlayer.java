@@ -10,10 +10,10 @@ import eu.darkcube.system.skyland.Equipment.*;
 import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.skyland.staticval.Globals;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,177 +23,168 @@ import java.util.List;
 
 public class SkylandPlayer implements SkylandEntity {
 
-	private static final Key MONEY_KEY = new Key(Skyland.getInstance(), "money");
-	private static final Key ACTIVE_CLASS_KEY = new Key(Skyland.getInstance(), "active_class_key");
-	private static final Key SKYLAND_PLAYER_CLASSES = new Key(Skyland.getInstance(), "skyland_player_classes");
+    public static final PersistentDataType<List<SkylandPlayerClass>> skylandClassList = PersistentDataTypes.list(SkylandPlayerClass.TYPE);
+    private static final Key MONEY_KEY = new Key(Skyland.getInstance(), "money");
+    private static final Key ACTIVE_CLASS_KEY = new Key(Skyland.getInstance(), "active_class_key");
+    private static final Key SKYLAND_PLAYER_CLASSES = new Key(Skyland.getInstance(), "skyland_player_classes");
+    private final User user;
+    //todo
 
-	public static final PersistentDataType<List<SkylandPlayerClass>> skylandClassList = PersistentDataTypes.list(SkylandPlayerClass.TYPE);
-	private final User user;
-	//todo
+    public SkylandPlayer(User user) {
+        this.user = user;
+        user.persistentData().setIfNotPresent(MONEY_KEY, PersistentDataTypes.BIGINTEGER, BigInteger.ZERO);
+        user.persistentData().setIfNotPresent(SKYLAND_PLAYER_CLASSES, skylandClassList, new ArrayList<>());
 
-	public SkylandPlayer(User user) {
-		this.user = user;
-		user.getPersistentDataStorage().setIfNotPresent(MONEY_KEY, PersistentDataTypes.BIGINTEGER, BigInteger.ZERO);
-		user.getPersistentDataStorage().setIfNotPresent(SKYLAND_PLAYER_CLASSES, skylandClassList, new ArrayList<>());
+    }
 
-	}
+    public boolean contains(EquipmentType[] collection, EquipmentType target) {
+        for (EquipmentType eq : collection) {
+            if (eq.equals(target)) {
+                return true;
+            }
+        }
 
+        return false;
+    }
 
-	public boolean contains(EquipmentType[] collection, EquipmentType target){
-		for (EquipmentType eq : collection){
-			if (eq.equals(target)){
-				return true;
-			}
-		}
+    public List<Equipment> getEquipment() {
+        ArrayList<Equipment> out = new ArrayList<>();
+        for (ItemStack i : getPlayer().getEquipment().getArmorContents()) {
+            Equipments equipments = Equipments.loadFromItem(i);
+            if (equipments != null) {
+                if (getActiveClass().isEqUsable(equipments)) {
+                    out.add(equipments);
+                }
 
-		return false;
-	}
+            }
+        }
 
-	public List<Equipment> getEquipment() {
-		ArrayList<Equipment> out = new ArrayList<>();
-		for (ItemStack i : getPlayer().getEquipment().getArmorContents()) {
-			Equipments equipments = Equipments.loadFromItem(i);
-			if (equipments != null) {
-				if (getActiveClass().isEqUsable(equipments)) {
-					out.add(equipments);
-				}
+        Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
+        if (equipments != null) {
+            if (getActiveClass().isEqUsable(equipments)) {
+                out.add(equipments);
+            }
+        }
 
-			}
-		}
+        //todo get from inv need duckness for additional slot
+        return out;
+    }
 
-		Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
-		if (equipments != null) {
-			if (getActiveClass().isEqUsable(equipments)) {
-				out.add(equipments);
-			}
-		}
+    public Weapon getActiveWeapon() {
+        //returns null if there isnt a weapon in the main hand
+        System.out.println("loading from main hand");
 
-		//todo get from inv need duckness for additional slot
-		return out;
-	}
+        if (getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
 
-	public Weapon getActiveWeapon() {
-		//returns null if there isnt a weapon in the main hand
-		System.out.println("loading from main hand");
+            Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
+            if (equipments != null) {
+                if (getActiveClass().isEqUsable(equipments)) {
+                    System.out.println("allowed to use this weapon");
+                    return equipments;
+                } else {
+                    System.out.println("not allowed to use this weapon");
+                }
+            }
+        } else {
+            System.out.println("item meta of active weapon is null");
+        }
 
-		if (getPlayer().getInventory().getItemInMainHand().getItemMeta() != null){
+        return null;
+    }
 
-			Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
-			if (equipments != null) {
-				if (getActiveClass().isEqUsable(equipments)) {
-					System.out.println("allowed to use this weapon");
-					return equipments;
-				}else {
-					System.out.println("not allowed to use this weapon");
-				}
-			}
-		}else {
-			System.out.println("item meta of active weapon is null");
-		}
+    @Override public PlayerStats[] getStats() {
 
-		return null;
-	}
+        ArrayList<PlayerStats> playerStats = new ArrayList<>();
+        //playerStats.add(activeClass);
 
-	@Override
-	public PlayerStats[] getStats() {
+        for (Equipment eq : getEquipment()) {
+            playerStats.addAll(List.of(eq.getStats()));
+        }
 
-		ArrayList<PlayerStats> playerStats = new ArrayList<>();
-		//playerStats.add(activeClass);
+        return PlayerStats.mergePstats(playerStats);
+    }
 
-		for (Equipment eq:getEquipment()) {
-			playerStats.addAll(List.of(eq.getStats()));
-		}
+    @Override public int getAttackDmg() {
+        int strength = 0;
 
+        for (PlayerStats ps : getStats()) {
+            if (ps.getType() == PlayerStatsType.STRENGHT) {
+                strength += ps.getMenge();
+            }
+        }
 
-		return PlayerStats.mergePstats(playerStats);
-	}
+        if (getActiveWeapon() != null) {
+            return getActiveWeapon().getDamage() * (1 + (strength * Globals.strengthDmgMult / 100));
+        } else {
+            System.out.println("no weapon found default dmg = 1");
+            return 1;
+        }
+        //here strength effectiveness is calculated
 
-	@Override
-	public int getAttackDmg() {
-		int strength = 0;
+    }
 
-		for (PlayerStats ps : getStats()) {
-			if (ps.getType() == PlayerStatsType.STRENGHT) {
-				strength += ps.getMenge();
-			}
-		}
+    public User getUser() {
+        return user;
+    }
 
-		if (getActiveWeapon() != null){
-			return getActiveWeapon().getDamage() * (1 + (strength * Globals.strengthDmgMult / 100));
-		}else {
-			System.out.println("no weapon found default dmg = 1");
-			return 1;
-		}
-		//here strength effectiveness is calculated
+    public Player getPlayer() {
+        return Bukkit.getPlayer(user.uniqueId());
+    }
 
-	}
+    public List<SkylandPlayerClass> getSkylandPlayerClasses() {
+        return user.persistentData().get(SKYLAND_PLAYER_CLASSES, skylandClassList);
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setSkylandPlayerClasses(List<SkylandPlayerClass> classes) {
+        user.persistentData().set(SKYLAND_PLAYER_CLASSES, skylandClassList, classes);
+    }
 
-	public Player getPlayer() {
-		return user.asPlayer();
-	}
+    public SkylandPlayerClass getActiveClass() {
+        return getSkylandPlayerClasses().get(user.persistentData().get(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER));
+    }
 
-	public List<SkylandPlayerClass> getSkylandPlayerClasses() {
-		return user.getPersistentDataStorage().get(SKYLAND_PLAYER_CLASSES, skylandClassList);
-	}
+    /*
+        public void setActiveClass(SkylandPlayerClass activeClass) {
+            for (int i = 0; i < getSkylandPlayerClasses().size(); i++) {
+                if (getSkylandPlayerClasses().get(i).equals(activeClass)){
+                    user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, i);
+                    return;
+                }
+            }
+            user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, 0);
+            System.out.println("active class not found");
+        }
 
-	public SkylandPlayerClass getActiveClass() {
-		return getSkylandPlayerClasses().get(user.getPersistentDataStorage().get(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER));
-	}
-/*
-	public void setActiveClass(SkylandPlayerClass activeClass) {
-		for (int i = 0; i < getSkylandPlayerClasses().size(); i++) {
-			if (getSkylandPlayerClasses().get(i).equals(activeClass)){
-				user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, i);
-				return;
-			}
-		}
-		user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, 0);
-		System.out.println("active class not found");
-	}
+     */
+    public void setActiveClass(int activeClass) {
+        user.persistentData().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, activeClass);
 
- */
-	public void setActiveClass(int activeClass) {
-		user.getPersistentDataStorage().set(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER, activeClass);
+    }
 
-	}
+    public BigInteger getMoney() {
+        return user.persistentData().get(MONEY_KEY, PersistentDataTypes.BIGINTEGER);
+    }
 
+    public void setMoney(BigInteger money) {
+        user.persistentData().set(MONEY_KEY, PersistentDataTypes.BIGINTEGER, money);
+    }
 
-	public void setSkylandPlayerClasses(List<SkylandPlayerClass> classes){
-		user.getPersistentDataStorage().set(SKYLAND_PLAYER_CLASSES, skylandClassList, classes);
-	}
+    @Override public String toString() {
+        return "SkylandPlayer{" + "user=" + user + "activeClass=" + getActiveClass().getsClass() + "Money=" + getMoney() + '}';
+    }
 
-	public BigInteger getMoney() {
-		return user.getPersistentDataStorage().get(MONEY_KEY, PersistentDataTypes.BIGINTEGER);
-	}
+    public boolean hastActiveClass() {
+        return user.persistentData().has(ACTIVE_CLASS_KEY);
+    }
 
-	public void setMoney(BigInteger money) {
-		user.getPersistentDataStorage().set(MONEY_KEY, PersistentDataTypes.BIGINTEGER, money);
-	}
+    public int getActiveClassID() {
+        return user.persistentData().get(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER);
+    }
 
-	@Override
-	public String toString() {
-		return "SkylandPlayer{" + "user=" + user +
-				"activeClass=" + getActiveClass().getsClass() +
-				"Money=" + getMoney() +
-				'}';
-	}
+    public void resetData() {
+        user.persistentData().remove(ACTIVE_CLASS_KEY, SkylandPlayerClass.TYPE);
+        setSkylandPlayerClasses(new ArrayList<>());
 
-	public boolean hastActiveClass(){
-		return user.getPersistentDataStorage().has(ACTIVE_CLASS_KEY);
-	}
-
-	public int getActiveClassID(){
-		return user.getPersistentDataStorage().get(ACTIVE_CLASS_KEY, PersistentDataTypes.INTEGER);
-	}
-	public void resetData(){
-		user.getPersistentDataStorage().remove(ACTIVE_CLASS_KEY, SkylandPlayerClass.TYPE);
-		setSkylandPlayerClasses(new ArrayList<>());
-
-
-	}
+    }
 
 }

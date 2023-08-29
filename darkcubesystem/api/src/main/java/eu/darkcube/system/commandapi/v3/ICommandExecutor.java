@@ -22,11 +22,17 @@ public interface ICommandExecutor extends Audience {
         this.sendMessage(message.getMessage(this, components));
     }
 
-    @Deprecated default Language getLanguage() {
+    /**
+     * @deprecated {@link #language()}
+     */
+    @Deprecated(forRemoval = true) default Language getLanguage() {
         return language();
     }
 
-    @Deprecated default void setLanguage(Language language) {
+    /**
+     * @deprecated {@link #language(Language)}
+     */
+    @Deprecated(forRemoval = true) default void setLanguage(Language language) {
         language(language);
     }
 
@@ -38,7 +44,7 @@ public interface ICommandExecutor extends Audience {
         return "";
     }
 
-    @Deprecated default String getCommandPrefix() {
+    @Deprecated(forRemoval = true) default String getCommandPrefix() {
         return commandPrefix();
     }
 }

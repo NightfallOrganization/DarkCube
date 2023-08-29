@@ -70,30 +70,30 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
         String itemid = Item.getItemId(event.item());
         if (itemid == null) return;
         if (itemid.equals(Item.PSERVER_DELETE.getItemId())) {
-            user.setOpenInventory(new InventoryConfirm(getTitle(), user.getUser(), () -> {
+            user.setOpenInventory(new InventoryConfirm(getTitle(), user.user(), () -> {
                 PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
-                ps.removeOwner(user.getUser().getUniqueId()).join();
-                user.getUser().asPlayer().closeInventory();
-            }, () -> user.setOpenInventory(new InventoryPServerConfiguration(user.getUser(), pserverId))));
+                ps.removeOwner(user.user().uniqueId()).join();
+                user.asPlayer().closeInventory();
+            }, () -> user.setOpenInventory(new InventoryPServerConfiguration(user.user(), pserverId))));
         } else if (itemid.equals(Item.START_PSERVER.getItemId())) {
-            user.getUser().asPlayer().closeInventory();
+            user.asPlayer().closeInventory();
             AsyncExecutor.service().submit(() -> {
                 if (connecting != null) return;
                 try {
                     // TODO: Forbid player to start multiple pservers
                     PServerExecutor ex = PServerProvider.instance().pserver(pserverId).get();
-                    connecting = user.getUser().getUniqueId();
+                    connecting = user.user().uniqueId();
                     new BukkitRunnable() {
                         @Override public void run() {
                             if (connecting == null) {
                                 cancel();
                                 return;
                             }
-                            user.getUser().sendActionBar(Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE.getMessage(user.getUser()));
+                            user.user().sendActionBar(Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE.getMessage(user.user()));
                         }
                     }.runTaskTimer(Lobby.getInstance(), 0, 10);
                     ex.start().thenRun(() -> {
-                        ex.connectPlayer(user.getUser().getUniqueId()).thenRun(() -> {
+                        ex.connectPlayer(user.user().uniqueId()).thenRun(() -> {
                             connecting = null;
                         });
                     }).exceptionally(e -> {
@@ -121,20 +121,20 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
 
     @Override protected void fillItems(Map<Integer, ItemStack> items) {
         super.fillItems(items);
-        items.put(8, Item.PSERVER_DELETE.getItem(this.user.getUser()));
+        items.put(8, Item.PSERVER_DELETE.getItem(this.user.user()));
         try {
             PServerExecutor ps = PServerProvider.instance().pserver(pserverId).get();
             State state = ps.state().get();
             AccessLevel accessLevel = ps.accessLevel().get();
             if (state == State.OFFLINE) {
-                items.put(12, Item.START_PSERVER.getItem(this.user.getUser()));
+                items.put(12, Item.START_PSERVER.getItem(this.user.user()));
             } else {
-                items.put(12, Item.STOP_PSERVER.getItem(this.user.getUser()));
+                items.put(12, Item.STOP_PSERVER.getItem(this.user.user()));
             }
             if (accessLevel == AccessLevel.PRIVATE) {
-                items.put(10, Item.PSERVER_PRIVATE.getItem(user.getUser()));
+                items.put(10, Item.PSERVER_PRIVATE.getItem(user.user()));
             } else if (accessLevel == AccessLevel.PUBLIC) {
-                items.put(10, Item.PSERVER_PUBLIC.getItem(user.getUser()));
+                items.put(10, Item.PSERVER_PUBLIC.getItem(user.user()));
             } else {
                 items.put(10, new ItemStack(Material.BARRIER));
             }
@@ -144,7 +144,7 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
     }
 
     @Override protected void insertFallbackItems() {
-        this.fallbackItems.put(IInventory.slot(1, 5), PServerDataManager.getDisplayItem(this.user.getUser(), pserverId).build());
+        this.fallbackItems.put(IInventory.slot(1, 5), PServerDataManager.getDisplayItem(this.user.user(), pserverId).build());
         super.insertFallbackItems();
     }
 

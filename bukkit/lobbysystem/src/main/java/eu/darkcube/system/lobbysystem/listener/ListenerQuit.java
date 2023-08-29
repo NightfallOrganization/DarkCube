@@ -16,10 +16,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class ListenerQuit extends BaseListener {
 
-	@EventHandler
-	public void handle(PlayerQuitEvent e) {
-		LobbyUser u = UserWrapper.fromUser(UserAPI.getInstance().getUser(e.getPlayer()));
-		u.stopJaR();
-		Lobby.getInstance().savePlayer(u);
-	}
+    @EventHandler public void handle(PlayerQuitEvent e) {
+        LobbyUser u = UserWrapper.fromUser(UserAPI.instance().user(e.getPlayer().getUniqueId()));
+        u.stopJaR();
+        Lobby.getInstance().savePlayer(u);
+    }
 }

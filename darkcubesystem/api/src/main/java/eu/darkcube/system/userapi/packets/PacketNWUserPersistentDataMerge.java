@@ -12,33 +12,20 @@ import eu.darkcube.system.packetapi.Packet;
 
 import java.util.UUID;
 
-public class PacketQueryUser extends Packet {
-
+public class PacketNWUserPersistentDataMerge extends Packet {
     private final UUID uuid;
+    private final Document data;
 
-    public PacketQueryUser(UUID uuid) {
+    public PacketNWUserPersistentDataMerge(UUID uuid, Document data) {
         this.uuid = uuid;
+        this.data = data;
     }
 
-    public UUID getUniqueId() {
+    public UUID uniqueId() {
         return uuid;
     }
 
-    public static class Result extends Packet {
-        private final String name;
-        private final Document data;
-
-        public Result(String name, Document data) {
-            this.name = name;
-            this.data = data;
-        }
-
-        public Document getData() {
-            return data;
-        }
-
-        public String getName() {
-            return name;
-        }
+    public Document data() {
+        return data;
     }
 }

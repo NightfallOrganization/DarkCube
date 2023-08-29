@@ -24,32 +24,33 @@ import java.util.List;
 import java.util.UUID;
 
 public class TeleporterTrustedListAddInventory extends AbstractInventory<AnvilGUI, Teleporter> {
-	public static final InventoryType TYPE = InventoryType.of("teleporter_trusted_list_add");
+    public static final InventoryType TYPE = InventoryType.of("teleporter_trusted_list_add");
 
-	@Override
-	protected AnvilGUI openInventory(AUser user) {
-		return new AnvilGUI.Builder().itemLeft(ItemBuilder.item(Material.NAME_TAG).displayname(
-						Component.text(user.user().getName()).color(TextColor.color(170, 0, 170))).build())
-				.onClick((slot, snapshot) -> {
-					UUID uuid = Bukkit.getPlayerUniqueId(snapshot.getText());
-					if (uuid == null) {
-						return List.of(ResponseAction.replaceInputText("Ungültiger Name"));
-					}
-					data().trustedList().add(uuid);
-					TeleporterListener.saveTeleporters(VanillaAddons.instance(),
-							data().block().block().getWorld());
-					return List.of(ResponseAction.close());
-				}).onClose(player -> new BukkitRunnable() {
-					@Override
-					public void run() {
-						user.openInventory(TeleporterTrustedListInventory.TYPE, data());
-					}
-				}.runTask(VanillaAddons.instance())).plugin(VanillaAddons.instance())
-				.open(user.user().asPlayer());
-	}
+    @Override protected AnvilGUI openInventory(AUser user) {
+        return new AnvilGUI.Builder()
+                .itemLeft(ItemBuilder
+                        .item(Material.NAME_TAG)
+                        .displayname(Component.text(user.user().name()).color(TextColor.color(170, 0, 170)))
+                        .build())
+                .onClick((slot, snapshot) -> {
+                    UUID uuid = Bukkit.getPlayerUniqueId(snapshot.getText());
+                    if (uuid == null) {
+                        return List.of(ResponseAction.replaceInputText("Ungültiger Name"));
+                    }
+                    data().trustedList().add(uuid);
+                    TeleporterListener.saveTeleporters(VanillaAddons.instance(), data().block().block().getWorld());
+                    return List.of(ResponseAction.close());
+                })
+                .onClose(player -> new BukkitRunnable() {
+                    @Override public void run() {
+                        user.openInventory(TeleporterTrustedListInventory.TYPE, data());
+                    }
+                }.runTask(VanillaAddons.instance()))
+                .plugin(VanillaAddons.instance())
+                .open(Bukkit.getPlayer(user.user().uniqueId()));
+    }
 
-	@Override
-	protected void closeInventory(AUser user, AnvilGUI inventory) {
+    @Override protected void closeInventory(AUser user, AnvilGUI inventory) {
 
-	}
+    }
 }

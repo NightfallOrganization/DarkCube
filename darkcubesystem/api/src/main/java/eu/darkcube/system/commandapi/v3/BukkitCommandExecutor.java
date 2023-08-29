@@ -40,14 +40,14 @@ public class BukkitCommandExecutor implements ICommandExecutor, ForwardingAudien
 
     @Override public Language language() {
         if (sender instanceof Player) {
-            return UserAPI.getInstance().getUser((Player) sender).language();
+            return UserAPI.instance().user(((Player) sender).getUniqueId()).language();
         }
         return Language.DEFAULT;
     }
 
     @Override public void language(Language language) {
         if (sender instanceof Player) {
-            UserAPI.getInstance().getUser((Player) sender).language(language);
+            UserAPI.instance().user(((Player) sender).getUniqueId()).language(language);
         }
         logger.warning("Can't set language of the console!");
     }

@@ -52,10 +52,8 @@ public class JaRManager {
 
     public JaR startJaR(LobbyUser user) {
         JaR jar = new JaR(this, user);
-        if (jar.getCurrentBlock() != null) user
-                .getUser()
-                .asPlayer()
-                .teleport(jar.getCurrentBlock().getLocation().add(0.5, 1, 0.5).setDirection(jar.getCurrentDirection()));
+        if (jar.getCurrentBlock() != null)
+            user.asPlayer().teleport(jar.getCurrentBlock().getLocation().add(0.5, 1, 0.5).setDirection(jar.getCurrentDirection()));
         return jar;
     }
 

@@ -32,7 +32,7 @@ public class ListenerLobbySwitcher extends BaseListener {
         ItemStack item = e.getCurrentItem();
         if (item == null) return;
         Player p = (Player) e.getWhoClicked();
-        User user = UserAPI.getInstance().getUser(p);
+        User user = UserAPI.instance().user(p.getUniqueId());
         String serverId = ItemBuilder.item(item).persistentDataStorage().get(InventoryLobbySwitcher.server, PersistentDataTypes.STRING);
         if (serverId == null || serverId.isEmpty()) return;
 

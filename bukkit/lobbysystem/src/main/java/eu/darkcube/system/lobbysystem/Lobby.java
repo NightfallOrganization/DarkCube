@@ -61,7 +61,13 @@ public class Lobby extends Plugin {
     }
 
     @Override public void onDisable() {
-        Bukkit.getOnlinePlayers().stream().map(UserAPI.getInstance()::getUser).map(UserWrapper::fromUser).forEach(LobbyUser::stopJaR);
+        Bukkit
+                .getOnlinePlayers()
+                .stream()
+                .map(Player::getUniqueId)
+                .map(UserAPI.instance()::user)
+                .map(UserWrapper::fromUser)
+                .forEach(LobbyUser::stopJaR);
         if (PServerSupport.isSupported()) {
             SkullCache.unregister();
         }
@@ -74,7 +80,7 @@ public class Lobby extends Plugin {
         this.serverManager.registerListener(new ConnectorNPC.UpdateListener());
 
         UserWrapper userWrapper = new UserWrapper();
-        UserAPI.getInstance().addModifier(userWrapper);
+        UserAPI.instance().addModifier(userWrapper);
         userWrapper.beginMigration();
 
         PServerSupport.init();
@@ -159,13 +165,14 @@ public class Lobby extends Plugin {
     }
 
     public void savePlayer(LobbyUser user) {
-        Player p = user.getUser().asPlayer();
-        user.setLastPosition(p.getLocation());
-        user.setSelectedSlot(p.getInventory().getHeldItemSlot());
+        user.player().ifPresent(p -> {
+            user.setLastPosition(p.getLocation());
+            user.setSelectedSlot(p.getInventory().getHeldItemSlot());
+        });
     }
 
     public void setupPlayer(LobbyUser user) {
-        Player p = user.getUser().asPlayer();
+        Player p = user.asPlayer();
         setItems(user);
 
         DataManager dataManager = getDataManager();
@@ -195,8 +202,9 @@ public class Lobby extends Plugin {
     }
 
     public void setItems(LobbyUser user) {
-        Player p = user.getUser().asPlayer();
-        User u = user.getUser();
+        Player p = user.asPlayer();
+        if (p == null) return;
+        User u = user.user();
         PlayerInventory inv = p.getInventory();
         inv.clear();
         if (user.getCurrentJaR() == null) {

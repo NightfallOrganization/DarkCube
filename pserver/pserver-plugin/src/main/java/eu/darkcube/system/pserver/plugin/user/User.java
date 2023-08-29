@@ -9,6 +9,7 @@ package eu.darkcube.system.pserver.plugin.user;
 
 import com.google.gson.JsonObject;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.Language;
 import org.bukkit.entity.Player;
 
@@ -16,20 +17,20 @@ import java.util.UUID;
 
 public interface User {
 
-	Language getLanguage();
+    Language getLanguage();
 
-	ICommandExecutor getCommandExecutor();
+    ICommandExecutor getCommandExecutor();
 
-	UUID getUUID();
+    UUID getUUID();
 
-	Player getOnlinePlayer();
+    @Nullable Player getOnlinePlayer();
 
-	JsonObject getExtra();
+    JsonObject getExtra();
 
-	void setExtra(JsonObject extra);
+    void setExtra(JsonObject extra);
 
-	void saveExtra();
+    void saveExtra();
 
-	boolean isOnline();
+    boolean isOnline();
 
 }

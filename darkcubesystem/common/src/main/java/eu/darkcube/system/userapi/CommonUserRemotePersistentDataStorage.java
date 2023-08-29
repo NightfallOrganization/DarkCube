@@ -4,14 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.userapi.data;
+package eu.darkcube.system.userapi;
 
 import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
-import eu.darkcube.system.userapi.BukkitUser;
-import eu.darkcube.system.userapi.packets.PacketUserPersistentDataRemove;
-import eu.darkcube.system.userapi.packets.PacketUserPersistentDataSet;
+import eu.darkcube.system.userapi.packets.PacketWNUserPersistentDataLoad;
+import eu.darkcube.system.userapi.packets.PacketWNUserPersistentDataRemove;
+import eu.darkcube.system.userapi.packets.PacketWNUserPersistentDataSet;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
@@ -19,17 +19,21 @@ import eu.darkcube.system.util.data.UnmodifiablePersistentDataStorage;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
-public class UserPersistentDataStorage implements PersistentDataStorage {
+public class CommonUserRemotePersistentDataStorage implements CommonPersistentDataStorage {
 
-    private final BukkitUser user;
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final UUID uniqueId;
     private final Map<Key, Object> caches = new HashMap<>();
     private final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
     private Document.Mutable data = Document.newJsonDocument();
 
-    public UserPersistentDataStorage(BukkitUser user) {
-        this.user = user;
+    public CommonUserRemotePersistentDataStorage(UUID uniqueId, Document initialData) {
+        this.uniqueId = uniqueId;
+        this.data.append(initialData);
     }
 
     @Override public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
@@ -39,12 +43,12 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
     @Override public @NotNull Collection<Key> keys() {
         List<Key> keys = new ArrayList<>();
         try {
-            user.lock();
+            lock.readLock().lock();
             for (String s : data.keys()) {
                 keys.add(Key.fromString(s));
             }
         } finally {
-            user.unlock();
+            lock.readLock().unlock();
         }
         return Collections.unmodifiableCollection(keys);
     }
@@ -53,35 +57,20 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
         Document.Mutable d = Document.newJsonDocument();
         type.serialize(d, key.toString(), data);
         try {
-            user.lock();
+            lock.writeLock().lock();
             this.data.append(d);
             caches.put(key, data);
         } finally {
-            user.unlock();
+            lock.writeLock().unlock();
         }
         notifyNotifiers();
-        new PacketUserPersistentDataSet(user.getUniqueId(), d).sendAsync();
-    }
-
-    public void remove(Key key) {
-        boolean changed = false;
-        try {
-            user.lock();
-            if (data.contains(key.toString())) {
-                changed = true;
-                data.remove(key.toString());
-                caches.remove(key);
-            }
-        } finally {
-            user.unlock();
-        }
-        if (changed) notifyNotifiers();
+        new PacketWNUserPersistentDataSet(uniqueId, d).sendAsync();
     }
 
     @Override public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         T ret;
         try {
-            user.lock();
+            lock.writeLock().lock();
             boolean contains = data.contains(key.toString());
             if (!contains) return null;
             T t = (T) caches.remove(key);
@@ -91,16 +80,16 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
             data.remove(key.toString());
             ret = t;
         } finally {
-            user.unlock();
+            lock.writeLock().unlock();
         }
-        new PacketUserPersistentDataRemove(user.getUniqueId(), key).sendAsync();
+        new PacketWNUserPersistentDataRemove(uniqueId, key).sendAsync();
         notifyNotifiers();
         return ret;
     }
 
     @Override public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         try {
-            user.lock();
+            lock.readLock().lock();
             T t = (T) caches.get(key);
             if (t != null) return t;
             if (!data.contains(key.toString())) return null;
@@ -108,38 +97,38 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
             caches.put(key, t);
             return t;
         } finally {
-            user.unlock();
+            lock.readLock().unlock();
         }
     }
 
     @Override public <T> @NotNull T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
+        T t;
         try {
-            user.lock();
-            T t = get(key, type);
-            if (t == null) {
-                t = defaultValue.get();
-                set(key, type, t);
-            }
-            return t;
+            lock.readLock().lock();
+            t = get(key, type);
         } finally {
-            user.unlock();
+            lock.readLock().unlock();
         }
+        if (t == null) {
+            t = defaultValue.get();
+        }
+        return t;
     }
 
     @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
-        user.lock();
+        lock.writeLock().lock();
         if (!this.data.contains(key.toString())) {
             set(key, type, data);
         }
-        user.unlock();
+        lock.writeLock().unlock();
     }
 
     @Override public boolean has(@NotNull Key key) {
         try {
-            user.lock();
+            lock.readLock().lock();
             return data.contains(key.toString());
         } finally {
-            user.unlock();
+            lock.readLock().unlock();
         }
     }
 
@@ -149,42 +138,32 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 
     @Override public void loadFromJsonDocument(Document document) {
         try {
-            user.lock();
-            this.data.clear();
-            this.caches.clear();
-            this.data.append(document);
+            lock.writeLock().lock();
+            data.clear();
+            caches.clear();
+            data.append(document);
+            new PacketWNUserPersistentDataLoad(uniqueId, document.immutableCopy()).send();
         } finally {
-            user.unlock();
-        }
-        notifyNotifiers();
-    }
-
-    public void merge(Document data) {
-        try {
-            user.lock();
-            this.data.append(data);
-            this.caches.clear();
-        } finally {
-            user.unlock();
+            lock.writeLock().unlock();
         }
         notifyNotifiers();
     }
 
     @Override public Document storeToJsonDocument() {
         try {
-            user.lock();
+            lock.readLock().lock();
             return data.immutableCopy();
         } finally {
-            user.unlock();
+            lock.readLock().unlock();
         }
     }
 
     @Override public void clearCache() {
         try {
-            user.lock();
+            lock.writeLock().lock();
             caches.clear();
         } finally {
-            user.unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -198,6 +177,44 @@ public class UserPersistentDataStorage implements PersistentDataStorage {
 
     @Override public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.remove(notifier);
+    }
+
+    @Override public void remove(@NotNull Key key) {
+        boolean changed = false;
+        try {
+            lock.writeLock().lock();
+            if (data.contains(key.toString())) {
+                changed = true;
+                data.remove(key.toString());
+                caches.remove(key);
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+        if (changed) notifyNotifiers();
+    }
+
+    @Override public void merge(@NotNull Document data) {
+        try {
+            lock.writeLock().lock();
+            this.data.append(data);
+            this.caches.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
+        notifyNotifiers();
+    }
+
+    @Override public void update(@NotNull Document document) {
+        try {
+            lock.writeLock().lock();
+            this.data.clear();
+            this.caches.clear();
+            this.data.append(document);
+        } finally {
+            lock.writeLock().unlock();
+        }
+        notifyNotifiers();
     }
 
     private void notifyNotifiers() {

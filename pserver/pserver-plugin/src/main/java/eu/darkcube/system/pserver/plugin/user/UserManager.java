@@ -7,58 +7,53 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
+import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.userapi.UserModifier;
+import eu.darkcube.system.util.data.Key;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class UserManager {
 
-	private static UserManager instance;
+    private static UserManager instance;
+    private final Key userKey = new Key("PServerPlugin", "pserver_user");
+    private final UserModifier userModifier = new UserModifier() {
+        @Override public void onLoad(eu.darkcube.system.userapi.User user) {
+            user.metadata().set(userKey, new PServerUser(user));
+        }
 
-	private final UserListener listener;
-	private final Map<UUID, User> online = new ConcurrentHashMap<>();
+        @Override public void onUnload(eu.darkcube.system.userapi.User user) {
+            user.metadata().remove(userKey);
+        }
+    };
 
-	private UserManager() {
-		this.listener = new UserListener();
-		this.listener.register();
-	}
+    private UserManager() {
+        UserAPI.instance().addModifier(userModifier);
+    }
 
-	void playerJoin(Player p) {
-		if (!online.containsKey(p.getUniqueId())) {
-			online.put(p.getUniqueId(), new OnlineUser(p));
-		}
-	}
+    public static void register() {
+        instance = new UserManager();
+    }
 
-	void playerQuit(Player p) {
-		if (online.containsKey(p.getUniqueId())) {
-			online.remove(p.getUniqueId()).saveExtra();
-		}
-	}
-	
-	public User getUser(Player p) {
-		return getUser(p.getUniqueId());
-	}
+    public static void unregister() {
+        instance.close();
+        instance = null;
+    }
 
-	public User getUser(UUID uuid) {
-		return online.getOrDefault(uuid, new OfflineUser(uuid));
-	}
+    public static UserManager getInstance() {
+        return instance;
+    }
 
-	private void close() {
-		this.listener.unregister();
-	}
+    public User getUser(Player p) {
+        return getUser(p.getUniqueId());
+    }
 
-	public static void register() {
-		instance = new UserManager();
-	}
+    public User getUser(UUID uuid) {
+        return UserAPI.instance().user(uuid).metadata().get(userKey);
+    }
 
-	public static void unregister() {
-		instance.close();
-		instance = null;
-	}
-
-	public static UserManager getInstance() {
-		return instance;
-	}
+    private void close() {
+        UserAPI.instance().removeModifier(userModifier);
+    }
 }

@@ -21,6 +21,7 @@ tasks {
 
 dependencies {
     api(project("api"))
+    runtimeOnly(project("common"))
     runtimeOnly(project("velocity"))
     runtimeOnly(project("bukkit"))
     runtimeOnly(project("module"))

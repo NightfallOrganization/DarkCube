@@ -14,14 +14,13 @@ import eu.darkcube.system.util.Language;
 
 public class CommandLanguage extends CommandExecutor {
 
-	public CommandLanguage() {
-		super("user", "language", new String[0],
-				b -> b.then(
-						Commands.argument("language", EnumArgument.enumArgument(Language.values()))
-								.executes(ctx -> {
+    public CommandLanguage() {
+        super("user", "language", new String[0], b -> b.then(Commands
+                .argument("language", EnumArgument.enumArgument(Language.values()))
+                .executes(ctx -> {
 
-									return 0;
-								})));
-	}
+                    return 0;
+                })));
+    }
 
 }

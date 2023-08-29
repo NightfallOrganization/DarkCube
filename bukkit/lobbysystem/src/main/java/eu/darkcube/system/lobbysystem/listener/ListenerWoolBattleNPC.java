@@ -25,8 +25,7 @@ import java.util.Random;
 
 public class ListenerWoolBattleNPC extends BaseListener {
 
-    @EventHandler
-    public void handle(PlayerNPCInteractEvent e) {
+    @EventHandler public void handle(PlayerNPCInteractEvent e) {
         NPCManagement.NPC npc = e.npc();
         if (npc.equals(Lobby.getInstance().getWoolBattleNPC())) {
             if (e.useAction() == PlayerNPCInteractEvent.EntityUseAction.ATTACK) {
@@ -36,8 +35,8 @@ public class ListenerWoolBattleNPC extends BaseListener {
                 // npc.sendEmote(emotes.get(new Random().nextInt(emotes.size())));
             } else {
                 Player p = e.player();
-                LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
-                user.setOpenInventory(new InventoryWoolBattle(user.getUser()));
+                LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
+                user.setOpenInventory(new InventoryWoolBattle(user.user()));
             }
         }
     }

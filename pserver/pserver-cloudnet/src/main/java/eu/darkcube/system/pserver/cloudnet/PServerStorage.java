@@ -28,7 +28,7 @@ public class PServerStorage implements PServerPersistentDataStorage {
     private final UniqueId pserver;
     private final AtomicBoolean saving = new AtomicBoolean(false);
     private final AtomicBoolean saveAgain = new AtomicBoolean(false);
-    private final PersistentDataType<Document> unsafeStorageModify = new PersistentDataType<Document>() {
+    private final PersistentDataType<Document> unsafeStorageModify = new PersistentDataType<>() {
         @Override public Document deserialize(Document doc, String key) {
             Document.Mutable mutableDoc = doc.mutableCopy();
             for (String docKey : doc.keys()) {

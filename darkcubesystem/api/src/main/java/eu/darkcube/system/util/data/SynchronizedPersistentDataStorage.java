@@ -86,7 +86,6 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
             }
             return null;
         });
-
     }
 
     private final Key key;

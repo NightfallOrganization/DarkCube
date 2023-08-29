@@ -55,12 +55,12 @@ public class InventoryNewPServer extends LobbyAsyncPagedInventory {
 
     @Override protected void fillItems(Map<Integer, ItemStack> items) {
         super.fillItems(items);
-        items.put(this.getPageSize() / 2 - 1, Item.WORLD_PSERVER.getItem(this.user.getUser()));
-        items.put(this.getPageSize() / 2 + 1, Item.GAME_PSERVER.getItem(this.user.getUser()));
+        items.put(this.getPageSize() / 2 - 1, Item.WORLD_PSERVER.getItem(this.user.user()));
+        items.put(this.getPageSize() / 2 + 1, Item.GAME_PSERVER.getItem(this.user.user()));
     }
 
     @Override protected void insertFallbackItems() {
-        this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_NEW_PSERVER.getItem(this.user.getUser()));
+        this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_NEW_PSERVER.getItem(this.user.user()));
         super.insertFallbackItems();
     }
 
