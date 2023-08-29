@@ -12,20 +12,20 @@ import eu.darkcube.system.util.data.Key;
 
 import java.util.UUID;
 
-public class PacketUserPersistentDataRemove extends Packet {
-	private UUID uuid;
-	private Key key;
+public class PacketWNUserPersistentDataRemove extends Packet {
+    private UUID uuid;
+    private Key key;
 
-	public PacketUserPersistentDataRemove(UUID uuid, Key key) {
-		this.uuid = uuid;
-		this.key = key;
-	}
+    public PacketWNUserPersistentDataRemove(UUID uuid, Key key) {
+        this.uuid = uuid;
+        this.key = key;
+    }
 
-	public Key getKey() {
-		return this.key;
-	}
+    public Key key() {
+        return this.key;
+    }
 
-	public UUID getUniqueId() {
-		return this.uuid;
-	}
+    public UUID uniqueId() {
+        return this.uuid;
+    }
 }

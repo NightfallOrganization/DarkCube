@@ -162,10 +162,10 @@ public class ConnectorNPC {
         }.runTaskLater(Lobby.getInstance(), 20);
         new BukkitRunnable() {
             @Override public void run() {
-                User user = UserAPI.getInstance().getUser(player);
+                User user = UserAPI.instance().user(player.getUniqueId());
                 ServerInformation c = currentServer.server;
                 if (c == null) return;
-                c.connectPlayer(user.getUniqueId());
+                c.connectPlayer(user.uniqueId());
             }
         }.runTask(Lobby.getInstance());
     }
@@ -214,19 +214,19 @@ public class ConnectorNPC {
         h.add("%%online%%", p -> {
             ServerInformation info = currentServer.server;
             if (info == null) {
-                return Message.CONNECTOR_NPC_SERVER_STARTING.getMessageString(UserAPI.getInstance().getUser(p));
+                return Message.CONNECTOR_NPC_SERVER_STARTING.getMessageString(UserAPI.instance().user(p.getUniqueId()));
             }
             int online = info.onlinePlayers();
             int maxPlayers = info.maxPlayers();
             return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(UserAPI
-                    .getInstance()
-                    .getUser(p), online, maxPlayers == -1 ? 100 : maxPlayers);
+                    .instance()
+                    .user(p.getUniqueId()), online, maxPlayers == -1 ? 100 : maxPlayers);
         });
         h.add("%%description%%", p -> {
             ServerInformation server = currentServer.server;
             if (server != null) {
                 Component displayName = server.displayName();
-                return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(UserAPI.getInstance().getUser(p), Component
+                return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(UserAPI.instance().user(p.getUniqueId()), Component
                         .empty()
                         .append(displayName == null ? Component.text(server.taskName()) : displayName)
                         .applyFallbackStyle(Style.style(NamedTextColor.LIGHT_PURPLE)));

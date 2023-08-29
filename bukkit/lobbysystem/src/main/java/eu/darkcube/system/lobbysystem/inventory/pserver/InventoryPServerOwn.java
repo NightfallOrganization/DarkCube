@@ -54,15 +54,14 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
             user.setOpenInventory(new InventoryNewPServer(event.user()));
         } else if (itemid.equals(ITEMID_EXISTING)) {
             UniqueId pserverId = new UniqueId(event.item().persistentDataStorage().get(META_KEY_PSERVERID, PersistentDataTypes.STRING));
-            user.setOpenInventory(new InventoryPServerConfiguration(user.getUser(), pserverId));
+            user.setOpenInventory(new InventoryPServerConfiguration(user.user(), pserverId));
         }
     }
 
     @Override protected void fillItems(Map<Integer, ItemStack> items) {
-        if (!user.getUser().isLoaded()) return;
-        super.fillItems(items);
-        Player p = user.getUser().asPlayer();
+        Player p = user.asPlayer();
         if (p == null) return;
+        super.fillItems(items);
         int pservercount = 0;
         for (PermissionAttachmentInfo info : p.getEffectivePermissions()) {
             if (info.getValue()) {
@@ -79,23 +78,23 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
         }
         final int pagesize = this.getPageSize();
 
-        Collection<UniqueId> col = PServerProvider.instance().pservers(user.getUser().getUniqueId()).join();
+        Collection<UniqueId> col = PServerProvider.instance().pservers(user.user().uniqueId()).join();
         pservercount = Math.max(pservercount, col.size());
         Iterator<UniqueId> it = col.iterator();
 
         for (int slot = 0; slot < pservercount; slot++) {
             UniqueId pserverId = it.hasNext() ? it.next() : null;
-            ItemBuilder item = PServerDataManager.getDisplayItem(this.user.getUser(), pserverId);
+            ItemBuilder item = PServerDataManager.getDisplayItem(this.user.user(), pserverId);
 
             if (item == null) {
-                item = ItemBuilder.item(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.getUser()));
+                item = ItemBuilder.item(Item.INVENTORY_PSERVER_SLOT_EMPTY.getItem(this.user.user()));
             } else {
                 Item.setItemId(item, InventoryPServerOwn.ITEMID_EXISTING);
                 PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
                 PServerExecutor.State state = ps == null ? PServerExecutor.State.OFFLINE : ps.state().join();
                 Message mstate = state == PServerExecutor.State.OFFLINE ? Message.STATE_OFFLINE : state == PServerExecutor.State.RUNNING ? Message.STATE_RUNNING : state == PServerExecutor.State.STARTING ? Message.STATE_STARTING : state == PServerExecutor.State.STOPPING ? Message.STATE_STOPPING : null;
                 if (mstate == null) throw new IllegalStateException();
-                item.lore(Message.PSERVEROWN_STATUS.getMessage(user.getUser(), mstate));
+                item.lore(Message.PSERVEROWN_STATUS.getMessage(user.user(), mstate));
             }
 
             if (pserverId != null)
@@ -104,7 +103,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
             items.put(slot, item.build());
         }
         for (int slot = pservercount % pagesize + (pservercount / pagesize) * pagesize; slot < pagesize; slot++) {
-            items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.getUser()));
+            items.put(slot, Item.INVENTORY_PSERVER_SLOT_NOT_BOUGHT.getItem(this.user.user()));
         }
     }
 
@@ -117,10 +116,10 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
     @Override protected void insertDefaultItems0() {
         super.insertDefaultItems0();
 
-        this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.getUser()));
-        this.fallbackItems.put(IInventory.slot(1, 5), Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
-        this.fallbackItems.put(IInventory.slot(1, 6), Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user.getUser()));
-        this.fallbackItems.put(IInventory.slot(1, 7), Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
+        this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.user()));
+        this.fallbackItems.put(IInventory.slot(1, 5), Item.LIME_GLASS_PANE.getItem(this.user.user()));
+        this.fallbackItems.put(IInventory.slot(1, 6), Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user.user()));
+        this.fallbackItems.put(IInventory.slot(1, 7), Item.LIME_GLASS_PANE.getItem(this.user.user()));
     }
 
     @Override protected void destroy() {

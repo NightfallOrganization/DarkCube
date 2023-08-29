@@ -63,8 +63,8 @@ public class DarkEssentials extends Plugin {
 
     public static void sendTitle(Player p, Component title, Component subtitle, int come, int stay, int go) {
         UserAPI
-                .getInstance()
-                .getUser(p)
+                .instance()
+                .user(p.getUniqueId())
                 .showTitle(Title.title(title, subtitle, Title.Times.times(Duration.of(come / 50, ChronoUnit.MILLIS), Duration.of(stay / 50, ChronoUnit.MILLIS), Duration.of(go / 50, ChronoUnit.MILLIS))));
     }
 

@@ -53,7 +53,7 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
     private Listener listener;
 
     public InventoryPServer(LobbyUser user) {
-        super(InventoryPServer.type_pserver, Item.PSERVER_PUBLIC.getDisplayName(user.getUser()), user);
+        super(InventoryPServer.type_pserver, Item.PSERVER_PUBLIC.getDisplayName(user.user()), user);
         // super(Item.PSERVER_MAIN_ITEM.getDisplayName(user), InventoryPServer.type_pserver);
         this.listener = new Listener();
         this.listener.register();
@@ -101,7 +101,7 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
                 ItemBuilder b = null;
 
                 if (ps.type().get() == Type.GAMEMODE) {
-                    b = PServerDataManager.getDisplayItemGamemode(this.user.getUser(), ps.taskName().get());
+                    b = PServerDataManager.getDisplayItemGamemode(this.user.user(), ps.taskName().get());
                 }
                 if (b == null) {
                     if (owner == null) {
@@ -114,8 +114,8 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
                     }
                 }
                 b.amount(online);
-                b.displayname(Message.PSERVER_ITEM_TITLE.getMessage(this.user.getUser(), ps.serverName().get()));
-                b.lore(publicServer ? Message.CLICK_TO_JOIN.getMessage(this.user.getUser()) : Message.PSERVER_NOT_PUBLIC.getMessage(this.user.getUser()));
+                b.displayname(Message.PSERVER_ITEM_TITLE.getMessage(this.user.user(), ps.serverName().get()));
+                b.lore(publicServer ? Message.CLICK_TO_JOIN.getMessage(this.user.user()) : Message.PSERVER_NOT_PUBLIC.getMessage(this.user.user()));
                 Item.setItemId(b, InventoryPServer.ITEMID);
                 b.persistentDataStorage().set(InventoryPServer.META_KEY_PSERVER, PersistentDataTypes.STRING, ps.id().toString());
                 sitems.put(ontime, b.build());
@@ -132,10 +132,10 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
     }
 
     @Override protected void insertFallbackItems() {
-        this.fallbackItems.put(IInventory.slot(1, 3), Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
-        this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.getUser()));
-        this.fallbackItems.put(IInventory.slot(1, 5), Item.LIME_GLASS_PANE.getItem(this.user.getUser()));
-        this.fallbackItems.put(IInventory.slot(1, 6), Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user.getUser()));
+        this.fallbackItems.put(IInventory.slot(1, 3), Item.LIME_GLASS_PANE.getItem(this.user.user()));
+        this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.user()));
+        this.fallbackItems.put(IInventory.slot(1, 5), Item.LIME_GLASS_PANE.getItem(this.user.user()));
+        this.fallbackItems.put(IInventory.slot(1, 6), Item.INVENTORY_PSERVER_PRIVATE.getItem(this.user.user()));
         super.insertFallbackItems();
     }
 

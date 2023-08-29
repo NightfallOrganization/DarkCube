@@ -9,31 +9,28 @@ package eu.darkcube.system.skyland.SkylandClassSystem;
 import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.userapi.data.UserModifier;
+import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.data.Key;
 import org.bukkit.entity.Player;
 
 public class SkylandPlayerModifier implements UserModifier {
-	private static final Key SKYLAND_PLAYER = new Key(Skyland.getInstance(), "user");
+    private static final Key SKYLAND_PLAYER = new Key(Skyland.getInstance(), "user");
 
-	@Override
-	public void onLoad(User user) {
-		System.out.println(user.getName() + " was looded with modifier!");
-		user.getMetaDataStorage().set(SKYLAND_PLAYER, new SkylandPlayer(user));
-	}
+    public static SkylandPlayer getSkylandPlayer(User user) {
+        return user.metadata().get(SKYLAND_PLAYER);
+    }
 
-	@Override
-	public void onUnload(User user) {
-		user.getMetaDataStorage().remove(SKYLAND_PLAYER);
-	}
+    public static SkylandPlayer getSkylandPlayer(Player player) {
+        return getSkylandPlayer(UserAPI.instance().user(player.getUniqueId()));
+    }
 
-	public static SkylandPlayer getSkylandPlayer(User user){
-		return user.getMetaDataStorage().get(SKYLAND_PLAYER);
-	}
+    @Override public void onLoad(User user) {
+        System.out.println(user.name() + " was looded with modifier!");
+        user.metadata().set(SKYLAND_PLAYER, new SkylandPlayer(user));
+    }
 
-	public static SkylandPlayer getSkylandPlayer(Player player){
-		return getSkylandPlayer(UserAPI.getInstance().getUser(player));
-	}
-
+    @Override public void onUnload(User user) {
+        user.metadata().remove(SKYLAND_PLAYER);
+    }
 
 }

@@ -8,6 +8,7 @@ package eu.darkcube.system.lobbysystem.user;
 
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
@@ -27,6 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class LobbyUser {
@@ -39,9 +41,9 @@ public class LobbyUser {
     private static final Key GADGET = new Key(Lobby.getInstance(), "gadget");
     private static final Key POSITION = new Key(Lobby.getInstance(), "position");
     private static final Key SELECTED_SLOT = new Key(Lobby.getInstance(), "selectedSlot");
-    final User user;
-    volatile IInventory openInventory;
-    boolean buildMode = false;
+    private final User user;
+    private boolean buildMode = false;
+    private volatile IInventory openInventory;
     private JaR currentJaR;
     private boolean disableAnimations = false;
     private boolean disableSounds = false;
@@ -49,12 +51,12 @@ public class LobbyUser {
     public LobbyUser(User user) {
         this.user = user;
         long time1 = System.currentTimeMillis();
-        this.user.getPersistentDataStorage().setIfNotPresent(ANIMATIONS, PersistentDataTypes.BOOLEAN, true);
-        this.user.getPersistentDataStorage().setIfNotPresent(SOUNDS, PersistentDataTypes.BOOLEAN, true);
-        this.user.getPersistentDataStorage().setIfNotPresent(LAST_DAILY_REWARD, PersistentDataTypes.LONG, 0L);
-        this.user.getPersistentDataStorage().setIfNotPresent(REWARD_SLOTS_USED, INTEGERS, new HashSet<>());
-        this.user.getPersistentDataStorage().setIfNotPresent(GADGET, TYPE_GADGET, Gadget.GRAPPLING_HOOK);
-        this.user.getPersistentDataStorage().setIfNotPresent(SELECTED_SLOT, PersistentDataTypes.INTEGER, 0);
+        this.user.persistentData().setIfNotPresent(ANIMATIONS, PersistentDataTypes.BOOLEAN, true);
+        this.user.persistentData().setIfNotPresent(SOUNDS, PersistentDataTypes.BOOLEAN, true);
+        this.user.persistentData().setIfNotPresent(LAST_DAILY_REWARD, PersistentDataTypes.LONG, 0L);
+        this.user.persistentData().setIfNotPresent(REWARD_SLOTS_USED, INTEGERS, new HashSet<>());
+        this.user.persistentData().setIfNotPresent(GADGET, TYPE_GADGET, Gadget.GRAPPLING_HOOK);
+        this.user.persistentData().setIfNotPresent(SELECTED_SLOT, PersistentDataTypes.INTEGER, 0);
         long time2 = System.currentTimeMillis();
         this.openInventory = new InventoryPlayer();
         if (System.currentTimeMillis() - time1 > 1000) {
@@ -65,6 +67,14 @@ public class LobbyUser {
         }
     }
 
+    public @NotNull Optional<@NotNull Player> player() {
+        return Optional.ofNullable(asPlayer());
+    }
+
+    public @Nullable Player asPlayer() {
+        return Bukkit.getPlayer(user.uniqueId());
+    }
+
     public JaR getCurrentJaR() {
         return currentJaR;
     }
@@ -72,7 +82,7 @@ public class LobbyUser {
     public void startJaR() {
         stopJaR();
         this.currentJaR = Lobby.getInstance().getJaRManager().startJaR(this);
-        user.asPlayer().setAllowFlight(false);
+        player().ifPresent(p -> p.setAllowFlight(false));
         Lobby.getInstance().setItems(this);
     }
 
@@ -81,12 +91,15 @@ public class LobbyUser {
             this.currentJaR.stop();
             this.currentJaR = null;
             Lobby.getInstance().setItems(this);
-            user.asPlayer().setAllowFlight(true);
-            user.asPlayer().teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn().clone().add(0, 0.1, 0));
+            player().ifPresent(player -> {
+                player.setAllowFlight(true);
+                player.teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn().clone().add(0, 0.1, 0));
+            });
+
         }
     }
 
-    public User getUser() {
+    public User user() {
         return this.user;
     }
 
@@ -99,7 +112,7 @@ public class LobbyUser {
             this.disableAnimations(true);
         }
 
-        Player p = user.asPlayer();
+        Player p = asPlayer();
         if (p != null) {
             Runnable r = () -> {
                 if (openInventory.getHandle() != null) {
@@ -121,19 +134,19 @@ public class LobbyUser {
     }
 
     public int getSelectedSlot() {
-        return user.getPersistentDataStorage().get(SELECTED_SLOT, PersistentDataTypes.INTEGER);
+        return user.persistentData().get(SELECTED_SLOT, PersistentDataTypes.INTEGER);
     }
 
     public void setSelectedSlot(int slot) {
-        user.getPersistentDataStorage().set(SELECTED_SLOT, PersistentDataTypes.INTEGER, slot);
+        user.persistentData().set(SELECTED_SLOT, PersistentDataTypes.INTEGER, slot);
     }
 
     public Set<Integer> getRewardSlotsUsed() {
-        return user.getPersistentDataStorage().get(REWARD_SLOTS_USED, INTEGERS);
+        return user.persistentData().get(REWARD_SLOTS_USED, INTEGERS);
     }
 
     public void setRewardSlotsUsed(Set<Integer> slots) {
-        user.getPersistentDataStorage().set(REWARD_SLOTS_USED, INTEGERS, slots);
+        user.persistentData().set(REWARD_SLOTS_USED, INTEGERS, slots);
     }
 
     public boolean disableAnimations() {
@@ -153,22 +166,20 @@ public class LobbyUser {
     }
 
     public Location getLastPosition() {
-        return user
-                .getPersistentDataStorage()
-                .get(POSITION, PersistentDataTypes.LOCATION, () -> Lobby.getInstance().getDataManager().getSpawn());
+        return user.persistentData().get(POSITION, PersistentDataTypes.LOCATION, () -> Lobby.getInstance().getDataManager().getSpawn());
     }
 
     public void setLastPosition(Location position) {
-        user.getPersistentDataStorage().set(POSITION, PersistentDataTypes.LOCATION, position);
+        user.persistentData().set(POSITION, PersistentDataTypes.LOCATION, position);
     }
 
     public boolean isSounds() {
         if (disableSounds()) return false;
-        return user.getPersistentDataStorage().get(SOUNDS, PersistentDataTypes.BOOLEAN);
+        return user.persistentData().get(SOUNDS, PersistentDataTypes.BOOLEAN);
     }
 
     public void setSounds(boolean sounds) {
-        user.getPersistentDataStorage().set(SOUNDS, PersistentDataTypes.BOOLEAN, sounds);
+        user.persistentData().set(SOUNDS, PersistentDataTypes.BOOLEAN, sounds);
     }
 
     public boolean disableSounds() {
@@ -181,24 +192,24 @@ public class LobbyUser {
 
     public boolean isAnimations() {
         if (disableAnimations()) return false;
-        return user.getPersistentDataStorage().get(ANIMATIONS, PersistentDataTypes.BOOLEAN);
+        return user.persistentData().get(ANIMATIONS, PersistentDataTypes.BOOLEAN);
     }
 
     public void setAnimations(boolean animations) {
-        user.getPersistentDataStorage().set(ANIMATIONS, PersistentDataTypes.BOOLEAN, animations);
+        user.persistentData().set(ANIMATIONS, PersistentDataTypes.BOOLEAN, animations);
     }
 
     public long getLastDailyReward() {
-        return user.getPersistentDataStorage().get(LAST_DAILY_REWARD, PersistentDataTypes.LONG);
+        return user.persistentData().get(LAST_DAILY_REWARD, PersistentDataTypes.LONG);
     }
 
     public void setLastDailyReward(long lastDailyReward) {
-        user.getPersistentDataStorage().set(LAST_DAILY_REWARD, PersistentDataTypes.LONG, lastDailyReward);
+        user.persistentData().set(LAST_DAILY_REWARD, PersistentDataTypes.LONG, lastDailyReward);
     }
 
     public void playSound(Sound sound, float volume, float pitch) {
         if (!this.isSounds()) return;
-        Player p = user.asPlayer();
+        Player p = asPlayer();
         if (p != null) {
             this.playSound(p.getLocation(), sound, volume, pitch);
         }
@@ -206,14 +217,14 @@ public class LobbyUser {
 
     public void playSound(Location loc, Sound sound, float volume, float pitch) {
         if (!this.isSounds()) return;
-        Player p = user.asPlayer();
+        Player p = asPlayer();
         if (p != null) {
             p.playSound(loc, sound, volume, pitch);
         }
     }
 
     public void teleport(Location loc) {
-        Player p = user.asPlayer();
+        Player p = asPlayer();
         if (p != null) {
             this.playSound(Sound.NOTE_PLING, 10, 1);
             p.teleport(loc.clone().add(0, 0.1, 0));
@@ -245,7 +256,7 @@ public class LobbyUser {
     }
 
     public Gadget getGadget() {
-        return user.getPersistentDataStorage().get(GADGET, TYPE_GADGET);
+        return user.persistentData().get(GADGET, TYPE_GADGET);
     }
 
     public void setGadget(Gadget gadget) {
@@ -253,7 +264,7 @@ public class LobbyUser {
         if (current == gadget) {
             return;
         }
-        user.getPersistentDataStorage().set(GADGET, TYPE_GADGET, gadget);
+        user.persistentData().set(GADGET, TYPE_GADGET, gadget);
         Lobby.getInstance().setItems(this);
     }
 

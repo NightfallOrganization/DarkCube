@@ -27,7 +27,7 @@ import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.ICommandExecutor;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.userapi.data.UserModifier;
+import eu.darkcube.system.userapi.UserModifier;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;

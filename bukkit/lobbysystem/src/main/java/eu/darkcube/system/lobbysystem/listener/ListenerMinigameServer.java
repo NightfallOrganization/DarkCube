@@ -40,6 +40,6 @@ public class ListenerMinigameServer extends BaseListener {
         p.closeInventory();
         ServerInformation information = lobby.serverManager().byUniqueId(uuid);
         if (information != null) information.connectPlayer(p.getUniqueId());
-        else UserAPI.getInstance().getUser(p).sendMessage(Message.SERVER_NOT_FOUND.getMessage(p));
+        else UserAPI.instance().user(p.getUniqueId()).sendMessage(Message.SERVER_NOT_FOUND.getMessage(p));
     }
 }

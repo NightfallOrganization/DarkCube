@@ -17,10 +17,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public class LocalPersistentDataStorage implements PersistentDataStorage {
-    private final ReadWriteLock lock = new ReentrantReadWriteLock(false);
-    private final Map<Key, Object> cache = new HashMap<>();
-    private final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
-    private final Document.Mutable data = Document.newJsonDocument();
+    protected final ReadWriteLock lock = new ReentrantReadWriteLock(false);
+    protected final Map<Key, Object> cache = new HashMap<>();
+    protected final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
+    protected final Document.Mutable data = Document.newJsonDocument();
 
     public void appendDocument(Document document) {
         try {
@@ -74,18 +74,12 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
             if (!data.contains(key.toString())) {
                 return null;
             }
-            if (type != null) {
-                @SuppressWarnings("unchecked") T old = (T) cache.remove(key);
-                if (old == null) {
-                    old = type.deserialize(data, key.toString());
-                }
-                data.remove(key.toString());
-                ret = type.clone(old);
-            } else {
-                cache.remove(key);
-                data.remove(key.toString());
-                ret = null;
+            T old = (T) cache.remove(key);
+            if (old == null) {
+                old = type.deserialize(data, key.toString());
             }
+            data.remove(key.toString());
+            ret = type.clone(old);
         } finally {
             lock.writeLock().unlock();
         }
@@ -97,7 +91,6 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
         } finally {
@@ -106,7 +99,6 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
             if (!data.contains(key.toString())) {
@@ -124,7 +116,6 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
         } finally {
@@ -134,7 +125,6 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                //noinspection unchecked
                 return type.clone((T) cache.get(key));
             }
             if (data.contains(key.toString())) {
@@ -188,7 +178,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
     @Override public void clear() {
         try {
             lock.writeLock().lock();
-            clearData();
+            data.clear();
             cache.clear();
         } finally {
             lock.writeLock().unlock();
@@ -199,7 +189,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
     @Override public void loadFromJsonDocument(Document document) {
         try {
             lock.writeLock().lock();
-            clearData();
+            data.clear();
             cache.clear();
             data.append(document);
         } finally {
@@ -229,18 +219,16 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         updateNotifiers.remove(notifier);
     }
 
-    private void clearData() {
-        //		data.clear() is broken with concurrentmodificationexception, bug with CloudNet
-        for (String key : new ArrayList<>(data.keys())) {
-            data.remove(key);
+    @Override public void clearCache() {
+        try {
+            lock.writeLock().lock();
+            cache.clear();
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 
-    @Override public void clearCache() {
-        cache.clear();
-    }
-
-    private void notifyNotifiers() {
+    protected void notifyNotifiers() {
         for (UpdateNotifier updateNotifier : updateNotifiers) {
             updateNotifier.notify(this);
         }

@@ -10,7 +10,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.perks.other.DoubleJumpPerk;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.data.UserModifier;
+import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 

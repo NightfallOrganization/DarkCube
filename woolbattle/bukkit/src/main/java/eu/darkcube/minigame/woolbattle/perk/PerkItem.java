@@ -23,66 +23,60 @@ import java.util.function.Supplier;
 
 public class PerkItem {
 
-	public static final Key KEY_PERK_ID = new Key(WoolBattleBukkit.instance(), "perk_id");
-	public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
+    public static final Key KEY_PERK_ID = new Key(WoolBattleBukkit.instance(), "perk_id");
+    public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
 
-	private final Supplier<Item> itemSupplier;
-	private final UserPerk perk;
+    private final Supplier<Item> itemSupplier;
+    private final UserPerk perk;
 
-	public PerkItem(Supplier<Item> itemSupplier, UserPerk perk) {
-		this.itemSupplier = itemSupplier;
-		this.perk = perk;
-	}
+    public PerkItem(Supplier<Item> itemSupplier, UserPerk perk) {
+        this.itemSupplier = itemSupplier;
+        this.perk = perk;
+    }
 
-	/**
-	 * Sets the item in the perk's owner's inventory
-	 */
-	public void setItem() {
-		ItemStack item = calculateItem();
-		if (item == null)
-			return;
-		int slot = perk.slot();
-		if (slot == 100) {
-			perk.owner().user().asPlayer().getOpenInventory().setCursor(item);
-		} else {
-			perk.owner().getBukkitEntity().getHandle().defaultContainer.getBukkitView()
-					.setItem(slot, item);
-			updateInventory(slot, item);
-		}
-	}
+    /**
+     * Sets the item in the perk's owner's inventory
+     */
+    public void setItem() {
+        ItemStack item = calculateItem();
+        if (item == null) return;
+        int slot = perk.slot();
+        if (slot == 100) {
+            perk.owner().getBukkitEntity().getOpenInventory().setCursor(item);
+        } else {
+            perk.owner().getBukkitEntity().getHandle().defaultContainer.getBukkitView().setItem(slot, item);
+            updateInventory(slot, item);
+        }
+    }
 
-	public ItemStack calculateItem() {
-		Item item = itemSupplier.get();
-		if (item == null)
-			return null;
-		ItemBuilder b = ItemBuilder.item(item.getItem(perk.owner()));
-		int amt = itemAmount();
-		if (amt > 0) {
-			b.amount(Math.min(amt, 65));
-		} else if (amt == 0) {
-			b.glow(true);
-		}
-		b.persistentDataStorage().set(KEY_PERK_ID, TYPE_PERK_ID, perk.id());
-		modify(b);
-		return b.build();
-	}
+    public ItemStack calculateItem() {
+        Item item = itemSupplier.get();
+        if (item == null) return null;
+        ItemBuilder b = ItemBuilder.item(item.getItem(perk.owner()));
+        int amt = itemAmount();
+        if (amt > 0) {
+            b.amount(Math.min(amt, 65));
+        } else if (amt == 0) {
+            b.glow(true);
+        }
+        b.persistentDataStorage().set(KEY_PERK_ID, TYPE_PERK_ID, perk.id());
+        modify(b);
+        return b.build();
+    }
 
-	protected void modify(ItemBuilder item) {
-	}
+    protected void modify(ItemBuilder item) {
+    }
 
-	protected int itemAmount() {
-		return perk.perk().cooldown().unit() == Unit.TICKS
-				? (perk.cooldown() + 19) / 20
-				: perk.cooldown();
-	}
+    protected int itemAmount() {
+        return perk.perk().cooldown().unit() == Unit.TICKS ? (perk.cooldown() + 19) / 20 : perk.cooldown();
+    }
 
-	private void updateInventory(int slot, ItemStack item) {
-		EntityPlayer ep = perk.owner().getBukkitEntity().getHandle();
-		ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId, slot,
-				CraftItemStack.asNMSCopy(item)));
-	}
+    private void updateInventory(int slot, ItemStack item) {
+        EntityPlayer ep = perk.owner().getBukkitEntity().getHandle();
+        ep.playerConnection.sendPacket(new PacketPlayOutSetSlot(ep.defaultContainer.windowId, slot, CraftItemStack.asNMSCopy(item)));
+    }
 
-	public UserPerk perk() {
-		return perk;
-	}
+    public UserPerk perk() {
+        return perk;
+    }
 }

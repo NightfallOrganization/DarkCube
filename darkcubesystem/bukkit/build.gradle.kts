@@ -11,7 +11,7 @@ plugins {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-    compileOnlyApi(parent!!.project("api"))
+    compileOnlyApi(parent!!.project("common"))
     compileOnlyApi(libs.cloudnetWrapper)
     compileOnlyApi(libs.viaversion)
     compileOnlyApi(libs.viaversion.common)

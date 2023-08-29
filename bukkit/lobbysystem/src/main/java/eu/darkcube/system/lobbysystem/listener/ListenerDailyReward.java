@@ -37,8 +37,7 @@ public class ListenerDailyReward extends BaseListener {
         int minCubes = 80;
         if (c.get(Calendar.MONTH) == Calendar.DECEMBER) {
             int day = c.get(Calendar.DAY_OF_MONTH);
-            if (day == 24 || day == 25 || day == 26 || day == 27 || day == 28 || day == 29
-                    || day == 30 || day == 31) {
+            if (day == 24 || day == 25 || day == 26 || day == 27 || day == 28 || day == 29 || day == 30 || day == 31) {
                 maxCubes *= 10;
                 minCubes *= 10;
             }
@@ -47,10 +46,9 @@ public class ListenerDailyReward extends BaseListener {
         return minCubes + new Random().nextInt(maxCubes - minCubes + 1);
     }
 
-    @EventHandler
-    public void handle(InventoryClickEvent e) {
+    @EventHandler public void handle(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
+        LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
         if (user.getOpenInventory().getType() != InventoryDailyReward.type_daily_reward) {
             return;
         }
@@ -61,8 +59,7 @@ public class ListenerDailyReward extends BaseListener {
         if (!ItemBuilder.item(item).persistentDataStorage().has(InventoryDailyReward.reward)) {
             return;
         }
-        int id = ItemBuilder.item(item).persistentDataStorage()
-                .get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
+        int id = ItemBuilder.item(item).persistentDataStorage().get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
 
         Set<Integer> used = user.getRewardSlotsUsed();
         // used.clear();
@@ -75,19 +72,18 @@ public class ListenerDailyReward extends BaseListener {
         user.setRewardSlotsUsed(used);
 
         int cubes = randomCubes(Calendar.getInstance());
-        user.getUser().setCubes(user.getUser().getCubes().add(BigInteger.valueOf(cubes)));
+        user.user().cubes(user.user().cubes().add(BigInteger.valueOf(cubes)));
         item = new ItemStack(Material.SULPHUR);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName("§a" + cubes);
         item.setItemMeta(meta);
         user.setLastDailyReward(System.currentTimeMillis());
         e.setCurrentItem(item);
-        AdventureSupport.audienceProvider().player(p).sendMessage(Message.REWARD_COINS.getMessage(user.getUser(), Integer.toString(cubes)));
+        AdventureSupport.audienceProvider().player(p).sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
         p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
     }
 
-    @EventHandler
-    public void handle(PlayerNPCInteractEvent e) {
+    @EventHandler public void handle(PlayerNPCInteractEvent e) {
         if (e.hand() != PlayerNPCInteractEvent.Hand.MAIN_HAND) {
             return;
         }
@@ -99,8 +95,8 @@ public class ListenerDailyReward extends BaseListener {
                 npc.sendEmotes(e.player(), emotes.get(new Random().nextInt(emotes.size())).getId());
             } else {
                 Player p = e.player();
-                LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
-                user.setOpenInventory(new InventoryDailyReward(user.getUser()));
+                LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
+                user.setOpenInventory(new InventoryDailyReward(user.user()));
             }
         }
     }

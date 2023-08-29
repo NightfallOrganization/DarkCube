@@ -68,31 +68,6 @@ class DefaultWBUser implements WBUser {
     private static final Key KEY_PERKS = new Key(WoolBattleBukkit.instance(), "perks");
     private static final PersistentDataType<PerkName> TYPE_PERK_NAME = PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new, p -> p);
     private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME = PersistentDataTypes.list(TYPE_PERK_NAME);
-    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<>() {
-        @Override public int[] deserialize(Document doc, String key) {
-            byte[] bytes = PersistentDataTypes.BYTE_ARRAY.deserialize(doc, key);
-            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
-            int len = buf.get();
-            int[] ar = new int[len];
-            for (int i = 0; buf.remaining() > 0; i++) {
-                ar[i] = buf.get();
-            }
-            return ar;
-        }
-
-        @Override public void serialize(Document.Mutable doc, String key, int[] data) {
-            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
-            IntBuffer ib = buf.asIntBuffer();
-            ib.put(data.length);
-            for (int i : data)
-                ib.put(i);
-            PersistentDataTypes.BYTE_ARRAY.serialize(doc, key, buf.array());
-        }
-
-        @Override public int[] clone(int[] object) {
-            return object.clone();
-        }
-    };
     private static final PersistentDataType<PlayerPerks> TYPE_PERKS = new PersistentDataType<PlayerPerks>() {
         @Override public PlayerPerks deserialize(Document doc, String key) {
             doc = doc.readDocument(key);
@@ -129,6 +104,31 @@ class DefaultWBUser implements WBUser {
             return object.clone();
         }
     };
+    private static final PersistentDataType<int[]> TYPE_INT_ARRAY = new PersistentDataType<>() {
+        @Override public int[] deserialize(Document doc, String key) {
+            byte[] bytes = PersistentDataTypes.BYTE_ARRAY.deserialize(doc, key);
+            IntBuffer buf = ByteBuffer.wrap(bytes).asIntBuffer();
+            int len = buf.get();
+            int[] ar = new int[len];
+            for (int i = 0; buf.remaining() > 0; i++) {
+                ar[i] = buf.get();
+            }
+            return ar;
+        }
+
+        @Override public void serialize(Document.Mutable doc, String key, int[] data) {
+            ByteBuffer buf = ByteBuffer.wrap(new byte[data.length * Integer.BYTES + Integer.BYTES]);
+            IntBuffer ib = buf.asIntBuffer();
+            ib.put(data.length);
+            for (int i : data)
+                ib.put(i);
+            PersistentDataTypes.BYTE_ARRAY.serialize(doc, key, buf.array());
+        }
+
+        @Override public int[] clone(int[] object) {
+            return object.clone();
+        }
+    };
     private final WoolBattleBukkit woolbattle;
     private final User user;
     private final UserPerks perks;
@@ -145,11 +145,11 @@ class DefaultWBUser implements WBUser {
     public DefaultWBUser(WoolBattleBukkit woolbattle, User user) {
         this.woolbattle = woolbattle;
         this.user = user;
-        user.getPersistentDataStorage().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay.getDefault());
-        user.getPersistentDataStorage().setIfNotPresent(KEY_PARTICLES, TYPE_PARTICLES, true);
-        user.getPersistentDataStorage().setIfNotPresent(KEY_PERKS, TYPE_PERKS, new DefaultPlayerPerks());
+        user.persistentData().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay.getDefault());
+        user.persistentData().setIfNotPresent(KEY_PARTICLES, TYPE_PARTICLES, true);
+        user.persistentData().setIfNotPresent(KEY_PERKS, TYPE_PERKS, new DefaultPlayerPerks());
         user
-                .getPersistentDataStorage()
+                .persistentData()
                 .setIfNotPresent(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection.getDefault());
         spawnProtectionTicks = 0;
         trollmode = false;
@@ -163,15 +163,15 @@ class DefaultWBUser implements WBUser {
     }
 
     @Override public UUID getUniqueId() {
-        return user.getUniqueId();
+        return user.uniqueId();
     }
 
     @Override public String getPlayerName() {
-        return user.getName();
+        return user.name();
     }
 
     @Override public Component getTeamPlayerName() {
-        return Component.text(user.getName()).style(getTeam().getPrefixStyle());
+        return Component.text(user.name()).style(getTeam().getPrefixStyle());
     }
 
     @Override public Language getLanguage() {
@@ -195,37 +195,35 @@ class DefaultWBUser implements WBUser {
     }
 
     @Override public PlayerPerks perksStorage() {
-        return user.getPersistentDataStorage().get(KEY_PERKS, TYPE_PERKS, DefaultPlayerPerks::new).clone();
+        return user.persistentData().get(KEY_PERKS, TYPE_PERKS, DefaultPlayerPerks::new).clone();
     }
 
     @Override public void perksStorage(PlayerPerks perks) {
-        user.getPersistentDataStorage().set(KEY_PERKS, TYPE_PERKS, perks.clone());
+        user.persistentData().set(KEY_PERKS, TYPE_PERKS, perks.clone());
     }
 
     @Override public boolean particles() {
-        return user.getPersistentDataStorage().get(KEY_PARTICLES, TYPE_PARTICLES, () -> true);
+        return user.persistentData().get(KEY_PARTICLES, TYPE_PARTICLES, () -> true);
     }
 
     @Override public void particles(boolean particles) {
-        user.getPersistentDataStorage().set(KEY_PARTICLES, TYPE_PARTICLES, particles);
+        user.persistentData().set(KEY_PARTICLES, TYPE_PARTICLES, particles);
     }
 
     @Override public HeightDisplay heightDisplay() {
-        return user.getPersistentDataStorage().get(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay::getDefault).clone();
+        return user.persistentData().get(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay::getDefault).clone();
     }
 
     @Override public void heightDisplay(HeightDisplay heightDisplay) {
-        user.getPersistentDataStorage().set(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, heightDisplay.clone());
+        user.persistentData().set(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, heightDisplay.clone());
     }
 
     @Override public WoolSubtractDirection woolSubtractDirection() {
-        return user
-                .getPersistentDataStorage()
-                .get(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection::getDefault);
+        return user.persistentData().get(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection::getDefault);
     }
 
     @Override public void woolSubtractDirection(WoolSubtractDirection woolSubtractDirection) {
-        user.getPersistentDataStorage().set(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, woolSubtractDirection);
+        user.persistentData().set(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, woolSubtractDirection);
     }
 
     @Override public int woolCount() {
@@ -329,7 +327,7 @@ class DefaultWBUser implements WBUser {
     }
 
     @Override public CraftPlayer getBukkitEntity() {
-        return (CraftPlayer) user.asPlayer();
+        return (CraftPlayer) Bukkit.getPlayer(getUniqueId());
     }
 
     @Override public IInventory getOpenInventory() {

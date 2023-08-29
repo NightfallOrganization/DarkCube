@@ -17,36 +17,35 @@ import eu.darkcube.system.vanillaaddons.inventory.AbstractInventory;
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule.TeleporterListener;
 import net.wesjd.anvilgui.AnvilGUI;
 import net.wesjd.anvilgui.AnvilGUI.ResponseAction;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
 public class TeleporterRenameInventory extends AbstractInventory<AnvilGUI, Teleporter> {
-	public static final InventoryType TYPE = InventoryType.of("teleporterRename");
+    public static final InventoryType TYPE = InventoryType.of("teleporterRename");
 
-	@Override
-	protected AnvilGUI openInventory(AUser user) {
-		return new AnvilGUI.Builder().plugin(VanillaAddons.instance()).title(data().name())
-				.itemLeft(ItemBuilder.item(Material.NAME_TAG)
-						.displayname(Component.text(data().name().replace('§', '&'))).build())
-				.onClick((slot, snapshot) -> {
-					TextComponent component = LegacyComponentSerializer.legacyAmpersand()
-							.deserialize(snapshot.getText());
-					String text = LegacyComponentSerializer.legacySection().serialize(component);
-					data().name(text);
-					TeleporterListener.saveTeleporters(VanillaAddons.instance(),
-							data().block().block().getWorld());
-					return List.of(ResponseAction.close());
-				}).onClose(player -> new BukkitRunnable() {
-					@Override
-					public void run() {
-						user.openInventory(TeleporterInventory.TYPE, data());
-					}
-				}.runTask(VanillaAddons.instance())).open(user.user().asPlayer());
-	}
+    @Override protected AnvilGUI openInventory(AUser user) {
+        return new AnvilGUI.Builder()
+                .plugin(VanillaAddons.instance())
+                .title(data().name())
+                .itemLeft(ItemBuilder.item(Material.NAME_TAG).displayname(Component.text(data().name().replace('§', '&'))).build())
+                .onClick((slot, snapshot) -> {
+                    TextComponent component = LegacyComponentSerializer.legacyAmpersand().deserialize(snapshot.getText());
+                    String text = LegacyComponentSerializer.legacySection().serialize(component);
+                    data().name(text);
+                    TeleporterListener.saveTeleporters(VanillaAddons.instance(), data().block().block().getWorld());
+                    return List.of(ResponseAction.close());
+                })
+                .onClose(player -> new BukkitRunnable() {
+                    @Override public void run() {
+                        user.openInventory(TeleporterInventory.TYPE, data());
+                    }
+                }.runTask(VanillaAddons.instance()))
+                .open(Bukkit.getPlayer(user.user().uniqueId()));
+    }
 
-	@Override
-	protected void closeInventory(AUser user, AnvilGUI inventory) {
-	}
+    @Override protected void closeInventory(AUser user, AnvilGUI inventory) {
+    }
 }

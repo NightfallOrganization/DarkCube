@@ -69,7 +69,7 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
         String itemid = Item.getItemId(event.item());
         if (itemid == null) return;
         if (itemid.equals(ITEMID)) {
-            user.setOpenInventory(new InventoryLoading(getTitle(), user.getUser(), lobbyUser -> {
+            user.setOpenInventory(new InventoryLoading(getTitle(), user.user(), lobbyUser -> {
                 ServiceTask serviceTask = InjectionLayer
                         .boot()
                         .instance(ServiceTaskProvider.class)
@@ -82,9 +82,9 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
                             .accessLevel(AccessLevel.PUBLIC)
                             .create()
                             .get();
-                    ps.addOwner(user.getUser().getUniqueId()).get();
+                    ps.addOwner(user.user().getUniqueId()).get();
                     Thread.sleep(1000);
-                    return new InventoryPServerConfiguration(user.getUser(), ps.id());
+                    return new InventoryPServerConfiguration(user.user(), ps.id());
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }

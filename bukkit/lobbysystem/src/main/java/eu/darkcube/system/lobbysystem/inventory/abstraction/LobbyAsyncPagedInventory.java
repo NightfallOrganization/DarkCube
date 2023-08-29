@@ -74,8 +74,8 @@ public abstract class LobbyAsyncPagedInventory extends DefaultAsyncPagedInventor
     }
 
     @Override protected void insertArrowItems() {
-        this.arrowItem.put(PageArrow.NEXT, Item.ARROW_NEXT.getItem(user.getUser()));
-        this.arrowItem.put(PageArrow.PREVIOUS, Item.ARROW_PREVIOUS.getItem(user.getUser()));
+        this.arrowItem.put(PageArrow.NEXT, Item.ARROW_NEXT.getItem(user.user()));
+        this.arrowItem.put(PageArrow.PREVIOUS, Item.ARROW_PREVIOUS.getItem(user.user()));
         super.insertArrowItems();
     }
 

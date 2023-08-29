@@ -13,7 +13,7 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.userapi.data.UserModifier;
+import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.data.Key;
 
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class UserWrapper implements UserModifier {
     public static final Key key = new Key(Lobby.getInstance(), "user");
 
     public static LobbyUser fromUser(User user) {
-        return user.getMetaDataStorage().get(key);
+        return user.metadata().get(key);
     }
 
     public void beginMigration() {
@@ -35,8 +35,8 @@ public class UserWrapper implements UserModifier {
             for (String key : keys) {
                 long time1 = System.currentTimeMillis();
                 UUID uuid = UUID.fromString(key);
-                User user = UserAPI.getInstance().getUser(uuid);
-                Lobby.getInstance().getLogger().info("Migrating lobbydata: " + user.getName() + "(" + uuid + ")");
+                User user = UserAPI.instance().user(uuid);
+                Lobby.getInstance().getLogger().info("Migrating lobbydata: " + user.name() + "(" + uuid + ")");
                 long time2 = System.currentTimeMillis();
                 UserData data = new UserData(uuid, db.get(key));
                 LobbyUser u = fromUser(user);
@@ -46,7 +46,6 @@ public class UserWrapper implements UserModifier {
                 u.setLastDailyReward(data.getLastDailyReward());
                 u.setRewardSlotsUsed(data.getRewardSlotsUsed());
                 long time3 = System.currentTimeMillis();
-                UserAPI.getInstance().unloadUser(user);
                 if (System.currentTimeMillis() - time1 > 100) {
                     Lobby
                             .getInstance()
@@ -59,10 +58,10 @@ public class UserWrapper implements UserModifier {
     }
 
     @Override public void onLoad(User user) {
-        user.getMetaDataStorage().set(key, new LobbyUser(user));
+        user.metadata().set(key, new LobbyUser(user));
     }
 
     @Override public void onUnload(User user) {
-        user.getMetaDataStorage().remove(key);
+        user.metadata().remove(key);
     }
 }

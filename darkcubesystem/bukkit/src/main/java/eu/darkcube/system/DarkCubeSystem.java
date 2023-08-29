@@ -12,12 +12,12 @@ import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.commandapi.v3.arguments.EntityOptions;
 import eu.darkcube.system.internal.PacketDeclareProtocolVersion;
 import eu.darkcube.system.internal.PacketRequestProtocolVersionDeclaration;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.link.LinkManager;
 import eu.darkcube.system.link.cloudnet.CloudNetLink;
 import eu.darkcube.system.link.luckperms.LuckPermsLink;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.BukkitUserAPI;
-import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.AsyncExecutor;
 import eu.darkcube.system.version.BukkitVersion;
@@ -30,8 +30,9 @@ import org.bukkit.event.player.PlayerKickEvent;
 
 import java.util.Objects;
 
-public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
+@ApiStatus.Internal public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
     private final LinkManager linkManager = new LinkManager();
+    private BukkitUserAPI userAPI;
 
     public DarkCubeSystem() {
         super("system");
@@ -45,19 +46,18 @@ public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
         EntityOptions.registerOptions();
         PacketAPI.init();
         CommandAPI.init(this);
+        userAPI = new BukkitUserAPI();
         linkManager.addLink(() -> new LuckPermsLink());
         linkManager.addLink(() -> new CloudNetLink(this));
     }
 
     @Override public void onDisable() {
-        UserAPI.getInstance().loadedUsersForEach(user -> UserAPI.getInstance().unloadUser(user));
         AsyncExecutor.stop();
         AdventureSupport.audienceProvider().close();
         linkManager.unregisterLinks();
     }
 
     @Override public void onEnable() {
-        BukkitUserAPI.init();
         Bukkit.getPluginManager().registerEvents(this, this);
         AdventureSupport.audienceProvider(); // Initializes adventure
         linkManager.enableLinks();

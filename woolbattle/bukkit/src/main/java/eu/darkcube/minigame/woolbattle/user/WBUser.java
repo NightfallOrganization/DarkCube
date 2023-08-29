@@ -31,11 +31,11 @@ public interface WBUser {
     }
 
     static WBUser getUser(Player player) {
-        return getUser(UserAPI.getInstance().getUser(player));
+        return getUser(UserAPI.instance().user(player.getUniqueId()));
     }
 
     static WBUser getUser(User user) {
-        return user.getMetaDataStorage().get(WBUserModifier.USER);
+        return user.metadata().get(WBUserModifier.USER);
     }
 
     /**

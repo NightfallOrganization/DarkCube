@@ -30,7 +30,7 @@ public class ListenerInventoryClick extends BaseListener {
 
     @EventHandler public void handle(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        LobbyUser user = UserWrapper.fromUser(UserAPI.getInstance().getUser(p));
+        LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
         if (user.isBuildMode()) {
             return;
         }
@@ -54,10 +54,10 @@ public class ListenerInventoryClick extends BaseListener {
             }
             i %= Language.values().length;
             language = Language.values()[i];
-            user.getUser().setLanguage(language);
+            user.user().language(language);
             user.disableSounds(true);
             Lobby.getInstance().setItems(user);
-            user.setOpenInventory(new InventorySettings(user.getUser()));
+            user.setOpenInventory(new InventorySettings(user.user()));
             p.setFlying(true);
             user.disableSounds(false);
         }
@@ -76,16 +76,16 @@ public class ListenerInventoryClick extends BaseListener {
             close = true;
         } else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItemId())) {
             user.setAnimations(false);
-            user.setOpenInventory(new InventorySettings(user.getUser()));
+            user.setOpenInventory(new InventorySettings(user.user()));
         } else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_OFF.getItemId())) {
             user.setAnimations(true);
-            user.setOpenInventory(new InventorySettings(user.getUser()));
+            user.setOpenInventory(new InventorySettings(user.user()));
         } else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_ON.getItemId())) {
             user.setSounds(false);
-            user.setOpenInventory(new InventorySettings(user.getUser()));
+            user.setOpenInventory(new InventorySettings(user.user()));
         } else if (itemid.equals(Item.INVENTORY_SETTINGS_SOUNDS_OFF.getItemId())) {
             user.setSounds(true);
-            user.setOpenInventory(new InventorySettings(user.getUser()));
+            user.setOpenInventory(new InventorySettings(user.user()));
         }
 
         // PagedInventories
@@ -101,7 +101,7 @@ public class ListenerInventoryClick extends BaseListener {
 
         if (inv instanceof InventoryPServer) {
             if (itemid.equals(Item.INVENTORY_PSERVER_PRIVATE.getItemId())) {
-                user.setOpenInventory(new InventoryPServerOwn(user.getUser()));
+                user.setOpenInventory(new InventoryPServerOwn(user.user()));
             }
         } else if (inv instanceof InventoryPServerOwn) {
             if (itemid.equals(Item.INVENTORY_PSERVER_PUBLIC.getItemId())) {

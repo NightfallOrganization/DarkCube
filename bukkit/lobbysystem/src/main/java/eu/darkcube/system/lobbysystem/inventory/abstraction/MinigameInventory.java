@@ -91,10 +91,10 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
                 } else {
                     builder.damage(DyeColor.LIME.getWoolData());
                 }
-                builder.lore(Message.GAMESERVER_STATE.getMessage(user.getUser(), Message.STATE_LOBBY));
+                builder.lore(Message.GAMESERVER_STATE.getMessage(user.user(), Message.STATE_LOBBY));
             } else if (state == GameState.INGAME) {
                 builder.damage(DyeColor.ORANGE.getWoolData());
-                builder.lore(Message.GAMESERVER_STATE.getMessage(user.getUser(), Message.STATE_INGAME));
+                builder.lore(Message.GAMESERVER_STATE.getMessage(user.user(), Message.STATE_INGAME));
             } else {
                 throw new IllegalStateException();
             }
@@ -113,7 +113,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     }
 
     @Override protected void insertFallbackItems() {
-        this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user.getUser()));
+        this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user.user()));
         super.insertFallbackItems();
     }
 

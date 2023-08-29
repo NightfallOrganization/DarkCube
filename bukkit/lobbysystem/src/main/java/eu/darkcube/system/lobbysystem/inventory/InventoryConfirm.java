@@ -34,12 +34,12 @@ public class InventoryConfirm extends LobbyAsyncPagedInventory {
 
     @Override protected void fillItems(Map<Integer, ItemStack> items) {
         super.fillItems(items);
-        items.put(IInventory.slot(2, 3), Item.CANCEL.getItem(this.user.getUser()));
-        items.put(IInventory.slot(2, 7), Item.CONFIRM.getItem(this.user.getUser()));
+        items.put(IInventory.slot(2, 3), Item.CANCEL.getItem(this.user.user()));
+        items.put(IInventory.slot(2, 7), Item.CONFIRM.getItem(this.user.user()));
     }
 
     @Override protected void insertFallbackItems() {
-        ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user.getUser());
+        ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user.user());
         for (int slot : this.SLOTS) {
             this.fallbackItems.put(slot, l);
         }

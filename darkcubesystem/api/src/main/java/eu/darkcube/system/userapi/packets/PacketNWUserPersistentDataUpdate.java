@@ -12,20 +12,21 @@ import eu.darkcube.system.packetapi.Packet;
 
 import java.util.UUID;
 
-public class PacketUserPersistentDataMerge extends Packet {
+public class PacketNWUserPersistentDataUpdate extends Packet {
+
     private final UUID uuid;
     private final Document data;
 
-    public PacketUserPersistentDataMerge(UUID uuid, Document data) {
+    public PacketNWUserPersistentDataUpdate(UUID uuid, Document data) {
         this.uuid = uuid;
         this.data = data;
     }
 
-    public UUID getUniqueId() {
+    public UUID uniqueId() {
         return uuid;
     }
 
-    public Document getData() {
+    public Document data() {
         return data;
     }
 }

@@ -105,14 +105,14 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
 
         for (int i = 0; i < Math.min(InventoryLobbySwitcher.SLOTS.length, lobbyCount); i++) {
             ServiceInfoSnapshot s = lobbies.get(i);
-            ItemStack item = Item.INVENTORY_LOBBY_SWITCHER_OTHER.getItem(this.user.getUser());
+            ItemStack item = Item.INVENTORY_LOBBY_SWITCHER_OTHER.getItem(this.user.user());
             ItemMeta meta = item.getItemMeta();
             String id = s.serviceId().name();
             if (!id.isEmpty()) {
                 id = Character.toUpperCase(id.charAt(0)) + id.substring(1).replace("-", " ");
             }
             if (s.serviceId().equals(serviceInfo.serviceId())) {
-                item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user.getUser());
+                item = Item.INVENTORY_LOBBY_SWITCHER_CURRENT.getItem(this.user.user());
                 meta.setDisplayName("§c" + id);
             } else {
                 meta.setDisplayName("§a" + id);
@@ -153,7 +153,7 @@ public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
     }
 
     @Override protected void insertFallbackItems() {
-        this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_LOBBY_SWITCHER.getItem(this.user.getUser()));
+        this.fallbackItems.put(IInventory.slot(1, 5), Item.INVENTORY_LOBBY_SWITCHER.getItem(this.user.user()));
         super.insertFallbackItems();
     }
 
