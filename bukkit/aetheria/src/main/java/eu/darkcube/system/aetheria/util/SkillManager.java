@@ -23,26 +23,53 @@ public class SkillManager {
     private JavaPlugin plugin;
 
     private Map<String, Skill> skillMap = new HashMap<>();
+    private Map<String, Skill> activeSkillMap = new HashMap<>();
+    private Map<String, Skill> passiveSkillMap = new HashMap<>();
 
     public SkillManager(JavaPlugin plugin) {
         this.plugin = plugin;
         registerSkills();
     }
 
+    public HashMap<String, Skill> getSkillMap() {
+        return (HashMap<String, Skill>) skillMap;
+    }
+
     private void registerSkills() {
-        skillMap.put("Dash", new SkillDash());
-        skillMap.put("VerticalDash", new SkillVerticalDash());
-        skillMap.put("WindBlades", new SkillWindBlades());
-        skillMap.put("Attraction", new SkillAttraction());
-        skillMap.put("Summoner", new SkillSummoner());
+        Skill skillDash = new SkillDash();
+        Skill skillVerticalDash = new SkillVerticalDash();
+        Skill skillAttraction = new SkillAttraction();
+        Skill skillSummoner = new SkillSummoner();
+        Skill skillWindBlades = new SkillWindBlades();
+        Skill skillDamageResistance = new SkillDamageResistance();
+
+        skillMap.put(skillDash.getName(), skillDash);
+        skillMap.put(skillVerticalDash.getName(), skillVerticalDash);
+        skillMap.put(skillAttraction.getName(), skillAttraction);
+        skillMap.put(skillSummoner.getName(), skillSummoner);
+        skillMap.put(skillWindBlades.getName(), skillWindBlades);
+        skillMap.put(skillDamageResistance.getName(), skillDamageResistance);
+
+        activeSkillMap.put(skillDash.getName(), skillDash);
+        activeSkillMap.put(skillVerticalDash.getName(), skillVerticalDash);
+        activeSkillMap.put(skillAttraction.getName(), skillAttraction);
+        activeSkillMap.put(skillSummoner.getName(), skillSummoner);
+        activeSkillMap.put(skillWindBlades.getName(), skillWindBlades);
+
+        passiveSkillMap.put(skillDamageResistance.getName(), skillDamageResistance);
+
+    }
+
+    public Skill getActiveSkillByName(String skillName) {
+        return activeSkillMap.get(skillName);
+    }
+
+    public Skill getPassiveSkillByName(String skillName) {
+        return passiveSkillMap.get(skillName);
     }
 
     public Skill getSkillByName(String skillName) {
         return skillMap.get(skillName);
-    }
-
-    public boolean isValidSkill(String skill) {
-        return skillMap.containsKey(skill);
     }
 
     public String getSlotOfSkill(Player player, String skillName) {
@@ -56,27 +83,26 @@ public class SkillManager {
         return "Unskilled";
     }
 
-    public void assignSkillToSlot(Player player, String skill, int slot) {
-        PersistentDataContainer container = player.getPersistentDataContainer();
-
-        // Remove skill if it's already assigned to a slot
-        for (int i = 1; i <= 4; i++) {
-            if (skill.equals(container.get(getKeyName(i), PersistentDataType.STRING))) {
-                container.set(getKeyName(i), PersistentDataType.STRING, "Unskilled");
-            }
-        }
-
-        container.set(getKeyName(slot), PersistentDataType.STRING, skill);
-    }
-
-    public String getSkillFromSlot(Player player, int slot) {
+    public String getSkillNameFromSlot(Player player, int slot) {
         PersistentDataContainer container = player.getPersistentDataContainer();
         return container.has(getKeyName(slot), PersistentDataType.STRING)
                 ? container.get(getKeyName(slot), PersistentDataType.STRING)
                 : "Unskilled";
     }
 
-    private NamespacedKey getKeyName(int slot) {
+    public Skill getSkillFromSlot(Player player, int slot) {
+        PersistentDataContainer container = player.getPersistentDataContainer();
+        String skillName = container.has(getKeyName(slot), PersistentDataType.STRING)
+                ? container.get(getKeyName(slot), PersistentDataType.STRING)
+                : "Unskilled";
+        if (slot <= 4) {
+            return activeSkillMap.get(skillName);
+        } else {
+            return passiveSkillMap.get(skillName);
+        }
+    }
+
+    public NamespacedKey getKeyName(int slot) {
         return new NamespacedKey(plugin, SKILL_PREFIX + slot);
     }
 }

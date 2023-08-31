@@ -8,10 +8,7 @@
 package eu.darkcube.system.aetheria.util;
 
 import eu.darkcube.system.aetheria.Aetheria;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.enchantments.Enchantment;
@@ -56,11 +53,17 @@ public class MonsterStatsManager implements Listener {
     public void level(Entity entity, int level) {
         entity.getPersistentDataContainer().set(levelKey, PersistentDataType.INTEGER, level);
         double maxHealth = level * 20;
-        healthManager.setHealth(entity, (int) maxHealth * 2);
-        healthManager.setMaxHealth(entity, (int) maxHealth * 2);
-        updateMonsterName(entity);
-        entity.setCustomName("§6Level §e" + level + " §7- §c100%");
-        entity.setCustomNameVisible(true);
+
+        if (!Double.isNaN(maxHealth) && maxHealth > 0) {
+            healthManager.setHealth(entity, (int) maxHealth * 4);
+            healthManager.setMaxHealth(entity, (int) maxHealth * 4);
+            updateMonsterName(entity);
+            entity.setCustomName("§6Level §e" + level + " §7- §c100%");
+            entity.setCustomNameVisible(true);
+        } else {
+            // Optional: Protokollieren Sie einen Fehler, wenn maxHealth ungültig ist
+            Bukkit.getLogger().warning("Ungültiger maxHealth Wert: " + maxHealth + " für Entity: " + entity.getUniqueId());
+        }
 
         // Equip skeleton with bow if monster is a skeleton
         if (entity instanceof Skeleton skeleton) {
@@ -124,13 +127,10 @@ public class MonsterStatsManager implements Listener {
         double currentHealth = healthManager.getHealth(monster);
         double healthPercentage = (currentHealth / maxHealth) * 100;
 
-        String customName = monster.getCustomName();
-        if (customName != null && !customName.isEmpty()) {
-            int levelStartIndex = customName.indexOf("§e") + 2;  // +2 um "§e" zu überspringen
-            int levelEndIndex = customName.indexOf(" ", levelStartIndex);
-            String levelString = customName.substring(levelStartIndex, levelEndIndex);
+        int monsterLevel = level(monster); // Holt das Level des Monsters
 
-            monster.setCustomName("§6Level §e" + levelString + " §7- §c" + String.format("%.0f", healthPercentage) + "%");
+        if (monsterLevel != -1) {
+            monster.setCustomName("§6Level §e" + monsterLevel + " §7- §c" + String.format("%.0f", healthPercentage) + "%");
         } else {
             monster.setCustomName("§c" + String.format("%.0f", healthPercentage) + "%");
         }

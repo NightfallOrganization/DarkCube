@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -79,9 +80,15 @@ public class DamageManager implements Listener {
             PlayerInventory inventory = humanEntity.getInventory();
             ItemStack mainHand = inventory.getItemInMainHand();
             additionalDamage += itemDamage(mainHand);
+
+            // Wenn das Item in der Haupt-Hand des Spielers ein CustomSword ist, fügen Sie den entsprechenden Schaden hinzu
+            if(aetheria.customSwordManager().getSwordAttackDamage(mainHand) > 0) {
+                additionalDamage += aetheria.customSwordManager().getSwordAttackDamage(mainHand);
+            }
         }
         return additionalDamage;
     }
+
 
     private double applyModifiers(Entity entity, Entity target, double damage) {
         double multiplier = 1;

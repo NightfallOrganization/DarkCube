@@ -95,12 +95,11 @@ public class SkillClickListener implements Listener {
         }
 
         if (slot != -1) {
-            String skillName = skillManager.getSkillFromSlot(player, slot);
-            if (!skillName.equals("Unskilled")) {
-                Skill skill = skillManager.getSkillByName(skillName);
-                if (skill != null) {
-                    skill.activate(player);
-                }
+            Skill skill = skillManager.getSkillFromSlot(player, slot);
+            if (skill != null && !skill.getName().equals("Unskilled")) {
+                skill.activate(player);
+                pattern.clear(); // Clear the pattern after activation
+                showClickPatternTitle(player, pattern);
             }
             pattern.clear(); // Clear the pattern after activation
             showClickPatternTitle(player, pattern);

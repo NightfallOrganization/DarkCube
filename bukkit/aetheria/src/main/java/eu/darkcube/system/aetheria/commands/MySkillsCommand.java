@@ -32,8 +32,8 @@ public class MySkillsCommand implements CommandExecutor {
         sender.sendMessage(" ");
         sender.sendMessage("§7§nMeine Skills:");
         sender.sendMessage(" ");
-        for (int i = 1; i <= 4; i++) {
-            String skill = skillManager.getSkillFromSlot(player, i);
+        for (int i = 1; i <= 8; i++) {
+            String skill = skillManager.getSkillNameFromSlot(player, i);
             sender.sendMessage("§7Slot " + i + ": §a" + (skill.equals("Unskilled") ? "§7Empty" : skill));
         }
         sender.sendMessage(" ");

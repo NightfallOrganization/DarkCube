@@ -18,11 +18,11 @@ public class SkillVerticalDash extends Skill {
     private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillVerticalDash() {
-        super("VerticalDash");
+        super("VerticalDash", true);
         this.cooldowns = new HashMap<>();
     }
 
-    @Override public void activate(Player player) {
+    @Override public void activateSkill(Player player) {
         if (canUse(player)) {
             Vector direction = player.getLocation().getDirection();
             direction.setY(0); // Y-Komponente ignorieren
