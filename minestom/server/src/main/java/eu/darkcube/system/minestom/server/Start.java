@@ -35,9 +35,10 @@ import net.minestom.server.world.biomes.BiomeParticle;
 
 public class Start {
     public static void main(String[] args) {
-        System.setProperty("minestom.chunk-view-distance", "3");
+        System.setProperty("minestom.chunk-view-distance", "8");
         System.setProperty("minestom.extension.enabled", "true");
-        System.setProperty("minestom.entity-view-distance", "3");
+        System.setProperty("minestom.entity-view-distance", "8");
+        System.setProperty("minestom.terminal-prompt", "");
         var server = MinecraftServer.init();
         var priorityCount = MinecraftServer.getChunkViewDistance() + 1;
         System.out.println("Priority count: " + priorityCount);
@@ -139,8 +140,6 @@ public class Start {
         });
 
         server.start(System.getProperty("service.bind.host"), Integer.getInteger("service.bind.port"));
-
-        MinestomTerminal.start();
 
     }
 }
