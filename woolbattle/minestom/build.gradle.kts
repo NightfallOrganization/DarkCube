@@ -5,24 +5,26 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 plugins {
-    alias(libs.plugins.shadow)
     `java-library`
+    alias(libs.plugins.shadow)
 }
 
 tasks {
-    shadowJar.configure {
-        archiveClassifier = ""
-    }
-    jar.configure {
+    jar {
         archiveClassifier = "pure"
     }
-    assemble.configure { dependsOn(shadowJar) }
+    shadowJar {
+        archiveBaseName = "application"
+        archiveClassifier = null
+        manifest {
+            attributes["Main-Class"] = "eu.darkcube.system.woolbattle.Start"
+        }
+    }
+    assemble {
+        dependsOn(shadowJar)
+    }
 }
 
 dependencies {
-    api(project("api"))
-    runtimeOnly(project("common"))
-    runtimeOnly(project("velocity"))
-    runtimeOnly(project("bukkit"))
-    runtimeOnly(project("module"))
+    implementation(libs.minestom)
 }

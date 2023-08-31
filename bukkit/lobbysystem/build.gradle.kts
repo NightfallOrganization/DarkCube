@@ -6,7 +6,7 @@
  */
 
 plugins {
-    id("com.github.johnrengelman.shadow")
+    alias(libs.plugins.shadow)
 }
 
 tasks {

@@ -14,11 +14,6 @@ pluginManagement {
             url = uri("https://repo.papermc.io/repository/maven-public/")
         }
     }
-    plugins {
-        id("com.github.johnrengelman.shadow") version "8.1.1" apply false
-        id("net.kyori.blossom") version "1.3.1" apply false
-        id("io.papermc.paperweight.userdev") version "1.5.5" apply false
-    }
 }
 
 rootProject.name = "DarkCube"
@@ -32,7 +27,7 @@ includeSubProjects("darkcubesystem:libs", "brigadier", "gson", "annotations")
 includeSubProjects("darkcubesystem:libs:adventure", "adventure-api", "adventure-key", "adventure-nbt", "adventure-platform-api", "adventure-platform-bukkit", "adventure-platform-facet", "adventure-platform-viaversion", "adventure-text-serializer-bungeecord", "adventure-text-serializer-gson", "adventure-text-serializer-gson-legacy-impl", "adventure-text-serializer-legacy", "adventure-text-serializer-plain", "examination-api", "examination-string")
 includeSubProjects("darkcubesystem:bukkit", "1.8.8", "1.20.1")
 
-includeSubProjects("woolbattle", "bukkit", "api")
+includeSubProjects("woolbattle", "bukkit", "api", "minestom")
 
 //includeSubProjects("darkcubesystem", "1.8.8", "1.19.3", "core", "module")
 include("bukkit:darkessentials")

@@ -10,6 +10,10 @@ viaversion = "4.7.0"
 annotations = "24.0.1"
 hologramlib = "2.6.0-SNAPSHOT"
 velocity = "3.1.1"
+minestom = "1.0-20230831.112407-1"
+shadow = "8.1.1"
+blossom = "1.3.1"
+paperweight-userdev = "1.5.5"
 
 [libraries]
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
@@ -22,6 +26,7 @@ viaversion-bukkit = { group = "com.viaversion", name = "viaversion-bukkit", vers
 protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
+minestom = { group = "net.minestom", name = "Minestom", version.ref = "minestom" }
 
 cloudnetDriver = { group = "eu.cloudnetservice.cloudnet", name = "driver", version.ref = "cloudnet" }
 cloudnetBridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
@@ -32,3 +37,7 @@ cloudnetInjectProcessor = { group = "eu.cloudnetservice.cloudnet", name = "platf
 
 [bundles]
 
+[plugins]
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+blossom = { id = "net.kyori.blossom", version.ref = "blossom" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }

@@ -6,8 +6,8 @@
  */
 
 plugins {
-    id("com.github.johnrengelman.shadow")
-    id("java-library")
+    alias(libs.plugins.shadow)
+    `java-library`
 }
 
 tasks {

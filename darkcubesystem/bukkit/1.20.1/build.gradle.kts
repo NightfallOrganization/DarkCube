@@ -6,8 +6,8 @@
  */
 
 plugins {
-    id("io.papermc.paperweight.userdev")
-    id("java-library")
+    alias(libs.plugins.paperweight.userdev)
+    `java-library`
 }
 
 dependencies {

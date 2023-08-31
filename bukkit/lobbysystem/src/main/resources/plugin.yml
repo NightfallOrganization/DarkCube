@@ -2,7 +2,7 @@ main: eu.darkcube.system.lobbysystem.Lobby
 version: 1.0
 author: DasBabyPixel
 name: LobbySystem
-depend: [ System, PServer ]
+softdepend: [ System, PServer ]
 permissions:
   system.npc.knockback.ignore:
     default: false

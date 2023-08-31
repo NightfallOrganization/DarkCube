@@ -7,7 +7,7 @@
 
 plugins {
     id("glyph-width-loader")
-    id("com.github.johnrengelman.shadow")
+    alias(libs.plugins.shadow)
     java
 }
 
