@@ -35,6 +35,7 @@ include("bukkit:darkessentials")
 include("bukkit:jumpleague")
 //include "bukkit:knockout"
 include("bukkit:aetheria")
+include("bukkit:jumpleaguemodules")
 include("bukkit:lobbysystem")
 include("bukkit:luckperms-prefixplugin")
 include("bukkit:miners")

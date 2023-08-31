@@ -22,14 +22,9 @@ public class UseSkillSlotCommand implements CommandExecutor {
 
     public UseSkillSlotCommand(SkillManager skillManager) {
         this.skillManager = skillManager;
-        this.skills = new HashMap<>();
-
-        this.skills.put("Dash", new SkillDash());
-        this.skills.put("VerticalDash", new SkillVerticalDash());
-        this.skills.put("WindBlades", new SkillWindBlades());
-        this.skills.put("Attraction", new SkillAttraction());
-        this.skills.put("Summoner", new SkillSummoner());
+        this.skills = skillManager.getSkillMap();
     }
+
 
     @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
@@ -45,7 +40,7 @@ public class UseSkillSlotCommand implements CommandExecutor {
         int slot;
         try {
             slot = Integer.parseInt(args[0]);
-            if (slot < 1 || slot > 4) {
+            if (slot < 1 || slot > 8) {
                 sender.sendMessage("§7Gib einen Slot zwischen §a1 §7und §a4 §7an");
                 return true;
             }
@@ -54,7 +49,7 @@ public class UseSkillSlotCommand implements CommandExecutor {
             return true;
         }
 
-        String skillName = skillManager.getSkillFromSlot(player, slot);
+        String skillName = skillManager.getSkillNameFromSlot(player, slot);
 
         if (skillName.equals("Unskilled")) {
             sender.sendMessage("§7Es wurde kein Skill zu Slot §a" + slot + " §7zugewiesen!");

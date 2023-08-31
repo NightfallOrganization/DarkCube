@@ -7,164 +7,207 @@ depend: [ System ]
 commands:
   gm:
     description: Wechselt den Gamemode
+    permission: aetheria.gm.use
   heal:
     description: Heilt den Spieler
+    permission: aetheria.heal.use
   day:
     description: Setzt Tag
+    permission: aetheria.day.use
   night:
     description: Setzt Nacht
+    permission: aetheria.night.use
   god:
     description: Setzt den Spieler in die Unzerstörbarkeit
+    permission: aetheria.god.use
   fly:
     description: Setzt den Spieler in den Flugmodus
+    permission: aetheria.fly.use
   feed:
     description: Füttert den Spieler
+    permission: aetheria.feed.use
   max:
     description: Maximiert die Werte des Spielers
+    permission: aetheria.max.use
   trash:
     description: Öffnet einen Mülleimer
+    permission: aetheria.trash.use
   warp:
     description: Öffnet die Warp-Punkte
+    permission: aetheria.warp.use
   spawn:
     description: Teleportiert den Spieler zum Spawn
+    permission: aetheria.spawn.use
   getitem:
     description: Öffnet ein Inventar mit custom Items
+    permission: aetheria.getitem.use
   killmobs:
     description: Tötet alle Mobs in der Welt des Spielers
+    permission: aetheria.killmobs.use
   addxp:
     description: Gibt dem Spieler custom XP
+    permission: aetheria.addxp.use
   mylevel:
     description: Zeigt dein aktuelles Level
+    permission: aetheria.mylevel.use
   resetlevel:
     description: Setzt dein Level und XP auf 0 zurück
+    permission: aetheria.resetlevel.use
   myxp:
     description: Zeigt die aktuellen benutzerdefinierten XP des Spielers an
+    permission: aetheria.myxp.use
   myap:
     description: Zeigt die aktuellen AP des Spielers an
+    permission: aetheria.myap.use
   attribute:
     description: Öffnet die Attribute
     aliases: [ attr ]
+    permission: aetheria.attribute.use
   addhealth:
     description: Gibt dem Spieler custom Health
+    permission: aetheria.addhealth.use
   myhealth:
     description: Zeigt die aktuellen benutzerdefinierten Health des Spielers an
+    permission: aetheria.myhealth.use
   addregeneration:
     description: Gibt dem Spieler custom Regeneration
+    permission: aetheria.addregeneration.use
   addarounddamage:
     description: Fügt AroundDamage zu einem Spieler hinzu
+    permission: aetheria.addarounddamage.use
   myarounddamage:
     description: Zeigt den AroundDamage des Spielers an
+    permission: aetheria.myarounddamage.use
   adddefense:
     description: Gibt dem Spieler custom Defense
+    permission: aetheria.adddefense.use
   mydefense:
     description: Zeigt die aktuelle benutzerdefinierte Defense des Spielers an
+    permission: aetheria.mydefense.use
   myregeneration:
     description: Zeigt den Regenerationswert des Spielers an
+    permission: aetheria.myregeneration.use
   additemlevel:
     description: Erhöht das ItemLevel des Gegenstands in der Hand des Spielers
+    permission: aetheria.additemlevel.use
   itemlevel:
     description: Zeigt das Level des Items im Hauptslot des Spielers an
+    permission: aetheria.itemlevel.use
   resetdurability:
     description: Setzt die Haltbarkeit des gehaltenen CustomSword-Items zurück
+    permission: aetheria.resetdurability.use
   spawnupgrader:
     description: Spawnt einen Upgrader NPC
+    permission: aetheria.spawnupgrader.use
   mycor:
     description: Zeigt die aktuellen Cor des Spielers an
+    permission: aetheria.mycor.use
   addcor:
     description: Gibt dem Spieler Cor
+    permission: aetheria.addcor.use
   setcor:
     description: Setzt dem Spieler Cor
+    permission: aetheria.setcor.use
   adddamage:
     description: Gibt dem Spieler custom Damage
+    permission: aetheria.adddamage.use
   mydamage:
     description: Zeigt den aktuellen benutzerdefinierten Damage des Spielers an
+    permission: aetheria.mydamage.use
   addskillslot:
     description: Setzt die Skills auf die Skillslots
+    permission: aetheria.addskillslot.use
   myskills:
     description: Zeigt die Skills auf den Skillslots
+    permission: aetheria.myskills.use
   useskill:
     description: Aktiviere einen benutzerdefinierten Skill
+    permission: aetheria.useskill.use
   useskillslot:
     description: Aktiviere einen Skill auf einen Skillslot
+    permission: aetheria.useskillslot.use
+  skills:
+    description: Öffne das Skill-Inventar
+    permission: aetheria.skills.use
 
-permissions:
-  gm.use:
     default: op
-  heal.use:
+  aetheria.heal.use:
     default: op
-  day.use:
+  aetheria.day.use:
     default: op
-  night.use:
+  aetheria.night.use:
     default: op
-  god.use:
+  aetheria.god.use:
     default: op
-  fly.use:
+  aetheria.fly.use:
     default: op
-  feed.use:
+  aetheria.feed.use:
     default: op
-  max.use:
+  aetheria.max.use:
     default: op
-  trash.use:
+  aetheria.trash.use:
     default: not op
-  warp.use:
+  aetheria.warp.use:
     default: not op
-  spawn.use:
+  aetheria.spawn.use:
     default: not op
-  getitem.use:
+  aetheria.getitem.use:
     default: op
-  killmobs.use:
+  aetheria.killmobs.use:
     default: op
-  addxp.use:
+  aetheria.addxp.use:
     default: op
-  mylevel.use:
+  aetheria.mylevel.use:
     default: not op
-  resetlevel.use:
+  aetheria.resetlevel.use:
     default: op
-  myxp.use:
+  aetheria.myxp.use:
     default: not op
-  myap.use:
+  aetheria.myap.use:
     default: not op
-  attribute.use:
+  aetheria.attribute.use:
     default: not op
-  addhealth.use:
+  aetheria.addhealth.use:
     default: op
-  myhealth.use:
+  aetheria.myhealth.use:
     default: not op
-  addregeneration.use:
+  aetheria.addregeneration.use:
     default: op
-  addarounddamage.use:
+  aetheria.addarounddamage.use:
     default: op
-  myarounddamage.use:
+  aetheria.myarounddamage.use:
     default: op
-  adddefense.use:
+  aetheria.adddefense.use:
     default: op
-  mydefense.use:
+  aetheria.mydefense.use:
     default: op
-  myregeneration.use:
+  aetheria.myregeneration.use:
     default: op
-  additemlevel.use:
+  aetheria.additemlevel.use:
     default: op
-  itemlevel.use:
+  aetheria.itemlevel.use:
     default: op
-  resetdurability.use:
+  aetheria.resetdurability.use:
     default: op
-  spawnupgrader.use:
+  aetheria.spawnupgrader.use:
     default: op
-  mycor.use:
+  aetheria.mycor.use:
     default: not op
-  addcore.use:
+  aetheria.addcore.use:
     default: op
-  setcore.use:
+  aetheria.setcore.use:
     default: op
-  mydamage.use:
+  aetheria.mydamage.use:
     default: not op
-  adddamage.use:
+  aetheria.adddamage.use:
     default: op
-  addskillslot.use:
+  aetheria.addskillslot.use:
     default: not op
-  myskills.use:
+  aetheria.myskills.use:
     default: not op
-  useskill.use:
+  aetheria.useskill.use:
     default: not op
-  useskillslot.use:
+  aetheria.useskillslot.use:
+    default: not op
+  aetheria.skills.use:
     default: not op

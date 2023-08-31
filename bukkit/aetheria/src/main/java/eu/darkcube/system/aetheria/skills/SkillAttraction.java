@@ -25,11 +25,11 @@ public class SkillAttraction extends Skill {
     private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillAttraction() {
-        super("Schwarzes Loch");
+        super("Attraction", true);
         this.cooldowns = new HashMap<>();
     }
 
-    @Override public void activate(Player player) {
+    @Override public void activateSkill(Player player) {
         if (canUse(player)) {
             Vector direction = player.getLocation().getDirection().setY(0).normalize().multiply(5);
             Location targetLocation = player.getLocation().add(direction);

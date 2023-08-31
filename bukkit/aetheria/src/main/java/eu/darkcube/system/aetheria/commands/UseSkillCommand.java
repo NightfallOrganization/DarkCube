@@ -23,11 +23,19 @@ public class UseSkillCommand implements CommandExecutor {
         this.skillManager = skillManager;
         this.skills = new HashMap<>();
 
-        this.skills.put("Dash", new SkillDash());
-        this.skills.put("VerticalDash", new SkillVerticalDash());
-        this.skills.put("Summoner", new SkillSummoner());
-        this.skills.put("WindBlades", new SkillWindBlades());
-        this.skills.put("Attraction", new SkillAttraction());
+        Skill skillDash = new SkillDash();
+        Skill skillVerticalDash = new SkillVerticalDash();
+        Skill skillAttraction = new SkillAttraction();
+        Skill skillSummoner = new SkillSummoner();
+        Skill skillWindBlades = new SkillWindBlades();
+        Skill skillDamageResistance = new SkillDamageResistance();
+
+        this.skills.put(skillDash.getName(), skillDash);
+        this.skills.put(skillVerticalDash.getName(), skillVerticalDash);
+        this.skills.put(skillAttraction.getName(), skillAttraction);
+        this.skills.put(skillSummoner.getName(), skillSummoner);
+        this.skills.put(skillWindBlades.getName(), skillWindBlades);
+        this.skills.put(skillDamageResistance.getName(), skillDamageResistance);
     }
 
     @Override
@@ -47,17 +55,22 @@ public class UseSkillCommand implements CommandExecutor {
         String skillName = args[0];
         String skillStatus = skillManager.getSlotOfSkill(player, skillName);
 
+        Skill skill = skills.get(skillName);
+        if (skill != null) {
+            if (skillManager.getPassiveSkillByName(skillName) != null) {
+                sender.sendMessage("§7Der Skill §a" + skillName + " §7ist ein passiver Skill und kann nicht aktiviert werden.");
+                return true;
+            }
+            skill.activate(player);
+        } else {
+            sender.sendMessage("§7Unknown skill: §a" + skillName);
+        }
+
         if (skillStatus.equals("Unskilled")) {
             sender.sendMessage("§7Du hast diesen Skill zu keinem Slot hinzugefügt!");
             return true;
         }
 
-        Skill skill = skills.get(skillName);
-        if (skill != null) {
-            skill.activate(player);
-        } else {
-            sender.sendMessage("§7Unknown skill: §a" + skillName);
-        }
 
         return true;
     }

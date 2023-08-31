@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.aetheria.commands;
 
-import eu.darkcube.system.aetheria.util.CustomSwordManager;
+import eu.darkcube.system.aetheria.items.CustomSwordManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

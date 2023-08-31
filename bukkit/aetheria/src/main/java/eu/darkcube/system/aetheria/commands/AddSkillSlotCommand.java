@@ -7,11 +7,15 @@
 
 package eu.darkcube.system.aetheria.commands;
 
+import eu.darkcube.system.aetheria.skills.Skill;
 import eu.darkcube.system.aetheria.util.SkillManager;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 public class AddSkillSlotCommand implements CommandExecutor {
     private SkillManager skillManager;
@@ -20,7 +24,8 @@ public class AddSkillSlotCommand implements CommandExecutor {
         this.skillManager = skillManager;
     }
 
-    @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage("Only players can use this command!");
             return true;
@@ -32,7 +37,9 @@ public class AddSkillSlotCommand implements CommandExecutor {
         }
 
         String skill = args[0];
-        if (!skillManager.isValidSkill(skill)) {
+        Skill skillObj = skillManager.getSkillByName(skill);
+
+        if (skillObj == null) {
             sender.sendMessage("§a" + skill + " §7ist kein Skill");
             return true;
         }
@@ -41,17 +48,42 @@ public class AddSkillSlotCommand implements CommandExecutor {
         try {
             slot = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            sender.sendMessage("§7Es muss ein Slot von 1 bis 4 sein");
+            sender.sendMessage("§7Es muss ein Slot von 1 bis 8 sein");
             return true;
         }
 
-        if (slot < 1 || slot > 4) {
-            sender.sendMessage("§7Es muss ein Slot von 1 bis 4 sein");
+        if (slot < 1 || slot > 8) {
+            sender.sendMessage("§7Es muss ein Slot von 1 bis 8 sein");
             return true;
         }
 
-        skillManager.assignSkillToSlot(player, skill, slot);
-        sender.sendMessage("§7Der Skill §a" + skill + " §7wurde zu Slot §a" + slot + " §7hinzugefügt");
+        PersistentDataContainer container = player.getPersistentDataContainer();
+        NamespacedKey key = skillManager.getKeyName(slot);
+
+        // Überprüfen, ob der Skill bereits in einem anderen Slot ist
+        for (int i = 1; i <= 8; i++) {
+            String existingSkill = container.get(skillManager.getKeyName(i), PersistentDataType.STRING);
+            if (existingSkill != null && existingSkill.equals(skill)) {
+                container.remove(skillManager.getKeyName(i));
+                break;
+            }
+        }
+
+        if (slot <= 4) {
+            if (skillManager.getActiveSkillByName(skill) != null) {
+                container.set(key, PersistentDataType.STRING, skill);
+                sender.sendMessage("§7Der Skill §a" + skill + " §7wurde zu Slot §a" + slot + " §7hinzugefügt");
+            } else {
+                sender.sendMessage("§7Der Skill §a" + skill + " §7kann nicht zu einem aktiven Slot hinzugefügt werden");
+            }
+        } else {
+            if (skillManager.getPassiveSkillByName(skill) != null) {
+                container.set(key, PersistentDataType.STRING, skill);
+                sender.sendMessage("§7Der Skill §a" + skill + " §7wurde zu Slot §a" + slot + " §7hinzugefügt");
+            } else {
+                sender.sendMessage("§7Der Skill §a" + skill + " §7kann nicht zu einem passiven Slot hinzugefügt werden");
+            }
+        }
 
         return true;
     }

@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.aetheria.util;
+package eu.darkcube.system.aetheria.items;
 
 import eu.darkcube.system.aetheria.Aetheria;
 import org.bukkit.Material;
@@ -22,23 +22,21 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomSwordManager implements Listener {
+public class CustomChestplateManager implements Listener {
+    private final Aetheria plugin;
     public final NamespacedKey itemLevelKey;
     public final NamespacedKey durabilityKey;
     public final NamespacedKey maxDurabilityKey;
-    public final NamespacedKey attackDamageKey;
-    private final Aetheria plugin;
 
-    public CustomSwordManager(Aetheria plugin) {
+    public CustomChestplateManager(Aetheria plugin) {
         this.plugin = plugin;
         this.itemLevelKey = new NamespacedKey(plugin, "item_level");
         this.durabilityKey = new NamespacedKey(plugin, "durability");
         this.maxDurabilityKey = new NamespacedKey(plugin, "max_durability");
-        this.attackDamageKey = new NamespacedKey(plugin, "attack_damage");
     }
 
-    public ItemStack getCustomSword(int level) {
-        return create(level);
+    public ItemStack getCustomChestplate(int level) {
+        return createCustomChestplate(level);
     }
 
     public void increaseItemLevel(ItemStack item, int levelToAdd) {
@@ -49,42 +47,26 @@ public class CustomSwordManager implements Listener {
 
             meta.getPersistentDataContainer().set(itemLevelKey, PersistentDataType.INTEGER, newLevel);
             item.setItemMeta(meta);
-            updateSwordLore(item, newLevel);
+            updateChestplateLore(item, newLevel);
         }
     }
 
-    public void setSwordAttackDamage(ItemStack item, int damage) {
-        if (item != null && item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            meta.getPersistentDataContainer().set(attackDamageKey, PersistentDataType.INTEGER, damage);
-            item.setItemMeta(meta);
-        }
-    }
+    public ItemStack createCustomChestplate(int level) {
+        // Erstellen Sie ein neues Netherite Chestplate ItemStack
+        ItemStack customChestplate = new ItemStack(Material.NETHERITE_CHESTPLATE, 1);
+        ItemMeta meta = customChestplate.getItemMeta();
 
-    public int getSwordAttackDamage(ItemStack item) {
-        if (item != null && item.hasItemMeta()) {
-            ItemMeta meta = item.getItemMeta();
-            return meta.getPersistentDataContainer().getOrDefault(attackDamageKey, PersistentDataType.INTEGER, 0);
-        }
-        return 0;
-    }
+        // Setzen Sie den Displaynamen
+        meta.setDisplayName("§7« §fNormal Chestplate §7»");
 
-    public ItemStack create(int level) {
-        ItemStack customSword = new ItemStack(Material.NETHERITE_SWORD, 1);
-        ItemMeta meta = customSword.getItemMeta();
-
-        meta.setDisplayName("§7« §fNormal Sword §7»");
+        // Hinzufügen von Persistent Data (z.B. Level, Durability, etc.)
         meta.getPersistentDataContainer().set(itemLevelKey, PersistentDataType.INTEGER, level);
         int durability = 200;
         int maxDurability = getMaxDurabilityForLevel(level);
         meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER, durability);
         meta.getPersistentDataContainer().set(maxDurabilityKey, PersistentDataType.INTEGER, maxDurability);
-        meta.setUnbreakable(true);
-        meta.setCustomModelData(3);
-        customSword.setItemMeta(meta);
-        setSwordAttackDamage(customSword, level * 2);
-        meta = customSword.getItemMeta();
 
+        // Erstellen Sie eine Lore für das Item
         List<String> lore = new ArrayList<>();
         lore.add(" ");
         lore.add("§7§m      §7« §bStats §7»§m      ");
@@ -97,11 +79,17 @@ public class CustomSwordManager implements Listener {
         lore.add("§7Rarity: " + "§aOrdinary");
         lore.add(" ");
         meta.setLore(lore);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        customSword.setItemMeta(meta);
 
-        return customSword;
+        // Hinzufügen von weiteren Eigenschaften
+        meta.setUnbreakable(true);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+        // Anwenden des ItemMeta auf das ItemStack
+        customChestplate.setItemMeta(meta);
+
+        return customChestplate;
     }
+
 
     private int getMaxDurabilityForLevel(int level) {
         int baseDurability = 200;
@@ -109,7 +97,7 @@ public class CustomSwordManager implements Listener {
         return baseDurability + (level - 1) * increasePerLevel;
     }
 
-    public int getMaxDurabilityOfSword(ItemStack item) {
+    public int getMaxDurabilityOfChestplate(ItemStack item) {
         if (item != null && item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
             int level = meta.getPersistentDataContainer().getOrDefault(itemLevelKey, PersistentDataType.INTEGER, 0);
@@ -118,7 +106,7 @@ public class CustomSwordManager implements Listener {
         return 0;
     }
 
-    public void updateSwordLore(ItemStack item, int level) {
+    public void updateChestplateLore(ItemStack item, int level) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             int durability = meta.getPersistentDataContainer().getOrDefault(durabilityKey, PersistentDataType.INTEGER, 0);
@@ -140,12 +128,15 @@ public class CustomSwordManager implements Listener {
         }
     }
 
-    @EventHandler public void handle(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player player)) return;
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if (!item.hasItemMeta()) return;
+    @EventHandler
+    public void handle(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return; // Prüfen, ob das beschädigte Entity ein Spieler ist.
+        ItemStack chestplate = player.getInventory().getChestplate(); // Brustpanzer des Spielers erhalten.
 
-        ItemMeta meta = item.getItemMeta();
+        // Überprüfen, ob der Brustpanzer ein Meta-Item ist und den Durability-Schlüssel hat.
+        if (chestplate == null || !chestplate.hasItemMeta()) return;
+
+        ItemMeta meta = chestplate.getItemMeta();
         if (!meta.getPersistentDataContainer().has(durabilityKey, PersistentDataType.INTEGER)) return;
 
         int durability = meta.getPersistentDataContainer().get(durabilityKey, PersistentDataType.INTEGER);
@@ -154,7 +145,7 @@ public class CustomSwordManager implements Listener {
         meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER, durability);
 
         // Lesen Sie den maxDurability Wert aus der PersistentDataContainer
-        int maxDurability = getMaxDurabilityOfSword(item);
+        int maxDurability = getMaxDurabilityOfChestplate(chestplate);
 
         // Aktualisiere die Lore
         List<String> lore = meta.getLore();
@@ -165,10 +156,10 @@ public class CustomSwordManager implements Listener {
             }
         }
         meta.setLore(lore);
-        item.setItemMeta(meta);
+        chestplate.setItemMeta(meta);
 
         if (durability <= 0) {
-            player.getInventory().removeItem(item);
+            player.getInventory().setChestplate(null); // Brustpanzer des Spielers entfernen, wenn die Haltbarkeit 0 erreicht.
         }
     }
 }

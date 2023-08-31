@@ -17,11 +17,11 @@ public class SkillSummoner extends Skill {
     private HashMap<Player, Long> cooldowns;// TODO use persistent data storage
 
     public SkillSummoner() {
-        super("Beschwörer");
+        super("Summoner", true);
         this.cooldowns = new HashMap<>();
     }
 
-    @Override public void activate(Player player) {
+    @Override public void activateSkill(Player player) {
         if (canUse(player)) {
             // Hier könnten Sie den Beschwörungs-Effekt hinzufügen. Zum Beispiel:
             // player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE); // Einen Zombie beschwören

@@ -17,11 +17,11 @@ public class SkillWindBlades extends Skill {
     private HashMap<Player, Long> cooldowns; // TODO use persistent data storage
 
     public SkillWindBlades() {
-        super("Windklingen");
+        super("Windblades", true);
         this.cooldowns = new HashMap<>();
     }
 
-    @Override public void activate(Player player) {
+    @Override public void activateSkill(Player player) {
         if (canUse(player)) {
             // Hier fügen Sie die spezifische Funktionalität für den Windklingen-Skill hinzu.
             // Zum Beispiel könnten die Windklingen einen Schaden um den Spieler herum verursachen.
