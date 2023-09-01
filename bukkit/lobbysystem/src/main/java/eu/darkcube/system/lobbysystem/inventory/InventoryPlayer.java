@@ -7,8 +7,8 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 

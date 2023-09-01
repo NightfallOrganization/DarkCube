@@ -7,10 +7,10 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.*;
 
-public class CommandNPC extends LobbyCommandExecutor {
+public class CommandNPC extends LobbyCommand {
 
 	public CommandNPC() {
 		super("npc", b -> b

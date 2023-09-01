@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.cloudnet)
-    compileOnly(libs.cloudnetBridge)
+    compileOnly(libs.cloudnet.node)
+    compileOnly(libs.cloudnet.bridge)
     compileOnly(rootProject.project("darkcubesystem"))
 }

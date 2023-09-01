@@ -8,14 +8,158 @@
 package eu.darkcube.system.woolbattle;
 
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.command.builder.Command;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.instance.InstanceChunkLoadEvent;
+import net.minestom.server.event.instance.InstanceChunkUnloadEvent;
+import net.minestom.server.event.player.PlayerChunkUnloadEvent;
+import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
+import net.minestom.server.instance.Chunk;
+import net.minestom.server.instance.IChunkLoader;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.instance.block.Block;
+import net.minestom.server.utils.NamespaceID;
+import net.minestom.server.world.DimensionType;
+import net.minestom.server.world.biomes.Biome;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WoolBattleMinestom {
 
-    public void start(String[] args) {
-        System.out.println(Arrays.toString(args));
+    public void start() {
+        System.setProperty("minestom.chunk-view-distance", "32");
+        System.setProperty("minestom.entity-view-distance", "32");
         MinecraftServer server = MinecraftServer.init();
+        MinecraftServer.setBrandName("WoolBattle");
+        MinecraftServer.setTerminalPrompt(null);
+
+        Command command = new Command("stop", "exit");
+        command.setDefaultExecutor((sender, context) -> {
+            MinecraftServer.stopCleanly();
+            System.exit(0);
+        });
+        MinecraftServer.getCommandManager().register(command);
+
+//        Biome customBiome = Biome
+//                .builder()
+//                .category(Biome.Category.FOREST)
+//                .name(NamespaceID.from("woolbattle", "woolbattle"))
+//                .effects(BiomeEffects.builder().biomeParticle(new BiomeParticle(1F, new BiomeParticle.DustOption(1, 0, 1, 1)))
+//                        .fogColor(new Color(255, 0, 0).asRGB())
+//                        .build())
+//                .build();
+//
+//        MinecraftServer.getBiomeManager().addBiome(customBiome);
+//
+        DimensionType dimensionType = DimensionType.builder(NamespaceID.from("woolbattle", "dimension")).ambientLight(2.0F).fixedTime(6000L)
+//                .skylightEnabled(false)
+//                .ceilingEnabled(true)
+                .build();
+        MinecraftServer.getDimensionTypeManager().addDimension(dimensionType);
+
+        Biome customBiome = Biome.PLAINS;
+//        DimensionType dimensionType = DimensionType.OVERWORLD;
+
+        InstanceContainer instanceContainer = MinecraftServer.getInstanceManager().createInstanceContainer(dimensionType);
+
+        instanceContainer.setGenerator(unit -> {
+            unit.modifier().fillBiome(customBiome);
+            unit.modifier().fillHeight(0, 100, Block.STONE);
+        });
+        instanceContainer.setChunkLoader(new IChunkLoader() {
+            @Override public @NotNull CompletableFuture<@Nullable Chunk> loadChunk(@NotNull Instance instance, int chunkX, int chunkZ) {
+                return CompletableFuture.completedFuture(null);
+            }
+
+            @Override public @NotNull CompletableFuture<Void> saveChunk(@NotNull Chunk chunk) {
+                return CompletableFuture.completedFuture(null);
+            }
+
+            @Override public boolean supportsParallelLoading() {
+                return true;
+            }
+
+            @Override public boolean supportsParallelSaving() {
+                return true;
+            }
+        });
+
+//        Chunk chunk = instanceContainer.loadChunk(0, 0).join();
+//
+//        instanceContainer.setChunkLoader(new IChunkLoader() {
+//            @Override public @NotNull CompletableFuture<@Nullable Chunk> loadChunk(@NotNull Instance instance, int chunkX, int chunkZ) {
+//                return CompletableFuture.completedFuture(chunk.copy(instance, chunkX, chunkZ));
+//            }
+//
+//            @Override public @NotNull CompletableFuture<Void> saveChunk(@NotNull Chunk chunk) {
+//                return CompletableFuture.completedFuture(null);
+//            }
+//        });
+
+//        InstanceContainer instanceContainer = MinecraftServer.getInstanceManager().createInstanceContainer();
+
+        AtomicInteger loaded = new AtomicInteger();
+
+        Instance instance = MinecraftServer.getInstanceManager().createSharedInstance(instanceContainer);
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkUnloadEvent.class, event -> {
+            Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
+            if (chunk != null) {
+                for (Player player : instance.getPlayers()) {
+                    if (chunk.equals(player.getChunk())) {
+                        return;
+                    }
+                }
+                instance.unloadChunk(chunk);
+            }
+        });
+        MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkLoadEvent.class, event -> {
+            loaded.incrementAndGet();
+        });
+        MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkUnloadEvent.class, event -> {
+            loaded.decrementAndGet();
+        });
+        Command loadedCommand = new Command("loadedchunks");
+        loadedCommand.setDefaultExecutor((sender, context) -> {
+            sender.sendMessage(loaded.get() + "");
+        });
+        MinecraftServer.getCommandManager().register(loadedCommand);
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
+            if (!instance.isChunkLoaded(event.getNewPosition())) {
+                event.setCancelled(true);
+                return;
+            }
+            Chunk chunk = instance.getChunkAt(event.getNewPosition());
+            if (chunk == null) {
+                event.setCancelled(true);
+                return;
+            }
+            Block to = chunk.getBlock(event.getNewPosition());
+            Block from = chunk.getBlock(event.getPlayer().getPosition());
+
+            if (to.isSolid() && from.isAir()) {
+                System.out.println("cancelled");
+                event.setCancelled(true);
+            } else if (!to.namespace().equals(from.namespace())) {
+                System.out.println("To: " + to);
+                System.out.println("From: " + from);
+            }
+        });
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
+            event.setSpawningInstance(instance);
+            event.getPlayer().setRespawnPoint(new Pos(0, 100, 0));
+            event.getPlayer().setGameMode(GameMode.CREATIVE);
+            event.getPlayer().setPermissionLevel(4);
+            event.getPlayer().setFlyingSpeed(10);
+        });
+
         server.start(System.getProperty("service.bind.host"), Integer.getInteger("service.bind.port"));
     }
+
 }

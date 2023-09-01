@@ -10,7 +10,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.system.inventoryapi.v1.*;
+import eu.darkcube.system.bukkit.inventoryapi.v1.*;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 import java.util.Collection;

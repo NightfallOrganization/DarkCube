@@ -40,12 +40,12 @@ bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 minestom = { group = "eu.darkcube", name = "minestom", version.ref = "minestom" }
 
-cloudnetDriver = { group = "eu.cloudnetservice.cloudnet", name = "driver", version.ref = "cloudnet" }
-cloudnetBridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
-cloudnet = { group = "eu.cloudnetservice.cloudnet", name = "node", version.ref = "cloudnet" }
-cloudnetWrapper = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "cloudnet" }
-cloudnetInjectApi = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-api", version.ref = "cloudnet" }
-cloudnetInjectProcessor = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-processor", version.ref = "cloudnet" }
+cloudnet-driver = { group = "eu.cloudnetservice.cloudnet", name = "driver", version.ref = "cloudnet" }
+cloudnet-bridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
+cloudnet-node = { group = "eu.cloudnetservice.cloudnet", name = "node", version.ref = "cloudnet" }
+cloudnet-wrapper = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "cloudnet" }
+cloudnet-inject-api = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-api", version.ref = "cloudnet" }
+cloudnet-inject-processor = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-processor", version.ref = "cloudnet" }
 
 [bundles]
 adventure = [

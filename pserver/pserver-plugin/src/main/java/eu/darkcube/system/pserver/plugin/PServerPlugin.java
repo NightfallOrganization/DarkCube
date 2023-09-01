@@ -6,8 +6,8 @@
  */
 package eu.darkcube.system.pserver.plugin;
 
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.plugin.command.*;
 import eu.darkcube.system.pserver.plugin.link.LinkManager;

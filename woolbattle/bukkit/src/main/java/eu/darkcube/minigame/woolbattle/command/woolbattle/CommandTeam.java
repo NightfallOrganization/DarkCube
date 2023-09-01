@@ -7,20 +7,20 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.team.CommandSetSpawn;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.team.*;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CommandTeam extends WBCommandExecutor {
+public class CommandTeam extends WBCommand {
     public CommandTeam(WoolBattleBukkit woolbattle) {
 
         super("team", b -> b.then(Commands

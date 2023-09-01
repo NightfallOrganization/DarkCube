@@ -4,77 +4,42 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.commandapi.v3;
 
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
+import eu.darkcube.system.util.Language;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.function.Consumer;
+public interface CommandExecutor extends Audience {
 
-public class CommandExecutor {
-
-    private final String name;
-    private final String prefix;
-    private final String permission;
-    private final String[] aliases;
-    private final String[] names;
-    private final Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder;
-
-    public CommandExecutor(String prefix, String name, String[] aliases,
-                           Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
-        this(prefix, name, prefix + "." + name, aliases, argumentBuilder);
+    default void sendMessage(BaseMessage message, Object... components) {
+        this.sendMessage(message.getMessage(this, components));
     }
 
-    public CommandExecutor(String prefix, String name, String permission, String[] aliases,
-                           Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
-        this.prefix = prefix;
-        this.name = name.toLowerCase(Locale.ROOT);
-        this.permission = permission;
-        this.aliases = aliases.clone();
-        this.argumentBuilder = argumentBuilder;
-        this.names = new String[this.aliases.length + 1];
-        this.names[0] = this.name;
-        for (int i = 0; i < this.aliases.length; i++) {
-            this.aliases[i] = this.aliases[i].toLowerCase(Locale.ROOT);
-        }
-        System.arraycopy(this.aliases, 0, this.names, 1, this.names.length - 1);
+    /**
+     * @deprecated {@link #language()}
+     */
+    @Deprecated(forRemoval = true) default Language getLanguage() {
+        return language();
     }
 
-    public final LiteralArgumentBuilder<CommandSource> builder() {
-        return builder(name);
+    /**
+     * @deprecated {@link #language(Language)}
+     */
+    @Deprecated(forRemoval = true) default void setLanguage(Language language) {
+        language(language);
     }
 
-    public final LiteralArgumentBuilder<CommandSource> builder(String name) {
-        LiteralArgumentBuilder<CommandSource> b = Commands.literal(name);
-        argumentBuilder.accept(b);
-        return b;
+    Language language();
+
+    void language(Language language);
+
+    default String commandPrefix() {
+        return "";
     }
 
-    public String[] getAliases() {
-        return aliases.clone();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public String[] getNames() {
-        return names.clone();
-    }
-
-    @Override
-    public String toString() {
-        return "CommandExecutor{" + "name='" + name + '\'' + ", prefix='" + prefix + '\''
-                + ", permission='" + permission + '\'' + ", aliases=" + Arrays.toString(aliases)
-                + '}';
+    @Deprecated(forRemoval = true) default String getCommandPrefix() {
+        return commandPrefix();
     }
 }

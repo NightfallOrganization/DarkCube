@@ -7,7 +7,7 @@
 package eu.darkcube.system.pserver.plugin;
 
 import eu.darkcube.system.BaseMessage;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.util.data.Key;
@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
+import static eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder.item;
 import static org.bukkit.Material.*;
 
 public enum Item implements BaseMessage {

@@ -6,16 +6,14 @@
  */
 package eu.darkcube.system.skyland.worldGen;
 
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.skyland.Skyland;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
 
 public class SkylandWorldGenPlugin extends DarkCubePlugin {
 
+    private static SkylandWorldGenPlugin instance;
 
-	private static SkylandWorldGenPlugin instance;
-
-	public SkylandWorldGenPlugin() {
-		super("skylandWorldGen");
-		instance = this;
-	}
+    public SkylandWorldGenPlugin() {
+        super("skylandWorldGen");
+        instance = this;
+    }
 }

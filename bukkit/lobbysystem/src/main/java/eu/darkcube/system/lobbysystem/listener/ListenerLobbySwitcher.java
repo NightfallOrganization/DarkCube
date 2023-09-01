@@ -7,7 +7,7 @@
 package eu.darkcube.system.lobbysystem.listener;
 
 import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryLobbySwitcher;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;

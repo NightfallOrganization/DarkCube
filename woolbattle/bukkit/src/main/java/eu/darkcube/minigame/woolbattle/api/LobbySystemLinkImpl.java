@@ -26,13 +26,13 @@ import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.server.util.DarkCubeServer;
 import eu.darkcube.system.util.GameState;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -83,7 +83,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         fullyLoaded = false;
         InjectionLayer.boot().instance(EventManager.class).registerListener(requestListener);
         new Scheduler(woolbattle, this::setFullyLoaded).runTask();
-        DarkCubeBukkit.autoConfigure(false);
+        DarkCubeServer.autoConfigure(false);
         if (pserver) {
             var executor = PServerProvider.instance().currentPServer();
             var doc = executor.storage().get(new Key("LobbySystem", "pserver.gameserver.service"), PersistentDataTypes.DOCUMENT);
@@ -128,14 +128,14 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         if (!fullyLoaded) return;
         if (!enabled) return;
         GameState gameState = gameState();
-        DarkCubeBukkit.gameState(gameState);
-        DarkCubeBukkit.playingPlayers().set(playingPlayers());
-        DarkCubeBukkit.maxPlayingPlayers().set(woolbattle.maxPlayers());
+        DarkCubeServer.gameState(gameState);
+        DarkCubeServer.playingPlayers().set(playingPlayers());
+        DarkCubeServer.maxPlayingPlayers().set(woolbattle.maxPlayers());
         ServiceInfoHolder serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
         BridgeServiceHelper serviceHelper = InjectionLayer.ext().instance(BridgeServiceHelper.class);
         serviceHelper.maxPlayers().set(1000);
-        DarkCubeBukkit.displayName("LobbyV2");
-        DarkCubeBukkit.extra(root -> {
+        DarkCubeServer.displayName("LobbyV2");
+        DarkCubeServer.extra(root -> {
             Document.Mutable doc = Document.newJsonDocument();
             GameData gameData = woolbattle.gameData();
             @Nullable MapSize gameDataSize = gameData.mapSize();

@@ -9,15 +9,15 @@ package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.PerkArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 
 import java.util.Collection;
 
-public class TrollCommand extends PServerExecutor {
+public class TrollCommand extends PServer {
 
     public TrollCommand(WoolBattleBukkit woolbattle) {
         super("troll", new String[0], b -> b

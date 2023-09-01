@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.user.User;
 

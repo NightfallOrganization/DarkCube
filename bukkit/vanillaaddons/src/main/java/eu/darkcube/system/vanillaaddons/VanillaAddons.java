@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.vanillaaddons;
 
-import eu.darkcube.system.DarkCubePlugin;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.Language;

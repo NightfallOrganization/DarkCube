@@ -11,7 +11,7 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.service.ServiceTemplate;
 import eu.cloudnetservice.driver.template.TemplateStorageProvider;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.CloudTemplateArgument;
 import eu.darkcube.minigame.woolbattle.map.CloudNetMapIngameData;
 import eu.darkcube.minigame.woolbattle.map.DefaultMap;
@@ -21,9 +21,9 @@ import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
 import eu.darkcube.minigame.woolbattle.util.UnloadedLocation;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPlugin;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
@@ -45,7 +45,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class CommandImport extends WBCommandExecutor {
+public class CommandImport extends WBCommand {
     public CommandImport(WoolBattleBukkit woolbattle) {
         super("import", b -> b.then(Commands.argument("template", CloudTemplateArgument.template()).executes(ctx -> {
             ServiceTemplate template = CloudTemplateArgument.template(ctx, "template");

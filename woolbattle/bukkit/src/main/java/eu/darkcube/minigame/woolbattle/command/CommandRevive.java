@@ -11,13 +11,13 @@ import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.ingame.PlayerUtil;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
-public class CommandRevive extends CommandExecutor {
+public class CommandRevive extends Command {
 
     public CommandRevive(WoolBattleBukkit woolbattle) {
         super("woolbattle", "revive", "woolbattle.command.revive", new String[0], b -> b.then(Commands

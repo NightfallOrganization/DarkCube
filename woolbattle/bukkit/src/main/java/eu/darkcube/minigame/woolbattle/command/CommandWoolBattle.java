@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.woolbattle.*;
 
-public class CommandWoolBattle extends WBCommandExecutor {
+public class CommandWoolBattle extends WBCommand {
 
     public CommandWoolBattle(WoolBattleBukkit woolbattle) {
         super("woolbattle", b -> b

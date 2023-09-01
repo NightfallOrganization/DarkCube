@@ -8,10 +8,10 @@
 package eu.darkcube.system.pserver.plugin.command;
 
 import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import org.bukkit.Bukkit;
 
-public class StopCommand extends PServerExecutor {
+public class StopCommand extends PServer {
 
 	public StopCommand() {
 		super("stop", new String[] {"shutdown"}, b -> b.executes(source -> {

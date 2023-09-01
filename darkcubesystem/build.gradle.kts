@@ -5,24 +5,46 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 plugins {
-    alias(libs.plugins.shadow)
     `java-library`
+    alias(libs.plugins.shadow)
+}
+
+configurations {
+    register("embed") {
+        isTransitive = false
+    }
 }
 
 tasks {
+    register<Jar>("finalJar") {
+        dependsOn(shadowJar)
+        dependsOn(configurations.named("embed"))
+        from(shadowJar.get().outputs.files.map { zipTree(it) })
+        configurations.named("embed").configure {
+            incoming.files.forEach {
+                from(it) {
+                    this.into("plugins")
+                }
+            }
+        }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        archiveClassifier = null
+    }
     shadowJar.configure {
-        archiveClassifier = ""
+        archiveClassifier = "shadow"
     }
     jar.configure {
-        archiveClassifier = "pure"
+        enabled = false
     }
-    assemble.configure { dependsOn(shadowJar) }
+    assemble.configure {
+        dependsOn(getByName("finalJar"))
+    }
 }
 
 dependencies {
     api(project("api"))
-    runtimeOnly(project("common"))
-    runtimeOnly(project("velocity"))
-    runtimeOnly(project("bukkit"))
-    runtimeOnly(project("module"))
+    runtimeOnly(project("implementation"))
+    "embed"(project("implementation:bukkit", "shadow"))
+    "embed"(project("implementation:velocity"))
+    "embed"(project("implementation:minestom", "shadow"))
 }

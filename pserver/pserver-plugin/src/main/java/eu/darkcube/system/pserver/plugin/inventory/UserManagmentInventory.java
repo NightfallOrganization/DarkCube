@@ -6,10 +6,10 @@
  */
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.pserver.plugin.Message;

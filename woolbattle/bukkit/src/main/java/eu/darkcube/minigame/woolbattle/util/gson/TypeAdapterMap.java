@@ -12,7 +12,7 @@ import eu.darkcube.minigame.woolbattle.map.DefaultMap;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Type;

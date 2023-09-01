@@ -10,7 +10,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;

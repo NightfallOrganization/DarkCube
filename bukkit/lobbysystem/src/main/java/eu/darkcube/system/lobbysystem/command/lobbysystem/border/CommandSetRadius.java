@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.DoubleArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.util.Border;
 
-public class CommandSetRadius extends LobbyCommandExecutor {
+public class CommandSetRadius extends LobbyCommand {
 
 	public CommandSetRadius() {
 		super("setRadius", b -> b.then(

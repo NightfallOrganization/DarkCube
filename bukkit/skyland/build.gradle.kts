@@ -7,6 +7,6 @@
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    compileOnly(libs.cloudnetDriver)
-    compileOnlyApi(project(":darkcubesystem"))
+    compileOnly(libs.cloudnet.driver)
+    compileOnlyApi(projects.darkcubesystem.bukkit)
 }

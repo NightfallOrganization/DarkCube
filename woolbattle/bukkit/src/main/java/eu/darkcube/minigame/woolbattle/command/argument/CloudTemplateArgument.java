@@ -11,7 +11,7 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.service.ServiceTemplate;
 import eu.cloudnetservice.driver.template.TemplateStorage;
 import eu.cloudnetservice.driver.template.TemplateStorageProvider;
-import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.v3.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;

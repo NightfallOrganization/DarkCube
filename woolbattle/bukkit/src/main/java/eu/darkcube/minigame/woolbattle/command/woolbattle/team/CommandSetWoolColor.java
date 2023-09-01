@@ -6,27 +6,29 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EnumArgument;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.DyeColor;
 
-public class CommandSetWoolColor extends WBCommandExecutor {
+public class CommandSetWoolColor extends WBCommand {
     public CommandSetWoolColor() {
-        super("setWoolColor", b -> b.then(Commands.argument("woolColor",
-                EnumArgument.enumArgument(DyeColor.values(),
-                        c -> new String[]{c.name().toLowerCase()})).executes(ctx -> {
-            TeamType team = TeamTypeArgument.teamType(ctx, "team");
-            DyeColor woolColor = EnumArgument.getEnumArgument(ctx, "woolColor", DyeColor.class);
-            team.setWoolColor(woolColor);
-            ctx.getSource().sendMessage(LegacyComponentSerializer.legacySection().deserialize(
-                    "§7Du hast die Wollfarbe des Teams " + team.getDisplayNameKey() + " zu "
-                            + woolColor.name() + "§7 geändert."));
-            return 0;
-        })));
+        super("setWoolColor", b -> b.then(Commands
+                .argument("woolColor", EnumArgument.enumArgument(DyeColor.values(), c -> new String[]{c.name().toLowerCase()}))
+                .executes(ctx -> {
+                    TeamType team = TeamTypeArgument.teamType(ctx, "team");
+                    DyeColor woolColor = EnumArgument.getEnumArgument(ctx, "woolColor", DyeColor.class);
+                    team.setWoolColor(woolColor);
+                    ctx
+                            .getSource()
+                            .sendMessage(LegacyComponentSerializer
+                                    .legacySection()
+                                    .deserialize("§7Du hast die Wollfarbe des Teams " + team.getDisplayNameKey() + " zu " + woolColor.name() + "§7 geändert."));
+                    return 0;
+                })));
     }
     //	public CommandSetWoolColor() {
     //		super(WoolBattle.getInstance(), "setWoolColor", new Command[0], "Setzt die Wollfarbe", CommandArgument.WOOL_COLOR);

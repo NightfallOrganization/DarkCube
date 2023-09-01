@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
 import eu.darkcube.system.lobbysystem.util.Message;
@@ -40,6 +40,6 @@ public class ListenerMinigameServer extends BaseListener {
         p.closeInventory();
         ServerInformation information = lobby.serverManager().byUniqueId(uuid);
         if (information != null) information.connectPlayer(p.getUniqueId());
-        else UserAPI.instance().user(p.getUniqueId()).sendMessage(Message.SERVER_NOT_FOUND.getMessage(p));
+        else UserAPI.instance().user(p.getUniqueId()).sendMessage(Message.SERVER_NOT_FOUND);
     }
 }

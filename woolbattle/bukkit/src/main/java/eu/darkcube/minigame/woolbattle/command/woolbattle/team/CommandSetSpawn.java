@@ -7,21 +7,21 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Locations;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class CommandSetSpawn extends WBCommandExecutor {
+public class CommandSetSpawn extends WBCommand {
     public CommandSetSpawn(WoolBattleBukkit woolbattle) {
         super("setSpawn", b -> b.then(Commands
                 .argument("map", MapArgument.mapArgument(woolbattle, MapArgument.ToStringFunction.function(ctx -> MapSizeArgument.mapSize(ctx, "mapSize"))))

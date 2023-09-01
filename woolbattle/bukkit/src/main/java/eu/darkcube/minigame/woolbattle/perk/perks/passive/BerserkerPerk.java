@@ -18,7 +18,7 @@ import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.util.data.Key;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;

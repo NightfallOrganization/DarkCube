@@ -7,8 +7,8 @@
 package eu.darkcube.system.lobbysystem.util;
 
 import eu.cloudnetservice.driver.document.StandardSerialisationStyle;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.FireworkBuilderMeta;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;

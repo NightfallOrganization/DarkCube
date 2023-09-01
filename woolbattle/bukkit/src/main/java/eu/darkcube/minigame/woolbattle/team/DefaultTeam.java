@@ -10,14 +10,17 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
-import eu.darkcube.system.util.AdventureSupport;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,33 @@ class DefaultTeam implements Team {
         this.woolbattle = woolbattle;
         this.uuid = UUID.randomUUID();
         this.type = type;
+    }
+
+    public static Style convert(ChatColor color) {
+        return switch (color) {
+            case BLACK -> Style.style(NamedTextColor.BLACK);
+            case DARK_BLUE -> Style.style(NamedTextColor.DARK_BLUE);
+            case DARK_GREEN -> Style.style(NamedTextColor.DARK_GREEN);
+            case DARK_AQUA -> Style.style(NamedTextColor.DARK_AQUA);
+            case DARK_RED -> Style.style(NamedTextColor.DARK_RED);
+            case DARK_PURPLE -> Style.style(NamedTextColor.DARK_PURPLE);
+            case GOLD -> Style.style(NamedTextColor.GOLD);
+            case GRAY -> Style.style(NamedTextColor.GRAY);
+            case DARK_GRAY -> Style.style(NamedTextColor.DARK_GRAY);
+            case BLUE -> Style.style(NamedTextColor.BLUE);
+            case GREEN -> Style.style(NamedTextColor.GREEN);
+            case AQUA -> Style.style(NamedTextColor.AQUA);
+            case RED -> Style.style(NamedTextColor.RED);
+            case LIGHT_PURPLE -> Style.style(NamedTextColor.LIGHT_PURPLE);
+            case YELLOW -> Style.style(NamedTextColor.YELLOW);
+            case WHITE -> Style.style(NamedTextColor.WHITE);
+            case MAGIC -> Style.style(TextDecoration.OBFUSCATED);
+            case BOLD -> Style.style(TextDecoration.BOLD);
+            case STRIKETHROUGH -> Style.style(TextDecoration.STRIKETHROUGH);
+            case UNDERLINE -> Style.style(TextDecoration.UNDERLINED);
+            case ITALIC -> Style.style(TextDecoration.ITALIC);
+            default -> throw new IllegalArgumentException(Objects.toString(color));
+        };
     }
 
     @Override public int compareTo(Team o) {
@@ -50,14 +80,14 @@ class DefaultTeam implements Team {
         return !isSpectator();
     }
 
-    @Override public Component getName(ICommandExecutor executor) {
+    @Override public Component getName(CommandExecutor executor) {
         return Message
-                .getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey().toUpperCase(Locale.ROOT), executor.getLanguage())
+                .getMessage(Message.TEAM_PREFIX + getType().getDisplayNameKey().toUpperCase(Locale.ROOT), executor.language())
                 .style(getPrefixStyle());
     }
 
     @Override public Style getPrefixStyle() {
-        return AdventureSupport.convert(getType().getNameColor());
+        return convert(getType().getNameColor());
     }
 
     @Override public TeamType getType() {

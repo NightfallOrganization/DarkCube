@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.command.troll;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.deprecated.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

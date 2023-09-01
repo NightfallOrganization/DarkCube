@@ -10,8 +10,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import eu.cloudnetservice.common.concurrent.Task;
 import eu.cloudnetservice.driver.channel.ChannelMessage;
 import eu.cloudnetservice.driver.event.EventListener;
@@ -20,8 +18,11 @@ import eu.cloudnetservice.driver.event.events.channel.ChannelMessageReceiveEvent
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.network.buffer.DataBuf;
 import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -40,9 +41,9 @@ public class PacketAPI {
         instance = new PacketAPI();
     }
 
+    private final Map<Class<? extends Packet>, PacketHandler<?>> handlers = new HashMap<>();
     private Listener listener;
     private EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
-    private BiMap<Class<? extends Packet>, PacketHandler<?>> handlers = HashBiMap.create();
     private Cache<UUID, QueryEntry<? extends Packet>> queries = Caffeine
             .newBuilder()
             .expireAfterWrite(Duration.ofSeconds(10))
@@ -59,11 +60,18 @@ public class PacketAPI {
         load();
     }
 
-    public static PacketAPI getInstance() {
+    /**
+     * @deprecated {@link #instance()}
+     */
+    @Deprecated(forRemoval = true) public static PacketAPI getInstance() {
         return instance;
     }
 
-    public static void init() {
+    public static PacketAPI instance() {
+        return instance;
+    }
+
+    @ApiStatus.Internal public static void init() {
     }
 
     void load() {
@@ -130,7 +138,7 @@ public class PacketAPI {
     }
 
     public void unregisterHandler(PacketHandler<?> handler) {
-        handlers.inverse().remove(handler);
+        handlers.values().remove(handler);
     }
 
     private record QueryEntry<T>(Task<T> task, Class<T> resultType) {

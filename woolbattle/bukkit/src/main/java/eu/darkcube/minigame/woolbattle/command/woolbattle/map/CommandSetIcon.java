@@ -6,10 +6,10 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.map;
 
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
-import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -17,7 +17,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class CommandSetIcon extends WBCommandExecutor {
+public class CommandSetIcon extends WBCommand {
     public CommandSetIcon() {
         super("setIcon", b -> b.executes(CommandSetIcon::setIcon));
     }

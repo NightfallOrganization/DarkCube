@@ -7,12 +7,12 @@
 
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
-public class CommandDelete extends WBCommandExecutor {
+public class CommandDelete extends WBCommand {
     public CommandDelete() {
         super("delete", b -> b.executes(ctx -> {
             TeamType teamType = TeamTypeArgument.teamType(ctx, "team");

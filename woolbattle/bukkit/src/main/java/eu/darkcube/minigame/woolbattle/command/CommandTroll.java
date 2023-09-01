@@ -12,7 +12,7 @@ import eu.darkcube.minigame.woolbattle.command.troll.CommandSetPerkCooldown;
 import eu.darkcube.minigame.woolbattle.command.troll.CommandSetPerkCost;
 import eu.darkcube.minigame.woolbattle.command.troll.CommandToggle;
 
-public class CommandTroll extends WBCommandExecutor {
+public class CommandTroll extends WBCommand {
     public CommandTroll(WoolBattleBukkit woolbattle) {
         super("troll", b -> b
                 .then(new CommandSetPerk(woolbattle).builder())

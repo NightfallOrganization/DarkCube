@@ -8,28 +8,26 @@
 package eu.darkcube.system.bauserver.command;
 
 import eu.darkcube.system.bauserver.Main;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class CommandBauserver extends CommandExecutor {
+public class CommandBauserver extends Command {
 
-	public CommandBauserver() {
-		super("bauserver", "bauserver", new String[0], b -> {
-			b.then(Commands.literal("togglerain").executes(ctx -> {
-				boolean may = !ctx.getSource().asPlayer().getWorld().hasMetadata("mayrain");
-				if (may) {
-					ctx.getSource().asPlayer().getWorld().setMetadata("mayrain",
-							new FixedMetadataValue(Main.getInstance(), true));
-				} else {
-					ctx.getSource().asPlayer().getWorld()
-							.removeMetadata("mayrain", Main.getInstance());
-				}
-				ctx.getSource().sendMessage(Component.text("MayRain: " + may));
-				return 0;
-			}));
-		});
-	}
+    public CommandBauserver() {
+        super("bauserver", "bauserver", new String[0], b -> {
+            b.then(Commands.literal("togglerain").executes(ctx -> {
+                boolean may = !ctx.getSource().asPlayer().getWorld().hasMetadata("mayrain");
+                if (may) {
+                    ctx.getSource().asPlayer().getWorld().setMetadata("mayrain", new FixedMetadataValue(Main.getInstance(), true));
+                } else {
+                    ctx.getSource().asPlayer().getWorld().removeMetadata("mayrain", Main.getInstance());
+                }
+                ctx.getSource().sendMessage(Component.text("MayRain: " + may));
+                return 0;
+            }));
+        });
+    }
 
 }
