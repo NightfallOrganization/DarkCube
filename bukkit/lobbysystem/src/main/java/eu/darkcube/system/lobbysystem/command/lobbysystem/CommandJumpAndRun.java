@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun.*;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun.CommandSetSpawn;
 
-public class CommandJumpAndRun extends LobbyCommandExecutor {
+public class CommandJumpAndRun extends LobbyCommand {
 
 	public CommandJumpAndRun() {
 		super("jumpAndRun", b -> b.then(new CommandListRegions().builder())

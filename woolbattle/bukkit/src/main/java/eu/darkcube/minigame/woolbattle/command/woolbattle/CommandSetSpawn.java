@@ -7,27 +7,26 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.util.Locations;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.BooleanArgument;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public class CommandSetSpawn extends WBCommandExecutor {
+public class CommandSetSpawn extends WBCommand {
     public CommandSetSpawn(WoolBattleBukkit woolbattle) {
-        super("setSpawn", b -> b.then(
-                Commands.argument("makeNice", BooleanArgument.booleanArgument()).executes(ctx -> {
-                    Player p = ctx.getSource().asPlayer();
-                    Location loc = p.getLocation();
-                    boolean makeNice = BooleanArgument.getBoolean(ctx, "makeNice");
-                    if (makeNice) {
-                        loc = Locations.getNiceLocation(loc);
-                        p.teleport(loc);
-                    }
-                    woolbattle.lobby().setSpawn(loc);
-                    p.sendMessage("§aDer LobbySpawn wurde umgesetzt!");
-                    return 0;
-                })));
+        super("setSpawn", b -> b.then(Commands.argument("makeNice", BooleanArgument.booleanArgument()).executes(ctx -> {
+            Player p = ctx.getSource().asPlayer();
+            Location loc = p.getLocation();
+            boolean makeNice = BooleanArgument.getBoolean(ctx, "makeNice");
+            if (makeNice) {
+                loc = Locations.getNiceLocation(loc);
+                p.teleport(loc);
+            }
+            woolbattle.lobby().setSpawn(loc);
+            p.sendMessage("§aDer LobbySpawn wurde umgesetzt!");
+            return 0;
+        })));
     }
 }

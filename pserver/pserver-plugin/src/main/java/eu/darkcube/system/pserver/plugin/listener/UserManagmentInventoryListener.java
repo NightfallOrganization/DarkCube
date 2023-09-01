@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.pserver.plugin.listener;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentUserInventory;
 import eu.darkcube.system.pserver.plugin.user.User;

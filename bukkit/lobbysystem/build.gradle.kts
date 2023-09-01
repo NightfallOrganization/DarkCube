@@ -53,8 +53,8 @@ dependencies {
     implementation(libs.hologramlib)
     implementation("me.clip:placeholderapi:2.11.3")
     compileOnly(libs.annotations)
-    compileOnly(libs.cloudnetBridge)
+    compileOnly(libs.cloudnet.bridge)
     compileOnly(libs.luckperms)
-    compileOnly(libs.cloudnetInjectApi)
-    annotationProcessor(libs.cloudnetInjectProcessor)
+    compileOnly(libs.cloudnet.inject.api)
+    annotationProcessor(libs.cloudnet.inject.processor)
 }

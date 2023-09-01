@@ -9,11 +9,11 @@ package eu.darkcube.system.pserver.plugin.command;
 
 import org.bukkit.entity.Player;
 
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
 
-public class UsersCommand extends PServerExecutor {
+public class UsersCommand extends PServer {
 
 	public UsersCommand() {
 		super("users", new String[0], b -> b.executes(context -> {

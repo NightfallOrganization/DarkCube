@@ -7,7 +7,7 @@
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;

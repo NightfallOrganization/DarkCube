@@ -6,14 +6,13 @@
  */
 package eu.darkcube.system;
 
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.util.Language;
-import org.bukkit.command.CommandSender;
 
 public interface BaseMessage {
 
@@ -41,15 +40,15 @@ public interface BaseMessage {
 
     String key();
 
-    default Component getMessage(CommandSender sender, Object... args) {
-        return getMessage(ICommandExecutor.create(sender), args);
-    }
+//    default Component getMessage(CommandSender sender, Object... args) {
+//        return getMessage(CommandExecutor.create(sender), args);
+//    }
 
-    default String getMessageString(ICommandExecutor executor, Object... args) {
+    default String getMessageString(CommandExecutor executor, Object... args) {
         return LegacyComponentSerializer.legacySection().serialize(getMessage(executor, new String[0], args));
     }
 
-    default Component getMessage(ICommandExecutor executor, Object... args) {
+    default Component getMessage(CommandExecutor executor, Object... args) {
         return getMessage(executor, new String[0], args);
     }
 
@@ -61,7 +60,7 @@ public interface BaseMessage {
         return language.getMessage(getPrefixModifier() + String.join("", prefixes) + key(), args);
     }
 
-    default Component getMessage(ICommandExecutor executor, String[] prefixes, Object... args) {
-        return getMessage(executor.getLanguage(), prefixes, args);
+    default Component getMessage(CommandExecutor executor, String[] prefixes, Object... args) {
+        return getMessage(executor.language(), prefixes, args);
     }
 }

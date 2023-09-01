@@ -6,9 +6,9 @@
  */
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.PageArrow;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
@@ -31,101 +31,79 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInventory, Teleporter> {
-	public static final InventoryType TYPE = InventoryType.of("teleporters");
+    public static final InventoryType TYPE = InventoryType.of("teleporters");
 
-	@Override
-	protected AddonsAsyncPagedInventory openInventory(AUser user) {
-		AddonsAsyncPagedInventory i = new AddonsAsyncPagedInventory(TYPE,
-				Component.text("\uDAFF\uDFEFⲊ").color(NamedTextColor.WHITE), () -> true) {
-			@Override
-			protected void fillItems(Map<Integer, ItemStack> items) {
-				int i = 0;
-				for (Entry<World, Teleporters> e : user.addons().moduleManager()
-						.module(TeleporterModule.class).teleporters().entrySet()) {
-					for (Teleporter t : e.getValue().teleporters) {
-						if (t == data())
-							continue;
-						if (t.access() == TeleportAccess.PRIVATE)
-							//noinspection DataFlowIssue
-							if (t.owner() != null && (!t.owner().equals(user.user().getUniqueId())
-									&& !t.trustedList().contains(user.user().getUniqueId())))
-								continue;
-						ItemStack item = ItemBuilder.item(t.icon()).displayname(t.dname())
-								.flag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS,
-										ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON,
-										ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_UNBREAKABLE)
-								.lore(Component.join(JoinConfiguration.separator(
-												Component.text().content(", ")
-														.color(TextColor.color(80, 80, 80))
-														.decoration(TextDecoration.ITALIC, false)),
-										Component.join(
-												JoinConfiguration.separator(Component.space()),
-												Component.text().content("Position:")
-														.color(TextColor.color(80, 80, 80))
-														.decoration(TextDecoration.ITALIC, false),
-												Component.join(JoinConfiguration.separator(
-																Component.text().content(", ")
-																		.color(TextColor.color(80,
-																				80, 80))
-																		.decoration(TextDecoration.ITALIC,
-																				false)),
-														Component.text()
-																.content(Integer.toString(t.block().x()))
-																.color(TextColor.color(255, 160,
-																		0))
-																.decoration(TextDecoration.ITALIC,
-																		false),
-														Component.text().content(
-																		Integer.toString(t.block().y()))
-																.color(TextColor.color(255, 160,
-																		0))
-																.decoration(TextDecoration.ITALIC,
-																		false), Component.text()
-																.content(Integer.toString(
-																		t.block().z()))
-																.color(TextColor.color(255, 160,
-																		0))
-																.decoration(TextDecoration.ITALIC,
-																		false))), Component.join(
-												JoinConfiguration.separator(Component.space()),
-												(Component.text().content("World:")
-														.color(TextColor.color(80, 80,
-																80))).decoration(
-														TextDecoration.ITALIC, false),
-												(Component.text().content(
-																t.block().block().getWorld().getName())
-														.color(TextColor.color(255, 160,
-																0))).decoration(
-														TextDecoration.ITALIC, false)))).build();
-						ItemMeta meta = item.getItemMeta();
-						meta.getPersistentDataContainer()
-								.set(new NamespacedKey("vanillaaddons", "teleporter"),
-										Teleporter.TELEPORTER, t);
-						item.setItemMeta(meta);
-						items.put(i++, item);
-					}
-				}
-			}
+    @Override protected AddonsAsyncPagedInventory openInventory(AUser user) {
+        AddonsAsyncPagedInventory i = new AddonsAsyncPagedInventory(TYPE, Component
+                .text("\uDAFF\uDFEFⲊ")
+                .color(NamedTextColor.WHITE), () -> true) {
+            @Override protected void fillItems(Map<Integer, ItemStack> items) {
+                int i = 0;
+                for (Entry<World, Teleporters> e : user.addons().moduleManager().module(TeleporterModule.class).teleporters().entrySet()) {
+                    for (Teleporter t : e.getValue().teleporters) {
+                        if (t == data()) continue;
+                        if (t.access() == TeleportAccess.PRIVATE)
+                            //noinspection DataFlowIssue
+                            if (t.owner() != null && (!t.owner().equals(user.user().uniqueId()) && !t
+                                    .trustedList()
+                                    .contains(user.user().uniqueId()))) continue;
+                        ItemStack item = ItemBuilder
+                                .item(t.icon())
+                                .displayname(t.dname())
+                                .flag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_UNBREAKABLE)
+                                .lore(Component.join(JoinConfiguration.separator(Component
+                                        .text()
+                                        .content(", ")
+                                        .color(TextColor.color(80, 80, 80))
+                                        .decoration(TextDecoration.ITALIC, false)), Component.join(JoinConfiguration.separator(Component.space()), Component
+                                        .text()
+                                        .content("Position:")
+                                        .color(TextColor.color(80, 80, 80))
+                                        .decoration(TextDecoration.ITALIC, false), Component.join(JoinConfiguration.separator(Component
+                                        .text()
+                                        .content(", ")
+                                        .color(TextColor.color(80, 80, 80))
+                                        .decoration(TextDecoration.ITALIC, false)), Component
+                                        .text()
+                                        .content(Integer.toString(t.block().x()))
+                                        .color(TextColor.color(255, 160, 0))
+                                        .decoration(TextDecoration.ITALIC, false), Component
+                                        .text()
+                                        .content(Integer.toString(t.block().y()))
+                                        .color(TextColor.color(255, 160, 0))
+                                        .decoration(TextDecoration.ITALIC, false), Component
+                                        .text()
+                                        .content(Integer.toString(t.block().z()))
+                                        .color(TextColor.color(255, 160, 0))
+                                        .decoration(TextDecoration.ITALIC, false))), Component.join(JoinConfiguration.separator(Component.space()), (Component
+                                        .text()
+                                        .content("World:")
+                                        .color(TextColor.color(80, 80, 80))).decoration(TextDecoration.ITALIC, false), (Component
+                                        .text()
+                                        .content(t.block().block().getWorld().getName())
+                                        .color(TextColor.color(255, 160, 0))).decoration(TextDecoration.ITALIC, false))))
+                                .build();
+                        ItemMeta meta = item.getItemMeta();
+                        meta.getPersistentDataContainer().set(new NamespacedKey("vanillaaddons", "teleporter"), Teleporter.TELEPORTER, t);
+                        item.setItemMeta(meta);
+                        items.put(i++, item);
+                    }
+                }
+            }
 
-			@Override
-			protected void insertArrowItems() {
-				super.insertArrowItems();
-				arrowItem.put(PageArrow.PREVIOUS, ItemBuilder.item(Material.ARROW)
-						.displayname(Component.text("Previous Page")).build());
-				arrowItem.put(PageArrow.NEXT,
-						ItemBuilder.item(Material.ARROW).displayname(Component.text("Next Page"))
-								.build());
-			}
+            @Override protected void insertArrowItems() {
+                super.insertArrowItems();
+                arrowItem.put(PageArrow.PREVIOUS, ItemBuilder.item(Material.ARROW).displayname(Component.text("Previous Page")).build());
+                arrowItem.put(PageArrow.NEXT, ItemBuilder.item(Material.ARROW).displayname(Component.text("Next Page")).build());
+            }
 
-			@Override
-			protected void insertFallbackItems() {
-			}
-		};
-		i.open(Objects.requireNonNull(Bukkit.getPlayer(user.user().getUniqueId())));
-		return i;
-	}
+            @Override protected void insertFallbackItems() {
+            }
+        };
+        i.open(Objects.requireNonNull(Bukkit.getPlayer(user.user().uniqueId())));
+        return i;
+    }
 
-	@Override
-	protected void closeInventory(AUser user, AddonsAsyncPagedInventory inventory) {
-	}
+    @Override protected void closeInventory(AUser user, AddonsAsyncPagedInventory inventory) {
+    }
 }

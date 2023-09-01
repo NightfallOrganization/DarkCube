@@ -8,10 +8,10 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
 
-public class CommandShowSkullCache extends LobbyCommandExecutor {
+public class CommandShowSkullCache extends LobbyCommand {
 
 	public CommandShowSkullCache() {
 		super("showSkullCache", b -> {

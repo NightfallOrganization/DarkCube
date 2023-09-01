@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.command.arguments;
 
-import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;

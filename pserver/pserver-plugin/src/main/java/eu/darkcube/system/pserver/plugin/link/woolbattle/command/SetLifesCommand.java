@@ -11,13 +11,13 @@ import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 
-public class SetLifesCommand extends PServerExecutor {
+public class SetLifesCommand extends PServer {
 
     public SetLifesCommand(WoolBattleBukkit woolbattle) {
         super("setlifes", new String[0], b -> b

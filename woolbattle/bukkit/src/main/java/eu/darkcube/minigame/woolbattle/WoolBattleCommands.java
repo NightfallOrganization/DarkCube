@@ -8,14 +8,14 @@
 package eu.darkcube.minigame.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.command.*;
-import eu.darkcube.system.commandapi.v3.CommandAPI;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
+import eu.darkcube.system.bukkit.commandapi.Command;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WoolBattleCommands {
-    private final List<CommandExecutor> commands = new ArrayList<>();
+    private final List<Command> commands = new ArrayList<>();
 
     public WoolBattleCommands(WoolBattleBukkit woolbattle) {
         commands.add(new CommandDisableStats());
@@ -34,13 +34,13 @@ public class WoolBattleCommands {
     }
 
     public void enableAll() {
-        for (CommandExecutor command : commands) {
+        for (Command command : commands) {
             CommandAPI.instance().register(command);
         }
     }
 
     public void disableAll() {
-        for (CommandExecutor command : commands) {
+        for (Command command : commands) {
             CommandAPI.instance().unregister(command);
         }
     }

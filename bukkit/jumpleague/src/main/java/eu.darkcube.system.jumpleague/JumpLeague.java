@@ -6,10 +6,10 @@
  */
 package eu.darkcube.system.jumpleague;
 
-import eu.darkcube.system.DarkCubePlugin;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
 
 public class JumpLeague extends DarkCubePlugin {
-	public JumpLeague() {
-		super("jumpleague");
-	}
+    public JumpLeague() {
+        super("jumpleague");
+    }
 }

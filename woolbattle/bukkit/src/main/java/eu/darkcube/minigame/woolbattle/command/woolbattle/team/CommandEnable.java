@@ -6,13 +6,13 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandEnable extends WBCommandExecutor {
+public class CommandEnable extends WBCommand {
     public CommandEnable() {
         super("enable", b -> b.executes(ctx -> {
             TeamType team = TeamTypeArgument.teamType(ctx, "team");

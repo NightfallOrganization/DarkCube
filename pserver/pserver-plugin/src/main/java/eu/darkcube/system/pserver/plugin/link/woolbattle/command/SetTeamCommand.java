@@ -11,16 +11,16 @@ import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
-public class SetTeamCommand extends PServerExecutor {
+public class SetTeamCommand extends PServer {
 
     public SetTeamCommand(WoolBattleBukkit woolbattle) {
         super("setteam", new String[0], b -> b.then(Commands.argument("team", TeamArgument.teamArgument(woolbattle)).executes(context -> {

@@ -13,7 +13,7 @@ plugins {
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20.2-R0.1-20231113.183409-94")
     implementation(parent!!)
-    compileOnly(libs.cloudnetDriver)
+    compileOnly(libs.cloudnet.driver)
 }
 
 tasks {

@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
 import eu.darkcube.system.lobbysystem.util.Item;

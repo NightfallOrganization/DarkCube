@@ -7,10 +7,12 @@
 
 package eu.darkcube.system.userapi;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 
-record UserAPIHolder() {
+@ApiStatus.Internal record UserAPIHolder() {
     private static final VarHandle INSTANCE;
     @SuppressWarnings("unused") // We use the VarHandle to assign this to prevent multiple UserAPIs
     private static volatile UserAPI instance;
@@ -23,7 +25,7 @@ record UserAPIHolder() {
         }
     }
 
-    UserAPIHolder {
+    public UserAPIHolder {
         throw new AssertionError();
     }
 

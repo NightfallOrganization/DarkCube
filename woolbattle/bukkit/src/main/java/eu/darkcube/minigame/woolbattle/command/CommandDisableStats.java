@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 
-public class CommandDisableStats extends WBCommandExecutor {
+public class CommandDisableStats extends WBCommand {
 	public CommandDisableStats() {
 		super("disableStats", b -> b.executes(ctx -> {
 			//				WoolBattle.getInstance().sendMessage("§cStats sind bereits deaktiviert!", sender);

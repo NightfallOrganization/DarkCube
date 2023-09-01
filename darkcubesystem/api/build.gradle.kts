@@ -10,9 +10,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
     compileOnly(libs.viaversion)
     compileOnly(libs.viaversion.common)
-    compileOnly(libs.cloudnetDriver)
+    compileOnly(libs.cloudnet.driver)
     api(parent!!.project("libs"))
 }

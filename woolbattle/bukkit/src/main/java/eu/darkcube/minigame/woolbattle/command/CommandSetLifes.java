@@ -11,11 +11,11 @@ import eu.darkcube.minigame.woolbattle.command.argument.TeamArgument;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
-public class CommandSetLifes extends WBCommandExecutor {
+public class CommandSetLifes extends WBCommand {
 
     public CommandSetLifes(WoolBattleBukkit woolbattle) {
         super("setlifes", "woolbattle.command.setlifes", new String[0], b -> b

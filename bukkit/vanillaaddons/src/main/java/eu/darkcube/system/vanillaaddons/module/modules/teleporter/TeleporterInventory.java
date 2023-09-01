@@ -6,10 +6,10 @@
  */
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;

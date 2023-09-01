@@ -7,12 +7,12 @@
 
 package eu.darkcube.system.vanillaaddons.module.modules.actionbar;
 
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-public class ActionbarCommand extends CommandExecutor {
+public class ActionbarCommand extends Command {
     public ActionbarCommand() {
         super("vanillaaddons", "actionbar", new String[0], b -> b.then(Commands
                 .argument("text", StringArgumentType.greedyString())

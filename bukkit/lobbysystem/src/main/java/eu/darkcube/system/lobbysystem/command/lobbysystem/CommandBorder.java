@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetPos1;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetPos2;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetRadius;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.border.CommandSetShape;
 
-public class CommandBorder extends LobbyCommandExecutor {
+public class CommandBorder extends LobbyCommand {
 
 	public CommandBorder() {
 		super("border", b -> {

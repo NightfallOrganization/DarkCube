@@ -6,14 +6,14 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.map;
 
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.Locale;
 
-public class CommandInfo extends WBCommandExecutor {
+public class CommandInfo extends WBCommand {
     public CommandInfo() {
         super("info", b -> b.executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");

@@ -10,7 +10,7 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;

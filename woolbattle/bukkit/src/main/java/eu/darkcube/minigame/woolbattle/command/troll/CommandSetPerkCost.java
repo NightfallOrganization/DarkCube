@@ -7,16 +7,16 @@
 package eu.darkcube.minigame.woolbattle.command.troll;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.PerkArgument;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 
 import java.util.Collection;
 
-public class CommandSetPerkCost extends WBCommandExecutor {
+public class CommandSetPerkCost extends WBCommand {
     public CommandSetPerkCost(WoolBattleBukkit woolbattle) {
         super("setPerkCost", b -> b.then(Commands
                 .argument("perks", PerkArgument.perkArgument(woolbattle))

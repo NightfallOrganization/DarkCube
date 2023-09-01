@@ -8,7 +8,7 @@ package eu.darkcube.minigame.woolbattle.team;
 
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import org.bukkit.Location;
@@ -24,7 +24,7 @@ public interface Team extends Comparable<Team> {
 
     boolean canPlay();
 
-    Component getName(ICommandExecutor executor);
+    Component getName(CommandExecutor executor);
 
     Style getPrefixStyle();
 

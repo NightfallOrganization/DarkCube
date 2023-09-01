@@ -6,10 +6,10 @@
  */
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.AsyncPagedInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.v1.AsyncPagedInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;

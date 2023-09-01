@@ -7,12 +7,11 @@
 
 package eu.darkcube.system.miners.command;
 
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.miners.player.TNTManager;
 import org.bukkit.entity.Player;
 
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.miners.player.TNTManager;
-
-public class CommandTest extends CommandExecutor {
+public class CommandTest extends Command {
 
     public CommandTest() {
         super("miners", "test", new String[0], b -> b.executes(context -> test(context.getSource().asPlayer())));

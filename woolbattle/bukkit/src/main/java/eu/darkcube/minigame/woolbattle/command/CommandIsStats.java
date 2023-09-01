@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 
-public class CommandIsStats extends WBCommandExecutor {
+public class CommandIsStats extends WBCommand {
 	public CommandIsStats() {
 		super("isStats", b -> b.executes(ctx -> {
 			if (StatsLink.isStats()) {

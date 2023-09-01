@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.vanillaaddons;
 
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.data.Key;

@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.pserver.plugin.Item;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.user.User;

@@ -9,11 +9,11 @@ package eu.darkcube.system.pserver.plugin.link.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 
-public class ForceMapCommand extends PServerExecutor {
+public class ForceMapCommand extends PServer {
 
     public ForceMapCommand(WoolBattleBukkit woolbattle) {
         super("forcemap", new String[0], b -> b.then(

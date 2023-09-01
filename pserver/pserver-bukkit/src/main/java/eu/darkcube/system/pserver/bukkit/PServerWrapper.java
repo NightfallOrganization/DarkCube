@@ -10,8 +10,8 @@ import eu.cloudnetservice.driver.ComponentInfo;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
-import eu.darkcube.system.Plugin;
-import eu.darkcube.system.commandapi.CommandAPI;
+import eu.darkcube.system.bukkit.Plugin;
+import eu.darkcube.system.bukkit.commandapi.deprecated.CommandAPI;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.bukkit.command.CommandPServer;
 import eu.darkcube.system.pserver.bukkit.command.PServerCommand;
@@ -81,9 +81,6 @@ public class PServerWrapper extends Plugin {
             ex.printStackTrace();
             System.out.println("[PSERVER] LOADING PSERVER API...");
         }
-    }
-
-    @Override public void onDisable() {
     }
 
     @Override public void onEnable() {

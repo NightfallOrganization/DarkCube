@@ -10,11 +10,11 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 
 import java.util.Set;
 
-public class CommandListTasks extends LobbyCommandExecutor {
+public class CommandListTasks extends LobbyCommand {
 
 	public CommandListTasks() {
 		super("listTasks", b -> b.executes(ctx -> {

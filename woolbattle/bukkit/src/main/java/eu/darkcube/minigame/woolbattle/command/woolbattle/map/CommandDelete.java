@@ -8,12 +8,12 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle.map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
-public class CommandDelete extends WBCommandExecutor {
+public class CommandDelete extends WBCommand {
     public CommandDelete(WoolBattleBukkit woolbattle) {
         super("delete", b -> b.executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");

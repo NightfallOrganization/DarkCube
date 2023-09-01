@@ -6,7 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.command;
 
-import eu.darkcube.system.commandapi.Argument;
+import eu.darkcube.system.bukkit.commandapi.deprecated.Argument;
 
 public class CommandArgument {
 

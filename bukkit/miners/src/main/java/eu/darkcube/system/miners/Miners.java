@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.miners;
 
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.miners.command.CommandTeam;
 import eu.darkcube.system.miners.command.CommandTest;
 import eu.darkcube.system.miners.command.CommandTimer;
@@ -137,10 +139,8 @@ public class Miners extends DarkCubePlugin {
 
     public static void sendTranslatedMessageAll(Message message, Object... replacements) {
         Bukkit.getOnlinePlayers().forEach(p -> sendTranslatedMessage(p, message, replacements));
-        AdventureSupport
-                .audienceProvider()
-                .sender(Bukkit.getConsoleSender())
-                .sendMessage(message.getMessage(Bukkit.getConsoleSender(), replacements));
+        Audience console = AdventureSupport.adventureSupport().audienceProvider().console();
+        console.sendMessage(message.getMessage(BukkitCommandExecutor.create(Bukkit.getConsoleSender()), replacements));
     }
 
     public static void log(Object o) {
@@ -168,7 +168,7 @@ public class Miners extends DarkCubePlugin {
         playerManager = new PlayerManager();
         teamManager = new TeamManager();
 
-        CommandAPI api = CommandAPI.getInstance();
+        CommandAPI api = CommandAPI.instance();
         api.register(new CommandTest());
         api.register(new CommandTimer());
         api.register(new CommandTeam());

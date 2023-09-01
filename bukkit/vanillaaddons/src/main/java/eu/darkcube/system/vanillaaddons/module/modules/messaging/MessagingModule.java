@@ -6,11 +6,11 @@
  */
 package eu.darkcube.system.vanillaaddons.module.modules.messaging;
 
-import eu.darkcube.system.commandapi.v3.CommandAPI;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -79,7 +79,7 @@ public class MessagingModule implements Module {
         }
     }
 
-    private final class CommandMessage extends CommandExecutor {
+    private final class CommandMessage extends Command {
 
         public CommandMessage() {
             super("vanillaaddons", "message", new String[]{"msg"}, b -> b.then(Commands
@@ -93,7 +93,7 @@ public class MessagingModule implements Module {
         }
     }
 
-    private final class CommandReply extends CommandExecutor {
+    private final class CommandReply extends Command {
 
         private static final SimpleCommandExceptionType NO_PLAYER_TO_ANSWER = new Message("COMMAND_R_NO_PLAYER_TO_ANSWER").newSimpleCommandExceptionType();
 

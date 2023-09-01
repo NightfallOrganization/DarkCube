@@ -7,7 +7,7 @@
 package eu.darkcube.system.lobbysystem.pserver;
 
 import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;

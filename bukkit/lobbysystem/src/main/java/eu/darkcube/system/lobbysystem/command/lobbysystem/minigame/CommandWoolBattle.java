@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame;
 
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandAddTask;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandListTasks;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandRemoveTask;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle.CommandSetSpawn;
 
-public class CommandWoolBattle extends LobbyCommandExecutor {
+public class CommandWoolBattle extends LobbyCommand {
 
 	public CommandWoolBattle() {
 		super("woolbattle", b -> {

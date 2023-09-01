@@ -10,7 +10,7 @@ package eu.darkcube.minigame.woolbattle.command.argument;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;

@@ -7,13 +7,13 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle.map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 
-public class CommandDisable extends WBCommandExecutor {
+public class CommandDisable extends WBCommand {
     public CommandDisable(WoolBattleBukkit woolbattle) {
         super("disable", b -> b.executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");

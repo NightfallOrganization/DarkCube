@@ -8,10 +8,10 @@ package eu.darkcube.minigame.woolbattle.command;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 
-public class CommandTimer extends WBCommandExecutor {
+public class CommandTimer extends WBCommand {
 
     public CommandTimer(WoolBattleBukkit woolbattle) {
         super("timer", b -> b.then(Commands.argument("time", IntegerArgumentType.integer(0)).executes(ctx -> {

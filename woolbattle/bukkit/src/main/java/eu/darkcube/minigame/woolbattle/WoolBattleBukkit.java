@@ -24,8 +24,9 @@ import eu.darkcube.minigame.woolbattle.util.SchedulerTicker;
 import eu.darkcube.minigame.woolbattle.util.convertingrule.ConvertingRuleHelper;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
+import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
 import org.bukkit.Bukkit;
@@ -125,7 +126,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         mapManager = new DefaultMapManager();
 
         this.userModifier = new WBUserModifier(this);
-        UserAPI.getInstance().addModifier(userModifier);
+        UserAPI.instance().addModifier(userModifier);
 
         this.tickTask = new SchedulerTicker(this).runTaskTimer(this, 0, 1);
 
@@ -142,7 +143,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         lobbySystemLink.disable();
         commands.disableAll();
         listeners.unregisterAll();
-        UserAPI.getInstance().removeModifier(userModifier);
+        UserAPI.instance().removeModifier(userModifier);
         this.tickTask.cancel();
     }
 
@@ -198,11 +199,11 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         this.sendMessage(msg, (u) -> replacements);
     }
 
-    public final void sendMessage(Message msg, Function<ICommandExecutor, Object[]> function) {
+    public final void sendMessage(Message msg, Function<CommandExecutor, Object[]> function) {
         for (WBUser user : WBUser.onlineUsers()) {
             user.user().sendMessage(msg, function.apply(user.user()));
         }
-        ICommandExecutor e = ICommandExecutor.create(Bukkit.getConsoleSender());
+        CommandExecutor e = BukkitCommandExecutor.create(Bukkit.getConsoleSender());
         e.sendMessage(msg, function.apply(e));
     }
 

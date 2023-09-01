@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 
-public class CommandFix extends WBCommandExecutor {
+public class CommandFix extends WBCommand {
     public CommandFix(WoolBattleBukkit woolbattle) {
         super("fix", b -> b.requires(s -> woolbattle.ingame().enabled()).executes(ctx -> {
             WBUser user = WBUser.getUser(ctx.getSource().asPlayer());

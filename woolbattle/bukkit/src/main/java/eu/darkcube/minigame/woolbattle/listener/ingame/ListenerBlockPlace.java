@@ -11,7 +11,7 @@ import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

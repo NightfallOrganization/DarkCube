@@ -7,12 +7,18 @@
 
 package eu.darkcube.system.pserver.plugin.command;
 
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityAnchorArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.commandapi.v3.*;
-import eu.darkcube.system.commandapi.v3.arguments.*;
+import eu.darkcube.system.bukkit.commandapi.argument.ILocationArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.RotationArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.Vec3Argument;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.pserver.plugin.Message;
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -21,7 +27,7 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.Collections;
 
-public class TeleportCommand extends PServerExecutor {
+public class TeleportCommand extends PServer {
 
     public static final SimpleCommandExceptionType TOO_MANY_ENTITIES = Messages.TOO_MANY_ENTITIES.newSimpleCommandExceptionType();
 
