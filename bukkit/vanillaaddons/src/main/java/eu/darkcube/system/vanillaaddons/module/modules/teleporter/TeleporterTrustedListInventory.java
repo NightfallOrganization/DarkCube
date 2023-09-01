@@ -6,12 +6,11 @@
  */
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta;
-import eu.darkcube.system.inventoryapi.item.meta.SkullBuilderMeta.UserProfile;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
@@ -67,7 +66,7 @@ public class TeleporterTrustedListInventory extends AbstractInventory<AddonsAsyn
                     String name = op.hasPlayedBefore() ? op.getName() == null ? "Unbekannter Spieler" : op.getName() : "Unbekannter Spieler";
                     items.put(id++, ItemBuilder
                             .item(Material.PLAYER_HEAD)
-                            .meta(new SkullBuilderMeta().owningPlayer(new UserProfile(name, uuid)))
+                            .meta(new SkullBuilderMeta().owningPlayer(new SkullBuilderMeta.UserProfile(name, uuid)))
                             .displayname(Component.text(name).color(TextColor.color(255, 0, 0)))
                             .lore(Component
                                     .text("Rechtsklick um Spieler Zugriff zu entfernen")

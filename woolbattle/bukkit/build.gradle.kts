@@ -32,6 +32,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
     compileOnlyApi(parent!!.project("api"))
     runtimeOnly(parent!!.project("api"))
-    compileOnlyApi(libs.cloudnetBridge)
-    compileOnlyApi(libs.cloudnetWrapper)
+    compileOnlyApi(libs.cloudnet.bridge)
+    compileOnlyApi(libs.cloudnet.wrapper)
 }

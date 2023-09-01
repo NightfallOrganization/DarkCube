@@ -7,8 +7,8 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.v3.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -20,12 +20,12 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilde
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class CommandRemoveTask extends LobbyCommandExecutor {
+public class CommandRemoveTask extends LobbyCommand {
 
 	private static final DynamicCommandExceptionType TASK_NOT_PRESENT =
 			Messages.SERVICE_TASK_NOT_PRESENT.newDynamicCommandExceptionType();

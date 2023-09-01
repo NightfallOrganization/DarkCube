@@ -7,11 +7,11 @@
 package eu.darkcube.system.vanillaaddons.module.modules.flightchestplate;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
-import eu.darkcube.system.inventoryapi.item.EquipmentSlot;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.attribute.Attribute;
-import eu.darkcube.system.inventoryapi.item.attribute.AttributeModifier;
-import eu.darkcube.system.inventoryapi.item.attribute.Operation;
+import eu.darkcube.system.bukkit.inventoryapi.item.EquipmentSlot;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.attribute.Attribute;
+import eu.darkcube.system.bukkit.inventoryapi.item.attribute.AttributeModifier;
+import eu.darkcube.system.bukkit.inventoryapi.item.attribute.Operation;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.util.data.Key;
@@ -65,7 +65,7 @@ public class FlightChestplateModule implements Listener, Module {
     }
 
     @Override public void onEnable() {
-        SmithingRecipe recipe = new SmithingTransformRecipe(new NamespacedKey(addons, "flight_chestplate_upgrade"), new ItemStack(Material.AIR), new MaterialChoice(Material.AIR), new MaterialChoice(Material.LEATHER_CHESTPLATE), new MaterialChoice(Material.NETHER_STAR), true);
+        SmithingRecipe recipe = new SmithingTransformRecipe(new NamespacedKey(addons, "flight_chestplate_upgrade"), new ItemStack(Material.AIR), new MaterialChoice(Material.AIR),new MaterialChoice(Material.LEATHER_CHESTPLATE), new MaterialChoice(Material.NETHER_STAR), true);
         Bukkit.addRecipe(recipe);
         Bukkit.getPluginManager().registerEvents(this, addons);
         Recipe.registerRecipe(this.recipe);
@@ -137,20 +137,20 @@ public class FlightChestplateModule implements Listener, Module {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR) public void handle(BlockDispenseArmorEvent event) {
-        var target = event.getTargetEntity();
-        if (!(target instanceof Player player)) return;
+    @EventHandler (priority = EventPriority.MONITOR) public void handle(BlockDispenseArmorEvent event) {
+        var target = event.getTargetEntity() ;
+        if (!(target instanceof Player player))return;
         var itemStack = event.getItem();
         var item = ItemBuilder.item(itemStack);
-        if (this.canFly(item)) {
-            player.getPersistentDataContainer().set(STORAGE_KEY, PersistentDataType.BYTE, (byte) 1);
-            var speed = 0;
-            if (item.persistentDataStorage().has(SPEED_KEY))
-                speed = item.persistentDataStorage().get(SPEED_KEY, PersistentDataTypes.INTEGER);
-            update(player, speed);
-        } else if (player.getPersistentDataContainer().has(STORAGE_KEY, PersistentDataType.BYTE)) {
-            player.getPersistentDataContainer().remove(STORAGE_KEY);
-            update(player, 0);
+            if (this.canFly(item)) {
+                player.getPersistentDataContainer().set(STORAGE_KEY, PersistentDataType.BYTE, (byte) 1);
+                var speed = 0;
+                if (item.persistentDataStorage().has(SPEED_KEY))
+                    speed = item.persistentDataStorage().get(SPEED_KEY, PersistentDataTypes.INTEGER);
+                update(player, speed);
+            } else if (player.getPersistentDataContainer().has(STORAGE_KEY, PersistentDataType.BYTE)) {
+                player.getPersistentDataContainer().remove(STORAGE_KEY);
+                update(player, 0);
         }
     }
 

@@ -6,17 +6,17 @@
  */
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.TeamTypeArgument;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EnumArgument;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 
 import java.util.Arrays;
 
-public class CommandSetNameColor extends WBCommandExecutor {
+public class CommandSetNameColor extends WBCommand {
     public CommandSetNameColor() {
         super("setNameColor", b -> b.then(Commands
                 .argument("nameColor", EnumArgument.enumArgument(Arrays

@@ -11,6 +11,7 @@ import com.github.unldenis.hologram.line.Line;
 import com.github.unldenis.hologram.line.TextLine;
 import com.github.unldenis.hologram.placeholder.Placeholders;
 import eu.cloudnetservice.driver.document.Document;
+import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
@@ -61,7 +62,7 @@ public class ConnectorNPC {
             } else {
                 permissions = new ArrayList<>();
             }
-            Location loc = PersistentDataTypes.LOCATION.deserialize(d, "location");
+            Location loc = BukkitPersistentDataTypes.LOCATION.deserialize(d, "location");
             return new ConnectorNPC(taskName, id, loc, permissions, v2Key);
         }
 
@@ -71,7 +72,7 @@ public class ConnectorNPC {
             strings.serialize(d, "permissions", data.permissions);
             d.append("id", data.id);
             if (data.v2Key != null) d.append("v2key", data.v2Key);
-            PersistentDataTypes.LOCATION.serialize(d, "location", data.location);
+            BukkitPersistentDataTypes.LOCATION.serialize(d, "location", data.location);
             doc.append(key, d);
         }
 

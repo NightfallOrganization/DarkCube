@@ -7,15 +7,15 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPlugin;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
 import java.io.File;
 
-public class CommandLoadWorld extends WBCommandExecutor {
+public class CommandLoadWorld extends WBCommand {
     public CommandLoadWorld(WoolBattleBukkit woolbattle) {
         super("loadWorld", b -> b.then(Commands.argument("world", StringArgumentType.string()).executes(ctx -> {
             String worldName = StringArgumentType.getString(ctx, "world");

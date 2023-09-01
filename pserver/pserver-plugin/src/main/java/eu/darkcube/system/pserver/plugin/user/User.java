@@ -8,7 +8,7 @@
 package eu.darkcube.system.pserver.plugin.user;
 
 import com.google.gson.JsonObject;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.Language;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ public interface User {
 
     Language getLanguage();
 
-    ICommandExecutor getCommandExecutor();
+    CommandExecutor getCommandExecutor();
 
     UUID getUUID();
 

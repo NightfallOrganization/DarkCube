@@ -10,9 +10,9 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.argument.MapArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 
-public class CommandSetMap extends WBCommandExecutor {
+public class CommandSetMap extends WBCommand {
     public CommandSetMap(WoolBattleBukkit woolbattle) {
         super("setMap", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle)).executes(ctx -> {
             Map map = MapArgument.getMap(ctx, "map");

@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun;
 
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaRRegion;
 
-public class CommandDeleteRegion extends LobbyCommandExecutor {
+public class CommandDeleteRegion extends LobbyCommand {
 
 	public CommandDeleteRegion() {
 		super("deleteRegion", b -> b.then(Commands.argument("index", IntegerArgumentType.integer(0,

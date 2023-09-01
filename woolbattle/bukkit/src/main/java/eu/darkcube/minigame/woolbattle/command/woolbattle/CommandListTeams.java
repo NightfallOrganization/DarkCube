@@ -7,11 +7,11 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
-public class CommandListTeams extends WBCommandExecutor {
+public class CommandListTeams extends WBCommand {
     public CommandListTeams(WoolBattleBukkit woolbattle) {
         super("listTeams", b -> b.executes(ctx -> {
             Component c = Component.empty();

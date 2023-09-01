@@ -7,14 +7,14 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
-import eu.darkcube.system.commandapi.v3.arguments.StringArgument;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EnumArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.StringArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
@@ -22,9 +22,9 @@ import org.bukkit.DyeColor;
 
 import java.util.Collection;
 
-import static eu.darkcube.system.commandapi.v3.Commands.argument;
+import static eu.darkcube.system.bukkit.commandapi.Commands.argument;
 
-public class CommandCreateTeam extends WBCommandExecutor {
+public class CommandCreateTeam extends WBCommand {
     public CommandCreateTeam(WoolBattleBukkit woolbattle) {
         super("createTeam", b -> b.then(argument("team", StringArgument.string(Arrays
                 .asList(SupportedColors.values())

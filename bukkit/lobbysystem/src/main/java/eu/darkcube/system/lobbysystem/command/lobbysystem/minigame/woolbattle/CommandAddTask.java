@@ -8,17 +8,17 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
 import eu.cloudnetservice.driver.service.ServiceTask;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.arguments.ServiceTaskArgument;
 
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class CommandAddTask extends LobbyCommandExecutor {
+public class CommandAddTask extends LobbyCommand {
 
     public CommandAddTask() {
         super("addTask", b -> b.then(Commands.argument("task", new ServiceTaskArgument() {

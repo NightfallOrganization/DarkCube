@@ -12,15 +12,15 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.Vote;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
-import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
+import static eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder.item;
 
 public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE =

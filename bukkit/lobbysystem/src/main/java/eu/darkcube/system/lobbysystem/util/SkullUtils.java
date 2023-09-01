@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import eu.darkcube.system.util.ReflectionUtils;
+import eu.darkcube.system.bukkit.util.ReflectionUtils;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 

@@ -7,7 +7,8 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.util.BukkitAdventureSupport;
 import eu.darkcube.system.labymod.emotes.Emotes;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.PlayerNPCInteractEvent;
@@ -17,7 +18,6 @@ import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -79,7 +79,11 @@ public class ListenerDailyReward extends BaseListener {
         item.setItemMeta(meta);
         user.setLastDailyReward(System.currentTimeMillis());
         e.setCurrentItem(item);
-        AdventureSupport.audienceProvider().player(p).sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
+        BukkitAdventureSupport
+                .adventureSupport()
+                .audienceProvider()
+                .player(p)
+                .sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
         p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
     }
 

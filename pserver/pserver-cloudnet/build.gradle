@@ -16,9 +16,9 @@ tasks {
 }
 
 dependencies {
-    compileOnlyApi libs.cloudnet
-    compileOnlyApi libs.cloudnetBridge
-    compileOnlyApi project(':darkcubesystem:module')
+    compileOnlyApi libs.cloudnet.node
+    compileOnlyApi libs.cloudnet.bridge
+//    compileOnlyApi project(':darkcubesystem:module')
     api project(':pserver:pserver-api')
     runtimeOnly project(':pserver:pserver-bukkit')
 }

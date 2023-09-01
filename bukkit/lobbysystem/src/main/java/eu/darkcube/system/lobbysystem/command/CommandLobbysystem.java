@@ -10,7 +10,7 @@ package eu.darkcube.system.lobbysystem.command;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.*;
 
-public class CommandLobbysystem extends LobbyCommandExecutor {
+public class CommandLobbysystem extends LobbyCommand {
 
     public CommandLobbysystem(Lobby lobby) {
         super("lobbysystem", b -> b

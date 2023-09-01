@@ -10,7 +10,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.inventory.SettingsInventory;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 
-public class CommandSettings extends WBCommandExecutor {
+public class CommandSettings extends WBCommand {
     public CommandSettings(WoolBattleBukkit woolbattle) {
         super("settings", b -> b.executes(ctx -> {
             WBUser user = WBUser.getUser(ctx.getSource().asPlayer());

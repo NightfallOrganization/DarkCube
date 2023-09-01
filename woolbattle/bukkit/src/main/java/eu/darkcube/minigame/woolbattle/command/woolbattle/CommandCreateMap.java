@@ -7,15 +7,15 @@
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.command.argument.MapSizeArgument;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 
-public class CommandCreateMap extends WBCommandExecutor {
+public class CommandCreateMap extends WBCommand {
     public CommandCreateMap(WoolBattleBukkit woolbattle) {
         super("createMap",
                 b -> b.then(Commands.argument("map", StringArgumentType.string()).then(Commands.argument("size", MapSizeArgument.mapSize(woolbattle)).executes(ctx -> {

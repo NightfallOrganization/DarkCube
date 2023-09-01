@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.darkcube.system.pserver.plugin.command.impl.PServerExecutor;
+import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 
 public class CommandBlockModifyListener extends SingleInstanceBaseListener {
 
@@ -31,7 +31,7 @@ public class CommandBlockModifyListener extends SingleInstanceBaseListener {
 			BlockCommandSender bsender = (BlockCommandSender) sender;
 			String command = event.getCommand();
 			String commandName = command.split(" ")[0];
-			if (!PServerExecutor.TOTAL_COMMAND_NAMES.contains(commandName)) {
+			if (!PServer.TOTAL_COMMAND_NAMES.contains(commandName)) {
 				bsender.sendMessage("Invalid command: " + commandName);
 				event.setCancelled(true);
 			}

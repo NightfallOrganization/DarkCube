@@ -6,7 +6,8 @@
  */
 package eu.darkcube.system.lobbysystem.user;
 
-import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.lobbysystem.Lobby;
@@ -166,11 +167,13 @@ public class LobbyUser {
     }
 
     public Location getLastPosition() {
-        return user.persistentData().get(POSITION, PersistentDataTypes.LOCATION, () -> Lobby.getInstance().getDataManager().getSpawn());
+        return user
+                .persistentData()
+                .get(POSITION, BukkitPersistentDataTypes.LOCATION, () -> Lobby.getInstance().getDataManager().getSpawn());
     }
 
     public void setLastPosition(Location position) {
-        user.persistentData().set(POSITION, PersistentDataTypes.LOCATION, position);
+        user.persistentData().set(POSITION, BukkitPersistentDataTypes.LOCATION, position);
     }
 
     public boolean isSounds() {

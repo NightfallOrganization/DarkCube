@@ -9,7 +9,7 @@ package eu.darkcube.system.pserver.plugin.link.woolbattle;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
-import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.pserver.plugin.link.Link;
 import eu.darkcube.system.pserver.plugin.link.woolbattle.command.*;
 

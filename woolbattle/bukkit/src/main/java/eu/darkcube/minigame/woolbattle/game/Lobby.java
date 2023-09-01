@@ -29,8 +29,9 @@ import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
-import eu.darkcube.system.DarkCubeBukkit;
+import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.server.util.DarkCubeServer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
@@ -116,7 +117,7 @@ public class Lobby extends GamePhase {
         woolbattle.gameData().mapSize(null);
         woolbattle.gameData().votedMap(null);
         woolbattle.gameData().forceMap(null);
-        DarkCubeBukkit.extra(doc -> doc.append("configured", false));
+        DarkCubeServer.extra(doc -> doc.append("configured", false));
         System.out.println("Unloaded Game");
         if (publishUpdate) woolbattle.lobbySystemLink().update();
     }
@@ -135,7 +136,7 @@ public class Lobby extends GamePhase {
         recalculateMap();
         recalculateEpGlitch();
         WBUser.onlineUsers().forEach(this::setupScoreboard);
-        DarkCubeBukkit.extra(doc -> doc.append("configured", true));
+        DarkCubeServer.extra(doc -> doc.append("configured", true));
         woolbattle.lobbySystemLink().update();
         System.out.println("Loaded game " + mapSize);
     }
@@ -268,13 +269,13 @@ public class Lobby extends GamePhase {
     public Location getSpawn() {
         if (this.spawn == null) this.spawn = woolbattle
                 .persistentDataStorage()
-                .get(Config.SPAWN, PersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
+                .get(Config.SPAWN, BukkitPersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
         return this.spawn.clone();
     }
 
     public void setSpawn(Location spawn) {
         this.spawn = spawn;
-        woolbattle.persistentDataStorage().set(Config.SPAWN, PersistentDataTypes.LOCATION, spawn);
+        woolbattle.persistentDataStorage().set(Config.SPAWN, BukkitPersistentDataTypes.LOCATION, spawn);
     }
 
     public int minPlayerCount() {

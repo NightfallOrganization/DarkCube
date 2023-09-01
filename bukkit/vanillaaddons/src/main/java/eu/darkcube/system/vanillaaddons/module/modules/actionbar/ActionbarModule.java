@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.vanillaaddons.module.modules.actionbar;
 
-import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.vanillaaddons.module.Module;
 
 public class ActionbarModule implements Module {

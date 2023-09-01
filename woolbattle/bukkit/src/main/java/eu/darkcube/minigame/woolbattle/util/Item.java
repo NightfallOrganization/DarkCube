@@ -7,13 +7,13 @@
 package eu.darkcube.minigame.woolbattle.util;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.SpawnEggBuilderMeta;
+import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.bukkit.inventoryapi.item.meta.SpawnEggBuilderMeta;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
+import static eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder.item;
 import static org.bukkit.Material.*;
 
 public enum Item {
