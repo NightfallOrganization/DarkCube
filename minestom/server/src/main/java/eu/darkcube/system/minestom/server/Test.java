@@ -9,6 +9,7 @@ package eu.darkcube.system.minestom.server;
 
 public class Test {
 
+
+    String s = "{$project.version}";
+
 }
-
-
