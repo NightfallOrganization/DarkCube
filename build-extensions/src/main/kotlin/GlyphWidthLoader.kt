@@ -18,7 +18,6 @@ import org.gradle.process.internal.ExecActionFactory
 import org.gradle.work.InputChanges
 import javax.inject.Inject
 
-@Suppress("LeakingThis")
 @CacheableTask
 abstract class GlyphWidthLoader : DefaultTask() {
 
