@@ -4,7 +4,27 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreviewQuietly("TYPESAFE_PROJECT_ACCESSORS", "Type-safe project accessors")
+
+/**
+ * @see <a href="https://github.com/gradle/gradle/issues/19069">Feature request</a>
+ */
+fun Settings.enableFeaturePreviewQuietly(name: String, summary: String = name) {
+    enableFeaturePreview(name)
+
+    val logger: Any = org.gradle.util.internal.IncubationLogger::class.java
+        .getDeclaredField("INCUBATING_FEATURE_HANDLER")
+        .apply { isAccessible = true }
+        .get(null)
+
+    @Suppress("UNCHECKED_CAST")
+    val features: MutableSet<String> = org.gradle.internal.featurelifecycle.LoggingIncubatingFeatureHandler::class.java
+        .getDeclaredField("features")
+        .apply { isAccessible = true }
+        .get(logger) as MutableSet<String>
+
+    features.add(summary)
+}
 
 pluginManagement {
     includeBuild("build-extensions")
@@ -30,14 +50,11 @@ include("bukkit:autovoidworld")
 include("bukkit:bauserver")
 //include "bukkit:bedwars"
 include("bukkit:changepermissionmessage")
-includeSubProjects("darkcubesystem", "api", "module", "velocity", "common", "libs")
-//includeSubProjects("darkcubesystem:libs", "brigadier", "gson", "annotations")
-//includeSubProjects("darkcubesystem:libs:adventure", "adventure-api", "adventure-key", "adventure-nbt", "adventure-platform-api", "adventure-platform-bukkit", "adventure-platform-facet", "adventure-platform-viaversion", "adventure-text-serializer-bungeecord", "adventure-text-serializer-gson", "adventure-text-serializer-gson-legacy-impl", "adventure-text-serializer-legacy", "adventure-text-serializer-plain", "examination-api", "examination-string")
-includeSubProjects("darkcubesystem:bukkit", "1.8.8", "1.20.2", "1.20.4")
+
+includeSubProjects("minestom", "server")
 
 includeSubProjects("woolbattle", "bukkit", "api", "minestom")
 
-//includeSubProjects("darkcubesystem", "1.8.8", "1.19.3", "core", "module")
 include("bukkit:darkessentials")
 //include "bukkit:holograms"
 include("bukkit:jumpleague")

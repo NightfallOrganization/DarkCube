@@ -16,9 +16,13 @@ repositories {
 
 gradlePlugin {
     plugins {
-        create("glyphWidthLoader") {
+        register("glyphWidthLoader") {
             id = "glyph-width-loader"
             implementationClass = "GlyphWidthLoaderPlugin"
+        }
+        register("tokenReplacement") {
+            id = "token-replacement"
+            implementationClass = "TokenReplacementPlugin"
         }
     }
 }
