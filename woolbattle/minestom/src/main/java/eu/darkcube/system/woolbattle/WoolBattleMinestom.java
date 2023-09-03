@@ -14,6 +14,7 @@ import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.instance.InstanceChunkLoadEvent;
 import net.minestom.server.event.instance.InstanceChunkUnloadEvent;
+import net.minestom.server.event.player.PlayerChunkLoadEvent;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
@@ -22,9 +23,13 @@ import net.minestom.server.instance.IChunkLoader;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.block.BlockFace;
+import net.minestom.server.listener.BlockPlacementListener;
+import net.minestom.server.registry.Registry;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.world.DimensionType;
 import net.minestom.server.world.biomes.Biome;
+import org.antlr.v4.runtime.atn.BlockEndState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +48,7 @@ public class WoolBattleMinestom {
         Command command = new Command("stop", "exit");
         command.setDefaultExecutor((sender, context) -> {
             MinecraftServer.stopCleanly();
+
             System.exit(0);
         });
         MinecraftServer.getCommandManager().register(command);
@@ -68,6 +74,7 @@ public class WoolBattleMinestom {
 //        DimensionType dimensionType = DimensionType.OVERWORLD;
 
         InstanceContainer instanceContainer = MinecraftServer.getInstanceManager().createInstanceContainer(dimensionType);
+//        instanceContainer.enableAutoChunkLoad(false);
 
         instanceContainer.setGenerator(unit -> {
             unit.modifier().fillBiome(customBiome);
@@ -106,9 +113,11 @@ public class WoolBattleMinestom {
 //        InstanceContainer instanceContainer = MinecraftServer.getInstanceManager().createInstanceContainer();
 
         AtomicInteger loaded = new AtomicInteger();
+        AtomicInteger playerloaded = new AtomicInteger();
 
         Instance instance = MinecraftServer.getInstanceManager().createSharedInstance(instanceContainer);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkUnloadEvent.class, event -> {
+            playerloaded.decrementAndGet();
             Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
             if (chunk != null) {
                 for (Player player : instance.getPlayers()) {
@@ -117,7 +126,12 @@ public class WoolBattleMinestom {
                     }
                 }
                 instance.unloadChunk(chunk);
+            } else {
+                System.out.println("Chunk was null");
             }
+        });
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkLoadEvent.class, event -> {
+            playerloaded.incrementAndGet();
         });
         MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkLoadEvent.class, event -> {
             loaded.incrementAndGet();
@@ -132,7 +146,9 @@ public class WoolBattleMinestom {
         MinecraftServer.getCommandManager().register(loadedCommand);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
             if (!instance.isChunkLoaded(event.getNewPosition())) {
-                event.setCancelled(true);
+                instance.loadChunk(event.getNewPosition()).thenAccept(c -> {
+                    System.out.println("Loaded chunk");
+                }).join();
                 return;
             }
             Chunk chunk = instance.getChunkAt(event.getNewPosition());
@@ -141,14 +157,9 @@ public class WoolBattleMinestom {
                 return;
             }
             Block to = chunk.getBlock(event.getNewPosition());
-            Block from = chunk.getBlock(event.getPlayer().getPosition());
 
-            if (to.isSolid() && from.isAir()) {
-                System.out.println("cancelled");
+            if (to.registry().collisionShape().intersectBox(event.getNewPosition(), event.getPlayer().getBoundingBox())) {
                 event.setCancelled(true);
-            } else if (!to.namespace().equals(from.namespace())) {
-                System.out.println("To: " + to);
-                System.out.println("From: " + from);
             }
         });
         MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
