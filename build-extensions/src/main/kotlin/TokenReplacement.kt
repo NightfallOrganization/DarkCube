@@ -4,29 +4,23 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ConfigurableFileTree
-import org.gradle.api.file.DirectoryTree
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
+import org.gradle.internal.impldep.org.apache.commons.io.file.Counters
+import org.gradle.internal.impldep.org.apache.commons.io.file.DeletingPathVisitor
 import org.gradle.work.ChangeType
-import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
-import java.io.File
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
+import java.util.concurrent.Callable
+import java.util.function.Supplier
+import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.io.path.name
 import kotlin.io.path.relativeTo
@@ -43,6 +37,9 @@ abstract class TokenReplacement : DefaultTask() {
     @Nested
     val sources = LinkedSourceDirectories()
 
+    @Input
+    val rules: MutableCollection<TokenReplacementRule> = ArrayList()
+
     @OutputDirectory
     val output = objects.directoryProperty()
 
@@ -51,17 +48,18 @@ abstract class TokenReplacement : DefaultTask() {
         val outputFile = output.asFile.get()
         if (!outputFile.exists()) outputFile.mkdirs()
         sources.forEach { node ->
-            println(node.tree.dir)
             if (!Files.exists(node.tree.dir.toPath())) return@forEach
             inputChanges.getFileChanges(node.files).forEach {
-                rewrite(it.file.toPath(), destination(it.file.toPath(), node.tree.dir.toPath()).get().asFile.toPath(), it.changeType)
+                val dest = destination(it.file.toPath(), node.tree.dir.toPath()).get().asFile.toPath()
+                val file = it.file.toPath()
+                rewrite(file, dest, it.changeType)
             }
         }
     }
 
     fun input(sourceDirectorySet: SourceDirectorySet) {
         for (srcDirTree in sourceDirectorySet.srcDirTrees) {
-            sources.add(project.files(srcDirTree), srcDirTree)
+            sources.add(project.files(srcDirTree), srcDirTree, srcDirTree.patterns.includes, srcDirTree.patterns.excludes)
         }
     }
 
@@ -75,19 +73,30 @@ abstract class TokenReplacement : DefaultTask() {
 
     private fun work(file: Path, dest: Path) {
         if (Files.isDirectory(file)) return
-        val content: String = Files.readString(file)
-        println("Rewrite " + file.name)
+        var content: String = Files.readString(file)
+        logger.info("Rewrite " + file.name)
+        for (rule: TokenReplacementRule in rules) {
+            content = content.replace(rule.getCompiledRegex(), rule.value)
+        }
+        Files.writeString(dest, content)
     }
 
     private fun rewrite(file: Path, dest: Path, change: ChangeType) {
         when (change) {
             ChangeType.REMOVED -> {
-                Files.delete(dest)
+                if (Files.isDirectory(dest))
+                    Files.walkFileTree(dest, DeletingPathVisitor(Counters.noopPathCounters()))
+                else
+                    Files.deleteIfExists(dest)
             }
 
             ChangeType.ADDED, ChangeType.MODIFIED -> {
-                Files.createDirectories(dest.parent)
-                work(file, dest)
+                if (Files.isRegularFile(file)) {
+                    Files.createDirectories(dest.parent)
+                    work(file, dest)
+                } else if (Files.isDirectory(file)) {
+                    Files.createDirectories(dest)
+                }
             }
         }
     }
