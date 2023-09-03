@@ -9,19 +9,25 @@ import java.util.regex.Pattern
  */
 
 class TokenReplacementExtension {
-    internal val entries: MutableList<Entry> = ArrayList()
+    val rules: MutableCollection<TokenReplacementRule> = ArrayList()
 
-    fun add(regex: String, replacement: String) {
-        add(regex) { replacement }
+    fun replace(token: String, value: Any) {
+        replace(token) { value }
     }
 
-    fun add(regex: String, replacement: Supplier<String>) {
-        add(Pattern.compile(regex), replacement)
+    fun replace(token: String, value: Supplier<Any>) {
+        replaceRegex(Regex.fromLiteral(token), value)
     }
 
-    fun add(regex: Pattern, replacement: Supplier<String>) {
-        entries.add(Entry(regex, replacement))
+    fun replaceRegex(regex: String, value: Any) {
+        replaceRegex(regex) { value }
     }
 
-    internal class Entry(internal val regex: Pattern, internal val replacement: Supplier<String>)
+    fun replaceRegex(regex: String, value: Supplier<Any>) {
+        replaceRegex(Regex(regex), value)
+    }
+
+    fun replaceRegex(regex: Regex, value: Supplier<Any>) {
+        rules.add(TokenReplacementRule(regex.pattern, regex.options, value.get().toString()))
+    }
 }

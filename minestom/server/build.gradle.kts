@@ -8,7 +8,7 @@ import org.gradle.api.internal.file.FileOperations
  */
 plugins {
     `java-library`
-//    id("token-replacement")
+    id("token-replacement")
 }
 
 abstract class SetupLibrariesTask : DefaultTask() {
@@ -55,13 +55,11 @@ abstract class SetupLibrariesTask : DefaultTask() {
     }
 }
 
+tokens {
+    replace("{\$project.version}", project.version)
+}
+
 sourceSets {
-//    main {
-//        this.java.srcDir("a")
-//        this.java.srcDir("b")
-//        this.java.srcDir("v")
-//        this.java.srcDir("z")
-//    }
 }
 
 tasks {

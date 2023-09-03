@@ -1,6 +1,8 @@
 import org.gradle.api.file.DirectoryTree
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.work.Incremental
 import java.util.function.Consumer
 
@@ -16,9 +18,10 @@ class LinkedSourceDirectories {
     @Nested
     private var head: Node? = null
 
-    fun add(files: FileCollection, tree: DirectoryTree) {
-        if (head == null) head = Node(files, tree)
-        else last()!!.next = Node(files, tree)
+    fun add(files: FileCollection, tree: DirectoryTree, includes: Set<String>, excludes: Set<String>) {
+        val node = Node(files, tree, includes, excludes)
+        if (head == null) head = node
+        else last()!!.next = node
     }
 
     fun forEach(consumer: Consumer<Node>) {
@@ -48,6 +51,8 @@ class LinkedSourceDirectories {
         return last
     }
 
-    class Node(@Incremental @InputFiles @PathSensitive(PathSensitivity.RELATIVE) val files: FileCollection, @Internal val tree: DirectoryTree, @Nested @Optional var next: Node? = null)
+    class Node(
+        @Incremental @InputFiles @PathSensitive(PathSensitivity.RELATIVE) val files: FileCollection, @Internal val tree: DirectoryTree, @Input val includes: Set<String>, excludes: Set<String>, @Nested @Optional var next: Node? = null
+    )
 
 }
