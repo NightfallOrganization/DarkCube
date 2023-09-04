@@ -70,6 +70,10 @@ include("pserver:pserver-plugin")
 fun includeSubProjects(rootProject: String, vararg subProjects: String) {
     include(rootProject)
     for (subProject in subProjects) {
-        include("$rootProject:$subProject")
+        val path = ":$rootProject:$subProject"
+        include(path)
+        var name = project(path).name
+        if (name.startsWith("1")) name = "v$name".replace(".", "_")
+        project(path).name = name
     }
 }
