@@ -90,7 +90,7 @@ public class Aetheria extends DarkCubePlugin {
 
         damageManager = new DamageManager(this);
         this.schadensAnzeige = new SchadensAnzeige();
-
+        
         instance.getCommand("skills").setExecutor(new SkillsCommand(skillManager));
         instance.getCommand("useskillslot").setExecutor(new UseSkillSlotCommand(skillManager));
         instance.getCommand("useskill").setExecutor(new UseSkillCommand(skillManager));

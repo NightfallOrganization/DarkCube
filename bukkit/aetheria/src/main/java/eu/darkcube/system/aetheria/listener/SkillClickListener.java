@@ -10,9 +10,11 @@ package eu.darkcube.system.aetheria.listener;
 import eu.darkcube.system.aetheria.Aetheria;
 import eu.darkcube.system.aetheria.skills.Skill;
 import eu.darkcube.system.aetheria.util.SkillManager;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -34,6 +36,8 @@ public class SkillClickListener implements Listener {
 
     @EventHandler public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        Action action = event.getAction();
+
 
         if (clickResetTasks.containsKey(player)) {
             clickResetTasks.get(player).cancel();
@@ -59,12 +63,14 @@ public class SkillClickListener implements Listener {
         LinkedList<String> pattern = clickPatterns.getOrDefault(player, new LinkedList<>());
 
         switch (event.getAction()) {
-            case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> pattern.add("Ḧ");
+            case RIGHT_CLICK_AIR -> pattern.add("Ḧ");
             case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> pattern.add("ḧ");
             default -> {
                 return;
             }
         }
+
+
 
         // Muster bereinigen, wenn es nur Linksklicks enthält
         while (!pattern.isEmpty() && pattern.getFirst().equals("ḧ")) {
