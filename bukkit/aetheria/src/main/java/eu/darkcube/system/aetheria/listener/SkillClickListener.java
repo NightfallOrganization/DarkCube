@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -38,6 +39,9 @@ public class SkillClickListener implements Listener {
         Player player = event.getPlayer();
         Action action = event.getAction();
 
+        if (action == Action.RIGHT_CLICK_BLOCK || (action == Action.RIGHT_CLICK_AIR && isArmor(player.getInventory().getItemInMainHand()))) {
+            return;  // Ignoriere das Event
+        }
 
         if (clickResetTasks.containsKey(player)) {
             clickResetTasks.get(player).cancel();
@@ -109,6 +113,24 @@ public class SkillClickListener implements Listener {
             }
             pattern.clear(); // Clear the pattern after activation
             showClickPatternTitle(player, pattern);
+        }
+    }
+
+    private boolean isArmor(ItemStack item) {
+        if (item == null) return false;
+
+        Material material = item.getType();
+        switch (material) {
+            case LEATHER_HELMET, LEATHER_CHESTPLATE, LEATHER_LEGGINGS, LEATHER_BOOTS,
+                    IRON_HELMET, IRON_CHESTPLATE, IRON_LEGGINGS, IRON_BOOTS,
+                    DIAMOND_HELMET, DIAMOND_CHESTPLATE, DIAMOND_LEGGINGS, DIAMOND_BOOTS,
+                    NETHERITE_HELMET, NETHERITE_CHESTPLATE, NETHERITE_LEGGINGS, NETHERITE_BOOTS,
+                    GOLDEN_HELMET, GOLDEN_CHESTPLATE, GOLDEN_LEGGINGS, GOLDEN_BOOTS,
+                    CHAINMAIL_HELMET, CHAINMAIL_CHESTPLATE, CHAINMAIL_LEGGINGS, CHAINMAIL_BOOTS,
+                    TURTLE_HELMET:
+                return true;
+            default:
+                return false;
         }
     }
 
