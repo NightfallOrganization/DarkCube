@@ -90,9 +90,6 @@ commands:
   additemlevel:
     description: Erhöht das ItemLevel des Gegenstands in der Hand des Spielers
     permission: aetheria.additemlevel.use
-  itemlevel:
-    description: Zeigt das Level des Items im Hauptslot des Spielers an
-    permission: aetheria.itemlevel.use
   resetdurability:
     description: Setzt die Haltbarkeit des gehaltenen CustomSword-Items zurück
     permission: aetheria.resetdurability.use
@@ -129,6 +126,12 @@ commands:
   skills:
     description: Öffne das Skill-Inventar
     permission: aetheria.skills.use
+  myitemlevel:
+    description: Zeigt das Level des Items im Hauptslot des Spielers an
+    permission: aetheria.myitemlevel.use
+  myitemdurability:
+    description: Zeigt die Durability des Items im Hauptslot des Spielers an
+    permission: aetheria.myitemdurability.use
 
     default: op
   aetheria.heal.use:
@@ -210,4 +213,8 @@ commands:
   aetheria.useskillslot.use:
     default: not op
   aetheria.skills.use:
+    default: not op
+  aetheria.myitemlevel.use:
+    default: not op
+  aetheria.myitemdurability.use:
     default: not op

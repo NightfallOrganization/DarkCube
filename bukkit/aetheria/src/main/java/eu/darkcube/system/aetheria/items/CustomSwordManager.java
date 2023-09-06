@@ -79,29 +79,33 @@ public class CustomSwordManager implements Listener {
         int maxDurability = getMaxDurabilityForLevel(level);
         meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER, durability);
         meta.getPersistentDataContainer().set(maxDurabilityKey, PersistentDataType.INTEGER, maxDurability);
+        int damage = level * 2;  // Berechne den Schaden hier
+        meta.getPersistentDataContainer().set(attackDamageKey, PersistentDataType.INTEGER, damage);  // Setze den Schaden hier
         meta.setUnbreakable(true);
         meta.setCustomModelData(3);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         customSword.setItemMeta(meta);
-        setSwordAttackDamage(customSword, level * 2);
-        meta = customSword.getItemMeta();
 
+        // Setze die Lore mit dem Schaden
         List<String> lore = new ArrayList<>();
         lore.add(" ");
         lore.add("§7§m      §7« §bStats §7»§m      ");
         lore.add(" ");
         lore.add("§7Durability: §a" + durability + " §7/ §a" + maxDurability);
+        lore.add("§7Damage: §c" + damage * 2);  // Zeige den Schaden
         lore.add(" ");
         lore.add("§7§m      §7« §dReqir §7»§7§m      ");
         lore.add(" ");
-        lore.add("§7Level: §a" + level);
+        lore.add("§7Level: §6" + level);
         lore.add("§7Rarity: " + "§aOrdinary");
         lore.add(" ");
         meta.setLore(lore);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         customSword.setItemMeta(meta);
 
         return customSword;
     }
+
 
     private int getMaxDurabilityForLevel(int level) {
         int baseDurability = 200;
@@ -123,22 +127,25 @@ public class CustomSwordManager implements Listener {
         if (meta != null) {
             int durability = meta.getPersistentDataContainer().getOrDefault(durabilityKey, PersistentDataType.INTEGER, 0);
             int maxDurability = getMaxDurabilityForLevel(level);
+            int damage = getSwordAttackDamage(item); // Hol dir den Schaden
 
             List<String> lore = new ArrayList<>();
             lore.add(" ");
             lore.add("§7§m      §7« §bStats §7»§m      ");
             lore.add(" ");
             lore.add("§7Durability: §a" + durability + " §7/ §a" + maxDurability);
+            lore.add("§7Damage: §c" + damage * 2);  // Zeige den Schaden
             lore.add(" ");
             lore.add("§7§m      §7« §dReqir §7»§7§m      ");
             lore.add(" ");
-            lore.add("§7Level: §a" + level);
+            lore.add("§7Level: §6" + level);
             lore.add("§7Rarity: " + "§aOrdinary");
             lore.add(" ");
             meta.setLore(lore);
             item.setItemMeta(meta);
         }
     }
+
 
     @EventHandler public void handle(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player player)) return;

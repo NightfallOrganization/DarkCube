@@ -9,7 +9,9 @@ package eu.darkcube.system.aetheria;
 
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.aetheria.commands.*;
+import eu.darkcube.system.aetheria.items.CustomAxeManager;
 import eu.darkcube.system.aetheria.items.CustomChestplateManager;
+import eu.darkcube.system.aetheria.items.CustomPickaxeManager;
 import eu.darkcube.system.aetheria.items.CustomSwordManager;
 import eu.darkcube.system.aetheria.listener.*;
 import eu.darkcube.system.aetheria.scheduler.RingOfHealingEffectApplier;
@@ -37,6 +39,8 @@ public class Aetheria extends DarkCubePlugin {
     private CorManager corManager;
     private SchadensAnzeige schadensAnzeige;
     private CustomSwordManager customSwordManager;
+    private CustomPickaxeManager customPickaxeManager;
+    private CustomAxeManager customAxeManager;
     private CustomChestplateManager customChestplateManager;
     private DamageManager damageManager;
     private MonsterStatsManager monsterStatsManager;
@@ -87,10 +91,13 @@ public class Aetheria extends DarkCubePlugin {
 
         customSwordManager = new CustomSwordManager(this);
         customChestplateManager = new CustomChestplateManager(this);
+        customPickaxeManager = new CustomPickaxeManager(this);
+        customAxeManager = new CustomAxeManager(this);
+        new TeleportManager(this);
 
         damageManager = new DamageManager(this);
         this.schadensAnzeige = new SchadensAnzeige();
-        
+
         instance.getCommand("skills").setExecutor(new SkillsCommand(skillManager));
         instance.getCommand("useskillslot").setExecutor(new UseSkillSlotCommand(skillManager));
         instance.getCommand("useskill").setExecutor(new UseSkillCommand(skillManager));
@@ -101,7 +108,7 @@ public class Aetheria extends DarkCubePlugin {
         instance.getCommand("setcor").setExecutor(new SetCorCommand(corManager));
         instance.getCommand("addcor").setExecutor(new AddCorCommand(corManager));
         instance.getCommand("mycor").setExecutor(new MyCorCommand(corManager));
-        instance.getCommand("resetdurability").setExecutor(new ResetDurabilityCommand(customSwordManager));
+        instance.getCommand("resetdurability").setExecutor(new ResetDurabilityCommand(customSwordManager, customAxeManager, customChestplateManager, customPickaxeManager));
         instance.getCommand("spawnupgrader").setExecutor(new SpawnUpgraderCommand(this));
         instance.getCommand("additemlevel").setExecutor(new AddItemLevelCommand(this));
         instance.getCommand("gm").setExecutor(new GMCommand());
@@ -151,9 +158,16 @@ public class Aetheria extends DarkCubePlugin {
 
         actionBarUtil = new ActionBarUtil(this, healthManager, levelXPManager);
 
-        this.getServer().getPluginManager().registerEvents(skillsCommand, this);
-        this.getServer().getPluginManager().registerEvents(customChestplateManager, this);
         this.getServer().getPluginManager().registerEvents(new CustomSwordManager(this), this);
+        this.getServer().getPluginManager().registerEvents(new CustomPickaxeManager(this), this);
+        this.getServer().getPluginManager().registerEvents(new CustomChestplateManager(this), this);
+        this.getServer().getPluginManager().registerEvents(new CustomAxeManager(this), this);
+
+        this.getServer().getPluginManager().registerEvents(new TeleportManager(this), this);
+        this.getCommand("myitemdurability").setExecutor(new MyItemDurabilityCommand(customPickaxeManager));
+        this.getCommand("myitemlevel").setExecutor(new ItemLevelCommand(customSwordManager));
+        this.getServer().getPluginManager().registerEvents(customChestplateManager, this);
+        this.getServer().getPluginManager().registerEvents(skillsCommand, this);
         this.getServer().getPluginManager().registerEvents(new SkillClickListener(skillManager), this);
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this::updateScoreboardsForAllOnlinePlayers, 0L, 90000L);
         this.getServer().getPluginManager().registerEvents(damageManager, this);
@@ -221,6 +235,14 @@ public class Aetheria extends DarkCubePlugin {
 
     public CustomSwordManager customSwordManager() {
         return customSwordManager;
+    }
+
+    public CustomPickaxeManager customPickaxeManager() {
+        return customPickaxeManager;
+    }
+
+    public CustomAxeManager customAxeManager() {
+        return customAxeManager;
     }
 
     public CustomChestplateManager customChestplateManager() {
