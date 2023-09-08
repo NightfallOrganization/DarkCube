@@ -9,6 +9,7 @@ import org.gradle.api.internal.file.FileOperations
 plugins {
     `java-library`
     id("token-replacement")
+    id("darkcube-parent")
 }
 
 abstract class SetupLibrariesTask : DefaultTask() {
@@ -67,8 +68,11 @@ tasks {
     jar {
         manifest {
             attributes["Main-Class"] = "eu.darkcube.system.minestom.server.Start"
-            attributes["Classpath"] = configurations.runtimeClasspath.get().files.joinToString(separator = " ") { "libraries/" + it.name }
+            attributes["Class-Path"] = configurations.runtimeClasspath.get().files.joinToString(separator = " ") { "libraries/" + it.name }
         }
+    }
+    uploadArtifact {
+        dependsOn(jar)
     }
     assemble {
         dependsOn(setupLibraries)
@@ -76,5 +80,12 @@ tasks {
 }
 
 dependencies {
-    implementation(libs.minestom)
+    compileOnly("space.vectrix.flare:flare-fastutil:2.0.1")
+    compileOnly("org.jctools:jctools-core:4.0.1")
+    compileOnlyApi(projects.darkcubesystem.server) {
+        exclude("org.jetbrains", "annotations")
+    }
+    implementation(libs.minestom) {
+        exclude("org.jetbrains", "annotations")
+    }
 }

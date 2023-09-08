@@ -14,6 +14,12 @@ repositories {
     gradlePluginPortal()
 }
 
+dependencies {
+    implementation("com.github.mwiede:jsch:0.2.11")
+    implementation("net.java.dev.jna:jna:4.5.0")
+    implementation("net.java.dev.jna:jna-platform:5.13.0")
+}
+
 gradlePlugin {
     plugins {
         register("glyphWidthLoader") {
@@ -23,6 +29,10 @@ gradlePlugin {
         register("tokenReplacement") {
             id = "token-replacement"
             implementationClass = "TokenReplacementPlugin"
+        }
+        register("darkcubeParent") {
+            id = "darkcube-parent"
+            implementationClass = "DarkCubeParent"
         }
     }
 }
