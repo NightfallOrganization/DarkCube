@@ -7,25 +7,21 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.CopySpec
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.internal.file.copy.CopySpecInternal
 import org.gradle.api.internal.file.copy.DefaultCopySpec
 import org.gradle.api.internal.file.copy.DestinationRootCopySpec
-import org.gradle.api.plugins.JavaBasePlugin
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.AbstractCopyTask
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.compile.AbstractCompile
-import org.gradle.kotlin.dsl.add
+import org.gradle.internal.logging.services.LoggingServiceRegistry
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
-import org.gradle.tooling.model.SourceDirectory
+import java.io.ByteArrayOutputStream
+import java.io.FilterOutputStream
+import java.io.PrintStream
+import java.nio.charset.StandardCharsets
 
 class TokenReplacementPlugin : Plugin<Project> {
     override fun apply(project: Project) {

@@ -7,23 +7,21 @@
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.impldep.org.apache.commons.io.file.Counters
 import org.gradle.internal.impldep.org.apache.commons.io.file.DeletingPathVisitor
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.concurrent.Callable
-import java.util.function.Supplier
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.io.path.name
-import kotlin.io.path.relativeTo
 
 @CacheableTask
 abstract class TokenReplacement : DefaultTask() {
@@ -33,6 +31,8 @@ abstract class TokenReplacement : DefaultTask() {
 
     @get: Inject
     internal abstract val fileSystemOperations: FileSystemOperations
+
+    private val loggingReplacements = HashMap<String, String>()
 
     @Nested
     val sources = LinkedSourceDirectories()
@@ -45,13 +45,14 @@ abstract class TokenReplacement : DefaultTask() {
 
     @TaskAction
     fun run(inputChanges: InputChanges) {
-        val outputFile = output.asFile.get()
-        if (!outputFile.exists()) outputFile.mkdirs()
         sources.forEach { node ->
+            val name = node.tree.dir.path
+            loggingReplacements[output.asFile.get().path] = name
             if (!Files.exists(node.tree.dir.toPath())) return@forEach
             inputChanges.getFileChanges(node.files).forEach {
-                val dest = destination(it.file.toPath(), node.tree.dir.toPath()).get().asFile.toPath()
                 val file = it.file.toPath()
+                val relative = node.tree.dir.toPath().relativize(file)
+                val dest = output.file(relative.toString()).get().asFile.toPath()
                 rewrite(file, dest, it.changeType)
             }
         }
@@ -61,14 +62,6 @@ abstract class TokenReplacement : DefaultTask() {
         for (srcDirTree in sourceDirectorySet.srcDirTrees) {
             sources.add(project.files(srcDirTree), srcDirTree, srcDirTree.patterns.includes, srcDirTree.patterns.excludes)
         }
-    }
-
-    private fun destination(file: Path, base: Path): Provider<RegularFile> {
-        return output.file(relative(file, base).toString())
-    }
-
-    private fun relative(file: Path, base: Path): Path {
-        return file.relativeTo(base)
     }
 
     private fun work(file: Path, dest: Path) {

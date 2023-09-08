@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 public class WoolBattleMinestom {
 
@@ -60,7 +61,10 @@ public class WoolBattleMinestom {
 //
 //        MinecraftServer.getBiomeManager().addBiome(customBiome);
 //
-        DimensionType dimensionType = DimensionType.builder(NamespaceID.from("woolbattle", "dimension")).ambientLight(2.0F).fixedTime(6000L)
+        DimensionType dimensionType = DimensionType
+                .builder(NamespaceID.from("woolbattle", "woolbattle"))
+                .ambientLight(2.0F)
+                .fixedTime(6000L)
 //                .skylightEnabled(false)
 //                .ceilingEnabled(true)
                 .build();
@@ -73,6 +77,7 @@ public class WoolBattleMinestom {
 //        instanceContainer.enableAutoChunkLoad(false);
 
         instanceContainer.setGenerator(unit -> {
+            LockSupport.parkNanos(100);
             unit.modifier().fillBiome(customBiome);
             unit.modifier().fillHeight(0, 100, Block.STONE);
         });
@@ -137,7 +142,7 @@ public class WoolBattleMinestom {
         });
         Command loadedCommand = new Command("loadedchunks");
         loadedCommand.setDefaultExecutor((sender, context) -> {
-            sender.sendMessage(loaded.get() + "");
+            sender.sendMessage(loaded.get() + " " + playerloaded.get());
         });
         MinecraftServer.getCommandManager().register(loadedCommand);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
