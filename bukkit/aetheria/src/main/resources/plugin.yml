@@ -132,8 +132,11 @@ commands:
   myitemdurability:
     description: Zeigt die Durability des Items im Hauptslot des Spielers an
     permission: aetheria.myitemdurability.use
+  openinventory:
+    description: Öffnet angegebene Inventare
+    permission: aetheria.openinventory.use
 
-    default: op
+
   aetheria.heal.use:
     default: op
   aetheria.day.use:
@@ -218,3 +221,5 @@ commands:
     default: not op
   aetheria.myitemdurability.use:
     default: not op
+  aetheria.openinventory.use:
+    default: op

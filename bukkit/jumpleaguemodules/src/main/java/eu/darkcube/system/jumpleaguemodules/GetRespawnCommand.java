@@ -25,7 +25,7 @@ public class GetRespawnCommand implements CommandExecutor {
         Player player = (Player) sender;
         ItemStack respawnItem = CustomItem.getRespawnItem();
         player.getInventory().addItem(respawnItem);
-        player.sendMessage("You have received a Respawn item!");
+        player.sendMessage("§7Du hast einen §6Respawn §7erhalten!");
 
         return true;
     }

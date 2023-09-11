@@ -17,7 +17,7 @@ public class CustomItem implements Listener {
     public static ItemStack getRespawnItem() {
         ItemStack item = new ItemStack(Material.GOLD_PLATE);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Respawn");
+        meta.setDisplayName("§6Respawn");
         item.setItemMeta(meta);
         return item;
     }
