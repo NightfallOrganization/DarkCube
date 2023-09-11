@@ -8,9 +8,9 @@
 package eu.darkcube.system.minestom.server;
 
 import eu.darkcube.system.minestom.server.instance.DataManager2D;
+import eu.darkcube.system.minestom.server.util.ConcurrentLinkedDeque;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.longs.LongLists;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
@@ -21,11 +21,77 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 
 public class Test {
     public static void main(String[] args) {
+        test1();
+    }
+
+    public static void test2() {
+        var deque = new ConcurrentLinkedDeque<Integer>();
+        System.out.println("Started");
+        ExecutorService s = Executors.newWorkStealingPool();
+        final int allocs = 3_000_000;
+        AtomicInteger size = new AtomicInteger();
+        Runnable filler = () -> {
+            for (int i = 0; i < allocs; i++) {
+                deque.offerLast(i);
+                size.incrementAndGet();
+//                LockSupport.parkNanos(10);
+            }
+        };
+        ConcurrentLinkedDeque.Node<?>[] nodes = new ConcurrentLinkedDeque.Node[100000];
+        CompletableFuture.runAsync(() -> {
+            for (int i = 0; i < nodes.length; i++) {
+                nodes[i] = deque.offerLast(i);
+                size.incrementAndGet();
+            }
+        }, s).join();
+        int fillers = 3;
+        AtomicLong time1 = new AtomicLong(System.nanoTime());
+        CompletableFuture<?>[] futs = new CompletableFuture[fillers];
+        for (int i = 0; i < fillers; i++) {
+            futs[i] = CompletableFuture.runAsync(filler, s);
+        }
+        CompletableFuture.allOf(futs).join();
+        final int total = fillers * allocs;
+        System.out.println(size.intValue());
+
+        System.out.println(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time1.longValue()));
+        time1.set(System.nanoTime());
+        CompletableFuture.runAsync(() -> {
+            for (ConcurrentLinkedDeque.Node<?> node : nodes) {
+                node.unlink();
+                size.decrementAndGet();
+            }
+        }, s).join();
+        System.out.println(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time1.longValue()));
+        time1.set(System.nanoTime());
+        System.out.println(size.intValue());
+        s.submit(() -> {
+            int count = 0;
+            Integer i;
+            while ((i = deque.pollFirst()) != null || count != total) {
+                count++;
+            }
+            System.out.println(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time1.longValue()));
+            s.shutdown();
+        });
+        try {
+            s.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void test1() {
         var frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(400, 400);
