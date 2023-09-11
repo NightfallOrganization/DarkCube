@@ -48,6 +48,18 @@ public class CustomItemListener implements Listener {
         }
     }
 
+    private boolean hasResetItem(Player player) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.INK_SACK && item.getDurability() == 1) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null && "§cReset".equals(meta.getDisplayName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.PHYSICAL && event.getClickedBlock().getType() == Material.GOLD_PLATE) {
@@ -56,11 +68,14 @@ public class CustomItemListener implements Listener {
 
             String lastPlate = lastSteppedOnPlate.get(player.getUniqueId());
 
-            ItemStack resetDye = new ItemStack(Material.INK_SACK, 1, (short) 1);
-            ItemMeta dyeMeta = resetDye.getItemMeta();
-            dyeMeta.setDisplayName("§cReset");
-            resetDye.setItemMeta(dyeMeta);
-            player.getInventory().setItem(0, resetDye);
+            // Wenn der Spieler das Reset-Item nicht hat, füge es seinem Inventar hinzu
+            if (!hasResetItem(player)) {
+                ItemStack resetDye = new ItemStack(Material.INK_SACK, 1, (short) 1);
+                ItemMeta dyeMeta = resetDye.getItemMeta();
+                dyeMeta.setDisplayName("§cReset");
+                resetDye.setItemMeta(dyeMeta);
+                player.getInventory().setItem(0, resetDye);
+            }
 
             if (lastPlate == null || !lastPlate.equals(currentPlate)) {
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
@@ -87,6 +102,8 @@ public class CustomItemListener implements Listener {
                     Location lastPlateLocation = Main.respawnLocations.get(player.getUniqueId());
                     if (lastPlateLocation != null) {
                         player.teleport(lastPlateLocation);
+                        // Spielen Sie den Villager Schaden Sound ab
+                        player.playSound(player.getLocation(), Sound.VILLAGER_HIT, 1.0F, 0.8F);
                     }
                 }
             }
@@ -103,6 +120,7 @@ public class CustomItemListener implements Listener {
             Location respawnLocation = Main.respawnLocations.get(player.getUniqueId());
             if (respawnLocation != null) {
                 player.teleport(respawnLocation);
+                player.playSound(player.getLocation(), Sound.VILLAGER_HIT, 1.0F, 0.8F);
             }
         }
     }
