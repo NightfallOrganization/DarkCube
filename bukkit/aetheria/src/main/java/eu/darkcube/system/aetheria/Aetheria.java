@@ -9,6 +9,7 @@ package eu.darkcube.system.aetheria;
 
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.aetheria.commands.*;
+import eu.darkcube.system.aetheria.inventorys.UpgraderInventory;
 import eu.darkcube.system.aetheria.items.CustomAxeManager;
 import eu.darkcube.system.aetheria.items.CustomChestplateManager;
 import eu.darkcube.system.aetheria.items.CustomPickaxeManager;
@@ -88,6 +89,7 @@ public class Aetheria extends DarkCubePlugin {
         corManager = new CorManager(this);
         scoreboardManager = new ScoreboardManager(this, levelXPManager, corManager);
         SkillsCommand skillsCommand = new SkillsCommand(skillManager);
+        UpgraderInventory upgraderInventory = new UpgraderInventory();
 
         customSwordManager = new CustomSwordManager(this);
         customChestplateManager = new CustomChestplateManager(this);
@@ -98,6 +100,7 @@ public class Aetheria extends DarkCubePlugin {
         damageManager = new DamageManager(this);
         this.schadensAnzeige = new SchadensAnzeige();
 
+        instance.getCommand("openinventory").setExecutor(new OpenInventoryCommand(upgraderInventory));
         instance.getCommand("skills").setExecutor(new SkillsCommand(skillManager));
         instance.getCommand("useskillslot").setExecutor(new UseSkillSlotCommand(skillManager));
         instance.getCommand("useskill").setExecutor(new UseSkillCommand(skillManager));
@@ -163,7 +166,8 @@ public class Aetheria extends DarkCubePlugin {
         this.getServer().getPluginManager().registerEvents(new CustomChestplateManager(this), this);
         this.getServer().getPluginManager().registerEvents(new CustomAxeManager(this), this);
 
-        this.getServer().getPluginManager().registerEvents(new TeleportManager(this), this);
+        this.getServer().getPluginManager().registerEvents(upgraderInventory, this);
+ //       this.getServer().getPluginManager().registerEvents(new TeleportManager(this), this);
         this.getCommand("myitemdurability").setExecutor(new MyItemDurabilityCommand(customPickaxeManager));
         this.getCommand("myitemlevel").setExecutor(new ItemLevelCommand(customSwordManager));
         this.getServer().getPluginManager().registerEvents(customChestplateManager, this);

@@ -1,0 +1,10 @@
+main: eu.darkcube.system.woolbattleteamfight.Main
+name: WoolBattleTeamfight
+author: EliteDarkness
+version: 1.0
+api-version: 1.8
+depend: [System]
+commands:
+  getrespawn:
+    description: Get a respawn item
+    usage: /getrespawn

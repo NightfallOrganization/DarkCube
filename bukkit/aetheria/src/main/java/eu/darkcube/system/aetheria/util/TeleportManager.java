@@ -14,6 +14,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,19 +26,83 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TeleportManager implements Listener {
 
     private final Aetheria plugin;
     private final HashMap<Location, Inventory> teleportInventories = new HashMap<>();
+    private File dataFile;
+    private YamlConfiguration yamlConfig;
 
     public TeleportManager(Aetheria plugin) {
         this.plugin = plugin;
+        this.dataFile = new File(plugin.getDataFolder(), "teleporters.yml");
+        if (!dataFile.exists()) {
+            try {
+                dataFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        this.yamlConfig = YamlConfiguration.loadConfiguration(dataFile);
+        loadTeleporters();
+    }
+
+    private void saveTeleporters() {
+        ConfigurationSection teleportersSection = yamlConfig.createSection("teleporters");
+        for (Map.Entry<Location, Inventory> entry : teleportInventories.entrySet()) {
+            String locStr = entry.getKey().toString();
+            teleportersSection.set(locStr, entry.getValue().getContents());
+        }
+
+        try {
+            yamlConfig.save(dataFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void loadTeleporters() {
+        ConfigurationSection teleportersSection = yamlConfig.getConfigurationSection("teleporters");
+        if (teleportersSection != null) {
+            for (String key : teleportersSection.getKeys(false)) {
+                Location loc = Location.deserialize(StringToMap(key));
+                ItemStack[] items = (ItemStack[]) teleportersSection.getList(key).toArray(new ItemStack[0]);
+                Inventory inv = Bukkit.createInventory(null, 45, ChatColor.WHITE + "\udaff\udfefⲊ");
+                inv.setContents(items);
+                teleportInventories.put(loc, inv);
+            }
+        }
+    }
+
+    private void updateTeleportMenu() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Inventory openInv = player.getOpenInventory().getTopInventory();
+            if (openInv != null && openInv.getHolder() instanceof InventoryView && ((InventoryView) openInv.getHolder()).getTitle().equals(ChatColor.WHITE + "\udaff\udfefⲊ")) {
+                openTeleportMenu(player);
+            }
+        }
+    }
+
+
+    private Map<String, Object> StringToMap(String str) {
+        String[] entries = str.substring(1, str.length() - 1).split(",");
+        Map<String, Object> map = new HashMap<>();
+        for (String entry : entries) {
+            String[] split = entry.split("=");
+            map.put(split[0].trim(), split[1].trim());
+        }
+        return map;
     }
 
     public static ItemStack getTeleportCatalyst() {
@@ -156,43 +222,34 @@ public class TeleportManager implements Listener {
     }
 
 
-    private void removeTeleportCatalystFromInventories(Location removedLocation) {
-        int locationHashCode = removedLocation.hashCode();
-
-        for (Inventory inv : teleportInventories.values()) {
-            for (ItemStack item : inv.getContents()) {
-                if (item != null && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() && item.getItemMeta().getCustomModelData() == locationHashCode) {
-                    inv.remove(item);
-                    break;
-                }
-            }
-        }
-    }
-
-
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.getItemInHand().isSimilar(getTeleportCatalyst())) {
             event.getBlockPlaced().setMetadata("TeleportCatalyst", new FixedMetadataValue(plugin, true));
-            teleportInventories.put(event.getBlockPlaced().getLocation(), null);
+
+            // Erstellen Sie das Inventory hier:
+            Inventory newTeleportInventory = Bukkit.createInventory(null, 45, ChatColor.WHITE + "\udaff\udfefⲊ");
+            teleportInventories.put(event.getBlockPlaced().getLocation(), newTeleportInventory);
+
+            saveTeleporters();
         } else if (event.getItemInHand().isSimilar(getManaStone())) {
             event.getBlockPlaced().setMetadata("ManaStone", new FixedMetadataValue(plugin, true));
 
         } else if (event.getItemInHand().isSimilar(getManaStairs())) {
             event.getBlockPlaced().setMetadata("ManaStairs", new FixedMetadataValue(plugin, true));
         }
+        updateTeleportMenu();
     }
+
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Player player = event.getPlayer();
-
         if (block.getType() == Material.PURPUR_PILLAR && block.hasMetadata("TeleportCatalyst")) {
-            // Entfernt den Teleport Catalyst aus den Inventaren
             teleportInventories.remove(block.getLocation());
-
+            saveTeleporters();
             event.setDropItems(false);
             player.getWorld().dropItemNaturally(block.getLocation(), getTeleportCatalyst());
 
@@ -204,6 +261,7 @@ public class TeleportManager implements Listener {
             event.setDropItems(false);
             player.getWorld().dropItemNaturally(block.getLocation(), getManaStairs());
         }
+        updateTeleportMenu();
     }
 
     private Inventory getOrCreateTeleportMenu(Player player) {
