@@ -44,6 +44,7 @@ public class Lobby extends Plugin {
 
     private static Lobby instance;
     private ServiceRegistry serviceRegistry = InjectionLayer.boot().instance(ServiceRegistry.class);
+    private CloudServiceProvider cloudServiceProvider = InjectionLayer.boot().instance(CloudServiceProvider.class);
     private DataManager dataManager;
     private NPCManagement npcManagement;
     private NPCManagement.NPC woolbattleNpc;
@@ -259,7 +260,7 @@ public class Lobby extends Plugin {
     }
 
     public CloudServiceProvider cloudServiceProvider() {
-        return serviceRegistry.firstProvider(CloudServiceProvider.class);
+        return cloudServiceProvider;
     }
 
     @Override public String getCommandPrefix() {
