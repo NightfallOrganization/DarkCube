@@ -90,7 +90,7 @@ public interface ServerInformation {
         }
 
         private int comparePlayers(ServerInformation o1, ServerInformation o2) {
-            int c = Integer.compare(o1.onlinePlayers(), o2.onlinePlayers());
+            int c = -Integer.compare(o1.onlinePlayers(), o2.onlinePlayers());
             if (c != 0) return c;
             return Integer.compare(o1.maxPlayers(), o2.maxPlayers());
         }
