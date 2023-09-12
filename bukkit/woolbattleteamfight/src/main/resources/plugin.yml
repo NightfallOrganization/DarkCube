@@ -4,7 +4,16 @@ author: EliteDarkness
 version: 1.0
 api-version: 1.8
 depend: [System]
+
 commands:
-  getrespawn:
-    description: Get a respawn item
-    usage: /getrespawn
+  timer:
+    description: Setzt den Lobby Timer
+    permission: woolbattleteamfight.timer.use
+  start:
+    description: Starte das Spiel
+    permission: woolbattleteamfight.start.use
+
+  woolbattleteamfight.timer.use:
+    default: op
+  woolbattleteamfight.start.use:
+    default: op
