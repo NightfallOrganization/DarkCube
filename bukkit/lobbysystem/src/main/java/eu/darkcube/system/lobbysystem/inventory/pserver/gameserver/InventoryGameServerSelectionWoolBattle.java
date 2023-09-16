@@ -29,7 +29,7 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
     public static class Func implements BiFunction<User, RegistryEntry, ItemBuilder> {
 
         @Override public ItemBuilder apply(User user, RegistryEntry t) {
-            var display = t.taskName() + "-" + t.data();
+            var display = t.data();
             return ItemBuilder.item(Item.GAMESERVER_WOOLBATTLE.getItem(user, display));
         }
 
