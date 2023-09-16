@@ -10,9 +10,9 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem.pserver.registry;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 
-public class CommandListEntries extends LobbyCommandExecutor {
+public class CommandListEntries extends LobbyCommand {
     public CommandListEntries(Lobby lobby) {
         super("listEntries", b -> b.executes(ctx -> {
             var entries = lobby.gameRegistry().entries();
