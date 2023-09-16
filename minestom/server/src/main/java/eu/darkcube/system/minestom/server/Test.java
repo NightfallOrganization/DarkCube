@@ -94,17 +94,17 @@ public class Test {
     public static void test1() {
         var frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(400, 400);
+        frame.setSize(800, 800);
         frame.setLocation(400, 250);
 
-        var image = new BufferedImage(100, 100, BufferedImage.OPAQUE);
+        var image = new BufferedImage(200, 200, BufferedImage.OPAQUE);
         int rgb = 0xFFFFFF;
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 image.setRGB(x, y, rgb);
             }
         }
-        var icon = new ImageIcon(image.getScaledInstance(400, 400, BufferedImage.SCALE_FAST));
+        var icon = new ImageIcon(image.getScaledInstance(800, 800, BufferedImage.SCALE_FAST));
         var label = new JLabel(icon);
         frame.add(label);
         LongSet l = LongSets.synchronize(new LongOpenHashSet());
@@ -128,7 +128,7 @@ public class Test {
 
             private void work0() {
                 synchronized (image) {
-                    icon.setImage(image.getScaledInstance(400, 400, BufferedImage.SCALE_FAST));
+                    icon.setImage(image.getScaledInstance(800, 800, BufferedImage.SCALE_FAST));
                 }
                 frame.repaint();
                 if (again) {
@@ -153,7 +153,7 @@ public class Test {
             int distYSq = distY * distY;
             return Integer.MAX_VALUE - distXSq - distYSq;
         }, (x, y, data) -> {
-            if (x < 0 || x >= 100 || y < 0 || y >= 100) return;
+            if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) return;
             long lo = ChunkUtils.getChunkIndex(x, y);
             if (!l.add(lo)) System.out.println("Duplicate");
             synchronized (image) {
@@ -161,7 +161,7 @@ public class Test {
             }
             redraw.run();
         }, (x, y, data) -> {
-            if (x < 0 || x >= 100 || y < 0 || y >= 100) return;
+            if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) return;
             if (!l.remove(ChunkUtils.getChunkIndex(x, y))) System.out.println("INvalid remove");
             synchronized (image) {
                 image.setRGB(x, y, 0xFFFFFF);
