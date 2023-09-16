@@ -17,6 +17,10 @@ public interface CommandExecutor extends Audience {
         this.sendMessage(message.getMessage(this, components));
     }
 
+    default void sendActionBar(BaseMessage message, Object... components) {
+        this.sendActionBar(message.getMessage(this, components));
+    }
+
     /**
      * @deprecated {@link #language()}
      */
