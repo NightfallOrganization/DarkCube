@@ -24,8 +24,10 @@ import eu.cloudnetservice.driver.provider.CloudServiceProvider;
 import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import eu.cloudnetservice.driver.service.ServiceLifeCycle;
 import eu.darkcube.system.DarkCubeServiceProperty;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.pserver.common.PServerExecutor;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Duration;
@@ -71,6 +73,24 @@ public class ServerManager {
 
     public Collection<? extends ServerInformation> informations() {
         return Collections.unmodifiableCollection(mergedInformations.values());
+    }
+
+    public @NotNull CompletableFuture<@Nullable ServerInformation> forPServer(PServerExecutor pserver) {
+        return pserver.serverName().thenCompose(serverName -> {
+            var fut = new CompletableFuture<ServerInformation>();
+            new BukkitRunnable() {
+                @Override public void run() {
+                    for (DefaultServerInformation information : mergedInformations.values()) {
+                        if (information.snapshot.name().equals(serverName)) {
+                            fut.complete(information);
+                            return;
+                        }
+                    }
+                    fut.complete(null);
+                }
+            }.runTask(lobby);
+            return fut;
+        });
     }
 
     private void triggerUpdate() {

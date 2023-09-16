@@ -119,11 +119,16 @@ public class PServerModule extends DriverModule {
         handlerGroup.registerHandler(PacketSet.class, new HandlerSet());
         handlerGroup.registerHandler(PacketSetIfNotPresent.class, new HandlerSetIfNotPresent());
         handlerGroup.registerHandler(PacketStoreToDocument.class, new HandlerStoreToDocument());
+        handlerGroup.registerHandler(PacketRegisteredPServers.class, new HandlerRegisteredPServers());
 
         PacketAPI.getInstance().registerGroup(handlerGroup);
 
         eventManager.registerListener((PServerModule.getInstance().listener = new Listener()));
         commandProvider.register(CommandPServers.class);
+    }
+
+    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED) public void stop() {
+        NodePServerProvider.instance().cleanup();
     }
 
     private void invalidateCompiledDeploymentExclusions() {

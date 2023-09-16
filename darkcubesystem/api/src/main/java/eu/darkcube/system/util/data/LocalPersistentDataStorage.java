@@ -12,12 +12,14 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public class LocalPersistentDataStorage implements PersistentDataStorage {
-    protected final ReadWriteLock lock = new ReentrantReadWriteLock(false);
+    protected final ReadWriteLock lock = new ReentrantReadWriteLock();
     protected final Map<Key, Object> cache = new HashMap<>();
     protected final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
     protected final Document.Mutable data = Document.newJsonDocument();
@@ -29,10 +31,10 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
                 cache.remove(Key.fromString(key));
             }
             data.append(document);
-            notifyNotifiers();
         } finally {
             lock.writeLock().unlock();
         }
+        notifyNotifiers();
     }
 
     @Override public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
@@ -53,9 +55,9 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
     }
 
     @Override public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+        data = type.clone(data);
         try {
             lock.writeLock().lock();
-            data = type.clone(data);
             if (cache.containsKey(key) && cache.get(key).equals(data)) {
                 return;
             }
@@ -74,7 +76,7 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
             if (!data.contains(key.toString())) {
                 return null;
             }
-            T old = (T) cache.remove(key);
+            var old = (T) cache.remove(key);
             if (old == null) {
                 old = type.deserialize(data, key.toString());
             }
@@ -91,7 +93,11 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                return type.clone((T) cache.get(key));
+                try {
+                    return type.clone((T) cache.get(key));
+                } catch (ClassCastException ex) {
+                    // TODO Corrupt cache. This happens when the PServer uses its unsafe modify strategy
+                }
             }
         } finally {
             lock.readLock().unlock();
@@ -99,12 +105,16 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                return type.clone((T) cache.get(key));
+                try {
+                    return type.clone((T) cache.get(key));
+                } catch (ClassCastException ex) {
+                    // TODO Corrupt cache. This happens when the PServer uses its unsafe modify strategy
+                }
             }
             if (!data.contains(key.toString())) {
                 return null;
             }
-            T value = type.clone(type.deserialize(data, key.toString()));
+            var value = type.clone(type.deserialize(data, key.toString()));
             cache.put(key, value);
             return type.clone(value);
         } finally {
@@ -116,7 +126,11 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
-                return type.clone((T) cache.get(key));
+                try {
+                    return type.clone((T) cache.get(key));
+                } catch (ClassCastException ex) {
+                    // TODO Corrupt cache. This happens when the PServer uses its unsafe modify strategy
+                }
             }
         } finally {
             lock.readLock().unlock();
@@ -125,14 +139,18 @@ public class LocalPersistentDataStorage implements PersistentDataStorage {
         try {
             lock.writeLock().lock();
             if (cache.containsKey(key)) {
-                return type.clone((T) cache.get(key));
+                try {
+                    return type.clone((T) cache.get(key));
+                } catch (ClassCastException ex) {
+                    // TODO Corrupt cache. This happens when the PServer uses its unsafe modify strategy
+                }
             }
             if (data.contains(key.toString())) {
-                T value = type.clone(type.deserialize(data, key.toString()));
+                var value = type.clone(type.deserialize(data, key.toString()));
                 cache.put(key, value);
                 return type.clone(value);
             }
-            T val = type.clone(defaultValue.get());
+            var val = type.clone(defaultValue.get());
             type.serialize(data, key.toString(), val);
             cache.put(key, val);
             ret = val;

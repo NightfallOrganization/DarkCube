@@ -13,9 +13,11 @@ import eu.darkcube.system.pserver.common.packets.wn.storage.PacketSet;
 import eu.darkcube.system.pserver.common.packets.wn.storage.PacketSet.Response;
 
 public class HandlerSet implements PacketHandler<PacketSet> {
-	@Override
-	public Packet handle(PacketSet packet) throws Throwable {
-		NodePServerProvider.instance().pserver(packet.id()).get().storage().append(packet.data());
-		return new Response();
-	}
+    @Override public Packet handle(PacketSet packet) {
+//        NodePServerProvider.instance().pserver(packet.id()).thenAccept(ps -> {
+//            ps.storage().append(packet.data());
+//        }).join();
+        NodePServerProvider.instance().pserver(packet.id()).join().storage().append(packet.data());
+        return new Response();
+    }
 }

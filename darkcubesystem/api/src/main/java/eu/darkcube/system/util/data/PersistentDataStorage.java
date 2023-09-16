@@ -85,7 +85,7 @@ public interface PersistentDataStorage {
 
     /**
      * Loads all the data from a {@link Document}<br>
-     * <b>This will NOT be cleared, the data will be ADDED to the current data</b>
+     * <b>This WILL be cleared, previous data will be REMOVED</b>
      *
      * @param document the document to load the data from
      */

@@ -34,6 +34,8 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.util.GameState;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 
 import java.time.Duration;
@@ -47,8 +49,9 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     private final UpdateTask updateTask;
     private final RequestListener requestListener = new RequestListener();
     private final Cache<UUID, ConnectionRequest> connectionRequests;
+    private final boolean pserver = PServerProvider.instance().isPServer();
     private boolean fullyLoaded = false;
-    private boolean enabled = false;
+    private volatile boolean enabled = false;
 
     public LobbySystemLinkImpl(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
@@ -76,13 +79,33 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     }
 
     public void enable() {
-        if (PServerProvider.instance().isPServer()) return; // Do not enable if we are a PServer
         updateTask.runTaskTimer(50);
         fullyLoaded = false;
         InjectionLayer.boot().instance(EventManager.class).registerListener(requestListener);
         new Scheduler(woolbattle, this::setFullyLoaded).runTask();
         DarkCubeBukkit.autoConfigure(false);
+        if (pserver) {
+            var executor = PServerProvider.instance().currentPServer();
+            var doc = executor.storage().get(new Key("LobbySystem", "pserver.gameserver.service"), PersistentDataTypes.DOCUMENT);
+            if (doc != null) {
+                var protocol = doc.readDocument("protocol");
+                var data = protocol.getString("data");
+                woolbattle.lobby().loadGame(MapSize.fromString(data));
+                new Scheduler(woolbattle, this::sendIsLoaded).runTaskLater(5);
+            }
+        }
         enabled = true;
+    }
+
+    private void sendIsLoaded() {
+        ChannelMessage
+                .builder()
+                .channel("darkcube_lobbysystem")
+                .message("pserver_loaded")
+                .targetServices()
+                .buffer(DataBuf.empty())
+                .build()
+                .send();
     }
 
     public void disable() {
@@ -95,6 +118,10 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     private void setFullyLoaded() {
         fullyLoaded = true;
         update();
+    }
+
+    public boolean pserver() {
+        return pserver;
     }
 
     @Override public void update() {
@@ -200,7 +227,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
 
     private class RequestListener {
 
-        private void response(ChannelMessageSender target, UUID requestId, int status, @Nullable String message) {
+        private void responseV2(ChannelMessageSender target, UUID requestId, int status, @Nullable String message) {
             DataBuf.Mutable buffer = DataBuf.empty().writeUniqueId(requestId).writeInt(status);
             if (message != null) buffer.writeString(message);
             ChannelMessage
@@ -214,38 +241,54 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         }
 
         @EventListener public void handle(ChannelMessageReceiveEvent event) {
-            if (!event.channel().equals("darkcube_lobbysystem_v2")) return;
-            @NotNull String msg = event.message();
-            @NotNull ChannelMessageSender sender = event.sender();
+            if (event.channel().equals("darkcube_lobbysystem_v2")) handleV2(event);
+            else if (event.channel().equals("darkcube_lobbysystem")) handle_(event);
+        }
+
+        private void handle_(ChannelMessageReceiveEvent event) {
+            var msg = event.message();
+            if (msg.equals("send_is_loaded")) {
+                if (!enabled) return;
+                if (!PServerProvider.instance().isPServer()) return;
+                var self = PServerProvider.instance().currentPServer();
+                var id = event.content().readString();
+                if (!id.equals(self.id().toString())) return;
+                sendIsLoaded();
+            }
+        }
+
+        private void handleV2(ChannelMessageReceiveEvent event) {
+            var msg = event.message();
+            @NotNull var sender = event.sender();
             if (msg.equals("start_connection_request")) {
-                @NotNull DataBuf buffer = event.content();
-                @NotNull UUID requestId = buffer.readUniqueId();
-                @NotNull UUID playerUniqueId = buffer.readUniqueId();
-                @NotNull Document protocolDocument = buffer.readObject(Document.class);
-                @Nullable MapSize mapSize = protocolDocument.readObject("mapSize", MapSize.class);
+                @NotNull var buffer = event.content();
+                @NotNull var requestId = buffer.readUniqueId();
+                @NotNull var playerUniqueId = buffer.readUniqueId();
+                @NotNull var protocolDocument = buffer.readObject(Document.class);
+                @Nullable var mapSize = protocolDocument.readObject("mapSize", MapSize.class);
                 if (mapSize == null) {
-                    response(sender, requestId, 0, "invalid_protocol");
+                    responseV2(sender, requestId, 0, "invalid_protocol");
                     return;
                 }
-                ConnectionRequest connectionRequest = new ConnectionRequest(playerUniqueId);
+                var connectionRequest = new ConnectionRequest(playerUniqueId);
                 connectionRequests.put(requestId, connectionRequest);
-                response(sender, requestId, 1, null);
+                responseV2(sender, requestId, 1, null);
                 schedule(() -> {
                     if (!woolbattle.lobby().enabled()) {
-                        response(sender, requestId, 0, "out_of_date");
+                        responseV2(sender, requestId, 0, "out_of_date");
                         return;
                     }
                     @Nullable MapSize loadedMapSize = woolbattle.gameData().mapSize();
                     if (loadedMapSize != null) {
                         if (!loadedMapSize.equals(mapSize)) {
-                            response(sender, requestId, 0, "out_of_date");
+                            responseV2(sender, requestId, 0, "out_of_date");
                             return;
                         }
                         // Game is already loaded with the MapSize. Only joining is left to do
                     } else {
                         woolbattle.lobby().loadGame(mapSize);
                     }
-                    response(sender, requestId, 2, null);
+                    responseV2(sender, requestId, 2, null);
                 });
             }
         }

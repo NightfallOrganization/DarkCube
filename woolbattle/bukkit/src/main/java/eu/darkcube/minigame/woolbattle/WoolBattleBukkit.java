@@ -45,9 +45,9 @@ public class WoolBattleBukkit extends DarkCubePlugin {
     private final Collection<MapSize> knownMapSizes = new HashSet<>();
     private final WoolBattleListeners listeners = new WoolBattleListeners(this);
     private final WoolBattleCommands commands = new WoolBattleCommands(this);
-    private final LobbySystemLinkImpl lobbySystemLink = new LobbySystemLinkImpl(this);
     public String atall;
     public String atteam;
+    private LobbySystemLinkImpl lobbySystemLink;
     private PerkRegistry perkRegistry;
     private UserModifier userModifier;
     private Lobby lobby;
@@ -90,7 +90,7 @@ public class WoolBattleBukkit extends DarkCubePlugin {
     }
 
     @Override public void onLoad() {
-
+        this.lobbySystemLink = new LobbySystemLinkImpl(this);
         LanguageHelper.load();
 
         ConvertingRuleHelper.load();

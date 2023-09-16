@@ -22,7 +22,7 @@ public class PServerUtil {
                 return mayJoin(user, pserver, true);
             }
             try {
-                if (pserver.owners().get().contains(user.user().getUniqueId())) {
+                if (pserver.owners().get().contains(user.user().uniqueId())) {
                     return mayJoin(user, pserver, true);
                 }
             } catch (InterruptedException | ExecutionException e) {

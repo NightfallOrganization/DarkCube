@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.pserver.common;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -121,7 +122,7 @@ public interface PServerExecutor {
     /**
      * @return the taskname of this pserver
      */
-    @NotNull CompletableFuture<@Nullable String> taskName();
+    @Deprecated @ApiStatus.Internal @NotNull CompletableFuture<@Nullable String> taskName();
 
     enum State {
         RUNNING, STARTING, STOPPING, OFFLINE

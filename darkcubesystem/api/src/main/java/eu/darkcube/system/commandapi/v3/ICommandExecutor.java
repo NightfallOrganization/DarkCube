@@ -8,18 +8,23 @@
 package eu.darkcube.system.commandapi.v3;
 
 import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.util.Language;
 import org.bukkit.command.CommandSender;
 
 public interface ICommandExecutor extends Audience {
 
-    static ICommandExecutor create(CommandSender sender) {
+    @Api static ICommandExecutor create(CommandSender sender) {
         return new BukkitCommandExecutor(sender);
     }
 
-    default void sendMessage(BaseMessage message, Object... components) {
+    @Api default void sendMessage(BaseMessage message, Object... components) {
         this.sendMessage(message.getMessage(this, components));
+    }
+
+    @Api default void sendActionBar(BaseMessage message, Object... components) {
+        this.sendActionBar(message.getMessage(this, components));
     }
 
     /**

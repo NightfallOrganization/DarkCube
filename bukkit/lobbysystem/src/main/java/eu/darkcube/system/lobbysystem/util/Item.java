@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.lobbysystem.util;
 
+import eu.cloudnetservice.driver.document.StandardSerialisationStyle;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -143,13 +144,11 @@ public enum Item {
     }
 
     public static Component getDisplayName(Item item, User user, Object... replacements) {
-        return user.getLanguage().getMessage(Message.KEY_PREFIX + item.getItemId(), replacements);
+        return user.language().getMessage(Message.KEY_PREFIX + item.getItemId(), replacements);
     }
 
     public static Component getLore(Item item, User user, Object... loreReplacements) {
-        return user
-                .getLanguage()
-                .getMessage(Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(), loreReplacements);
+        return user.language().getMessage(Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + item.getKey(), loreReplacements);
     }
 
     public static Item byGadget(Gadget gadget) {

@@ -6,9 +6,6 @@
  */
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
-import eu.cloudnetservice.driver.service.ServiceTask;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
@@ -19,18 +16,18 @@ import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInven
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerConfiguration;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.gameregistry.RegistryEntry;
 import eu.darkcube.system.pserver.common.PServerBuilder;
-import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -38,15 +35,16 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
     public static final String ITEMID = "pserver_gameserver";
     public static final Key SLOT = new Key(Lobby.getInstance(), "pserver.gameserver.slot");
-    public static final Key SERVICETASK = new Key(Lobby.getInstance(), "pserver.gameserver.serviceTask");
+    public static final Key SERVICE = new Key(Lobby.getInstance(), "pserver.gameserver.service");
+    public static final PersistentDataType<RegistryEntry> SERVICE_TYPE = RegistryEntry.TYPE;
     protected final int[] itemSort;
     private final Item item;
-    private final Supplier<Collection<ServiceTask>> supplier;
-    private final BiFunction<User, ServiceTask, ItemBuilder> toItemFunction;
+    private final Supplier<Collection<RegistryEntry>> supplier;
+    private final BiFunction<User, RegistryEntry, ItemBuilder> toItemFunction;
     private final User auser;
-    private boolean done = false;
+    private boolean done;
 
-    public InventoryGameServerSelection(User user, Item item, InventoryType type, Supplier<Collection<ServiceTask>> supplier, BiFunction<User, ServiceTask, ItemBuilder> toItemFunction) {
+    public InventoryGameServerSelection(User user, Item item, InventoryType type, Supplier<Collection<RegistryEntry>> supplier, BiFunction<User, RegistryEntry, ItemBuilder> toItemFunction) {
         super(type, item.getDisplayName(user), UserWrapper.fromUser(user));
         auser = user;
         this.supplier = supplier;
@@ -66,28 +64,21 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
     @Override protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
-        String itemid = Item.getItemId(event.item());
+        var itemid = Item.getItemId(event.item());
         if (itemid == null) return;
         if (itemid.equals(ITEMID)) {
             user.setOpenInventory(new InventoryLoading(getTitle(), user.user(), lobbyUser -> {
-                ServiceTask serviceTask = InjectionLayer
-                        .boot()
-                        .instance(ServiceTaskProvider.class)
-                        .serviceTask(event.item().persistentDataStorage().get(SERVICETASK, PersistentDataTypes.STRING));
-                if (serviceTask == null) return InventoryGameServerSelection.this;
-                try {
-                    PServerExecutor ps = new PServerBuilder()
-                            .type(Type.GAMEMODE)
-                            .taskName(serviceTask.name())
-                            .accessLevel(AccessLevel.PUBLIC)
-                            .create()
-                            .get();
-                    ps.addOwner(user.user().getUniqueId()).get();
-                    Thread.sleep(1000);
-                    return new InventoryPServerConfiguration(user.user(), ps.id());
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                var registryEntry = event.item().persistentDataStorage().get(SERVICE, SERVICE_TYPE);
+                if (registryEntry == null) return InventoryGameServerSelection.this;
+                var ps = new PServerBuilder()
+                        .type(Type.GAMEMODE)
+                        .taskName(registryEntry.taskName())
+                        .accessLevel(AccessLevel.PUBLIC)
+                        .create()
+                        .join();
+                ps.storage().setAsync(SERVICE, SERVICE_TYPE, registryEntry).join();
+                ps.addOwner(user.user().uniqueId()).join();
+                return new InventoryPServerConfiguration(user.user(), ps.id());
             }));
         }
     }
@@ -98,10 +89,11 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
 
     @Override protected void fillItems(Map<Integer, ItemStack> items) {
         int slot = 0;
-        Collection<ServiceTask> serviceTasks = this.supplier.get();
-        for (ServiceTask serviceTask : serviceTasks) {
-            ItemBuilder b = this.toItemFunction.apply(this.auser, serviceTask);
-            b.persistentDataStorage().set(SERVICETASK, PersistentDataTypes.STRING, serviceTask.name());
+        var serviceTasks = this.supplier.get();
+        for (var entry : serviceTasks) {
+            var b = this.toItemFunction.apply(this.auser, entry);
+
+            b.persistentDataStorage().set(SERVICE, SERVICE_TYPE, entry);
             b.persistentDataStorage().set(SLOT, PersistentDataTypes.INTEGER, slot);
             Item.setItemId(b, InventoryGameServerSelection.ITEMID);
             items.put(this.itemSort[slot % this.itemSort.length] + this.itemSort.length * (slot / this.itemSort.length), b.build());

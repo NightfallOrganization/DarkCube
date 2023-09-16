@@ -6,20 +6,16 @@
  */
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
-import eu.cloudnetservice.driver.service.ServiceTask;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.gameregistry.RegistryEntry;
 import eu.darkcube.system.userapi.User;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerSelection {
@@ -30,37 +26,25 @@ public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerS
         super(user, Item.GAMESERVER_SELECTION_WOOLBATTLE, InventoryGameServerSelectionWoolBattle.type_gameserver_selection_woolbattle, new Sup(), new Func());
     }
 
-    public static class Func implements BiFunction<User, ServiceTask, ItemBuilder> {
+    public static class Func implements BiFunction<User, RegistryEntry, ItemBuilder> {
 
-        private static final Pattern pattern = Pattern.compile("\\d");
-
-        @Override public ItemBuilder apply(User user, ServiceTask t) {
-            Matcher matcher = pattern.matcher(t.name());
-            String text;
-            if (matcher.find()) {
-                text = t.name().substring(matcher.start());
-            } else {
-                text = "Invalid Task!";
-            }
-            return ItemBuilder.item(Item.GAMESERVER_WOOLBATTLE.getItem(user, text));
+        @Override public ItemBuilder apply(User user, RegistryEntry t) {
+            var display = t.taskName() + "-" + t.data();
+            return ItemBuilder.item(Item.GAMESERVER_WOOLBATTLE.getItem(user, display));
         }
 
     }
 
-    public static class Sup implements Supplier<Collection<ServiceTask>> {
+    public static class Sup implements Supplier<Collection<RegistryEntry>> {
 
-        @Override public Collection<ServiceTask> get() {
-            ServiceTaskProvider prov = InjectionLayer.boot().instance(ServiceTaskProvider.class);
+        @Override public Collection<RegistryEntry> get() {
             return Lobby
                     .getInstance()
                     .getDataManager()
                     .getWoolBattleTasks()
                     .stream()
-                    .filter(s -> prov.serviceTask(s) != null)
-                    .map(prov::serviceTask)
-                    .collect(Collectors.toList());
+                    .flatMap(s -> Lobby.getInstance().gameRegistry().entries(s).stream())
+                    .collect(Collectors.toSet());
         }
-
     }
-
 }

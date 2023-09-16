@@ -9,11 +9,7 @@ package eu.darkcube.system.pserver.bukkit;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.common.*;
-import eu.darkcube.system.pserver.common.packets.wn.PacketCreate;
-import eu.darkcube.system.pserver.common.packets.wn.PacketExists;
-import eu.darkcube.system.pserver.common.packets.wn.PacketExists.Response;
-import eu.darkcube.system.pserver.common.packets.wn.PacketPServers;
-import eu.darkcube.system.pserver.common.packets.wn.PacketPServersByOwner;
+import eu.darkcube.system.pserver.common.packets.wn.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +28,7 @@ public class WrapperPServerProvider extends PServerProvider {
     private WrapperPServerProvider() {
     }
 
-    public static WrapperPServerProvider instance() {
+    public static @NotNull WrapperPServerProvider instance() {
         return instance;
     }
 
@@ -52,12 +48,18 @@ public class WrapperPServerProvider extends PServerProvider {
         return self;
     }
 
+    @Override public @NotNull CompletableFuture<@NotNull Collection<@NotNull UniqueId>> registeredPServers() {
+        return new PacketRegisteredPServers()
+                .sendQueryAsync(PacketRegisteredPServers.Response.class)
+                .thenApply(PacketRegisteredPServers.Response::ids);
+    }
+
     @Override public @NotNull CompletableFuture<@Nullable WrapperPServerExecutor> pserver(@NotNull UniqueId pserver) {
         return CompletableFuture.completedFuture(new WrapperPServerExecutor(pserver));
     }
 
     @Override public @NotNull CompletableFuture<@NotNull Boolean> pserverExists(@NotNull UniqueId pserver) {
-        return new PacketExists(pserver).sendQueryAsync(PacketExists.Response.class).thenApply(Response::exists);
+        return new PacketExists(pserver).sendQueryAsync(PacketExists.Response.class).thenApply(PacketExists.Response::exists);
     }
 
     @Override public CompletableFuture<WrapperPServerExecutor> createPServer(PServerBuilder builder) {

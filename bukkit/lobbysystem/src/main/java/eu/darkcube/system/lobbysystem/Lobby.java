@@ -6,6 +6,8 @@
  */
 package eu.darkcube.system.lobbysystem;
 
+import dev.derklaro.aerogel.binding.BindingBuilder;
+import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.CloudServiceProvider;
 import eu.cloudnetservice.driver.registry.ServiceRegistry;
@@ -26,6 +28,7 @@ import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.*;
+import eu.darkcube.system.lobbysystem.util.gameregistry.GameRegistry;
 import eu.darkcube.system.lobbysystem.util.server.ServerManager;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
@@ -50,6 +53,7 @@ public class Lobby extends Plugin {
     private NPCManagement.NPC woolbattleNpc;
     private NPCManagement.NPC dailyRewardNpc;
     private JaRManager jaRManager;
+    private GameRegistry gameRegistry;
     private ServerManager serverManager;
 
     public Lobby() {
@@ -73,11 +77,16 @@ public class Lobby extends Plugin {
             SkullCache.unregister();
         }
         ConnectorNPC.clear();
+
+        var eventManager = InjectionLayer.boot().instance(EventManager.class);
+        var ext = InjectionLayer.ext();
+        eventManager.unregisterListener(ext.instance(ListenerPServer.class));
     }
 
     @Override public void onEnable() {
         this.npcManagement = new NPCManagement(this);
         this.serverManager = new ServerManager(this);
+        this.gameRegistry = new GameRegistry(this);
         this.serverManager.registerListener(new ConnectorNPC.UpdateListener());
 
         UserWrapper userWrapper = new UserWrapper();
@@ -108,7 +117,7 @@ public class Lobby extends Plugin {
         this.dailyRewardNpc = DailyRewardNPC.create();
 
         CommandAPI.instance().register(new CommandBuild());
-        CommandAPI.instance().register(new CommandLobbysystem());
+        CommandAPI.instance().register(new CommandLobbysystem(this));
 
         for (World world : Bukkit.getWorlds()) {
             world.setGameRuleValue("randomTickSpeed", "0");
@@ -139,6 +148,9 @@ public class Lobby extends Plugin {
         new ListenerWeather();
         new ListenerPhysics();
         new ListenerBorder();
+
+        var eventManager = InjectionLayer.boot().instance(EventManager.class);
+        eventManager.registerListener(ListenerPServer.class);
 
         if (PServerSupport.isSupported()) {
             SkullCache.register();
@@ -174,6 +186,7 @@ public class Lobby extends Plugin {
 
     public void setupPlayer(LobbyUser user) {
         Player p = user.asPlayer();
+        if (p == null) return;
         setItems(user);
 
         DataManager dataManager = getDataManager();
@@ -225,6 +238,10 @@ public class Lobby extends Plugin {
         } else {
             inv.setItem(8, Item.JUMPANDRUN_STOP.getItem(u));
         }
+    }
+
+    public GameRegistry gameRegistry() {
+        return gameRegistry;
     }
 
     public NPCManagement npcManagement() {

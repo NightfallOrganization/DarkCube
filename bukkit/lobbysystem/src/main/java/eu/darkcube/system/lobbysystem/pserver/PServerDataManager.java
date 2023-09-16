@@ -6,16 +6,18 @@
  */
 package eu.darkcube.system.lobbysystem.pserver;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
-import eu.cloudnetservice.driver.service.ServiceTask;
+import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection;
 import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelectionWoolBattle;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.SkullCache;
+import eu.darkcube.system.lobbysystem.util.gameregistry.RegistryEntry;
 import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.pserver.common.PServerProvider;
@@ -29,14 +31,14 @@ public class PServerDataManager {
         if (pserverId != null) {
             PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
             Type type = ps.type().join();
-            String taskName = ps.taskName().join();
 
             if (type == Type.GAMEMODE) {
-                ItemBuilder b = getDisplayItemGamemode(user, taskName);
+                var entry = ps.storage().get(InventoryGameServerSelection.SERVICE, InventoryGameServerSelection.SERVICE_TYPE);
+                ItemBuilder b = getDisplayItemGamemode(user, entry);
                 b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
                 return b;
             }
-            ItemBuilder b = ItemBuilder.item(SkullCache.getCachedItem(user.getUniqueId()));
+            ItemBuilder b = ItemBuilder.item(SkullCache.getCachedItem(user.uniqueId()));
             b.displayname(Item.WORLD_PSERVER.getDisplayName(user));
             b.lore(Component.text("ID: " + pserverId).color(NamedTextColor.GRAY));
             return b;
@@ -44,18 +46,16 @@ public class PServerDataManager {
         return null;
     }
 
-    public static ItemBuilder getDisplayItemGamemode(User user, String task) {
-        if (task == null) {
-            return null;
+    public static ItemBuilder getDisplayItemGamemode(@NotNull User user, @Nullable RegistryEntry entry) {
+        if (entry == null) {
+            entry = new RegistryEntry("unknown", "unconverted", Document.newJsonDocument());
         }
-        if (Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(task)) {
-            ServiceTask stask = InjectionLayer.boot().instance(ServiceTaskProvider.class).serviceTask(task);
-            if (stask != null) {
-                return new InventoryGameServerSelectionWoolBattle.Func().apply(user, stask);
-            }
+
+        if (Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(entry.taskName())) {
+            return new InventoryGameServerSelectionWoolBattle.Func().apply(user, entry);
         }
         ItemBuilder b = ItemBuilder.item(Material.BARRIER);
-        b.displayname(Component.text("Task not found: " + task).color(NamedTextColor.RED));
+        b.displayname(Component.text("Task not found: " + entry.taskName()).color(NamedTextColor.RED));
         return b;
     }
 }

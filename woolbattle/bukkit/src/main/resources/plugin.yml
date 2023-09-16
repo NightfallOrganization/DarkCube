@@ -3,3 +3,5 @@ version: 1.0
 author: DasBabyPixel
 name: WoolBattle
 depend: [System]
+softdepend:
+  - PServer

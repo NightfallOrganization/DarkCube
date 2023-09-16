@@ -12,7 +12,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 import eu.darkcube.system.pserver.common.PServerPersistentDataStorage;
-import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.LocalPersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
@@ -25,7 +24,7 @@ import java.util.function.Supplier;
 public class PServerStorage implements PServerPersistentDataStorage {
     private final LocalPersistentDataStorage storage;
     private final NodePServerProvider provider;
-    private final UniqueId pserver;
+    private final NodePServerExecutor executor;
     private final AtomicBoolean saving = new AtomicBoolean(false);
     private final AtomicBoolean saveAgain = new AtomicBoolean(false);
     private final PersistentDataType<Document> unsafeStorageModify = new PersistentDataType<>() {
@@ -48,9 +47,10 @@ public class PServerStorage implements PServerPersistentDataStorage {
         }
     };
 
-    public PServerStorage(NodePServerProvider provider, UniqueId pserver) {
+    public PServerStorage(NodePServerProvider provider, NodePServerExecutor executor) {
         this.provider = provider;
-        this.pserver = pserver;
+        this.executor = executor;
+        var pserver = executor.id();
         storage = new LocalPersistentDataStorage();
         if (!provider.pserverData().contains(pserver.toString())) {
             provider.pserverData().insert(pserver.toString(), Document.newJsonDocument());
@@ -72,7 +72,8 @@ public class PServerStorage implements PServerPersistentDataStorage {
     }
 
     private void save0() {
-        CompletableFuture<Boolean> fut = provider.pserverData().insertAsync(pserver.toString(), storeToJsonDocument());
+        var doc = storeToJsonDocument();
+        CompletableFuture<Boolean> fut = provider.pserverData().insertAsync(executor.id().toString(), doc);
         fut.exceptionally(th -> {
             th.printStackTrace();
             return null;
@@ -140,7 +141,9 @@ public class PServerStorage implements PServerPersistentDataStorage {
     }
 
     public void append(Document document) {
+//        if (pserver.toString().startsWith("2a")) System.out.println(storage.storeToJsonDocument());
         storage.appendDocument(document);
+//        if (pserver.toString().startsWith("2a")) System.out.println(storage.storeToJsonDocument());
     }
 
     public Document remove(Key key) {

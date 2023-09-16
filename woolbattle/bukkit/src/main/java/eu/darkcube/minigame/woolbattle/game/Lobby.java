@@ -142,6 +142,7 @@ public class Lobby extends GamePhase {
         if (online != 0) return;
         woolbattle.lobbySystemLink().connectionRequests().cleanUp();
         if (!woolbattle.lobbySystemLink().connectionRequests().asMap().isEmpty()) return;
+        if (woolbattle.lobbySystemLink().pserver()) return;
         if (woolbattle.gameData().mapSize() == null) return;
         if (!enabled()) return;
         unloadGame(true);

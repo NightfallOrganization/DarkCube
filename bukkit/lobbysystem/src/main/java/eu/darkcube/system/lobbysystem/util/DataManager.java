@@ -13,16 +13,25 @@ import eu.cloudnetservice.driver.database.DatabaseProvider;
 import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection;
 import eu.darkcube.system.lobbysystem.parser.Locations;
 import eu.darkcube.system.lobbysystem.util.Border.Shape;
+import eu.darkcube.system.pserver.common.PServerExecutor;
+import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class DataManager {
 
+    private static final Key K_TASK = new Key("PServer", "task");
+    private static final PersistentDataType<String> T_TASK = PersistentDataTypes.STRING;
+    private static final Pattern WB_LEGACY_PSERVER = Pattern.compile("(?<task>woolbattle)(?<data>\\d*x\\d*)");
     private final Database database;
     private volatile Border border;
     private volatile Set<String> woolbattleTasks;
@@ -62,6 +71,29 @@ public class DataManager {
                 fetchWoolBattleTasks();
             }
         }.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60 * 2);
+    }
+
+    public static void convertPServer(PServerExecutor executor) {
+        var taskName = executor.storage().get(K_TASK, T_TASK);
+        if (taskName == null) return; // Not a GameServer
+        if (executor.storage().has(InventoryGameServerSelection.SERVICE)) return; // Already converted
+        var type = executor.type().join();
+        if (type == PServerExecutor.Type.WORLD) return;
+        var matcher = WB_LEGACY_PSERVER.matcher(taskName);
+        if (!matcher.matches()) {
+            System.err.println("Wrong pserver: " + taskName);
+            return;
+        }
+        String task = matcher.group("task");
+        String data = matcher.group("data");
+        var entry = Lobby.getInstance().gameRegistry().entry(task, data);
+        if (entry == null) {
+            System.err.println("No entry registered for " + taskName);
+            return;
+        }
+        System.out.println(executor.id() + " -> " + task + ": " + data);
+        executor.storage().setAsync(K_TASK, T_TASK, task).join();
+        executor.storage().setAsync(InventoryGameServerSelection.SERVICE, InventoryGameServerSelection.SERVICE_TYPE, entry).join();
     }
 
     public boolean isJumpAndRunEnabled() {

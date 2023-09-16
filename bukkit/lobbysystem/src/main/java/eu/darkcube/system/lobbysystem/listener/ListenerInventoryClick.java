@@ -29,23 +29,23 @@ import org.bukkit.inventory.ItemStack;
 public class ListenerInventoryClick extends BaseListener {
 
     @EventHandler public void handle(InventoryClickEvent e) {
-        Player p = (Player) e.getWhoClicked();
-        LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
+        var p = (Player) e.getWhoClicked();
+        var user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
         if (user.isBuildMode()) {
             return;
         }
         e.setCancelled(true);
-        ItemStack item = e.getCurrentItem();
+        var item = e.getCurrentItem();
         if (item == null) {
             return;
         }
-        String itemid = Item.getItemId(item);
+        var itemid = Item.getItemId(item);
         language:
         {
-            String languageId = ItemBuilder.item(item).persistentDataStorage().get(InventorySettings.language, PersistentDataTypes.STRING);
+            var languageId = ItemBuilder.item(item).persistentDataStorage().get(InventorySettings.language, PersistentDataTypes.STRING);
             if (languageId == null || languageId.isEmpty()) break language;
-            Language language = Language.fromString(languageId);
-            int i = 0;
+            var language = Language.fromString(languageId);
+            var i = 0;
             for (; i < Language.values().length; i++) {
                 if (Language.values()[i] == language) {
                     i++;
@@ -64,7 +64,7 @@ public class ListenerInventoryClick extends BaseListener {
         if (itemid == null || itemid.isEmpty()) {
             return;
         }
-        boolean close = false;
+        var close = false;
         if (itemid.equals(Item.INVENTORY_COMPASS_SPAWN.getItemId())) {
             user.teleport(Lobby.getInstance().getDataManager().getSpawn());
             close = true;
@@ -89,7 +89,7 @@ public class ListenerInventoryClick extends BaseListener {
         }
 
         // PagedInventories
-        IInventory inv = user.getOpenInventory();
+        var inv = user.getOpenInventory();
 
         if (inv instanceof InventoryConfirm cinv) {
             if (itemid.equals(Item.CONFIRM.getItemId())) {

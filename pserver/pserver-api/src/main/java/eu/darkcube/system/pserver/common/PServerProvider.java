@@ -57,6 +57,8 @@ public abstract class PServerProvider {
      */
     public abstract @NotNull PServerExecutor currentPServer() throws IllegalStateException;
 
+    public abstract @NotNull CompletableFuture<@NotNull Collection<@NotNull UniqueId>> registeredPServers();
+
     /**
      * This will get a {@link PServerExecutor} instance.
      *

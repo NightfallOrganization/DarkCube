@@ -17,10 +17,10 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
+import eu.darkcube.system.lobbysystem.listener.ListenerPServer;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.pserver.bukkit.event.PServerStopEvent;
 import eu.darkcube.system.pserver.bukkit.event.PServerUpdateEvent;
 import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
@@ -28,27 +28,24 @@ import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.AsyncExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Map;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory implements Listener {
 
     private static final InventoryType type_pserver_configuration = InventoryType.of("type_pserver_configuration");
-
     public final UniqueId pserverId;
+    private final ListenerPServer listenerPServer = InjectionLayer.ext().instance(ListenerPServer.class);
     private boolean done;
-    private volatile UUID connecting = null;
 
     public InventoryPServerConfiguration(User user, UniqueId pserverId) {
         super(type_pserver_configuration, getDisplayName(user, pserverId), user);
@@ -69,43 +66,17 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
         if (event.item() == null) return;
         String itemid = Item.getItemId(event.item());
         if (itemid == null) return;
+        var player = user.asPlayer();
+        if (player == null) return;
         if (itemid.equals(Item.PSERVER_DELETE.getItemId())) {
             user.setOpenInventory(new InventoryConfirm(getTitle(), user.user(), () -> {
                 PServerExecutor ps = PServerProvider.instance().pserver(pserverId).join();
                 ps.removeOwner(user.user().uniqueId()).join();
-                user.asPlayer().closeInventory();
+                player.closeInventory();
             }, () -> user.setOpenInventory(new InventoryPServerConfiguration(user.user(), pserverId))));
         } else if (itemid.equals(Item.START_PSERVER.getItemId())) {
-            user.asPlayer().closeInventory();
-            AsyncExecutor.service().submit(() -> {
-                if (connecting != null) return;
-                try {
-                    // TODO: Forbid player to start multiple pservers
-                    PServerExecutor ex = PServerProvider.instance().pserver(pserverId).get();
-                    connecting = user.user().uniqueId();
-                    new BukkitRunnable() {
-                        @Override public void run() {
-                            if (connecting == null) {
-                                cancel();
-                                return;
-                            }
-                            user.user().sendActionBar(Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE.getMessage(user.user()));
-                        }
-                    }.runTaskTimer(Lobby.getInstance(), 0, 10);
-                    ex.start().thenRun(() -> {
-                        ex.connectPlayer(user.user().uniqueId()).thenRun(() -> {
-                            connecting = null;
-                        });
-                    }).exceptionally(e -> {
-                        e.printStackTrace();
-                        connecting = null;
-                        return null;
-                    });
-                    //					Lobby.getInstance().getPServerJoinOnStart().register(user, ex);
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            player.closeInventory();
+            startPServer();
         } else if (itemid.equals(Item.STOP_PSERVER.getItemId())) {
             PServerProvider.instance().pserver(pserverId).thenApply(PServerExecutor::stop);
         } else if (itemid.equals(Item.PSERVER_PUBLIC.getItemId())) {
@@ -113,6 +84,60 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
         } else if (itemid.equals(Item.PSERVER_PRIVATE.getItemId())) {
             PServerProvider.instance().pserver(pserverId).thenAccept(ps -> ps.accessLevel(AccessLevel.PUBLIC));
         }
+    }
+
+    private void connectPlayer(PServerExecutor pserver) {
+        pserver.type().thenAccept(type -> listenerPServer.connectPlayer(user.user(), pserver)).whenComplete((unused, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                listenerPServer.failed(user.user());
+            }
+        });
+    }
+
+    private void startPServer() {
+
+        PServerProvider.instance().pservers(user.user().uniqueId()).thenCompose(pserverIds -> {
+            CompletableFuture<Boolean>[] futs = new CompletableFuture[pserverIds.size()];
+            int i = 0;
+            for (var id : pserverIds) {
+                futs[i++] = PServerProvider.instance().pserverExists(id);
+            }
+            return CompletableFuture.allOf(futs).thenApply(ignored -> {
+                for (CompletableFuture<Boolean> fut : futs) {
+                    if (fut.join()) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }).thenAccept(mayStart -> {
+            if (!mayStart) {
+                user.user().sendMessage(Message.MAY_NOT_START_MULTIPLE_PSERVERS);
+                return;
+            }
+            BukkitTask task = new BukkitRunnable() {
+                @Override public void run() {
+                    user.user().sendActionBar(Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE);
+                }
+            }.runTaskTimer(Lobby.getInstance(), 1, 1);
+            if (!listenerPServer.setStarted(user.user(), pserverId, fail -> task.cancel())) {
+                task.cancel();
+                return;
+            }
+            PServerProvider.instance().pserver(pserverId).thenCompose(ex -> ex.start().whenComplete((started, throwable) -> {
+                if (throwable == null && started) {
+                    connectPlayer(ex);
+                }
+            })).whenComplete((started, throwable) -> {
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                    listenerPServer.failed(user.user());
+                } else if (!started) {
+                    listenerPServer.failed(user.user());
+                }
+            });
+        });
     }
 
     @Override protected boolean done() {
@@ -154,20 +179,8 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
         InjectionLayer.boot().instance(EventManager.class).unregisterListener(this);
     }
 
-    @EventListener public void handle(PServerStopEvent event) {
-        if (event.pserver().id().equals(pserverId)) {
-            connecting = null;
-        }
-    }
-
-    @EventHandler public void handle(PlayerQuitEvent event) {
-        connecting = null;
-    }
-
     @EventListener public void handle(PServerUpdateEvent event) {
-        if (!event.pserver().id().equals(pserverId)) {
-            return;
-        }
+        if (!event.pserver().id().equals(pserverId)) return;
         this.recalculate();
     }
 }

@@ -32,11 +32,11 @@ public class Listener {
     }
 
     @EventListener public void handle(CloudServicePreLifecycleEvent e) {
-        if (e.serviceInfo().lifeCycle() == ServiceLifeCycle.RUNNING) {
+        if (e.targetLifecycle() == ServiceLifeCycle.DELETED || e.targetLifecycle() == ServiceLifeCycle.STOPPED) {
             UniqueId id = ServiceInfoUtil.getInstance().getUniqueId(e.serviceInfo());
             if (id != null) {
                 // Resources are automatically deployed because of autoDeleteOnStop
-                NodePServerProvider.instance().unload(id);
+                NodePServerProvider.instance().lifecycleStopped(id);
             }
         }
     }

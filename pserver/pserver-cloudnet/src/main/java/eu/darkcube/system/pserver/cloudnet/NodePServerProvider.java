@@ -17,7 +17,6 @@ import eu.cloudnetservice.driver.template.TemplateStorage;
 import eu.cloudnetservice.driver.template.TemplateStorageProvider;
 import eu.cloudnetservice.node.template.LocalTemplateStorage;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
 import eu.darkcube.system.pserver.common.PServerBuilder;
 import eu.darkcube.system.pserver.common.PServerExecutor;
@@ -28,24 +27,18 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 public class NodePServerProvider extends PServerProvider {
 
     public static final String pserverTaskName = "pserver";
     private static NodePServerProvider instance;
-    final ConcurrentMap<UniqueId, SoftReference<NodePServerExecutor>> weakpservers = new ConcurrentHashMap<>();
-    final ReferenceQueue<NodePServerExecutor> referenceQueue = new ReferenceQueue<>();
-    final Map<UniqueId, NodePServerExecutor> pservers = new HashMap<>();
-    final SingleThreadExecutor executor = new SingleThreadExecutor();
+    private final Map<UniqueId, Reference<? extends NodePServerExecutor>> weakPServers = new HashMap<>();
+    private final Map<Reference<? extends NodePServerExecutor>, UniqueId> weakPServersReverse = new HashMap<>();
+    private final ReferenceQueue<NodePServerExecutor> referenceQueue = new ReferenceQueue<>();
+    private final Map<UniqueId, NodePServerExecutor> pservers = new HashMap<>();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "PServerThread"));
     private final Database pserverData;
     private ServiceTask pserverTask;
     private ServiceTemplate globalTemplate;
@@ -59,20 +52,20 @@ public class NodePServerProvider extends PServerProvider {
 
         // ServiceTask
         {
-            ServiceTaskProvider serviceTaskProvider = InjectionLayer.boot().instance(ServiceTaskProvider.class);
+            var serviceTaskProvider = InjectionLayer.boot().instance(ServiceTaskProvider.class);
             if (serviceTaskProvider.serviceTask(NodePServerProvider.pserverTaskName) == null) {
-                Collection<ServiceRemoteInclusion> includes = new ArrayList<>();
-                Collection<ServiceTemplate> templates = new ArrayList<>();
-                Collection<ServiceDeployment> deployments = new ArrayList<>();
-                String runtime = "jvm";
+                var includes = new ArrayList<ServiceRemoteInclusion>();
+                var templates = new ArrayList<ServiceTemplate>();
+                var deployments = new ArrayList<ServiceDeployment>();
+                var runtime = "jvm";
                 boolean maintenance = false;
                 boolean autoDeleteOnStop = true;
                 boolean staticServices = false;
-                Document properties = Document.newJsonDocument();
-                Collection<String> associatedNodes = new ArrayList<>();
-                Collection<String> groups = new ArrayList<>();
-                Collection<String> deletedFilesAfterStop = new ArrayList<>();
-                ProcessConfiguration.Builder processConfiguration = ProcessConfiguration
+                var properties = Document.newJsonDocument();
+                var associatedNodes = new ArrayList<String>();
+                var groups = new ArrayList<String>();
+                var deletedFilesAfterStop = new ArrayList<String>();
+                var processConfiguration = ProcessConfiguration
                         .builder()
                         .environment(ServiceEnvironmentType.MINECRAFT_SERVER)
                         .maxHeapMemorySize(312)
@@ -108,7 +101,7 @@ public class NodePServerProvider extends PServerProvider {
         }
         // Groups
         {
-            GroupConfigurationProvider groupConfigurationProvider = InjectionLayer.boot().instance(GroupConfigurationProvider.class);
+            var groupConfigurationProvider = InjectionLayer.boot().instance(GroupConfigurationProvider.class);
             if (groupConfigurationProvider.groupConfiguration("pserver-global") == null) {
                 groupConfigurationProvider.addGroupConfiguration(GroupConfiguration.builder().name("pserver-global").build());
             }
@@ -118,7 +111,7 @@ public class NodePServerProvider extends PServerProvider {
         }
         // ServiceTemplates
         {
-            String name = ".global";
+            var name = ".global";
 
             this.globalTemplate = ServiceTemplate
                     .builder()
@@ -141,7 +134,7 @@ public class NodePServerProvider extends PServerProvider {
                 this.storage.create(this.worldTemplate);
             }
         }
-        DatabaseProvider databaseProvider = InjectionLayer.boot().instance(DatabaseProvider.class);
+        var databaseProvider = InjectionLayer.boot().instance(DatabaseProvider.class);
         this.pserverData = databaseProvider.database("pserver_data");
     }
 
@@ -153,31 +146,55 @@ public class NodePServerProvider extends PServerProvider {
         NodePServerProvider.instance = new NodePServerProvider();
     }
 
-    @NotNull private Thread thread() {
-        Thread th = new Thread(() -> {
-            while (true) {
-                try {
-                    Reference<? extends NodePServerExecutor> ref = referenceQueue.remove();
-                    for (UniqueId id : weakpservers.keySet()) {
-                        if (weakpservers.get(id).equals(ref)) {
-                            weakpservers.remove(id);
-                            break;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        th.setName("PServerGCHandler");
-        th.setDaemon(true);
-        return th;
+    private void putWeakPServer(NodePServerExecutor executor) {
+        var ref = new SoftReference<>(executor, referenceQueue);
+        weakPServers.put(executor.id(), ref);
+        weakPServersReverse.put(ref, executor.id());
     }
 
-    public void unload(UniqueId id) {
+    private @NotNull NodePServerExecutor pserverInternal(@NotNull UniqueId pserver) {
+        if (pservers.containsKey(pserver)) return pservers.get(pserver);
+        var ref = weakPServers.get(pserver);
+        if (ref != null) {
+            var ex = ref.get();
+            if (ex != null) return ex;
+        }
+        var ex = new NodePServerExecutor(this, pserver);
+        putWeakPServer(ex);
+        return ex;
+    }
+
+    private @NotNull NodePServerExecutor createPServerInternal(@NotNull PServerBuilder builder) {
+        var uid = NodeUniqueIdProvider.instance().newUniqueId();
+        var taskName = builder.taskName() == null ? this.pserverTask.name() : builder.taskName();
+        var ex = new NodePServerExecutor(this, uid, builder.type(), taskName);
+        ex.accessLevel(builder.accessLevel());
+        putWeakPServer(ex);
+        return ex;
+    }
+
+    void holdReference(NodePServerExecutor executor) {
+        this.executor.execute(() -> pservers.put(executor.id(), executor));
+    }
+
+    void releaseReference(NodePServerExecutor executor) {
+        this.executor.execute(() -> pservers.remove(executor.id(), executor));
+    }
+
+    private boolean pserverExistsInternal(@NotNull UniqueId pserver) {
+        return pservers.containsKey(pserver);
+    }
+
+    public void cleanup() {
+        executor.shutdown();
+        instance = null;
+    }
+
+    public void lifecycleStopped(UniqueId id) {
         executor.execute(() -> {
-            if (pservers.containsKey(id)) {
-                weakpservers.put(id, new SoftReference<>(pservers.remove(id), referenceQueue));
+            var ex = pservers.remove(id);
+            if (ex != null) {
+                ex.stop();
             }
         });
     }
@@ -188,10 +205,6 @@ public class NodePServerProvider extends PServerProvider {
 
     ServiceTemplate globalTemplate() {
         return globalTemplate;
-    }
-
-    ServiceTask pserverTask() {
-        return pserverTask;
     }
 
     TemplateStorage storage() {
@@ -210,60 +223,22 @@ public class NodePServerProvider extends PServerProvider {
         throw new IllegalStateException();
     }
 
-    @Override public @NotNull CompletableFuture<@Nullable NodePServerExecutor> pserver(@NotNull UniqueId pserver) {
-        CompletableFuture<NodePServerExecutor> fut = new CompletableFuture<>();
-        executor.execute(() -> {
-            try {
-                if (pservers.containsKey(pserver)) {
-                    fut.complete(pservers.get(pserver));
-                    return;
-                }
-                SoftReference<NodePServerExecutor> ref = weakpservers.get(pserver);
-                if (ref != null) {
-                    NodePServerExecutor ex = ref.get();
-                    if (ex != null) {
-                        fut.complete(ex);
-                    } else {
-                        weakpservers.remove(pserver);
-                    }
-                }
-                NodePServerExecutor ex = new NodePServerExecutor(this, pserver);
-                ref = new SoftReference<>(ex, referenceQueue);
-                weakpservers.put(pserver, ref);
-                fut.complete(ex);
-            } catch (Throwable t) {
-                fut.completeExceptionally(t);
-            }
-        });
-        return fut;
+    @Override public @NotNull CompletableFuture<@NotNull NodePServerExecutor> pserver(@NotNull UniqueId pserver) {
+        return CompletableFuture.supplyAsync(() -> pserverInternal(pserver), executor);
     }
 
     @Override public @NotNull CompletableFuture<@NotNull Boolean> pserverExists(@NotNull UniqueId pserver) {
-        CompletableFuture<Boolean> fut = new CompletableFuture<>();
-        executor.execute(() -> {
-            if (pserver == null) fut.complete(false);
-            fut.complete(pservers.containsKey(pserver));
-        });
-        return fut;
+        return CompletableFuture.supplyAsync(() -> pserverExistsInternal(pserver), executor);
     }
 
-    @Override public CompletableFuture<PServerExecutor> createPServer(PServerBuilder builder) {
-        CompletableFuture<PServerExecutor> fut = new CompletableFuture<>();
-        executor.execute(() -> {
-            UniqueId uid = NodeUniqueIdProvider.instance().newUniqueId();
-            String taskName = builder.taskName() == null ? this.pserverTask.name() : builder.taskName();
-            NodePServerExecutor ex = new NodePServerExecutor(this, uid, builder.type(), taskName);
-            ex.accessLevel(builder.accessLevel());
-            weakpservers.put(uid, new SoftReference<>(ex, referenceQueue));
-            fut.complete(ex);
-        });
-        return fut;
+    @Override public @NotNull CompletableFuture<@NotNull NodePServerExecutor> createPServer(PServerBuilder builder) {
+        return CompletableFuture.supplyAsync(() -> createPServerInternal(builder), executor);
     }
 
     @Override public CompletableFuture<Collection<? extends PServerExecutor>> pservers() {
-        CompletableFuture<Collection<? extends PServerExecutor>> fut = new CompletableFuture<>();
+        var fut = new CompletableFuture<Collection<? extends PServerExecutor>>();
         executor.execute(() -> {
-            List<PServerExecutor> l = new ArrayList<>(pservers.values());
+            var l = List.copyOf(pservers.values());
             fut.complete(l);
         });
         return fut;
@@ -276,67 +251,31 @@ public class NodePServerProvider extends PServerProvider {
                 .getPServers(owner));
     }
 
-    public Collection<String> getAllTemplateIDs() {
-        return this.storage
-                .templates()
-                .stream()
-                .filter(s -> s.prefix().equals(PServerProvider.templatePrefix()))
-                .map(ServiceTemplate::name)
-                .filter(s -> !(s.equals(".world") || s.equals(".global")))
-                .collect(Collectors.toList());
-    }
-
     public Database pserverData() {
         return pserverData;
     }
 
-    static class SingleThreadExecutor extends Thread {
-        private final Queue<Runnable> queue = new ConcurrentLinkedQueue<>();
-        private final Lock lock = new ReentrantLock();
-        private final Condition condition = lock.newCondition();
-        private volatile boolean exit = false;
-
-        public SingleThreadExecutor() {
-            super("SingleThreadPServerExecutor");
-            start();
-        }
-
-        @Override public void run() {
-            while (!exit) {
-                while (canPoll()) {
-                    workQueue();
-                }
-                lock.lock();
-                if (canPoll()) {
-                    lock.unlock();
-                    continue;
-                }
-                condition.awaitUninterruptibly();
-                lock.unlock();
-            }
-        }
-
-        private boolean canPoll() {
-            return !queue.isEmpty();
-        }
-
-        private void workQueue() {
-            Runnable r;
-            while ((r = queue.poll()) != null) {
-                r.run();
-            }
-        }
-
-        public void execute(Runnable runnable) {
-            if (Thread.currentThread() == this) {
-                runnable.run();
-                return;
-            }
-            queue.offer(runnable);
-            lock.lock();
-            condition.signalAll();
-            lock.unlock();
-        }
+    @Override public @NotNull CompletableFuture<@NotNull Collection<@NotNull UniqueId>> registeredPServers() {
+        var db = eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider.get("pserver").cast(PServerDatabase.class);
+        return CompletableFuture.completedFuture(db.getUsedPServerIDs());
     }
 
+    @NotNull private Thread thread() {
+        var th = new Thread(() -> {
+            while (true) {
+                try {
+                    var ref = referenceQueue.remove();
+                    executor.submit(() -> {
+                        var id = weakPServersReverse.remove(ref);
+                        weakPServers.remove(id, ref);
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        th.setName("PServerGCHandler");
+        th.setDaemon(true);
+        return th;
+    }
 }
