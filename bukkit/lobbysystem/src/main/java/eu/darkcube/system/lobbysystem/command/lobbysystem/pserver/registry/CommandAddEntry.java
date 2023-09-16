@@ -8,13 +8,13 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem.pserver.registry;
 
 import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.commandapi.v3.Commands;
+import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 
-public class CommandAddEntry extends LobbyCommandExecutor {
+public class CommandAddEntry extends LobbyCommand {
     public CommandAddEntry(Lobby lobby) {
         super("addEntry", b -> b.then(Commands
                 .argument("task", StringArgumentType.word())
