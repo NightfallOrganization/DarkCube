@@ -43,6 +43,13 @@ import java.util.function.Consumer;
     }
 
     public boolean setStarted(User user, UniqueId id, Consumer<Boolean> callback) {
+        var res = setStarted0(user, id, callback);
+        if (!res) callback.accept(false);
+        return res;
+    }
+
+    private boolean setStarted0(User user, UniqueId id, Consumer<Boolean> callback) {
+        if (user.metadata().has(keyStarted)) return false;
         user.metadata().set(keyCallback, callback);
         user.metadata().set(keyStarted, id);
         return true;
@@ -113,17 +120,21 @@ import java.util.function.Consumer;
     }
 
     private void pserverLoaded(ChannelMessageSender sender) {
-        for (var player : Bukkit.getOnlinePlayers()) {
-            var user = UserAPI.instance().user(player.getUniqueId());
-            if (!user.metadata().has(key)) continue;
-            var senderName = sender.name();
-            var pserver = user.metadata().<PServerExecutor>get(key);
-            pserver.serverName().thenAccept(name -> {
-                if (!senderName.equals(name)) return;
-                connectNow(user, pserver);
-                user.metadata().remove(key);
-            });
-        }
+        new BukkitRunnable() {
+            @Override public void run() {
+                for (var player : Bukkit.getOnlinePlayers()) {
+                    var user = UserAPI.instance().user(player.getUniqueId());
+                    if (!user.metadata().has(key)) continue;
+                    var senderName = sender.name();
+                    var pserver = user.metadata().<PServerExecutor>get(key);
+                    pserver.serverName().thenAccept(name -> {
+                        if (!senderName.equals(name)) return;
+                        connectNow(user, pserver);
+                        user.metadata().remove(key);
+                    });
+                }
+            }
+        }.runTask(Lobby.getInstance());
     }
 
     @EventListener public void handle(PServerStopEvent event) {

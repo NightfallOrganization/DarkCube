@@ -121,10 +121,7 @@ public class InventoryPServerConfiguration extends LobbyAsyncPagedInventory impl
                     user.user().sendActionBar(Message.CONNECTING_TO_PSERVER_AS_SOON_AS_ONLINE);
                 }
             }.runTaskTimer(Lobby.getInstance(), 1, 1);
-            if (!listenerPServer.setStarted(user.user(), pserverId, fail -> task.cancel())) {
-                task.cancel();
-                return;
-            }
+            if (!listenerPServer.setStarted(user.user(), pserverId, fail -> task.cancel())) return;
             PServerProvider.instance().pserver(pserverId).thenCompose(ex -> ex.start().whenComplete((started, throwable) -> {
                 if (throwable == null && started) {
                     connectPlayer(ex);
