@@ -5,13 +5,18 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolbattleteamfight;
+package eu.darkcube.system.woolbattleteamfight.lobby;
 
+import eu.darkcube.system.woolbattleteamfight.Main;
+import eu.darkcube.system.woolbattleteamfight.team.MapTeamSpawns;
+import eu.darkcube.system.woolbattleteamfight.team.TeamDistributor;
+import eu.darkcube.system.woolbattleteamfight.team.TeamManager;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Team;
 
 public class LobbyTimer {
 
@@ -20,9 +25,13 @@ public class LobbyTimer {
     private final Main plugin;
     private int previousTimerValue = -1;
     private boolean running = false;
+    private final TeamManager teamManager;
+    private final TeamDistributor teamDistributor;
 
-    public LobbyTimer(Main plugin) {
+    public LobbyTimer(Main plugin, TeamManager teamManager) {
         this.plugin = plugin;
+        this.teamManager = teamManager;
+        this.teamDistributor = new TeamDistributor(teamManager);
     }
 
     public void setTimer(int seconds) {
@@ -54,6 +63,7 @@ public class LobbyTimer {
     }
 
     private class TimerRunnable extends BukkitRunnable {
+        MapTeamSpawns mapTeamSpawns = new MapTeamSpawns();
         @Override
         public void run() {
             if (Bukkit.getOnlinePlayers().size() < 2) {
@@ -75,6 +85,23 @@ public class LobbyTimer {
             if (timer <= 0) {
                 cancel();
                 running = false;
+
+                // Teleportiere Spieler zu ihren Team-Spawns
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    teamDistributor.distributeTeamsAfterTimer();
+
+                    if (teamManager.isPlayerInTeam(player)) {
+                        Team team = teamManager.playerTeams.get(player);
+                        Location teamSpawn = mapTeamSpawns.getSpawnLocation("WBT-1", team.getName());
+                        if (teamSpawn != null) {
+                            player.teleport(teamSpawn);
+                        } else {
+                            System.out.println("Kein Teleportort für Team: " + team.getName());
+                        }
+                    } else {
+                        player.teleport(new Location(Bukkit.getWorld("WBT-1"), 0, 140, 0));
+                    }
+                }
             }
         }
     }

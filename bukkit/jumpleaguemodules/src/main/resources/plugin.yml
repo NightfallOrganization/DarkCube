@@ -14,5 +14,6 @@ commands:
     usage: /setheight
     permission: jumpleaguemodules.setheight.use
 
+Permissions:
   jumpleaguemodules.setheight.use:
     default: not op

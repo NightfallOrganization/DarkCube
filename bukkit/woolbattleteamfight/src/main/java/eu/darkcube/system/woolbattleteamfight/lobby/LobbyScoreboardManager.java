@@ -5,8 +5,9 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolbattleteamfight;
+package eu.darkcube.system.woolbattleteamfight.lobby;
 
+import eu.darkcube.system.woolbattleteamfight.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
