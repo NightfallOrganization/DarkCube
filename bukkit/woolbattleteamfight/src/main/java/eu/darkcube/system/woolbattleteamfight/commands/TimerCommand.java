@@ -5,20 +5,22 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolbattleteamfight;
+package eu.darkcube.system.woolbattleteamfight.commands;
 
+import eu.darkcube.system.woolbattleteamfight.Main;
+import eu.darkcube.system.woolbattleteamfight.lobby.LobbyTimer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class StartCommand implements CommandExecutor {
+public class TimerCommand implements CommandExecutor {
 
     private final Main plugin;
     private final LobbyTimer lobbyTimer;
 
-    public StartCommand(Main plugin, LobbyTimer lobbyTimer) {
+    public TimerCommand(Main plugin, LobbyTimer lobbyTimer) {
         this.plugin = plugin;
         this.lobbyTimer = lobbyTimer;
     }
@@ -32,8 +34,21 @@ public class StartCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        lobbyTimer.setTimer(1);
-        player.sendMessage(ChatColor.GRAY + "Der Timer wurde gestartet!");
+        if (args.length != 1) {
+            player.sendMessage("§7Verwendung: /timer <sekunden>");
+            return true;
+        }
+
+        int seconds;
+        try {
+            seconds = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            player.sendMessage("§7Bitte geben Sie eine gültige Zahl ein");
+            return true;
+        }
+
+        lobbyTimer.setTimer(seconds);
+        player.sendMessage("§7Timer wurde auf §a" + seconds + "§7 Sekunden gesetzt.");
         return true;
     }
 }

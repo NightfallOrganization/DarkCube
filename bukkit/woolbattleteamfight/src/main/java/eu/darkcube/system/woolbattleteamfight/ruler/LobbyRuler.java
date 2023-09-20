@@ -5,25 +5,27 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolbattleteamfight;
+package eu.darkcube.system.woolbattleteamfight.ruler;
 
+import eu.darkcube.system.woolbattleteamfight.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class LobbyManager implements Listener {
+public class LobbyRuler implements Listener {
 
-    public LobbyManager() {
+    public LobbyRuler() {
         // Setzt die Welt "world" ständig auf Mittag
         Bukkit.getScheduler().runTaskTimer(Main.getPlugin(Main.class), () -> {
             World world = Bukkit.getWorld("world");
@@ -41,6 +43,19 @@ public class LobbyManager implements Listener {
         String playerName = event.getPlayer().getName();
         event.setJoinMessage("§7" + playerName + " hat das Spiel betreten");
     }
+
+    @EventHandler
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        // Überprüft, ob das Entity ein Pfeil ist
+        if (event.getEntityType() == EntityType.ARROW) {
+            return; // Wenn es ein Pfeil ist, beende die Methode frühzeitig
+        }
+
+        if (event.getEntity().getWorld().getName().equals("world")) {
+            event.setCancelled(true);
+        }
+    }
+
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {

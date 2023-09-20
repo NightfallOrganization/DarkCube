@@ -22,19 +22,25 @@ public class PlayerDataHandler {
     private static FileConfiguration playerData;
 
     public static void setup(File dataFolder) {
-        file = new File(dataFolder, "playerdata.yml");
+        file = new File(dataFolder + File.separator + "playerdata.yml");
+
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
 
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                // Handle the exception
                 e.printStackTrace();
+
+                System.out.println("Failed to create file at: " + file.getAbsolutePath());
             }
         }
 
         playerData = YamlConfiguration.loadConfiguration(file);
     }
+
 
     public static FileConfiguration get() {
         return playerData;

@@ -136,7 +136,7 @@ commands:
     description: Öffnet angegebene Inventare
     permission: aetheria.openinventory.use
 
-
+Permissions:
   aetheria.heal.use:
     default: op
   aetheria.day.use:

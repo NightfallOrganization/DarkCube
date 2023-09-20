@@ -12,8 +12,19 @@ commands:
   start:
     description: Starte das Spiel
     permission: woolbattleteamfight.start.use
+  setteam:
+    description: Setze das Team für einen Spieler
+    permission: woolbattleteamfight.setteam.use
+  myteam:
+    description: Zeigt das Team von einem Spieler
+    permission: woolbattleteamfight.setteam.use
 
+Permissions:
   woolbattleteamfight.timer.use:
     default: op
   woolbattleteamfight.start.use:
+    default: op
+  woolbattleteamfight.setteam.use:
+    default: op
+  woolbattleteamfight.myteam.use:
     default: op
