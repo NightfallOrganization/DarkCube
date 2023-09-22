@@ -92,6 +92,7 @@ public class Test {
     }
 
     public static void test1() {
+
         var frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 800);
@@ -142,16 +143,13 @@ public class Test {
 
         var dataManager = new DataManager2D<>(task -> {
             LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(30));
-//            return new Color(ThreadLocalRandom.current().nextInt(256), ThreadLocalRandom.current().nextInt(256), ThreadLocalRandom
-//                    .current()
-//                    .nextInt(256));
             return Color.BLACK;
         }, (centerX, centerY, x, y) -> {
             int distX = centerX - x;
             int distY = centerY - y;
             int distXSq = distX * distX;
             int distYSq = distY * distY;
-            return Integer.MAX_VALUE - distXSq - distYSq;
+            return Math.max(0, Math.min(31, (int) Math.sqrt(distXSq + distYSq)));
         }, (x, y, data) -> {
             if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) return;
             long lo = ChunkUtils.getChunkIndex(x, y);
