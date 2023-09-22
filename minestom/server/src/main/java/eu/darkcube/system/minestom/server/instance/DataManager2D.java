@@ -35,7 +35,7 @@ public class DataManager2D<T> {
     private final Callback<? super T> unloadCallback;
 
     public DataManager2D(Long2ObjectFunction<T> loader, PriorityCalculator priorityCalculator, Callback<? super T> loadCallback, Callback<? super T> unloadCallback) {
-        this(new PrioritizedExecutor.Default(), loader, priorityCalculator, loadCallback, unloadCallback);
+        this(new PrioritizedExecutor.Default(32), loader, priorityCalculator, loadCallback, unloadCallback);
     }
 
     public DataManager2D(PrioritizedExecutor executor, Long2ObjectFunction<T> loader, PriorityCalculator priorityCalculator, Callback<? super T> loadCallback, Callback<? super T> unloadCallback) {
@@ -107,7 +107,6 @@ public class DataManager2D<T> {
                     return; // Someone else still needs this
                 }
                 task.cancel();
-                executor.remove(task);
                 writeLock.unlock();
                 try {
                     synchronized (task) {
@@ -219,7 +218,6 @@ public class DataManager2D<T> {
             }
             if (task.requireCount.get() == 1) {
                 task.cancel();
-                executor.remove(task);
                 var newTask = new GeneratorTask<>(priority, task.future(), dataGenerator, task.lateFuture, key);
                 loading.put(key, newTask);
                 executor.submit(newTask);
@@ -244,7 +242,6 @@ public class DataManager2D<T> {
                 // We might need to re-prioritize the task
                 if (task.priority() < priority) {
                     task.cancel();
-                    executor.remove(task);
                     var newTask = new GeneratorTask<>(priority, task.future(), dataGenerator, task.lateFuture, key);
                     newTask.requireCount.set(task.requireCount.get() + 1);
                     loading.put(key, newTask);

@@ -9,20 +9,22 @@ package eu.darkcube.system.minestom.server.instance;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.minestom.server.util.ConcurrentLinkedDeque;
+import eu.darkcube.system.minestom.server.util.Prioritized;
 
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.LockSupport;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ChunkPriorityQueue<T> extends AbstractQueue<T> implements BlockingQueue<T> {
 
-    private final AtomicInteger tookSomething = new AtomicInteger(1);
-    private final CopyOnWriteArrayList<Thread> waiting = new CopyOnWriteArrayList<>();
+    private final AtomicBoolean waiting = new AtomicBoolean(false);
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition notEmpty = lock.newCondition();
     private final ConcurrentLinkedDeque<T>[] queues;
 
     public ChunkPriorityQueue(int priorityCount) {
@@ -34,30 +36,41 @@ public class ChunkPriorityQueue<T> extends AbstractQueue<T> implements BlockingQ
 
     public Entry<T> add(int priority, T chunk) {
         var node = queues[priority].offerLast(chunk);
-        wake:
-        if (tookSomething.compareAndSet(0, 1)) {
-            Thread thread;
-            do {
-                var it = waiting.iterator();
-                if (!it.hasNext()) break wake;
-                thread = it.next();
-            } while (!waiting.remove(thread));
-            LockSupport.unpark(thread);
+        if (waiting.compareAndSet(true, false)) {
+            try {
+                lock.lock();
+                notEmpty.signalAll();
+            } finally {
+                lock.unlock();
+            }
         }
         return new Entry<>(chunk, node);
     }
 
-    @Override public @NotNull T take() throws InterruptedException {
-        restart:
+    @Override public boolean offer(@NotNull T t) {
+        if (t instanceof Prioritized p) {
+            add(p.priority(), t);
+            return true;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public @NotNull T take() {
         while (true) {
-            
-            for (ConcurrentLinkedDeque<T> queue : queues) {
-                T value = queue.pollFirst();
+            for (var queue : queues) {
+                var value = queue.pollFirst();
                 if (value == null) continue;
-                tookSomething.set(1);
                 return value;
             }
 
+            waiting.set(true);
+            try {
+                lock.lock();
+                if (!waiting.get()) continue;
+                notEmpty.awaitUninterruptibly();
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -94,10 +107,6 @@ public class ChunkPriorityQueue<T> extends AbstractQueue<T> implements BlockingQ
     }
 
     @Override public int drainTo(@NotNull Collection<? super T> c, int maxElements) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public boolean offer(@NotNull T t) {
         throw new UnsupportedOperationException();
     }
 

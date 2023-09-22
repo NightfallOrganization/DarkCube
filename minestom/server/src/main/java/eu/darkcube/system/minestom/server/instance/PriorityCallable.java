@@ -7,9 +7,11 @@
 
 package eu.darkcube.system.minestom.server.instance;
 
+import eu.darkcube.system.minestom.server.util.Prioritized;
+
 import java.util.concurrent.CompletableFuture;
 
-public abstract class PriorityCallable<T> implements Runnable, Comparable<PriorityCallable<T>> {
+public abstract class PriorityCallable<T> implements Runnable, Comparable<PriorityCallable<T>>, Prioritized {
     private final int priority;
     private final CompletableFuture<T> future;
     private volatile boolean cancel = false;
@@ -42,7 +44,7 @@ public abstract class PriorityCallable<T> implements Runnable, Comparable<Priori
         return future;
     }
 
-    public int priority() {
+    @Override public int priority() {
         return priority;
     }
 }
