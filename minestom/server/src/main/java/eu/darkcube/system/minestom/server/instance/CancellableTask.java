@@ -7,5 +7,9 @@
 
 package eu.darkcube.system.minestom.server.instance;
 
-public class Ticket {
+public interface CancellableTask {
+    CancellableTask NOOP = () -> {
+    };
+
+    void cancel();
 }

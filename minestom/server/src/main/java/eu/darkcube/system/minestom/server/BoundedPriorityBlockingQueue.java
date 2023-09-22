@@ -32,7 +32,11 @@ public class BoundedPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         this.handle = handle;
     }
 
-    @Override public boolean offer(T t) {
+    @Override public boolean add(@NotNull T t) {
+        return super.add(t);
+    }
+
+    @Override public boolean offer(@NotNull T t) {
         while (true) {
             int size = this.size.get();
             if (size == max) return false;
@@ -45,7 +49,7 @@ public class BoundedPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         return r;
     }
 
-    @Override public void put(T t) throws InterruptedException {
+    @Override public void put(@NotNull T t) throws InterruptedException {
         spaceAvailableLock.lockInterruptibly();
         while (!offer(t)) spaceAvailable.await();
         spaceAvailableLock.unlock();
@@ -98,11 +102,11 @@ public class BoundedPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         return max - size.get();
     }
 
-    @Override public int drainTo(Collection<? super T> c) {
+    @Override public int drainTo(@NotNull Collection<? super T> c) {
         throw new UnsupportedOperationException();
     }
 
-    @Override public int drainTo(Collection<? super T> c, int maxElements) {
+    @Override public int drainTo(@NotNull Collection<? super T> c, int maxElements) {
         throw new UnsupportedOperationException();
     }
 
