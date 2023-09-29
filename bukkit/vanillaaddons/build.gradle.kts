@@ -27,7 +27,6 @@ dependencies {
     compileOnly(project(":darkcubesystem"))
     implementation("net.wesjd:anvilgui:1.9.3-SNAPSHOT")
 }
-
 repositories {
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
 }
