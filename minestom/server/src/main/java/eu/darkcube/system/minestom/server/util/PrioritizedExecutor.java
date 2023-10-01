@@ -5,10 +5,10 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.minestom.server.instance;
+package eu.darkcube.system.minestom.server.util;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.minestom.server.util.Prioritized;
+import eu.darkcube.system.minestom.server.chunk.ChunkPriorityQueue;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -20,6 +20,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public interface PrioritizedExecutor {
 
     CancellableTask submit(PriorityCallable<?> task);
+
+    void shutdown();
 
     /**
      * A handler for tasks that cannot be executed by a {@link ThreadPoolExecutor}.
@@ -58,13 +60,15 @@ public interface PrioritizedExecutor {
             this.executor = new Pool(maxSize, maxSize, 1, TimeUnit.MINUTES, queue, new DefaultThreadFactory(), new DefaultRejectedExecutionHandler());
         }
 
-        @Override public CancellableTask submit(PriorityCallable<?> task) {
-            executor.execute(task);
-            return () -> {
-
-            };
+        @Override
+        public CancellableTask submit(PriorityCallable<?> task) {
+            return executor.executeTask(task);
         }
 
+        @Override
+        public void shutdown() {
+            executor.shutdownNow();
+        }
     }
 
     /**
@@ -235,26 +239,26 @@ public interface PrioritizedExecutor {
      *
      * <ol>
      *
-     * <li>In the default {@link Pool.AbortPolicy}, the handler
+     * <li>In the default {@link AbortPolicy}, the handler
      * throws a runtime {@link RejectedExecutionException} upon rejection.
      *
-     * <li>In {@link Pool.CallerRunsPolicy}, the thread
+     * <li>In {@link CallerRunsPolicy}, the thread
      * that invokes {@code execute} itself runs the task. This provides a
      * simple feedback control mechanism that will slow down the rate that
      * new tasks are submitted.
      *
-     * <li>In {@link Pool.DiscardPolicy}, a task that cannot
+     * <li>In {@link DiscardPolicy}, a task that cannot
      * be executed is simply dropped. This policy is designed only for
      * those rare cases in which task completion is never relied upon.
      *
-     * <li>In {@link Pool.DiscardOldestPolicy}, if the
+     * <li>In {@link DiscardOldestPolicy}, if the
      * executor is not shut down, the task at the head of the work queue
      * is dropped, and then execution is retried (which can fail again,
      * causing this to be repeated.) This policy is rarely acceptable.  In
      * nearly all cases, you should also cancel the task to cause an
      * exception in any component waiting for its completion, and/or log
      * the failure, as illustrated in {@link
-     * Pool.DiscardOldestPolicy} documentation.
+     * DiscardOldestPolicy} documentation.
      *
      * </ol>
      * <p>
@@ -358,7 +362,7 @@ public interface PrioritizedExecutor {
         /**
          * The default rejected execution handler.
          */
-        private static final RejectedExecutionHandler defaultHandler = new Pool.AbortPolicy();
+        private static final RejectedExecutionHandler defaultHandler = new AbortPolicy();
         /**
          * Permission required for callers of shutdown and shutdownNow.
          * We additionally require (see checkShutdownAccess) that callers
@@ -474,7 +478,7 @@ public interface PrioritizedExecutor {
          * Set containing all worker threads in pool. Accessed only when
          * holding mainLock.
          */
-        private final HashSet<Pool.Worker> workers = new HashSet<>();
+        private final HashSet<Worker> workers = new HashSet<>();
         /**
          * Wait condition to support awaitTermination.
          */
@@ -654,7 +658,8 @@ public interface PrioritizedExecutor {
             // assert targetState == SHUTDOWN || targetState == STOP;
             for (; ; ) {
                 int c = ctl.get();
-                if (runStateAtLeast(c, targetState) || ctl.compareAndSet(c, ctlOf(targetState, workerCountOf(c)))) break;
+                if (runStateAtLeast(c, targetState) || ctl.compareAndSet(c, ctlOf(targetState, workerCountOf(c))))
+                    break;
             }
         }
 
@@ -671,7 +676,8 @@ public interface PrioritizedExecutor {
         final void tryTerminate() {
             for (; ; ) {
                 int c = ctl.get();
-                if (isRunning(c) || runStateAtLeast(c, TIDYING) || (runStateLessThan(c, STOP) && !workQueue.isEmpty())) return;
+                if (isRunning(c) || runStateAtLeast(c, TIDYING) || (runStateLessThan(c, STOP) && !workQueue.isEmpty()))
+                    return;
                 if (workerCountOf(c) != 0) { // Eligible to terminate
                     interruptIdleWorkers(ONLY_ONE);
                     return;
@@ -719,7 +725,7 @@ public interface PrioritizedExecutor {
          */
         private void interruptWorkers() {
             // assert mainLock.isHeldByCurrentThread();
-            for (Pool.Worker w : workers)
+            for (Worker w : workers)
                 w.interruptIfStarted();
         }
 
@@ -746,7 +752,7 @@ public interface PrioritizedExecutor {
             final ReentrantLock mainLock = this.mainLock;
             mainLock.lock();
             try {
-                for (Pool.Worker w : workers) {
+                for (Worker w : workers) {
                     Thread t = w.thread;
                     if (!t.isInterrupted() && w.tryLock()) {
                         try {
@@ -838,7 +844,8 @@ public interface PrioritizedExecutor {
             retry:
             for (int c = ctl.get(); ; ) {
                 // Check if queue empty only if necessary.
-                if (runStateAtLeast(c, SHUTDOWN) && (runStateAtLeast(c, STOP) || firstTask != null || workQueue.isEmpty())) return false;
+                if (runStateAtLeast(c, SHUTDOWN) && (runStateAtLeast(c, STOP) || firstTask != null || workQueue.isEmpty()))
+                    return false;
 
                 for (; ; ) {
                     if (workerCountOf(c) >= ((core ? corePoolSize : maximumPoolSize) & COUNT_MASK)) return false;
@@ -851,9 +858,9 @@ public interface PrioritizedExecutor {
 
             boolean workerStarted = false;
             boolean workerAdded = false;
-            Pool.Worker w = null;
+            Worker w = null;
             try {
-                w = new Pool.Worker(firstTask);
+                w = new Worker(firstTask);
                 final Thread t = w.thread;
                 if (t != null) {
                     final ReentrantLock mainLock = this.mainLock;
@@ -892,7 +899,7 @@ public interface PrioritizedExecutor {
          * - rechecks for termination, in case the existence of this
          * worker was holding up termination
          */
-        private void addWorkerFailed(Pool.Worker w) {
+        private void addWorkerFailed(Worker w) {
             final ReentrantLock mainLock = this.mainLock;
             mainLock.lock();
             try {
@@ -919,7 +926,7 @@ public interface PrioritizedExecutor {
          * @param w                 the worker
          * @param completedAbruptly if the worker died due to user exception
          */
-        private void processWorkerExit(Pool.Worker w, boolean completedAbruptly) {
+        private void processWorkerExit(Worker w, boolean completedAbruptly) {
             if (completedAbruptly) // If abrupt, then workerCount wasn't adjusted
                 decrementWorkerCount();
 
@@ -1037,7 +1044,7 @@ public interface PrioritizedExecutor {
          *
          * @param w the worker
          */
-        final void runWorker(Pool.Worker w) {
+        final void runWorker(Worker w) {
             Thread wt = Thread.currentThread();
             Runnable task = w.firstTask;
             w.firstTask = null;
@@ -1073,7 +1080,8 @@ public interface PrioritizedExecutor {
             }
         }
 
-        @Override public void execute(Runnable command) {
+        @Override
+        public void execute(Runnable command) {
             executeTask(command);
         }
 
@@ -1233,14 +1241,6 @@ public interface PrioritizedExecutor {
             }
         }
 
-        /**
-         * @implNote Previous versions of this class had a finalize method
-         * that shut down this executor, but in this version, finalize
-         * does nothing.
-         */
-        @Deprecated(since = "9") protected void finalize() {
-        }
-
         // Override without "throws Throwable" for compatibility with subclasses
         // whose finalize method invokes super.finalize() (as is recommended).
         // Before JDK 11, finalize() had a non-empty method body.
@@ -1397,7 +1397,8 @@ public interface PrioritizedExecutor {
          * @since 1.6
          */
         public void allowCoreThreadTimeOut(boolean value) {
-            if (value && keepAliveTime <= 0) throw new IllegalArgumentException("Core threads must have nonzero keep alive times");
+            if (value && keepAliveTime <= 0)
+                throw new IllegalArgumentException("Core threads must have nonzero keep alive times");
             if (value != allowCoreThreadTimeOut) {
                 allowCoreThreadTimeOut = value;
                 if (value) interruptIdleWorkers();
@@ -1569,7 +1570,7 @@ public interface PrioritizedExecutor {
             mainLock.lock();
             try {
                 int n = 0;
-                for (Pool.Worker w : workers)
+                for (Worker w : workers)
                     if (w.isLocked()) ++n;
                 return n;
             } finally {
@@ -1606,7 +1607,7 @@ public interface PrioritizedExecutor {
             mainLock.lock();
             try {
                 long n = completedTaskCount;
-                for (Pool.Worker w : workers) {
+                for (Worker w : workers) {
                     n += w.completedTasks;
                     if (w.isLocked()) ++n;
                 }
@@ -1630,7 +1631,7 @@ public interface PrioritizedExecutor {
             mainLock.lock();
             try {
                 long n = completedTaskCount;
-                for (Pool.Worker w : workers)
+                for (Worker w : workers)
                     n += w.completedTasks;
                 return n;
             } finally {
@@ -1654,7 +1655,7 @@ public interface PrioritizedExecutor {
                 ncompleted = completedTaskCount;
                 nactive = 0;
                 nworkers = workers.size();
-                for (Pool.Worker w : workers) {
+                for (Worker w : workers) {
                     ncompleted += w.completedTasks;
                     if (w.isLocked()) ++nactive;
                 }
@@ -1977,7 +1978,8 @@ public interface PrioritizedExecutor {
     class DefaultThreadFactory implements ThreadFactory {
         private final AtomicInteger count = new AtomicInteger();
 
-        @Override public Thread newThread(@NotNull Runnable r) {
+        @Override
+        public Thread newThread(@NotNull Runnable r) {
             var thread = new Thread(r);
             thread.setDaemon(true);
             thread.setName("ChunkGenerator-" + count.incrementAndGet());
@@ -1987,7 +1989,8 @@ public interface PrioritizedExecutor {
     }
 
     class DefaultRejectedExecutionHandler implements RejectedExecutionHandler {
-        @Override public void rejectedExecution(Runnable r, Pool executor) {
+        @Override
+        public void rejectedExecution(Runnable r, Pool executor) {
             new RejectedExecutionException("Failed to execute runnable " + r + " on executor " + executor).printStackTrace();
         }
     }

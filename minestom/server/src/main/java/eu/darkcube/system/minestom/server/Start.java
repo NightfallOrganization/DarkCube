@@ -9,8 +9,11 @@ package eu.darkcube.system.minestom.server;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.minestom.server.chunk.NormalPriorityCalculator;
 import eu.darkcube.system.minestom.server.instance.DarkCubeInstance;
+import eu.darkcube.system.minestom.server.player.PlayerManager;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.color.Color;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
@@ -26,69 +29,76 @@ import net.minestom.server.instance.IChunkLoader;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.utils.NamespaceID;
+import net.minestom.server.utils.async.AsyncUtils;
 import net.minestom.server.world.DimensionType;
 import net.minestom.server.world.biomes.Biome;
+import net.minestom.server.world.biomes.BiomeEffects;
+import net.minestom.server.world.biomes.BiomeParticle;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.LockSupport;
 
 public class Start {
     public static void main(String[] args) {
         System.setProperty("minestom.chunk-view-distance", "32");
         System.setProperty("minestom.entity-view-distance", "32");
-        MinecraftServer server = MinecraftServer.init();
-        MinecraftServer.setBrandName("WoolBattle");
+        var server = MinecraftServer.init();
+        var priorityCount = MinecraftServer.getChunkViewDistance() + 1;
+        System.out.println("Priority count: " + priorityCount);
+        var priorityCalculator = new NormalPriorityCalculator(priorityCount);
+        var playerManager = new PlayerManager(priorityCalculator);
+        playerManager.register(MinecraftServer.getGlobalEventHandler());
+
+        MinecraftServer.setBrandName("DarkCube");
         MinecraftServer.setTerminalPrompt(null);
 
-        Command command = new Command("stop", "exit");
+        var command = new Command("stop", "exit");
         command.setDefaultExecutor((sender, context) -> {
             MinecraftServer.stopCleanly();
 
             System.exit(0);
         });
-        MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getCommandManager().register(command);
 
-//        Biome customBiome = Biome
-//                .builder()
-//                .category(Biome.Category.FOREST)
-//                .name(NamespaceID.from("woolbattle", "woolbattle"))
-//                .effects(BiomeEffects.builder().biomeParticle(new BiomeParticle(1F, new BiomeParticle.DustOption(1, 0, 1, 1)))
-//                        .fogColor(new Color(255, 0, 0).asRGB())
-//                        .build())
-//                .build();
+        Biome customBiome = Biome
+                .builder()
+                .category(Biome.Category.FOREST)
+                .name(NamespaceID.from("darkcube", "testbiome"))
+                .effects(BiomeEffects
+                        .builder()
+                        .biomeParticle(new BiomeParticle(1F, new BiomeParticle.DustOption(1, 0, 1, 1)))
+                        .fogColor(new Color(255, 0, 0).asRGB())
+                        .build())
+                .build();
+
+        MinecraftServer.getBiomeManager().addBiome(customBiome);
 //
-//        MinecraftServer.getBiomeManager().addBiome(customBiome);
-//
-        DimensionType dimensionType = DimensionType
-                .builder(NamespaceID.from("woolbattle", "woolbattle"))
-                .ambientLight(2.0F)
-                .fixedTime(6000L)
+        var dimensionType = DimensionType.builder(NamespaceID.from("darkcube", "fullbright")).ambientLight(2.0F).fixedTime(6000L)
 //                .skylightEnabled(false)
 //                .ceilingEnabled(true)
                 .build();
         MinecraftServer.getDimensionTypeManager().addDimension(dimensionType);
 
-        Biome customBiome = Biome.PLAINS;
-//        DimensionType dimensionType = DimensionType.OVERWORLD;
+//        var customBiome = Biome.PLAINS;
 
-        DarkCubeInstance instance = new DarkCubeInstance(UUID.randomUUID(), dimensionType);
+        var instance = new DarkCubeInstance(UUID.randomUUID(), dimensionType, priorityCount);
+        MinecraftServer.getInstanceManager().registerInstance(instance);
+        instance.enableAutoChunkLoad(false);
 //        instanceContainer.enableAutoChunkLoad(false);
 
         instance.setGenerator(unit -> {
-            LockSupport.parkNanos(10_000_000);
+//            LockSupport.parkNanos(10_000_000);
             unit.modifier().fillBiome(customBiome);
             unit.modifier().fillHeight(0, 100, Block.STONE);
         });
         instance.setChunkLoader(new IChunkLoader() {
             @Override public @NotNull CompletableFuture<@Nullable Chunk> loadChunk(@NotNull Instance instance, int chunkX, int chunkZ) {
-                return CompletableFuture.completedFuture(null);
+                return AsyncUtils.empty();
             }
 
             @Override public @NotNull CompletableFuture<Void> saveChunk(@NotNull Chunk chunk) {
-                return CompletableFuture.completedFuture(null);
+                return AsyncUtils.empty();
             }
 
             @Override public boolean supportsParallelLoading() {
@@ -100,23 +110,11 @@ public class Start {
             }
         });
 
-        AtomicInteger loaded = new AtomicInteger();
-        AtomicInteger playerloaded = new AtomicInteger();
+        var loaded = new AtomicInteger();
+        var playerloaded = new AtomicInteger();
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkUnloadEvent.class, event -> {
-            var i = event.getInstance();
-            if (!(i instanceof DarkCubeInstance dc)) return;
-
             playerloaded.decrementAndGet();
-            Chunk chunk = i.getChunk(event.getChunkX(), event.getChunkZ());
-            if (chunk != null) {
-                for (Player player : i.getPlayers()) {
-                    if (chunk.equals(player.getChunk())) {
-                        return;
-                    }
-                }
-                i.unloadChunk(chunk);
-            }
         });
         MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkLoadEvent.class, event -> {
             playerloaded.incrementAndGet();
@@ -133,14 +131,9 @@ public class Start {
         });
         MinecraftServer.getCommandManager().register(loadedCommand);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
-            if (!instance.isChunkLoaded(event.getNewPosition())) {
-                instance.loadChunk(event.getNewPosition()).thenAccept(c -> {
-                    System.out.println("Loaded chunk");
-                }).join();
-                return;
-            }
             Chunk chunk = instance.getChunkAt(event.getNewPosition());
             if (chunk == null) {
+                System.out.println("Cancelled move");
                 event.setCancelled(true);
                 return;
             }
@@ -151,11 +144,12 @@ public class Start {
             }
         });
         MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
+            var player = event.getPlayer();
             event.setSpawningInstance(instance);
-            event.getPlayer().setRespawnPoint(new Pos(0, 100, 0));
-            event.getPlayer().setGameMode(GameMode.CREATIVE);
-            event.getPlayer().setPermissionLevel(4);
-            event.getPlayer().setFlyingSpeed(10);
+            player.setRespawnPoint(new Pos(0, 100, 0));
+            player.setGameMode(GameMode.CREATIVE);
+            player.setPermissionLevel(4);
+            player.setFlyingSpeed(2);
         });
 
         server.start(System.getProperty("service.bind.host"), Integer.getInteger("service.bind.port"));
