@@ -22,14 +22,16 @@ abstract class UploadArtifact : DefaultTask() {
         val username = System.getProperty("uploadUser")
         val hostname = System.getProperty("uploadHost")
         val localFileName = System.getProperty("uploadFile")
-        val remoteFileName = System.getProperty("uploadRemoteFile")
+        val remoteFileName: String? = System.getProperty("uploadRemoteFile")
         val fingerprint = System.getProperty("uploadRemoteFingerprint")
         val localFile = File(localFileName)
         if (!localFile.exists()) throw RuntimeException("File ${localFile.canonicalPath} does not exist")
         println("Uploading ${localFile.path} to $username@$hostname:$remoteFileName");
         JSch.setConfig("PreferredAuthentications", "publickey");
         val jsch = JSch()
-        jsch.setKnownHosts(StringInputStream("$hostname ssh-ed25519 $fingerprint"))
+
+        if (fingerprint != null)
+            jsch.setKnownHosts(StringInputStream("$hostname ssh-ed25519 $fingerprint"))
         val session = jsch.getSession(username, hostname)
         val connector = PageantConnector()
         val repository = AgentIdentityRepository(connector)

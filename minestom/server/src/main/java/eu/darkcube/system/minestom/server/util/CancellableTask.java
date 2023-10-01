@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.minestom.server.instance;
+package eu.darkcube.system.minestom.server.util;
 
 public interface CancellableTask {
     CancellableTask NOOP = () -> {

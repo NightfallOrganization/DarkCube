@@ -5,36 +5,36 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.minestom.server.instance;
-
-import eu.darkcube.system.minestom.server.util.Prioritized;
+package eu.darkcube.system.minestom.server.util;
 
 import java.util.concurrent.CompletableFuture;
 
 public abstract class PriorityCallable<T> implements Runnable, Comparable<PriorityCallable<T>>, Prioritized {
-    private final int priority;
-    private final CompletableFuture<T> future;
-    private volatile boolean cancel = false;
+    protected final int priority;
+    protected final CompletableFuture<T> future;
 
     public PriorityCallable(int priority, CompletableFuture<T> future) {
         this.priority = priority;
         this.future = future;
     }
 
-    @Override public final void run() {
-        if (cancel) return;
-        if (future.isDone()) return;
-        var t = call();
-        synchronized (this) { // We need some point to synchronize the future on. This task is a good idea
-            future.complete(t);
+    @Override
+    public void run() {
+        try {
+            if (future.isDone()) return;
+            var t = call();
+            complete(t);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
-    void cancel() {
-        cancel = true;
+    protected void complete(T t) {
+        future.complete(t);
     }
 
-    @Override public int compareTo(PriorityCallable<T> o) {
+    @Override
+    public int compareTo(PriorityCallable<T> o) {
         return Integer.compare(o.priority, priority);
     }
 
@@ -44,7 +44,8 @@ public abstract class PriorityCallable<T> implements Runnable, Comparable<Priori
         return future;
     }
 
-    @Override public int priority() {
+    @Override
+    public int priority() {
         return priority;
     }
 }

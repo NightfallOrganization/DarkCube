@@ -15,7 +15,7 @@ import java.lang.invoke.VarHandle;
 import java.util.Objects;
 
 @SuppressWarnings({"UnnecessaryLabelOnBreakStatement", "CommentedOutCode", "unused", "SpellCheckingInspection"})
-public final class ConcurrentLinkedDeque<T> {
+public final class ConcurrentLinkedNodeDeque<T> {
 
     private static final int HOPS = 2;
     private static final Node<Object> PREV_TERMINATOR, NEXT_TERMINATOR;
@@ -32,8 +32,8 @@ public final class ConcurrentLinkedDeque<T> {
         NEXT_TERMINATOR.prev = NEXT_TERMINATOR;
         try {
             var lookup = MethodHandles.lookup();
-            HEAD = lookup.findVarHandle(ConcurrentLinkedDeque.class, "head", Node.class);
-            TAIL = lookup.findVarHandle(ConcurrentLinkedDeque.class, "tail", Node.class);
+            HEAD = lookup.findVarHandle(ConcurrentLinkedNodeDeque.class, "head", Node.class);
+            TAIL = lookup.findVarHandle(ConcurrentLinkedNodeDeque.class, "tail", Node.class);
             PREV = lookup.findVarHandle(Node.class, "prev", Node.class);
             NEXT = lookup.findVarHandle(Node.class, "next", Node.class);
             ITEM = lookup.findVarHandle(Node.class, "item", Object.class);
@@ -45,7 +45,7 @@ public final class ConcurrentLinkedDeque<T> {
     private volatile Node<T> head;
     private volatile Node<T> tail;
 
-    public ConcurrentLinkedDeque() {
+    public ConcurrentLinkedNodeDeque() {
         head = tail = new Node<>();
     }
 
@@ -98,6 +98,21 @@ public final class ConcurrentLinkedDeque<T> {
                     return null;
                 }
             }
+        }
+    }
+
+    public T peekFirst() {
+        restart:
+        for (; ; ) {
+            T item;
+            Node<T> first = first(), p = first;
+            while ((item = p.item) == null) {
+                if (p == (p = p.next)) continue restart;
+                if (p == null) break;
+            }
+            // recheck for linearizability
+            if (first.prev != null) continue;
+            return item;
         }
     }
 
@@ -532,12 +547,12 @@ public final class ConcurrentLinkedDeque<T> {
     }
 
     public static final class Node<T> {
-        private final ConcurrentLinkedDeque<T> deque;
+        private final ConcurrentLinkedNodeDeque<T> deque;
         private volatile Node<T> prev;
         private volatile Node<T> next;
         private volatile T item;
 
-        private Node(T item, ConcurrentLinkedDeque<T> deque) {
+        private Node(T item, ConcurrentLinkedNodeDeque<T> deque) {
             this.deque = deque;
             ITEM.set(this, item);
         }
