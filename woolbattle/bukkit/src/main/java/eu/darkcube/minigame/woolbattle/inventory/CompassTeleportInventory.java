@@ -26,10 +26,17 @@ import java.util.UUID;
 public class CompassTeleportInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_compass_teleport");
     private final Key USER;
+    private boolean done;
 
     public CompassTeleportInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_COMPASS.getMessage(user), user);
         USER = new Key(woolbattle, "tp_user_id");
+        done = true;
+        complete();
+    }
+
+    @Override public boolean done() {
+        return super.done() && done;
     }
 
     @Override protected void inventoryClick(IInventoryClickEvent event) {
