@@ -24,7 +24,7 @@ public class CommandSetPerkCooldown extends WBCommandExecutor {
                     Collection<Perk> perks = PerkArgument.getPerkTypes(ctx, "perks");
                     int cooldown = IntegerArgumentType.getInteger(ctx, "cooldown");
                     for (Perk perk : perks) {
-                        perk.cooldown(new Perk.Cooldown(perk.cooldown().unit(), cooldown));
+                        perk.cooldown(new Perk.Cooldown(perk.cooldown().unit(), cooldown * 20));
                         ctx.getSource().sendMessage(Message.PERK_COOLDOWN_SET, perk.perkName().getName().toLowerCase(), cooldown);
                     }
                     return 0;

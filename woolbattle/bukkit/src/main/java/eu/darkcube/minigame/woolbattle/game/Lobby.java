@@ -16,6 +16,7 @@ import eu.darkcube.minigame.woolbattle.game.lobby.LobbyTimerTask;
 import eu.darkcube.minigame.woolbattle.listener.lobby.*;
 import eu.darkcube.minigame.woolbattle.listener.lobby.item.*;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
+import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.team.TeamType;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -89,6 +90,10 @@ public class Lobby extends GamePhase {
             this.setTimer(Math.max(this.getTimer(), 300));
             p.teleport(getSpawn());
         });
+        for (Perk perk : woolbattle.perkRegistry().perks().values()) {
+            perk.cooldown(perk.defaultCooldown());
+            perk.cost(perk.defaultCost());
+        }
 
         this.maxPlayerCount = -1;
     }
