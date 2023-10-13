@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import java.util.*;
 
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 public class CoreManager implements Listener {
 
@@ -54,6 +55,11 @@ public class CoreManager implements Listener {
                         && player.getLocation().getBlockZ() == loc.getBlockZ()
                         && player.getLocation().getBlockY() == loc.getBlockY() + 1) {
 
+                    Team currentTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(team);
+                    if (currentTeam == null || currentTeam.getEntries().isEmpty()) {
+                        return;
+                    }
+
                     if (teamManager.isPlayerInTeam(player) && teamManager.getPlayerTeam(player).equals(team)) {
                         return;
                     }
@@ -62,6 +68,17 @@ public class CoreManager implements Listener {
                         BukkitRunnable task = new BukkitRunnable() {
                             @Override
                             public void run() {
+
+                                Location playerLoc = player.getLocation();
+                                if (!(playerLoc.getWorld().equals(loc.getWorld())
+                                        && playerLoc.getBlockX() == loc.getBlockX()
+                                        && playerLoc.getBlockZ() == loc.getBlockZ()
+                                        && playerLoc.getBlockY() == loc.getBlockY() + 1)) {
+                                    // Wenn der Spieler nicht mehr auf dem Core steht, beende den Task
+                                    this.cancel();
+                                    sneakingTasks.remove(player.getUniqueId());
+                                    return;
+                                }
 
                                 int currentCharge = coreCharges.get(team);
                                 currentCharge -= 5;

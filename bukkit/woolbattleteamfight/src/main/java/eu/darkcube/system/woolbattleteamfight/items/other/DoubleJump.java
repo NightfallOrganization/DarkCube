@@ -79,6 +79,10 @@ public class DoubleJump implements Listener {
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player player = e.getPlayer();
 
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            return;
+        }
+
         if (isFlying.getOrDefault(player.getUniqueId(), false)) {
             e.setCancelled(true);
             return;
@@ -141,11 +145,17 @@ public class DoubleJump implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    // Wenn der Spieler im Spectator-Modus ist, mache nichts.
+                    if (player.getGameMode() == GameMode.SPECTATOR) {
+                        return;
+                    }
+
                     doubleJumpCountdown.put(player.getUniqueId(), false);  // Set countdown inactive status for the player.
                     player.setAllowFlight(true);
                     checkWoolAndToggleFlight(player);
                 }
             }.runTaskLater(plugin, 63);
+
         }
     }
 

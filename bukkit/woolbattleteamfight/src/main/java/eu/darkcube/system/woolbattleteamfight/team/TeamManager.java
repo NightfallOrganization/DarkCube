@@ -43,7 +43,6 @@ public class TeamManager implements Listener {
         blue.setPrefix("§9"); // Blau
         violet.setPrefix("§5"); // Violett
         green.setPrefix("§a"); // Grün
-
     }
 
     public boolean isPlayerInTeam(Player player) {

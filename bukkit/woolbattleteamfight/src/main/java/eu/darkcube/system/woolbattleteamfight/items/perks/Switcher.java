@@ -10,10 +10,7 @@ package eu.darkcube.system.woolbattleteamfight.items.perks;
 import eu.darkcube.system.woolbattleteamfight.Main;
 import eu.darkcube.system.woolbattleteamfight.game.GameItemManager;
 import eu.darkcube.system.woolbattleteamfight.wool.WoolReducer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -26,14 +23,19 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class Switcher implements Listener {
 
     private static final int SWITCHER_SLOT = 3; // Slots beginnen bei 0, daher ist Slot 5 eigentlich Index 3
     private GameItemManager gameItemManager;
+    private Set<UUID> countdownPlayers = new HashSet<>();
 
     public Switcher(GameItemManager gameItemManager) {
         this.gameItemManager = gameItemManager;
@@ -47,7 +49,26 @@ public class Switcher implements Listener {
 
         if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
                 && itemInHand != null
+                && itemInHand.getType() == Material.SNOW_BALL
+                && countdownPlayers.contains(player.getUniqueId())) {
+            event.setCancelled(true);
+            player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1, 1);
+            return;
+        }
+
+        if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+                && itemInHand != null
                 && itemInHand.getType() == Material.SNOW_BALL) {
+
+            ItemMeta meta = itemInHand.getItemMeta();
+            if (meta != null && meta.hasDisplayName() && ChatColor.stripColor(meta.getDisplayName()).startsWith("Tauscher")) {
+                if (countdownPlayers.contains(player.getUniqueId())) {
+                    event.setCancelled(true);
+                    player.sendMessage(ChatColor.RED + "Du kannst den Schneeball während des Countdowns nicht werfen!");
+                    return;
+                }
+            }
+
 
             if (!WoolReducer.hasEnoughWool(player, 8)) {
                 player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1, 1);
@@ -65,6 +86,7 @@ public class Switcher implements Listener {
             }
 
             WoolReducer.removeWool(player, 8);
+            countdownPlayers.add(player.getUniqueId()); // Spieler zur Countdown-Liste hinzufügen.
 
             new BukkitRunnable() {
                 int secondsLeft = 7;
@@ -86,6 +108,7 @@ public class Switcher implements Listener {
                                         new String[]{"&7Tausche den Platz mit deinem Gegner!"},
                                         new Enchantment[]{Enchantment.DURABILITY},
                                         new int[]{1}, true));
+                        countdownPlayers.remove(player.getUniqueId()); // Spieler aus der Countdown-Liste entfernen.
                         this.cancel();
                     }
                 }
@@ -93,6 +116,14 @@ public class Switcher implements Listener {
         }
     }
 
+    @EventHandler
+    public void onSnowballThrow(PlayerInteractEvent event) {
+        if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) &&
+                event.getPlayer().getItemInHand().getType() == Material.SNOW_BALL &&
+                countdownPlayers.contains(event.getPlayer().getUniqueId())) {
+            event.setCancelled(true);
+        }
+    }
 
 
     @EventHandler
