@@ -32,13 +32,4 @@ public class MapManager implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-
-
-        // Optional: Teleportiere den Spieler in die Welt, wenn er beitritt
-        //player.teleport(world.getSpawnLocation());
-    }
 }

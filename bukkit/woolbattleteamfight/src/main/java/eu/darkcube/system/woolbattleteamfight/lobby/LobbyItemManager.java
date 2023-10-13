@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyItemManager implements Listener {
+    public static List<Player> playersWithParticlesOff = new ArrayList<>();
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -60,13 +61,31 @@ public class LobbyItemManager implements Listener {
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
-        if (event.getPlayer().getWorld().getName().equals("world")) {
+        Player player = event.getPlayer();
+        if (player.getWorld().getName().equals("world")) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                ItemStack item = event.getPlayer().getItemInHand();
-                if (item != null && item.getType() == Material.BOOK && item.hasItemMeta()) {
+                ItemStack item = player.getItemInHand();
+                if (item != null && item.hasItemMeta()) {
                     ItemMeta meta = item.getItemMeta();
-                    if (meta.getDisplayName().equals(ChatColor.BLUE + "Teams")) {
-                        TeamGUI.openTeamsInventory(event.getPlayer());
+                    // Prüfen, ob es sich um die aktivierte Blaze Rod handelt
+                    if (item.getType() == Material.BLAZE_ROD && meta.getDisplayName().equals(ChatColor.GOLD + "Partikel " + ChatColor.GREEN + "An " + ChatColor.DARK_GRAY + "╏ " + ChatColor.GRAY + "Ausschalten?")) {
+                        item = createItem(Material.BLAZE_ROD, 1, ChatColor.GOLD + "Partikel " + ChatColor.RED + "Aus " + ChatColor.DARK_GRAY + "╏ " + ChatColor.GRAY + "Anschalten?",
+                                new String[]{ChatColor.GRAY + "Klicke um Partikel zu aktivieren!"}, null, null);
+                        player.setItemInHand(item);
+                        playersWithParticlesOff.add(player);  // Füge den Spieler zur Liste hinzu
+                        return;
+
+                    } else if (item.getType() == Material.BLAZE_ROD && meta.getDisplayName().equals(ChatColor.GOLD + "Partikel " + ChatColor.RED + "Aus " + ChatColor.DARK_GRAY + "╏ " + ChatColor.GRAY + "Anschalten?")) {
+                        item = createItem(Material.BLAZE_ROD, 1, ChatColor.GOLD + "Partikel " + ChatColor.GREEN + "An " + ChatColor.DARK_GRAY + "╏ " + ChatColor.GRAY + "Ausschalten?",
+                                new String[]{ChatColor.GRAY + "Klicke um Partikel zu deaktivieren!"}, null, null);
+                        player.setItemInHand(item);
+                        playersWithParticlesOff.remove(player);  // Entferne den Spieler von der Liste
+                        return;
+                    }
+
+                    // Ihr bisheriger Code für das Buch
+                    else if (item.getType() == Material.BOOK && meta.getDisplayName().equals(ChatColor.BLUE + "Teams")) {
+                        TeamGUI.openTeamsInventory(player);
                     }
                 }
             }

@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.woolbattleteamfight.team;
 
+import eu.darkcube.system.woolbattleteamfight.game.ArmorManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
@@ -19,9 +20,11 @@ import java.util.stream.Collectors;
 public class TeamDistributor {
 
     private TeamManager teamManager;
+    private ArmorManager armorManager;
 
-    public TeamDistributor(TeamManager teamManager) {
+    public TeamDistributor(TeamManager teamManager, ArmorManager armorManager) {
         this.teamManager = teamManager;
+        this.armorManager = armorManager;
     }
 
     public void distributeTeamsAfterTimer() {
@@ -55,6 +58,7 @@ public class TeamDistributor {
                     randomTeam.addEntry(playerToMove.getName());
                     teamManager.playerTeams.put(playerToMove, randomTeam);
                     teamManager.updatePlayerDisplayName(playerToMove);
+                    armorManager.setArmor(playerToMove);  // Rüstung setzen
                 }
                 break;
             }
@@ -67,12 +71,14 @@ public class TeamDistributor {
                 randomEmptyTeam.addEntry(player.getName());
                 teamManager.playerTeams.put(player, randomEmptyTeam);
                 teamManager.updatePlayerDisplayName(player);
+                armorManager.setArmor(player);  // Rüstung setzen
                 emptyTeams.remove(randomEmptyTeam);
             } else if (!teamsWithOnePlayer.isEmpty()) {
                 Team randomTeamWithOnePlayer = teamsWithOnePlayer.get(new Random().nextInt(teamsWithOnePlayer.size()));
                 randomTeamWithOnePlayer.addEntry(player.getName());
                 teamManager.playerTeams.put(player, randomTeamWithOnePlayer);
                 teamManager.updatePlayerDisplayName(player);
+                armorManager.setArmor(player);  // Rüstung setzen
                 teamsWithOnePlayer.remove(randomTeamWithOnePlayer);
             }
         }

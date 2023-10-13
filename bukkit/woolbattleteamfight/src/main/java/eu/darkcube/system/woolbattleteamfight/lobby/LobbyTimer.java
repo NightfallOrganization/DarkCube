@@ -8,6 +8,7 @@
 package eu.darkcube.system.woolbattleteamfight.lobby;
 
 import eu.darkcube.system.woolbattleteamfight.Main;
+import eu.darkcube.system.woolbattleteamfight.game.ArmorManager;
 import eu.darkcube.system.woolbattleteamfight.team.MapTeamSpawns;
 import eu.darkcube.system.woolbattleteamfight.team.TeamDistributor;
 import eu.darkcube.system.woolbattleteamfight.team.TeamManager;
@@ -28,10 +29,10 @@ public class LobbyTimer {
     private final TeamManager teamManager;
     private final TeamDistributor teamDistributor;
 
-    public LobbyTimer(Main plugin, TeamManager teamManager) {
+    public LobbyTimer(Main plugin, TeamManager teamManager, ArmorManager armorManager) {
         this.plugin = plugin;
         this.teamManager = teamManager;
-        this.teamDistributor = new TeamDistributor(teamManager);
+        this.teamDistributor = new TeamDistributor(teamManager, armorManager);
     }
 
     public void setTimer(int seconds) {
