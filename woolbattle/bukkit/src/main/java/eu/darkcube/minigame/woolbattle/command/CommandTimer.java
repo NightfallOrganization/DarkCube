@@ -16,7 +16,7 @@ public class CommandTimer extends WBCommandExecutor {
     public CommandTimer(WoolBattleBukkit woolbattle) {
         super("timer", b -> b.then(Commands.argument("time", IntegerArgumentType.integer(0)).executes(ctx -> {
             int time = IntegerArgumentType.getInteger(ctx, "time");
-            woolbattle.lobby().setOverrideTimer(time);
+            woolbattle.lobby().setOverrideTimer(time * 20);
             ctx.getSource().sendMessage(Message.TIMER_CHANGED, time);
             return 0;
         })));
