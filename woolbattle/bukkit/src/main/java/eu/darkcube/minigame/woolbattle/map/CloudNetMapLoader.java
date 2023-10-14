@@ -19,10 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -60,6 +57,11 @@ public class CloudNetMapLoader implements MapLoader {
         Path rootFolder = Paths.get("anything").toAbsolutePath().normalize().getParent();
         return woolbattleStorage.openZipInputStreamAsync(template(map)).thenCompose(zipIn -> {
             CompletableFuture<Void> future = new CompletableFuture<>();
+            if (zipIn == null) {
+                var ex = new FileNotFoundException("Zip was null: " + template(map));
+                new Scheduler(woolbattle, () -> future.completeExceptionally(ex)).runTask();
+                return future;
+            }
             try {
                 Path worldFolder = rootFolder.resolve(map.getName() + "-" + map.size());
                 CloudNetMapIngameData ingameData = null;
