@@ -149,6 +149,7 @@ public class Ingame extends GamePhase {
     }
 
     @Override public void onEnable() {
+        killstreak.clear();
         this.startingIngame = true;
 
         woolbattle.lobbySystemLink().update();
