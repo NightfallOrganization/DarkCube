@@ -17,6 +17,7 @@ import eu.darkcube.system.link.LinkManager;
 import eu.darkcube.system.link.cloudnet.CloudNetLink;
 import eu.darkcube.system.link.luckperms.LuckPermsLink;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.provider.via.ViaSupport;
 import eu.darkcube.system.userapi.BukkitUserAPI;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.AsyncExecutor;
@@ -27,8 +28,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 @ApiStatus.Internal public final class DarkCubeSystem extends DarkCubePlugin implements Listener {
     private final LinkManager linkManager = new LinkManager();
@@ -65,18 +69,38 @@ import java.util.Objects;
         if (v instanceof BukkitVersion) {
             ((BukkitVersion) v).enabled(this);
         }
-        PacketAPI.getInstance().registerHandler(PacketRequestProtocolVersionDeclaration.class, packet -> {
+        ViaSupport via = v.provider().service(ViaSupport.class);
+        Runnable r = () -> {
+            PacketAPI.getInstance().registerHandler(PacketRequestProtocolVersionDeclaration.class, packet -> {
+                declareVersion();
+                return null;
+            });
             declareVersion();
-            return null;
-        });
-        declareVersion();
+        };
+        if (!via.supported()) {
+            r.run();
+        } else {
+            new BukkitRunnable() {
+                @Override public void run() {
+                    r.run();
+                }
+            }.runTask(this);
+        }
     }
 
     public void declareVersion() {
-        new PacketDeclareProtocolVersion(InjectionLayer
-                .boot()
-                .instance(ComponentInfo.class)
-                .componentName(), ((BukkitVersion) VersionSupport.version()).protocolVersion()).sendAsync();
+        int nativeVersion = ((BukkitVersion) VersionSupport.version()).protocolVersion();
+        int[] versions = new int[]{nativeVersion};
+        ViaSupport viaSupport = VersionSupport.version().provider().service(ViaSupport.class);
+        if (viaSupport.supported()) {
+            versions = viaSupport.supportedVersions();
+            if (IntStream.of(versions).filter(i -> i == nativeVersion).count() == 0) {
+                getLogger().severe("Via Support is enabled but via does not support the native version: " + Arrays.toString(versions) + ", native: " + nativeVersion);
+                Thread.dumpStack();
+                versions = new int[]{nativeVersion};
+            }
+        }
+        new PacketDeclareProtocolVersion(InjectionLayer.boot().instance(ComponentInfo.class).componentName(), versions).sendAsync();
     }
 
     @EventHandler public void handle(PlayerKickEvent event) {

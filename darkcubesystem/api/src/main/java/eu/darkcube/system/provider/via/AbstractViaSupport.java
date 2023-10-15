@@ -19,18 +19,19 @@ public abstract class AbstractViaSupport implements ViaSupport {
 
     public abstract void init();
 
-    @Override
-    public boolean supported() {
+    @Override public boolean supported() {
         return true;
     }
 
-    @Override
-    public int version(UUID uuid) {
+    @Override public int version(UUID uuid) {
         return Via.getAPI().getPlayerVersion(uuid);
     }
 
-    @Override
-    public int serverVersion() {
+    @Override public int[] supportedVersions() {
+        return Via.getManager().getProtocolManager().getSupportedVersions().stream().mapToInt(i -> i).toArray();
+    }
+
+    @Override public int serverVersion() {
         return Via.getAPI().getServerVersion().highestSupportedVersion();
     }
 }

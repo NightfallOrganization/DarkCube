@@ -36,6 +36,10 @@ class ViaSupportWrapper implements ViaSupport {
         return via.serverVersion();
     }
 
+    @Override public int[] supportedVersions() {
+        return via.supportedVersions();
+    }
+
     @Override
     public List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, Suggestions suggestions) {
         return via.tabComplete(playerVersion, player, commandLine, parse, suggestions);

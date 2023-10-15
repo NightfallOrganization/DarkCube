@@ -29,6 +29,8 @@ public interface ViaSupport {
 
     int serverVersion();
 
+    int[] supportedVersions();
+
     List<String> tabComplete(int playerVersion, Player player, String commandLine, ParseResults<CommandSource> parse, Suggestions suggestions);
 
 }

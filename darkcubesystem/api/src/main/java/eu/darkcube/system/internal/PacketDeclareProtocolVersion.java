@@ -11,18 +11,18 @@ import eu.darkcube.system.packetapi.Packet;
 
 public class PacketDeclareProtocolVersion extends Packet {
     private final String serverName;
-    private final int protocolVersion;
+    private final int[] protocolVersions;
 
-    public PacketDeclareProtocolVersion(String serverName, int protocolVersion) {
+    public PacketDeclareProtocolVersion(String serverName, int[] protocolVersions) {
         this.serverName = serverName;
-        this.protocolVersion = protocolVersion;
+        this.protocolVersions = protocolVersions;
     }
 
     public String serverName() {
         return serverName;
     }
 
-    public int protocolVersion() {
-        return protocolVersion;
+    public int[] protocolVersions() {
+        return protocolVersions;
     }
 }

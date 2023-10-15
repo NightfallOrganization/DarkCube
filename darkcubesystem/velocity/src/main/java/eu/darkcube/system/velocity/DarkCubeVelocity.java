@@ -19,6 +19,8 @@ import eu.darkcube.system.internal.PacketRequestProtocolVersionDeclaration;
 import eu.darkcube.system.packetapi.PacketAPI;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
+
 @Plugin(id = "darkcubesystem", name = "DarkCubeSystem", version = "1.0", authors = {"DasBabyPixel"}, dependencies = {@Dependency(id = "viaversion")})
 public class DarkCubeVelocity {
     private final ProxyServer server;
@@ -31,8 +33,8 @@ public class DarkCubeVelocity {
 
     @Subscribe public void handle(ProxyInitializeEvent event) {
         PacketAPI.getInstance().registerHandler(PacketDeclareProtocolVersion.class, packet -> {
-            logger.info("Server " + packet.serverName() + " has protocol version " + packet.protocolVersion());
-            Via.proxyPlatform().protocolDetectorService().setProtocolVersion(packet.serverName(), packet.protocolVersion());
+            logger.info("Server " + packet.serverName() + " has protocol versions " + Arrays.toString(packet.protocolVersions()));
+            Via.proxyPlatform().protocolDetectorService().setProtocolVersions(packet.serverName(), packet.protocolVersions());
             return null;
         });
         new PacketRequestProtocolVersionDeclaration().sendAsync();
