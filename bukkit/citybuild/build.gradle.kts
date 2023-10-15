@@ -20,7 +20,7 @@ sourceSets {
 tasks {
     register<GlyphWidthLoader>("generateGlyphWidths") {
         version = "latest"
-        resourcePacks = listOf("https://metropolis.darkcube.eu/Metropolis.zip")
+        resourcePacks = listOf("https://aetheria.darkcube.eu/Aetheria.zip")
         outputFile = sourceSets.getByName("generated").output.resourcesDir!!.resolve("glyph-widths.bin")
     }
     processResources.configure {
