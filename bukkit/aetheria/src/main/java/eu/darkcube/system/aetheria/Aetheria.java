@@ -111,7 +111,9 @@ public class Aetheria extends DarkCubePlugin {
         instance.getCommand("setcor").setExecutor(new SetCorCommand(corManager));
         instance.getCommand("addcor").setExecutor(new AddCorCommand(corManager));
         instance.getCommand("mycor").setExecutor(new MyCorCommand(corManager));
-        instance.getCommand("resetdurability").setExecutor(new ResetDurabilityCommand(customSwordManager, customAxeManager, customChestplateManager, customPickaxeManager));
+        instance
+                .getCommand("resetdurability")
+                .setExecutor(new ResetDurabilityCommand(customSwordManager, customAxeManager, customChestplateManager, customPickaxeManager));
         instance.getCommand("spawnupgrader").setExecutor(new SpawnUpgraderCommand(this));
         instance.getCommand("additemlevel").setExecutor(new AddItemLevelCommand(this));
         instance.getCommand("gm").setExecutor(new GMCommand());
@@ -167,7 +169,7 @@ public class Aetheria extends DarkCubePlugin {
         this.getServer().getPluginManager().registerEvents(new CustomAxeManager(this), this);
 
         this.getServer().getPluginManager().registerEvents(upgraderInventory, this);
- //       this.getServer().getPluginManager().registerEvents(new TeleportManager(this), this);
+        //       this.getServer().getPluginManager().registerEvents(new TeleportManager(this), this);
         this.getCommand("myitemdurability").setExecutor(new MyItemDurabilityCommand(customPickaxeManager));
         this.getCommand("myitemlevel").setExecutor(new ItemLevelCommand(customSwordManager));
         this.getServer().getPluginManager().registerEvents(customChestplateManager, this);
