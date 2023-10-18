@@ -11,17 +11,15 @@ import com.google.gson.reflect.TypeToken;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.CommandAPI;
 import eu.darkcube.system.darkessentials.command.*;
-import eu.darkcube.system.darkessentials.util.EssentialCollections;
+import eu.darkcube.system.darkessentials.util.*;
 import eu.darkcube.system.darkessentials.util.EssentialCollections.SortingRule;
-import eu.darkcube.system.darkessentials.util.Message;
-import eu.darkcube.system.darkessentials.util.NumbzUtils;
-import eu.darkcube.system.darkessentials.util.WarpPoint;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.libs.net.kyori.adventure.title.Title;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import org.bukkit.*;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -107,7 +105,7 @@ public class DarkEssentials extends Plugin {
         List<String> list = new ArrayList<>();
         for (Player current : Bukkit.getOnlinePlayers()) {
             String playerName = current.getName().toLowerCase(Locale.ENGLISH);
-            if (playerName.startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH)) && !NumbzUtils.containsStringIgnoreCase(playerName, args)) {
+            if (playerName.startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH)) && !KesUtils.containsStringIgnoreCase(playerName, args)) {
                 list.add(current.getName());
             }
         }
@@ -164,6 +162,10 @@ public class DarkEssentials extends Plugin {
         colorValue = ChatColor.valueOf(config.getString("main.colors.valueColor")).toString();
 
         //		System.out.println(config.getBoolean("command.burn.enabled"));
+
+        Bukkit.getPluginManager().registerEvents(new Pinger(), this);
+        Bukkit.getPluginManager().registerEvents(new ChatColorHandler(), this);
+        Bukkit.getPluginManager().registerEvents(new TextSound(), this);
 
         EssentialCollections.addSortingRule(new SortingRule<World>() {
             @Override public boolean instanceOf(Object obj) {

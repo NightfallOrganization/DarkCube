@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.darkessentials.DarkEssentials;
-import eu.darkcube.system.darkessentials.util.NumbzUtils;
+import eu.darkcube.system.darkessentials.util.KesUtils;
 
 public class CommandNear extends Command {
 
@@ -43,7 +43,7 @@ public class CommandNear extends Command {
 								.append(DarkEssentials.cValue()).append(closest.getName()).append(
 										DarkEssentials.cConfirm()).append(" (")
 								.append(DarkEssentials.cValue())
-								.append((int) NumbzUtils.getDistance(((Player) sender).getLocation(),
+								.append((int) KesUtils.getDistance(((Player) sender).getLocation(),
 										closest.getLocation()))
 								.append(DarkEssentials.cConfirm()).append(" Blöcke).").toString(),
 						sender);
@@ -64,7 +64,7 @@ public class CommandNear extends Command {
 											DarkEssentials.cValue())
 									.append(closest.getName()).append(DarkEssentials.cConfirm()).append(" (")
 									.append(DarkEssentials.cValue())
-									.append((int) NumbzUtils.getDistance(current.getLocation(), closest.getLocation()))
+									.append((int) KesUtils.getDistance(current.getLocation(), closest.getLocation()))
 									.append(DarkEssentials.cConfirm()).append(" Blöcke).").toString(), sender);
 				} else {
 					DarkEssentials.getInstance().sendMessage(
@@ -82,9 +82,9 @@ public class CommandNear extends Command {
 		double dist = Double.MAX_VALUE;
 		Player closest = null;
 		for (Player current : Bukkit.getOnlinePlayers()) {
-			if (NumbzUtils.getDistance(pl.getLocation(), current.getLocation()) < dist && !current.equals(pl)) {
+			if (KesUtils.getDistance(pl.getLocation(), current.getLocation()) < dist && !current.equals(pl)) {
 				closest = current;
-				dist = NumbzUtils.getDistance(pl.getLocation(), current.getLocation());
+				dist = KesUtils.getDistance(pl.getLocation(), current.getLocation());
 			}
 		}
 		return closest;
