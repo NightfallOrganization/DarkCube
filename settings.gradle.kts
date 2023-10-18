@@ -50,6 +50,7 @@ include("bukkit:luckperms-prefixplugin")
 include("bukkit:miners")
 include("bukkit:skyland")
 include("bukkit:vanillaaddons")
+include("bukkit:sumo")
 //include "bukkit:smash"
 include("bukkit:statsapi")
 //include("bungee")
