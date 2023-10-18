@@ -10,7 +10,7 @@ import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
-import eu.darkcube.system.darkessentials.util.NumbzUtils;
+import eu.darkcube.system.darkessentials.util.KesUtils;
 import eu.darkcube.system.darkessentials.util.WarpPoint;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -94,7 +94,7 @@ public class CommandWarp extends Command implements Listener {
 			inv.clear();
 			for (WarpPoint warp : enabledWarps) {
 				Location loc = warp.getLocation();
-				inv.addItem(NumbzUtils.setNBT(NumbzUtils.getNamedItemStack(
+				inv.addItem(KesUtils.setNBT(KesUtils.getNamedItemStack(
 						new ItemStack(Material.valueOf(warp.getIcon().split(":")[0]), 1,
 								Short.parseShort(warp.getIcon().split(":")[1])),
 						ChatColor.RESET + warp.getName(),
@@ -186,7 +186,7 @@ public class CommandWarp extends Command implements Listener {
 		if (e.getCurrentItem() == null || e.getCurrentItem().getType().equals(Material.AIR))
 			return;
 
-		if (NumbzUtils.getTagValue(e.getCurrentItem(), "warp").equals("true")) {
+		if (KesUtils.getTagValue(e.getCurrentItem(), "warp").equals("true")) {
 			e.setCancelled(true);
 			startTeleport((Player) e.getWhoClicked(),
 					getWarp(e.getCurrentItem().getItemMeta().getDisplayName().substring(2)));

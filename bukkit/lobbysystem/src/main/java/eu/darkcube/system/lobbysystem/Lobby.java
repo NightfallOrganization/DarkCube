@@ -125,6 +125,7 @@ public class Lobby extends Plugin {
             world.setFullTime(6000);
         }
 
+        new ListenerRoundWalk(this);
         new ListenerJoin();
         new ListenerScoreboard();
         new ListenerQuit();

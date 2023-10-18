@@ -18,7 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
-public class NumbzUtils {
+public class KesUtils {
 	public static boolean containsStringIgnoreCase(String string, Collection<String> list) {
 		for (String s : list) {
 			if (s.equalsIgnoreCase(string))

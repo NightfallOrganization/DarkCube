@@ -24,7 +24,7 @@ import eu.darkcube.system.commandapi.Argument;
 import eu.darkcube.system.commandapi.Command;
 import eu.darkcube.system.darkessentials.DarkEssentials;
 import eu.darkcube.system.darkessentials.util.EssentialCollections;
-import eu.darkcube.system.darkessentials.util.NumbzUtils;
+import eu.darkcube.system.darkessentials.util.KesUtils;
 
 public class CommandItemclear extends Command {
 
@@ -104,7 +104,7 @@ public class CommandItemclear extends Command {
 			for (Player player : players) {
 				for (Entity entity : player.getWorld().getEntities()) {
 					if (entity.getType().equals(EntityType.DROPPED_ITEM)) {
-						if (NumbzUtils.getDistance(player, entity) <= radius) {
+						if (KesUtils.getDistance(player, entity) <= radius) {
 							entity.remove();
 							count++;
 						}
