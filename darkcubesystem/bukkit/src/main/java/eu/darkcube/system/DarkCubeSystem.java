@@ -28,7 +28,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -80,11 +79,7 @@ import java.util.stream.IntStream;
         if (!via.supported()) {
             r.run();
         } else {
-            new BukkitRunnable() {
-                @Override public void run() {
-                    r.run();
-                }
-            }.runTaskLater(this, 5);
+            Bukkit.getScheduler().runTaskLater(this, r, 5);
         }
     }
 
