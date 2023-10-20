@@ -79,7 +79,7 @@ import java.util.stream.IntStream;
         if (!via.supported()) {
             r.run();
         } else {
-            Bukkit.getScheduler().runTaskLater(this, r, 5);
+            Bukkit.getScheduler().runTaskLater(this, r, 2);
         }
     }
 
