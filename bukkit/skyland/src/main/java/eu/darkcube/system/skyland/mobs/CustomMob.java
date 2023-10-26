@@ -31,6 +31,7 @@ public interface CustomMob extends SkylandEntity {
 	EntityType getType();
 
 
+
 	default void spawnMob(Location location, EntityType entityType){
 		Mob mob = (Mob) location.getWorld().spawnEntity(location, EntityType.VILLAGER);
 		mob.getPersistentDataContainer().set(getCustomMobTypeKey(), PersistentDataType.INTEGER, -1);

@@ -47,6 +47,7 @@ public class BeamOfLight extends Skills {
 							for (LivingEntity living : loc[0].getNearbyLivingEntities(1)){
 								living.setHealth(living.getHealth() + 6);
 								spawnFireWork(living.getLocation().add(0, 2, 0), Color.YELLOW, 2);
+
 							}
 							cancel();
 						}

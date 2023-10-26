@@ -7,10 +7,16 @@
 package eu.darkcube.system.skyland.Equipment;
 
 public enum EquipmentType {
-	AXE, HELMET
+	AXE(new ComponentTypes[] {}, new ComponentTypes[] {} ), HELMET(new ComponentTypes[] {}, new ComponentTypes[] {} )
 
 	;
 	ComponentTypes[] requiredComponents;
+	ComponentTypes[] allowedUpgradeComponents;
+
+	EquipmentType(ComponentTypes[] requiredComponents, ComponentTypes[] allowedUpgradeComponents){
+		this.requiredComponents = requiredComponents;
+		this.allowedUpgradeComponents = allowedUpgradeComponents;
+	}
 
 
 }

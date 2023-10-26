@@ -26,6 +26,9 @@
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$" />
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="eu.darkcube.system.libs.org.jetbrains.annotations.Nullable" />
     <option name="myDefaultNotNull" value="eu.darkcube.system.libs.org.jetbrains.annotations.NotNull" />

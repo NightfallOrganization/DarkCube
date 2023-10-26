@@ -49,6 +49,8 @@ public abstract class Skills {
 		fwm.setPower(power);
 		fwm.addEffect(FireworkEffect.builder().withColor(color).flicker(false).build());
 
+
+
 		fw.setFireworkMeta(fwm);
 		fw.detonate();
 	}
