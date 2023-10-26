@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.skyland.Equipment.*;
+import eu.darkcube.system.skyland.equipment.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;

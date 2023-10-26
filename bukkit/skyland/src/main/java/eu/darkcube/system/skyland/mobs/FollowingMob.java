@@ -7,12 +7,10 @@
 package eu.darkcube.system.skyland.mobs;
 
 import eu.darkcube.system.libs.com.google.gson.Gson;
-import eu.darkcube.system.skyland.Equipment.Materials;
-import eu.darkcube.system.skyland.Equipment.PlayerStats;
-import eu.darkcube.system.skyland.Equipment.Rarity;
+import eu.darkcube.system.skyland.equipment.Materials;
+import eu.darkcube.system.skyland.equipment.PlayerStats;
+import eu.darkcube.system.skyland.equipment.Rarity;
 import eu.darkcube.system.skyland.Skyland;
-import eu.darkcube.system.skyland.SkylandClassSystem.SkylandPlayerClass;
-import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +19,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;

@@ -6,26 +6,13 @@
  */
 package eu.darkcube.system.skyland.mobs;
 
-import com.destroystokyo.paper.entity.Pathfinder;
-import com.destroystokyo.paper.entity.Pathfinder.PathResult;
-import com.destroystokyo.paper.entity.ai.Goal;
-import eu.darkcube.system.libs.com.google.gson.Gson;
-import eu.darkcube.system.skyland.Equipment.PlayerStats;
-import eu.darkcube.system.skyland.Equipment.PlayerStatsType;
-import eu.darkcube.system.skyland.Equipment.Rarity;
-import eu.darkcube.system.skyland.Skyland;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import eu.darkcube.system.skyland.equipment.PlayerStats;
+import eu.darkcube.system.skyland.equipment.PlayerStatsType;
+import eu.darkcube.system.skyland.equipment.Rarity;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.Zombie;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.lang.reflect.Field;
-import java.util.Collection;
 
 public class CustomZombie {
 

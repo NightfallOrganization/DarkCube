@@ -6,21 +6,16 @@
  */
 package eu.darkcube.system.skyland.mobs;
 
-		import eu.darkcube.system.skyland.Equipment.Materials;
-		import eu.darkcube.system.skyland.Equipment.Rarity;
-		import eu.darkcube.system.skyland.Skyland;
-		import eu.darkcube.system.skyland.SkylandClassSystem.SkylandEntity;
+		import eu.darkcube.system.skyland.equipment.Materials;
+        import eu.darkcube.system.skyland.Skyland;
+		import eu.darkcube.system.skyland.skylandclasssystem.SkylandEntity;
 		import org.bukkit.Location;
 		import org.bukkit.NamespacedKey;
-		import org.bukkit.entity.Entity;
-		import org.bukkit.entity.EntityType;
+        import org.bukkit.entity.EntityType;
 		import org.bukkit.entity.Mob;
 		import org.bukkit.persistence.PersistentDataType;
-		import org.bukkit.util.Vector;
 
-		import java.util.ArrayList;
-		import java.util.HashMap;
-		import java.util.List;
+        import java.util.List;
 
 public interface CustomMob extends SkylandEntity {
 
