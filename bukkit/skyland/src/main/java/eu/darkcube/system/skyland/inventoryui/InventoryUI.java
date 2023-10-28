@@ -43,7 +43,7 @@ public class InventoryUI {
 
 	public void setInvSlot(UIitemStack us, int x, int y){
 		if (x < inv.length){
-			if (y < 9){
+			if (y < inv[x].length){
 				inv[x][y] = us;
 				inventory.setItem(x*9+y, us.getItemStack());
 			}else {

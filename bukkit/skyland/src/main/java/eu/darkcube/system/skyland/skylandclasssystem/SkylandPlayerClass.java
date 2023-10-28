@@ -15,9 +15,7 @@ import eu.darkcube.system.util.data.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class
-
-SkylandPlayerClass {
+public class SkylandPlayerClass {
 
     public static final PersistentDataType<SkylandPlayerClass> TYPE = new PersistentDataType<SkylandPlayerClass>() {
         @Override public SkylandPlayerClass deserialize(Document doc, String key) {
