@@ -34,7 +34,7 @@ public class Skyland extends DarkCubePlugin {
     ArrayList<CustomMob> mobs = new ArrayList<>();
     List<SkylandStructure> structures = new ArrayList<>();
 
-    CustomChunkGenerator customChunkGenerator;
+    CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator();
 
     public Skyland() {
         super("skyland");
@@ -145,7 +145,6 @@ public class Skyland extends DarkCubePlugin {
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        customChunkGenerator = new CustomChunkGenerator();
         return customChunkGenerator;
     }
 
