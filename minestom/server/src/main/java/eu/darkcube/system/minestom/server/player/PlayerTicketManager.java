@@ -2,32 +2,32 @@ package eu.darkcube.system.minestom.server.player;
 
 import eu.darkcube.system.minestom.server.chunk.ChunkCache;
 import eu.darkcube.system.minestom.server.chunk.ChunkManager;
+import eu.darkcube.system.minestom.server.chunk.ChunkViewer;
 import eu.darkcube.system.minestom.server.util.BinaryOperations;
 import eu.darkcube.system.minestom.server.util.MathHelper;
 import eu.darkcube.system.minestom.server.util.PriorityCalculator;
-import net.minestom.server.instance.Chunk;
-import net.minestom.server.network.packet.server.play.UnloadChunkPacket;
 
 import java.util.concurrent.CompletableFuture;
 
-public class PlayerTicketManager {
+public class PlayerTicketManager<T> {
 
-    private final ChunkManager<?> chunkManager;
+    private final ChunkManager<T> chunkManager;
     private final PriorityCalculator priorityCalculator;
-    private final DarkCubePlayer player;
+    private final ChunkViewer<T> viewer;
     private ChunkCache.Ticket[] tickets;
+    private int[][] ticketsIndexes;
     private ChunkCache.Ticket[] oldTickets;
-    private CompletableFuture<Chunk>[] futures;
+    private CompletableFuture<T>[] futures;
     private int[] offsets;
     private float radius = -1;
     private boolean unloaded = true;
     private int x = 0;
     private int y = 0;
 
-    public PlayerTicketManager(ChunkManager<?> chunkManager, PriorityCalculator priorityCalculator, float radius, DarkCubePlayer player) {
+    public PlayerTicketManager(ChunkManager<T> chunkManager, PriorityCalculator priorityCalculator, float radius, ChunkViewer<T> viewer) {
         this.chunkManager = chunkManager;
         this.priorityCalculator = priorityCalculator;
-        this.player = player;
+        this.viewer = viewer;
         resize(radius);
     }
 
@@ -89,13 +89,13 @@ public class PlayerTicketManager {
 
                 // Load the coordinate
                 var result = chunkManager.require(realX, realY, priority);
-                var now = (Chunk) result.future().getNow(null);
+                var now = result.future().getNow(null);
                 if (now != null) {
                     var existingTickets = chunkManager.tickets(realX, realY);
                     var oldTicket = tickets[i];
                     if (oldTicket == null || !existingTickets.contains(oldTicket)) {
                         // Make sure not to send every chunk on every border crossing
-                        now.sendChunk(player);
+                        viewer.loadChunk(realX, realY, now);
                         cnt++;
                     }
                 }
@@ -113,7 +113,7 @@ public class PlayerTicketManager {
                 var existingTickets = chunkManager.tickets(realX, realY);
                 var currentTicket = tickets[i];
                 if (currentTicket == null || !existingTickets.contains(currentTicket)) {
-                    player.sendPacket(new UnloadChunkPacket(realX, realY));
+//                    viewer.unloadChunk(realX, realY);
                 }
 
                 oldTickets[i] = null;

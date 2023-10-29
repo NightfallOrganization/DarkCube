@@ -15,6 +15,7 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.instance.AddEntityToInstanceEvent;
 import net.minestom.server.event.player.PlayerSettingsChangeEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.instance.Chunk;
 
 public class PlayerManager {
 
@@ -35,7 +36,7 @@ public class PlayerManager {
             player.getAcquirable().sync(e -> {
                 var position = player.getPosition();
                 var radius = actualViewDistance(player);
-                var ticketManager = new PlayerTicketManager(instance.chunkManager(), priorityCalculator, radius, player);
+                var ticketManager = new PlayerTicketManager<>(instance.chunkManager(), priorityCalculator, radius, player);
                 ticketManager.move(position.chunkX(), position.chunkZ());
                 var chunkManager = ticketManager.chunkManager();
                 player.playerTicketManager(ticketManager);

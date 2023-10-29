@@ -4,6 +4,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.minestom.server.util.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.util.Collection;

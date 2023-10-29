@@ -117,52 +117,52 @@ public class WoolBattleMinestom {
         AtomicInteger playerloaded = new AtomicInteger();
 
         Instance instance = MinecraftServer.getInstanceManager().createSharedInstance(instanceContainer);
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkUnloadEvent.class, event -> {
-            playerloaded.decrementAndGet();
-            Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
-            if (chunk != null) {
-                for (Player player : instance.getPlayers()) {
-                    if (chunk.equals(player.getChunk())) {
-                        return;
-                    }
-                }
-                instance.unloadChunk(chunk);
-            } else {
-                System.out.println("Chunk was null");
-            }
-        });
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkLoadEvent.class, event -> {
-            playerloaded.incrementAndGet();
-        });
-        MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkLoadEvent.class, event -> {
-            loaded.incrementAndGet();
-        });
-        MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkUnloadEvent.class, event -> {
-            loaded.decrementAndGet();
-        });
+//        MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkUnloadEvent.class, event -> {
+//            playerloaded.decrementAndGet();
+//            Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
+//            if (chunk != null) {
+//                for (Player player : instance.getPlayers()) {
+//                    if (chunk.equals(player.getChunk())) {
+//                        return;
+//                    }
+//                }
+//                instance.unloadChunk(chunk);
+//            } else {
+//                System.out.println("Chunk was null");
+//            }
+//        });
+//        MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkLoadEvent.class, event -> {
+//            playerloaded.incrementAndGet();
+//        });
+//        MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkLoadEvent.class, event -> {
+//            loaded.incrementAndGet();
+//        });
+//        MinecraftServer.getGlobalEventHandler().addListener(InstanceChunkUnloadEvent.class, event -> {
+//            loaded.decrementAndGet();
+//        });
         Command loadedCommand = new Command("loadedchunks");
         loadedCommand.setDefaultExecutor((sender, context) -> {
             sender.sendMessage(loaded.get() + " " + playerloaded.get());
         });
         MinecraftServer.getCommandManager().register(loadedCommand);
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
-            if (!instance.isChunkLoaded(event.getNewPosition())) {
-                instance.loadChunk(event.getNewPosition()).thenAccept(c -> {
-                    System.out.println("Loaded chunk");
-                }).join();
-                return;
-            }
-            Chunk chunk = instance.getChunkAt(event.getNewPosition());
-            if (chunk == null) {
-                event.setCancelled(true);
-                return;
-            }
-            Block to = chunk.getBlock(event.getNewPosition());
-
-            if (to.registry().collisionShape().intersectBox(event.getNewPosition(), event.getPlayer().getBoundingBox())) {
-                event.setCancelled(true);
-            }
-        });
+//        MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
+//            if (!instance.isChunkLoaded(event.getNewPosition())) {
+//                instance.loadChunk(event.getNewPosition()).thenAccept(c -> {
+//                    System.out.println("Loaded chunk");
+//                }).join();
+//                return;
+//            }
+//            Chunk chunk = instance.getChunkAt(event.getNewPosition());
+//            if (chunk == null) {
+//                event.setCancelled(true);
+//                return;
+//            }
+//            Block to = chunk.getBlock(event.getNewPosition());
+//
+//            if (to.registry().collisionShape().intersectBox(event.getNewPosition(), event.getPlayer().getBoundingBox())) {
+//                event.setCancelled(true);
+//            }
+//        });
         MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
             event.setSpawningInstance(instance);
             event.getPlayer().setRespawnPoint(new Pos(0, 100, 0));
