@@ -4,7 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.version.v1_20_1;
+package eu.darkcube.system.version.v1_20_2;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
@@ -31,7 +31,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -47,7 +47,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class ItemBuilder1_20_1 extends AbstractItemBuilder {
+public class ItemBuilder1_20_2 extends AbstractItemBuilder {
     private static final Logger LOGGER = Logger.getLogger("ItemBuilder");
     private static final NamespacedKey persistentDataKey = new NamespacedKey(DarkCubePlugin.systemPlugin(), "persistentDataStorage");
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(ItemStack.class, new TypeAdapter<ItemStack>() {
@@ -80,11 +80,11 @@ public class ItemBuilder1_20_1 extends AbstractItemBuilder {
     }).create();
     private final ItemStack item;
 
-    public ItemBuilder1_20_1() {
+    public ItemBuilder1_20_2() {
         this.item = null;
     }
 
-    public ItemBuilder1_20_1(ItemStack item) {
+    public ItemBuilder1_20_2(ItemStack item) {
         this.item = item.clone();
         item = item.clone();
         item.setItemMeta(item.getItemMeta());
@@ -178,8 +178,8 @@ public class ItemBuilder1_20_1 extends AbstractItemBuilder {
         }
     }
 
-    public static ItemBuilder1_20_1 deserialize(JsonElement json) {
-        return new ItemBuilder1_20_1(gson.fromJson(json, ItemStack.class));
+    public static ItemBuilder1_20_2 deserialize(JsonElement json) {
+        return new ItemBuilder1_20_2(gson.fromJson(json, ItemStack.class));
     }
 
     @Override public boolean canBeRepairedBy(eu.darkcube.system.inventoryapi.item.ItemBuilder ingredient) {
@@ -275,7 +275,7 @@ public class ItemBuilder1_20_1 extends AbstractItemBuilder {
     }
 
     @Override public AbstractItemBuilder clone() {
-        return new ItemBuilder1_20_1(build());
+        return new ItemBuilder1_20_2(build());
     }
 
     @Override public JsonElement serialize() {
