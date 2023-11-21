@@ -27,7 +27,8 @@ public class DataManagerTest {
     }
 
     public static void test1() {
-        var playerTicketManagers = new PlayerTicketManager[3];
+        var playerTicketManagers = new PlayerTicketManager[1];
+        var viewDistance = 2;
         var viewers = new ChunkViewer[playerTicketManagers.length];
 
         PriorityCalculator priorityCalculator = (centerX, centerY, x, y) -> {
@@ -35,7 +36,7 @@ public class DataManagerTest {
             int distY = centerY - y;
             int distXSq = distX * distX;
             int distYSq = distY * distY;
-            return Math.max(0, Math.min(31, (int) Math.sqrt(distXSq + distYSq)));
+            return Math.max(0, Math.min(viewDistance + 1, (int) Math.sqrt(distXSq + distYSq)));
         };
         var dataManager = new ChunkManager<>(new ChunkManager.Callbacks<>() {
             @Override public void loaded(int chunkX, int chunkY) {
@@ -63,7 +64,7 @@ public class DataManagerTest {
         for (int i = 0; i < playerTicketManagers.length; i++) {
             var data = viewer(combinedData.viewer());
             viewers[i] = data.viewer();
-            playerTicketManagers[i] = new PlayerTicketManager<>(dataManager, priorityCalculator, 30, data.viewer());
+            playerTicketManagers[i] = new PlayerTicketManager<>(dataManager, priorityCalculator, viewDistance, data.viewer());
             addListeners(data.label(), playerTicketManagers[i], data.image());
         }
 
@@ -159,7 +160,7 @@ public class DataManagerTest {
             @Override public void loadChunk(int x, int y, Color chunk) {
                 if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) return;
                 long lo = BinaryOperations.combine(x, y);
-                if (!l.add(lo)) System.out.println("Duplicate");
+//                if (!l.add(lo)) System.out.println("Duplicate");
                 if (combined != null) combined.loadChunk(x, y, chunk);
                 synchronized (image) {
                     image.setRGB(x, y, chunk.getRGB());
@@ -169,7 +170,7 @@ public class DataManagerTest {
 
             @Override public void unloadChunk(int x, int y) {
                 if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) return;
-                if (!l.remove(BinaryOperations.combine(x, y))) System.out.println("INvalid remove");
+//                if (!l.remove(BinaryOperations.combine(x, y))) System.out.println("INvalid remove");
                 if (combined != null) combined.unloadChunk(x, y);
                 synchronized (image) {
                     image.setRGB(x, y, 0xFFFFFF);
