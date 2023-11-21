@@ -1,7 +1,9 @@
 package eu.darkcube.system.minestom.server.chunk;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.minestom.server.util.*;
+import io.vavr.collection.List;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 
 import javax.swing.plaf.TableHeaderUI;
@@ -12,6 +14,8 @@ import java.util.NavigableSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 import static eu.darkcube.system.minestom.server.util.BinaryOperations.combine;
 
@@ -70,14 +74,14 @@ public class ChunkCache<T> {
                 // we just re-created the entry. Someone might still be freeing this though. Well just wait for them to update the state
                 if (STATE.compareAndSet(entry, STATE_INITIALIZED, STATE_GENERATING_INIT)) {
                     entry.taskPriority = priority;
-                    entry.task = executor.submit(new GeneratorTask<>(priority, entry.future, generator, entry, key, generatedCallback));
+                    entry.task = executor.submit(new GeneratorTask<>(priority, entry.future.future, generator, entry, key, generatedCallback));
                     cache.put(key, entry);
                     entry.state = STATE_GENERATING;
                     return new RequireResult<>(entry.future, ticket, true);
                 }
                 if (entry.state == STATE_GENERATED_UNLOADED) {
                     cache.put(key, entry);
-                    generatedCallback.call(chunkX, chunkY, entry.future.resultNow());
+                    generatedCallback.call(chunkX, chunkY, entry.future.future.resultNow());
                     entry.state = STATE_GENERATED;
                     return new RequireResult<>(entry.future, ticket, true);
                 }
@@ -111,7 +115,7 @@ public class ChunkCache<T> {
                 if (STATE.compareAndSet(entry, STATE_GENERATING, STATE_RE_PRIORITIZING)) {
                     entry.task.cancel();
                     entry.taskPriority = last.priority;
-                    entry.task = executor.submit(new GeneratorTask<>(last.priority, entry.future, generator, entry, key, generatedCallback));
+                    entry.task = executor.submit(new GeneratorTask<>(last.priority, entry.future.future, generator, entry, key, generatedCallback));
                     entry.state = STATE_GENERATING;
                 }
             }
@@ -207,7 +211,41 @@ public class ChunkCache<T> {
         void call(int chunkX, int chunkY, T data);
     }
 
-    public record RequireResult<T>(CompletableFuture<T> future, Ticket ticket, boolean required) {
+    public record RequireResult<T>(ChunkFuture<T> future, Ticket ticket, boolean required) {
+    }
+
+    public static class ChunkFuture<T> {
+        private final CompletableFuture<T> future = new CompletableFuture<>();
+        private final Collection<Consumer<T>> listeners = new CopyOnWriteArrayList<>();
+
+        public ChunkFuture() {
+            future.thenAccept(value -> {
+                for (var listener : listeners) {
+                    listener.accept(value);
+                }
+            });
+        }
+
+        @Nullable public T getNow() {
+            return future.getNow(null);
+        }
+
+        public void then(Consumer<T> listener) {
+            if (future.isDone()) {
+                listener.accept(future.resultNow());
+                return;
+            }
+            listeners.add(listener);
+            if (future.isDone()) {
+                if (listeners.remove(listener)) {
+                    listener.accept(future.resultNow());
+                }
+            }
+        }
+
+        public void remove(Consumer<T> listener) {
+            listeners.remove(listener);
+        }
     }
 
     public record ReleaseResult(boolean released) {
@@ -226,10 +264,14 @@ public class ChunkCache<T> {
             if (cmp != 0) return cmp;
             return Integer.compare(hashCode(), o.hashCode());
         }
+
+        @Override public String toString() {
+            return Integer.toString(priority);
+        }
     }
 
     @SuppressWarnings({"unused", "FieldMayBeFinal"}) public static class Entry<T> {
-        private final CompletableFuture<T> future = new CompletableFuture<>();
+        private final ChunkFuture<T> future = new ChunkFuture<>();
         private final ConcurrentSkipListMap<Ticket, Boolean> tickets = new ConcurrentSkipListMap<>();
         private volatile int count;
         private volatile int state = STATE_INITIALIZED;
@@ -239,7 +281,7 @@ public class ChunkCache<T> {
         public Entry(long key) {
         }
 
-        public CompletableFuture<T> future() {
+        public ChunkFuture<T> future() {
             return future;
         }
 
