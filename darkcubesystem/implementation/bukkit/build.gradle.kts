@@ -32,7 +32,7 @@ dependencies {
 
     runtimeOnly(projects.darkcubesystem.bukkit) { isTransitive = false }
     runtimeOnly(projects.darkcubesystem.server) { isTransitive = false }
-    runtimeOnly(projects.darkcubesystem.implementation.common) { isTransitive = false }
+//    runtimeOnly(projects.darkcubesystem.implementation.common) { isTransitive = false }
     runtimeOnly(project("v1_8_8"))
-    runtimeOnly(project("v1_20_1", "reobf"))
+    runtimeOnly(project("v1_20_2", "reobf"))
 }
