@@ -4,7 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.bukkit.version.v1_20_1;
+package eu.darkcube.system.bukkit.version.v1_20_2;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.CommandNode;
@@ -12,7 +12,7 @@ import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.DarkCubeSystemBukkit;
 import eu.darkcube.system.bukkit.commandapi.Command;
 import eu.darkcube.system.bukkit.version.BukkitCommandAPIUtils;
-import eu.darkcube.system.bukkit.version.v1_20_1.commandapi.CommandConverter;
+import eu.darkcube.system.bukkit.version.v1_20_2.commandapi.CommandConverter;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
@@ -32,7 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class CommandAPIUtils1_20_1 extends BukkitCommandAPIUtils implements Listener {
+public class CommandAPIUtils1_20_2 extends BukkitCommandAPIUtils implements Listener {
     private final Map<VanillaCommandWrapper, VanillaCommandWrapper> custom = new HashMap<>();
     private volatile boolean requireSync = false;
     private int requireSyncTick = 0;

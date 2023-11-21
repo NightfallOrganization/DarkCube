@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.bukkit.version.v1_20_1.util;
+package eu.darkcube.system.bukkit.version.v1_20_2.util;
 
 import eu.darkcube.system.bukkit.util.WorkbenchUtil;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;

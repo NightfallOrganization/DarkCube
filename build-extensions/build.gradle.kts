@@ -14,8 +14,6 @@ repositories {
     gradlePluginPortal()
 }
 
-kotlin.jvmToolchain(17)
-
 dependencies {
     implementation("com.github.mwiede:jsch:0.2.11")
     implementation("net.java.dev.jna:jna:4.5.0")

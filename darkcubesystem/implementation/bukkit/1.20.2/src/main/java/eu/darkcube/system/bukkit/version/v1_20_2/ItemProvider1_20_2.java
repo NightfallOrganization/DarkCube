@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.bukkit.version.v1_20_1;
+package eu.darkcube.system.bukkit.version.v1_20_2;
 
 import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.bukkit.inventoryapi.item.ItemProvider;

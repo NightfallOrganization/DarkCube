@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.bukkit.version.v1_20_1.commandapi;
+package eu.darkcube.system.bukkit.version.v1_20_2.commandapi;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;

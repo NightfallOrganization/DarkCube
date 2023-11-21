@@ -31,9 +31,11 @@ tasks {
         archiveClassifier = null
     }
     shadowJar.configure {
+        destinationDirectory = layout.buildDirectory.dir("cache")
         archiveClassifier = "shadow"
     }
     jar.configure {
+        destinationDirectory = layout.buildDirectory.dir("cache")
         enabled = false
     }
     assemble.configure {

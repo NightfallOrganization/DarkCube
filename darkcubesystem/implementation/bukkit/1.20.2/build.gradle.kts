@@ -16,15 +16,8 @@ dependencies {
     compileOnly(libs.cloudnet.driver)
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
 tasks {
     assemble {
         dependsOn(reobfJar)
-    }
-    reobfJar {
-    }
-    compileJava {
-        options.release = 17
     }
 }
