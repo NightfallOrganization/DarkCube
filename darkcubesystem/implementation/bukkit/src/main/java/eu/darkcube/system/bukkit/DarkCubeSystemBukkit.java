@@ -46,6 +46,7 @@ import java.util.Optional;
     public DarkCubeSystemBukkit() {
         super("system");
         DarkCubePlugin.systemPlugin(this);
+        PacketAPI.instance().classLoader(getClassLoader());
     }
 
     @Override public void onLoad() {
@@ -72,16 +73,24 @@ import java.util.Optional;
         AdventureSupportHolderAccess.instance(new BukkitAdventureSupportImpl(this));
         linkManager.enableLinks();
         BukkitVersionImpl.version().enabled(this);
-        PacketAPI.instance().registerHandler(PacketRequestProtocolVersionDeclaration.class, packet -> {
+        Runnable run = () -> {
+            PacketAPI.instance().registerHandler(PacketRequestProtocolVersionDeclaration.class, packet -> {
+                declareVersion();
+                return null;
+            });
             declareVersion();
-            return null;
-        });
-        declareVersion();
+        };
+        if (ServerVersion.version().provider().service(ViaSupport.class).supported()) {
+            Bukkit.getScheduler().runTaskLater(this, run, 2);
+        } else {
+            run.run();
+        }
     }
 
     public void declareVersion() {
         var via = ServerVersion.version().provider().service(ViaSupport.class);
-        var supported = via.supported() ? via.supportedVersions() : new int[]{ServerVersion.version().protocolVersion()};
+        var supported = via.supported() ? via.supportedVersions() : new int[0];
+        if (supported.length == 0) supported = new int[]{ServerVersion.version().protocolVersion()};
         new PacketDeclareProtocolVersion(InjectionLayer.boot().instance(ComponentInfo.class).componentName(), supported).sendAsync();
     }
 
