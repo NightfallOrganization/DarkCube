@@ -6,7 +6,7 @@
  */
 
 plugins {
-    id("java-library")
+    `java-library`
 }
 
 dependencies {

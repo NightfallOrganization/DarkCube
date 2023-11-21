@@ -17,6 +17,7 @@ import eu.darkcube.system.bukkit.commandapi.argument.EntityOptions;
 import eu.darkcube.system.bukkit.link.LinkManager;
 import eu.darkcube.system.bukkit.link.cloudnet.CloudNetLink;
 import eu.darkcube.system.bukkit.link.luckperms.LuckPermsLink;
+import eu.darkcube.system.bukkit.provider.via.ViaSupport;
 import eu.darkcube.system.bukkit.userapi.BukkitUserAPI;
 import eu.darkcube.system.bukkit.util.BukkitAdventureSupportImpl;
 import eu.darkcube.system.bukkit.version.BukkitVersionImpl;
@@ -79,9 +80,9 @@ import java.util.Optional;
     }
 
     public void declareVersion() {
-        new PacketDeclareProtocolVersion(InjectionLayer.boot().instance(ComponentInfo.class).componentName(), ServerVersion
-                .version()
-                .protocolVersion()).sendAsync();
+        var via = ServerVersion.version().provider().service(ViaSupport.class);
+        var supported = via.supported() ? via.supportedVersions() : new int[]{ServerVersion.version().protocolVersion()};
+        new PacketDeclareProtocolVersion(InjectionLayer.boot().instance(ComponentInfo.class).componentName(), supported).sendAsync();
     }
 
     private Version loadVersion() {

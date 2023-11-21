@@ -57,7 +57,7 @@ public class DarkCubeSystemMinestomExtension extends Extension {
 
     private Packet declareVersion() {
         ComponentInfo componentInfo = InjectionLayer.boot().instance(ComponentInfo.class);
-        new PacketDeclareProtocolVersion(componentInfo.componentName(), MinecraftServer.PROTOCOL_VERSION).sendAsync();
+        new PacketDeclareProtocolVersion(componentInfo.componentName(), new int[]{MinecraftServer.PROTOCOL_VERSION}).sendAsync();
         return null;
     }
 }

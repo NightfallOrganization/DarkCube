@@ -10,5 +10,5 @@ plugins {
 
 dependencies {
     compileOnlyApi(libs.cloudnet.driver)
-    api(projects.darkcubesystem.api)
+    compileOnlyApi(projects.darkcubesystem.api)
 }
