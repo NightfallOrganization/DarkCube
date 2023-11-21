@@ -42,6 +42,7 @@ public class PacketAPI {
     }
 
     private final Map<Class<? extends Packet>, PacketHandler<?>> handlers = new HashMap<>();
+    private volatile ClassLoader classLoader = getClass().getClassLoader();
     private Listener listener;
     private EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
     private Cache<UUID, QueryEntry<? extends Packet>> queries = Caffeine
@@ -72,6 +73,10 @@ public class PacketAPI {
     }
 
     @ApiStatus.Internal public static void init() {
+    }
+
+    public void classLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 
     void load() {
@@ -165,12 +170,12 @@ public class PacketAPI {
                 if (queryResponse) {
                     QueryEntry<? extends Packet> entry = queries.getIfPresent(queryId);
                     if (entry == null) return;
-                    Packet packet = PacketSerializer.readPacket(content);
+                    Packet packet = PacketSerializer.readPacket(content, classLoader);
                     entry.complete(packet);
                     return;
                 }
 
-                Class<? extends Packet> packetClass = PacketSerializer.getClass(content);
+                Class<? extends Packet> packetClass = PacketSerializer.getClass(content, classLoader);
                 if (handlers.containsKey(packetClass)) {
                     try {
                         Packet received = content.readObject(packetClass);

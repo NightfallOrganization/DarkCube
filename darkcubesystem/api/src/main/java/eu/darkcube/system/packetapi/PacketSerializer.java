@@ -8,12 +8,7 @@ package eu.darkcube.system.packetapi;
 
 import eu.cloudnetservice.driver.network.buffer.DataBuf;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class PacketSerializer {
-
-    private static final Logger LOGGER = Logger.getLogger("PacketSerializer");
 
     public static DataBuf.Mutable serialize(Packet packet, DataBuf.Mutable buf) {
         if (packet != null) {
@@ -22,16 +17,15 @@ public class PacketSerializer {
         return buf;
     }
 
-    public static Packet readPacket(DataBuf buf) {
-        Class<? extends Packet> cls = getClass(buf);
+    public static Packet readPacket(DataBuf buf, ClassLoader classLoader) {
+        Class<? extends Packet> cls = getClass(buf, classLoader);
         return buf.readObject(cls);
     }
 
-    public static Class<? extends Packet> getClass(DataBuf doc) {
+    public static Class<? extends Packet> getClass(DataBuf doc, ClassLoader classLoader) {
         try {
-            return (Class<? extends Packet>) Class.forName(doc.readString());
-        } catch (ClassNotFoundException exception) {
-            LOGGER.log(Level.SEVERE, "Failed to deserialize Packet", exception);
+            return (Class<? extends Packet>) Class.forName(doc.readString(), true, classLoader);
+        } catch (ClassNotFoundException ignored) {
         }
         return null;
     }
