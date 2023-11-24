@@ -1,5 +1,6 @@
 package eu.darkcube.system.minestom.server.chunk;
 
+import eu.darkcube.system.minestom.server.util.ConcurrentLinkedNodeDeque;
 import eu.darkcube.system.minestom.server.util.PrioritizedExecutor;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 
@@ -35,7 +36,11 @@ public class ChunkManager<T> {
         if (result.released()) {
             callbacks.unloaded(x, y);
         }
+        ConcurrentLinkedNodeDeque
         return result;
+    }
+
+    public void tick() {
     }
 
     public interface Callbacks<T> {

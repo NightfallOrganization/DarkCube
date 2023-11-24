@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.util.Objects;
 
-@SuppressWarnings({"UnnecessaryLabelOnBreakStatement", "CommentedOutCode", "unused", "SpellCheckingInspection"})
+@SuppressWarnings({"UnnecessaryLabelOnBreakStatement", "CommentedOutCode", "SpellCheckingInspection"})
 public final class ConcurrentLinkedNodeDeque<T> {
 
     private static final int HOPS = 2;
