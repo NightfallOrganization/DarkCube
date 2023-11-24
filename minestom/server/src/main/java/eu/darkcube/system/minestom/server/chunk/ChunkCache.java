@@ -2,13 +2,9 @@ package eu.darkcube.system.minestom.server.chunk;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.minestom.server.player.PlayerManager;
 import eu.darkcube.system.minestom.server.util.*;
-import io.vavr.collection.List;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
-import net.minestom.server.entity.Player;
 
-import javax.swing.plaf.TableHeaderUI;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.util.Collection;
