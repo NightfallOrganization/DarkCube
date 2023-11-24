@@ -49,6 +49,11 @@ public class DarkCubeInstance extends InstanceContainer {
         this.chunkManager = new ChunkManager<>(callbacks, priorityCount, generator);
     }
 
+    @Override public void tick(long time) {
+        chunkManager.tick();
+        super.tick(time);
+    }
+
     @Override public synchronized InstanceContainer copy() {
         throw new UnsupportedOperationException();
     }
