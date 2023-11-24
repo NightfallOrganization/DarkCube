@@ -43,7 +43,7 @@ public class PlayerManager {
 
                 // We make sure the chunk where the player spawns is loaded and generated. The PlayerTicketManager will take care that the chunk remains loaded after we release our temporary ticket.
                 var requireResult = chunkManager.require(position.chunkX(), position.chunkZ(), 0);
-                requireResult.future().join();
+                requireResult.future().await();
                 chunkManager.release(position.chunkX(), position.chunkZ(), requireResult.ticket());
             });
         });
