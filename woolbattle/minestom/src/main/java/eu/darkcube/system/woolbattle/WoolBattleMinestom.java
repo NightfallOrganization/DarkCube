@@ -40,7 +40,6 @@ public class WoolBattleMinestom {
         System.setProperty("minestom.entity-view-distance", "32");
         MinecraftServer server = MinecraftServer.init();
         MinecraftServer.setBrandName("WoolBattle");
-        MinecraftServer.setTerminalPrompt(null);
 
         Command command = new Command("stop", "exit");
         command.setDefaultExecutor((sender, context) -> {
