@@ -14,6 +14,7 @@ import java.util.concurrent.locks.LockSupport;
 
 import eu.darkcube.system.minestom.server.instance.DarkCubeInstance;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.color.Color;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.coordinate.Pos;
@@ -26,6 +27,8 @@ import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.generator.GenerationUnit;
+import net.minestom.server.instance.generator.Generator;
 import net.minestom.server.terminal.MinestomTerminal;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.world.DimensionType;
@@ -35,12 +38,13 @@ import net.minestom.server.world.biomes.BiomeParticle;
 
 public class Start {
     public static void main(String[] args) {
+
         System.setProperty("minestom.chunk-view-distance", "8");
         System.setProperty("minestom.extension.enabled", "true");
         System.setProperty("minestom.entity-view-distance", "8");
         System.setProperty("minestom.terminal-prompt", "");
         var server = MinecraftServer.init();
-        var priorityCount = MinecraftServer.getChunkViewDistance() + 1;
+        var priorityCount = ServerFlag.CHUNK_VIEW_DISTANCE + 1;
         System.out.println("Priority count: " + priorityCount);
         //        var playerManager = new PlayerManager(priorityCalculator);
         //        playerManager.register(MinecraftServer.getGlobalEventHandler());
@@ -86,23 +90,6 @@ public class Start {
             unit.modifier().fillBiome(customBiome);
             unit.modifier().fillHeight(0, 100, Block.STONE);
         });
-        //        instance.setChunkLoader(new IChunkLoader() {
-        //            @Override public @NotNull CompletableFuture<@Nullable Chunk> loadChunk(@NotNull Instance instance, int chunkX, int chunkZ) {
-        //                return AsyncUtils.empty();
-        //            }
-        //
-        //            @Override public @NotNull CompletableFuture<Void> saveChunk(@NotNull Chunk chunk) {
-        //                return AsyncUtils.empty();
-        //            }
-        //
-        //            @Override public boolean supportsParallelLoading() {
-        //                return true;
-        //            }
-        //
-        //            @Override public boolean supportsParallelSaving() {
-        //                return true;
-        //            }
-        //        });
 
         var loaded = new AtomicInteger();
         var playerloaded = new AtomicInteger();
