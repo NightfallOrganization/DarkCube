@@ -45,6 +45,9 @@ plugins {
 }
 
 rootProject.name = "DarkCube"
+
+includeBuild("minestom/minestom-library/Minestom")
+
 include("bukkit")
 include("bukkit:autovoidworld")
 include("bukkit:bauserver")
