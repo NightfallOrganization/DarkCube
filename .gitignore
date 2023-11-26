@@ -19,6 +19,7 @@ gradle-app.setting
 bin
 .idea/.name
 .idea/jarRepositories.xml
+.idea/checkstyleidea-libs/readme.txt
 
 .idea/gradle.xml
 .idea/libraries
