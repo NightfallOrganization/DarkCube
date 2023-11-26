@@ -24,7 +24,7 @@ tasks {
 dependencies {
     compileOnlyApi(projects.darkcubesystem.implementation.common)
     compileOnlyApi(projects.darkcubesystem.server)
-    compileOnlyApi(libs.minestom)
+    compileOnlyApi("net.minestom:minestom")
 
     runtimeOnly(projects.darkcubesystem.implementation.common) { isTransitive = false }
     runtimeOnly(projects.darkcubesystem.server) { isTransitive = false }

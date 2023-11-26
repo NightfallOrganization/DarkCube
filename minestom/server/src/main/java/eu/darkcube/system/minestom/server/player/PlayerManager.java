@@ -15,7 +15,6 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.instance.AddEntityToInstanceEvent;
 import net.minestom.server.event.player.PlayerSettingsChangeEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.instance.Chunk;
 
 public class PlayerManager {
 
@@ -27,7 +26,7 @@ public class PlayerManager {
         });
         node.addListener(PlayerSettingsChangeEvent.class, event -> {
             var player = (DarkCubePlayer) event.getPlayer();
-            player.playerTicketManager().resize(actualViewDistance(player));
+//            player.playerTicketManager().resize(actualViewDistance(player));
         });
         node.addListener(AddEntityToInstanceEvent.class, event -> {
             var instance = (DarkCubeInstance) event.getInstance();
@@ -36,15 +35,15 @@ public class PlayerManager {
             player.getAcquirable().sync(e -> {
                 var position = player.getPosition();
                 var radius = actualViewDistance(player);
-                var ticketManager = new PlayerTicketManager<>(instance.chunkManager(), priorityCalculator, radius, player);
-                ticketManager.move(position.chunkX(), position.chunkZ());
-                var chunkManager = ticketManager.chunkManager();
-                player.playerTicketManager(ticketManager);
+//                var ticketManager = new PlayerChunkManager<>(instance.chunkManager(), priorityCalculator, radius, player);
+//                ticketManager.move(position.chunkX(), position.chunkZ());
+//                var chunkManager = ticketManager.chunkManager();
+//                player.playerTicketManager(ticketManager);
 
                 // We make sure the chunk where the player spawns is loaded and generated. The PlayerTicketManager will take care that the chunk remains loaded after we release our temporary ticket.
-                var requireResult = chunkManager.require(position.chunkX(), position.chunkZ(), 0);
-                requireResult.future().await();
-                chunkManager.release(position.chunkX(), position.chunkZ(), requireResult.ticket());
+//                var requireResult = chunkManager.require(position.chunkX(), position.chunkZ(), 0);
+//                requireResult.future().await();
+//                chunkManager.release(position.chunkX(), position.chunkZ(), requireResult.ticket());
             });
         });
     }

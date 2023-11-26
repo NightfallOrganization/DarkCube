@@ -26,5 +26,5 @@ tasks {
 }
 
 dependencies {
-    implementation(libs.minestom)
+    implementation("net.minestom:minestom")
 }

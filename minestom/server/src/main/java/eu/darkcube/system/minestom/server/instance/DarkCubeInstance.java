@@ -7,70 +7,115 @@
 
 package eu.darkcube.system.minestom.server.instance;
 
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.minestom.server.chunk.ChunkManager;
-import eu.darkcube.system.minestom.server.player.DarkCubePlayer;
-import eu.darkcube.system.minestom.server.util.BinaryOperations;
-import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
-import net.minestom.server.entity.Player;
-import net.minestom.server.instance.Chunk;
-import net.minestom.server.instance.IChunkLoader;
-import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.network.packet.server.play.UnloadChunkPacket;
-import net.minestom.server.world.DimensionType;
-
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
-public class DarkCubeInstance extends InstanceContainer {
-    private final ChunkManager<Chunk> chunkManager;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import net.minestom.server.coordinate.Point;
+import net.minestom.server.entity.Player;
+import net.minestom.server.instance.Chunk;
+import net.minestom.server.instance.DynamicChunk;
+import net.minestom.server.instance.IChunkLoader;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.block.BlockFace;
+import net.minestom.server.instance.block.BlockHandler;
+import net.minestom.server.instance.generator.Generator;
+import net.minestom.server.utils.chunk.ChunkSupplier;
+import net.minestom.server.world.DimensionType;
 
-    public DarkCubeInstance(UUID uniqueId, DimensionType dimensionType, int priorityCount) {
-        this(uniqueId, dimensionType, null, priorityCount);
+public class DarkCubeInstance extends Instance {
+
+    private final ChunkStorage chunkStorage = new ChunkStorage(this);
+    private @NotNull ChunkSupplier chunkSupplier = DynamicChunk::new;
+    private @Nullable Generator generator;
+    private @Nullable IChunkLoader chunkLoader;
+    private boolean autoChunkLoading = false;
+
+    public DarkCubeInstance(@NotNull UUID uniqueId, @NotNull DimensionType dimensionType) {
+        super(uniqueId, dimensionType);
     }
 
-    public DarkCubeInstance(UUID uniqueId, DimensionType dimensionType, IChunkLoader loader, int priorityCount) {
-        super(uniqueId, dimensionType, loader);
-        ChunkManager.Callbacks<Chunk> callbacks = new ChunkManager.Callbacks<>() {
-            @Override public void loaded(int chunkX, int chunkY) {
-            }
+    @Override public void setBlock(int x, int y, int z, @NotNull Block block, boolean doBlockUpdates) {
 
-            @Override public void unloaded(int chunkX, int chunkY) {
-                var chunk = getChunk(chunkX, chunkY);
-                if (chunk == null) return;
-                unloadChunk(chunk);
-            }
-
-            @Override public void generated(int chunkX, int chunkY, Chunk chunk) {
-                chunk.sendChunk();
-            }
-        };
-        Long2ObjectFunction<Chunk> generator = key -> loadChunk(BinaryOperations.x(key), BinaryOperations.y(key)).join();
-        this.chunkManager = new ChunkManager<>(callbacks, priorityCount, generator);
     }
 
-    @Override public void tick(long time) {
-        chunkManager.tick();
-        super.tick(time);
+    @Override public boolean placeBlock(BlockHandler.@NotNull Placement placement, boolean doBlockUpdates) {
+        return false;
     }
 
-    @Override public synchronized InstanceContainer copy() {
-        throw new UnsupportedOperationException();
+    @Override
+    public boolean breakBlock(@NotNull Player player, @NotNull Point blockPosition, @NotNull BlockFace blockFace, boolean doBlockUpdates) {
+        return false;
     }
 
-    @Override public Chunk getChunk(int chunkX, int chunkZ) {
-        return super.getChunk(chunkX, chunkZ);
+    @Override public @NotNull CompletableFuture<@NotNull Chunk> loadChunk(int chunkX, int chunkZ) {
+        return chunkStorage.loadChunk(chunkX, chunkZ);
     }
 
-    @Override public synchronized void unloadChunk(@NotNull Chunk chunk) {
-        super.unloadChunk(chunk);
+    @Override public @NotNull CompletableFuture<@Nullable Chunk> loadOptionalChunk(int chunkX, int chunkZ) {
+        return chunkStorage.loadChunkOptional(chunkX, chunkZ);
+    }
+
+    @Override public void unloadChunk(@NotNull Chunk chunk) {
+        chunkStorage.unloadChunk(chunk);
+    }
+
+    @Override public @Nullable Chunk getChunk(int chunkX, int chunkZ) {
+        return chunkStorage.getChunk(chunkX, chunkZ);
+    }
+
+    @Override public @NotNull CompletableFuture<Void> saveInstance() {
+        return chunkLoader.saveInstance(this);
+    }
+
+    @Override public @NotNull CompletableFuture<Void> saveChunkToStorage(@NotNull Chunk chunk) {
+        return chunkLoader.saveChunk(chunk);
+    }
+
+    @Override public @NotNull CompletableFuture<Void> saveChunksToStorage() {
+        return chunkLoader.saveChunks(getChunks());
+    }
+
+    @Override public void setChunkSupplier(@NotNull ChunkSupplier chunkSupplier) {
+        this.chunkSupplier = chunkSupplier;
+    }
+
+    @Override public @NotNull ChunkSupplier getChunkSupplier() {
+        return chunkSupplier;
+    }
+
+    @Override public @Nullable Generator generator() {
+        return this.generator;
+    }
+
+    @Override public void setGenerator(@Nullable Generator generator) {
+        this.generator = generator;
     }
 
     @Override public @NotNull Collection<@NotNull Chunk> getChunks() {
-        return super.getChunks();
+        return chunkStorage.chunks().values();
     }
 
-    public ChunkManager<Chunk> chunkManager() {
-        return chunkManager;
+    @Override public void enableAutoChunkLoad(boolean enable) {
+        this.autoChunkLoading = enable;
+    }
+
+    @Override public boolean hasEnabledAutoChunkLoad() {
+        return this.autoChunkLoading;
+    }
+
+    @Override public boolean isInVoid(@NotNull Point point) {
+        return point.y() < getDimensionType().getMinY() - 64;
+    }
+
+    public void chunkLoader(@Nullable IChunkLoader chunkLoader) {
+        this.chunkLoader = chunkLoader;
+    }
+
+    public @Nullable IChunkLoader chunkLoader() {
+        return chunkLoader;
     }
 }
