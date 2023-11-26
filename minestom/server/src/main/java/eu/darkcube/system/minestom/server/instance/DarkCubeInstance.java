@@ -15,6 +15,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.DynamicChunk;
 import net.minestom.server.instance.IChunkLoader;
@@ -28,10 +29,11 @@ import net.minestom.server.world.DimensionType;
 
 public class DarkCubeInstance extends Instance {
 
+    private static final AnvilLoader DEFAULT_LOADER = new AnvilLoader("world");
     private final ChunkStorage chunkStorage = new ChunkStorage(this);
     private @NotNull ChunkSupplier chunkSupplier = DynamicChunk::new;
+    private @NotNull IChunkLoader chunkLoader = DEFAULT_LOADER;
     private @Nullable Generator generator;
-    private @Nullable IChunkLoader chunkLoader;
     private boolean autoChunkLoading = false;
 
     public DarkCubeInstance(@NotNull UUID uniqueId, @NotNull DimensionType dimensionType) {
@@ -96,7 +98,7 @@ public class DarkCubeInstance extends Instance {
     }
 
     @Override public @NotNull Collection<@NotNull Chunk> getChunks() {
-        return chunkStorage.chunks().values();
+        return chunkStorage.chunks();
     }
 
     @Override public void enableAutoChunkLoad(boolean enable) {
@@ -112,10 +114,10 @@ public class DarkCubeInstance extends Instance {
     }
 
     public void chunkLoader(@Nullable IChunkLoader chunkLoader) {
-        this.chunkLoader = chunkLoader;
+        this.chunkLoader = chunkLoader == null ? DEFAULT_LOADER : chunkLoader;
     }
 
-    public @Nullable IChunkLoader chunkLoader() {
+    public @NotNull IChunkLoader chunkLoader() {
         return chunkLoader;
     }
 }
