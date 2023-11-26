@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class WeakLoadingCache<K, V> {
 
+    private static final Cleaner CLEANER = Cleaner.create();
+
     private final Loader<K, V> loader;
     private final ConcurrentHashMap<K, WeakReference<V>> backend = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<WeakReference<V>, K> inverse = new ConcurrentHashMap<>();
@@ -16,7 +18,7 @@ public class WeakLoadingCache<K, V> {
         this.loader = loader;
         var cleanerThread = new CleanerThread<>(queue, backend, inverse);
         cleanerThread.start();
-        Cleaner.create().register(this, cleanerThread::exit);
+        CLEANER.register(this, cleanerThread::exit);
     }
 
     public V get(K key) {

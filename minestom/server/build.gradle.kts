@@ -8,7 +8,6 @@ import org.gradle.api.internal.file.FileOperations
  */
 plugins {
     `java-library`
-    id("token-replacement")
     id("darkcube-parent")
 }
 
@@ -56,13 +55,6 @@ abstract class SetupLibrariesTask : DefaultTask() {
     }
 }
 
-tokens {
-    replace("{\$project.version}", project.version)
-}
-
-sourceSets {
-}
-
 tasks {
     val setupLibraries = register<SetupLibrariesTask>("setupLibraries")
     jar {
@@ -85,7 +77,7 @@ dependencies {
     compileOnlyApi(projects.darkcubesystem.server) {
         exclude("org.jetbrains", "annotations")
     }
-    implementation(libs.minestom) {
+    implementation("net.minestom:minestom") {
         exclude("org.jetbrains", "annotations")
     }
 }
