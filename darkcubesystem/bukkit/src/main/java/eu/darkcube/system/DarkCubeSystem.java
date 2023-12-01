@@ -84,7 +84,7 @@ import java.util.stream.IntStream;
                 @Override public void run() {
                     r.run();
                 }
-            }.runTask(this);
+            }.runTaskLater(this, 5);
         }
     }
 
