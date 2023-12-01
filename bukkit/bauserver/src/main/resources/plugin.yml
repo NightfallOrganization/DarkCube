@@ -3,3 +3,5 @@ version: 1.0
 name: BauServer
 author: DasBabyPixel
 api-version: 1.13
+softdepend:
+  - System
