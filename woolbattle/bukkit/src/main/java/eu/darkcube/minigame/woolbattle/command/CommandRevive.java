@@ -8,6 +8,7 @@ package eu.darkcube.minigame.woolbattle.command;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
+import eu.darkcube.minigame.woolbattle.game.ingame.PlayerUtil;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
@@ -24,14 +25,11 @@ public class CommandRevive extends CommandExecutor {
                 .executes(context -> {
                     Player p = EntityArgument.getPlayer(context, "player");
                     WBUser user = WBUser.getUser(p);
-                    Ingame ingame = woolbattle.ingame();
-                    if (!ingame.lastTeam.containsKey(user)) {
+                    if (!woolbattle.ingame().playerUtil().revive(user)) {
                         context.getSource().sendMessage(Component.text("Konnte team für spieler nicht finden!"));
-                        return 0;
+                    } else {
+                        context.getSource().sendMessage(Component.text("Spieler wiederbelebt!"));
                     }
-                    Team team = ingame.lastTeam.get(user);
-                    woolbattle.teamManager().setTeam(user, team);
-                    context.getSource().sendMessage(Component.text("Spieler wiederbelebt!"));
                     return 0;
                 })));
     }
