@@ -153,8 +153,10 @@ public class Ingame extends GamePhase {
         this.startingIngame = true;
 
         woolbattle.lobbySystemLink().update();
-        
-        CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(woolbattle.gameData().map());
+
+        var map = woolbattle.gameData().map(); // TODO this should never be null
+        if (map == null) map = woolbattle.mapManager().defaultRandomPersistentMap(woolbattle.gameData().mapSize());
+        CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(map);
         woolbattle.sendMessage(Message.STARTING_GAME);
         for (WBUser user : WBUser.onlineUsers()) {
             user.getBukkitEntity().setGameMode(GameMode.SPECTATOR);
