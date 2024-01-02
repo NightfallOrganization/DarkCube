@@ -45,22 +45,22 @@ public class MinePerk extends Perk {
 
         @EventHandler public void handle(BlockPlaceEvent event) {
             if (event.getItemInHand() == null) return;
-            ItemStack item = event.getItemInHand();
-            WBUser user = WBUser.getUser(event.getPlayer());
-            AtomicReference<UserPerk> perkRef = new AtomicReference<>(null);
+            var item = event.getItemInHand();
+            var user = WBUser.getUser(event.getPlayer());
+            var perkRef = new AtomicReference<UserPerk>(null);
             if (!checkUsable(user, item, perk(), perkRef::set, woolbattle)) {
                 if (perkRef.get() != null) event.setCancelled(true);
                 return;
             }
-            UserPerk userPerk = perkRef.get();
+            var userPerk = perkRef.get();
             userPerk.currentPerkItem().setItem();
             new Scheduler(woolbattle, userPerk.currentPerkItem()::setItem).runTask();
             event.setCancelled(true);
             activated(userPerk);
-            woolbattle.ingame().place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
-                new Scheduler(woolbattle, () -> b.setType(Material.STONE_PLATE)).runTask();
+            new Scheduler(woolbattle, () -> woolbattle.ingame().place(event.getBlock(), b -> {
+                b.setType(Material.STONE_PLATE);
                 woolbattle.ingame().setMetaData(b, "perk", userPerk);
-            });
+            })).runTask();
         }
 
         @EventHandler public void handle(PlayerInteractEvent event) {

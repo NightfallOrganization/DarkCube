@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.module;
 
 import dev.derklaro.aerogel.Inject;
 import dev.derklaro.aerogel.Singleton;
+import eu.cloudnetservice.common.log.Logger;
 import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.provider.CloudServiceProvider;
@@ -56,6 +57,7 @@ import java.util.List;
         int unconfiguredCount = unconfiguredServices.size();
         ServiceTask task = serviceTaskProvider.serviceTask(taskName);
         if (task == null) return;
+        if (task.maintenance()) return;
         if (minServiceCount > unconfiguredCount) startService(task);
         if (minServiceCount + discrepancy < unconfiguredCount) stopUnconfigured(unconfiguredServices);
     }
@@ -75,7 +77,7 @@ import java.util.List;
                 .build()
                 .createNewService();
         if (result.state() != ServiceCreateResult.State.CREATED) {
-            System.out.println("Failed to create service for task " + task.name());
+            Logger.getLogger("ServiceHelper").info("Failed to create service for task " + task.name());
             return;
         }
         result.serviceInfo().provider().start();

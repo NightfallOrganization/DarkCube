@@ -29,8 +29,9 @@ public class SchedulerResetWool extends Scheduler implements ConfiguredScheduler
         this.userPlacedBlocks = userPlacedBlocks;
     }
 
-    @Override public synchronized void run() {
+    @Override public void run() {
         for (Entry<Block, DyeColor> e : brokenWool.entrySet()) {
+            woolbattle().ingame().removeMetaStorage(e.getKey());
             BlockState state = e.getKey().getState();
             state.setType(Material.WOOL);
             Wool wool = (Wool) state.getData();

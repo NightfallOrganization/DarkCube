@@ -153,6 +153,11 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
                         write(doc, map);
                     }
                 }
+            } else if (gameState == GameState.INGAME) {
+                var map = woolbattle.gameData().map();
+                if (map != null) {
+                    write(doc, map);
+                }
             }
 
             root.append("LobbyV2", doc);
@@ -275,6 +280,10 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
                 responseV2(sender, requestId, 1, null);
                 schedule(() -> {
                     if (!woolbattle.lobby().enabled()) {
+                        if (woolbattle.ingame().enabled()) {
+                            responseV2(sender, requestId, 2, null);
+                            return;
+                        }
                         responseV2(sender, requestId, 0, "out_of_date");
                         return;
                     }

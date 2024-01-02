@@ -18,6 +18,7 @@ import eu.cloudnetservice.driver.template.TemplateStorage;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 @Singleton public class ServiceHelper extends DriverModule {
 

@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.version.v1_20_1.commandapi;
+package eu.darkcube.system.version.v1_20_2.commandapi;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -28,7 +28,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
-import org.bukkit.craftbukkit.v1_20_R1.command.VanillaCommandWrapper;
+import org.bukkit.craftbukkit.v1_20_R2.command.VanillaCommandWrapper;
 
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;

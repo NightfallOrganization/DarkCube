@@ -46,7 +46,8 @@ public class FreezeArrowPerk extends Perk {
                     event.shooter().addWool(removed);
                     return;
                 }
-                event.target().getBukkitEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 4 * 20, 10, true, false));
+                var be = event.target().getBukkitEntity();
+                if (be != null) be.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 2 * 20 + 10, 10, true, false));
             }
         }
 

@@ -135,13 +135,17 @@ public class Ingame extends GamePhase {
                 ingame.breakedWool.put(block, ((Wool) block.getState().getData()).getColor());
             }
 
-            if (block.hasMetadata("WoolBattleMetaStorage")) {
-                block.removeMetadata("WoolBattleMetaStorage", woolbattle);
-            }
+            removeMetaStorage(block);
             block.setType(Material.AIR);
             return true;
         }
         return false;
+    }
+
+    public void removeMetaStorage(Block block) {
+        if (block.hasMetadata("WoolBattleMetaStorage")) {
+            block.removeMetadata("WoolBattleMetaStorage", woolbattle);
+        }
     }
 
     public Team getLastTeam(WBUser user) {
@@ -153,8 +157,10 @@ public class Ingame extends GamePhase {
         this.startingIngame = true;
 
         woolbattle.lobbySystemLink().update();
-        
-        CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(woolbattle.gameData().map());
+
+        var map = woolbattle.gameData().map(); // TODO this should never be null
+        if (map == null) map = woolbattle.mapManager().defaultRandomPersistentMap(woolbattle.gameData().mapSize());
+        CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(map);
         woolbattle.sendMessage(Message.STARTING_GAME);
         for (WBUser user : WBUser.onlineUsers()) {
             user.getBukkitEntity().setGameMode(GameMode.SPECTATOR);

@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.listener.endgame;
 
+import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -18,5 +19,7 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
 	@EventHandler
 	public void handle(PlayerQuitEvent e) {
 		e.setQuitMessage(null);
+		var user = WBUser.getUser(e.getPlayer());
+		user.setTeam(null);
 	}
 }

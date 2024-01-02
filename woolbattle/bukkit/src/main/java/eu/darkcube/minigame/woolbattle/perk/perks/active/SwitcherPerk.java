@@ -65,6 +65,7 @@ public class SwitcherPerk extends Perk {
                 e.setCancelled(true);
                 WBUser user = WBUser.getUser(hit);
                 if (user.projectileImmunityTicks() > 0) return;
+                if (!woolbattle.ingame().playerUtil().canAttack(WBUser.getUser(p), user)) return;
                 if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30))
                     woolbattle.ingame().playerUtil().attack(WBUser.getUser(p), user);
                 Location loc = p.getLocation();

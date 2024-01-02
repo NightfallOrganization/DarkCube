@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.version.v1_20_1.util;
+package eu.darkcube.system.version.v1_20_2.util;
 
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -17,12 +17,12 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftLocation;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftLocation;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
-public class WorkbenchUtil1_20_1 implements WorkbenchUtil {
+public class WorkbenchUtil1_20_2 implements WorkbenchUtil {
 
     @Override public InventoryView openWorkbench(Player player, Location location, boolean force, Component title) {
         CraftPlayer cp = (CraftPlayer) player;

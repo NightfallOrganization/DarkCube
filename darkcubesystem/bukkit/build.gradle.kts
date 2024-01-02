@@ -17,6 +17,6 @@ dependencies {
     compileOnlyApi(libs.viaversion.common)
     compileOnly(libs.luckperms)
     runtimeOnly(project("v1_8_8"))
-    runtimeOnly(project("v1_20_1", "reobf"))
+    runtimeOnly(project("v1_20_2", "reobf"))
     annotationProcessor(libs.cloudnetInjectProcessor)
 }
