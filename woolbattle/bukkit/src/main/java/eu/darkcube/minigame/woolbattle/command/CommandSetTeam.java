@@ -21,14 +21,13 @@ public class CommandSetTeam extends CommandExecutor {
     public CommandSetTeam(WoolBattleBukkit woolbattle) {
         super("woolbattle", "setteam", "woolbattle.command.setteam", new String[0], b -> {
             b.then(Commands.argument("player", EntityArgument.player())
-                    .then(Commands.argument("team", TeamArgument.teamArgument(woolbattle))
+                    .then(Commands.argument("team", TeamArgument.teamArgumentSpectator(woolbattle))
                             .executes(context -> {
                                 Player player = EntityArgument.getPlayer(context, "player");
                                 WBUser user = WBUser.getUser(player);
                                 Team team = TeamArgument.team(context, "team");
                                 user.setTeam(team);
-                                context.getSource()
-                                        .sendMessage(Component.text("Team gesetzt!"));
+                                context.getSource().sendMessage(Component.text("Team gesetzt!"));
                                 return 0;
                             })));
         });

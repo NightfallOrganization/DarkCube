@@ -187,12 +187,20 @@ public class ItemBuilder1_8_8 extends AbstractItemBuilder {
                 if (builderMeta instanceof FireworkBuilderMeta) {
                     ((FireworkEffectMeta) meta).setEffect(((FireworkBuilderMeta) builderMeta).fireworkEffect());
                 } else if (builderMeta instanceof SkullBuilderMeta bmeta) {
-                    UserProfile owner = bmeta.owningPlayer();
-                    Texture texture = owner.texture();
-                    GameProfile profile = new GameProfile(owner.uniqueId() == null ? UUID.randomUUID() : owner.uniqueId(), owner.name());
-                    if (texture != null)
+                    var owner = bmeta.owningPlayer();
+                    var texture = owner.texture();
+                    var generateUUID = texture != null;
+                    var uuid = generateUUID ? (owner.uniqueId() == null ? UUID.randomUUID() : owner.uniqueId()) : null;
+                    GameProfile profile = new GameProfile(uuid, owner.name());
+                    if (texture != null) {
                         profile.getProperties().put("textures", new Property("textures", texture.value(), texture.signature()));
-                    ReflectionUtils.setValue(meta, CraftMetaSkull$profile, profile);
+                    }
+                    if (owner.name() != null && owner.uniqueId() == null && texture == null) {
+                        // Special case - we use spigot api for faster SkullMeta (it uses existing players for lookup)
+                        ((SkullMeta) meta).setOwner(owner.name());
+                    } else {
+                        ReflectionUtils.setValue(meta, CraftMetaSkull$profile, profile);
+                    }
                 } else if (builderMeta instanceof LeatherArmorBuilderMeta) {
                     ((LeatherArmorMeta) meta).setColor(((LeatherArmorBuilderMeta) builderMeta).color());
                 } else if (builderMeta instanceof SpawnEggBuilderMeta) {

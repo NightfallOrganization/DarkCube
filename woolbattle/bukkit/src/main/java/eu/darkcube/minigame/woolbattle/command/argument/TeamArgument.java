@@ -19,12 +19,13 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExc
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class TeamArgument implements ArgumentType<Team> {
-    private static final DynamicCommandExceptionType INVALID_ENUM =
-            Messages.INVALID_ENUM.newDynamicCommandExceptionType();
+    private static final DynamicCommandExceptionType INVALID_ENUM = Messages.INVALID_ENUM.newDynamicCommandExceptionType();
     private final WoolBattleBukkit woolbattle;
     private final boolean spectator;
 
@@ -49,19 +50,23 @@ public class TeamArgument implements ArgumentType<Team> {
         return new TeamArgument(woolbattle, true);
     }
 
-    @Override
-    public Team parse(StringReader reader) throws CommandSyntaxException {
+    @Override public Team parse(StringReader reader) throws CommandSyntaxException {
         String dnk = reader.readString();
-        for (Team team : woolbattle.teamManager().getTeams()) {
-            if (!spectator && team.isSpectator()) continue;
-            if (team.getType().getDisplayNameKey().equals(dnk)) return team;
-        }
+        var team = teams()
+                .filter(t -> !t.isSpectator() || spectator)
+                .filter(t -> t.getType().getDisplayNameKey().equals(dnk))
+                .findFirst()
+                .orElse(null);
+        if (team != null) return team;
         throw INVALID_ENUM.createWithContext(reader, dnk);
     }
 
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        Stream<String> suggestions = woolbattle.teamManager().getTeams().stream().filter(t -> {
+    private Stream<Team> teams() {
+        return Stream.concat(Stream.of(woolbattle.teamManager().getSpectator()), woolbattle.teamManager().getTeams().stream());
+    }
+
+    @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        Stream<String> suggestions = teams().filter(t -> {
             if (!spectator) return !t.isSpectator();
             return true;
         }).map(t -> t.getType().getDisplayNameKey());

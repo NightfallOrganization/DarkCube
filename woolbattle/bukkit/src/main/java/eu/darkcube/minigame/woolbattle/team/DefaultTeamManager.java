@@ -26,7 +26,6 @@ public class DefaultTeamManager implements TeamManager {
 
     private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_teams");
     private final Collection<Team> teams;
-    private final Map<WBUser, Team> teamByUser;
     private final WoolBattleBukkit woolbattle;
     private final Map<MapSize, Collection<TeamType>> teamTypes = new HashMap<>();
     private Team spectator;
@@ -34,7 +33,6 @@ public class DefaultTeamManager implements TeamManager {
     public DefaultTeamManager(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         teams = new HashSet<>();
-        teamByUser = new HashMap<>();
 
         loadSpectator();
         loadTeams();
@@ -158,28 +156,11 @@ public class DefaultTeamManager implements TeamManager {
     }
 
     @Override public Team getTeam(WBUser user) {
-        return teamByUser.get(user);
+        return user.getTeam();
     }
 
     @Override public void setTeam(WBUser user, Team team) {
-        Team t = getTeam(user);
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            WBUser u = WBUser.getUser(p);
-            Scoreboard s = new Scoreboard(u);
-            if (t != null) s.getTeam(t.getType().getScoreboardTag()).removePlayer(user.getPlayerName());
-            s.getTeam(team.getType().getScoreboardTag()).getPrefix();
-            s.getTeam(team.getType().getScoreboardTag()).addPlayer(user.getPlayerName());
-        }
-        if (!team.isSpectator()) {
-            for (Player o : Bukkit.getOnlinePlayers()) {
-                o.showPlayer(user.getBukkitEntity());
-            }
-        }
-        teamByUser.put(user, team);
-        if (woolbattle.ingame().enabled()) {
-            woolbattle.ingame().playerUtil().setPlayerItems(user);
-            woolbattle.ingame().checkGameEnd();
-        }
+        user.setTeam(team);
     }
 
     @Override public Collection<? extends Team> getTeams() {

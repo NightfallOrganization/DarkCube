@@ -135,13 +135,17 @@ public class Ingame extends GamePhase {
                 ingame.breakedWool.put(block, ((Wool) block.getState().getData()).getColor());
             }
 
-            if (block.hasMetadata("WoolBattleMetaStorage")) {
-                block.removeMetadata("WoolBattleMetaStorage", woolbattle);
-            }
+            removeMetaStorage(block);
             block.setType(Material.AIR);
             return true;
         }
         return false;
+    }
+
+    public void removeMetaStorage(Block block) {
+        if (block.hasMetadata("WoolBattleMetaStorage")) {
+            block.removeMetadata("WoolBattleMetaStorage", woolbattle);
+        }
     }
 
     public Team getLastTeam(WBUser user) {

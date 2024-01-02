@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -202,7 +203,7 @@ public interface WBUser {
     /**
      * @return the bukkit {@link Player} object
      */
-    CraftPlayer getBukkitEntity();
+    @Nullable CraftPlayer getBukkitEntity();
 
     /**
      * @return the open inventory of the player

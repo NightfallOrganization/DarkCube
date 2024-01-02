@@ -37,5 +37,6 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         WBUser.onlineUsers().forEach(ScoreboardHelper::setOnline);
         e.setQuitMessage(null);
         woolBattle.lobby().checkUnload(Bukkit.getOnlinePlayers().size() - 1);
+        user.setTeam(null);
     }
 }

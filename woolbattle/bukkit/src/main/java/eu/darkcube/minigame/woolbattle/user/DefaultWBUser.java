@@ -20,6 +20,7 @@ import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
+import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.userapi.User;
@@ -30,6 +31,7 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -68,7 +70,7 @@ class DefaultWBUser implements WBUser {
     private static final Key KEY_PERKS = new Key(WoolBattleBukkit.instance(), "perks");
     private static final PersistentDataType<PerkName> TYPE_PERK_NAME = PersistentDataTypes.map(PersistentDataTypes.STRING, PerkName::getName, PerkName::new, p -> p);
     private static final PersistentDataType<List<PerkName>> TYPE_LIST_PERK_NAME = PersistentDataTypes.list(TYPE_PERK_NAME);
-    private static final PersistentDataType<PlayerPerks> TYPE_PERKS = new PersistentDataType<PlayerPerks>() {
+    private static final PersistentDataType<PlayerPerks> TYPE_PERKS = new PersistentDataType<>() {
         @Override public PlayerPerks deserialize(Document doc, String key) {
             doc = doc.readDocument(key);
             Document docPerks = doc.readDocument("perks");
@@ -132,6 +134,7 @@ class DefaultWBUser implements WBUser {
     private final WoolBattleBukkit woolbattle;
     private final User user;
     private final UserPerks perks;
+    private Team team;
     private boolean trollmode;
     private int spawnProtectionTicks;
     private IInventory openInventory;
@@ -183,11 +186,33 @@ class DefaultWBUser implements WBUser {
     }
 
     @Override public Team getTeam() {
-        return woolbattle.teamManager().getTeam(this);
+        return team;
     }
 
     @Override public void setTeam(Team team) {
-        woolbattle.teamManager().setTeam(this, team);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            WBUser u = WBUser.getUser(p);
+            Scoreboard s = new Scoreboard(u);
+            if (this.team != null) s.getTeam(this.team.getType().getScoreboardTag()).removePlayer(getPlayerName());
+            if (team != null) s.getTeam(team.getType().getScoreboardTag()).addPlayer(getPlayerName());
+        }
+        if (team != null) {
+            if (!team.isSpectator()) {
+                var be = getBukkitEntity();
+                if (be != null) {
+                    for (Player o : Bukkit.getOnlinePlayers()) {
+                        o.showPlayer(be);
+                    }
+                }
+            }
+        }
+        this.team = team;
+        if (team != null) {
+            if (woolbattle.ingame().enabled()) {
+                woolbattle.ingame().playerUtil().setPlayerItems(this);
+                woolbattle.ingame().checkGameEnd();
+            }
+        }
     }
 
     @Override public UserPerks perks() {
@@ -253,24 +278,29 @@ class DefaultWBUser implements WBUser {
         if (event.isCancelled()) return 0;
         int added = 0;
         ItemStack item = getSingleWoolItem();
-        Inventory inv = getBukkitEntity().getInventory();
-        while (addCount > 0) {
-            ItemStack i = item.clone();
-            i.setAmount(Math.min(64, addCount));
-            addCount -= 64;
-            added += i.getAmount();
-            inv.addItem(i);
+        var bukkitEntity = getBukkitEntity();
+        if (bukkitEntity != null) {
+            Inventory inv = bukkitEntity.getInventory();
+            while (addCount > 0) {
+                ItemStack i = item.clone();
+                i.setAmount(Math.min(64, addCount));
+                addCount -= 64;
+                added += i.getAmount();
+                inv.addItem(i);
+            }
         }
         woolCount += added;
         EventUserWoolCountUpdate eventUserWoolCountUpdate = new EventUserWoolCountUpdate(this, woolCount);
         Bukkit.getPluginManager().callEvent(eventUserWoolCountUpdate);
-        if (event.dropRemaining()) {
-            while (dropCount > 0) {
-                ItemStack i = item.clone();
-                i.setAmount(Math.min(64, dropCount));
-                dropCount -= 64;
-                added += i.getAmount();
-                getBukkitEntity().getWorld().dropItemNaturally(getBukkitEntity().getLocation().add(0, 0.5, 0), i);
+        if (bukkitEntity != null) {
+            if (event.dropRemaining()) {
+                while (dropCount > 0) {
+                    ItemStack i = item.clone();
+                    i.setAmount(Math.min(64, dropCount));
+                    dropCount -= 64;
+                    added += i.getAmount();
+                    getBukkitEntity().getWorld().dropItemNaturally(getBukkitEntity().getLocation().add(0, 0.5, 0), i);
+                }
             }
         }
         return added;
@@ -289,7 +319,8 @@ class DefaultWBUser implements WBUser {
         woolCount -= removeCount;
         if (updateInventory) {
             ItemStack singleItem = getSingleWoolItem();
-            ItemManager.removeItems(this, getBukkitEntity().getInventory(), singleItem, removeCount);
+            var bukkitEntity = getBukkitEntity();
+            if (bukkitEntity != null) ItemManager.removeItems(this, bukkitEntity.getInventory(), singleItem, removeCount);
         }
         EventUserWoolCountUpdate eventUserWoolCountUpdate = new EventUserWoolCountUpdate(this, woolCount);
         Bukkit.getPluginManager().callEvent(eventUserWoolCountUpdate);

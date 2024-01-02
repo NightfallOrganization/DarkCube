@@ -27,17 +27,21 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         e.setQuitMessage(null);
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);
+        user.setTrollMode(false);
+        Team t = woolbattle.ingame().lastTeam.remove(user);
         if (user.getTeam().isSpectator()) {
             return;
         }
-        Team t = woolbattle.ingame().lastTeam.remove(user);
-        if (t != null) {
-            if (!t.getUsers().isEmpty()) {
-                StatsLink.addLoss(user);
+        if (!user.getTeam().isSpectator()) {
+            if (t != null) {
+                if (!t.getUsers().isEmpty()) {
+                    StatsLink.addLoss(user);
+                }
             }
+            woolbattle.sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
+            woolbattle.ingame().playerUtil().kill(user, true);
         }
-        woolbattle.sendMessage(Message.PLAYER_LEFT, user.getTeamPlayerName());
-        woolbattle.ingame().playerUtil().kill(user, true);
+        user.setTeam(null);
     }
 
 }

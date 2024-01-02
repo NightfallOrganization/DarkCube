@@ -26,15 +26,16 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
     }
 
     @Override @EventHandler public void handle(AsyncPlayerChatEvent e) {
-        Player p = e.getPlayer();
-        WBUser user = WBUser.getUser(p);
-        String msg = e.getMessage();
-        boolean atall = false;
-        boolean replace = !woolbattle.lobby().enabled();
-        boolean startsatall = false;
+        var p = e.getPlayer();
+        var user = WBUser.getUser(p);
+        var msg = e.getMessage();
+        var atall = true;
+        var replace = !woolbattle.lobby().enabled();
+        var startsatall = false;
+        var addPrefixAtAll = false;
         if (woolbattle.ingame().enabled()) {
             startsatall = msg.startsWith(woolbattle.atall);
-            boolean startsatteam = msg.startsWith(woolbattle.atteam);
+            var startsatteam = msg.startsWith(woolbattle.atteam);
             atall = startsatall || user.getTeam().getUsers().size() == 1;
             if (msg.length() >= woolbattle.atall.length() + 1) {
                 if ((startsatall && msg.substring(woolbattle.atall.length()).charAt(0) == ' ') || (startsatteam && msg
@@ -51,30 +52,36 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
                 atall = false;
             }
         }
-        String color = user.getTeam().getType().getNameColor().toString();
+        var color = user.getTeam().getType().getNameColor().toString();
         e.setCancelled(true);
         if (msg.isEmpty() || (startsatall && msg.substring(2).isEmpty())) {
             return;
         }
         msg = getMessage(p, msg, atall, color, woolbattle, startsatall);
+
         if (user.getTeam().isSpectator()) {
             woolbattle.sendMessageWithoutPrefix(msg, user
                     .getTeam()
                     .getUsers()
                     .stream()
-                    .map(u -> Bukkit.getPlayer(u.getUniqueId()))
+                    .map(WBUser::getBukkitEntity)
                     .collect(Collectors.toSet()));
             woolbattle.sendConsoleWithoutPrefix(msg);
         } else {
-            for (WBUser t : WBUser.onlineUsers()) {
-                String pmsg = msg;
+            for (var t : WBUser.onlineUsers()) {
+                var pmsg = msg;
+                var be = t.getBukkitEntity();
+                if (be == null) continue;
+                if(replace) {
+                    pmsg = pmsg.replaceFirst(woolbattle.atall,LegacyComponentSerializer.legacySection().serialize(Message.AT_ALL.getMessage(t)));
+                }
                 if (atall && replace) {
                     pmsg = pmsg.replaceFirst(woolbattle.atall, LegacyComponentSerializer
                             .legacySection()
                             .serialize(Message.AT_ALL.getMessage(t)));
-                    t.getBukkitEntity().sendMessage(pmsg);
+                    be.sendMessage(pmsg);
                 } else if (t.getTeam().getType().equals(user.getTeam().getType())) {
-                    t.getBukkitEntity().sendMessage(pmsg);
+                    be.sendMessage(pmsg);
                 }
             }
             woolbattle.sendConsoleWithoutPrefix(msg);
@@ -82,9 +89,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
     }
 
     private String getMessage(Player p, String msg, boolean atall, String color, WoolBattleBukkit main, boolean satall) {
-        return color + (atall && main
-                .ingame()
-                .enabled() ? main.atall : "") + color + p.getName() + ChatColor.RESET + ": " + (satall ? msg.substring(main.atall.length()) : msg);
+        var prefix = (atall && main.ingame().enabled() ? main.atall : "");
+        return color + prefix + color + p.getName() + ChatColor.WHITE + ": " + (satall ? msg.substring(main.atall.length()) : msg);
     }
-
 }

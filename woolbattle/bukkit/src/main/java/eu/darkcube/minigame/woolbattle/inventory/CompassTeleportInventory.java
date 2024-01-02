@@ -62,7 +62,7 @@ public class CompassTeleportInventory extends WoolBattlePagedInventory {
             }
             ItemBuilder b = ItemBuilder
                     .item(Material.SKULL_ITEM)
-                    .meta(new SkullBuilderMeta(new UserProfile(null, user.getUniqueId())))
+                    .meta(new SkullBuilderMeta(new UserProfile(user.getPlayerName())))
                     .damage(3)
                     .displayname(user.getTeamPlayerName());
             ItemManager.setId(b, USER, user.getUniqueId().toString());

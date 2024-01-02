@@ -119,7 +119,7 @@ public class PlayerUtil {
         if (!ingame.lastTeam.containsKey(target)) {
             return false;
         }
-        woolbattle.teamManager().setTeam(target, ingame.lastTeam.remove(target));
+        target.setTeam(ingame.lastTeam.remove(target));
         return true;
     }
 
@@ -269,7 +269,7 @@ public class PlayerUtil {
 
         Team userTeam = user.getTeam();
         if (userTeam.getLifes() == 0 || leaving) {
-            woolbattle.teamManager().setTeam(user, woolbattle.teamManager().getSpectator());
+            user.setTeam(woolbattle.teamManager().getSpectator());
         }
 
         if (userTeam.getUsers().isEmpty()) {

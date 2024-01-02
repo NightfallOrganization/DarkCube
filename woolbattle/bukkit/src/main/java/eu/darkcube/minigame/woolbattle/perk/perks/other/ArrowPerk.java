@@ -117,10 +117,9 @@ public class ArrowPerk extends Perk {
         }
 
         @EventHandler public void handle(EntityDamageByEntityEvent event) {
-            if (!(event.getEntity() instanceof Player)) return;
-            if (!(event.getDamager() instanceof Arrow)) return;
-            WBUser user = WBUser.getUser((Player) event.getEntity());
-            Arrow arrow = (Arrow) event.getDamager();
+            if (!(event.getEntity() instanceof Player userPlayer)) return;
+            if (!(event.getDamager() instanceof Arrow arrow)) return;
+            WBUser user = WBUser.getUser(userPlayer);
             if (!arrow.hasMetadata("perk")) return;
             if (!arrow.getMetadata("perk").get(0).value().equals(perkName())) return;
             WBUser shooter = (WBUser) arrow.getMetadata("user").get(0).value();
@@ -146,21 +145,22 @@ public class ArrowPerk extends Perk {
                 logger.warning("Inconsistent behaviour for ArrowPerk. This might mess up some logic for " + "other perks");
                 return;
             }
-            user.getBukkitEntity().damage(0);
-            shooter.getBukkitEntity().playSound(shooter.getBukkitEntity().getLocation(), Sound.SUCCESSFUL_HIT, 1, 0);
-            user.getBukkitEntity().getWorld().playSound(arrow.getLocation(), Sound.ARROW_HIT, 1, 1);
-            user
-                    .getBukkitEntity()
-                    .setVelocity(arrow
-                            .getVelocity()
-                            .setY(0)
-                            .normalize()
-                            .multiply(.47 + new Random().nextDouble() / 70 + strength / 1.42)
-                            .setY(.400023));
+            userPlayer.damage(0);
+            var shooterPlayer = shooter.getBukkitEntity();
+            if (shooterPlayer != null) {
+                shooterPlayer.playSound(shooter.getBukkitEntity().getLocation(), Sound.SUCCESSFUL_HIT, 1, 0);
+            }
+            userPlayer.getWorld().playSound(arrow.getLocation(), Sound.ARROW_HIT, 1, 1);
+            userPlayer.setVelocity(arrow
+                    .getVelocity()
+                    .setY(0)
+                    .normalize()
+                    .multiply(.47 + new Random().nextDouble() / 70 + strength / 1.42)
+                    .setY(.400023));
 
             new Scheduler(woolbattle) {
                 @Override public void run() {
-                    Location loc = user.getBukkitEntity().getLocation();
+                    Location loc = userPlayer.getLocation();
                     execute(woolbattle.ingame(), loc);
                 }
 
