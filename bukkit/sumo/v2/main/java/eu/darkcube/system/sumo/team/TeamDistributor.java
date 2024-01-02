@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.sumo.team;
 
+import eu.darkcube.system.sumo.game.ArmorManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
@@ -19,12 +20,14 @@ import java.util.stream.Collectors;
 public class TeamDistributor {
 
     private TeamManager teamManager;
+    private ArmorManager armorManager;
 
-    public TeamDistributor(TeamManager teamManager) {
+    public TeamDistributor(TeamManager teamManager, ArmorManager armorManager) {
         this.teamManager = teamManager;
+        this.armorManager = armorManager;
     }
 
-    public void distributeTeamsAfterTimer() {
+    public void distributeTeamsAfterTimer(TeamManager teamManager) {
         List<Team> teamsWithOnePlayer = new ArrayList<>();
         List<Team> emptyTeams = new ArrayList<>();
         List<Player> playersWithoutTeam = new ArrayList<>();
@@ -39,6 +42,9 @@ public class TeamDistributor {
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            Team team = teamManager.getTeamOfPlayer(player);
+            armorManager.setArmor(player, team);
+
             if (!teamManager.isPlayerInTeam(player)) {
                 playersWithoutTeam.add(player);
             }
@@ -49,7 +55,9 @@ public class TeamDistributor {
             if (team.getSize() == 2 && Bukkit.getOnlinePlayers().size() == 2) {
                 String playerNameToMove = team.getEntries().stream().findAny().get();
                 Player playerToMove = Bukkit.getPlayer(playerNameToMove);
-                Team randomTeam = getRandomTeamExcludingCurrent(team);
+                Team currentTeam = teamManager.getTeamOfPlayer(playerToMove);
+                String teamName = currentTeam.getName();
+                Team randomTeam = getRandomTeamExcludingCurrent(currentTeam, teamName, playerToMove);
                 if (randomTeam != null) {
                     team.removeEntry(playerToMove.getName());
                     randomTeam.addEntry(playerToMove.getName());
@@ -62,6 +70,9 @@ public class TeamDistributor {
 
         // Verteilen der spieler ohne Teams
         for (Player player : playersWithoutTeam) {
+            Team team = teamManager.getTeamOfPlayer(player);
+            armorManager.setArmor(player, team);
+
             if (!emptyTeams.isEmpty()) {
                 Team randomEmptyTeam = emptyTeams.get(new Random().nextInt(emptyTeams.size()));
                 randomEmptyTeam.addEntry(player.getName());
@@ -78,8 +89,12 @@ public class TeamDistributor {
         }
     }
 
-    private Team getRandomTeamExcludingCurrent(Team currentTeam) {
+    private Team getRandomTeamExcludingCurrent(Team currentTeam, String teamName, Player player) {
         List<Team> otherTeams = teamManager.teams.stream().filter(team -> !team.getName().equals(currentTeam.getName())).collect(Collectors.toList());
+
+        Team team = Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeam(teamName);
+        armorManager.setArmor(player, team);
+
         if (otherTeams.isEmpty()) {
             return null;
         }

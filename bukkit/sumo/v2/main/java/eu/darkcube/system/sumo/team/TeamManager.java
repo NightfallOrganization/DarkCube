@@ -8,6 +8,7 @@
 package eu.darkcube.system.sumo.team;
 
 import eu.darkcube.system.sumo.game.ArmorManager;
+import eu.darkcube.system.sumo.game.items.LifeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,12 +23,11 @@ public class TeamManager implements Listener {
 
     final List<Team> teams = new ArrayList<>();
     public final Map<Player, Team> playerTeams = new HashMap<>();
-    private MapTeamSpawns mapTeamSpawns;
+
     private ArmorManager armorManager;
 
-    public TeamManager(MapTeamSpawns mapTeamSpawns) {
-        this.mapTeamSpawns = mapTeamSpawns;
-        this.armorManager = new ArmorManager();
+    public TeamManager(ArmorManager armorManager) {
+        this.armorManager = armorManager;
 
         Scoreboard mainScoreboard = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
 
@@ -40,6 +40,15 @@ public class TeamManager implements Listener {
         black.setPrefix("§8"); // Schwarz
         white.setPrefix("§f"); // Weiß
 
+    }
+
+    public int getTotalLivesOfTeam(String teamName, LifeManager lifeManager) {
+        int totalLives = 0;
+        Team team = Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeam(teamName);
+        if (team != null) {
+            totalLives = lifeManager.getLives(team.getName()) * team.getEntries().size();
+        }
+        return totalLives;
     }
 
     public boolean isPlayerInTeam(Player player) {
@@ -61,6 +70,10 @@ public class TeamManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         updatePlayerDisplayName(player);
+    }
+
+    public Team getTeamOfPlayer(Player player) {
+        return playerTeams.get(player);
     }
 
     public void removePlayerFromTeam(Player player) {
@@ -91,7 +104,6 @@ public class TeamManager implements Listener {
                 team.addEntry(player.getName());
                 playerTeams.put(player, team);
                 updatePlayerDisplayName(player);
-//                armorManager.setArmor(player);
 
                 System.out.println(player.getName() + " wurde erfolgreich zum Team " + teamName + " hinzugefügt.");
             } else {

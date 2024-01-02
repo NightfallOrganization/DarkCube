@@ -8,53 +8,74 @@
 package eu.darkcube.system.sumo.ruler;
 
 import eu.darkcube.system.sumo.Sumo;
-import eu.darkcube.system.sumo.team.MapTeamSpawns;
+import eu.darkcube.system.sumo.game.GameRespawn;
+import eu.darkcube.system.sumo.game.items.LifeManager;
+import eu.darkcube.system.sumo.lobby.LobbyTimer;
 import eu.darkcube.system.sumo.team.TeamManager;
 import org.bukkit.*;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
 
 public class GameRuler implements Listener {
 
     private TeamManager teamManager;
-    private MapTeamSpawns mapTeamSpawns;
+    private GameRespawn gameRespawn;
+    private LifeManager lifeManager;
+    private LobbyTimer lobbyTimer;
 
-    public GameRuler(TeamManager teamManager, MapTeamSpawns mapTeamSpawns) {
+    public GameRuler(TeamManager teamManager, GameRespawn gameRespawn, LifeManager lifeManager, LobbyTimer lobbyTimer) {
         this.teamManager = teamManager;
-        this.mapTeamSpawns = mapTeamSpawns;
+        this.gameRespawn = gameRespawn;
+        this.lifeManager = lifeManager;
+        this.lobbyTimer = lobbyTimer;
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getLocation().getY() <= 70) {
-            if (teamManager.isPlayerInTeam(player)) {
-                Team team = teamManager.playerTeams.get(player);
-                Location spawnLocation = mapTeamSpawns.getSpawnLocation("Origin", team.getName());
 
-                if (spawnLocation != null) {
-                    player.teleport(spawnLocation);
+        if (player.getWorld().getName().equals("world")) {
+            return;
+        }
+
+        if (player.getLocation().getY() <= 70) {
+            Team team = teamManager.getTeamOfPlayer(player);
+            int teamLives = lifeManager.getLives(team.getName());
+
+            if (teamLives > 0) {
+                teamLives--;
+                lifeManager.setLives(team.getName(), teamLives);
+
+                String message;
+                if (team.getName().equals("Black")) {
+                    message = "§7Team §8Schwarz §7hat ein Leben verloren!";
+                } else if (team.getName().equals("White")) {
+                    message = "§7Team §fWeiß §7hat ein Leben verloren!";
                 } else {
-                    player.teleport(new Location(player.getWorld(), 0, 101, 0));
+                    message = team.getName() + " §7hat ein Leben verloren!";
+                }
+
+                Bukkit.broadcastMessage(message);
+
+                if (teamLives <= 0) {
+                    lobbyTimer.setGameState(LobbyTimer.GameState.STOPPED);
                 }
             } else {
-                player.teleport(new Location(player.getWorld(), 0, 101, 0));
+                // Wenn die Leben bereits 0 sind und der Spieler unter Höhe 70 fällt
+                lobbyTimer.setGameState(LobbyTimer.GameState.STOPPED);
+                Bukkit.shutdown();
             }
+
+            GameRespawn.teleportRandomlyAroundSpawn(player);
         }
     }
 
