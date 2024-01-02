@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.Team;
@@ -51,6 +52,11 @@ public class ArmorManager {
         LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
         meta.setColor(color);
         meta.setDisplayName(name);
+        meta.spigot().setUnbreakable(true);
+        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+        meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
         item.setItemMeta(meta);
         return item;
     }

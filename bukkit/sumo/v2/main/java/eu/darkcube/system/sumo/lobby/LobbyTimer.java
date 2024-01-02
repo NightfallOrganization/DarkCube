@@ -8,11 +8,13 @@
 package eu.darkcube.system.sumo.lobby;
 
 import eu.darkcube.system.sumo.Sumo;
-import eu.darkcube.system.sumo.team.MapTeamSpawns;
+import eu.darkcube.system.sumo.game.ArmorManager;
+import eu.darkcube.system.sumo.game.GameRespawn;
 import eu.darkcube.system.sumo.team.TeamDistributor;
 import eu.darkcube.system.sumo.team.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -28,16 +30,16 @@ public class LobbyTimer {
     private final TeamManager teamManager;
     private final TeamDistributor teamDistributor;
 
-    private GameState gameState = GameState.STOPPED;
+    private GameState gameState = GameState.STARTING;
 
     public enum GameState {
         STARTING, STARTED, STOPPED;
     }
 
-    public LobbyTimer(Sumo plugin, TeamManager teamManager) {
+    public LobbyTimer(Sumo plugin, TeamManager teamManager, ArmorManager armorManager) {
         this.plugin = plugin;
         this.teamManager = teamManager;
-        this.teamDistributor = new TeamDistributor(teamManager);
+        this.teamDistributor = new TeamDistributor(teamManager, armorManager);
     }
 
     public void setTimer(int seconds) {
@@ -76,7 +78,6 @@ public class LobbyTimer {
     }
 
     private class TimerRunnable extends BukkitRunnable {
-        MapTeamSpawns mapTeamSpawns = new MapTeamSpawns();
 
         @Override
         public void run() {
@@ -88,7 +89,7 @@ public class LobbyTimer {
 
             if (timer != previousTimerValue) {
                 // Pass the current LobbyTimer instance to the method
-                LobbyScoreboardManager.updateScoreboardForAllPlayers(LobbyTimer.this);
+                LobbyScoreboard.updateScoreboardForAllPlayers(LobbyTimer.this);
                 previousTimerValue = timer;
             }
 
@@ -102,19 +103,12 @@ public class LobbyTimer {
 
                 // Teleportiere Spieler zu ihren Team-Spawns
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    teamDistributor.distributeTeamsAfterTimer();
+                    teamDistributor.distributeTeamsAfterTimer(teamManager);
 
-                    if (teamManager.isPlayerInTeam(player)) {
-                        Team team = teamManager.playerTeams.get(player);
-                        Location teamSpawn = mapTeamSpawns.getSpawnLocation("Origin", team.getName());
-                        if (teamSpawn != null) {
-                            player.teleport(teamSpawn);
-                        } else {
-                            System.out.println("Kein Teleportort für Team: " + team.getName());
-                        }
-                    } else {
-                        player.teleport(new Location(Bukkit.getWorld("Origin"), 0, 110, 0));
-                    }
+                        World originWorld = Bukkit.getWorld("Origin");
+                        player.teleport(new Location(originWorld, 0, 110, 0));
+                        GameRespawn.teleportRandomlyAroundSpawn(player);
+
                 }
                 setGameState(GameState.STARTED);
             }

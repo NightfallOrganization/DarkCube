@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.sumo;
+package eu.darkcube.system.sumo.other;
 
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;

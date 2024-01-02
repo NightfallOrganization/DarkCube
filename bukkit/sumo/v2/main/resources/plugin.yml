@@ -1,0 +1,40 @@
+main: eu.darkcube.system.sumo.Sumo
+name: Sumo
+author: EliteDarkness
+version: 1.0
+api-version: 1.8
+depend: [System]
+
+commands:
+  timer:
+    description: Setzt den Lobby Timer
+    permission: woolbattleteamfight.timer.use
+  start:
+    description: Starte das Spiel
+    permission: woolbattleteamfight.start.use
+  setteam:
+    description: Setze das Team für einen Spieler
+    permission: woolbattleteamfight.setteam.use
+  myteam:
+    description: Zeigt das Team von einem Spieler
+    permission: woolbattleteamfight.myteam.use
+  mylifes:
+    description: Zeigt die Leben von einem Team
+    permission: woolbattleteamfight.mylifes.use
+  setlifes:
+    description: Setzt die Leben von einem Team
+    permission: woolbattleteamfight.setlifes.use
+
+Permissions:
+  woolbattleteamfight.timer.use:
+    default: op
+  woolbattleteamfight.start.use:
+    default: op
+  woolbattleteamfight.setteam.use:
+    default: op
+  woolbattleteamfight.myteam.use:
+    default: op
+  woolbattleteamfight.mylifes.use:
+    default: op
+  woolbattleteamfight.setlifes.use:
+    default: op

@@ -20,7 +20,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
-public class LobbyScoreboardManager implements Listener {
+public class LobbyScoreboard implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
