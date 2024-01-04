@@ -14,7 +14,7 @@ import eu.darkcube.system.skyland.skylandclasssystem.SkylandPlayerClass;
 import eu.darkcube.system.skyland.skylandclasssystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.mobs.CustomZombie;
 import eu.darkcube.system.skyland.skillsandability.BeamOfLight;
-import eu.darkcube.system.skyland.worldgen.SkylandBiomes;
+import eu.darkcube.system.skyland.worldgen.SkylandBiome;
 import eu.darkcube.system.skyland.worldgen.structures.CustomPallette;
 import eu.darkcube.system.skyland.worldgen.structures.SkylandStructure;
 import eu.darkcube.system.skyland.worldgen.structures.SkylandStructureModifiers;
@@ -100,7 +100,7 @@ public class Feed implements CommandExecutor {
 
                     structure.fill(((Player) sender).getLocation(), new BlockVector(32, 32, 32), false);
 
-                    SkylandStructure skylandStructure = new SkylandStructure(nsk, new SkylandStructureModifiers[]{new SkylandStructureModifiers(SkylandBiomes.TEST2, 10, 2, 3, true, new Vector(0, 0, 0))});
+                    SkylandStructure skylandStructure = new SkylandStructure(nsk, new SkylandStructureModifiers[]{new SkylandStructureModifiers(SkylandBiome.TEST2, 10, 2, 3, true, new Vector(0, 0, 0))});
 
                     structure.getPalettes().remove(0);
                     System.out.println("Paletts left after removal (1 if copy, 0 if raw): " + structure.getPalettes().size());
@@ -198,8 +198,8 @@ public class Feed implements CommandExecutor {
             } else if (args[0].equals("pic")) {
                 p.sendMessage("display pic");
                 if (args.length == 3) {
-                    p.sendMessage("Color: " + SkylandBiomes.getColor(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-                    p.sendMessage("Intensity: " + SkylandBiomes.getBiomeIntensity(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
+                    p.sendMessage("Color: " + SkylandBiome.getColor(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
+                    p.sendMessage("Intensity: " + SkylandBiome.getBiomeIntensity(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
                     return true;
                 }
                 try {
