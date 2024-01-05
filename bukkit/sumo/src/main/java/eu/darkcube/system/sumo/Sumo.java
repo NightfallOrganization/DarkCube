@@ -33,9 +33,9 @@ public class Sumo extends DarkCubePlugin {
 
         MapLoader mapLoader = new MapLoader();
         mapLoader.loadWorlds();
-        MainRuler mainRuler = new MainRuler(this);
+        LobbyScoreboard lobbyScoreboard = new LobbyScoreboard(this);
+        MainRuler mainRuler = new MainRuler(this, lobbyScoreboard);
         LobbyRuler lobbyRuler = new LobbyRuler();
-        LobbyScoreboard lobbyScoreboard = new LobbyScoreboard();
         MainManager mainManager = new MainManager(lobbyScoreboard);
         Respawn respawn = new Respawn(mainRuler);
         StartingTimer startingTimer = new StartingTimer(this, lobbyScoreboard, respawn);
