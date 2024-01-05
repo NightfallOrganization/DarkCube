@@ -8,6 +8,7 @@
 package eu.darkcube.system.sumo.commands;
 
 import eu.darkcube.system.sumo.ruler.MainRuler;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,8 +31,10 @@ public class TpActiveWorldCommand implements CommandExecutor {
 
         Player player = (Player) sender;
         if (mainRuler.getActiveWorld() != null) {
-            player.teleport(mainRuler.getActiveWorld().getSpawnLocation());
-            sender.sendMessage("§7Teleporting to: §b" + mainRuler.getActiveWorld().getName());
+            Location targetLocation = new Location(mainRuler.getActiveWorld(), 0.5, 102, 0.5);
+
+            player.teleport(targetLocation);
+            sender.sendMessage("§7Teleporting to §bActive World");
         } else {
             sender.sendMessage("§7Active World: §bNone");
         }

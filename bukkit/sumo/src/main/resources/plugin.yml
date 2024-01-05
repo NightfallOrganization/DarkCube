@@ -15,6 +15,15 @@ commands:
   tpactiveworld:
     description: Teleportiert sich zur aktiven Map
     permission: sumo.tpactiveworld.use
+  showgamestate:
+    description: Zeigt den Game Status
+    permission: sumo.showgamestate.use
+  setgamestate:
+    description: Setzt den Game Status
+    permission: sumo.setgamestate.use
+  timer:
+    description: Setzt den Timer
+    permission: sumo.timer.use
 
 
 Permissions:
@@ -23,4 +32,10 @@ Permissions:
   sumo.showactivemap.use:
     default: op
   sumo.tpactiveworld.use:
+    default: op
+  sumo.showgamestate.use:
+    default: op
+  sumo.setgamestate.use:
+    default: op
+  sumo.timer.use:
     default: op

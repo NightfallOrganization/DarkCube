@@ -21,7 +21,7 @@ public class ShowActiveMapCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        sender.sendMessage("§7Active map: §b" + mainRuler.getActiveWorld());
+        sender.sendMessage("§7Active Map: §b" + mainRuler.getActiveWorld());
         return true;
     }
 }
