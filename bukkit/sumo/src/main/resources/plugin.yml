@@ -24,6 +24,21 @@ commands:
   timer:
     description: Setzt den Timer
     permission: sumo.timer.use
+  setteam:
+    description: Setzt das Team für den Spieler
+    permission: sumo.setteam.use
+  start:
+    description: Startet die Runde
+    permission: sumo.start.use
+  setactivemap:
+    description: Setzt die aktive Map
+    permission: sumo.setactivemap.use
+  setlifes:
+    description: Setzt die Leben für ein Team
+    permission: sumo.setlifes.use
+  showteamlifes:
+    description: Zeigt die Leben für ein Team
+    permission: sumo.showteamlifes.use
 
 
 Permissions:
@@ -38,4 +53,14 @@ Permissions:
   sumo.setgamestate.use:
     default: op
   sumo.timer.use:
+    default: op
+  sumo.setteam.use:
+    default: op
+  sumo.start.use:
+    default: op
+  sumo.setactivemap.use:
+    default: op
+  sumo.setlifes.use:
+    default: op
+  sumo.showteamlifes.use:
     default: op

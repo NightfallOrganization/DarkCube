@@ -7,12 +7,15 @@
 
 package eu.darkcube.system.sumo.guis;
 
+import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.other.GameStates;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +25,11 @@ public class TeamGUI implements Listener {
 
     private final String TITLE = "§9Teams";
     private final GUIPattern guiPattern = new GUIPattern();
+    TeamManager teamManager;
 
+    public TeamGUI(TeamManager teamManager) {
+        this.teamManager = teamManager;
+    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -52,14 +59,14 @@ public class TeamGUI implements Listener {
         gui.setItem(4, book);
 
         // Schwarze Wolle auf Slot 21 setzen
-        ItemStack blackWool = new ItemStack(Material.WOOL, 1, (short) 15); // 15 ist die Datenwert für schwarze Wolle
+        ItemStack blackWool = new ItemStack(Material.WOOL, 1, (short) 15); // 15 ist der Datenwert für schwarze Wolle
         ItemMeta blackWoolMeta = blackWool.getItemMeta();
         blackWoolMeta.setDisplayName("§8Schwarz");
         blackWool.setItemMeta(blackWoolMeta);
         gui.setItem(21, blackWool);
 
         // Weiße Wolle auf Slot 23 setzen
-        ItemStack whiteWool = new ItemStack(Material.WOOL, 1, (short) 0); // 0 ist die Datenwert für weiße Wolle
+        ItemStack whiteWool = new ItemStack(Material.WOOL, 1, (short) 0); // 0 ist der Datenwert für weiße Wolle
         ItemMeta whiteWoolMeta = whiteWool.getItemMeta();
         whiteWoolMeta.setDisplayName("§fWeiß");
         whiteWool.setItemMeta(whiteWoolMeta);
@@ -67,6 +74,28 @@ public class TeamGUI implements Listener {
 
         // GUI für den Spieler öffnen
         player.openInventory(gui);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getView().getTitle().equals(TITLE)) {
+
+            if (event.getCurrentItem() == null) return;
+
+            Player player = (Player) event.getWhoClicked();
+
+            // Überprüfen, ob schwarze Wolle angeklickt wurde
+            if (event.getCurrentItem().getType() == Material.WOOL && event.getCurrentItem().getDurability() == 15) {
+                teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_BLACK);
+                player.sendMessage("§7Du bist jetzt im Team §8Schwarz");
+            }
+
+            // Überprüfen, ob weiße Wolle angeklickt wurde
+            else if (event.getCurrentItem().getType() == Material.WOOL && event.getCurrentItem().getDurability() == 0) {
+                teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_WHITE);
+                player.sendMessage("§7Du bist jetzt im Team §fWeiß");
+            }
+        }
     }
 
 }
