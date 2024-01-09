@@ -8,13 +8,9 @@
 package eu.darkcube.system.sumo.manager;
 
 import eu.darkcube.system.sumo.other.GameStates;
-import eu.darkcube.system.sumo.other.LobbyScoreboard;
-import eu.darkcube.system.sumo.other.Spectator;
-import eu.darkcube.system.sumo.other.StartingTimer;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
+import eu.darkcube.system.sumo.executions.Spectator;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

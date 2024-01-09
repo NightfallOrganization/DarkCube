@@ -7,9 +7,12 @@
 
 package eu.darkcube.system.sumo.ruler;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -67,5 +70,28 @@ public class MapRuler implements Listener {
                 activeWorld.setTime(6000); // Setzt die Zeit auf Tag
             }
         }, 0L, 600L); // 6000 Ticks entsprechen 5 Minuten
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        World activeWorld = mainRuler.getActiveWorld();
+        Player player = (Player) event.getEntity();
+
+        if (!player.getWorld().equals(activeWorld)) {
+            return;
+        }
+
+        if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
+            if (entityDamageByEntityEvent.getDamager() instanceof Player) {
+                // Schaden durch Spieler zulassen
+                return;
+            }
+        }
+
+        event.setCancelled(true);
     }
 }

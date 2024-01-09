@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.sumo.ruler;
 
-import eu.darkcube.system.sumo.other.LobbyScoreboard;
+import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import org.bukkit.World;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -33,6 +33,7 @@ public class MainRuler implements Listener {
     public void setActiveWorld(World world) {
         this.activeWorld = world;
         this.lobbyScoreboard.updateMap(world.getName());
+        this.activeWorld.setGameRuleValue("keepInventory", "true");
     }
 
     public World getActiveWorld() {

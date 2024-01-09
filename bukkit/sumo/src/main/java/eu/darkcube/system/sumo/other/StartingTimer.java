@@ -8,6 +8,11 @@
 package eu.darkcube.system.sumo.other;
 
 import eu.darkcube.system.sumo.Sumo;
+import eu.darkcube.system.sumo.executions.EquipPlayer;
+import eu.darkcube.system.sumo.executions.RandomTeam;
+import eu.darkcube.system.sumo.executions.Respawn;
+import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -18,6 +23,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 public class StartingTimer implements Listener {
     private int timer = 15;
     private BukkitTask task = null;
@@ -25,11 +34,17 @@ public class StartingTimer implements Listener {
     private boolean running = false;
     private LobbyScoreboard lobbyScoreboard;
     private Respawn respawn;
+    private EquipPlayer equipPlayer;
+    private TeamManager teamManager;
+    private RandomTeam randomTeam;
 
-    public StartingTimer(Sumo plugin, LobbyScoreboard lobbyScoreboard, Respawn respawn) {
+    public StartingTimer(Sumo plugin, LobbyScoreboard lobbyScoreboard, Respawn respawn, EquipPlayer equipPlayer, TeamManager teamManager, RandomTeam randomTeam) {
         this.plugin = plugin;
+        this.teamManager = teamManager;
         this.lobbyScoreboard = lobbyScoreboard;
+        this.equipPlayer = equipPlayer;
         this.respawn = respawn;
+        this.randomTeam = randomTeam;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -54,15 +69,29 @@ public class StartingTimer implements Listener {
         }
         running = false;
         Bukkit.broadcastMessage("§7Der §bTimer §7wurde gestoppt");
-        // Füge hier eventuell weitere Aktionen hinzu, die durchgeführt werden sollen, wenn der Timer gestoppt wird
     }
 
-    private void startTimer() {
+    public void zeroTimer() {
         if (running && task != null) {
             task.cancel();
         }
 
-        timer = 15; // Timer zurücksetzen
+        GameStates.setState(GameStates.PLAYING);
+        Set<UUID> playerIDs = Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
+
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            randomTeam.balanceTeams(playerIDs);
+            equipPlayer.equipPlayerIfInTeam(player);
+            respawn.teleportPlayerRandomly(player);
+        }
+    }
+
+    public void startTimer() {
+        if (running && task != null) {
+            task.cancel();
+        }
+
+        timer = 15;
         task = new TimerRunnable().runTaskTimer(plugin, 20L, 20L);
         running = true;
     }
@@ -79,7 +108,7 @@ public class StartingTimer implements Listener {
             lobbyScoreboard.updateTime(timer);
 
             if (timer <= 3) {
-                playSoundToAllPlayers(Sound.WOOD_CLICK, 1.0f, 1.5f);
+                playSoundToAllPlayers();
                 Bukkit.broadcastMessage("§7Spiel startet in §b" + timer);
             }
 
@@ -90,8 +119,11 @@ public class StartingTimer implements Listener {
                 running = false;
 
                 GameStates.setState(GameStates.PLAYING);
+                Set<UUID> playerIDs = Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    randomTeam.balanceTeams(playerIDs);
+                    equipPlayer.equipPlayerIfInTeam(player);
                     respawn.teleportPlayerRandomly(player);
                 }
 
@@ -99,9 +131,9 @@ public class StartingTimer implements Listener {
         }
     }
 
-    private void playSoundToAllPlayers(Sound sound, float volume, float pitch) {
+    private void playSoundToAllPlayers() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            player.playSound(player.getLocation(), sound, volume, pitch);
+            player.playSound(player.getLocation(), Sound.WOOD_CLICK, (float) 1.0, (float) 1.5);
         }
     }
 }
