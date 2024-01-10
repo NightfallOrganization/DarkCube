@@ -46,7 +46,7 @@ public class SkylandBiomeProvider extends org.bukkit.generator.BiomeProvider {
 
 		 */
 
-		return SkylandBiomes.getBiome(x,z).getBiome();
+		return SkylandBiome.getBiome(x,z).getBiome();
 
 
 	}

@@ -16,7 +16,7 @@ import eu.darkcube.system.skyland.skylandclasssystem.SkylandPlayerModifier;
 import eu.darkcube.system.skyland.inventoryui.UINewClassSelect;
 import eu.darkcube.system.skyland.mobs.CustomMob;
 import eu.darkcube.system.skyland.mobs.FollowingMob;
-import eu.darkcube.system.skyland.worldgen.SkylandBiomes;
+import eu.darkcube.system.skyland.worldgen.SkylandBiome;
 import eu.darkcube.system.skyland.worldgen.structures.SkylandStructure;
 import eu.darkcube.system.skyland.worldgen.structures.SkylandStructureModifiers;
 import eu.darkcube.system.userapi.UserAPI;
@@ -166,7 +166,7 @@ public class SkylandListener implements Listener {
 				Random random = new Random();
 				int x = random.nextInt(16) + e.getChunk().getX() * 16;
 				int z = random.nextInt(16) + e.getChunk().getZ() * 16;
-				SkylandStructureModifiers mod = skylandStructure.getModifier(SkylandBiomes.getBiome(x, z));
+				SkylandStructureModifiers mod = skylandStructure.getModifier(SkylandBiome.getBiome(x, z));
 
 
 				if (mod != null && skylandStructure.shouldPlace(x, z)){
@@ -200,14 +200,14 @@ public class SkylandListener implements Listener {
 
 		if (e.getSpawnReason().equals(SpawnReason.NATURAL)){
 
-			SkylandBiomes skylandBiomes = SkylandBiomes.getBiome(e.getLocation().getBlockX(), e.getLocation().getBlockZ());
-			if (skylandBiomes.getMobs().length == 0){
+			SkylandBiome skylandBiome = SkylandBiome.getBiome(e.getLocation().getBlockX(), e.getLocation().getBlockZ());
+			if (skylandBiome.getMobs().length == 0){
 				return;
 			}else {
 				Random random = new Random(2322);
 
-				int roll = random.nextInt(0, skylandBiomes.getMobs().length);
-				skylandBiomes.getMobs()[roll].spawnMob(e.getLocation(), skylandBiomes.getMobs()[roll].getType());
+				int roll = random.nextInt(0, skylandBiome.getMobs().length);
+				skylandBiome.getMobs()[roll].spawnMob(e.getLocation(), skylandBiome.getMobs()[roll].getType());
 				return;
 			}
 

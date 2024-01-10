@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-public enum SkylandBiomes {
+public enum SkylandBiome {
 
 	//color green
 	FOREST(Biome.FOREST, new CustomMob[]{}, new AllBiomeBlocks(
@@ -73,7 +73,7 @@ public enum SkylandBiomes {
 	static SimplexOctaveGenerator biomeGen = new SimplexOctaveGenerator(new Random(1133423454), 6);
 	static SimplexOctaveGenerator biomeGen2 = new SimplexOctaveGenerator(new Random(124245), 6);
 
-	SkylandBiomes(Biome biome, CustomMob[] mobs, AllBiomeBlocks biomeBlock, int colorCode) {
+	SkylandBiome(Biome biome, CustomMob[] mobs, AllBiomeBlocks biomeBlock, int colorCode) {
 		this.biome = biome;
 		this.mobs = mobs;
 		this.biomeBlock = biomeBlock;
@@ -81,8 +81,8 @@ public enum SkylandBiomes {
 		this.colorCode = colorCode;
 	}
 
-	SkylandBiomes(Biome biome, CustomMob[] mobs, AllBiomeBlocks biomeBlock,
-			BiomeGenModifiers biomeGenModifiers, int colorCode) {
+	SkylandBiome(Biome biome, CustomMob[] mobs, AllBiomeBlocks biomeBlock,
+				 BiomeGenModifiers biomeGenModifiers, int colorCode) {
 		this.biome = biome;
 		this.mobs = mobs;
 		this.biomeBlock = biomeBlock;
@@ -125,7 +125,7 @@ public enum SkylandBiomes {
 
 	static int[][] intensity = null;
 
-	public static SkylandBiomes getBiome(int x, int z) {
+	public static SkylandBiome getBiome(int x, int z) {
 		if (colors == null) {
 			try {
 				colors =
@@ -142,13 +142,13 @@ public enum SkylandBiomes {
 		int test = (int) ((biomeGen.noise(x, z, 0.2D, 0.5D, true) + 1) * colors.length / 2);
 		int test2 = (int) ((biomeGen2.noise(x, z, 0.2D, 0.5D, true) + 1) * colors[0].length / 2);
 
-		for (SkylandBiomes skylandBiomes : values()) {
-			if (skylandBiomes.getColorCode() == colors[test][test2]) {
-				return skylandBiomes;
+		for (SkylandBiome skylandBiome : values()) {
+			if (skylandBiome.getColorCode() == colors[test][test2]) {
+				return skylandBiome;
 			}
 		}
 
-		return SkylandBiomes.FOREST;
+		return SkylandBiome.FOREST;
 	}
 
 	public static int getColor(int x, int y) {

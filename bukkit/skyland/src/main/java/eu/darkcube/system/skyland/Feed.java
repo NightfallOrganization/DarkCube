@@ -7,6 +7,7 @@
 package eu.darkcube.system.skyland;
 
 import eu.darkcube.system.skyland.inventoryui.*;
+import org.bukkit.util.noise.SimplexOctaveGenerator;
 import util.SebUtil;
 import eu.darkcube.system.skyland.equipment.*;
 import eu.darkcube.system.skyland.skylandclasssystem.SkylandPlayer;
@@ -243,6 +244,14 @@ public class Feed implements CommandExecutor {
                 p.sendMessage("beam!");
                 new BeamOfLight().activate(p);
 
+            }else if (args[0].equals("sample")){
+                SimplexOctaveGenerator biomeBorderGen = new SimplexOctaveGenerator(new Random(1123214124), 8);
+                int xNoise = (int) (biomeBorderGen.noise(p.getLocation().getBlockX(), p.getLocation().getBlockZ(),1, 1, 1, true) * 10000);
+                int zNoise = (int) (biomeBorderGen.noise(p.getLocation().getBlockX(), p.getLocation().getBlockZ(),2, 1, 1, true)  * 10000);
+                p.sendMessage("xnoise is noice: " + xNoise);
+                p.sendMessage("znoise is noice: " + zNoise);
+                p.sendMessage("xmoduliert: " + xNoise%(3*2+1));
+                p.sendMessage("zmoduliert: " + zNoise%(3*2+1));
             }
 
         } else {

@@ -7,7 +7,7 @@
 package eu.darkcube.system.skyland.worldgen.structures;
 
 import eu.darkcube.system.skyland.Skyland;
-import eu.darkcube.system.skyland.worldgen.SkylandBiomes;
+import eu.darkcube.system.skyland.worldgen.SkylandBiome;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.structure.Mirror;
@@ -35,7 +35,7 @@ public class SkylandStructure {
 		Skyland.getInstance().saveStructure(this);
 	}
 
-	public SkylandStructureModifiers getModifier(SkylandBiomes biome) {
+	public SkylandStructureModifiers getModifier(SkylandBiome biome) {
 		for (int i = 0; i < modifier.length; i++) {
 			if (biome == modifier[i].getBiome()) {
 				return modifier[i];
@@ -59,13 +59,13 @@ public class SkylandStructure {
 	}
 
 	public boolean shouldPlace(int x, int z) {
-		SkylandBiomes skylandBiomes = SkylandBiomes.getBiome(x, z);
+		SkylandBiome skylandBiome = SkylandBiome.getBiome(x, z);
 
-		SkylandStructureModifiers modifiers = getModifier(skylandBiomes);
+		SkylandStructureModifiers modifiers = getModifier(skylandBiome);
 		if (modifiers == null) {
 			return false;
 		} else {
-			if (SkylandBiomes.getBiomeIntensity(x, z) >= modifiers.getIntensity()) {
+			if (SkylandBiome.getBiomeIntensity(x, z) >= modifiers.getIntensity()) {
 				System.out.println("intent good");
 				if (Skyland.getInstance().getCustomChunkGenerator().isIsland(x, z)
 						|| !modifiers.isSpawnOnlyOnIsland()) {

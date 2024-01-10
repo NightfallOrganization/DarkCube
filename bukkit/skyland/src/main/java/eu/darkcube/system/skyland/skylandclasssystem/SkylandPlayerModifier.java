@@ -25,7 +25,7 @@ public class SkylandPlayerModifier implements UserModifier {
     }
 
     @Override public void onLoad(User user) {
-        System.out.println(user.name() + " was looded with modifier!");
+        System.out.println(user.name() + " was loaded with modifier!");
         user.metadata().set(SKYLAND_PLAYER, new SkylandPlayer(user));
     }
 

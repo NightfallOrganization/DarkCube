@@ -9,6 +9,7 @@ package eu.darkcube.system.skyland;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.system.skyland.equipment.crafting.RecipeBook;
 import eu.darkcube.system.skyland.listener.SkylandListener;
 import eu.darkcube.system.skyland.inventoryui.AllInventory;
 import eu.darkcube.system.skyland.mobs.CustomMob;
@@ -25,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,31 +65,13 @@ public class Skyland extends DarkCubePlugin {
     @Override
     public void onEnable() {
 
-        File file = new File("skyland");
-        if (!file.exists()) {
-            file.mkdirs();
+        loadStructures();
+        try {
+            RecipeBook.getInstance().loadRecipies(Path.of("skyland/recipes"));
+        } catch (IOException e) {
+            //todo investigate why this occurs
+            //throw new RuntimeException(e);
         }
-
-        file = new File("skyland/structures");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-
-        Gson gson = new Gson();
-
-        for (File f : file.listFiles()) {
-            try {
-                FileInputStream fileInputStream = new FileInputStream(f);
-                String content = Files.readString(f.toPath(), StandardCharsets.UTF_8);
-                fileInputStream.close();
-                structures.add(gson.fromJson(content, SkylandStructure.class));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-
-
 
 
 /*		try {
@@ -141,6 +125,32 @@ public class Skyland extends DarkCubePlugin {
             }
         }.runTaskTimer(this, 20, 5);
 
+    }
+
+    private void loadStructures(){
+        File file = new File("skyland");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        file = new File("skyland/structures");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        Gson gson = new Gson();
+
+        for (File f : file.listFiles()) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(f);
+                String content = Files.readString(f.toPath(), StandardCharsets.UTF_8);
+                fileInputStream.close();
+                structures.add(gson.fromJson(content, SkylandStructure.class));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     @Override

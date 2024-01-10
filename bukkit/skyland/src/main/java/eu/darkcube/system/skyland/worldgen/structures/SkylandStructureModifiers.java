@@ -6,11 +6,11 @@
  */
 package eu.darkcube.system.skyland.worldgen.structures;
 
-import eu.darkcube.system.skyland.worldgen.SkylandBiomes;
+import eu.darkcube.system.skyland.worldgen.SkylandBiome;
 import org.bukkit.util.Vector;
 
 public class SkylandStructureModifiers {
-	SkylandBiomes biome;
+	SkylandBiome biome;
 	int rarity;
 	int intensity;
 	int islandThiccness;
@@ -18,7 +18,7 @@ public class SkylandStructureModifiers {
 	Vector offset;
 
 
-	public SkylandStructureModifiers(SkylandBiomes biome, int rarity, int intensity, int islandThiccness, boolean spawnOnlyOnIsland, Vector offset) {
+	public SkylandStructureModifiers(SkylandBiome biome, int rarity, int intensity, int islandThiccness, boolean spawnOnlyOnIsland, Vector offset) {
 		this.biome = biome;
 		this.rarity = rarity;
 		this.intensity = intensity;
@@ -27,7 +27,7 @@ public class SkylandStructureModifiers {
 		this.offset = offset;
 	}
 
-	public SkylandBiomes getBiome() {
+	public SkylandBiome getBiome() {
 		return biome;
 	}
 

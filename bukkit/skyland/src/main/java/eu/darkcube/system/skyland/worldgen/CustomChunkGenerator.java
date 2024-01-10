@@ -16,20 +16,22 @@ import org.bukkit.util.noise.SimplexOctaveGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class CustomChunkGenerator extends ChunkGenerator {
 
 	//PerlinNoiseGenerator terrain = new PerlinNoiseGenerator(new Random());
 	//PerlinNoiseGenerator details = new PerlinNoiseGenerator(new Random());
 
-	SimplexOctaveGenerator islandThiccnessNoise = new SimplexOctaveGenerator(new Random(), 8);
-	SimplexOctaveGenerator generator = new SimplexOctaveGenerator(new Random(), 8);
-	SimplexOctaveGenerator details = new SimplexOctaveGenerator(new Random(113445), 16);
-	SimplexOctaveGenerator spikeGen = new SimplexOctaveGenerator(new Random(), 3);
+	int seed = 1123214124;
+	SimplexOctaveGenerator islandThiccnessNoise = new SimplexOctaveGenerator(new Random(seed), 8);
+	SimplexOctaveGenerator generator = new SimplexOctaveGenerator(new Random(seed), 8);
+	SimplexOctaveGenerator details = new SimplexOctaveGenerator(new Random(seed), 16);
+	SimplexOctaveGenerator spikeGen = new SimplexOctaveGenerator(new Random(seed), 3);
+	SimplexOctaveGenerator biomeBorderGen = new SimplexOctaveGenerator(new Random(seed), 100);
+
+
+	int iterpolRad = 5;
 
 	HashMap<Integer, Integer> testResultHashMap = new HashMap<>();
 
@@ -52,11 +54,36 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 		//test end
 
+
+
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 
 				int islandGenHeight = getIslandThiccness(chunkX * 16 + x, chunkZ * 16 + z);
-				SkylandBiomes skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
+				SkylandBiome skylandBiome = SkylandBiome.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
+
+
+
+				int xNoise = (int) ((biomeBorderGen.noise(chunkX * 16 + x, chunkZ * 16 + z,1, 10, 1, true)+1) * 10000);
+				int zNoise = (int) ((biomeBorderGen.noise(chunkX * 16 + x, chunkZ * 16 + z,2, 10, 1, true)+1)  * 10000);
+				if (xNoise < 0){
+					xNoise = xNoise*-2;
+				}
+				if (zNoise < 0){
+					zNoise = zNoise*-2;
+				}
+
+				xNoise = xNoise % (iterpolRad+1);
+				xNoise-= iterpolRad;
+				zNoise = zNoise % (iterpolRad+1);
+				zNoise-= iterpolRad;
+
+
+				SkylandBiome skylandBiomeBlock = SkylandBiome.getBiome( (chunkX * 16 + x + xNoise),  (chunkZ * 16 + z + zNoise));
+
+
+
+
 
 				if (isIsland(chunkX * 16 + x, chunkZ * 16 + z)) {
 
@@ -79,12 +106,12 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 
 					chunkData.setBlock(x, currentHeight, z,
-							skylandBiomes.getBiomeBlock().getNextSurfaceBlock(random).getBlock());
+							skylandBiomeBlock.getBiomeBlock().getNextSurfaceBlock(random).getBlock());
 					chunkData.setBlock(x, currentHeight - 1, z,
-							skylandBiomes.getBiomeBlock().getNextBelowSurfaceBlock(random)
+							skylandBiomeBlock.getBiomeBlock().getNextBelowSurfaceBlock(random)
 									.getBlock());
 					chunkData.setBlock(x, currentHeight - 2, z,
-							skylandBiomes.getBiomeBlock().getNextBelowSurfaceBlock(random)
+							skylandBiomeBlock.getBiomeBlock().getNextBelowSurfaceBlock(random)
 									.getBlock());
 
 					double spikes =
@@ -98,21 +125,21 @@ public class CustomChunkGenerator extends ChunkGenerator {
 					}
 					//-spikes
 					for (int i = currentHeight - 3; i > currentHeight + 2 * islandGenHeight - 73; i--) {
-						skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
+						//skylandBiome = SkylandBiome.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
 						chunkData.setBlock(x, i, z,
-								skylandBiomes.getBiomeBlock().getNextStone(random).getBlock());
+								skylandBiomeBlock.getBiomeBlock().getNextStone(random).getBlock());
 					}
 
 					for (int i = currentHeight + 2 * islandGenHeight - 73;
 					     i > currentHeight + 2 * islandGenHeight - 73 - spikes; i--) {
-						skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
-						chunkData.setBlock(x, i, z, skylandBiomes.getBiomeBlock().getNextStone(random).getBlock());
+						//skylandBiome = SkylandBiome.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
+						chunkData.setBlock(x, i, z, skylandBiomeBlock.getBiomeBlock().getNextStone(random).getBlock());
 					}
 
 					spikes = ((spikeGen.noise(chunkX * 16 + x, chunkZ * 16 + z, 5D, 4D, true) + 1)
 							* 31D);
 
-					if (skylandBiomes.equals(SkylandBiomes.LAVA)) {
+					if (skylandBiome.equals(SkylandBiome.LAVA)) {
 						if (spikes < 30) {
 							spikes = 0;
 						} else {
@@ -120,7 +147,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 						}
 
 						for (int i = currentHeight + 1; i < currentHeight + spikes; i++) {
-							skylandBiomes = SkylandBiomes.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
+							//skylandBiome = SkylandBiome.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
 
 							chunkData.setBlock(x, i, z, Material.REDSTONE_BLOCK);
 						}
@@ -182,7 +209,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		return false;
 	}
 
-	public int getRawTopY(int x, int z, SkylandBiomes biomes) {
+	public int getRawTopY(int x, int z, SkylandBiome biomes) {
 
 		int baseNoise = (int) ((generator.noise(x, z, biomes.getBiomeGenModifiers().terrainFrequency, biomes.getBiomeGenModifiers().terrainAmplitude,
 				true) + 1) * biomes.getBiomeGenModifiers().maxTerrainHeight + biomes.getBiomeGenModifiers().minTerrainHeight);
@@ -197,12 +224,11 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		return baseNoise + details;
 	}
 	public int getFinalTopY(int x, int z) {
-		int iterpolRad = 5;
 
 		int sum = 0;
 		for (int dx = -iterpolRad; dx <= iterpolRad; dx++)  {
 			for (int dz = -iterpolRad; dz <= iterpolRad; dz++) {
-				sum += getRawTopY(x, z, SkylandBiomes.getBiome(x + dx, z + dz));
+				sum += getRawTopY(x, z, SkylandBiome.getBiome(x + dx, z + dz));
 			}
 		}
 		int out = sum / ((iterpolRad*2+1) * (iterpolRad*2+1));
@@ -216,11 +242,11 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		return out;
 	}
 
-	public int getCurrentHeightTemp(SkylandBiomes skylandBiomes, int x, int z){
+	public int getCurrentHeightTemp(SkylandBiome skylandBiome, int x, int z){
 		//int currentHeight = (int) ((generator.noise(chunkX * 16 + x, chunkZ * 16 +
 		// z, 0.5D, 0.5D, true) +1 ) * 50D + 50D);
 
-		BiomeGenModifiers biomeGenModifier = skylandBiomes.getBiomeGenModifiers();
+		BiomeGenModifiers biomeGenModifier = skylandBiome.getBiomeGenModifiers();
 
 		int currentHeight =
 				(int) ((generator.noise(x, z, biomeGenModifier.terrainFrequency, biomeGenModifier.terrainAmplitude,
@@ -248,7 +274,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	public int getCurrentHeight(int x, int z){
 
 
-		return getCurrentHeightTemp(SkylandBiomes.getBiome(x, z), x ,z);
+		return getCurrentHeightTemp(SkylandBiome.getBiome(x, z), x ,z);
 	}
 
 
@@ -305,8 +331,9 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	public boolean shouldGenerateObject(SimplexOctaveGenerator generator, int x, int z, int rarity, int minIntensity) {
 		double roll = (generator.noise(x, z, 0.5D, 0.5D, true) + 1);
 		return ((int) (roll * rarity)) % rarity == 0
-				&& SkylandBiomes.getBiomeIntensity(x, z) > minIntensity;
+				&& SkylandBiome.getBiomeIntensity(x, z) > minIntensity;
 	}
+
 
 
 }

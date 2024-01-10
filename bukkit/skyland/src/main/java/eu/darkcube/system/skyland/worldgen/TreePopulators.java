@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class TreePopulators extends BlockPopulator {
 
-	SimplexOctaveGenerator islandGen = new SimplexOctaveGenerator(new Random(), 8);
+	SimplexOctaveGenerator islandGen = new SimplexOctaveGenerator(new Random(1), 8);
 
 	public TreePopulators() {
 		islandGen.setScale(1D);
@@ -36,7 +36,7 @@ public class TreePopulators extends BlockPopulator {
 				int treeFreq = 2; // tree everey treeFreq block
 
 				if (((int) (roll * treeFreq)) % treeFreq == 0
-						&& SkylandBiomes.getBiomeIntensity(chunkX * 16 + x, chunkZ * 16 + z) > 2) {
+						&& SkylandBiome.getBiomeIntensity(chunkX * 16 + x, chunkZ * 16 + z) > 2) {
 
 					int y = worldInfo.getMaxHeight()-10;
 					while(limitedRegion.getType(chunkX * 16 + x,y, chunkZ * 16 + z).isAir() && y > limitedRegion.getWorld()
