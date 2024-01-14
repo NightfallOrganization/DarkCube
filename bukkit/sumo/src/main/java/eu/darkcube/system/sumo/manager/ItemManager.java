@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.sumo.manager;
 
+import eu.darkcube.system.sumo.items.game.ItemStick;
+import eu.darkcube.system.sumo.items.game.ItemWool;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
 
 public class ItemManager {
 
@@ -36,7 +39,13 @@ public class ItemManager {
         player.getInventory().setItem(8, createItem(Material.PAPER, "§6Voting", "§7Stimme für Spielszenarien ab!"));
     }
 
+    public static void setPlayingItems(Player player) {
+        player.getInventory().setItem(1, ItemStick.createStick());
+        player.getInventory().setItem(0, ItemWool.createWool(player));
+    }
+
+
     public static void setEndingItems(Player player) {
-        // Implementiere die Logik, um dem Spieler Endgegenstände zu geben
+
     }
 }

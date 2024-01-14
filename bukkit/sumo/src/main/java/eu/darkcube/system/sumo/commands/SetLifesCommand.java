@@ -8,6 +8,8 @@
 package eu.darkcube.system.sumo.commands;
 
 import eu.darkcube.system.sumo.manager.LifeManager;
+import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,9 +19,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class SetLifesCommand implements CommandExecutor {
 
     private final LifeManager lifeManager;
+    private GameScoreboard gameScoreboard;
 
-    public SetLifesCommand(LifeManager lifeManager) {
+
+    public SetLifesCommand(LifeManager lifeManager, GameScoreboard gameScoreboard) {
         this.lifeManager = lifeManager;
+        this.gameScoreboard = gameScoreboard;
+
     }
 
     @Override
@@ -45,8 +51,16 @@ public class SetLifesCommand implements CommandExecutor {
             return false;
         }
 
+
         lifeManager.setTeamLives(teamColor, lives);
         sender.sendMessage(ChatColor.GREEN + "§7Die Leben wurden auf §b" + lives + " §7gesetzt");
+
+        if (teamColor == TeamManager.TEAM_BLACK) {
+            gameScoreboard.updateBlackLives(lives);
+        } else if (teamColor == TeamManager.TEAM_WHITE) {
+            gameScoreboard.updateWhiteLives(lives);
+        }
+
         return true;
     }
 

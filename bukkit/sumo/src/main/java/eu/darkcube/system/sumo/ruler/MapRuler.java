@@ -14,11 +14,15 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.entity.EntityType;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.inventory.PlayerInventory;
 
 public class MapRuler implements Listener {
 
@@ -42,6 +46,28 @@ public class MapRuler implements Listener {
         World activeWorld = mainRuler.getActiveWorld();
         if (event.getWorld().equals(activeWorld)) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        World activeWorld = mainRuler.getActiveWorld();
+        if (event.getPlayer().getWorld().equals(activeWorld)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        World activeWorld = mainRuler.getActiveWorld();
+        if (event.getWhoClicked().getWorld().equals(activeWorld)) {
+            if (event.getClickedInventory() instanceof PlayerInventory) {
+                PlayerInventory inventory = (PlayerInventory) event.getClickedInventory();
+                if ((event.getSlot() == 36 || event.getSlot() == 37 || event.getSlot() == 38 || event.getSlot() == 39) &&
+                        inventory.getItem(event.getSlot()) != null) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 
