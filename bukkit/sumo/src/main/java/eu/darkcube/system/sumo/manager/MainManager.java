@@ -8,6 +8,7 @@
 package eu.darkcube.system.sumo.manager;
 
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.ruler.MainRuler;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import eu.darkcube.system.sumo.executions.Spectator;
 import org.bukkit.*;
@@ -20,16 +21,18 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class MainManager implements Listener {
     private LobbyScoreboard lobbyScoreboard;
+    private MainRuler mainRuler;
 
-    public MainManager(LobbyScoreboard lobbyScoreboard) {
+    public MainManager(LobbyScoreboard lobbyScoreboard, MainRuler mainRuler) {
         this.lobbyScoreboard = lobbyScoreboard;
+        this.mainRuler = mainRuler;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " hat das Spiel betreten");
+        event.setJoinMessage(ChatColor.GRAY + player.getName() + " hat das Spiel betreten");
 
         if (GameStates.getState() == GameStates.STARTING || GameStates.getState() == GameStates.ENDING) {
             Location spawnLocation = new Location(Bukkit.getWorld("world"), 0.5, 101, 0.5);
@@ -40,9 +43,11 @@ public class MainManager implements Listener {
         }
 
         if (GameStates.isState(GameStates.STARTING)) {
-            ItemManager.setStartingItems(event.getPlayer());
+            ItemManager.setStartingItems(player);
+        } else if (GameStates.isState(GameStates.PLAYING)) {
+            ItemManager.setPlayingItems(player);
         } else if (GameStates.isState(GameStates.ENDING)) {
-            ItemManager.setEndingItems(event.getPlayer());
+            ItemManager.setEndingItems(player);
         }
     }
 
@@ -65,6 +70,13 @@ public class MainManager implements Listener {
                 ItemManager.setEndingItems(player);
             }
         }
+
+        if (worldName.equals(mainRuler.getActiveWorld().getName())) {
+            if (GameStates.isState(GameStates.PLAYING)) {
+                ItemManager.setPlayingItems(player);
+            }
+        }
+
     }
 
 }

@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.sumo.manager;
 
+import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import org.bukkit.ChatColor;
@@ -17,13 +18,11 @@ import java.util.UUID;
 public class LifeManager {
     private final Map<ChatColor, Integer> teamLives;
     private final TeamManager teamManager;
-    private LifeManager lifeManager;
     private GameScoreboard gameScoreboard;
 
-    public LifeManager(TeamManager teamManager, GameScoreboard gameScoreboard, LifeManager lifeManager) {
+    public LifeManager(TeamManager teamManager, GameScoreboard gameScoreboard) {
         this.teamManager = teamManager;
         this.gameScoreboard = gameScoreboard;
-        this.lifeManager = lifeManager;
         teamLives = new HashMap<>();
         initializeTeamLives();
     }
@@ -46,7 +45,7 @@ public class LifeManager {
             }
 
             if (newLives <= 0) {
-                Ending ending = new Ending();
+                Ending ending = new Ending(Sumo.getInstance());
                 ending.execute(teamColor);
             }
         }

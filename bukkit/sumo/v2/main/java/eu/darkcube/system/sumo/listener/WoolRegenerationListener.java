@@ -88,7 +88,5 @@ public class WoolRegenerationListener implements Listener {
             timer.runTaskLater(plugin, 20 * 10);
         }
     }
-
-
 }
 

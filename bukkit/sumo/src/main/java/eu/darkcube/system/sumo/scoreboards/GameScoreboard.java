@@ -18,20 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 
 public class GameScoreboard implements Listener {
     private MainRuler mainRuler;
@@ -39,32 +26,40 @@ public class GameScoreboard implements Listener {
     private Objective objective;
     private Team blackTeam;
     private Team whiteTeam;
-    private static final String ENTRY_BLACK = "§0§f";
-    private static final String ENTRY_WHITE = "§f§f";
+    private static final String ENTRY_BLACK = "§0§f ";
+    private static final String ENTRY_WHITE = "§f§f ";
 
     public GameScoreboard(MainRuler mainRuler) {
         this.mainRuler = mainRuler;
         this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.objective = scoreboard.registerNewObjective("game", "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName(ChatColor.WHITE + "« " + ChatColor.DARK_GRAY + "Dark" + ChatColor.GRAY + "Cube" + ChatColor.WHITE + "." + ChatColor.DARK_GRAY + "eu" + ChatColor.WHITE + " »");
+
+        Score space = objective.getScore(" ");
+        space.setScore(3);
 
         blackTeam = scoreboard.registerNewTeam("black_team");
-        blackTeam.setPrefix("§0Schwarz: ");
+        blackTeam.setPrefix("§7×");
         blackTeam.addEntry(ENTRY_BLACK);
         objective.getScore(ENTRY_BLACK).setScore(2);
 
         whiteTeam = scoreboard.registerNewTeam("white_team");
-        whiteTeam.setPrefix("§fWeiß: ");
+        whiteTeam.setPrefix("§7×");
         whiteTeam.addEntry(ENTRY_WHITE);
         objective.getScore(ENTRY_WHITE).setScore(1);
+
+        updateBlackLives(10);
+        updateWhiteLives(10);
     }
 
+
     public void updateBlackLives(int lives) {
-        blackTeam.setSuffix(" " + lives);
+        blackTeam.setSuffix("" + lives + " §7× §8Schwarz");
     }
 
     public void updateWhiteLives(int lives) {
-        whiteTeam.setSuffix(" " + lives);
+        whiteTeam.setSuffix("" + lives + " §7× §fWeiß");
     }
 
     @EventHandler
