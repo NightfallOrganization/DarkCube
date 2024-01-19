@@ -35,7 +35,15 @@ public class LifeManager {
     public void reduceLife(UUID playerID) {
         ChatColor teamColor = teamManager.getPlayerTeam(playerID);
         if (teamColor != null && teamLives.containsKey(teamColor)) {
-            int newLives = teamLives.get(teamColor) - 1;
+            int currentLives = teamLives.get(teamColor);
+
+            if (currentLives <= 0) {
+                Ending ending = new Ending(Sumo.getInstance());
+                ending.execute(teamColor);
+                return;
+            }
+
+            int newLives = currentLives - 1;
             teamLives.put(teamColor, newLives);
 
             if (teamColor == TeamManager.TEAM_BLACK) {
@@ -44,10 +52,6 @@ public class LifeManager {
                 gameScoreboard.updateWhiteLives(newLives);
             }
 
-            if (newLives <= 0) {
-                Ending ending = new Ending(Sumo.getInstance());
-                ending.execute(teamColor);
-            }
         }
     }
 

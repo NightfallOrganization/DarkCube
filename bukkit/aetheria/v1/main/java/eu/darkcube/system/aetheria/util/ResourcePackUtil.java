@@ -32,8 +32,8 @@ public class ResourcePackUtil {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Aetheria aetheria;
     private final Key hashKey;
-    private final String url = "https://metropolis.darkcube.eu/";
-    private final String urlBlank = "https://metropolis.darkcube.eu/blank.zip";
+    private final String url = "https://aetheria.darkcube.eu/";
+    private final String urlBlank = "https://aetheria.darkcube.eu/blank.zip";
     private byte[] hash;
 
     public ResourcePackUtil(Aetheria aetheria) {
