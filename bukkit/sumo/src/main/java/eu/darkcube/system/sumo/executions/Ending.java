@@ -9,10 +9,7 @@ package eu.darkcube.system.sumo.executions;
 
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.other.GameStates;
-import org.bukkit.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -35,8 +32,9 @@ public class Ending {
     private void teleportPlayersToSpawn() {
         World world = Bukkit.getWorld("world");
         if (world != null) {
+            Location targetLocation = new Location(world, 0.5, 101, 0.5);
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.teleport(world.getSpawnLocation());
+                player.teleport(targetLocation);
             }
         } else {
             System.out.println("Welt 'world' nicht gefunden!");

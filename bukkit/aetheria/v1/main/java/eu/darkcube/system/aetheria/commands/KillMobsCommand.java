@@ -25,7 +25,7 @@ public class KillMobsCommand implements CommandExecutor {
                 }
                 player.sendMessage("§7Alle Mobs wurden §aentfernt§7!");
             } else {
-                player.sendMessage("§cDu hast keine Berechtigung, diesen Befehl auszuführen!");
+                player.sendMessage("§7Du hast keine Berechtigung, diesen Befehl auszuführen!");
             }
         }
         return true;

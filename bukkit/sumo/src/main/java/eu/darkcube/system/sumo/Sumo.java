@@ -19,6 +19,7 @@ import eu.darkcube.system.sumo.manager.DamageManager;
 import eu.darkcube.system.sumo.manager.LifeManager;
 import eu.darkcube.system.sumo.manager.MainManager;
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.other.GameDoubleJump;
 import eu.darkcube.system.sumo.other.WoolDespawner;
 import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
@@ -48,7 +49,7 @@ public class Sumo extends DarkCubePlugin {
         WoolDespawner woolDespawner = new WoolDespawner(this);
         GameScoreboard gameScoreboard = new GameScoreboard(mainRuler);
         LifeManager lifeManager = new LifeManager(teamManager, gameScoreboard);
-
+        GameDoubleJump gameDoubleJump = new GameDoubleJump(this, mainRuler);
         LobbyRuler lobbyRuler = new LobbyRuler();
         MainManager mainManager = new MainManager(lobbyScoreboard, mainRuler);
         Respawn respawn = new Respawn(mainRuler, lifeManager, teamManager);
@@ -57,8 +58,9 @@ public class Sumo extends DarkCubePlugin {
         StartingTimer startingTimer = new StartingTimer(this, lobbyScoreboard, respawn, equipPlayer, teamManager, randomTeam);
         DamageManager damageManager = new DamageManager(teamManager, this);
         Spectator.setMainRuler(mainRuler);
-        ItemWool itemWool = new ItemWool(teamManager, this);
+        ItemWool itemWool = new ItemWool(teamManager, this, mainRuler);
 
+        getServer().getPluginManager().registerEvents(gameDoubleJump, this);
         getServer().getPluginManager().registerEvents(itemWool, this);
         getServer().getPluginManager().registerEvents(woolDespawner, this);
         getServer().getPluginManager().registerEvents(damageManager, this);

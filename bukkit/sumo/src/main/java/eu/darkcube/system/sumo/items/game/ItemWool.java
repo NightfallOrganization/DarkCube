@@ -10,6 +10,7 @@ package eu.darkcube.system.sumo.items.game;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.ruler.MainRuler;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -33,12 +34,14 @@ import java.util.UUID;
 public class ItemWool implements Listener {
 
     private JavaPlugin plugin;
+    private MainRuler mainRuler;
     private static TeamManager teamManager;
     private Map<UUID, Map<Integer, BukkitRunnable>> playerSlotTasks = new HashMap<>();
 
-    public ItemWool(TeamManager teamManager, Plugin plugin) {
+    public ItemWool(TeamManager teamManager, Plugin plugin, MainRuler mainRuler) {
         ItemWool.teamManager = teamManager;
         this.plugin = plugin;
+        this.mainRuler = mainRuler;
     }
 
     public static ItemStack createWool(Player player) {
@@ -60,40 +63,39 @@ public class ItemWool implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
 
-        // Überprüfen, ob der platzierte Block Wolle ist
         if (block.getType() == Material.WOOL) {
             int slot = player.getInventory().getHeldItemSlot();
             DyeColor color = ((Wool) block.getState().getData()).getColor();
+            String worldName = player.getWorld().getName();
 
-            // Überprüfen und alte Aufgaben für diesen Slot abbrechen
             playerSlotTasks.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
             Map<Integer, BukkitRunnable> slotTasks = playerSlotTasks.get(player.getUniqueId());
             if (slotTasks.containsKey(slot)) {
                 slotTasks.get(slot).cancel();
             }
 
-            // Erstellen einer neuen Aufgabe für den Slot
             BukkitRunnable task = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    regenerateWool(player, slot, color);
-                    // Aufgabe aus der Map entfernen, wenn fertig
+                    regenerateWool(player, slot, color, worldName);
                     slotTasks.remove(slot);
                 }
             };
 
-            // Aufgabe in die Map einfügen und starten
             slotTasks.put(slot, task);
-            task.runTaskLater(this.plugin, 20 * 10); // 20 Ticks * 10 Sekunden
+            task.runTaskLater(this.plugin, 20 * 10);
         }
     }
 
-    private void regenerateWool(Player player, int slot, DyeColor color) {
-        PlayerInventory inventory = player.getInventory();
-        // Stellen Sie sicher, dass der Slot nicht belegt ist
-        if (inventory.getItem(slot) == null || inventory.getItem(slot).getType() == Material.AIR) {
-            ItemStack wool = new Wool(color).toItemStack(10);
-            inventory.setItem(slot, wool);
+    private void regenerateWool(Player player, int slot, DyeColor color, String placedWorldName) {
+        if (player.getWorld().equals(mainRuler.getActiveWorld()) && player.getWorld().getName().equals(placedWorldName)) {
+            PlayerInventory inventory = player.getInventory();
+
+            if (inventory.getItem(slot) == null || inventory.getItem(slot).getType() == Material.AIR) {
+                ItemStack wool = new Wool(color).toItemStack(10);
+                inventory.setItem(slot, wool);
+            }
         }
     }
+
 }
