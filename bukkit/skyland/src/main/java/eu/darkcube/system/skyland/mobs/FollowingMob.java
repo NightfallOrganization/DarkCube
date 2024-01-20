@@ -7,13 +7,12 @@
 package eu.darkcube.system.skyland.mobs;
 
 import eu.darkcube.system.libs.com.google.gson.Gson;
-import eu.darkcube.system.skyland.equipment.Materials;
+import eu.darkcube.system.skyland.equipment.Material;
 import eu.darkcube.system.skyland.equipment.PlayerStats;
 import eu.darkcube.system.skyland.equipment.Rarity;
 import eu.darkcube.system.skyland.Skyland;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -121,7 +120,7 @@ public class FollowingMob implements CustomMob{
 
 
 						if (mob.getLocation().add(mob.getLocation().getDirection().multiply(1/mob.getLocation().distance(targetL))).getBlock().getType().equals(
-								Material.AIR)){
+								org.bukkit.Material.AIR)){
 							setTargetL(mob.getLocation().add(r.nextInt(9)-5, 0 , r.nextInt(9)-5));
 							//todo prob remove this if
 						}
@@ -154,10 +153,10 @@ public class FollowingMob implements CustomMob{
 	}
 
 	@Override
-	public List<Materials> getLootTable() {
-		ArrayList<Materials> out = new ArrayList<>();
-		out.add(Materials.DRAGON_SCALE);
-		out.add(Materials.TESTING_IRON);
+	public List<Material> getLootTable() {
+		ArrayList<Material> out = new ArrayList<>();
+		out.add(Material.DRAGON_SCALE);
+		out.add(Material.TESTING_IRON);
 
 		return out;
 	}

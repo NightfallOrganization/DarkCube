@@ -6,6 +6,7 @@
  */
 package eu.darkcube.system.skyland;
 
+import eu.darkcube.system.skyland.equipment.Material;
 import eu.darkcube.system.skyland.inventoryui.*;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 import util.SebUtil;
@@ -19,7 +20,6 @@ import eu.darkcube.system.skyland.worldgen.SkylandBiome;
 import eu.darkcube.system.skyland.worldgen.structures.CustomPallette;
 import eu.darkcube.system.skyland.worldgen.structures.SkylandStructure;
 import eu.darkcube.system.skyland.worldgen.structures.SkylandStructureModifiers;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
@@ -62,15 +62,16 @@ public class Feed implements CommandExecutor {
                 SkylandPlayerModifier.getSkylandPlayer(p).resetData();
             } else if (args[0].equals("gui")) {
                 if (args.length > 3) {
-                    p.showTitle(Title.title(Component.text(args[2]).color(TextColor.color(0x4e, 0x5c, 0x24)), Component
+                    p.showTitle(Title.title(net.kyori.adventure.text.Component
+                            .text(args[2]).color(TextColor.color(0x4e, 0x5c, 0x24)), net.kyori.adventure.text.Component
                             .text(args[3])
                             .color(TextColor.color(0x4e, 0x5c, 0x24)), Times.times(Duration.of(0, ChronoUnit.SECONDS), Duration.of(Long.parseLong(args[1]), ChronoUnit.SECONDS), Duration.of(0, ChronoUnit.SECONDS))));
                     //p.sendTitle(args[1], "", 0, 100000, 0);
                 } else {
                     if (args.length > 2) {
-                        p.showTitle(Title.title(Component
+                        p.showTitle(Title.title(net.kyori.adventure.text.Component
                                 .text(args[2])
-                                .color(TextColor.color(0x4e, 0x5c, 0x24)), Component.text(""), Times.times(Duration.of(0, ChronoUnit.SECONDS), Duration.of(Long.parseLong(args[1]), ChronoUnit.SECONDS), Duration.of(0, ChronoUnit.SECONDS))));
+                                .color(TextColor.color(0x4e, 0x5c, 0x24)), net.kyori.adventure.text.Component.text(""), Times.times(Duration.of(0, ChronoUnit.SECONDS), Duration.of(Long.parseLong(args[1]), ChronoUnit.SECONDS), Duration.of(0, ChronoUnit.SECONDS))));
                     } else {
                         p.sendTitle("\uEff1", "", 0, 100000, 0);
                     }
@@ -78,10 +79,10 @@ public class Feed implements CommandExecutor {
                 }
 
             } else if (args[0].equals("weapon")) {
-                Weapons weapons = Weapons.createEquipent(1000, new ItemStack(Material.STRING), Rarity.RARE, 0, new ArrayList<>(List.of(new Components[]{new Components(Materials.DRAGON_SCALE, ComponentTypes.AXE), new Components(Materials.TESTING_IRON, ComponentTypes.AXE)})), EquipmentType.AXE, Ability.TEST);
-                p.getInventory().setItemInMainHand(weapons.getModel());
+                Weapon weapon = Weapon.createEquipment(1000, new ItemStack(org.bukkit.Material.STRING), Rarity.RARE, 0, new ArrayList<>(List.of(new Component[]{new Component(Material.DRAGON_SCALE, ComponentType.AXE), new Component(Material.TESTING_IRON, ComponentType.AXE)})), EquipmentType.AXE, Ability.TEST);
+                p.getInventory().setItemInMainHand(weapon.getModel());
             } else if (args[0].equals("armor")) {
-                Equipments eq = Equipments.createEquipent(1000, new ItemStack(Material.LEATHER_CHESTPLATE), Rarity.RARE, new ArrayList<>(List.of(new Components[]{new Components(Materials.DRAGON_SCALE, ComponentTypes.AXE)})), EquipmentType.AXE);
+                Equipment eq = Equipment.createEquipment(1000, new ItemStack(org.bukkit.Material.LEATHER_CHESTPLATE), Rarity.RARE, new ArrayList<>(List.of(new Component[]{new Component(Material.DRAGON_SCALE, ComponentType.AXE)})), EquipmentType.AXE);
                 p.getInventory().setItemInMainHand(eq.getModel());
             } else if (args[0].equals("lvl")) {
                 if (args.length > 1) {
@@ -164,7 +165,7 @@ public class Feed implements CommandExecutor {
 
                     for (BlockState state : structure.getPalettes().get(0).getBlocks()) {
                         p.sendMessage("state found");
-                        if (state.getType().equals(Material.AIR)) {
+                        if (state.getType().equals(org.bukkit.Material.AIR)) {
                             p.sendMessage("state removed");
                             structure.getPalettes().get(0).getBlocks().remove(state);
                         }
@@ -256,7 +257,7 @@ public class Feed implements CommandExecutor {
 
         } else {
             InventoryUI inventoryUI = new InventoryUI(6, "\uEff1", (Player) sender);
-            inventoryUI.setInvSlot(new UIitemStack(true, new ItemStack(Material.DIAMOND_SWORD)), 0, 5);
+            inventoryUI.setInvSlot(new UIitemStack(true, new ItemStack(org.bukkit.Material.DIAMOND_SWORD)), 0, 5);
             inventoryUI.openInv();
         }
 

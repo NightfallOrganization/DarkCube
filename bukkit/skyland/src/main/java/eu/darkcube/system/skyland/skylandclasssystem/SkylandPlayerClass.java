@@ -7,7 +7,7 @@
 package eu.darkcube.system.skyland.skylandclasssystem;
 
 import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.skyland.equipment.Equipment;
+import eu.darkcube.system.skyland.equipment.EquipmentInterface;
 import eu.darkcube.system.skyland.equipment.EquipmentType;
 import eu.darkcube.system.skyland.equipment.PlayerStats;
 import eu.darkcube.system.util.data.PersistentDataType;
@@ -60,7 +60,7 @@ public class SkylandPlayerClass {
         return "SkylandPlayerClass{" + "sClass=" + getsClass() + ", lvl=" + getLvl() + ", baseStats=" + getBaseStats().toString() + '}';
     }
 
-    public boolean isEqUsable(Equipment eq) {
+    public boolean isEqUsable(EquipmentInterface eq) {
         boolean isAllowedType = false;
         boolean isLvl = false;
         for (EquipmentType equipmentType : getsClass().getAllowedEquip()) {

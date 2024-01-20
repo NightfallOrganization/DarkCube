@@ -6,19 +6,19 @@
  */
 package eu.darkcube.system.skyland.equipment;
 
-public class Components {
+public class Component {
 
-	Materials materialType;
-	ComponentTypes compType;
+	Material materialType;
+	ComponentType compType;
 
-	public Components(Materials type, ComponentTypes compType) {
+	public Component(Material type, ComponentType compType) {
 		this.materialType = type;
 		this.compType = compType;
 	}
 
-	public static Components parseFromString(String s) {
+	public static Component parseFromString(String s) {
 		String[] temp = s.split("\\\\");
-		return new Components(Materials.valueOf(temp[1]), ComponentTypes.valueOf(temp[3]));
+		return new Component(Material.valueOf(temp[1]), ComponentType.valueOf(temp[3]));
 	}
 
 	public PlayerStats[] getPStats() {
@@ -63,11 +63,11 @@ public class Components {
 		return materialType.getLvlReq();
 	}
 
-	public ComponentTypes getCompType() {
+	public ComponentType getCompType() {
 		return compType;
 	}
 
-	public Materials getMaterialType() {
+	public Material getMaterialType() {
 		return materialType;
 	}
 }

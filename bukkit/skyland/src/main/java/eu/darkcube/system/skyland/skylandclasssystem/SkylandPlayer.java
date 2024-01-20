@@ -47,19 +47,19 @@ public class SkylandPlayer implements SkylandEntity {
         return false;
     }
 
-    public List<Equipment> getEquipment() {
-        ArrayList<Equipment> out = new ArrayList<>();
+    public List<EquipmentInterface> getEquipment() {
+        ArrayList<EquipmentInterface> out = new ArrayList<>();
         for (ItemStack i : getPlayer().getEquipment().getArmorContents()) {
-            Equipments equipments = Equipments.loadFromItem(i);
-            if (equipments != null) {
-                if (getActiveClass().isEqUsable(equipments)) {
-                    out.add(equipments);
+            Equipment equipment = Equipment.loadFromItem(i);
+            if (equipment != null) {
+                if (getActiveClass().isEqUsable(equipment)) {
+                    out.add(equipment);
                 }
 
             }
         }
 
-        Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
+        Weapon equipments = Weapon.loadFromItem(getPlayer().getInventory().getItemInMainHand());
         if (equipments != null) {
             if (getActiveClass().isEqUsable(equipments)) {
                 out.add(equipments);
@@ -70,13 +70,13 @@ public class SkylandPlayer implements SkylandEntity {
         return out;
     }
 
-    public Weapon getActiveWeapon() {
+    public WeaponInterface getActiveWeapon() {
         //returns null if there isnt a weapon in the main hand
         System.out.println("loading from main hand");
 
         if (getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
 
-            Weapons equipments = Weapons.loadFromItem(getPlayer().getInventory().getItemInMainHand());
+            Weapon equipments = Weapon.loadFromItem(getPlayer().getInventory().getItemInMainHand());
             if (equipments != null) {
                 if (getActiveClass().isEqUsable(equipments)) {
                     System.out.println("allowed to use this weapon");
@@ -97,7 +97,7 @@ public class SkylandPlayer implements SkylandEntity {
         ArrayList<PlayerStats> playerStats = new ArrayList<>();
         //playerStats.add(activeClass);
 
-        for (Equipment eq : getEquipment()) {
+        for (EquipmentInterface eq : getEquipment()) {
             playerStats.addAll(List.of(eq.getStats()));
         }
 

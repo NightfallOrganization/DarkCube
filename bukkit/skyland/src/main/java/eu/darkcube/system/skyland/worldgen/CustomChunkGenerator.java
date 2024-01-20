@@ -262,10 +262,12 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 
 		int islandGenHeight = getIslandThiccness(x, z);
-
-		if (islandGenHeight >= 29){
-			currentHeight = (int) (currentHeight - 0.67*(islandGenHeight-35) - 0.67*6);
+		
+		if (getIslandIntensity(x,z) < 5){
+			currentHeight = (int) (currentHeight - (getIslandIntensity(x,z) - 5 )*-2);
 		}
+
+
 
 		return currentHeight;
 	}
@@ -314,7 +316,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	@Override
 	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
 		ArrayList<BlockPopulator> out = new ArrayList<>();
-		out.add(new TreePopulators());
+		out.add(new TreePopulator());
 		out.add(new LootChestPopulator());
 
 		return out;

@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.skyland.listener;
 
-import eu.darkcube.system.skyland.equipment.Materials;
+import eu.darkcube.system.skyland.equipment.Material;
 import eu.darkcube.system.skyland.equipment.PlayerStats;
 import eu.darkcube.system.skyland.equipment.PlayerStatsType;
 import eu.darkcube.system.skyland.Skyland;
@@ -236,7 +236,7 @@ public class SkylandListener implements Listener {
 
 			if (mob.getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())){
 
-				Materials drop = Materials.getRandomMaterial(Skyland.getInstance().getCustomMob(mob).getLootTable());
+				Material drop = Material.getRandomMaterial(Skyland.getInstance().getCustomMob(mob).getLootTable());
 				System.out.println("drop: " + drop.toString());
 				e.getDrops().add(drop.getModel());
 

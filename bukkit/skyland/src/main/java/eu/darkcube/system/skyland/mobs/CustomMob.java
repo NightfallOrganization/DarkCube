@@ -6,7 +6,7 @@
  */
 package eu.darkcube.system.skyland.mobs;
 
-		import eu.darkcube.system.skyland.equipment.Materials;
+		import eu.darkcube.system.skyland.equipment.Material;
         import eu.darkcube.system.skyland.Skyland;
 		import eu.darkcube.system.skyland.skylandclasssystem.SkylandEntity;
 		import org.bukkit.Location;
@@ -32,7 +32,7 @@ public interface CustomMob extends SkylandEntity {
 		mob.getPersistentDataContainer().set(getCustomMobTypeKey(), PersistentDataType.INTEGER, -1);
 	}
 
-	List<Materials> getLootTable();//todo maybe different format!
+	List<Material> getLootTable();//todo maybe different format!
 
 	static NamespacedKey getCustomMobTypeKey() {
 		return new NamespacedKey(Skyland.getInstance(), "mobTypeId");

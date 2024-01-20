@@ -7,7 +7,6 @@
 package eu.darkcube.system.skyland.equipment;
 
 import eu.darkcube.system.skyland.Skyland;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -17,12 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public enum Materials {
+public enum Material {
 
 	DRAGON_SCALE(new PlayerStats[] {new PlayerStats(PlayerStatsType.ARMOR, 100)}, Rarity.RARE,
-			new ItemStack(Material.DIAMOND_AXE), 10, 40),
+			new ItemStack(org.bukkit.Material.DIAMOND_AXE), 10, 40),
 	TESTING_IRON(new PlayerStats[] {new PlayerStats(PlayerStatsType.DAMAGE, 10)}, Rarity.RARE,
-			new ItemStack(Material.DIAMOND_AXE), 10, 40),//beispiel
+			new ItemStack(org.bukkit.Material.DIAMOND_AXE), 10, 40),//beispiel
 
 	;
 
@@ -34,7 +33,7 @@ public enum Materials {
 	private int lvlReq;
 
 	//private static HashMap<Rarity, ArrayList<Materials>> materials = new HashMap<>();
-	Materials(PlayerStats[] stats, Rarity rarity, ItemStack model, int durability, int lvlReq) {
+	Material(PlayerStats[] stats, Rarity rarity, ItemStack model, int durability, int lvlReq) {
 		this.stats = stats;
 		this.rarity = rarity;
 		this.model = model;
@@ -90,9 +89,9 @@ public enum Materials {
         return materials;
     }*/
 
-	public static Materials getRandomMaterial(List<Materials> materials){
+	public static Material getRandomMaterial(List<Material> materials){
 		int totalWeight = 0;
-		for (Materials m : materials) {
+		for (Material m : materials) {
 			totalWeight += m.getRarity().getWeight();
 		}
 
@@ -101,7 +100,7 @@ public enum Materials {
 		Random random = new Random();
 		int roll = random.nextInt(totalWeight);
 		System.out.println("roll: " + roll);
-		for (Materials m: materials) {
+		for (Material m: materials) {
 			if (roll <= m.getRarity().getWeight()) {
 				return m;
 			}

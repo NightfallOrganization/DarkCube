@@ -6,22 +6,9 @@
  */
 package eu.darkcube.system.skyland.equipment;
 
-public enum ComponentTypes {
-	AXE(new PlayerStats[] {new PlayerStats(PlayerStatsType.STRENGHT, 3)}),
+public interface WeaponInterface extends EquipmentInterface {
 
+	int getDamage();
 
-
-
-	;
-
-	private PlayerStats[] stats;
-
-	ComponentTypes(PlayerStats[] stats) {
-		this.stats = stats;
-	}
-
-	public PlayerStats[] getStats() {
-		return stats;
-	}
+	//Ability getAbility(); todo uncommewnt
 }
-

@@ -15,11 +15,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
-public class TreePopulators extends BlockPopulator {
+public class TreePopulator extends BlockPopulator {
 
 	SimplexOctaveGenerator islandGen = new SimplexOctaveGenerator(new Random(1), 8);
 
-	public TreePopulators() {
+	public TreePopulator() {
 		islandGen.setScale(1D);
 	}
 
