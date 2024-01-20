@@ -28,7 +28,7 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         playerRegenerationManager.stopRegeneration(player);
         playerRegenerationManager.startRegeneration(player);
-//        aetheria.resourcePackUtil().sendResourcePack(player);
+        aetheria.resourcePackUtil().sendResourcePack(player);
     }
 
 }

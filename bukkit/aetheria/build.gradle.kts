@@ -60,7 +60,7 @@ dependencies {
     compileOnly("com.github.juliarn:npc-lib-common:3.0.0-SNAPSHOT")
     compileOnly("com.github.juliarn:npc-lib-api:3.0.0-SNAPSHOT")
 
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
     compileOnly(project(":darkcubesystem"))
     compileOnly(parent!!.project("luckperms-prefixplugin"))
     implementation(project(":common:glyph-width-loader"))
