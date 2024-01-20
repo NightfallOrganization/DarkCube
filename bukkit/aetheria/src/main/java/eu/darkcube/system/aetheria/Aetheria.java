@@ -18,18 +18,23 @@ import eu.darkcube.system.aetheria.manager.monster.MonsterNameManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterSpawnManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterXPManager;
 import eu.darkcube.system.aetheria.manager.player.*;
+import eu.darkcube.system.aetheria.other.ActionBarUtil;
 import eu.darkcube.system.aetheria.other.PlayerJoinListener;
 import eu.darkcube.system.aetheria.other.ResourcePackUtil;
 import eu.darkcube.system.aetheria.ruler.MainRuler;
 import eu.darkcube.system.aetheria.ruler.MainWorldRuler;
 import eu.darkcube.system.aetheria.ruler.MonsterWorldRuler;
+import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class Aetheria extends DarkCubePlugin {
     private final GlyphWidthManager glyphWidthManager = new GlyphWidthManager();
     private static Aetheria instance;
     private ResourcePackUtil resourcePackUtil;
+    private final GlyphCommand glyphCommand = new GlyphCommand(this);
+    private final ResourcePackCommand resourcePackCommand = new ResourcePackCommand(this);
 
     public Aetheria() {
         super("aetheria");
@@ -70,12 +75,13 @@ public class Aetheria extends DarkCubePlugin {
         var monsterLevelManager = new MonsterLevelManager(healthManager, maxHealthManager, levelManager, damageManager);
         var monsterXPManager = new MonsterXPManager(xpManager, monsterLevelManager);
         var playerRegenerationManager = new PlayerRegenerationManager(this, healthManager, maxHealthManager, regenerationManager);
-        var playerDeathManager = new PlayerDeathManager(this, coreManager, xpManager);
+        var playerDeathManager = new PlayerDeathManager(coreManager, xpManager, healthManager, maxHealthManager);
         var entityDamageHandler = new EntityDamageHandler(healthManager, damageManager, monsterXPManager, playerRegenerationManager, playerDeathManager);
         var dataModeCommand = new DataModeCommand(monsterLevelManager);
         var monsterNameManager = new MonsterNameManager(monsterLevelManager);
         var monsterSpawnManager = new MonsterSpawnManager(monsterLevelManager);
-        var playerJoinListener = new PlayerJoinListener(playerRegenerationManager);
+        var playerJoinListener = new PlayerJoinListener(this, playerRegenerationManager);
+        var actionBarUtil = new ActionBarUtil(this, healthManager, levelXPHandler, levelManager, maxHealthManager, xpManager);
 
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("world").setExecutor(new WorldCommand());
@@ -90,6 +96,7 @@ public class Aetheria extends DarkCubePlugin {
         instance.getCommand("setregeneration").setExecutor(new SetRegenerationCommand(regenerationManager));
         instance.getCommand("setlevel").setExecutor(new SetLevelCommand(levelManager));
         instance.getCommand("datamode").setExecutor(dataModeCommand);
+        instance.getCommand("setcore").setExecutor(new SetCoreCommand(coreManager));
 
         instance.getServer().getPluginManager().registerEvents(playerJoinListener, this);
         instance.getServer().getPluginManager().registerEvents(monsterXPManager, this);
@@ -102,10 +109,14 @@ public class Aetheria extends DarkCubePlugin {
         instance.getServer().getPluginManager().registerEvents(monsterWorldRuler, this);
         instance.getServer().getPluginManager().registerEvents(mainWorldRuler, this);
         instance.getServer().getPluginManager().registerEvents(mainRuler, this);
+
+        CommandAPI.instance().register(glyphCommand);
+        CommandAPI.instance().register(resourcePackCommand);
     }
 
     @Override public void onDisable() {
-
+        CommandAPI.instance().unregister(glyphCommand);
+        CommandAPI.instance().unregister(resourcePackCommand);
     }
 
     public GlyphWidthManager glyphWidthManager() {

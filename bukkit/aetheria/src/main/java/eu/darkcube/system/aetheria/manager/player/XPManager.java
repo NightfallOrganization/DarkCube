@@ -27,6 +27,7 @@ public class XPManager {
     public void setXP(Player player, double xp) {
         player.getPersistentDataContainer().set(xpKey, PersistentDataType.DOUBLE, xp);
         LevelXPHandler.checkLevelUp(player, this, levelManager);
+        LevelBarManager.updateExperienceBar(player, this, levelManager);
     }
 
     public double getXP(Player player) {

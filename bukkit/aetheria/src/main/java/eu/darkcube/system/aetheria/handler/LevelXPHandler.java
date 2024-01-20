@@ -9,6 +9,7 @@ package eu.darkcube.system.aetheria.handler;
 
 import eu.darkcube.system.aetheria.manager.player.LevelManager;
 import eu.darkcube.system.aetheria.manager.player.XPManager;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,14 +27,17 @@ public class LevelXPHandler {
             xpManager.setXP(player, xp - xpRequired); // Reset XP to 0 after leveling up
             // Optional: Notify the player about the level up
             player.sendMessage("§7Du hast Level §e" + (currentLevel + 1) + " §7erreicht!");
+            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 1f, 1f);
         }
     }
 
-    private static double calculateXPRequiredForNextLevel(int currentLevel) {
+    public static double calculateXPRequiredForNextLevel(int currentLevel) {
         double baseXP = 20;
-        double rate = Math.pow(500000.0 / baseXP, 1.0 / 999);
+        double maxXP = 43000;
+        int totalLevels = 99;
 
-        return baseXP * Math.pow(rate, currentLevel - 1);
+        double xpPerLevelIncrement = (maxXP - baseXP) / totalLevels;
+        return xpPerLevelIncrement * (currentLevel - 1) + baseXP;
     }
 
 }

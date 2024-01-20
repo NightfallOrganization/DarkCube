@@ -44,6 +44,9 @@ commands:
   datamode:
     description: Wechselt den DataMode
     permission: aetheria.datamode.use
+  setcore:
+    description: Setzt die Core
+    permission: aetheria.setcore.use
 
 
 Permissions:
@@ -72,4 +75,6 @@ Permissions:
   aetheria.setlevel.use:
     default: op
   aetheria.datamode.use:
+    default: op
+  aetheria.setcore.use:
     default: op
