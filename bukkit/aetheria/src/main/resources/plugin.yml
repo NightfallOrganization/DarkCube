@@ -38,6 +38,12 @@ commands:
   setregeneration:
     description: Setzt die Regeneration
     permission: aetheria.setregeneration.use
+  setlevel:
+    description: Setzt die Level
+    permission: aetheria.setlevel.use
+  datamode:
+    description: Wechselt den DataMode
+    permission: aetheria.datamode.use
 
 
 Permissions:
@@ -62,4 +68,8 @@ Permissions:
   aetheria.setxp.use:
     default: op
   aetheria.setregeneration.use:
+    default: op
+  aetheria.setlevel.use:
+    default: op
+  aetheria.datamode.use:
     default: op

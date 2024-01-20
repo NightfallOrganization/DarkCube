@@ -15,30 +15,25 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
 
 public class LevelXPHandler {
-    private final XPManager xpManager;
-    private final LevelManager levelManager;
 
-    public LevelXPHandler(XPManager xpManager, LevelManager levelManager) {
-        this.xpManager = xpManager;
-        this.levelManager = levelManager;
-    }
-
-    public void addXP(Player player, double xpToAdd) {
-        double currentXP = xpManager.getXP(player);
+    public static void checkLevelUp(Player player, XPManager xpManager, LevelManager levelManager) {
+        double xp = xpManager.getXP(player);
         int currentLevel = levelManager.getLevel(player);
-        double newXP = currentXP + xpToAdd;
+        double xpRequired = calculateXPRequiredForNextLevel(currentLevel);
 
-        while (newXP >= calculateXPRequirement(currentLevel)) {
-            newXP -= calculateXPRequirement(currentLevel);
-            currentLevel++;
-            levelManager.setLevel(player, currentLevel);
+        if (xp >= xpRequired) {
+            levelManager.setLevel(player, currentLevel + 1);
+            xpManager.setXP(player, xp - xpRequired); // Reset XP to 0 after leveling up
+            // Optional: Notify the player about the level up
+            player.sendMessage("§7Du hast Level §e" + (currentLevel + 1) + " §7erreicht!");
         }
-
-        xpManager.setXP(player, newXP);
     }
 
-    private double calculateXPRequirement(int level) {
-        if (level == 0) return 20;
-        return 20 + 480980 * Math.log10(level);
+    private static double calculateXPRequiredForNextLevel(int currentLevel) {
+        double baseXP = 20;
+        double rate = Math.pow(500000.0 / baseXP, 1.0 / 999);
+
+        return baseXP * Math.pow(rate, currentLevel - 1);
     }
+
 }

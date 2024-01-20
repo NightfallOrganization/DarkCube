@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.aetheria.manager;
+package eu.darkcube.system.aetheria.manager.player;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;

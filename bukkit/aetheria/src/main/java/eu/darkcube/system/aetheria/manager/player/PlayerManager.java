@@ -7,14 +7,12 @@
 
 package eu.darkcube.system.aetheria.manager.player;
 
-import eu.darkcube.system.aetheria.manager.CoreManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 

@@ -8,16 +8,10 @@
 package eu.darkcube.system.aetheria.manager.player;
 
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerRegenerationManager {
     private final JavaPlugin plugin;
@@ -57,6 +51,14 @@ public class PlayerRegenerationManager {
                 }
             }
         }.runTaskTimer(plugin, 0L, 100L); // 100L = 5 seconds
+    }
+
+    public void stopRegeneration(LivingEntity livingEntity) {
+        if (!isRegenerationRunning(livingEntity)) {
+            return;
+        }
+
+        setRegenerationRunning(livingEntity, false);
     }
 
     private boolean isRegenerationRunning(LivingEntity livingEntity) {

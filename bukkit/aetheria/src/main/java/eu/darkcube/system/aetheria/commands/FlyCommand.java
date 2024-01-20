@@ -18,7 +18,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -85,15 +87,35 @@ public class FlyCommand implements CommandExecutor, Listener {
         checkAndApplyFlyMode(event.getPlayer());
     }
 
+    @EventHandler
+    public void onGameModeChange(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+        NamespacedKey key = new NamespacedKey(plugin, "flymode");
+        byte flyStatus = player.getPersistentDataContainer().getOrDefault(key, PersistentDataType.BYTE, (byte) 0);
+
+        if (flyStatus == 1) {
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                player.setAllowFlight(true);
+                player.setFlying(true);
+            });
+        }
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> checkAndApplyFlyMode(player), 20L); // 20L steht für 20 Ticks, also 1 Sekunde
+    }
+
     private void checkAndApplyFlyMode(Player player) {
         NamespacedKey key = new NamespacedKey(plugin, "flymode");
         byte flyStatus = player.getPersistentDataContainer().getOrDefault(key, PersistentDataType.BYTE, (byte) 0);
 
         if (flyStatus == 1) {
-            player.setAllowFlight(true);
-        }
-
-        if (flyStatus == 0) {
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                player.setAllowFlight(true);
+            });
+        } else {
             player.setAllowFlight(false);
             player.setFlying(false);
         }
