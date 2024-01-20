@@ -4,6 +4,8 @@ author: EliteDarkness
 version: 2.0
 api-version: 1.13
 depend: [ System ]
+softdepend:
+  - Multiverse-Core
 commands:
   gm:
     description: Wechselt den Gamemode

@@ -68,7 +68,6 @@ public class Aetheria extends DarkCubePlugin {
         var maxHealthManager = new MaxHealthManager(this);
         var coreManager = new CoreManager(this);
         var damageManager = new DamageManager(this);
-        var levelXPHandler = new LevelXPHandler();
         var xpManager = new XPManager(this, levelManager);
         var regenerationManager = new RegenerationManager(this);
         var playerManager = new PlayerManager(this, healthManager, coreManager, damageManager, xpManager, levelManager, maxHealthManager, regenerationManager);
@@ -81,7 +80,7 @@ public class Aetheria extends DarkCubePlugin {
         var monsterNameManager = new MonsterNameManager(monsterLevelManager);
         var monsterSpawnManager = new MonsterSpawnManager(monsterLevelManager);
         var playerJoinListener = new PlayerJoinListener(this, playerRegenerationManager);
-        var actionBarUtil = new ActionBarUtil(this, healthManager, levelXPHandler, levelManager, maxHealthManager, xpManager);
+        var actionBarUtil = new ActionBarUtil(this, healthManager, levelManager, maxHealthManager, xpManager);
 
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("world").setExecutor(new WorldCommand());

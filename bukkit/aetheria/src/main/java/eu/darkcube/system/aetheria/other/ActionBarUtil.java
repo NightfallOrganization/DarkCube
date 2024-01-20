@@ -24,15 +24,13 @@ public class ActionBarUtil {
 
     private final Aetheria aetheria;
     private final HealthManager healthManager;
-    private final LevelXPHandler levelXPHandler;
     private LevelManager levelManager;
     private MaxHealthManager maxHealthManager;
     private XPManager xpManager;
 
-    public ActionBarUtil(Aetheria aetheria, HealthManager healthManager, LevelXPHandler levelXPManager, LevelManager levelManager, MaxHealthManager maxHealthManager, XPManager xpManager) {
+    public ActionBarUtil(Aetheria aetheria, HealthManager healthManager, LevelManager levelManager, MaxHealthManager maxHealthManager, XPManager xpManager) {
         this.aetheria = aetheria;
         this.healthManager = healthManager;
-        this.levelXPHandler = levelXPManager;
         this.levelManager = levelManager;
         this.maxHealthManager = maxHealthManager;
         this.xpManager = xpManager;
