@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.aetheria.commands;
 
+import eu.darkcube.system.aetheria.handler.LevelXPHandler;
 import eu.darkcube.system.aetheria.manager.player.PlayerManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -37,6 +38,7 @@ public class StatsCommand implements CommandExecutor {
             int level = playerManager.getLevelManager().getLevel(player);
             double maxhealth = playerManager.getMaxHealthManager().getMaxHealth(player);
             double regeneration = playerManager.getRegenerationManager().getRegenerationRate(player);
+            int maxxp = (int) LevelXPHandler.calculateXPRequiredForNextLevel(level);
 
             player.sendMessage(" ");
             player.sendMessage("§7--- §aSpielerstatistiken §7---");
@@ -45,7 +47,7 @@ public class StatsCommand implements CommandExecutor {
             player.sendMessage("§7Regeneration: §a" + regeneration);
             player.sendMessage("§7Core: §a" + coreValue);
             player.sendMessage("§7Schaden: §a" + damage);
-            player.sendMessage("§7Erfahrung: §a" + xp);
+            player.sendMessage("§7Erfahrung: §a" + xp + " §7/ §a" + maxxp);
             player.sendMessage("§7Level: §a" + level);
         }
 

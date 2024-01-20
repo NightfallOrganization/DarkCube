@@ -81,6 +81,10 @@ public class EntityDamageHandler implements Listener {
                 newHealth = 0;
             }
 
+            playerRegenerationManager.startRegeneration(damaged);
+            healthManager.setHealth(damaged, newHealth);
+            event.setDamage(0.0);
+
             if (newHealth <= 0) {
                 damaged.setHealth(0);
 
@@ -93,9 +97,6 @@ public class EntityDamageHandler implements Listener {
                 }
             }
 
-            playerRegenerationManager.startRegeneration(damaged);
-            healthManager.setHealth(damaged, newHealth);
-            event.setDamage(0.0);
         }
     }
 

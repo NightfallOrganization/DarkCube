@@ -8,17 +8,11 @@
 package eu.darkcube.system.aetheria.ruler;
 
 import eu.darkcube.system.aetheria.manager.player.LevelManager;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.projectiles.ProjectileSource;
 
 public class MainRuler implements Listener {
@@ -57,6 +51,14 @@ public class MainRuler implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         event.setKeepInventory(true);
         event.getDrops().clear();
+        event.setDeathMessage(null);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getEntity() instanceof Monster) {
+            event.setDroppedExp(0);
+        }
     }
 
 }
