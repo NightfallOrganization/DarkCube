@@ -8,10 +8,7 @@
 package eu.darkcube.system.aetheria.handler;
 
 import eu.darkcube.system.aetheria.manager.monster.MonsterXPManager;
-import eu.darkcube.system.aetheria.manager.player.DamageManager;
-import eu.darkcube.system.aetheria.manager.player.HealthManager;
-import eu.darkcube.system.aetheria.manager.player.LevelManager;
-import eu.darkcube.system.aetheria.manager.player.PlayerRegenerationManager;
+import eu.darkcube.system.aetheria.manager.player.*;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -30,12 +27,14 @@ public class EntityDamageHandler implements Listener {
     private DamageManager damageManager;
     private MonsterXPManager monsterXPManager;
     private PlayerRegenerationManager playerRegenerationManager;
+    private PlayerDeathManager playerDeathManager;
 
-    public EntityDamageHandler(HealthManager healthManager, DamageManager damageManager, MonsterXPManager monsterXPManager, PlayerRegenerationManager playerRegenerationManager) {
+    public EntityDamageHandler(HealthManager healthManager, DamageManager damageManager, MonsterXPManager monsterXPManager, PlayerRegenerationManager playerRegenerationManager, PlayerDeathManager playerDeathManager) {
         this.healthManager = healthManager;
         this.damageManager = damageManager;
         this.monsterXPManager = monsterXPManager;
         this.playerRegenerationManager = playerRegenerationManager;
+        this.playerDeathManager = playerDeathManager;
     }
 
     @EventHandler
@@ -83,11 +82,15 @@ public class EntityDamageHandler implements Listener {
             }
 
             if (newHealth <= 0) {
-            damaged.setHealth(0);
-            }
+                damaged.setHealth(0);
 
-            if (damage > 0 && damager instanceof Player && damaged instanceof Monster) {
-                monsterXPManager.awardXP((Player) damager, (LivingEntity) damaged);
+                if (damager instanceof  Player) {
+                    monsterXPManager.awardXP((Player) damager, (LivingEntity) damaged);
+                }
+
+                if (damaged instanceof Player) {
+                    playerDeathManager.handlePlayerDeath((Player) damaged);
+                }
             }
 
             playerRegenerationManager.startRegeneration(damaged);

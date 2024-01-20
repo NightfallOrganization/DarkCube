@@ -11,19 +11,20 @@ import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.aetheria.commands.*;
 import eu.darkcube.system.aetheria.handler.EntityDamageHandler;
 import eu.darkcube.system.aetheria.handler.LevelXPHandler;
-import eu.darkcube.system.aetheria.manager.CoreManager;
+import eu.darkcube.system.aetheria.manager.player.CoreManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterLevelManager;
 import eu.darkcube.system.aetheria.manager.WorldManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterNameManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterSpawnManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterXPManager;
 import eu.darkcube.system.aetheria.manager.player.*;
-import eu.darkcube.system.aetheria.other.MonsterLevelListener;
+import eu.darkcube.system.aetheria.other.PlayerJoinListener;
 import eu.darkcube.system.aetheria.other.ResourcePackUtil;
 import eu.darkcube.system.aetheria.ruler.MainRuler;
 import eu.darkcube.system.aetheria.ruler.MainWorldRuler;
 import eu.darkcube.system.aetheria.ruler.MonsterWorldRuler;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class Aetheria extends DarkCubePlugin {
     private final GlyphWidthManager glyphWidthManager = new GlyphWidthManager();
@@ -35,7 +36,7 @@ public class Aetheria extends DarkCubePlugin {
         instance = this;
     }
 
-    @Deprecated public static Aetheria getInstance() {
+    public static Aetheria getInstance() {
         return instance;
     }
 
@@ -53,27 +54,28 @@ public class Aetheria extends DarkCubePlugin {
             e.printStackTrace();
         }
 
-        LevelManager levelManager = new LevelManager(this);
-        MainRuler mainRuler = new MainRuler(levelManager);
-        MainWorldRuler mainWorldRuler = new MainWorldRuler();
-        MonsterWorldRuler monsterWorldRuler = new MonsterWorldRuler(this);
-        FlyCommand flyCommand = new FlyCommand(this);
-        HealthManager healthManager = new HealthManager(this);
-        MaxHealthManager maxHealthManager = new MaxHealthManager(this);
-        CoreManager coreManager = new CoreManager(this);
-        DamageManager damageManager = new DamageManager(this);
-        XPManager xpManager = new XPManager(this);
-        RegenerationManager regenerationManager = new RegenerationManager(this);
-        PlayerManager playerManager = new PlayerManager(this, healthManager, coreManager, damageManager, xpManager, levelManager, maxHealthManager, regenerationManager);
-        MonsterLevelManager monsterLevelManager = new MonsterLevelManager(healthManager, maxHealthManager, levelManager, damageManager);
-        LevelXPHandler levelXPHandler = new LevelXPHandler(xpManager, levelManager);
-        MonsterXPManager monsterXPManager = new MonsterXPManager(xpManager, monsterLevelManager);
-        PlayerRegenerationManager playerRegenerationManager = new PlayerRegenerationManager(this, healthManager, maxHealthManager, regenerationManager);
-        EntityDamageHandler entityDamageHandler = new EntityDamageHandler(healthManager, damageManager, monsterXPManager, playerRegenerationManager);
-        MonsterLevelListener monsterLevelListener = new MonsterLevelListener(monsterLevelManager);
-        MonsterNameManager monsterNameManager = new MonsterNameManager(monsterLevelManager);
-        MonsterSpawnManager monsterSpawnManager = new MonsterSpawnManager(monsterLevelManager);
-
+        var levelManager = new LevelManager(this);
+        var mainRuler = new MainRuler(levelManager);
+        var mainWorldRuler = new MainWorldRuler();
+        var monsterWorldRuler = new MonsterWorldRuler(this);
+        var flyCommand = new FlyCommand(this);
+        var healthManager = new HealthManager(this);
+        var maxHealthManager = new MaxHealthManager(this);
+        var coreManager = new CoreManager(this);
+        var damageManager = new DamageManager(this);
+        var levelXPHandler = new LevelXPHandler();
+        var xpManager = new XPManager(this, levelManager);
+        var regenerationManager = new RegenerationManager(this);
+        var playerManager = new PlayerManager(this, healthManager, coreManager, damageManager, xpManager, levelManager, maxHealthManager, regenerationManager);
+        var monsterLevelManager = new MonsterLevelManager(healthManager, maxHealthManager, levelManager, damageManager);
+        var monsterXPManager = new MonsterXPManager(xpManager, monsterLevelManager);
+        var playerRegenerationManager = new PlayerRegenerationManager(this, healthManager, maxHealthManager, regenerationManager);
+        var playerDeathManager = new PlayerDeathManager(this, coreManager, xpManager);
+        var entityDamageHandler = new EntityDamageHandler(healthManager, damageManager, monsterXPManager, playerRegenerationManager, playerDeathManager);
+        var dataModeCommand = new DataModeCommand(monsterLevelManager);
+        var monsterNameManager = new MonsterNameManager(monsterLevelManager);
+        var monsterSpawnManager = new MonsterSpawnManager(monsterLevelManager);
+        var playerJoinListener = new PlayerJoinListener(playerRegenerationManager);
 
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("world").setExecutor(new WorldCommand());
@@ -86,11 +88,14 @@ public class Aetheria extends DarkCubePlugin {
         instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
         instance.getCommand("setxp").setExecutor(new SetXPCommand(xpManager));
         instance.getCommand("setregeneration").setExecutor(new SetRegenerationCommand(regenerationManager));
+        instance.getCommand("setlevel").setExecutor(new SetLevelCommand(levelManager));
+        instance.getCommand("datamode").setExecutor(dataModeCommand);
 
+        instance.getServer().getPluginManager().registerEvents(playerJoinListener, this);
         instance.getServer().getPluginManager().registerEvents(monsterXPManager, this);
         instance.getServer().getPluginManager().registerEvents(monsterSpawnManager, this);
         instance.getServer().getPluginManager().registerEvents(monsterNameManager, this);
-        instance.getServer().getPluginManager().registerEvents(monsterLevelListener, this);
+        instance.getServer().getPluginManager().registerEvents(dataModeCommand, this);
         instance.getServer().getPluginManager().registerEvents(entityDamageHandler, this);
         instance.getServer().getPluginManager().registerEvents(playerManager, this);
         instance.getServer().getPluginManager().registerEvents(flyCommand, this);
