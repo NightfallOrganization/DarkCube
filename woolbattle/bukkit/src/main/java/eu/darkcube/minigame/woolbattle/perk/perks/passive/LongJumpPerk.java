@@ -36,6 +36,7 @@ public class LongJumpPerk extends Perk {
                 double y = velocity.getY();
                 velocity = velocity.multiply(5.2);
                 velocity.setY(y * 1.06);
+                event.velocity(velocity);
             }
         }
     }
