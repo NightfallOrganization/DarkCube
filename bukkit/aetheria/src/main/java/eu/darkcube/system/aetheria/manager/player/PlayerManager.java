@@ -7,6 +7,9 @@
 
 package eu.darkcube.system.aetheria.manager.player;
 
+import eu.darkcube.system.aetheria.manager.shared.DamageManager;
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 

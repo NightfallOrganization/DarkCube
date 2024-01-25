@@ -7,13 +7,12 @@
 
 package eu.darkcube.system.aetheria.commands;
 
-import eu.darkcube.system.aetheria.manager.player.HealthManager;
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
 import eu.darkcube.system.aetheria.manager.player.MaxHealthManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class SetHealthCommand implements CommandExecutor {
     private final HealthManager healthManager;

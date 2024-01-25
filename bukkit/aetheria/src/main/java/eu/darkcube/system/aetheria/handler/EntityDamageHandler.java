@@ -9,18 +9,14 @@ package eu.darkcube.system.aetheria.handler;
 
 import eu.darkcube.system.aetheria.manager.monster.MonsterXPManager;
 import eu.darkcube.system.aetheria.manager.player.*;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
+import eu.darkcube.system.aetheria.manager.shared.DamageManager;
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.projectiles.ProjectileSource;
-
-import java.util.Objects;
 
 public class EntityDamageHandler implements Listener {
     private HealthManager healthManager;

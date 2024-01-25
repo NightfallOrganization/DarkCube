@@ -10,7 +10,6 @@ package eu.darkcube.system.aetheria;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.aetheria.commands.*;
 import eu.darkcube.system.aetheria.handler.EntityDamageHandler;
-import eu.darkcube.system.aetheria.handler.LevelXPHandler;
 import eu.darkcube.system.aetheria.manager.player.CoreManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterLevelManager;
 import eu.darkcube.system.aetheria.manager.WorldManager;
@@ -18,6 +17,9 @@ import eu.darkcube.system.aetheria.manager.monster.MonsterNameManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterSpawnManager;
 import eu.darkcube.system.aetheria.manager.monster.MonsterXPManager;
 import eu.darkcube.system.aetheria.manager.player.*;
+import eu.darkcube.system.aetheria.manager.shared.DamageManager;
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import eu.darkcube.system.aetheria.other.ActionBarUtil;
 import eu.darkcube.system.aetheria.other.PlayerJoinListener;
 import eu.darkcube.system.aetheria.other.ResourcePackUtil;
@@ -26,8 +28,6 @@ import eu.darkcube.system.aetheria.ruler.MainWorldRuler;
 import eu.darkcube.system.aetheria.ruler.MonsterWorldRuler;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
 import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class Aetheria extends DarkCubePlugin {
     private final GlyphWidthManager glyphWidthManager = new GlyphWidthManager();

@@ -9,8 +9,8 @@ package eu.darkcube.system.aetheria.other;
 
 import eu.darkcube.system.aetheria.Aetheria;
 import eu.darkcube.system.aetheria.handler.LevelXPHandler;
-import eu.darkcube.system.aetheria.manager.player.HealthManager;
-import eu.darkcube.system.aetheria.manager.player.LevelManager;
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import eu.darkcube.system.aetheria.manager.player.MaxHealthManager;
 import eu.darkcube.system.aetheria.manager.player.XPManager;
 import net.kyori.adventure.text.Component;
