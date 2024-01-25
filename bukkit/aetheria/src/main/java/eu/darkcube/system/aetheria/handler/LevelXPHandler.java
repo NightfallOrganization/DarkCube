@@ -7,12 +7,9 @@
 
 package eu.darkcube.system.aetheria.handler;
 
-import eu.darkcube.system.aetheria.manager.player.LevelManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import eu.darkcube.system.aetheria.manager.player.XPManager;
 import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import org.bukkit.entity.Player;
 
 public class LevelXPHandler {

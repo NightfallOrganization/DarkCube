@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.aetheria.commands;
 
-import eu.darkcube.system.aetheria.manager.player.LevelManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -7,8 +7,8 @@
 
 package eu.darkcube.system.aetheria.manager.player;
 
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlayerDeathManager {
     private final CoreManager coreManager;

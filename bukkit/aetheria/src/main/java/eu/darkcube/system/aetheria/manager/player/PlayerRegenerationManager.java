@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.aetheria.manager.player;
 
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;

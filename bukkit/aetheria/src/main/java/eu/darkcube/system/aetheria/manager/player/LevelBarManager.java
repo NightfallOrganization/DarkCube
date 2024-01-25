@@ -8,6 +8,7 @@
 package eu.darkcube.system.aetheria.manager.player;
 
 import eu.darkcube.system.aetheria.handler.LevelXPHandler;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import org.bukkit.entity.Player;
 
 public class LevelBarManager {

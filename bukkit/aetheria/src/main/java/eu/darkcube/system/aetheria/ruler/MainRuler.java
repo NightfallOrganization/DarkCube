@@ -7,13 +7,12 @@
 
 package eu.darkcube.system.aetheria.ruler;
 
-import eu.darkcube.system.aetheria.manager.player.LevelManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.projectiles.ProjectileSource;
 
 public class MainRuler implements Listener {
     private LevelManager levelManager;

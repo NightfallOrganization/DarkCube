@@ -7,12 +7,11 @@
 
 package eu.darkcube.system.aetheria.manager.monster;
 
-import eu.darkcube.system.aetheria.manager.player.DamageManager;
-import eu.darkcube.system.aetheria.manager.player.HealthManager;
-import eu.darkcube.system.aetheria.manager.player.LevelManager;
+import eu.darkcube.system.aetheria.manager.shared.DamageManager;
+import eu.darkcube.system.aetheria.manager.shared.HealthManager;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import eu.darkcube.system.aetheria.manager.player.MaxHealthManager;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class MonsterLevelManager {
     private HealthManager healthManager;

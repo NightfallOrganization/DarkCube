@@ -7,19 +7,11 @@
 
 package eu.darkcube.system.aetheria.commands;
 
-import eu.darkcube.system.aetheria.manager.player.DamageManager;
+import eu.darkcube.system.aetheria.manager.shared.DamageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SetDamageCommand implements CommandExecutor {
 

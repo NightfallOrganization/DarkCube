@@ -8,6 +8,7 @@
 package eu.darkcube.system.aetheria.manager.player;
 
 import eu.darkcube.system.aetheria.handler.LevelXPHandler;
+import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
