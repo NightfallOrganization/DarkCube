@@ -32,7 +32,7 @@ public class RocketJumpPerk extends Perk {
         @EventHandler public void handle(DoubleJumpEvent event) {
             for (UserPerk ignored : event.user().perks().perks(perk().perkName())) {
                 Vector velocity = event.velocity();
-                velocity.setY(velocity.getY() * 1.45);
+                velocity.setY(velocity.getY() * 1.25);
                 event.velocity(velocity);
             }
         }
