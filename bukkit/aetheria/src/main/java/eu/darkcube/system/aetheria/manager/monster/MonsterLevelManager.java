@@ -11,19 +11,31 @@ import eu.darkcube.system.aetheria.manager.shared.DamageManager;
 import eu.darkcube.system.aetheria.manager.shared.HealthManager;
 import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import eu.darkcube.system.aetheria.manager.player.MaxHealthManager;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+
+import static eu.darkcube.system.aetheria.manager.monster.EntityTypeManager.EntityType.ZOMBIE;
 
 public class MonsterLevelManager {
     private HealthManager healthManager;
     private MaxHealthManager maxHealthManager;
     private LevelManager levelManager;
     private DamageManager damageManager;
+    private MonsterCreationManager monsterCreationManager;
 
-    public MonsterLevelManager(HealthManager healthManager, MaxHealthManager maxHealthManager, LevelManager levelManager, DamageManager damageManager) {
+    public MonsterLevelManager(HealthManager healthManager, MaxHealthManager maxHealthManager, LevelManager levelManager, DamageManager damageManager, MonsterCreationManager monsterCreationManager) {
         this.healthManager = healthManager;
         this.maxHealthManager = maxHealthManager;
         this.levelManager = levelManager;
         this.damageManager = damageManager;
+        this.monsterCreationManager = monsterCreationManager;
+    }
+
+    public boolean isLevelAppropriate(EntityTypeManager.EntityType entityType, int level) {
+        return monsterCreationManager.getMonsterByEntityType(entityType)
+                .map(monster -> level >= monster.getMinLevel() && level <= monster.getMaxLevel())
+                .orElse(false);
     }
 
     public void updateMonsterLevel(LivingEntity monster, int level) {
