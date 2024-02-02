@@ -8,18 +8,20 @@
 package eu.darkcube.system.aetheria.manager.monster;
 
 import eu.darkcube.system.aetheria.manager.RarityManager;
-import org.bukkit.Location;
+import eu.darkcube.system.aetheria.other.GsonUtil;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 public class MonsterCreationManager {
-    public List<Monster> monsters = new ArrayList<>();
+    public List<MonsterType> monsterTypes = new ArrayList<>();
 
     public void createMonsterWithRarity(RarityManager.Rarity rarity, String name, EntityTypeManager.EntityType entityType, int minLevel, int maxLevel) {
-        monsters.add(new Monster(name, rarity, entityType, minLevel, maxLevel));
+        monsterTypes.add(new MonsterType(name, rarity, entityType, minLevel, maxLevel));
     }
 
     public void createMultipleMonsters() {
@@ -28,20 +30,21 @@ public class MonsterCreationManager {
         createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster3", EntityTypeManager.EntityType.PILLAGER, 1, 30);
     }
 
-    public Optional<Monster> getMonsterByEntityType(EntityTypeManager.EntityType entityType) {
-        return monsters.stream()
-                .filter(monster -> monster.entityType == entityType)
+    public Optional<MonsterType> getMonsterTypeByEntityType(EntityTypeManager.EntityType entityType) {
+        return monsterTypes.stream()
+                .filter(monsterType -> monsterType.entityType == entityType)
                 .findFirst();
     }
 
-    public class Monster {
+    public static class MonsterType {
+        public static final PersistentDataType<String, MonsterType> MONSTER_TYPE = GsonUtil.createDataType(MonsterType.class);
         private String name;
         private RarityManager.Rarity rarity;
         private EntityTypeManager.EntityType entityType;
         private int minLevel;
         private int maxLevel;
 
-        public Monster(String name, RarityManager.Rarity rarity, EntityTypeManager.EntityType entityType, int minLevel, int maxLevel) {
+        private MonsterType(String name, RarityManager.Rarity rarity, EntityTypeManager.EntityType entityType, int minLevel, int maxLevel) {
             this.name = name;
             this.rarity = rarity;
             this.entityType = entityType;
@@ -55,10 +58,6 @@ public class MonsterCreationManager {
 
         public RarityManager.Rarity getRarity() {
             return rarity;
-        }
-
-        public List<Monster> getMonsters() {
-            return new ArrayList<>(monsters);
         }
 
         public int getMinLevel() {
@@ -75,8 +74,8 @@ public class MonsterCreationManager {
 
     }
 
-    public List<Monster> getMonsters() {
-        return new ArrayList<>(monsters);
+    public List<MonsterType> getMonsters() {
+        return new ArrayList<>(monsterTypes);
     }
 
 }
