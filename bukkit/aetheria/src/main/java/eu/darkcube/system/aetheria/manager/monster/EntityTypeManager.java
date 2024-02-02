@@ -11,7 +11,8 @@ public class EntityTypeManager {
 
     public enum EntityType {
         ZOMBIE(org.bukkit.entity.Zombie.class),
-        SKELETON(org.bukkit.entity.Skeleton.class);
+        SKELETON(org.bukkit.entity.Skeleton.class),
+        PILLAGER(org.bukkit.entity.Pillager.class);
 
         private final Class<? extends org.bukkit.entity.Entity> entityClass;
 

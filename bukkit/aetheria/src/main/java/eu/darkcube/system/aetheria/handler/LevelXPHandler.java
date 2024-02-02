@@ -24,7 +24,7 @@ public class LevelXPHandler {
             xpManager.setXP(player, xp - xpRequired); // Reset XP to 0 after leveling up
             // Optional: Notify the player about the level up
             player.sendMessage("§7Du hast Level §e" + (currentLevel + 1) + " §7erreicht!");
-            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 1f, 1f);
+            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 5f, 1f);
         }
     }
 
