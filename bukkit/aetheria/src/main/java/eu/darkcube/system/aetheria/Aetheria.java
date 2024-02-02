@@ -78,7 +78,7 @@ public class Aetheria extends DarkCubePlugin {
         var entityDamageHandler = new EntityDamageHandler(healthManager, damageManager, monsterXPManager, playerRegenerationManager, playerDeathManager);
         var dataModeCommand = new DataModeCommand(monsterLevelManager);
         var monsterNameManager = new MonsterNameManager(monsterLevelManager);
-        var monsterSpawnManager = new MonsterSpawnManager(monsterLevelManager, monsterCreationManager);
+        var monsterSpawnManager = new MonsterSpawnManager(monsterCreationManager);
 //        var monsterSpawnTask = new MonsterSpawnTask(monsterSpawnManager, monsterCreationManager);
 //        monsterSpawnTask.run();
         var playerJoinListener = new PlayerJoinListener(this, playerRegenerationManager);
