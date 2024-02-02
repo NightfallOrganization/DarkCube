@@ -23,8 +23,9 @@ public class MonsterCreationManager {
     }
 
     public void createMultipleMonsters() {
-        createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster1", EntityTypeManager.EntityType.ZOMBIE, 5, 20);
-        createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster2", EntityTypeManager.EntityType.SKELETON, 10, 30);
+        createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster1", EntityTypeManager.EntityType.ZOMBIE, 1, 20);
+        createMonsterWithRarity(RarityManager.Rarity.DIVINE, "Monster2", EntityTypeManager.EntityType.SKELETON, 1, 20);
+        createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster3", EntityTypeManager.EntityType.PILLAGER, 1, 30);
     }
 
     public Optional<Monster> getMonsterByEntityType(EntityTypeManager.EntityType entityType) {
@@ -32,24 +33,6 @@ public class MonsterCreationManager {
                 .filter(monster -> monster.entityType == entityType)
                 .findFirst();
     }
-
-    public Optional<Monster> getMonsterByLevelAndRarity(int level, RarityManager.Rarity rarity) {
-        return monsters.stream()
-                .filter(monster -> monster.getRarity() == rarity && monster.getMinLevel() <= level && monster.getMaxLevel() >= level)
-                .findAny();
-    }
-
-    public void spawnMonsterAtLocation(RarityManager.Rarity rarity, Location location, int level) {
-        Optional<Monster> monsterOpt = getMonsterByLevelAndRarity(level, rarity);
-        monsterOpt.ifPresent(monster -> {
-            // Logik zum Spawnen des Monsters an der gegebenen Position
-        });
-    }
-
-    public List<Monster> getMonsters() {
-        return new ArrayList<>(monsters);
-    }
-
 
     public class Monster {
         private String name;
@@ -90,6 +73,10 @@ public class MonsterCreationManager {
             return entityType;
         }
 
+    }
+
+    public List<Monster> getMonsters() {
+        return new ArrayList<>(monsters);
     }
 
 }

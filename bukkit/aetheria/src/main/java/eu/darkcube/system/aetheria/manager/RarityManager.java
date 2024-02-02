@@ -35,8 +35,4 @@ public class RarityManager {
         }
     }
 
-    public static String getRarityPrefix(Rarity rarity) {
-        return rarity.getPrefix();
-    }
-
 }
