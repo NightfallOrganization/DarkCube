@@ -63,7 +63,20 @@ public class MonsterNameManager implements Listener {
         int level = monsterLevelManager.getMonsterLevel(entity);
         double health = monsterLevelManager.getMonsterHealth(entity);
         double maxHealth = monsterLevelManager.getMonsterMaxHealth(entity);
-        double healthPercentage = Math.max(1, (health / maxHealth) * 100);
+        double healthPercentage;
+
+        if (health <= 0) {
+            healthPercentage = 0;
+        } else if (health < 1) {
+            healthPercentage = 1;
+        } else {
+            healthPercentage = (health / maxHealth) * 100;
+            if (healthPercentage > 99 && health < maxHealth) {
+                healthPercentage = 99;
+            } else if (healthPercentage > 100 || health == maxHealth) {
+                healthPercentage = 100;
+            }
+        }
 
         String name = ChatColor.GOLD + "Level " + ChatColor.YELLOW + level
                 + ChatColor.GRAY + " - " + ChatColor.RED

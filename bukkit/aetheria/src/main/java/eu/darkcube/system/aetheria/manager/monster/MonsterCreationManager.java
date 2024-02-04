@@ -26,8 +26,10 @@ public class MonsterCreationManager {
 
     public void createMultipleMonsters() {
         createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster1", EntityTypeManager.EntityType.ZOMBIE, 1, 20);
-        createMonsterWithRarity(RarityManager.Rarity.DIVINE, "Monster2", EntityTypeManager.EntityType.SKELETON, 1, 20);
-        createMonsterWithRarity(RarityManager.Rarity.ORDINARY, "Monster3", EntityTypeManager.EntityType.PILLAGER, 1, 30);
+        createMonsterWithRarity(RarityManager.Rarity.RARE, "Monster2", EntityTypeManager.EntityType.SKELETON, 1, 20);
+        createMonsterWithRarity(RarityManager.Rarity.EPIC, "Monster3", EntityTypeManager.EntityType.PILLAGER, 1, 20);
+        createMonsterWithRarity(RarityManager.Rarity.MYTHIC, "Monster4", EntityTypeManager.EntityType.CREEPER, 1, 20);
+        createMonsterWithRarity(RarityManager.Rarity.LEGENDARY, "Monster5", EntityTypeManager.EntityType.SPIDER, 1, 20);
     }
 
     public Optional<MonsterType> getMonsterTypeByEntityType(EntityTypeManager.EntityType entityType) {

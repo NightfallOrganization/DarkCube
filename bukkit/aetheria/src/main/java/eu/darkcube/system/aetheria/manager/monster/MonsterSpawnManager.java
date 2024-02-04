@@ -14,19 +14,24 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Optional;
+import java.util.Random;
 
 public class MonsterSpawnManager implements Listener {
     private static final NamespacedKey MONSTER_TYPE = new NamespacedKey(Aetheria.getInstance(), "monster_type");
     private final MonsterCreationManager monsterCreationManager;
+    private MonsterLevelManager monsterLevelManager;
+    private final Random random = new Random();
 
-    public MonsterSpawnManager(MonsterCreationManager monsterCreationManager) {
+    public MonsterSpawnManager(MonsterCreationManager monsterCreationManager, MonsterLevelManager monsterLevelManager) {
         this.monsterCreationManager = monsterCreationManager;
+        this.monsterLevelManager = monsterLevelManager;
     }
 
     @EventHandler
@@ -37,60 +42,47 @@ public class MonsterSpawnManager implements Listener {
         }
     }
 
-    public void spawnMonster(World world, Location location, EntityTypeManager.EntityType entityType) {
-        var monsterTypeOptional = monsterCreationManager.getMonsterTypeByEntityType(entityType);
-        if (monsterTypeOptional.isEmpty()) throw new IllegalArgumentException("Type can not be spawned - it does not exist as a monster?");
-        var monsterType = monsterTypeOptional.get();
-        var bukkitEntityClass = monsterType.getEntityType().getEntityClass();
-        world.spawn(location, bukkitEntityClass, entity -> {
-            // setup monster. Name/PersistentData, etc.
-            // Das hier wird ausgeführt, BEVOR das monster in der Welt ist.
-            // Teleport/Bewegung, etc ist hier nicht erlaubt.
+    public void spawnMonster(World world, Location location, EntityTypeManager.EntityType entityType, RarityManager.Rarity rarity) {
+        if (shouldSpawnBasedOnRarity(rarity)) {
+            Optional<MonsterCreationManager.MonsterType> monsterTypeOptional = monsterCreationManager.getMonsterTypeByEntityType(entityType);
+            if (monsterTypeOptional.isEmpty()) throw new IllegalArgumentException("Type cannot be spawned - it does not exist as a monster?");
+            MonsterCreationManager.MonsterType monsterType = monsterTypeOptional.get();
+            Integer level = calculateMonsterLevel(location, rarity);
 
-            entity.getPersistentDataContainer().set(MONSTER_TYPE, MonsterCreationManager.MonsterType.MONSTER_TYPE, monsterType);
-            entity.customName(Component.text(monsterType.getName()));
-        });
-    }
-}
-
-class OldCode implements Listener {
-
-    private World monsterWorld;
-    private MonsterLevelManager monsterLevelManager;
-    private MonsterCreationManager monsterCreationManager;
-
-    public OldCode(MonsterLevelManager monsterLevelManager, MonsterCreationManager monsterCreationManager) {
-        this.monsterLevelManager = monsterLevelManager;
-        this.monsterCreationManager = monsterCreationManager;
-        monsterWorld = WorldManager.MONSTERWORLD;
-    }
-
-    @EventHandler
-    public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (!event.getLocation().getWorld().equals(monsterWorld)) {
-            return;
-        }
-
-        LivingEntity spawnedEntity = event.getEntity();
-
-        try {
-            EntityTypeManager.EntityType entityType = EntityTypeManager.EntityType.valueOf(spawnedEntity.getType());
-            Optional<MonsterCreationManager.MonsterType> monsterOpt = monsterCreationManager.getMonsterTypeByEntityType(entityType);
-
-            if (monsterOpt.isPresent()) {
-                RarityManager.Rarity rarity = monsterOpt.get().getRarity();
-                Integer level = calculateMonsterLevel(event.getLocation(), rarity);
-                if (level != null && monsterLevelManager.isLevelAppropriate(entityType, level)) {
-                    monsterLevelManager.updateMonsterLevel(spawnedEntity, level);
-                } else {
-                    event.setCancelled(true);
-                }
-            } else {
-                event.setCancelled(true);
+            // Prüfe, ob das Monsterlevel im erlaubten Bereich liegt.
+            if (level == null || level < monsterType.getMinLevel() || level > monsterType.getMaxLevel()) {
+                return; // Nicht spawnen, wenn das Level außerhalb des Bereichs liegt.
             }
-        } catch (IllegalArgumentException e) {
-            event.setCancelled(true);
+
+            Class<? extends Entity> bukkitEntityClass = monsterType.getEntityType().getEntityClass();
+            Location spawnLocation = location.clone().add(0, 1, 0); // Erhöhe die Y-Koordinate um 1.
+
+            world.spawn(spawnLocation, bukkitEntityClass, entity -> {
+                entity.getPersistentDataContainer().set(MONSTER_TYPE, MonsterCreationManager.MonsterType.MONSTER_TYPE, monsterType);
+                entity.customName(Component.text(monsterType.getName()));
+                entity.setCustomNameVisible(true);
+                if (entity instanceof LivingEntity) {
+                    LivingEntity livingEntity = (LivingEntity) entity;
+                    monsterLevelManager.updateMonsterLevel(livingEntity, level);
+                }
+            });
         }
+    }
+
+    private boolean shouldSpawnBasedOnRarity(RarityManager.Rarity rarity) {
+        int chance = switch (rarity) {
+            case ORDINARY -> 1; // Immer spawnen
+            case RARE -> 5;
+            case EPIC -> 25;
+            case MYTHIC -> 50;
+            case LEGENDARY -> 500;
+            case DIVINE -> 2500;
+            case UNIQUE -> Integer.MAX_VALUE; // Niemals spawnen
+        };
+
+        if (chance == 1) return true; // ORDINARY immer spawnen lassen
+        if (chance == Integer.MAX_VALUE) return false; // UNIQUE niemals spawnen lassen
+        return this.random.nextInt(chance) == 0; // Generiere eine Zufallszahl und prüfe, ob sie 0 ist
     }
 
     private Integer calculateMonsterLevel(Location location, RarityManager.Rarity rarity) {

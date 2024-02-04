@@ -28,12 +28,6 @@ public class MonsterLevelManager {
         this.monsterCreationManager = monsterCreationManager;
     }
 
-    public boolean isLevelAppropriate(EntityTypeManager.EntityType entityType, int level) {
-        return monsterCreationManager.getMonsterTypeByEntityType(entityType)
-                .map(monster -> level >= monster.getMinLevel() && level <= monster.getMaxLevel())
-                .orElse(false);
-    }
-
     public void updateMonsterLevel(LivingEntity monster, int level) {
         levelManager.setLevel(monster, level);
         double health = calculateHealth(level);

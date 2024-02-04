@@ -33,6 +33,7 @@ public class RarityManager {
         public int getWeight() {
             return this.weight;
         }
+
     }
 
 }

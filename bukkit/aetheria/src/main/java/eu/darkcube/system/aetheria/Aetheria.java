@@ -19,6 +19,7 @@ import eu.darkcube.system.aetheria.manager.shared.HealthManager;
 import eu.darkcube.system.aetheria.manager.shared.LevelManager;
 import eu.darkcube.system.aetheria.other.ActionBarUtil;
 //import eu.darkcube.system.aetheria.other.MonsterSpawnTask;
+import eu.darkcube.system.aetheria.other.MonsterSpawnTask;
 import eu.darkcube.system.aetheria.other.PlayerJoinListener;
 import eu.darkcube.system.aetheria.other.ResourcePackUtil;
 import eu.darkcube.system.aetheria.ruler.MainRuler;
@@ -78,9 +79,11 @@ public class Aetheria extends DarkCubePlugin {
         var entityDamageHandler = new EntityDamageHandler(healthManager, damageManager, monsterXPManager, playerRegenerationManager, playerDeathManager);
         var dataModeCommand = new DataModeCommand(monsterLevelManager);
         var monsterNameManager = new MonsterNameManager(monsterLevelManager);
-        var monsterSpawnManager = new MonsterSpawnManager(monsterCreationManager);
-//        var monsterSpawnTask = new MonsterSpawnTask(monsterSpawnManager, monsterCreationManager);
-//        monsterSpawnTask.run();
+        var monsterSpawnManager = new MonsterSpawnManager(monsterCreationManager, monsterLevelManager);
+
+        var monsterSpawnTask = new MonsterSpawnTask(monsterSpawnManager, monsterCreationManager);
+        monsterSpawnTask.startSpawning();
+
         var playerJoinListener = new PlayerJoinListener(this, playerRegenerationManager);
         var actionBarUtil = new ActionBarUtil(this, healthManager, levelManager, maxHealthManager, xpManager);
 
