@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.bukkit.commandapi;
 
-import eu.darkcube.system.commandapi.v3.Direction;
-import eu.darkcube.system.commandapi.v3.MathHelper;
+import eu.darkcube.system.commandapi.util.Direction;
+import eu.darkcube.system.commandapi.util.MathHelper;
 import org.bukkit.entity.Entity;
 
-import static eu.darkcube.system.commandapi.v3.Direction.*;
+import static eu.darkcube.system.commandapi.util.Direction.*;
 
 public final class BukkitDirection {
     public static Direction[] getFacingDirections(Entity entityIn) {

@@ -8,7 +8,7 @@
 package eu.darkcube.system.userapi;
 
 import eu.darkcube.system.annotations.Api;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 
 public interface User extends ForwardingAudience.Single, CommandExecutor, UserData {

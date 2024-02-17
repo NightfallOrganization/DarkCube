@@ -19,5 +19,4 @@ public interface WorkbenchUtil {
     default InventoryView openWorkbench(Player player, Component title) {
         return openWorkbench(player, player.getLocation(), true, title);
     }
-
 }

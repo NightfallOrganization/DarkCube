@@ -4,13 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.util;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -18,17 +22,15 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ItemManager {
 
     public static final Key ITEM_ID = new Key(WoolBattleBukkit.instance(), "itemId");
 
-    public static void removeItems(WBUser user, Inventory invToRemoveFrom, ItemStack itemToRemove,
-                                   int count) {
-        if (WoolBattleBukkit.instance().ingame().enabled() && itemToRemove.getType() == Material.WOOL
-                && user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
+    public static void removeItems(WBUser user, Inventory invToRemoveFrom, ItemStack itemToRemove, int count) {
+        if (WoolBattleBukkit
+                .instance()
+                .ingame()
+                .enabled() && itemToRemove.getType() == Material.WOOL && user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
             Map<Integer, ItemStack> leftOver = new HashMap<>();
             itemToRemove = new ItemStack(itemToRemove);
             itemToRemove.setAmount(1);
@@ -71,9 +73,7 @@ public class ItemManager {
         }
         ItemStack[] invContents = inv.getContents();
         for (int i = invContents.length - 1; i >= 0; i--) {
-            if (invContents[i] != null && (withAmount
-                    ? item.equals(invContents[i])
-                    : item.isSimilar(invContents[i]))) {
+            if (invContents[i] != null && (withAmount ? item.equals(invContents[i]) : item.isSimilar(invContents[i]))) {
                 return i;
             }
         }
@@ -84,17 +84,17 @@ public class ItemManager {
         return ItemManager.getItem(item, user, replacements, new Object[0]);
     }
 
-    public static ItemStack getItem(Item item, WBUser user, Object[] replacements,
-                                    Object... loreReplacements) {
-        ItemBuilder builder = item.getBuilder().persistentDataStorage()
-                .iset(ITEM_ID, PersistentDataTypes.STRING, item.getItemId()).builder();
+    public static ItemStack getItem(Item item, WBUser user, Object[] replacements, Object... loreReplacements) {
+        ItemBuilder builder = item
+                .getBuilder()
+                .persistentDataStorage()
+                .iset(ITEM_ID, PersistentDataTypes.STRING, item.getItemId())
+                .builder();
         Language language = user.getLanguage();
         Component name = ItemManager.getDisplayName(item, language, replacements);
         builder.displayname(name);
-        if (language.containsMessage(
-                Message.KEY_PREFIX + Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name())) {
-            builder.lore(Message.getMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(),
-                    language, loreReplacements));
+        if (language.containsMessage(Message.KEY_PREFIX + Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name())) {
+            builder.lore(Message.getMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(), language, loreReplacements));
         }
         return builder.build();
     }

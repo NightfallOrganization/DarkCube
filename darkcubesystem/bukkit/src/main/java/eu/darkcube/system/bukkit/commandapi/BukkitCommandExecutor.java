@@ -4,10 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.bukkit.commandapi;
 
+import java.util.Collections;
+import java.util.logging.Logger;
+
 import eu.darkcube.system.bukkit.util.BukkitAdventureSupport;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -18,9 +22,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.logging.Logger;
-
 public class BukkitCommandExecutor implements CommandExecutor, ForwardingAudience {
 
     private static final Logger logger = Logger.getLogger("System");
@@ -29,7 +30,7 @@ public class BukkitCommandExecutor implements CommandExecutor, ForwardingAudienc
 
     private BukkitCommandExecutor(CommandSender sender) {
         this.sender = sender;
-        CommandSender s = sender;
+        var s = sender;
         while (s instanceof ProxiedCommandSender) s = ((ProxiedCommandSender) s).getCaller();
         this.audience = BukkitAdventureSupport.adventureSupport().audienceProvider().sender(s);
         Bukkit.getPluginManager().callEvent(new BukkitCommandExecutorConfigureEvent(this));

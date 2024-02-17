@@ -7,15 +7,22 @@
 
 package eu.darkcube.minigame.woolbattle.util.gson;
 
-import com.google.gson.*;
+import java.lang.reflect.Type;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import eu.darkcube.minigame.woolbattle.map.DefaultMap;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
-
-import java.lang.reflect.Type;
 
 public class TypeAdapterMap implements JsonSerializer<Map>, JsonDeserializer<Map> {
 

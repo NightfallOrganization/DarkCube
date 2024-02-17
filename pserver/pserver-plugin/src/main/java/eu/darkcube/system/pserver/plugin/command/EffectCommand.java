@@ -7,12 +7,19 @@
 
 package eu.darkcube.system.pserver.plugin.command;
 
-import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.EnumArgument;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.builder.ArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
@@ -21,12 +28,11 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import eu.darkcube.system.pserver.plugin.effect.PotionEffect;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-
-import java.util.*;
 
 public class EffectCommand extends PServer {
 

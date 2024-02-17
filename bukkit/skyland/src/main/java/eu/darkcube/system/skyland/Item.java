@@ -7,14 +7,14 @@
 
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.userapi.User;
-import org.bukkit.inventory.ItemStack;
-
-import static eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder.item;
+import static eu.darkcube.system.server.item.ItemBuilder.item;
 import static org.bukkit.Material.*;
 import static org.bukkit.enchantments.Enchantment.*;
+
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.userapi.User;
+import org.bukkit.inventory.ItemStack;
 
 public enum Item {
 

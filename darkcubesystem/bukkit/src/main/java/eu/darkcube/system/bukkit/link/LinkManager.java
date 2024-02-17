@@ -4,20 +4,21 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.bukkit.link;
 
-import eu.darkcube.system.annotations.Api;
+package eu.darkcube.system.bukkit.link;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
 
+import eu.darkcube.system.annotations.Api;
+
 @Api public class LinkManager {
     private Collection<Link> links = new ArrayList<>();
 
     @Api public boolean addLink(LinkSupplier supplier) {
-        boolean success = false;
+        var success = false;
         try {
             this.links.add(supplier.get());
             success = true;

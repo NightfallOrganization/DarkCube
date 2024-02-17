@@ -1,3 +1,5 @@
+import org.gradle.jvm.tasks.Jar
+
 /*
  * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
@@ -9,30 +11,54 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+val bukkitVersion: Configuration by configurations.creating {
+    isCanBeConsumed = false
+}
+
 tasks {
+    val finalJar = register<Jar>("finalJar") {
+        dependsOn(shadowJar)
+        dependsOn(bukkitVersion)
+        from(shadowJar.map { jar -> jar.outputs.files.map { zipTree(it) } })
+        bukkitVersion.run {
+            incoming.files.forEach {
+                val zip = zipTree(it)
+                val version = zip.matching { include("version-info") }.singleFile.readText()
+                from(it) {
+                    rename { "$version.jar" }
+                    into("versions")
+                }
+            }
+        }
+    }
     shadowJar {
-        archiveClassifier = null
+        destinationDirectory = temporaryDir
     }
     jar {
-        archiveClassifier = "pure"
+        destinationDirectory = temporaryDir
     }
     assemble {
-        dependsOn(shadowJar)
+        dependsOn(finalJar)
     }
+}
+
+val bukkit: Configuration by configurations.creating {
+    isCanBeResolved = false
+    outgoing.artifact(tasks.named("finalJar"))
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
     compileOnlyApi(projects.darkcubesystem.bukkit)
-    compileOnlyApi(projects.darkcubesystem.implementation.common)
+    compileOnlyApi(projects.darkcubesystem.implementation.server)
     compileOnlyApi(libs.cloudnet.wrapper)
     compileOnly(libs.viaversion)
     compileOnly(libs.viaversion.common)
     compileOnly(libs.luckperms)
 
+    runtimeOnly(projects.darkcubesystem.implementation.server) { isTransitive = false }
     runtimeOnly(projects.darkcubesystem.bukkit) { isTransitive = false }
     runtimeOnly(projects.darkcubesystem.server) { isTransitive = false }
-//    runtimeOnly(projects.darkcubesystem.implementation.common) { isTransitive = false }
-    runtimeOnly(project("v1_8_8"))
-    runtimeOnly(project("v1_20_2", "reobf"))
+    bukkitVersion(project("v1_8_8"))
+    bukkitVersion(project("latest", "reobf"))
 }

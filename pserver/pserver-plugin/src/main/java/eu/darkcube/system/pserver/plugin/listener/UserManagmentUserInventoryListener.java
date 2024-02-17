@@ -7,55 +7,53 @@
 
 package eu.darkcube.system.pserver.plugin.listener;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.UUID;
+
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentUserInventory;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
-
 public class UserManagmentUserInventoryListener implements BaseListener {
 
-	private final UserManagmentUserInventory inventory;
+    private final UserManagmentUserInventory inventory;
 
-	public UserManagmentUserInventoryListener(UserManagmentUserInventory inventory) {
-		this.inventory = inventory;
-	}
+    public UserManagmentUserInventoryListener(UserManagmentUserInventory inventory) {
+        this.inventory = inventory;
+    }
 
-	@EventHandler
-	public void handle(InventoryClickEvent event) {
-		if (!(event.getWhoClicked() instanceof Player)) {
-			return;
-		}
-		Player player = (Player) event.getWhoClicked();
-		User user = UserManager.getInstance().getUser(player.getUniqueId());
-		if (!inventory.isOpened(player)) {
-			return;
-		}
-		ItemStack item = event.getCurrentItem();
-		if (item == null) {
-			return;
-		}
-		ItemBuilder builder = ItemBuilder.item(item);
-		if (!builder.persistentDataStorage().has(UserManagmentInventory.KEY)) {
-			return;
-		}
-		if (!builder.persistentDataStorage()
-				.get(UserManagmentInventory.KEY, PersistentDataTypes.STRING)
-				.equals(UserManagmentInventory.KEY_VALUE)) {
-			return;
-		}
-		UUID uuid = UUID.fromString(builder.persistentDataStorage()
-				.get(UserManagmentInventory.USER_UUID_KEY, PersistentDataTypes.STRING));
-		String name = builder.persistentDataStorage()
-				.get(UserManagmentInventory.USER_NAME_KEY, PersistentDataTypes.STRING);
-		new UserManagmentUserInventory(user, uuid, name).open();
-	}
+    @EventHandler public void handle(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getWhoClicked();
+        User user = UserManager.getInstance().getUser(player.getUniqueId());
+        if (!inventory.isOpened(player)) {
+            return;
+        }
+        ItemStack item = event.getCurrentItem();
+        if (item == null) {
+            return;
+        }
+        ItemBuilder builder = ItemBuilder.item(item);
+        if (!builder.persistentDataStorage().has(UserManagmentInventory.KEY)) {
+            return;
+        }
+        if (!builder
+                .persistentDataStorage()
+                .get(UserManagmentInventory.KEY, PersistentDataTypes.STRING)
+                .equals(UserManagmentInventory.KEY_VALUE)) {
+            return;
+        }
+        UUID uuid = UUID.fromString(builder.persistentDataStorage().get(UserManagmentInventory.USER_UUID_KEY, PersistentDataTypes.STRING));
+        String name = builder.persistentDataStorage().get(UserManagmentInventory.USER_NAME_KEY, PersistentDataTypes.STRING);
+        new UserManagmentUserInventory(user, uuid, name).open();
+    }
 
 }

@@ -7,9 +7,9 @@
 
 package eu.darkcube.system.miners.listener;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.miners.items.Item;
 import eu.darkcube.system.miners.items.Item.ItemKey;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 public class ListenerItemPickup implements Listener {
 
     @EventHandler public void onItemPickup(PlayerPickupItemEvent e) {
-        ItemBuilder ib = ItemBuilder.item(e.getItem().getItemStack());
+        var ib = ItemBuilder.item(e.getItem().getItemStack());
         if (!ib.persistentDataStorage().has(ItemKey.ITEM)) return;
         e
                 .getItem()

@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.inventory;
+
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -13,13 +16,11 @@ import eu.darkcube.minigame.woolbattle.perk.PerkRegistry;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.Key;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
 
 public class PerksInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_perks");
@@ -33,26 +34,21 @@ public class PerksInventory extends WoolBattlePagedInventory {
         complete();
     }
 
-    @Override
-    protected boolean done() {
+    @Override protected boolean done() {
         return super.done() && PERKS_TYPE != null;
     }
 
-    @Override
-    protected void inventoryClick(IInventoryClickEvent event) {
+    @Override protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
+        if (event.item() == null) return;
         String typeId = ItemManager.getId(event.item(), PERKS_TYPE);
-        if (typeId == null)
-            return;
+        if (typeId == null) return;
         ActivationType type = ActivationType.values()[Integer.parseInt(typeId)];
         int number = Integer.parseInt(ItemManager.getId(event.item(), PERKS_TYPE_NUMBER));
         user.setOpenInventory(new PerksTypeInventory(woolbattle, user, type, number));
     }
 
-    @Override
-    protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override protected void fillItems(Map<Integer, ItemStack> items) {
         PerkRegistry registry = woolbattle.perkRegistry();
         int i = 0;
         for (Perk.ActivationType type : Perk.ActivationType.values()) {

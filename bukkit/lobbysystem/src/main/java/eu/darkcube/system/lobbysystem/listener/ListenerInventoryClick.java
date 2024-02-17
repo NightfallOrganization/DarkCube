@@ -7,8 +7,6 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
 import eu.darkcube.system.lobbysystem.inventory.InventorySettings;
@@ -16,16 +14,15 @@ import eu.darkcube.system.lobbysystem.inventory.InventorySumo;
 import eu.darkcube.system.lobbysystem.inventory.InventoryWoolBattle;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerOwn;
-import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class ListenerInventoryClick extends BaseListener {
 

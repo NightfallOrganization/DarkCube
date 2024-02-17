@@ -4,9 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
@@ -15,6 +20,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -22,11 +28,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class InventoryDailyReward extends LobbyAsyncPagedInventory {
     public static final Key reward = new Key(Lobby.getInstance().getName(), "reward");
@@ -37,17 +38,17 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
     public InventoryDailyReward(User user) {
         super(InventoryDailyReward.type_daily_reward, Message.INVENTORY_NAME_DAILY_REWARD.getMessage(user), 5 * 9, AsyncPagedInventory.box(1, 1, 5, 9), user);
 
-        this.SORT[IInventory.slot(5, 2)] = this.SORT[IInventory.slot(5, 1)] + 1;
-        this.SORT[IInventory.slot(5, 3)] = this.SORT[IInventory.slot(5, 2)] + 1;
-        this.SORT[IInventory.slot(5, 4)] = this.SORT[IInventory.slot(5, 3)] + 1;
-        this.SORT[IInventory.slot(5, 5)] = this.SORT[IInventory.slot(5, 4)] + 1;
-        this.SORT[IInventory.slot(5, 6)] = this.SORT[IInventory.slot(5, 5)] - 1;
-        this.SORT[IInventory.slot(5, 7)] = this.SORT[IInventory.slot(5, 6)] - 1;
-        this.SORT[IInventory.slot(5, 8)] = this.SORT[IInventory.slot(5, 7)] - 1;
+        this.sort[IInventory.slot(5, 2)] = this.sort[IInventory.slot(5, 1)] + 1;
+        this.sort[IInventory.slot(5, 3)] = this.sort[IInventory.slot(5, 2)] + 1;
+        this.sort[IInventory.slot(5, 4)] = this.sort[IInventory.slot(5, 3)] + 1;
+        this.sort[IInventory.slot(5, 5)] = this.sort[IInventory.slot(5, 4)] + 1;
+        this.sort[IInventory.slot(5, 6)] = this.sort[IInventory.slot(5, 5)] - 1;
+        this.sort[IInventory.slot(5, 7)] = this.sort[IInventory.slot(5, 6)] - 1;
+        this.sort[IInventory.slot(5, 8)] = this.sort[IInventory.slot(5, 7)] - 1;
 
-        this.SORT[IInventory.slot(3, 4)] = this.SORT[IInventory.slot(5, 5)] + 2;
-        this.SORT[IInventory.slot(3, 5)] = this.SORT[IInventory.slot(5, 5)] + 2;
-        this.SORT[IInventory.slot(3, 6)] = this.SORT[IInventory.slot(5, 5)] + 2;
+        this.sort[IInventory.slot(3, 4)] = this.sort[IInventory.slot(5, 5)] + 2;
+        this.sort[IInventory.slot(3, 5)] = this.sort[IInventory.slot(5, 5)] + 2;
+        this.sort[IInventory.slot(3, 6)] = this.sort[IInventory.slot(5, 5)] + 2;
         updateSorts();
         // super(Bukkit.createInventory(null, 5 * 9,
         // Message.INVENTORY_NAME_DAILY_REWARD.getMessage(user)),
@@ -56,7 +57,7 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
     @Override protected void postTick(boolean changedInformation) {
         if (!displayedRewards) {
-            displayedRewards = currentSort.get() >= this.SORT[IInventory.slot(3, 5)];
+            displayedRewards = currentSort.get() >= this.sort[IInventory.slot(3, 5)];
         }
         if (changedInformation) {
             if (this.displayedRewards) {

@@ -4,19 +4,24 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.CloudServiceProvider;
 import eu.cloudnetservice.driver.service.ServiceId;
 import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -24,61 +29,20 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
 public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
     public static final Key server = new Key(Lobby.getInstance(), "server");
     private static final InventoryType type_lobby_switcher = InventoryType.of("lobby_switcher");
     // @formatter:off
-	private static final int[] SLOTS = new int[] {
-			31, 30, 32, 29, 33, 28, 34,
-			22, 21, 23, 20, 24, 19, 25,
-			40, 39, 41, 38, 42, 37, 43
-	};
-
-	// @Override
-	// public void playAnimation(User user) {
-	// this.animate(user, false);
-	// }
-	//
-	// @Override
-	// public void skipAnimation(User user) {
-	// this.animate(user, true);
-	// }
-
-	// private static final int[] SLOTS;
-	// private static final int[] SORT;
-	//
-	// static {
-	// int center = s(1, 5);
-	// List<Integer> slots = new ArrayList<>();
-	// for (int r = 2; r <= 4; r++) {
-	// for (int i = 2; i <= 8; i++) {
-	// slots.add(s(r, i));
-	// }
-	// }
-	// SLOTS = new int[slots.size()];
-	// SORT = new int[SLOTS.length];
-	// for (int i = 0; i < SLOTS.length; i++) {
-	// SLOTS[i] = slots.get(i);
-	// SORT[i] = dist(center, SLOTS[i]);
-	// }
-	// }
-	//
-	public InventoryLobbySwitcher(User user) {
-		super(InventoryLobbySwitcher.type_lobby_switcher,
-				Item.INVENTORY_LOBBY_SWITCHER.getDisplayName(user), user);
-		System.arraycopy(InventoryLobbySwitcher.SLOTS,0,this.PAGE_SLOTS,0,InventoryLobbySwitcher.SLOTS.length);
-	}
-
-//	private static final int[] SORT = new int[] {
-//			02, 03, 03, 04, 04, 05, 05, 
-//			01, 02, 02, 03, 03, 04, 04, 
-//			03, 04, 04, 05, 05, 06, 06
-//	};
-	// @formatter:on
+    private static final int[] SLOTS = new int[] {
+        31, 30, 32, 29, 33, 28, 34,
+        22, 21, 23, 20, 24, 19, 25,
+        40, 39, 41, 38, 42, 37, 43
+    };
+    // @formatter:on
+    public InventoryLobbySwitcher(User user) {
+        super(InventoryLobbySwitcher.type_lobby_switcher, Item.INVENTORY_LOBBY_SWITCHER.getDisplayName(user), user);
+        System.arraycopy(InventoryLobbySwitcher.SLOTS, 0, this.pageSlots, 0, InventoryLobbySwitcher.SLOTS.length);
+    }
 
     @Override protected void fillItems(Map<Integer, ItemStack> items) {
         super.fillItems(items);

@@ -9,8 +9,8 @@ package eu.darkcube.system.module.node.userapi;
 
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.common.userapi.CommonUser;
-import eu.darkcube.system.common.userapi.CommonUserData;
+import eu.darkcube.system.impl.common.userapi.CommonUser;
+import eu.darkcube.system.impl.common.userapi.CommonUserData;
 
 public class NodeUser extends CommonUser {
 

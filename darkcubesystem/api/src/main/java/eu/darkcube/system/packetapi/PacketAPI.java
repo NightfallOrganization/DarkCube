@@ -4,7 +4,16 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.packetapi;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -19,14 +28,6 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.network.buffer.DataBuf;
 import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
-
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PacketAPI {
 
@@ -45,16 +46,11 @@ public class PacketAPI {
     private volatile ClassLoader classLoader = getClass().getClassLoader();
     private Listener listener;
     private EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
-    private Cache<UUID, QueryEntry<? extends Packet>> queries = Caffeine
-            .newBuilder()
-            .expireAfterWrite(Duration.ofSeconds(10))
-            .scheduler(Scheduler.systemScheduler())
-            .removalListener((UUID $, QueryEntry<? extends Packet> value, RemovalCause cause) -> {
-                if (cause.wasEvicted() && value != null) {
-                    value.task().completeExceptionally(new TimeoutException());
-                }
-            })
-            .build();
+    private Cache<UUID, QueryEntry<? extends Packet>> queries = Caffeine.newBuilder().expireAfterWrite(Duration.ofSeconds(10)).scheduler(Scheduler.systemScheduler()).removalListener((UUID unused, QueryEntry<? extends Packet> value, RemovalCause cause) -> {
+        if (cause.wasEvicted() && value != null) {
+            value.task().completeExceptionally(new TimeoutException());
+        }
+    }).build();
 
     private PacketAPI() {
         this.listener = new Listener();
@@ -62,6 +58,8 @@ public class PacketAPI {
     }
 
     /**
+     * Old api for acquiring the {@link PacketAPI}.
+     *
      * @deprecated {@link #instance()}
      */
     @Deprecated(forRemoval = true) public static PacketAPI getInstance() {
@@ -91,12 +89,12 @@ public class PacketAPI {
         preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().sendQuery();
     }
 
-    public void sendPacketAsync(Packet packet) {
-        preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().send();
-    }
-
     public void sendPacket(Packet packet, ServiceInfoSnapshot snapshot) {
         preparePacket(packet, null, TYPE_NO_RESPONSE).targetService(snapshot.name()).build().sendQuery();
+    }
+
+    public void sendPacketAsync(Packet packet) {
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().send();
     }
 
     public void sendPacketAsync(Packet packet, ServiceInfoSnapshot snapshot) {
@@ -158,42 +156,38 @@ public class PacketAPI {
             if (!e.channel().equals(CHANNEL)) return;
             if (!e.message().equals(MESSAGE_PACKET)) return;
 
-            DataBuf content = e.content();
+            var content = e.content();
             try {
                 content.startTransaction();
-                byte messageType = content.readByte();
+                var messageType = content.readByte();
 
-                boolean query = messageType == TYPE_QUERY;
-                boolean queryResponse = messageType == TYPE_QUERY_RESPONSE;
-                UUID queryId = query || queryResponse ? content.readUniqueId() : null;
+                var query = messageType == TYPE_QUERY;
+                var queryResponse = messageType == TYPE_QUERY_RESPONSE;
+                var queryId = query || queryResponse ? content.readUniqueId() : null;
 
                 if (queryResponse) {
-                    QueryEntry<? extends Packet> entry = queries.getIfPresent(queryId);
+                    var entry = queries.getIfPresent(queryId);
                     if (entry == null) return;
-                    Packet packet = PacketSerializer.readPacket(content, classLoader);
+                    var packet = PacketSerializer.readPacket(content, classLoader);
                     entry.complete(packet);
                     return;
                 }
 
-                Class<? extends Packet> packetClass = PacketSerializer.getClass(content, classLoader);
+                var packetClass = PacketSerializer.getClass(content, classLoader);
                 if (handlers.containsKey(packetClass)) {
                     try {
-                        Packet received = content.readObject(packetClass);
-                        PacketHandler<Packet> handler = (PacketHandler<Packet>) handlers.get(packetClass);
-                        Packet response = handler.handle(received);
+                        var received = content.readObject(packetClass);
+                        var handler = (PacketHandler<Packet>) handlers.get(packetClass);
+                        var response = handler.handle(received);
 
                         if (query) {
-                            DataBuf.Mutable buf = DataBuf.empty();
+                            var buf = DataBuf.empty();
                             buf.writeByte(TYPE_QUERY_RESPONSE);
                             buf.writeUniqueId(queryId);
                             PacketSerializer.serialize(response, buf);
                             prepareMessage(buf).target(e.sender().toTarget()).build().send();
                         } else if (response != null) {
-                            Logger
-                                    .getLogger("PacketAPI")
-                                    .warning("Gave a response packet to a Packet that isn't a query packet! Handler: " + handler
-                                            .getClass()
-                                            .getName());
+                            Logger.getLogger("PacketAPI").warning("Gave a response packet to a Packet that isn't a query packet! Handler: " + handler.getClass().getName());
                         }
                     } catch (Throwable ex) {
                         Logger.getLogger("PacketAPI").log(Level.SEVERE, "Packet Handling Failed", ex);

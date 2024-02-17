@@ -4,10 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
@@ -18,7 +25,11 @@ import eu.darkcube.system.vanillaaddons.module.modules.teleporter.Teleporter.Tel
 import eu.darkcube.system.vanillaaddons.util.BlockLocation;
 import eu.darkcube.system.vanillaaddons.util.Item;
 import eu.darkcube.system.vanillaaddons.util.Item.Data;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,8 +52,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.*;
 
 public class TeleporterModule implements Module {
     private final VanillaAddons addons;

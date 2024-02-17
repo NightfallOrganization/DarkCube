@@ -4,16 +4,21 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
+import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.AUser;
@@ -26,10 +31,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 public class TeleporterTrustedListInventory extends AbstractInventory<AddonsAsyncPagedInventory, Teleporter> {
     public static final InventoryType TYPE = InventoryType.of("teleporter_trusted_list");

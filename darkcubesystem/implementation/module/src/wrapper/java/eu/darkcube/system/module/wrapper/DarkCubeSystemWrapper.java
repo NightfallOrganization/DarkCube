@@ -7,18 +7,29 @@
 
 package eu.darkcube.system.module.wrapper;
 
+import dev.derklaro.aerogel.Inject;
 import dev.derklaro.aerogel.Singleton;
 import dev.derklaro.aerogel.SpecifiedInjector;
+import dev.derklaro.aerogel.binding.BindingBuilder;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.module.ModuleImplementation;
+import eu.darkcube.system.module.wrapper.userapi.WrapperUserAPI;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.userapi.UserAPI;
 
 @Singleton public class DarkCubeSystemWrapper implements ModuleImplementation {
+    private WrapperUserAPI userAPI;
+
+    @Inject public DarkCubeSystemWrapper(WrapperUserAPI userAPI) {
+        this.userAPI = userAPI;
+        InjectionLayer.boot().install(BindingBuilder.create().bind(UserAPI.class).toInstance(userAPI));
+    }
+
     @Override public void start(InjectionLayer<SpecifiedInjector> injectionLayer) {
         PacketAPI.init();
     }
 
     @Override public void stop(InjectionLayer<SpecifiedInjector> injectionLayer) {
-
+        userAPI.close();
     }
 }

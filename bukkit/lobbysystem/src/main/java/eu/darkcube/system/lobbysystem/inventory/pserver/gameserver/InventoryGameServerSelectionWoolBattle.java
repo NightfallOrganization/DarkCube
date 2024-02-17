@@ -4,19 +4,20 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.lobbysystem.util.gameregistry.RegistryEntry;
-import eu.darkcube.system.userapi.User;
+package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.gameregistry.RegistryEntry;
+import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.userapi.User;
 
 public class InventoryGameServerSelectionWoolBattle extends InventoryGameServerSelection {
 

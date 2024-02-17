@@ -31,12 +31,10 @@ tasks {
         archiveClassifier = null
     }
     shadowJar.configure {
-        destinationDirectory = layout.buildDirectory.dir("cache")
-        archiveClassifier = "shadow"
+        destinationDirectory = temporaryDir
     }
     jar.configure {
-        destinationDirectory = layout.buildDirectory.dir("cache")
-        enabled = false
+        destinationDirectory = temporaryDir
     }
     assemble.configure {
         dependsOn(getByName("finalJar"))
@@ -46,7 +44,7 @@ tasks {
 dependencies {
     api(project("api"))
     runtimeOnly(project("implementation"))
-    "embed"(project("implementation:bukkit", "shadow"))
+    "embed"(project("implementation:bukkit", "bukkit"))
     "embed"(project("implementation:velocity"))
     "embed"(project("implementation:minestom", "shadow"))
 }

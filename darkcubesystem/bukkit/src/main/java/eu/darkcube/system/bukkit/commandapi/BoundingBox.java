@@ -8,9 +8,9 @@
 package eu.darkcube.system.bukkit.commandapi;
 
 import eu.darkcube.system.bukkit.version.BukkitVersion;
-import eu.darkcube.system.commandapi.v3.Direction;
-import eu.darkcube.system.commandapi.v3.MathHelper;
-import eu.darkcube.system.commandapi.v3.Vector3d;
+import eu.darkcube.system.commandapi.util.Direction;
+import eu.darkcube.system.commandapi.util.MathHelper;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
