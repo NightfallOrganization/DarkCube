@@ -7,12 +7,12 @@
 
 package eu.darkcube.system.module.wrapper.userapi;
 
-import eu.darkcube.system.common.userapi.CommonUser;
+import java.util.UUID;
+
+import eu.darkcube.system.impl.common.userapi.CommonUser;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.AdventureSupport;
-
-import java.util.UUID;
 
 public class WrapperUser extends CommonUser {
     public WrapperUser(UUID uniqueId) {

@@ -8,8 +8,8 @@
 package eu.darkcube.system.bukkit.commandapi.argument;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.commandapi.v3.Vector2f;
-import eu.darkcube.system.commandapi.v3.Vector3d;
+import eu.darkcube.system.commandapi.util.Vector2f;
+import eu.darkcube.system.commandapi.util.Vector3d;
 
 public interface ILocationArgument {
 

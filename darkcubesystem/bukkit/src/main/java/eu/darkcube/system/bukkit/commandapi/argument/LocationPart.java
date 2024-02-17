@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.bukkit.commandapi.argument;
 
-import eu.darkcube.system.commandapi.v3.Messages;
+import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;

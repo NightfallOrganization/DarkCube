@@ -1,0 +1,28 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DarkCube:woolbattle:minestom [uploadArtifact]" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/woolbattle/minestom" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="uploadArtifacts" />
+          <option value="--user=development" />
+          <option value="--host=darkcube.eu" />
+          <option value="--remoteDir=/home/development/CloudNet4/local/templates/minestom/default/extensions/" />
+          <option value="--fingerprint=AAAAC3NzaC1lZDI1NTE5AAAAIAw8qQ7NjnD01YvjivyF68/p+zw0z4YYQgZPLgqOgzRw" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
+    <method v="2" />
+  </configuration>
+</component>

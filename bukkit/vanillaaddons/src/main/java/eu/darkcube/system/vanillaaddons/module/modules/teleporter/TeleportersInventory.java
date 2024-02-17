@@ -4,9 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.bukkit.inventoryapi.v1.PageArrow;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -14,6 +18,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextDecoration;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.inventory.AbstractInventory;
 import eu.darkcube.system.vanillaaddons.inventory.AddonsAsyncPagedInventory;
@@ -25,10 +30,6 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 
 public class TeleportersInventory extends AbstractInventory<AddonsAsyncPagedInventory, Teleporter> {
     public static final InventoryType TYPE = InventoryType.of("teleporters");

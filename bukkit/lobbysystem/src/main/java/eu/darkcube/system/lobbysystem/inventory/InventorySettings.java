@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.SkullUtils;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
@@ -35,7 +35,7 @@ public class InventorySettings extends LobbyAsyncPagedInventory {
 
         String textureId = "";
         String name = "";
-        switch (this.user.user().getLanguage()) {
+        switch (this.user.user().language()) {
             case ENGLISH:
                 textureId = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1" + "cmUvYTE3MDFmMjE4MzVhODk4YjIwNzU5ZmIzMGE1ODNhMzhiOTk0YWJmNjBkMzkxMmFiNGNlOWYyMzExZTc0Zj" + "cyIn19fQ==";
                 name = "English";
@@ -52,7 +52,7 @@ public class InventorySettings extends LobbyAsyncPagedInventory {
         item = ItemBuilder
                 .item(item)
                 .persistentDataStorage()
-                .iset(language, PersistentDataTypes.STRING, this.user.user().getLanguage().name())
+                .iset(language, PersistentDataTypes.STRING, this.user.user().language().name())
                 .builder()
                 .build();
         SkullUtils.setSkullTextureId(item, textureId);

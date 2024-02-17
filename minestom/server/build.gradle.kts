@@ -11,6 +11,14 @@ plugins {
     id("darkcube-parent")
 }
 
+val minestomLibrary = configurations.register("minestomLibrary") {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+configurations.api.configure {
+    extendsFrom(minestomLibrary.get())
+}
+
 abstract class SetupLibrariesTask : DefaultTask() {
     @get: Inject
     protected abstract val layout: ProjectLayout
@@ -32,16 +40,20 @@ abstract class SetupLibrariesTask : DefaultTask() {
     val applicationFiles: FileCollection = layout.files(taskContainer.jar)
 
     @InputFiles
-    val runtimeClasspath: FileCollection = layout.files(configurationContainer.runtimeClasspath)
+    val runtimeClasspath: FileCollection = layout.files(configurationContainer.named("minestomLibrary"))
 
-    @OutputDirectory
-    val outputDirectory: Provider<Directory> = layout.buildDirectory.dir("setup")
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    init {
+        outputDirectory.convention(layout.dir(objects.property<File?>().convention(temporaryDir)))
+    }
 
     @TaskAction
     fun setup() {
         fileSystem.delete(outputDirectory)
         fileSystem.mkdir(outputDirectory)
-        val librariesDir = outputDirectory.map { out -> out.dir("libraries") }
+        val librariesDir = outputDirectory.dir("libraries")
         fileSystem.mkdir(librariesDir)
         fileSystem.copy {
             from(runtimeClasspath)
@@ -57,14 +69,15 @@ abstract class SetupLibrariesTask : DefaultTask() {
 
 tasks {
     val setupLibraries = register<SetupLibrariesTask>("setupLibraries")
+    register<UploadArtifacts>("uploadArtifacts"){
+        dependsOn(setupLibraries)
+        files.from(setupLibraries.flatMap { it.outputDirectory })
+    }
     jar {
         manifest {
-            attributes["Main-Class"] = "eu.darkcube.system.minestom.server.Start"
-            attributes["Class-Path"] = configurations.runtimeClasspath.get().files.joinToString(separator = " ") { "libraries/" + it.name }
+            attributes["Main-Class"] = "eu.darkcube.system.minestom.Start"
+            attributes["Class-Path"] = minestomLibrary.get().files.joinToString(separator = " ") { "libraries/" + it.name }
         }
-    }
-    uploadArtifact {
-        dependsOn(jar)
     }
     assemble {
         dependsOn(setupLibraries)
@@ -72,12 +85,18 @@ tasks {
 }
 
 dependencies {
-    compileOnly("space.vectrix.flare:flare-fastutil:2.0.1")
-    compileOnly("org.jctools:jctools-core:4.0.1")
-    compileOnlyApi(projects.darkcubesystem.server) {
+    api(projects.darkcubesystem.minestom) {
         exclude("org.jetbrains", "annotations")
     }
-    implementation("net.minestom:minestom") {
+    implementation("org.ow2.asm:asm:9.5") // in cloudnet but not exposed
+    implementation("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
+    // libraries to be added
+    "minestomLibrary"(projects.darkcubesystem.minestom) { isTransitive = false }
+    "minestomLibrary"("org.slf4j:jul-to-slf4j:2.0.11")
+    "minestomLibrary"("org.apache.logging.log4j:log4j-core:2.22.1")
+    "minestomLibrary"("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")
+    "minestomLibrary"(libs.jline)
+    "minestomLibrary"(libs.bundles.minestom) {
         exclude("org.jetbrains", "annotations")
     }
 }

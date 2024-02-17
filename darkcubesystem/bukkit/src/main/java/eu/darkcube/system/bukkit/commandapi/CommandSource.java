@@ -4,16 +4,24 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.bukkit.commandapi;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.avaje.ebean.validation.NotNull;
 import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.bukkit.commandapi.argument.EntityAnchorArgument;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.MathHelper;
-import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
-import eu.darkcube.system.commandapi.v3.Vector2f;
-import eu.darkcube.system.commandapi.v3.Vector3d;
+import eu.darkcube.system.commandapi.CommandExecutor;
+import eu.darkcube.system.commandapi.util.MathHelper;
+import eu.darkcube.system.commandapi.util.Messages.MessageWrapper;
+import eu.darkcube.system.commandapi.util.Vector2f;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.LiteralMessage;
 import eu.darkcube.system.libs.com.mojang.brigadier.Message;
 import eu.darkcube.system.libs.com.mojang.brigadier.ResultConsumer;
@@ -35,9 +43,6 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommandSource implements ISuggestionProvider, ForwardingAudience {
 
@@ -107,8 +112,8 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
     public void sendMessage(Message message) {
         if (message instanceof MessageWrapper) {
             MessageWrapper w = (MessageWrapper) message;
-            BaseMessage m = w.getMessage();
-            sendMessage(m.getMessage(source, w.getComponents()));
+            BaseMessage m = w.message();
+            sendMessage(m.getMessage(source, w.components()));
         } else {
             sendMessage(Component.text(message.getString()).color(NamedTextColor.RED));
         }
@@ -254,13 +259,9 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
 
             Component hover = Component.empty();
 
-            if (completion.getTooltip() != null && completion.getTooltip().getString() != null)
-                hover = hover.append(Component.text(completion.getTooltip().getString())).append(Component.newline());
+            if (completion.getTooltip() != null && completion.getTooltip().getString() != null) hover = hover.append(Component.text(completion.getTooltip().getString())).append(Component.newline());
 
-            hover = hover.append(Component
-                    .text("Click to insert command", NamedTextColor.GRAY)
-                    .append(Component.newline())
-                    .append(Component.text(cmd, NamedTextColor.GRAY)));
+            hover = hover.append(Component.text("Click to insert command", NamedTextColor.GRAY).append(Component.newline()).append(Component.text(cmd, NamedTextColor.GRAY)));
 
             clickable = clickable.hoverEvent(HoverEvent.showText(hover));
 

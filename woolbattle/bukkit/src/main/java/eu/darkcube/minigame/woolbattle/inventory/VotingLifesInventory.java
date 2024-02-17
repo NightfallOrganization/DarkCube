@@ -4,21 +4,22 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.inventory;
+
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.Key;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
 
 public class VotingLifesInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_voting_lifes");

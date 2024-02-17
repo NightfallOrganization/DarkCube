@@ -4,12 +4,19 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.deathchests;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.bukkit.inventoryapi.item.meta.SkullBuilderMeta;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import org.bukkit.Bukkit;
@@ -32,8 +39,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-import java.util.*;
 
 public class DeathChestsModule implements Module, Listener {
     private static final List<Vector> RELATIVE_POSTIONS = Arrays.asList(new Vector(1, 0, 0), new Vector(1, 0, 1), new Vector(0, 0, 1), new Vector(-1, 0, 0), new Vector(-1, 0, -1), new Vector(0, 0, -1), new Vector(-1, 0, 1), new Vector(1, 0, -1), new Vector(1, 1, 0), new Vector(1, 1, 1), new Vector(0, 1, 1), new Vector(-1, 1, 0), new Vector(-1, 1, -1), new Vector(0, 1, -1), new Vector(-1, 1, 1), new Vector(1, 1, -1), new Vector(0, 1, 0), new Vector(1, -1, 0), new Vector(1, -1, 1), new Vector(0, -1, 1), new Vector(-1, -1, 0), new Vector(-1, -1, -1), new Vector(0, -1, -1), new Vector(-1, -1, 1), new Vector(1, -1, -1), new Vector(0, -1, 0));
@@ -126,7 +131,7 @@ public class DeathChestsModule implements Module, Listener {
     }
 
     private ItemStack getPlayerHead(String name, UUID uuid) {
-        ItemBuilder item = ItemBuilder
+        var item = ItemBuilder
                 .item(Material.PLAYER_HEAD)
                 .meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(name, uuid)))
                 .displayname(Component.text(name, NamedTextColor.YELLOW));

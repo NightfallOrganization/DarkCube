@@ -11,6 +11,6 @@ import org.gradle.kotlin.dsl.register
 
 class DarkCubeParent : Plugin<Project> {
     override fun apply(project: Project) {
-        project.tasks.register<UploadArtifact>("uploadArtifact")
+        // dummy to access tasks like UploadArtifact
     }
 }

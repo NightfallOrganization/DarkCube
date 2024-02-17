@@ -7,19 +7,19 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.UUID;
+
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
 
 public class ListenerMinigameServer extends BaseListener {
     private final Lobby lobby;

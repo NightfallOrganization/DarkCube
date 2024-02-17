@@ -4,9 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.Objects;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
@@ -14,6 +16,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.AUser;
@@ -24,19 +27,16 @@ import eu.darkcube.system.vanillaaddons.module.modules.teleporter.Teleporter.Tel
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule.TeleporterListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Objects;
 
 public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInventory, Teleporter> {
     public static final InventoryType TYPE = InventoryType.of("teleporter");
 
     @Override protected AddonsAsyncPagedInventory openInventory(AUser user) {
-        Teleporter teleporter = data();
-        final Key KEY_TYPE = new Key(user.addons(), "teleporter_inventory_type");
-        AddonsAsyncPagedInventory i = new AddonsAsyncPagedInventory(TYPE, Component
+        var teleporter = data();
+        final var KEY_TYPE = new Key(user.addons(), "teleporter_inventory_type");
+        var i = new AddonsAsyncPagedInventory(TYPE, Component
                 .text("\uDAFF\uDFEFⲌ")
                 .color(NamedTextColor.WHITE), () -> true) {
 
@@ -44,8 +44,8 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
                 if (Objects.equals(event.bukkitEvent().getClickedInventory(), event.bukkitEvent().getView().getTopInventory())) {
                     event.setCancelled(true);
                 }
-                ItemStack bitem = event.bukkitEvent().getView().getItem(event.bukkitEvent().getRawSlot());
-                ItemBuilder item = bitem == null ? null : ItemBuilder.item(bitem);
+                var bitem = event.bukkitEvent().getView().getItem(event.bukkitEvent().getRawSlot());
+                var item = bitem == null ? null : ItemBuilder.item(bitem);
                 if (item == null) return;
                 if (!item.persistentDataStorage().has(KEY_TYPE)) return;
                 int type = item.persistentDataStorage().get(KEY_TYPE, PersistentDataTypes.INTEGER);
@@ -125,7 +125,7 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
 //				super.insertFallbackItems();
             }
         };
-        Player p = Bukkit.getPlayer(user.user().uniqueId());
+        var p = Bukkit.getPlayer(user.user().uniqueId());
         i.open(p);
         return i;
     }

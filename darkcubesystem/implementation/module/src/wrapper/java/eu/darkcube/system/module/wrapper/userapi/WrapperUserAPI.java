@@ -7,16 +7,12 @@
 
 package eu.darkcube.system.module.wrapper.userapi;
 
-import eu.darkcube.system.common.userapi.CommonUser;
-import eu.darkcube.system.common.userapi.CommonUserAPI;
-
 import java.util.UUID;
 
+import eu.darkcube.system.impl.common.userapi.CommonUser;
+import eu.darkcube.system.impl.common.userapi.CommonUserAPI;
+
 public class WrapperUserAPI extends CommonUserAPI {
-
-    public WrapperUserAPI() {
-    }
-
     @Override protected CommonUser loadUser(UUID uniqueId) {
         return new WrapperUser(uniqueId);
     }

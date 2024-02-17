@@ -7,10 +7,10 @@
 
 package eu.darkcube.system.userapi;
 
+import java.util.UUID;
+
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 @Api public interface UserAPI {
 
@@ -19,6 +19,8 @@ import java.util.UUID;
     }
 
     /**
+     * Old method for acquiring the instance.
+     *
      * @deprecated {@link #instance()}
      */
     @Deprecated(forRemoval = true) static @NotNull UserAPI getInstance() {
@@ -34,6 +36,8 @@ import java.util.UUID;
     @NotNull User user(UUID uniqueId);
 
     /**
+     * Old method for acquiring a user.
+     *
      * @deprecated {@link #user(UUID)}
      */
     @Deprecated(forRemoval = true) default @NotNull User getUser(UUID uuid) {

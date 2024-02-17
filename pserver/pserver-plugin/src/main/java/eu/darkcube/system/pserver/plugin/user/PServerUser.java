@@ -9,7 +9,7 @@ package eu.darkcube.system.pserver.plugin.user;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.util.Language;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

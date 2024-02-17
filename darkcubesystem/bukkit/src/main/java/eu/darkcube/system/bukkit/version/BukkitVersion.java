@@ -7,16 +7,15 @@
 
 package eu.darkcube.system.bukkit.version;
 
+import java.util.List;
+
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.bukkit.commandapi.deprecated.Command;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemProvider;
 import eu.darkcube.system.server.version.ServerVersion;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
-
-import java.util.List;
 
 @Api public interface BukkitVersion extends ServerVersion {
 
@@ -24,16 +23,7 @@ import java.util.List;
         return (BukkitVersion) ServerVersion.version();
     }
 
-    /**
-     * For example 1_8_8 or 1_19_3
-     *
-     * @return this version's classifier
-     */
-    @Api String classifier();
-
     @Api BukkitCommandAPIUtils commandApiUtils();
-
-    @Api ItemProvider itemProvider();
 
     @Api interface BukkitCommandAPIUtils {
         @Api String unknownCommandMessage();

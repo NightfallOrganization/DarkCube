@@ -4,10 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system;
 
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.Messages.MessageWrapper;
+import eu.darkcube.system.commandapi.CommandExecutor;
+import eu.darkcube.system.commandapi.util.Messages.MessageWrapper;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;

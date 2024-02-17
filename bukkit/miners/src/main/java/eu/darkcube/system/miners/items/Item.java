@@ -4,18 +4,19 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.miners.items;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import static eu.darkcube.system.server.item.ItemBuilder.item;
+
 import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import static eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder.item;
 
 public enum Item {
 
@@ -39,27 +40,22 @@ public enum Item {
     public static final String NAME_SUFFIX = "_NAME";
     public static final String LORE_SUFFIX = "_LORE";
     private final ItemBuilder itemBuilder;
-    private final String KEY_NAME;
-    private final String KEY_LORE;
+    private final String keyName;
+    private final String keyLore;
 
     Item(ItemBuilder ib) {
         this.itemBuilder = ib;
         ib.persistentDataStorage().set(ItemKey.ITEM, PersistentDataTypes.STRING, this.name());
-        this.KEY_NAME = ITEM_PREFIX + this.name() + NAME_SUFFIX;
-        this.KEY_LORE = ITEM_PREFIX + this.name() + LORE_SUFFIX;
+        this.keyName = ITEM_PREFIX + this.name() + NAME_SUFFIX;
+        this.keyLore = ITEM_PREFIX + this.name() + LORE_SUFFIX;
     }
 
     public ItemStack getItem(Language lang, int amount) {
-        ItemBuilder itemBuilder = this.itemBuilder.clone();
-        itemBuilder.displayname(lang.getMessage(KEY_NAME));
-        itemBuilder.lore(lang.getMessage(KEY_LORE));
+        var itemBuilder = this.itemBuilder.clone();
+        itemBuilder.displayname(lang.getMessage(keyName));
+        itemBuilder.lore(lang.getMessage(keyLore));
         itemBuilder.amount(amount);
         return itemBuilder.build();
-        //		return lore.equals("")
-        //				? itemBuilder.displayname(getName(lang)).amount(amount).build()
-        //				: itemBuilder.displayname(getName(lang))
-        //						.lores(Arrays.asList(getLore(lang).split("\n"))).amount(amount)
-        //						.build();
     }
 
     public ItemStack getItem(Player player, int amount) {

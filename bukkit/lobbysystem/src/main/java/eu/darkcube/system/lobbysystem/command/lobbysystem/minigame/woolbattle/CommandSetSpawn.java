@@ -9,8 +9,8 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.commandapi.v3.Vector2f;
-import eu.darkcube.system.commandapi.v3.Vector3d;
+import eu.darkcube.system.commandapi.util.Vector2f;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.ILocationArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.RotationArgument;

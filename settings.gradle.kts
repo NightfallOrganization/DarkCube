@@ -4,27 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-enableFeaturePreviewQuietly("TYPESAFE_PROJECT_ACCESSORS", "Type-safe project accessors")
-
-/**
- * @see <a href="https://github.com/gradle/gradle/issues/19069">Feature request</a>
- */
-fun Settings.enableFeaturePreviewQuietly(name: String, summary: String = name) {
-    enableFeaturePreview(name)
-
-    val logger: Any = org.gradle.util.internal.IncubationLogger::class.java
-        .getDeclaredField("INCUBATING_FEATURE_HANDLER")
-        .apply { isAccessible = true }
-        .get(null)
-
-    @Suppress("UNCHECKED_CAST")
-    val features: MutableSet<String> = org.gradle.internal.featurelifecycle.LoggingIncubatingFeatureHandler::class.java
-        .getDeclaredField("features")
-        .apply { isAccessible = true }
-        .get(logger) as MutableSet<String>
-
-    features.add(summary)
-}
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     includeBuild("build-extensions")
@@ -56,7 +36,7 @@ include("bukkit:changepermissionmessage")
 
 includeSubProjects("minestom", "server")
 
-includeSubProjects("woolbattle", "bukkit", "api", "minestom")
+includeSubProjects("woolbattle", "api", "common", "bukkit", "minestom")
 
 include("bukkit:darkessentials")
 //include "bukkit:holograms"

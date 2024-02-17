@@ -26,7 +26,7 @@ import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
 import org.bukkit.Bukkit;
