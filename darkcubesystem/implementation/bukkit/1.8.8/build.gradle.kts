@@ -9,6 +9,12 @@ plugins {
     `java-library`
 }
 
+configurations {
+    default {
+        artifacts.clear()
+    }
+}
+
 dependencies {
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
     compileOnly(parent!!)

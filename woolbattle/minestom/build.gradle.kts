@@ -6,25 +6,32 @@
  */
 plugins {
     `java-library`
+    id("darkcube-parent")
     alias(libs.plugins.shadow)
 }
 
+dependencies {
+    compileOnlyApi(projects.darkcubesystem.minestom)
+    api(parent!!.project("common"))
+}
+
 tasks {
+    val setupArtifactsForUpload = register<Copy>("setupArtifactsForUpload") {
+        from(shadowJar.map { it.archiveFile })
+        into(temporaryDir)
+    }
+    register<UploadArtifacts>("uploadArtifacts") {
+        dependsOn(setupArtifactsForUpload)
+        files.from(setupArtifactsForUpload.map { it.destinationDir })
+    }
     jar {
-        archiveClassifier = "pure"
+        destinationDirectory = temporaryDir
     }
     shadowJar {
-        archiveBaseName = "application"
+        archiveBaseName = "woolbattle"
         archiveClassifier = null
-        manifest {
-            attributes["Main-Class"] = "eu.darkcube.system.woolbattle.Start"
-        }
     }
     assemble {
         dependsOn(shadowJar)
     }
-}
-
-dependencies {
-    implementation("net.minestom:minestom")
 }

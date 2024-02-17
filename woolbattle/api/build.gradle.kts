@@ -5,9 +5,9 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 plugins {
-    id("java-library")
+    `java-library`
 }
 
 dependencies {
-    compileOnly(project(":darkcubesystem"))
+    compileOnly(projects.darkcubesystem.server)
 }

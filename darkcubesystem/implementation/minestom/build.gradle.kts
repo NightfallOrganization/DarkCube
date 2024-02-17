@@ -22,10 +22,10 @@ tasks {
 }
 
 dependencies {
-    compileOnlyApi(projects.darkcubesystem.implementation.common)
-    compileOnlyApi(projects.darkcubesystem.server)
-    compileOnlyApi("net.minestom:minestom")
+    compileOnlyApi(projects.darkcubesystem.implementation.server)
+    compileOnlyApi(projects.darkcubesystem.minestom)
+    compileOnlyApi(projects.minestom.server)
 
-    runtimeOnly(projects.darkcubesystem.implementation.common) { isTransitive = false }
     runtimeOnly(projects.darkcubesystem.server) { isTransitive = false }
+    // minestom api is included in the server bootstrap project because of class loading
 }

@@ -10,7 +10,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;

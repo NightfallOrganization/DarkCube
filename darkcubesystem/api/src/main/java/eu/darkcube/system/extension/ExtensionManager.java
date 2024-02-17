@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.extension;
 
-import eu.darkcube.system.annotations.ThreadSafe;
-
 import java.nio.file.Path;
 import java.util.Collection;
+
+import eu.darkcube.system.annotations.ThreadSafe;
 
 @ThreadSafe public interface ExtensionManager {
 
     /**
-     * Loads all extensions in the given {@code paths} in correct order
+     * Loads all extensions in the given {@code paths} in correct order.
      */
     void loadExtensions(Collection<Path> paths);
 

@@ -7,17 +7,17 @@
 
 package eu.darkcube.system.module.node.userapi;
 
-import eu.cloudnetservice.common.concurrent.Task;
-import eu.cloudnetservice.driver.database.Database;
-import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.common.userapi.UserLocalPersistentDataStorage;
-import eu.darkcube.system.util.data.PersistentDataStorage;
-
 import java.util.UUID;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingDeque;
+
+import eu.cloudnetservice.common.concurrent.Task;
+import eu.cloudnetservice.driver.database.Database;
+import eu.cloudnetservice.driver.document.Document;
+import eu.darkcube.system.impl.common.userapi.UserLocalPersistentDataStorage;
+import eu.darkcube.system.util.data.PersistentDataStorage;
 
 class NodeDataSaver {
     private final Database database;
@@ -25,6 +25,7 @@ class NodeDataSaver {
     // Writes should be fast so if this queue gets filled with more than 256 entries, we can just let new entries wait
     private final BlockingDeque<UUID> saveQueue = new LinkedBlockingDeque<>(256);
     private final PersistentDataStorage.UpdateNotifier saveNotifier = storage -> save((UserLocalPersistentDataStorage) storage);
+    private Task<?> task;
     private volatile boolean exit = false;
 
     public NodeDataSaver(Database database) {
@@ -34,14 +35,15 @@ class NodeDataSaver {
     public void exit() {
         exit = true;
         saveQueue.offer(UUID.randomUUID());
+        task.join();
     }
 
     public void init() {
-        Task.supply(() -> {
+        task = Task.supply(() -> {
             while (!exit) {
                 try {
-                    UUID uniqueId = saveQueue.take();
-                    Document data = dataToSave.remove(uniqueId);
+                    var uniqueId = saveQueue.take();
+                    var data = dataToSave.remove(uniqueId);
                     if (data == null) continue;
                     database.insert(uniqueId.toString(), data);
                 } catch (InterruptedException ignored) {
@@ -55,7 +57,7 @@ class NodeDataSaver {
     }
 
     void save(UserLocalPersistentDataStorage storage) {
-        Document.Mutable data = Document.newJsonDocument();
+        var data = Document.newJsonDocument();
         data.append("name", storage.name());
         data.append("uuid", storage.uniqueId());
         data.append("persistentData", storage.storeToJsonDocument());

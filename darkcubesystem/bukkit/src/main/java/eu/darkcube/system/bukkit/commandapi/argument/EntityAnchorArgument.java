@@ -7,12 +7,18 @@
 
 package eu.darkcube.system.bukkit.commandapi.argument;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
+
 import com.google.common.collect.Maps;
 import eu.darkcube.system.bukkit.commandapi.BukkitVector3d;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Messages;
-import eu.darkcube.system.commandapi.v3.Vector3d;
+import eu.darkcube.system.commandapi.util.Messages;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
@@ -23,14 +29,9 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilde
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
-
 public class EntityAnchorArgument implements ArgumentType<EntityAnchorArgument.Type> {
-    private static final Collection<String> EXMAPLES = Arrays.asList("eyes", "feet");
+    private static final Collection<String> EXAMPLES = Arrays.asList("eyes", "feet");
+
     private static final DynamicCommandExceptionType ANCHOR_INVALID = Messages.ANCHOR_INVALID.newDynamicCommandExceptionType();
 
     public static Type getEntityAnchor(CommandContext<CommandSource> context, String name) {
@@ -42,9 +43,9 @@ public class EntityAnchorArgument implements ArgumentType<EntityAnchorArgument.T
     }
 
     @Override public Type parse(StringReader reader) throws CommandSyntaxException {
-        int i = reader.getCursor();
-        String s = reader.readUnquotedString();
-        Type entityanchorargument$type = Type.getByName(s);
+        var i = reader.getCursor();
+        var s = reader.readUnquotedString();
+        var entityanchorargument$type = Type.getByName(s);
         if (entityanchorargument$type == null) {
             reader.setCursor(i);
             throw EntityAnchorArgument.ANCHOR_INVALID.createWithContext(reader, s);
@@ -57,20 +58,16 @@ public class EntityAnchorArgument implements ArgumentType<EntityAnchorArgument.T
     }
 
     @Override public Collection<String> getExamples() {
-        return EntityAnchorArgument.EXMAPLES;
+        return EntityAnchorArgument.EXAMPLES;
     }
 
     public enum Type {
-        FEET("feet", (pos, entity) -> {
-            return pos;
-        }), EYES("eyes", (pos, entity) -> {
-            return new Vector3d(pos.x, pos.y + (entity instanceof LivingEntity ? ((LivingEntity) entity).getEyeHeight() : 0), pos.z);
-        });
+        FEET("feet", (pos, entity) -> pos), EYES("eyes", (pos, entity) -> new Vector3d(pos.x, pos.y + (entity instanceof LivingEntity ? ((LivingEntity) entity).getEyeHeight() : 0), pos.z));
 
         private static final Map<String, Type> BY_NAME = Maps.newHashMap();
 
         static {
-            for (Type type : Type.values()) {
+            for (var type : Type.values()) {
                 Type.BY_NAME.put(type.name, type);
             }
         }
@@ -92,7 +89,7 @@ public class EntityAnchorArgument implements ArgumentType<EntityAnchorArgument.T
         }
 
         public Vector3d apply(CommandSource sourceIn) {
-            Entity entity = sourceIn.getEntity();
+            var entity = sourceIn.getEntity();
             return entity == null ? sourceIn.getPos() : this.offsetFunc.apply(sourceIn.getPos(), entity);
         }
     }

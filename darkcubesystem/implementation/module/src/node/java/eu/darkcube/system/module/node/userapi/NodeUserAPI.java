@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.module.node.userapi;
 
+import java.util.UUID;
+
 import dev.derklaro.aerogel.Inject;
 import dev.derklaro.aerogel.Singleton;
 import eu.cloudnetservice.driver.database.Database;
@@ -16,11 +18,14 @@ import eu.cloudnetservice.driver.registry.ServiceRegistry;
 import eu.cloudnetservice.modules.bridge.player.CloudOfflinePlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import eu.darkcube.system.module.userapi.handler.HandlerPlayerLogin;
-import eu.darkcube.system.common.userapi.*;
+import eu.darkcube.system.impl.common.userapi.CommonPersistentDataStorage;
 import eu.darkcube.system.userapi.packets.PacketNWUpdateName;
 import eu.darkcube.system.userapi.packets.PacketWNPlayerLogin;
-
-import java.util.UUID;
+import eu.darkcube.system.impl.common.userapi.CommonUser;
+import eu.darkcube.system.impl.common.userapi.CommonUserAPI;
+import eu.darkcube.system.impl.common.userapi.CommonUserData;
+import eu.darkcube.system.impl.common.userapi.UserLocalPacketHandlers;
+import eu.darkcube.system.impl.common.userapi.UserLocalPersistentDataStorage;
 
 @Singleton public class NodeUserAPI extends CommonUserAPI {
     private final PlayerManager playerManager;
@@ -43,12 +48,12 @@ import java.util.UUID;
     }
 
     @Override protected CommonUser loadUser(UUID uniqueId) {
-        Document data = this.database.get(uniqueId.toString());
+        var data = this.database.get(uniqueId.toString());
         if (data == null) data = Document.emptyDocument();
         String name = data.getString("name");
         if (name != null && uniqueId.toString().startsWith(name)) name = null;
         if (name == null) {
-            CloudOfflinePlayer offlinePlayer = this.playerManager.offlinePlayer(uniqueId);
+            var offlinePlayer = this.playerManager.offlinePlayer(uniqueId);
             if (offlinePlayer != null) name = offlinePlayer.name();
         }
         if (name == null) {
@@ -56,7 +61,7 @@ import java.util.UUID;
         }
         CommonPersistentDataStorage persistentData = new UserLocalPersistentDataStorage(uniqueId, name, data.readDocument("persistentData"));
         persistentData.addUpdateNotifier(this.dataSaver.saveNotifier());
-        CommonUserData userData = new CommonUserData(uniqueId, name, persistentData);
+        var userData = new CommonUserData(uniqueId, name, persistentData);
         return new NodeUser(userData);
     }
 

@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.bukkit.commandapi;
 
-import eu.darkcube.system.commandapi.v3.Vector3d;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import org.bukkit.Location;
 
 public final class BukkitVector3d {

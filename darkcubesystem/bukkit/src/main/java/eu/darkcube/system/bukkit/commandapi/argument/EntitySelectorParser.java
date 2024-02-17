@@ -7,10 +7,26 @@
 
 package eu.darkcube.system.bukkit.commandapi.argument;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+
 import com.google.common.primitives.Doubles;
+import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.bukkit.commandapi.BoundingBox;
 import eu.darkcube.system.bukkit.commandapi.BukkitVector3d;
-import eu.darkcube.system.commandapi.v3.*;
+import eu.darkcube.system.commandapi.util.MathHelper;
+import eu.darkcube.system.commandapi.util.Messages;
+import eu.darkcube.system.commandapi.util.MinMaxBounds;
+import eu.darkcube.system.commandapi.util.MinMaxBoundsWrapped;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
@@ -20,12 +36,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilde
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.*;
 
 public class EntitySelectorParser {
 
@@ -37,12 +47,8 @@ public class EntitySelectorParser {
     public static final DynamicCommandExceptionType EXPECTED_VALUE_FOR_OPTION = Messages.EXPECTED_VALUE_FOR_OPTION.newDynamicCommandExceptionType();
     public static final BiConsumer<Vector3d, List<? extends Entity>> ARBITRARY = (vec, entities) -> {
     };
-    public static final BiConsumer<Vector3d, List<? extends Entity>> NEAREST = (vec, entities) -> entities.sort((e1, e2) -> Doubles.compare(BukkitVector3d
-            .position(e1.getLocation())
-            .squareDistanceTo(vec), BukkitVector3d.position(e2.getLocation()).squareDistanceTo(vec)));
-    public static final BiConsumer<Vector3d, List<? extends Entity>> FURTHEST = (vec, entities) -> entities.sort((e1, e2) -> Doubles.compare(BukkitVector3d
-            .position(e1.getLocation())
-            .squareDistanceTo(vec), BukkitVector3d.position(e2.getLocation()).squareDistanceTo(vec)));
+    public static final BiConsumer<Vector3d, List<? extends Entity>> NEAREST = (vec, entities) -> entities.sort((e1, e2) -> Doubles.compare(BukkitVector3d.position(e1.getLocation()).squareDistanceTo(vec), BukkitVector3d.position(e2.getLocation()).squareDistanceTo(vec)));
+    public static final BiConsumer<Vector3d, List<? extends Entity>> FURTHEST = (vec, entities) -> entities.sort((e1, e2) -> Doubles.compare(BukkitVector3d.position(e1.getLocation()).squareDistanceTo(vec), BukkitVector3d.position(e2.getLocation()).squareDistanceTo(vec)));
     public static final BiConsumer<Vector3d, List<? extends Entity>> RANDOM = (vec, entities) -> Collections.shuffle(entities);
     public static final BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> SUGGEST_NONE = (p_201342_0_, p_201342_1_) -> p_201342_0_.buildFuture();
 
@@ -53,7 +59,12 @@ public class EntitySelectorParser {
     private boolean currentWorldOnly;
     private MinMaxBounds.FloatBound distance = MinMaxBounds.FloatBound.UNBOUNDED;
     private MinMaxBounds.IntBound level = MinMaxBounds.IntBound.UNBOUNDED;
-    private Double x, y, z, dx, dy, dz;
+    private Double x;
+    private Double y;
+    private Double z;
+    private Double dx;
+    private Double dy;
+    private Double dz;
     private MinMaxBoundsWrapped xRotation = MinMaxBoundsWrapped.UNBOUNDED;
     private MinMaxBoundsWrapped yRotation = MinMaxBoundsWrapped.UNBOUNDED;
     private Predicate<Entity> filter = entity -> true;
@@ -114,15 +125,15 @@ public class EntitySelectorParser {
     }
 
     private BoundingBox createAABB(double sizeX, double sizeY, double sizeZ) {
-        boolean flag = sizeX < 0.0D;
-        boolean flag1 = sizeY < 0.0D;
-        boolean flag2 = sizeZ < 0.0D;
-        double d0 = flag ? sizeX : 0.0D;
-        double d1 = flag1 ? sizeY : 0.0D;
-        double d2 = flag2 ? sizeZ : 0.0D;
-        double d3 = (flag ? 0.0D : sizeX) + 1.0D;
-        double d4 = (flag1 ? 0.0D : sizeY) + 1.0D;
-        double d5 = (flag2 ? 0.0D : sizeZ) + 1.0D;
+        var flag = sizeX < 0.0D;
+        var flag1 = sizeY < 0.0D;
+        var flag2 = sizeZ < 0.0D;
+        var d0 = flag ? sizeX : 0.0D;
+        var d1 = flag1 ? sizeY : 0.0D;
+        var d2 = flag2 ? sizeZ : 0.0D;
+        var d3 = (flag ? 0.0D : sizeX) + 1.0D;
+        var d4 = (flag1 ? 0.0D : sizeY) + 1.0D;
+        var d5 = (flag2 ? 0.0D : sizeZ) + 1.0D;
         return new BoundingBox(d0, d1, d2, d3, d4, d5);
     }
 
@@ -145,7 +156,7 @@ public class EntitySelectorParser {
         double d0 = MathHelper.wrapDegrees(angleBounds.min() == null ? 0.0F : angleBounds.min());
         double d1 = MathHelper.wrapDegrees(angleBounds.max() == null ? 359.0F : angleBounds.max());
         return (p_197374_5_) -> {
-            double d2 = MathHelper.wrapDegrees(angleFunc.applyAsDouble(p_197374_5_));
+            var d2 = MathHelper.wrapDegrees(angleFunc.applyAsDouble(p_197374_5_));
             if (d0 > d1) {
                 return d2 >= d0 || d2 <= d1;
             }
@@ -158,8 +169,8 @@ public class EntitySelectorParser {
         if (!this.reader.canRead()) {
             throw EntitySelectorParser.SELECTOR_TYPE_MISSING.createWithContext(this.reader);
         }
-        int i = this.reader.getCursor();
-        char c0 = this.reader.read();
+        var i = this.reader.getCursor();
+        var c0 = this.reader.read();
         if (c0 == 'p') {
             this.limit = 1;
             this.includeNonPlayers = false;
@@ -204,8 +215,8 @@ public class EntitySelectorParser {
             this.suggestionHandler = this::suggestName;
         }
 
-        int i = this.reader.getCursor();
-        String s = this.reader.readString();
+        var i = this.reader.getCursor();
+        var s = this.reader.readString();
 
         try {
             this.uuid = UUID.fromString(s);
@@ -230,9 +241,9 @@ public class EntitySelectorParser {
         while (true) {
             if (this.reader.canRead() && this.reader.peek() != ']') {
                 this.reader.skipWhitespace();
-                int i = this.reader.getCursor();
-                String s = this.reader.readString();
-                EntityOptions.IFilter entityoptions$ifilter = EntityOptions.get(this, s, i);
+                var i = this.reader.getCursor();
+                var s = this.reader.readString();
+                var entityoptions$ifilter = EntityOptions.get(this, s, i);
                 this.reader.skipWhitespace();
                 if (!this.reader.canRead() || this.reader.peek() != '=') {
                     this.reader.setCursor(i);
@@ -270,7 +281,7 @@ public class EntitySelectorParser {
         }
     }
 
-    public boolean shouldInvertValue() {
+    @Api public boolean shouldInvertValue() {
         this.reader.skipWhitespace();
         if (this.reader.canRead() && this.reader.peek() == '!') {
             this.reader.skip();
@@ -280,111 +291,111 @@ public class EntitySelectorParser {
         return false;
     }
 
-    public StringReader getReader() {
+    @Api public StringReader getReader() {
         return this.reader;
     }
 
-    public void addFilter(Predicate<Entity> filterIn) {
+    @Api public void addFilter(Predicate<Entity> filterIn) {
         this.filter = this.filter.and(filterIn);
     }
 
-    public void setCurrentWorldOnly() {
+    @Api public void setCurrentWorldOnly() {
         this.currentWorldOnly = true;
     }
 
-    public MinMaxBounds.FloatBound getDistance() {
+    @Api public MinMaxBounds.FloatBound getDistance() {
         return this.distance;
     }
 
-    public void setDistance(MinMaxBounds.FloatBound distanceIn) {
+    @Api public void setDistance(MinMaxBounds.FloatBound distanceIn) {
         this.distance = distanceIn;
     }
 
-    public MinMaxBounds.IntBound getLevel() {
+    @Api public MinMaxBounds.IntBound getLevel() {
         return this.level;
     }
 
-    public void setLevel(MinMaxBounds.IntBound levelIn) {
+    @Api public void setLevel(MinMaxBounds.IntBound levelIn) {
         this.level = levelIn;
     }
 
-    public MinMaxBoundsWrapped getXRotation() {
+    @Api public MinMaxBoundsWrapped getXRotation() {
         return this.xRotation;
     }
 
-    public void setXRotation(MinMaxBoundsWrapped xRotationIn) {
+    @Api public void setXRotation(MinMaxBoundsWrapped xRotationIn) {
         this.xRotation = xRotationIn;
     }
 
-    public MinMaxBoundsWrapped getYRotation() {
+    @Api public MinMaxBoundsWrapped getYRotation() {
         return this.yRotation;
     }
 
-    public void setYRotation(MinMaxBoundsWrapped yRotationIn) {
+    @Api public void setYRotation(MinMaxBoundsWrapped yRotationIn) {
         this.yRotation = yRotationIn;
     }
 
-    public Double getX() {
+    @Api public Double getX() {
         return this.x;
     }
 
-    public void setX(double xIn) {
+    @Api public void setX(double xIn) {
         this.x = xIn;
     }
 
-    public Double getY() {
+    @Api public Double getY() {
         return this.y;
     }
 
-    public void setY(double yIn) {
+    @Api public void setY(double yIn) {
         this.y = yIn;
     }
 
-    public Double getZ() {
+    @Api public Double getZ() {
         return this.z;
     }
 
-    public void setZ(double zIn) {
+    @Api public void setZ(double zIn) {
         this.z = zIn;
     }
 
-    public Double getDx() {
+    @Api public Double getDx() {
         return this.dx;
     }
 
-    public void setDx(double dxIn) {
+    @Api public void setDx(double dxIn) {
         this.dx = dxIn;
     }
 
-    public Double getDy() {
+    @Api public Double getDy() {
         return this.dy;
     }
 
-    public void setDy(double dyIn) {
+    @Api public void setDy(double dyIn) {
         this.dy = dyIn;
     }
 
-    public Double getDz() {
+    @Api public Double getDz() {
         return this.dz;
     }
 
-    public void setDz(double dzIn) {
+    @Api public void setDz(double dzIn) {
         this.dz = dzIn;
     }
 
-    public void setLimit(int limitIn) {
+    @Api public void setLimit(int limitIn) {
         this.limit = limitIn;
     }
 
-    public void setIncludeNonPlayers(boolean includeNonPlayersIn) {
+    @Api public void setIncludeNonPlayers(boolean includeNonPlayersIn) {
         this.includeNonPlayers = includeNonPlayersIn;
     }
 
-    public void setSorter(BiConsumer<Vector3d, List<? extends Entity>> sorterIn) {
+    @Api public void setSorter(BiConsumer<Vector3d, List<? extends Entity>> sorterIn) {
         this.sorter = sorterIn;
     }
 
-    public EntitySelector parse() throws CommandSyntaxException {
+    @Api public EntitySelector parse() throws CommandSyntaxException {
         this.cursorStart = this.reader.getCursor();
         this.suggestionHandler = this::suggestNameOrSelector;
         if (this.reader.canRead() && this.reader.peek() == '@') {
@@ -412,13 +423,13 @@ public class EntitySelectorParser {
     }
 
     private CompletableFuture<Suggestions> suggestName(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
-        SuggestionsBuilder suggestionsbuilder = builder.createOffset(this.cursorStart);
+        var suggestionsbuilder = builder.createOffset(this.cursorStart);
         consumer.accept(suggestionsbuilder);
         return builder.add(suggestionsbuilder).buildFuture();
     }
 
     private CompletableFuture<Suggestions> suggestSelector(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
-        SuggestionsBuilder suggestionsbuilder = builder.createOffset(builder.getStart() - 1);
+        var suggestionsbuilder = builder.createOffset(builder.getStart() - 1);
         EntitySelectorParser.fillSelectorSuggestions(suggestionsbuilder);
         builder.add(suggestionsbuilder);
         return builder.buildFuture();
@@ -446,106 +457,106 @@ public class EntitySelectorParser {
         return builder.buildFuture();
     }
 
-    public boolean isCurrentEntity() {
+    @Api public boolean isCurrentEntity() {
         return this.self;
     }
 
-    public void setSuggestionHandler(BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionHandlerIn) {
+    @Api public void setSuggestionHandler(BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionHandlerIn) {
         this.suggestionHandler = suggestionHandlerIn;
     }
 
-    public CompletableFuture<Suggestions> fillSuggestions(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
+    @Api public CompletableFuture<Suggestions> fillSuggestions(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
         return this.suggestionHandler.apply(builder.createOffset(this.reader.getCursor()), consumer);
     }
 
-    public boolean hasNameEquals() {
+    @Api public boolean hasNameEquals() {
         return this.hasNameEquals;
     }
 
-    public void setHasNameEquals(boolean value) {
+    @Api public void setHasNameEquals(boolean value) {
         this.hasNameEquals = value;
     }
 
-    public boolean hasNameNotEquals() {
+    @Api public boolean hasNameNotEquals() {
         return this.hasNameNotEquals;
     }
 
-    public void setHasNameNotEquals(boolean value) {
+    @Api public void setHasNameNotEquals(boolean value) {
         this.hasNameNotEquals = value;
     }
 
-    public boolean isLimited() {
+    @Api public boolean isLimited() {
         return this.isLimited;
     }
 
-    public void setLimited(boolean value) {
+    @Api public void setLimited(boolean value) {
         this.isLimited = value;
     }
 
-    public boolean isSorted() {
+    @Api public boolean isSorted() {
         return this.isSorted;
     }
 
-    public void setSorted(boolean value) {
+    @Api public void setSorted(boolean value) {
         this.isSorted = value;
     }
 
-    public boolean hasGamemodeEquals() {
+    @Api public boolean hasGamemodeEquals() {
         return this.hasGamemodeEquals;
     }
 
-    public void setHasGamemodeEquals(boolean value) {
+    @Api public void setHasGamemodeEquals(boolean value) {
         this.hasGamemodeEquals = value;
     }
 
-    public boolean hasGamemodeNotEquals() {
+    @Api public boolean hasGamemodeNotEquals() {
         return this.hasGamemodeNotEquals;
     }
 
-    public void setHasGamemodeNotEquals(boolean value) {
+    @Api public void setHasGamemodeNotEquals(boolean value) {
         this.hasGamemodeNotEquals = value;
     }
 
-    public boolean hasTeamEquals() {
+    @Api public boolean hasTeamEquals() {
         return this.hasTeamEquals;
     }
 
-    public void setHasTeamEquals(boolean value) {
+    @Api public void setHasTeamEquals(boolean value) {
         this.hasTeamEquals = value;
     }
 
-    public void setHasTeamNotEquals(boolean value) {
+    @Api public void setHasTeamNotEquals(boolean value) {
     }
 
-    public void setEntityType(EntityType type) {
+    @Api public void setEntityType(EntityType type) {
         this.type = type;
     }
 
-    public void setTypeLimitedInversely() {
+    @Api public void setTypeLimitedInversely() {
         this.typeInverse = true;
     }
 
-    public boolean isTypeLimited() {
+    @Api public boolean isTypeLimited() {
         return this.type != null;
     }
 
-    public boolean isTypeLimitedInversely() {
+    @Api public boolean isTypeLimitedInversely() {
         return this.typeInverse;
     }
 
-    public boolean hasScores() {
+    @Api public boolean hasScores() {
         return this.hasScores;
     }
 
-    public void setHasScores(boolean value) {
+    @Api public void setHasScores(boolean value) {
         this.hasScores = value;
     }
 
-    public boolean hasAdvancements() {
+    @Api public boolean hasAdvancements() {
         return this.hasAdvancements;
     }
 
-    public void setHasAdvancements(boolean value) {
+    @Api public void setHasAdvancements(boolean value) {
         this.hasAdvancements = value;
     }
 

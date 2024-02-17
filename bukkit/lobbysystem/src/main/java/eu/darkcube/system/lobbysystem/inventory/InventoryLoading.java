@@ -4,9 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
@@ -17,16 +22,12 @@ import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInven
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.PositionedIterator;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 public class InventoryLoading extends LobbyAsyncPagedInventory {
 
@@ -40,7 +41,7 @@ public class InventoryLoading extends LobbyAsyncPagedInventory {
 
     public InventoryLoading(Component title, User user, Function<LobbyUser, IInventory> inventoryFunction) {
         super(InventoryLoading.type_loading, title, 5 * 9, AsyncPagedInventory.box(1, 1, 5, 9), user);
-        Arrays.fill(this.SORT, 0);
+        Arrays.fill(this.sort, 0);
         // Arrays.fill(this.TOTAL_SORT, 0);
         this.inventoryFunction = inventoryFunction;
 
@@ -57,8 +58,8 @@ public class InventoryLoading extends LobbyAsyncPagedInventory {
 
     @Override protected void insertFallbackItems() {
         ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user.user());
-        for (int i = 0; i < this.SLOTS.length; i++) {
-            int slot = this.SLOTS[i];
+        for (int i = 0; i < this.slots.length; i++) {
+            int slot = this.slots[i];
             this.fallbackItems.put(slot, l);
         }
         super.insertFallbackItems();

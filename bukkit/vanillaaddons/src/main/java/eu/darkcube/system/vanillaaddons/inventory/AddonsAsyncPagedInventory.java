@@ -4,23 +4,24 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.inventory;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import static eu.darkcube.system.bukkit.inventoryapi.v1.IInventory.slot;
+import static eu.darkcube.system.bukkit.inventoryapi.v1.IInventory.slot0;
+
+import java.util.Map;
+import java.util.function.BooleanSupplier;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.bukkit.inventoryapi.v1.PageArrow;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
-import java.util.function.BooleanSupplier;
-
-import static eu.darkcube.system.bukkit.inventoryapi.v1.IInventory.slot;
-import static eu.darkcube.system.bukkit.inventoryapi.v1.IInventory.slot0;
 
 public class AddonsAsyncPagedInventory extends AsyncPagedInventory {
 
@@ -47,8 +48,8 @@ public class AddonsAsyncPagedInventory extends AsyncPagedInventory {
     }
 
     protected void playSound() {
-//		this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
-//				.forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, 100, 1));
+//this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast)
+//.forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, 100, 1));
     }
 
     protected void insertArrowItems() {

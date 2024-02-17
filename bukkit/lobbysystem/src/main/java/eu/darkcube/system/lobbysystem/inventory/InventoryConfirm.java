@@ -40,7 +40,7 @@ public class InventoryConfirm extends LobbyAsyncPagedInventory {
 
     @Override protected void insertFallbackItems() {
         ItemStack l = Item.LIGHT_GRAY_GLASS_PANE.getItem(this.user.user());
-        for (int slot : this.SLOTS) {
+        for (int slot : this.slots) {
             this.fallbackItems.put(slot, l);
         }
         super.insertFallbackItems();

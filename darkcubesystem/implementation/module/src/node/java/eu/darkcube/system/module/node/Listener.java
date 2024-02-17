@@ -7,6 +7,12 @@
 
 package eu.darkcube.system.module.node;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import dev.derklaro.aerogel.Inject;
 import dev.derklaro.aerogel.Singleton;
 import eu.cloudnetservice.driver.event.EventListener;
@@ -15,13 +21,6 @@ import eu.cloudnetservice.driver.util.ModuleHelper;
 import eu.cloudnetservice.node.event.service.CloudServicePreProcessStartEvent;
 import eu.cloudnetservice.node.service.CloudService;
 import eu.darkcube.system.module.DarkCubeSystemModule;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Singleton public class Listener {
 
@@ -37,16 +36,12 @@ import java.util.logging.Logger;
 
     private void copy(CloudService service) {
         try {
-            String pluginJar = pluginJarFileName(service);
+            var pluginJar = pluginJarFileName(service);
             if (pluginJar != null) {
-                Path path = this.getFile(service.pluginDirectory().resolve(DarkCubeSystemModule.PLUGIN_NAME));
+                var path = this.getFile(service.pluginDirectory().resolve(DarkCubeSystemModule.PLUGIN_NAME));
                 copyPlugin(pluginJar, path);
             }
-            moduleHelper.copyJarContainingClass(Listener.class, getFile(service
-                    .directory()
-                    .resolve(".wrapper")
-                    .resolve("modules")
-                    .resolve(DarkCubeSystemModule.PLUGIN_NAME)));
+            moduleHelper.copyJarContainingClass(Listener.class, getFile(service.directory().resolve(".wrapper").resolve("modules").resolve(DarkCubeSystemModule.PLUGIN_NAME)));
         } catch (IOException e) {
             Logger.getGlobal().log(Level.SEVERE, "error during copy for system", e);
         }
@@ -54,7 +49,7 @@ import java.util.logging.Logger;
 
     private void copyPlugin(String pluginJar, Path path) {
         try {
-            InputStream in = getClass().getClassLoader().getResourceAsStream("plugins/" + pluginJar);
+            var in = getClass().getClassLoader().getResourceAsStream("plugins/" + pluginJar);
             if (in == null) throw new AssertionError("Plugin not found: " + pluginJar);
             Files.copy(in, path);
         } catch (IOException e) {
@@ -63,7 +58,7 @@ import java.util.logging.Logger;
     }
 
     private String pluginJarFileName(CloudService service) {
-        ServiceEnvironmentType env = service.serviceId().environment();
+        var env = service.serviceId().environment();
         if (env.equals(ServiceEnvironmentType.MINECRAFT_SERVER)) {
             return "bukkit.jar";
         } else if (env.equals(ServiceEnvironmentType.VELOCITY)) {

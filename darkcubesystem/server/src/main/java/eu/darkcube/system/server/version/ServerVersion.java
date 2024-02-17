@@ -16,5 +16,4 @@ import eu.darkcube.system.version.Version;
     }
 
     @Api int protocolVersion();
-
 }

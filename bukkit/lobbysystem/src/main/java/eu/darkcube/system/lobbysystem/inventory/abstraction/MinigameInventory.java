@@ -4,13 +4,19 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory.abstraction;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.event.events.service.CloudServiceUpdateEvent;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -19,6 +25,7 @@ import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.GameState;
 import eu.darkcube.system.util.data.Key;
@@ -26,12 +33,6 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     public static final Key minigameServer = new Key(Lobby.getInstance(), "minigameserver");

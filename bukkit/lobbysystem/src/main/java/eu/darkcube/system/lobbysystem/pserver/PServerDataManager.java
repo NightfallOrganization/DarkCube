@@ -4,10 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.pserver;
 
 import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -22,6 +22,7 @@ import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Material;
 

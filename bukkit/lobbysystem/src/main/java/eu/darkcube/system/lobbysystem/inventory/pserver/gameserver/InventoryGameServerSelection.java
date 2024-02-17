@@ -4,9 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory.pserver.gameserver;
 
-import eu.darkcube.system.bukkit.inventoryapi.item.ItemBuilder;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
@@ -20,16 +25,12 @@ import eu.darkcube.system.lobbysystem.util.gameregistry.RegistryEntry;
 import eu.darkcube.system.pserver.common.PServerBuilder;
 import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInventory {
 
@@ -50,13 +51,13 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
         this.supplier = supplier;
         this.toItemFunction = toItemFunction;
         this.item = item;
+        //@formatter:off
         this.itemSort = new int[]{
-                //@formatter:off
-				10, 9, 11, 8, 12, 3, 17, 
-				16, 18, 2, 4, 7, 13, 15,
-				19, 1, 5, 14, 20, 0, 6
-				//@formatter:on
+            10, 9, 11, 8, 12, 3, 17,
+            16, 18, 2, 4, 7, 13, 15,
+            19, 1, 5, 14, 20, 0, 6
         };
+        //@formatter:on
         this.done = true;
         this.complete();
     }
