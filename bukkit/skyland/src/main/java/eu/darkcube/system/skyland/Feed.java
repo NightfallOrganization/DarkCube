@@ -92,7 +92,14 @@ public class Feed implements CommandExecutor {
                     skp.setSkylandPlayerClasses(skpc);
                 }
             } else if (args[0].equals("mob")) {
-                CustomZombie customZombie = new CustomZombie(p.getLocation());
+                if (args.length > 1){
+                    for (int i = 0; i < Integer.parseInt(args[1]); i++) {
+                        CustomZombie customZombie = new CustomZombie(p.getLocation());
+                    }
+                }else {
+                    CustomZombie customZombie = new CustomZombie(p.getLocation());
+                }
+
             } else if (args[0].equals("copy")) {
 
                 if (args.length > 1) {
