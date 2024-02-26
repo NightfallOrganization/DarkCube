@@ -89,23 +89,9 @@ public class Skyland extends DarkCubePlugin {
         Bukkit.getPluginManager().registerEvents(AllInventory.getInstance(), instance);
 
         instance.getCommand("test").setExecutor(new Feed());
-       /* instance.getCommand("gm").setExecutor(new GM());
-        instance.getCommand("heal").setExecutor(new Heal());
-        instance.getCommand("day").setExecutor(new Day());
-        instance.getCommand("night").setExecutor(new Night());
-        instance.getCommand("fly").setExecutor(new Fly());
-        instance.getCommand("max").setExecutor(new Max());
-        instance.getCommand("god").setExecutor(new God());
-        instance.getCommand("trash").setExecutor(new Trash());
-        instance.getCommand("world").setExecutor(new WorldX());
-        instance.getCommand("getitem").setExecutor(new GetItem());
-        instance.getCommand("getgui").setExecutor(new GetGUI());*/
 
         CommandAPI.getInstance().register(new SkylandGeneratorCommand(this));
 
-        TrainingStand trainingStand = new TrainingStand();
-        instance.getCommand("spawntrainingstand").setExecutor(trainingStand);
-        Bukkit.getPluginManager().registerEvents(trainingStand, this);
 
         new BukkitRunnable() {
             @Override
