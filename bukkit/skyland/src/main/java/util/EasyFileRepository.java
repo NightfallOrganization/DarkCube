@@ -41,6 +41,7 @@ public class EasyFileRepository<T> {
 
         if (!file.exists()) {
             System.out.println("no File found with file name: " + fileName);
+            return null;
         }
 
 
