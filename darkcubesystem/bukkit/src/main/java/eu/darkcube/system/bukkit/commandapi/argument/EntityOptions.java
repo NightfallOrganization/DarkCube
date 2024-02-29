@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.MathHelper;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.commandapi.util.MinMaxBounds;

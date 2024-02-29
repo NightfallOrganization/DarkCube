@@ -11,7 +11,12 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.pserver.plugin.link.Link;
-import eu.darkcube.system.pserver.plugin.link.woolbattle.command.*;
+import eu.darkcube.system.pserver.plugin.link.woolbattle.command.ForceMapCommand;
+import eu.darkcube.system.pserver.plugin.link.woolbattle.command.ReviveCommand;
+import eu.darkcube.system.pserver.plugin.link.woolbattle.command.SetLifesCommand;
+import eu.darkcube.system.pserver.plugin.link.woolbattle.command.SetTeamCommand;
+import eu.darkcube.system.pserver.plugin.link.woolbattle.command.TimerCommand;
+import eu.darkcube.system.pserver.plugin.link.woolbattle.command.TrollCommand;
 
 public class WoolBattleLink extends Link {
 
@@ -20,7 +25,7 @@ public class WoolBattleLink extends Link {
     }
 
     @Override protected void link() throws Throwable {
-        WoolBattleBukkit api = WoolBattleBukkit.instance();
+        var api = WoolBattleBukkit.instance();
         StatsLink.enabled = false;
         CommandAPI.instance().unregisterPrefixlessByPrefix("woolbattle");
         CommandAPI.instance().register(new ForceMapCommand(api));

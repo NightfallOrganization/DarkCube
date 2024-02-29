@@ -4,11 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.bukkit.commandapi;
 
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.bukkit.version.BukkitVersion;
-import eu.darkcube.system.version.Version;
 
 public class CommandAPI {
 
@@ -24,6 +24,8 @@ public class CommandAPI {
     }
 
     /**
+     * Deprecated in favor of {@link #instance()}.
+     *
      * @see #instance()
      */
     @Deprecated(forRemoval = true) public static CommandAPI getInstance() {

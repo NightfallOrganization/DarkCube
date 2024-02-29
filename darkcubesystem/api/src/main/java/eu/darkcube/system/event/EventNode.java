@@ -7,17 +7,17 @@
 
 package eu.darkcube.system.event;
 
-import eu.darkcube.system.annotations.ThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import eu.darkcube.system.annotations.ThreadSafe;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a single node in an event graph.
@@ -54,8 +54,7 @@ import java.util.function.Predicate;
      * @param <E>    The resulting event type of the node
      * @return A node with just an event type filter
      */
-    @Contract(value = "_, _ -> new", pure = true)
-    static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter) {
+    @Contract(value = "_, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter) {
         return create(name, filter, null);
     }
 
@@ -78,8 +77,7 @@ import java.util.function.Predicate;
      * @param <E>       The resulting event type of the node
      * @return A node with an event type filter as well as a condition on the event.
      */
-    @Contract(value = "_, _, _ -> new", pure = true)
-    static <E, V> @NotNull EventNode<E> event(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<E> predicate) {
+    @Contract(value = "_, _, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> event(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<E> predicate) {
         return create(name, filter, (e, h) -> predicate.test(e));
     }
 
@@ -104,8 +102,7 @@ import java.util.function.Predicate;
      * @param <V>       The handler type of the event filter
      * @return A node with an event type filter as well as a condition on the event.
      */
-    @Contract(value = "_, _, _ -> new", pure = true)
-    static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull BiPredicate<E, V> predicate) {
+    @Contract(value = "_, _, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull BiPredicate<E, V> predicate) {
         return create(name, filter, predicate);
     }
 
@@ -127,8 +124,7 @@ import java.util.function.Predicate;
      * @param <V>       The handler type of the event filter
      * @return A node with an event type filter as well as a condition on the event.
      */
-    @Contract(value = "_, _, _ -> new", pure = true)
-    static <E, V> @NotNull EventNode<E> value(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<V> predicate) {
+    @Contract(value = "_, _, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> value(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<V> predicate) {
         return create(name, filter, (e, h) -> predicate.test(h));
     }
 
@@ -267,8 +263,7 @@ import java.util.function.Predicate;
 
     @Contract(value = "_ -> this") @NotNull EventNode<T> addListener(@NotNull EventListener<? extends T> listener);
 
-    @Contract(value = "_, _ -> this")
-    default <E extends T> @NotNull EventNode<T> addListener(@NotNull Class<E> eventType, @NotNull Consumer<@NotNull E> listener) {
+    @Contract(value = "_, _ -> this") default <E extends T> @NotNull EventNode<T> addListener(@NotNull Class<E> eventType, @NotNull Consumer<@NotNull E> listener) {
         return addListener(EventListener.of(eventType, listener));
     }
 

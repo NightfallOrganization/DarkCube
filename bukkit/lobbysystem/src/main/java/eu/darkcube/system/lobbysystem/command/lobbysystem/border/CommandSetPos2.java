@@ -9,7 +9,7 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
+import eu.darkcube.system.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
@@ -23,14 +23,7 @@ import org.bukkit.Location;
 public class CommandSetPos2 extends LobbyCommand {
 
     public CommandSetPos2() {
-        super("setPos2", b -> b
-                .executes(ctx -> cmd(ctx, ctx.getSource().asPlayer().getLocation()))
-                .then(Commands
-                        .argument("makenice", BooleanArgument.booleanArgument())
-                        .executes(ctx -> cmd(ctx, BooleanArgument.getBoolean(ctx, "makenice") ? Locations.getNiceLocation(ctx
-                                .getSource()
-                                .asPlayer()
-                                .getLocation()) : ctx.getSource().asPlayer().getLocation()))));
+        super("setPos2", b -> b.executes(ctx -> cmd(ctx, ctx.getSource().asPlayer().getLocation())).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> cmd(ctx, BooleanArgument.getBoolean(ctx, "makenice") ? Locations.getNiceLocation(ctx.getSource().asPlayer().getLocation()) : ctx.getSource().asPlayer().getLocation()))));
     }
 
     private static int cmd(CommandContext<CommandSource> ctx, Location loc) {

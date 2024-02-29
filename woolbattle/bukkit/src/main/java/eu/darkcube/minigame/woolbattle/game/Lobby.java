@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.game;
 
 import eu.darkcube.minigame.woolbattle.Config;
@@ -239,12 +240,7 @@ public class Lobby extends GamePhase {
     }
 
     public void recalculateMap() {
-        @NotNull eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values(), woolbattle
-                .mapManager()
-                .getMaps(woolbattle.gameData().mapSize())
-                .stream()
-                .filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
-                .collect(Collectors.toSet()), woolbattle.gameData().map());
+        @NotNulleu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values(), woolbattle.mapManager().getMaps(woolbattle.gameData().mapSize()).stream().filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled).collect(Collectors.toSet()), woolbattle.gameData().map());
 
         woolbattle.gameData().votedMap(map);
     }
@@ -267,9 +263,7 @@ public class Lobby extends GamePhase {
     }
 
     public Location getSpawn() {
-        if (this.spawn == null) this.spawn = woolbattle
-                .persistentDataStorage()
-                .get(Config.SPAWN, BukkitPersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
+        if (this.spawn == null) this.spawn = woolbattle.persistentDataStorage().get(Config.SPAWN, BukkitPersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
         return this.spawn.clone();
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -25,14 +25,14 @@ public class LocationInput implements ILocationArgument {
     }
 
     public static LocationInput parseInt(StringReader reader) throws CommandSyntaxException {
-        int i = reader.getCursor();
-        LocationPart locationpart = LocationPart.parseInt(reader);
+        var i = reader.getCursor();
+        var locationpart = LocationPart.parseInt(reader);
         if (reader.canRead() && reader.peek() == ' ') {
             reader.skip();
-            LocationPart locationpart1 = LocationPart.parseInt(reader);
+            var locationpart1 = LocationPart.parseInt(reader);
             if (reader.canRead() && reader.peek() == ' ') {
                 reader.skip();
-                LocationPart locationpart2 = LocationPart.parseInt(reader);
+                var locationpart2 = LocationPart.parseInt(reader);
                 return new LocationInput(locationpart, locationpart1, locationpart2);
             }
             reader.setCursor(i);
@@ -43,14 +43,14 @@ public class LocationInput implements ILocationArgument {
     }
 
     public static LocationInput parseDouble(StringReader reader, boolean centerIntegers) throws CommandSyntaxException {
-        int i = reader.getCursor();
-        LocationPart locationpart = LocationPart.parseDouble(reader, centerIntegers);
+        var i = reader.getCursor();
+        var locationpart = LocationPart.parseDouble(reader, centerIntegers);
         if (reader.canRead() && reader.peek() == ' ') {
             reader.skip();
-            LocationPart locationpart1 = LocationPart.parseDouble(reader, false);
+            var locationpart1 = LocationPart.parseDouble(reader, false);
             if (reader.canRead() && reader.peek() == ' ') {
                 reader.skip();
-                LocationPart locationpart2 = LocationPart.parseDouble(reader, centerIntegers);
+                var locationpart2 = LocationPart.parseDouble(reader, centerIntegers);
                 return new LocationInput(locationpart, locationpart1, locationpart2);
             }
             reader.setCursor(i);
@@ -65,12 +65,12 @@ public class LocationInput implements ILocationArgument {
     }
 
     @Override public Vector3d getPosition(CommandSource source) {
-        Vector3d vector3d = source.getPos();
+        var vector3d = source.getPos();
         return new Vector3d(this.x.get(vector3d.x), this.y.get(vector3d.y), this.z.get(vector3d.z));
     }
 
     @Override public Vector2f getRotation(CommandSource source) {
-        Vector2f vector2f = source.getRotation();
+        var vector2f = source.getRotation();
         return new Vector2f((float) this.x.get(vector2f.x), (float) this.y.get(vector2f.y));
     }
 
@@ -92,7 +92,7 @@ public class LocationInput implements ILocationArgument {
         } else if (!(p_equals_1_ instanceof LocationInput)) {
             return false;
         } else {
-            LocationInput locationinput = (LocationInput) p_equals_1_;
+            var locationinput = (LocationInput) p_equals_1_;
             if (!this.x.equals(locationinput.x)) {
                 return false;
             }
@@ -101,7 +101,7 @@ public class LocationInput implements ILocationArgument {
     }
 
     @Override public int hashCode() {
-        int i = this.x.hashCode();
+        var i = this.x.hashCode();
         i = 31 * i + this.y.hashCode();
         return 31 * i + this.z.hashCode();
     }

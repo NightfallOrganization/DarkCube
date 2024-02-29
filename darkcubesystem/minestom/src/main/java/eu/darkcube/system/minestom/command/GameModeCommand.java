@@ -29,14 +29,10 @@ public class GameModeCommand extends Command {
         var targetsArgumentType = ArgumentType.Entity("targets").onlyPlayers(true);
 
         setCondition((sender, commandString) -> sender instanceof ConsoleSender || sender.hasPermission("command.gamemode") || (sender instanceof Player player && player.getPermissionLevel() >= 2));
-        gamemodeArgumentType.setCallback((sender, exception) -> MinestomCommandExecutor
-                .create(sender)
-                .sendMessage(Message.INVALID_GAMEMODE, exception.getInput()));
+        gamemodeArgumentType.setCallback((sender, exception) -> MinestomCommandExecutor.create(sender).sendMessage(Message.INVALID_GAMEMODE, exception.getInput()));
 
         addConditionalSyntax((sender, commandString) -> sender instanceof Player, (sender, context) -> gamemode(sender, context.get(gamemodeArgumentType), List.of((Player) sender)), gamemodeArgumentType);
-        addSyntax((sender, context) -> gamemode(sender, context.get(gamemodeArgumentType), context
-                .get(targetsArgumentType)
-                .find(sender)), gamemodeArgumentType, targetsArgumentType);
+        addSyntax((sender, context) -> gamemode(sender, context.get(gamemodeArgumentType), context.get(targetsArgumentType).find(sender)), gamemodeArgumentType, targetsArgumentType);
     }
 
     private void gamemode(CommandSender sender, GameMode gameMode, List<Entity> targets) {

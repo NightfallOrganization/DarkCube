@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.bukkit.commandapi.argument;
 
+import java.util.concurrent.CompletableFuture;
+
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -19,8 +21,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-
-import java.util.concurrent.CompletableFuture;
 
 public class WorldArgument implements ArgumentType<World> {
 
@@ -38,8 +38,8 @@ public class WorldArgument implements ArgumentType<World> {
     }
 
     @Override public World parse(StringReader reader) throws CommandSyntaxException {
-        String worldname = reader.readString();
-        for (World world : Bukkit.getWorlds()) {
+        var worldname = reader.readString();
+        for (var world : Bukkit.getWorlds()) {
             if (world.getName().equals(worldname)) {
                 return world;
             }

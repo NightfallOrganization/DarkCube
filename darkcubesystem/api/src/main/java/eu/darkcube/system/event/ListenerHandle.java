@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
      * May trigger an update if the cached data is not correct.
      * <p>
      * Useful if you are able to avoid expensive computation in the case where
-     * the event is unused. Be aware that {@link #call(Event)}
+     * the event is unused. Be aware that {@link #call(E)}
      * has similar optimization built-in.
      *
      * @return true if the event has 1 or more listeners

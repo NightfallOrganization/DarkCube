@@ -8,4 +8,5 @@
 package eu.darkcube.minigame.woolbattle.api.world;
 
 public interface World {
+    Block blockAt(int x, int y, int z);
 }

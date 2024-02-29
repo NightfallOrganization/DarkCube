@@ -8,8 +8,9 @@
 package eu.darkcube.minigame.woolbattle.api;
 
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.util.data.Key;
 
-@Api public interface WoolBattleApi {
+@Api public interface WoolBattleApi extends Key.Named {
     @Api static WoolBattleApi instance() {
         return WoolBattleApiHolder.instance;
     }

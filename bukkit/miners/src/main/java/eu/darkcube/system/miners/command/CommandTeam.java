@@ -9,7 +9,7 @@ package eu.darkcube.system.miners.command;
 
 import eu.darkcube.system.bukkit.commandapi.Command;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
+import eu.darkcube.system.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.miners.player.Message;

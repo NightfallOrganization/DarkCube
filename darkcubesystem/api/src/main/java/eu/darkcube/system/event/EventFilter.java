@@ -7,14 +7,14 @@
 
 package eu.darkcube.system.event;
 
+import java.util.function.Function;
+
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
-import java.util.function.Function;
-
 /**
- * Represents a filter for a specific {@link Event} type.
+ * Represents a filter for a specific Event type.
  * <p>
  * The handler represents a "target" of the event. This can be used
  * to create filters for all events of a specific type using information

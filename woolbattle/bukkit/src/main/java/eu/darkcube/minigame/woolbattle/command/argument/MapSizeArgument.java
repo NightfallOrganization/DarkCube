@@ -7,10 +7,13 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
@@ -18,9 +21,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
 
 public class MapSizeArgument implements ArgumentType<MapSize> {
     private static final DynamicCommandExceptionType TYPE_INVALID_SIZE = Message.INVALID_MAP_SIZE.newDynamicCommandExceptionType();
@@ -44,16 +44,14 @@ public class MapSizeArgument implements ArgumentType<MapSize> {
         return context.getArgument(name, MapSize.class);
     }
 
-    @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         return ISuggestionProvider.suggest(woolbattle.knownMapSizes().stream().map(MapSize::toString).distinct(), builder);
     }
 
-    @Override
-    public MapSize parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
-        String s = reader.readString();
-        String[] a = s.split("x");
+    @Override public MapSize parse(StringReader reader) throws CommandSyntaxException {
+        var cursor = reader.getCursor();
+        var s = reader.readString();
+        var a = s.split("x");
         if (a.length != 2) {
             reader.setCursor(cursor);
             throw TYPE_INVALID_SIZE.createWithContext(reader, s);
@@ -67,7 +65,7 @@ public class MapSizeArgument implements ArgumentType<MapSize> {
             reader.setCursor(cursor);
             throw TYPE_INVALID_SIZE.createWithContext(reader, s);
         }
-        MapSize mapSize = new MapSize(teams, teamSize);
+        var mapSize = new MapSize(teams, teamSize);
         if (!validate.test(mapSize)) {
             reader.setCursor(cursor);
             throw TYPE_INVALID_SIZE.createWithContext(reader, s);

@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.user;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -31,9 +32,9 @@ public class WBUserModifier implements UserModifier {
 
     @SuppressWarnings("DataFlowIssue") @Override public void onLoad(User user) {
         user.persistentData().clearCache();
-        DefaultWBUser u = new DefaultWBUser(woolbattle, user);
-        int oldDataVersion = 0;
-        int dataVersion = 0;
+        var u = new DefaultWBUser(woolbattle, user);
+        var oldDataVersion = 0;
+        var dataVersion = 0;
         if (user.persistentData().has(DATA_VERSION)) {
             oldDataVersion = dataVersion = user.persistentData().get(DATA_VERSION, PersistentDataTypes.INTEGER);
         }
@@ -59,7 +60,7 @@ public class WBUserModifier implements UserModifier {
 
     private void migrateFrom1To2(DefaultWBUser user) {
         logger.info("[WoolBattle] Migrating user " + user.user().name() + " from version 1 to 2");
-        PlayerPerks perks = user.perksStorage();
+        var perks = user.perksStorage();
         perks.perk(ActivationType.DOUBLE_JUMP, 0, DoubleJumpPerk.DOUBLE_JUMP);
         perks.perkInvSlot(ActivationType.DOUBLE_JUMP, 0, -1);
         user.perksStorage(perks);

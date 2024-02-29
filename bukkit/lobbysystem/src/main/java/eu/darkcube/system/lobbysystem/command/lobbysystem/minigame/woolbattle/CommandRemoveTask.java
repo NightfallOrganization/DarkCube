@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
+import java.util.concurrent.CompletableFuture;
+
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -22,40 +24,31 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-
 public class CommandRemoveTask extends LobbyCommand {
 
-	private static final DynamicCommandExceptionType TASK_NOT_PRESENT =
-			Messages.SERVICE_TASK_NOT_PRESENT.newDynamicCommandExceptionType();
+    private static final DynamicCommandExceptionType TASK_NOT_PRESENT = Messages.SERVICE_TASK_NOT_PRESENT.newDynamicCommandExceptionType();
 
-	public CommandRemoveTask() {
-		super("removeTask", b -> b.then(Commands.argument("task", new ArgumentType<String>() {
-			@Override
-			public String parse(StringReader reader) throws CommandSyntaxException {
-				String task = reader.readString();
-				if (!Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(task)) {
-					throw TASK_NOT_PRESENT.createWithContext(reader, task);
-				}
-				return task;
-			}
+    public CommandRemoveTask() {
+        super("removeTask", b -> b.then(Commands.argument("task", new ArgumentType<String>() {
+            @Override public String parse(StringReader reader) throws CommandSyntaxException {
+                var task = reader.readString();
+                if (!Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(task)) {
+                    throw TASK_NOT_PRESENT.createWithContext(reader, task);
+                }
+                return task;
+            }
 
-			@Override
-			public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
-					SuggestionsBuilder builder) {
-				return ISuggestionProvider.suggest(
-						Lobby.getInstance().getDataManager().getWoolBattleTasks(), builder);
-			}
-		}).executes(ctx -> {
-			String task = ctx.getArgument("task", String.class);
-			Set<String> tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
-			tasks.remove(task);
-			Lobby.getInstance().getDataManager().setWoolBattleTasks(tasks);
-			ctx.getSource().sendMessage(
-					Component.text("Task erfolgreich entfernt!").color(NamedTextColor.GREEN));
-			return 0;
-		})));
-	}
+            @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+                return ISuggestionProvider.suggest(Lobby.getInstance().getDataManager().getWoolBattleTasks(), builder);
+            }
+        }).executes(ctx -> {
+            var task = ctx.getArgument("task", String.class);
+            var tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
+            tasks.remove(task);
+            Lobby.getInstance().getDataManager().setWoolBattleTasks(tasks);
+            ctx.getSource().sendMessage(Component.text("Task erfolgreich entfernt!").color(NamedTextColor.GREEN));
+            return 0;
+        })));
+    }
 
 }

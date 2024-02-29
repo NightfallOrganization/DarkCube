@@ -27,7 +27,7 @@ public class LineBuilderPerk extends Perk {
     public static final PerkName LINE_BUILDER = new PerkName("LINE_BUILDER");
 
     public LineBuilderPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, LINE_BUILDER, new Cooldown(Unit.TICKS, 10 * 20), true, 2, CostType.PER_BLOCK, Item.PERK_LINE_BUILDER, (user, perk, id, perkSlot, wb) -> new LineBuilderUserPerk(user, id, perkSlot, perk, woolbattle));
+        super(ActivationType.ACTIVE, LINE_BUILDER, new Cooldown(Unit.TICKS, 10 * 20), true, 2, Item.PERK_LINE_BUILDER, (user, perk, id, perkSlot, wb) -> new LineBuilderUserPerk(user, id, perkSlot, perk, woolbattle));
         addListener(new ListenerLineBuilder(this, woolbattle));
     }
 

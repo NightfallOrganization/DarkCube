@@ -9,12 +9,12 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.commandapi.util.Vector2f;
-import eu.darkcube.system.commandapi.util.Vector3d;
-import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.ILocationArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.RotationArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.Vec3Argument;
+import eu.darkcube.system.commandapi.argument.BooleanArgument;
+import eu.darkcube.system.commandapi.util.Vector2f;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
@@ -28,34 +28,19 @@ public class CommandSetPlate extends LobbyCommand {
 
     public CommandSetPlate() {
         super("setPlate", b -> {
-            b
-                    .then(Commands
-                            .argument("location", Vec3Argument.vec3())
-                            .executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), null, false))
-                            .then(Commands
-                                    .argument("rotation", RotationArgument.rotation())
-                                    .executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), false))
-                                    .then(Commands
-                                            .argument("makenice", BooleanArgument.booleanArgument())
-                                            .executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), BooleanArgument.getBoolean(ctx, "makenice")))))
-                            .then(Commands
-                                    .argument("makenice", BooleanArgument.booleanArgument())
-                                    .executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), null, BooleanArgument.getBoolean(ctx, "makenice")))))
-                    .then(Commands
-                            .argument("makenice", BooleanArgument.booleanArgument())
-                            .executes(ctx -> setPlate(ctx, null, null, BooleanArgument.getBoolean(ctx, "makenice"))));
+            b.then(Commands.argument("location", Vec3Argument.vec3()).executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), null, false)).then(Commands.argument("rotation", RotationArgument.rotation()).executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), false)).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), BooleanArgument.getBoolean(ctx, "makenice"))))).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> setPlate(ctx, Vec3Argument.getLocation(ctx, "location"), null, BooleanArgument.getBoolean(ctx, "makenice"))))).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> setPlate(ctx, null, null, BooleanArgument.getBoolean(ctx, "makenice"))));
         });
     }
 
     private static int setPlate(CommandContext<CommandSource> context, ILocationArgument location, ILocationArgument rotation, boolean makenice) {
-        Vector3d pos = location == null ? pos(context.getSource().getEntity().getLocation()) : location.getPosition(context.getSource());
-        Vector2f rot = rotation == null ? rot(context.getSource().getEntity().getLocation()) : location.getRotation(context.getSource());
-        Location loc = new Location(context.getSource().getEntity().getWorld(), pos.x, pos.y, pos.z, rot.x, rot.y);
+        var pos = location == null ? pos(context.getSource().getEntity().getLocation()) : location.getPosition(context.getSource());
+        var rot = rotation == null ? rot(context.getSource().getEntity().getLocation()) : location.getRotation(context.getSource());
+        var loc = new Location(context.getSource().getEntity().getWorld(), pos.x, pos.y, pos.z, rot.x, rot.y);
         if (makenice) {
             loc = Locations.getNiceLocation(loc);
             context.getSource().getEntity().teleport(loc);
         }
-        Material m = loc.getBlock().getType();
+        var m = loc.getBlock().getType();
         if (m == Material.IRON_PLATE || m == Material.GOLD_PLATE || m == Material.WOOD_PLATE || m == Material.STONE_PLATE) {
             Lobby.getInstance().getDataManager().setJumpAndRunPlate(loc.getBlock().getLocation());
             context.getSource().sendMessage(Component.text("Platte neugesetzt!").color(NamedTextColor.GREEN));

@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.command.argument;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.team.Team;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -51,7 +51,7 @@ public class TeamArgument implements ArgumentType<Team> {
     }
 
     @Override public Team parse(StringReader reader) throws CommandSyntaxException {
-        String dnk = reader.readString();
+        var dnk = reader.readString();
         var team = teams()
                 .filter(t -> !t.isSpectator() || spectator)
                 .filter(t -> t.getType().getDisplayNameKey().equals(dnk))
@@ -66,7 +66,7 @@ public class TeamArgument implements ArgumentType<Team> {
     }
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        Stream<String> suggestions = teams().filter(t -> {
+        var suggestions = teams().filter(t -> {
             if (!spectator) return !t.isSpectator();
             return true;
         }).map(t -> t.getType().getDisplayNameKey());
