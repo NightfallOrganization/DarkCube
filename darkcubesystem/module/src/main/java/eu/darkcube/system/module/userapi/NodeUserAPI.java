@@ -15,7 +15,10 @@ import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.registry.ServiceRegistry;
 import eu.cloudnetservice.modules.bridge.player.CloudOfflinePlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
+import eu.darkcube.system.module.userapi.handler.HandlerPlayerLogin;
 import eu.darkcube.system.userapi.*;
+import eu.darkcube.system.userapi.packets.PacketNWUpdateName;
+import eu.darkcube.system.userapi.packets.PacketWNPlayerLogin;
 
 import java.util.UUID;
 
@@ -29,16 +32,28 @@ import java.util.UUID;
         this.playerManager = serviceRegistry.firstProvider(PlayerManager.class);
         this.database = databaseProvider.database("userapi_users");
         this.dataSaver = new NodeDataSaver(this.database);
+        this.packetHandlers.handlerGroup().registerHandler(PacketWNPlayerLogin.class, new HandlerPlayerLogin(this));
+    }
+
+    public void updateName(UUID uniqueId, String playerName) {
+        var user = user(uniqueId);
+        user.userData().name(playerName);
+        ((UserLocalPersistentDataStorage) user.persistentData()).name(playerName);
+        new PacketNWUpdateName(uniqueId, playerName).sendAsync();
     }
 
     @Override protected CommonUser loadUser(UUID uniqueId) {
         Document data = this.database.get(uniqueId.toString());
         if (data == null) data = Document.emptyDocument();
-        String name;
-        CloudOfflinePlayer offlinePlayer = this.playerManager.offlinePlayer(uniqueId);
-        if (offlinePlayer != null) name = offlinePlayer.name();
-        else if (data.contains("name")) name = data.getString("name");
-        else name = uniqueId.toString().substring(0, 16);
+        String name = data.getString("name");
+        if (name != null && uniqueId.toString().startsWith(name)) name = null;
+        if (name == null) {
+            CloudOfflinePlayer offlinePlayer = this.playerManager.offlinePlayer(uniqueId);
+            if (offlinePlayer != null) name = offlinePlayer.name();
+        }
+        if (name == null) {
+            name = uniqueId.toString().substring(0, 16);
+        }
         CommonPersistentDataStorage persistentData = new UserLocalPersistentDataStorage(uniqueId, name, data.readDocument("persistentData"));
         persistentData.addUpdateNotifier(this.dataSaver.saveNotifier());
         CommonUserData userData = new CommonUserData(uniqueId, name, persistentData);

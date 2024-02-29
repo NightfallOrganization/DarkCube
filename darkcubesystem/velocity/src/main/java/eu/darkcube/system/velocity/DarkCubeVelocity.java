@@ -9,6 +9,8 @@ package eu.darkcube.system.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
@@ -17,6 +19,7 @@ import com.viaversion.viaversion.api.Via;
 import eu.darkcube.system.internal.PacketDeclareProtocolVersion;
 import eu.darkcube.system.internal.PacketRequestProtocolVersionDeclaration;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.userapi.packets.PacketWNPlayerLogin;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
@@ -38,5 +41,9 @@ public class DarkCubeVelocity {
             return null;
         });
         new PacketRequestProtocolVersionDeclaration().sendAsync();
+    }
+
+    @Subscribe public void handle(LoginEvent event) {
+        new PacketWNPlayerLogin(event.getPlayer().getUniqueId(), event.getPlayer().getUsername()).sendQuery(PacketWNPlayerLogin.Response.class);
     }
 }

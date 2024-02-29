@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(parent!!.project("api"))
+    compileOnly(parent!!.project("common"))
     compileOnly(libs.cloudnetDriver)
     compileOnly(libs.viaversion.velocity)
     compileOnly(libs.viaversion.bukkit)

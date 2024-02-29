@@ -41,6 +41,10 @@ public class UserLocalPacketHandlers {
         });
     }
 
+    public HandlerGroup handlerGroup() {
+        return handlerGroup;
+    }
+
     public void registerHandlers() {
         PacketAPI.getInstance().registerGroup(handlerGroup);
     }

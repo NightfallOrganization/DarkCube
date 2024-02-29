@@ -20,7 +20,7 @@ public class CommonUserData implements UserData {
     public static final Key CUBES_KEY = new Key("UserAPI", "cubes");
     public static final PersistentDataType<BigInteger> CUBES_TYPE = PersistentDataTypes.BIGINTEGER;
     private final UUID uniqueId;
-    private final String name;
+    private volatile String name;
     private final MetaDataStorage metadata;
     private final CommonPersistentDataStorage persistentData;
 
@@ -61,5 +61,9 @@ public class CommonUserData implements UserData {
 
     @Override public @NotNull CommonPersistentDataStorage persistentData() {
         return persistentData;
+    }
+
+    public void name(String name) {
+        this.name = name;
     }
 }

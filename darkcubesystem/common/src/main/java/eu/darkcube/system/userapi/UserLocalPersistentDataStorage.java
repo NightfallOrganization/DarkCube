@@ -30,7 +30,7 @@ public class UserLocalPersistentDataStorage implements CommonPersistentDataStora
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final UUID uniqueId;
-    private final String name;
+    private volatile String name;
     private final Document.Mutable data = Document.newJsonDocument();
     private final Map<Key, Object> cache = new HashMap<>();
     private final Collection<@NotNull UpdateNotifier> updateNotifiers = new CopyOnWriteArrayList<>();
@@ -43,6 +43,10 @@ public class UserLocalPersistentDataStorage implements CommonPersistentDataStora
 
     public String name() {
         return name;
+    }
+
+    public void name(String name) {
+        this.name = name;
     }
 
     public UUID uniqueId() {

@@ -9,6 +9,7 @@ package eu.darkcube.system.userapi;
 
 import eu.darkcube.system.packetapi.HandlerGroup;
 import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.userapi.packets.PacketNWUpdateName;
 import eu.darkcube.system.userapi.packets.PacketNWUserPersistentDataMerge;
 import eu.darkcube.system.userapi.packets.PacketNWUserPersistentDataRemove;
 import eu.darkcube.system.userapi.packets.PacketNWUserPersistentDataUpdate;
@@ -33,6 +34,13 @@ public class CommonRemoteUserPacketHandler {
         });
         this.handlerGroup.registerHandler(PacketNWUserPersistentDataMerge.class, packet -> {
             ifPresent(packet.uniqueId(), packet, (storage, data) -> storage.merge(packet.data()));
+            return null;
+        });
+        this.handlerGroup.registerHandler(PacketNWUpdateName.class, packet -> {
+            var user = api.userCache.getIfPresent(packet.uniqueId());
+            if (user != null) {
+                user.userData().name(packet.playerName());
+            }
             return null;
         });
     }
