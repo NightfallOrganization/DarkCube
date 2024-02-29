@@ -1,14 +1,16 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.bukkit.commandapi.argument;
+package eu.darkcube.system.commandapi.argument;
 
-import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -17,11 +19,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class UUIDArgument implements ArgumentType<UUID> {
 
@@ -31,12 +28,12 @@ public class UUIDArgument implements ArgumentType<UUID> {
         return new UUIDArgument();
     }
 
-    public static UUID getUUID(CommandContext<CommandSource> context, String name) {
+    public static UUID getUUID(CommandContext<?> context, String name) {
         return context.getArgument(name, UUID.class);
     }
 
     @Override public UUID parse(StringReader r) throws CommandSyntaxException {
-        String s = r.readUnquotedString();
+        var s = r.readUnquotedString();
         try {
             return UUID.fromString(s);
         } catch (Exception ex) {
@@ -45,6 +42,8 @@ public class UUIDArgument implements ArgumentType<UUID> {
     }
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return ISuggestionProvider.suggest(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).map(UUID::toString), builder);
+        if (!(context.getSource() instanceof ISuggestionProvider)) return builder.buildFuture();
+
+        return ISuggestionProvider.suggest(((ISuggestionProvider) context.getSource()).getPlayerUniqueIds().stream().map(UUID::toString), builder);
     }
 }

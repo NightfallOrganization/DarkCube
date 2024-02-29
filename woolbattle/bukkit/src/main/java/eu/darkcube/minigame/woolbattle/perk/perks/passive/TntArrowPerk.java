@@ -25,7 +25,7 @@ public class TntArrowPerk extends Perk {
     public static final PerkName TNT_ARROW = new PerkName("TNT_ARROW");
 
     public TntArrowPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.PASSIVE, TNT_ARROW, new Cooldown(Unit.ACTIVATIONS, 7), false, 16, CostType.PER_SHOT, Item.PERK_TNT_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_TNT_ARROW_COOLDOWN, wb));
+        super(ActivationType.PASSIVE, TNT_ARROW, new Cooldown(Unit.ACTIVATIONS, 7), false, 16, Item.PERK_TNT_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_TNT_ARROW_COOLDOWN, wb));
         addListener(new TntArrowListener(woolbattle));
     }
 

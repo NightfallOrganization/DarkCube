@@ -5,8 +5,9 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.commandapi;
+package eu.darkcube.minigame.woolbattle.api.util.translation;
 
-public class CommandSource {
+import eu.darkcube.system.BaseMessage;
 
+public interface Message extends BaseMessage {
 }

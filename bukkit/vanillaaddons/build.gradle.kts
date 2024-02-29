@@ -15,7 +15,7 @@ tasks {
         relocate("net.wesjd.anvilgui", "eu.darkcube.system.vanillaaddons.libs.net.wesjd.anvilgui")
     }
     jar.configure {
-        archiveClassifier = "pure"
+        destinationDirectory = temporaryDir
     }
     assemble.configure {
         dependsOn(shadowJar)

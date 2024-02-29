@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.entity.EntityDespawnEvent;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
-import net.minestom.server.instance.Chunk;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.instance.Instance;
 
 public class ChunkUnloader {
@@ -22,6 +22,10 @@ public class ChunkUnloader {
     public static void entityDespawn(EntityDespawnEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         lastInstance.put(player, event.getInstance());
+    }
+
+    public static void playerDisconnect(PlayerDisconnectEvent event) {
+        lastInstance.remove(event.getPlayer());
     }
 
     public static void playerChunkUnload(PlayerChunkUnloadEvent event) {

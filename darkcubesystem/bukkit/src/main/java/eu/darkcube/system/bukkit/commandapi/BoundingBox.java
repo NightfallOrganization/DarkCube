@@ -7,6 +7,11 @@
 
 package eu.darkcube.system.bukkit.commandapi;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import eu.darkcube.system.bukkit.version.BukkitVersion;
 import eu.darkcube.system.commandapi.util.Direction;
 import eu.darkcube.system.commandapi.util.MathHelper;
@@ -17,17 +22,17 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 public class BoundingBox {
 
-    private double minX, minY, minZ, maxX, maxY, maxZ;
+    private double minX;
+    private double minY;
+    private double minZ;
+    private double maxX;
+    private double maxY;
+    private double maxZ;
 
     public BoundingBox(Entity entity) {
-        double[] d = BukkitVersion.version().commandApiUtils().getEntityBB(entity);
+        var d = BukkitVersion.version().commandApiUtils().getEntityBB(entity);
         this.minX = d[0];
         this.minY = d[1];
         this.minZ = d[2];
@@ -94,9 +99,9 @@ public class BoundingBox {
     }
 
     private static Direction checkSideForHit(double[] minDistance, double distanceSide, double distanceOtherA, double distanceOtherB, double minSide, double minOtherA, double maxOtherA, double minOtherB, double maxOtherB, Direction hitSide, double startSide, double startOtherA, double startOtherB) {
-        double d0 = (minSide - startSide) / distanceSide;
-        double d1 = startOtherA + d0 * distanceOtherA;
-        double d2 = startOtherB + d0 * distanceOtherB;
+        var d0 = (minSide - startSide) / distanceSide;
+        var d1 = startOtherA + d0 * distanceOtherA;
+        var d2 = startOtherB + d0 * distanceOtherB;
         if (0.0D < d0 && d0 < minDistance[0] && minOtherA - 1.0E-7D < d1 && d1 < maxOtherA + 1.0E-7D && minOtherB - 1.0E-7D < d2 && d2 < maxOtherB + 1.0E-7D) {
             minDistance[0] = d0;
             return hitSide;
@@ -110,7 +115,7 @@ public class BoundingBox {
 
     public List<Entity> getEntitiesWithin(World world, EntityType type, Predicate<Entity> filter) {
         List<Entity> list = new ArrayList<>();
-        for (Entity ent : world.getEntities()) {
+        for (var ent : world.getEntities()) {
             if (type == null || ent.getType() == type) {
                 if (this.intersects(new BoundingBox(ent))) {
                     if (filter.test(ent)) {
@@ -153,8 +158,8 @@ public class BoundingBox {
     }
 
     @Override public int hashCode() {
-        long i = Double.doubleToLongBits(this.minX);
-        int j = (int) (i ^ i >>> 32);
+        var i = Double.doubleToLongBits(this.minX);
+        var j = (int) (i ^ i >>> 32);
         i = Double.doubleToLongBits(this.minY);
         j = 31 * j + (int) (i ^ i >>> 32);
         i = Double.doubleToLongBits(this.minZ);
@@ -168,12 +173,12 @@ public class BoundingBox {
     }
 
     public BoundingBox contract(double x, double y, double z) {
-        double d0 = this.minX;
-        double d1 = this.minY;
-        double d2 = this.minZ;
-        double d3 = this.maxX;
-        double d4 = this.maxY;
-        double d5 = this.maxZ;
+        var d0 = this.minX;
+        var d1 = this.minY;
+        var d2 = this.minZ;
+        var d3 = this.maxX;
+        var d4 = this.maxY;
+        var d5 = this.maxZ;
         if (x < 0.0D) {
             d0 -= x;
         } else if (x > 0.0D) {
@@ -200,12 +205,12 @@ public class BoundingBox {
     }
 
     public BoundingBox expand(double x, double y, double z) {
-        double d0 = this.minX;
-        double d1 = this.minY;
-        double d2 = this.minZ;
-        double d3 = this.maxX;
-        double d4 = this.maxY;
-        double d5 = this.maxZ;
+        var d0 = this.minX;
+        var d1 = this.minY;
+        var d2 = this.minZ;
+        var d3 = this.maxX;
+        var d4 = this.maxY;
+        var d5 = this.maxZ;
         if (x < 0.0D) {
             d0 += x;
         } else if (x > 0.0D) {
@@ -228,12 +233,12 @@ public class BoundingBox {
     }
 
     public BoundingBox grow(double x, double y, double z) {
-        double d0 = this.minX - x;
-        double d1 = this.minY - y;
-        double d2 = this.minZ - z;
-        double d3 = this.maxX + x;
-        double d4 = this.maxY + y;
-        double d5 = this.maxZ + z;
+        var d0 = this.minX - x;
+        var d1 = this.minY - y;
+        var d2 = this.minZ - z;
+        var d3 = this.maxX + x;
+        var d4 = this.maxY + y;
+        var d5 = this.maxZ + z;
         return new BoundingBox(d0, d1, d2, d3, d4, d5);
     }
 
@@ -242,22 +247,22 @@ public class BoundingBox {
     }
 
     public BoundingBox intersect(BoundingBox other) {
-        double d0 = Math.max(this.minX, other.minX);
-        double d1 = Math.max(this.minY, other.minY);
-        double d2 = Math.max(this.minZ, other.minZ);
-        double d3 = Math.min(this.maxX, other.maxX);
-        double d4 = Math.min(this.maxY, other.maxY);
-        double d5 = Math.min(this.maxZ, other.maxZ);
+        var d0 = Math.max(this.minX, other.minX);
+        var d1 = Math.max(this.minY, other.minY);
+        var d2 = Math.max(this.minZ, other.minZ);
+        var d3 = Math.min(this.maxX, other.maxX);
+        var d4 = Math.min(this.maxY, other.maxY);
+        var d5 = Math.min(this.maxZ, other.maxZ);
         return new BoundingBox(d0, d1, d2, d3, d4, d5);
     }
 
     public BoundingBox union(BoundingBox other) {
-        double d0 = Math.min(this.minX, other.minX);
-        double d1 = Math.min(this.minY, other.minY);
-        double d2 = Math.min(this.minZ, other.minZ);
-        double d3 = Math.max(this.maxX, other.maxX);
-        double d4 = Math.max(this.maxY, other.maxY);
-        double d5 = Math.max(this.maxZ, other.maxZ);
+        var d0 = Math.min(this.minX, other.minX);
+        var d1 = Math.min(this.minY, other.minY);
+        var d2 = Math.min(this.minZ, other.minZ);
+        var d3 = Math.max(this.maxX, other.maxX);
+        var d4 = Math.max(this.maxY, other.maxY);
+        var d5 = Math.max(this.maxZ, other.maxZ);
         return new BoundingBox(d0, d1, d2, d3, d4, d5);
     }
 
@@ -266,7 +271,7 @@ public class BoundingBox {
     }
 
     public BoundingBox offset(Block block) {
-        Location loc = block.getLocation();
+        var loc = block.getLocation();
         return this.offset(new Vector3d(loc.getX(), loc.getY(), loc.getZ()));
     }
 
@@ -295,9 +300,9 @@ public class BoundingBox {
     }
 
     public double getAverageEdgeLength() {
-        double d0 = this.getXSize();
-        double d1 = this.getYSize();
-        double d2 = this.getZSize();
+        var d0 = this.getXSize();
+        var d1 = this.getYSize();
+        var d2 = this.getZSize();
         return (d0 + d1 + d2) / 3.0D;
     }
 
@@ -318,15 +323,15 @@ public class BoundingBox {
     }
 
     public Optional<Vector3d> rayTrace(Vector3d from, Vector3d to) {
-        double[] adouble = new double[]{1.0D};
-        double d0 = to.x - from.x;
-        double d1 = to.y - from.y;
-        double d2 = to.z - from.z;
-        Direction direction = BoundingBox.calcSideHit(this, from, adouble, d0, d1, d2);
+        var adouble = new double[]{1.0D};
+        var d0 = to.x - from.x;
+        var d1 = to.y - from.y;
+        var d2 = to.z - from.z;
+        var direction = BoundingBox.calcSideHit(this, from, adouble, d0, d1, d2);
         if (direction == null) {
             return Optional.empty();
         }
-        double d3 = adouble[0];
+        var d3 = adouble[0];
         return Optional.of(from.add(d3 * d0, d3 * d1, d3 * d2));
     }
 

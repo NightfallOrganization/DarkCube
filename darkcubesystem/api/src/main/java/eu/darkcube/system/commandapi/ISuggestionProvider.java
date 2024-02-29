@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -130,6 +131,8 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilde
     }
 
     @Api Collection<String> getPlayerNames();
+
+    @Api Collection<UUID> getPlayerUniqueIds();
 
     @Api default Collection<String> getTargetedEntity() {
         return Collections.emptyList();

@@ -14,7 +14,7 @@ tasks {
         archiveClassifier = null
     }
     jar {
-        archiveClassifier = "pure"
+        destinationDirectory = temporaryDir
     }
     assemble {
         dependsOn(shadowJar)

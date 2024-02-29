@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.event;
 
-import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Experimental public interface EventBinding<E> {
 

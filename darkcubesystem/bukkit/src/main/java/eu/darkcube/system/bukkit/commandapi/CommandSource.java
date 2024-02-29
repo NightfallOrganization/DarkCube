@@ -8,16 +8,18 @@
 package eu.darkcube.system.bukkit.commandapi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.avaje.ebean.validation.NotNull;
 import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.bukkit.commandapi.argument.EntityAnchorArgument;
 import eu.darkcube.system.commandapi.CommandExecutor;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.MathHelper;
 import eu.darkcube.system.commandapi.util.Messages.MessageWrapper;
 import eu.darkcube.system.commandapi.util.Vector2f;
@@ -38,6 +40,8 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.event.ClickEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.HoverEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
@@ -87,11 +91,11 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
     }
 
     public static CommandSource create(BukkitCommandExecutor executor) {
-        CommandSender sender = executor.sender();
+        var sender = executor.sender();
         Vector3d pos = null;
         World world = null;
-        String name = sender.getName();
-        String displayName = sender.getName();
+        var name = sender.getName();
+        var displayName = sender.getName();
         Entity entity = null;
         Vector2f rotation = null;
         if (sender instanceof Entity) {
@@ -100,8 +104,7 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
             displayName = entity instanceof Player ? name : entity.getCustomName();
             rotation = new Vector2f(entity.getLocation().getYaw(), entity.getLocation().getPitch());
             world = entity.getWorld();
-        } else if (sender instanceof BlockCommandSender) {
-            BlockCommandSender b = (BlockCommandSender) sender;
+        } else if (sender instanceof BlockCommandSender b) {
             pos = BukkitVector3d.position(b.getBlock().getLocation().add(0.5, 0.5, 0.5));
             rotation = new Vector2f(0, 0);
             world = b.getBlock().getWorld();
@@ -110,10 +113,8 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
     }
 
     public void sendMessage(Message message) {
-        if (message instanceof MessageWrapper) {
-            MessageWrapper w = (MessageWrapper) message;
-            BaseMessage m = w.message();
-            sendMessage(m.getMessage(source, w.components()));
+        if (message instanceof MessageWrapper(var message1, var components)) {
+            sendMessage(message1.getMessage(source, components));
         } else {
             sendMessage(Component.text(message.getString()).color(NamedTextColor.RED));
         }
@@ -137,6 +138,21 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
 
     public CommandSource withRotation(Vector2f rotation) {
         return this.rotation == rotation ? this : new CommandSource(this.source, this.pos, this.world, this.name, this.displayName, this.feedbackDisabled, this.entity, this.resultConsumer, this.entityAnchorType, rotation, this.extra);
+    }
+
+    public CommandSource withRotation(Entity entity, EntityAnchorArgument.Type anchorType) {
+        return this.withRotation(anchorType.apply(entity));
+    }
+
+    public CommandSource withRotation(Vector3d lookPos) {
+        var vector3d = this.entityAnchorType.apply(this);
+        var d0 = lookPos.x - vector3d.x;
+        var d1 = lookPos.y - vector3d.y;
+        var d2 = lookPos.z - vector3d.z;
+        double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
+        var f = MathHelper.wrapDegrees((float) (-(MathHelper.atan2(d1, d3) * (180F / (float) Math.PI))));
+        var f1 = MathHelper.wrapDegrees((float) (MathHelper.atan2(d2, d0) * (180F / (float) Math.PI)) - 90.0F);
+        return this.withRotation(new Vector2f(f, f1));
     }
 
     public CommandSource withResultConsumer(ResultConsumer<CommandSource> resultConsumer) {
@@ -173,21 +189,6 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
         return this.extra;
     }
 
-    public CommandSource withRotation(Entity entity, EntityAnchorArgument.Type anchorType) {
-        return this.withRotation(anchorType.apply(entity));
-    }
-
-    public CommandSource withRotation(Vector3d lookPos) {
-        Vector3d vector3d = this.entityAnchorType.apply(this);
-        double d0 = lookPos.x - vector3d.x;
-        double d1 = lookPos.y - vector3d.y;
-        double d2 = lookPos.z - vector3d.z;
-        double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
-        float f = MathHelper.wrapDegrees((float) (-(MathHelper.atan2(d1, d3) * (180F / (float) Math.PI))));
-        float f1 = MathHelper.wrapDegrees((float) (MathHelper.atan2(d2, d0) * (180F / (float) Math.PI)) - 90.0F);
-        return this.withRotation(new Vector2f(f, f1));
-    }
-
     public String getDisplayName() {
         return this.displayName;
     }
@@ -217,14 +218,14 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
     public void sendCompletions(String commandLine, Suggestions suggestions, Map<CommandNode<CommandSource>, String> usages) {
         List<String> possibilities = new ArrayList<>();
         Map<String, String> usageMap = new HashMap<>();
-        int idx = commandLine.lastIndexOf(' ');
-        String lastWord = commandLine.substring(idx + 1) + " ";
+        var idx = commandLine.lastIndexOf(' ');
+        var lastWord = commandLine.substring(idx + 1) + " ";
         Map<String, CommandNode<CommandSource>> reverseUsages = new HashMap<>();
-        for (Map.Entry<CommandNode<CommandSource>, String> entry : usages.entrySet()) {
-            String usage = entry.getValue().replace('|', '┃');
+        for (var entry : usages.entrySet()) {
+            var usage = entry.getValue().replace('|', '┃');
             if (usage.length() > 30) {
                 usage = usage.substring(0, 30);
-                int i = usage.lastIndexOf(' ', 30);
+                var i = usage.lastIndexOf(' ', 30);
                 if (i != -1) {
                     usage = usage.substring(0, i);
                 }
@@ -233,21 +234,21 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
             reverseUsages.put(usage, entry.getKey());
             possibilities.add(entry.getKey().getName());
         }
-        for (Suggestion completion : suggestions.getList()) possibilities.add(completion.getText());
+        for (var completion : suggestions.getList()) possibilities.add(completion.getText());
 
         possibilities = possibilities.stream().distinct().sorted().collect(Collectors.toList());
 
         Map<String, Component> components = new HashMap<>();
 
-//        final TextColor DARKER_AQUA_VALUE = TextColor.color(0x44EEEE);
+        // final TextColor DARKER_AQUA_VALUE = TextColor.color(0x44EEEE);
         final TextColor DARKER_AQUA_VALUE = NamedTextColor.BLUE;
 
-        for (Suggestion completion : suggestions.getList()) {
-            String text = completion.getText();
-            String cmd = source.commandPrefix() + completion.apply(commandLine);
+        for (var completion : suggestions.getList()) {
+            var text = completion.getText();
+            var cmd = source.commandPrefix() + completion.apply(commandLine);
             String display2 = null;
             if (usageMap.containsKey(text)) {
-                String usage = usageMap.remove(text);
+                var usage = usageMap.remove(text);
                 display2 = usage.substring(text.length());
             }
             Component clickable = Component.text(text, NamedTextColor.AQUA);
@@ -269,22 +270,22 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
             components.put(text, c);
         }
 
-        for (Map.Entry<String, String> entry : usageMap.entrySet()) {
-            String e = entry.getValue();
+        for (var entry : usageMap.entrySet()) {
+            var e = entry.getValue();
             if (!e.startsWith(lastWord)) {
                 if (reverseUsages.get(e) instanceof LiteralCommandNode) {
                     continue;
                 }
-//                int i = e.indexOf(' ');
-//                e = e.substring(i + 1);
+                // int i = e.indexOf(' ');
+                // e = e.substring(i + 1);
             } else {
                 e = e.substring(lastWord.length());
             }
             Component c = Component.text(" - ", NamedTextColor.GREEN).append(Component.text(e, DARKER_AQUA_VALUE));
             components.put(entry.getKey(), c);
         }
-        for (String possibility : possibilities) {
-            Component component = components.get(possibility);
+        for (var possibility : possibilities) {
+            var component = components.get(possibility);
             if (component != null) sendMessage(component);
         }
     }
@@ -313,4 +314,11 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience {
         return this.world;
     }
 
+    @Override public Collection<String> getPlayerNames() {
+        return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+    }
+
+    @Override public Collection<UUID> getPlayerUniqueIds() {
+        return Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).toList();
+    }
 }

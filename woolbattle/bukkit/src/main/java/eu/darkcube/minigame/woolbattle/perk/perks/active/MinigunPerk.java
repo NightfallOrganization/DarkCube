@@ -32,7 +32,7 @@ public class MinigunPerk extends Perk {
     public static final PerkName MINIGUN = new PerkName("MINIGUN");
 
     public MinigunPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_MINIGUN_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, MINIGUN, 10, 1, Item.PERK_MINIGUN, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_MINIGUN_COOLDOWN, woolbattle));
         addListener(new ListenerMinigun(this, woolbattle));
     }
 

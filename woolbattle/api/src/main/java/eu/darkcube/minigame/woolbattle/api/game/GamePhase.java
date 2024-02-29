@@ -8,4 +8,5 @@
 package eu.darkcube.minigame.woolbattle.api.game;
 
 public interface GamePhase {
+    Game game();
 }

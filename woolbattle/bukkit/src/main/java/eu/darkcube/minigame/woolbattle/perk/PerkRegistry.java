@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -72,9 +73,7 @@ public class PerkRegistry {
     }
 
     public Perk[] perks(ActivationType activationType) {
-        return cache1
-                .computeIfAbsent(activationType, n -> perks.values().stream().filter(p -> p.activationType() == n).toArray(Perk[]::new))
-                .clone();
+        return cache1.computeIfAbsent(activationType, n -> perks.values().stream().filter(p -> p.activationType() == n).toArray(Perk[]::new)).clone();
     }
 
     public Map<PerkName, Perk> perks() {

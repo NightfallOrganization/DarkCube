@@ -34,9 +34,9 @@ public class ItemManager {
             Map<Integer, ItemStack> leftOver = new HashMap<>();
             itemToRemove = new ItemStack(itemToRemove);
             itemToRemove.setAmount(1);
-            int toDelete = count;
-            int did = 0;
-            for (int i = count - 1; i >= 0; i--) {
+            var toDelete = count;
+            var did = 0;
+            for (var i = count - 1; i >= 0; i--) {
                 do {
                     int last;
                     if ((last = ItemManager.last(invToRemoveFrom, itemToRemove, false)) == -1) {
@@ -44,8 +44,8 @@ public class ItemManager {
                         leftOver.put(i, itemToRemove);
                         break;
                     }
-                    ItemStack item = invToRemoveFrom.getItem(last);
-                    int amount = item.getAmount();
+                    var item = invToRemoveFrom.getItem(last);
+                    var amount = item.getAmount();
                     if (amount <= toDelete) {
                         toDelete -= amount;
                         invToRemoveFrom.clear(last);
@@ -61,7 +61,7 @@ public class ItemManager {
                 }
             }
         } else {
-            for (int i = 0; i < count; i++) {
+            for (var i = 0; i < count; i++) {
                 invToRemoveFrom.removeItem(itemToRemove);
             }
         }
@@ -71,8 +71,8 @@ public class ItemManager {
         if (item == null) {
             return -1;
         }
-        ItemStack[] invContents = inv.getContents();
-        for (int i = invContents.length - 1; i >= 0; i--) {
+        var invContents = inv.getContents();
+        for (var i = invContents.length - 1; i >= 0; i--) {
             if (invContents[i] != null && (withAmount ? item.equals(invContents[i]) : item.isSimilar(invContents[i]))) {
                 return i;
             }
@@ -85,13 +85,13 @@ public class ItemManager {
     }
 
     public static ItemStack getItem(Item item, WBUser user, Object[] replacements, Object... loreReplacements) {
-        ItemBuilder builder = item
+        var builder = item
                 .getBuilder()
                 .persistentDataStorage()
                 .iset(ITEM_ID, PersistentDataTypes.STRING, item.getItemId())
                 .builder();
-        Language language = user.getLanguage();
-        Component name = ItemManager.getDisplayName(item, language, replacements);
+        var language = user.getLanguage();
+        var name = ItemManager.getDisplayName(item, language, replacements);
         builder.displayname(name);
         if (language.containsMessage(Message.KEY_PREFIX + Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name())) {
             builder.lore(Message.getMessage(Message.ITEM_PREFIX + Message.LORE_PREFIX + item.name(), language, loreReplacements));

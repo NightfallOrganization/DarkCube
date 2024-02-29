@@ -27,7 +27,7 @@ public class FreezeArrowPerk extends Perk {
     public static final PerkName FREEZE_ARROW = new PerkName("FREEZE_ARROW");
 
     public FreezeArrowPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.PASSIVE, FREEZE_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 4, CostType.PER_ACTIVATION, Item.PERK_FREEZE_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_FREEZE_ARROW_COOLDOWN, wb));
+        super(ActivationType.PASSIVE, FREEZE_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 4, Item.PERK_FREEZE_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_FREEZE_ARROW_COOLDOWN, wb));
         addListener(new FreezeArrowListener(woolbattle));
     }
 

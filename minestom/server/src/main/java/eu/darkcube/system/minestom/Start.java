@@ -17,6 +17,7 @@ import net.hollowcube.minestom.extensions.ExtensionBootstrap;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.entity.EntityDespawnEvent;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.permission.Permission;
 
@@ -43,6 +44,7 @@ public class Start {
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerChunkUnloadEvent.class, ChunkUnloader::playerChunkUnload);
         MinecraftServer.getGlobalEventHandler().addListener(EntityDespawnEvent.class, ChunkUnloader::entityDespawn);
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, ChunkUnloader::playerDisconnect);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
             var instance = event.getInstance();
             var chunk = instance.getChunkAt(event.getNewPosition());
