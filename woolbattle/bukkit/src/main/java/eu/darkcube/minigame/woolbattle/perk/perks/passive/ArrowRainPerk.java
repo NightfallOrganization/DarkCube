@@ -26,7 +26,7 @@ public class ArrowRainPerk extends Perk {
     public static final PerkName ARROW_RAIN = new PerkName("ARROW_RAIN");
 
     public ArrowRainPerk() {
-        super(ActivationType.PASSIVE, ARROW_RAIN, new Cooldown(Unit.ACTIVATIONS, 6), false, 0, CostType.PER_ACTIVATION, Item.PERK_ARROW_RAIN, (user, perk, id, perkSlot, woolbattle) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ARROW_RAIN_COOLDOWN, woolbattle));
+        super(ActivationType.PASSIVE, ARROW_RAIN, new Cooldown(Unit.ACTIVATIONS, 6), false, 0, Item.PERK_ARROW_RAIN, (user, perk, id, perkSlot, woolbattle) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ARROW_RAIN_COOLDOWN, woolbattle));
         addListener(new ArrowRainListener());
     }
 

@@ -4,24 +4,8 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.bukkit.commandapi;
 
-import eu.darkcube.system.bukkit.version.BukkitVersion;
-import eu.darkcube.system.libs.com.mojang.brigadier.CommandDispatcher;
-import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
-import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import eu.darkcube.system.libs.com.mojang.brigadier.context.SuggestionContext;
-import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
-import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
-import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.util.AdventureSupport;
-import org.bukkit.command.CommandSender;
+package eu.darkcube.system.bukkit.commandapi;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -32,6 +16,22 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+
+import eu.darkcube.system.bukkit.version.BukkitVersion;
+import eu.darkcube.system.libs.com.mojang.brigadier.CommandDispatcher;
+import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
+import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
+import eu.darkcube.system.libs.com.mojang.brigadier.tree.CommandNode;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.util.AdventureSupport;
+import org.bukkit.command.CommandSender;
 
 public class Commands {
 
@@ -71,11 +71,11 @@ public class Commands {
     }
 
     public void unregisterByPrefix(String prefix) {
-        for (CommandEntry entry : new HashSet<>(commandEntries)) {
+        for (var entry : new HashSet<>(commandEntries)) {
             if (!entry.executor.getPrefix().equals(prefix)) {
                 continue;
             }
-            for (CommandEntry.OriginalCommandTree original : new HashSet<>(entry.nodes)) {
+            for (var original : new HashSet<>(entry.nodes)) {
                 if (unregister(dispatcher.getRoot(), original)) {
                     BukkitVersion.version().commandApiUtils().unregister(original.source.getName());
                     entry.nodes.remove(original);
@@ -88,11 +88,11 @@ public class Commands {
     }
 
     public void unregisterPrefixlessByPrefix(String prefix) {
-        for (CommandEntry entry : new HashSet<>(commandEntries)) {
+        for (var entry : new HashSet<>(commandEntries)) {
             if (!entry.executor.getPrefix().equals(prefix)) {
                 continue;
             }
-            for (CommandEntry.OriginalCommandTree original : new HashSet<>(entry.nodes)) {
+            for (var original : new HashSet<>(entry.nodes)) {
                 if (original.prefixless) {
                     if (unregister(dispatcher.getRoot(), original)) {
                         BukkitVersion.version().commandApiUtils().unregister(original.source.getName());
@@ -107,9 +107,9 @@ public class Commands {
     }
 
     public void unregister(Command command) {
-        for (CommandEntry entry : new ArrayList<>(commandEntries)) {
+        for (var entry : new ArrayList<>(commandEntries)) {
             if (entry.executor.equals(command)) {
-                for (CommandEntry.OriginalCommandTree original : entry.nodes) {
+                for (var original : entry.nodes) {
                     unregister(dispatcher.getRoot(), original);
                 }
                 commandEntries.remove(entry);
@@ -118,12 +118,12 @@ public class Commands {
     }
 
     private boolean unregister(CommandNode<CommandSource> parent, CommandEntry.OriginalCommandTree original) {
-        CommandNode<CommandSource> node = parent.getChild(original.source.getName());
+        var node = parent.getChild(original.source.getName());
         if (node == null) return false;
-        for (CommandEntry.OriginalCommandTree o : original.children) {
+        for (var o : original.children) {
             unregister(node, o);
         }
-        eu.darkcube.system.libs.com.mojang.brigadier.Command<CommandSource> ncommand = node.getCommand();
+        var ncommand = node.getCommand();
         if (ncommand != null && ncommand.equals(original.command)) {
             ncommand = null;
         }
@@ -136,7 +136,7 @@ public class Commands {
 
     public void register(Command executor) {
         Collection<CommandEntry.OriginalCommandTree> nodes = new HashSet<>();
-        for (String name : executor.getNames()) {
+        for (var name : executor.getNames()) {
             nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(executor.builder(name)), true));
             nodes.add(new CommandEntry.OriginalCommandTree(dispatcher.register(executor.builder(executor.getPrefix() + ":" + name)), false));
         }
@@ -144,12 +144,12 @@ public class Commands {
     }
 
     public void executeCommand(CommandSender sender, final String commandLine) {
-        CommandSource source = CommandSource.create(sender);
-        ParseResults<CommandSource> parse = dispatcher.parse(commandLine, source);
+        var source = CommandSource.create(sender);
+        var parse = dispatcher.parse(commandLine, source);
         try {
             dispatcher.execute(parse);
         } catch (CommandSyntaxException ex) {
-            int failedCursor = ex.getCursor();
+            var failedCursor = ex.getCursor();
             if (failedCursor == 0) {
                 return; // Happens when someone tries to execute a main command (PluginCommand) that requires a condition which is not met
             }
@@ -160,18 +160,18 @@ public class Commands {
             source.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
 
             if (failedCursor == commandLine.length()) {
-                final String commandLineNext = commandLine + " ";
-                ParseResults<CommandSource> parse2 = dispatcher.parse(commandLineNext, source);
+                final var commandLineNext = commandLine + " ";
+                var parse2 = dispatcher.parse(commandLineNext, source);
                 getTabCompletions(parse2).thenAccept(completions -> source.sendCompletions(commandLineNext, completions, usages(parse2)));
             } else {
                 getTabCompletions(parse).thenAccept(completions2 -> source.sendCompletions(commandLine, completions2, usages(parse)));
             }
         } catch (Throwable ex) {
-            StringWriter writer = new StringWriter();
+            var writer = new StringWriter();
             ex.printStackTrace(new PrintWriter(writer));
-            String[] msgs = writer.getBuffer().toString().replace("\t", "  ").split("(\r\n|\r|\n)");
+            var msgs = writer.getBuffer().toString().replace("\t", "  ").split("(\r\n|\r|\n)");
             Component c = Component.text("");
-            for (int i = 0; i < msgs.length; i++) {
+            for (var i = 0; i < msgs.length; i++) {
                 if (i != 0) c = c.appendNewline();
                 c = c.append(Component.text(msgs[i]).color(NamedTextColor.DARK_RED));
             }
@@ -181,7 +181,7 @@ public class Commands {
     }
 
     private Map<CommandNode<CommandSource>, String> usages(ParseResults<CommandSource> parse) {
-        SuggestionContext<CommandSource> suggestionContext = parse.getContext().findSuggestionContext(parse.getReader().getTotalLength());
+        var suggestionContext = parse.getContext().findSuggestionContext(parse.getReader().getTotalLength());
         return dispatcher.getSmartUsage(suggestionContext.parent, parse.getContext().getSource());
     }
 
@@ -193,19 +193,7 @@ public class Commands {
         void parse(StringReader reader) throws CommandSyntaxException;
     }
 
-    private static class CommandEntry {
-        private final Command executor;
-        private final Collection<OriginalCommandTree> nodes;
-
-        public CommandEntry(Command executor, Collection<OriginalCommandTree> nodes) {
-            this.executor = executor;
-            this.nodes = nodes;
-        }
-
-        @Override public String toString() {
-            return "CommandEntry{" + "executor=" + executor + ", nodes=" + nodes + '}';
-        }
-
+    private record CommandEntry(Command executor, Collection<OriginalCommandTree> nodes) {
         private static class OriginalCommandTree {
             private final eu.darkcube.system.libs.com.mojang.brigadier.Command<CommandSource> command;
             private final CommandNode<CommandSource> source;
@@ -217,7 +205,7 @@ public class Commands {
                 this.command = node.getCommand();
                 this.children = new HashSet<>();
                 this.prefixless = prefixless;
-                for (CommandNode<CommandSource> child : node.getChildren()) {
+                for (var child : node.getChildren()) {
                     children.add(new OriginalCommandTree(child, false));
                 }
             }

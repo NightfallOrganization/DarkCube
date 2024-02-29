@@ -15,7 +15,7 @@ tasks {
         archiveClassifier = ""
     }
     jar.configure {
-        archiveClassifier = "pure"
+        destinationDirectory = temporaryDir
     }
     assemble.configure {
         dependsOn(shadowJar)
@@ -30,8 +30,8 @@ dependencies {
     compileOnly(project(":bukkit:statsapi"))
     compileOnly(project(":pserver:pserver-api"))
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
-    compileOnlyApi(parent!!.project("api"))
-    runtimeOnly(parent!!.project("api"))
+    compileOnlyApi(parent!!.project("common"))
+    runtimeOnly(parent!!.project("common"))
     compileOnlyApi(libs.cloudnet.bridge)
     compileOnlyApi(libs.cloudnet.wrapper)
 }

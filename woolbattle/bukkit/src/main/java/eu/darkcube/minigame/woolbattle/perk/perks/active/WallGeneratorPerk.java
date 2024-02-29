@@ -24,7 +24,7 @@ public class WallGeneratorPerk extends Perk {
     public static final PerkName WALL_GENERATOR = new PerkName("WALL_GENERATOR");
 
     public WallGeneratorPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, WALL_GENERATOR, 9, 1, CostType.PER_BLOCK, Item.PERK_WALL_GENERATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_WALL_GENERATOR_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, WALL_GENERATOR, 9, 1, Item.PERK_WALL_GENERATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_WALL_GENERATOR_COOLDOWN, woolbattle));
         addListener(new ListenerWallGenerator(this, woolbattle));
     }
 

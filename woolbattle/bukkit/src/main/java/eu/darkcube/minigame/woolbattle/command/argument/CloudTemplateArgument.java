@@ -7,11 +7,14 @@
 
 package eu.darkcube.minigame.woolbattle.command.argument;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.service.ServiceTemplate;
-import eu.cloudnetservice.driver.template.TemplateStorage;
 import eu.cloudnetservice.driver.template.TemplateStorageProvider;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -20,10 +23,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 
 public class CloudTemplateArgument implements ArgumentType<ServiceTemplate> {
 
@@ -41,9 +40,9 @@ public class CloudTemplateArgument implements ArgumentType<ServiceTemplate> {
     }
 
     @Override public ServiceTemplate parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
-        String text = read(reader);
-        ServiceTemplate template = ServiceTemplate.parse(text);
+        var cursor = reader.getCursor();
+        var text = read(reader);
+        var template = ServiceTemplate.parse(text);
         if (template == null) {
             reader.setCursor(cursor);
             throw NO_TEMPLATE.createWithContext(reader, text);
@@ -52,9 +51,9 @@ public class CloudTemplateArgument implements ArgumentType<ServiceTemplate> {
     }
 
     private String read(StringReader reader) {
-        StringBuilder b = new StringBuilder();
+        var b = new StringBuilder();
         while (reader.canRead()) {
-            char c = reader.peek();
+            var c = reader.peek();
             if (c == ' ') break;
             b.append(c);
             reader.skip();
@@ -63,16 +62,16 @@ public class CloudTemplateArgument implements ArgumentType<ServiceTemplate> {
     }
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        TemplateStorageProvider provider = InjectionLayer.boot().instance(TemplateStorageProvider.class);
+        var provider = InjectionLayer.boot().instance(TemplateStorageProvider.class);
         return provider.availableTemplateStoragesAsync().thenCompose(s -> {
             Collection<CompletableFuture<Collection<ServiceTemplate>>> templatesFutures = new ArrayList<>();
-            for (String storageName : s) {
-                TemplateStorage storage = provider.templateStorage(storageName);
+            for (var storageName : s) {
+                var storage = provider.templateStorage(storageName);
                 if (storage != null) templatesFutures.add(storage.templatesAsync());
             }
             return CompletableFuture.allOf(templatesFutures.toArray(new CompletableFuture[0])).thenApply(ignored -> {
                 Collection<ServiceTemplate> built = new ArrayList<>();
-                for (CompletableFuture<Collection<ServiceTemplate>> fut : templatesFutures) {
+                for (var fut : templatesFutures) {
                     built.addAll(fut.getNow(null));
                 }
                 ISuggestionProvider.suggest(built.stream().map(ServiceTemplate::toString), builder);

@@ -4,7 +4,12 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.logging.Logger;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
@@ -14,10 +19,6 @@ import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
 import org.bukkit.event.Listener;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.logging.Logger;
 
 public class Perk {
 
@@ -30,7 +31,6 @@ public class Perk {
     private final PerkName perkName;
     private final Cooldown defaultCooldown;
     private final int defaultCost;
-    private final CostType costType;
     private final Item defaultItem;
     private final UserPerkCreator perkCreator;
     private final boolean autoCountdownCooldown;
@@ -41,24 +41,15 @@ public class Perk {
         this(activationType, perkName, new Cooldown(Unit.TICKS, cooldownSeconds * 20), cost, defaultItem, perkCreator);
     }
 
-    public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost, CostType costType, Item defaultItem, UserPerkCreator perkCreator) {
-        this(activationType, perkName, new Cooldown(Unit.TICKS, cooldownSeconds * 20), cost, costType, defaultItem, perkCreator);
-    }
-
     public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown, int cost, Item defaultItem, UserPerkCreator perkCreator) {
-        this(activationType, perkName, cooldown, cost, CostType.PER_ACTIVATION, defaultItem, perkCreator);
+        this(activationType, perkName, cooldown, true, cost, defaultItem, perkCreator);
     }
 
-    public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown, int cost, CostType costType, Item defaultItem, UserPerkCreator perkCreator) {
-        this(activationType, perkName, cooldown, true, cost, costType, defaultItem, perkCreator);
-    }
-
-    public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown, boolean autoCountdownCooldown, int cost, CostType costType, Item defaultItem, UserPerkCreator perkCreator) {
+    public Perk(ActivationType activationType, PerkName perkName, Cooldown cooldown, boolean autoCountdownCooldown, int cost, Item defaultItem, UserPerkCreator perkCreator) {
         this.activationType = activationType;
         this.perkName = perkName;
         this.defaultCooldown = cooldown;
         this.defaultCost = cost;
-        this.costType = costType;
         this.cost = cost;
         this.cooldown = cooldown;
         this.autoCountdownCooldown = autoCountdownCooldown;
@@ -132,10 +123,6 @@ public class Perk {
         return perkName;
     }
 
-    public CostType costType() {
-        return costType;
-    }
-
     public int cost() {
         return cost;
     }
@@ -160,10 +147,6 @@ public class Perk {
         return defaultCost;
     }
 
-    public enum CostType {
-        PER_BLOCK, PER_SHOT, PER_ACTIVATION
-    }
-
     /**
      * This is the class for all perk types. May need renaming in the future, {@code
      * ActivationType}
@@ -177,9 +160,12 @@ public class Perk {
      */
     public enum ActivationType {
         // Order is important here, as the inventory will be filled in that order for new players
-        PRIMARY_WEAPON("primaryWeapon", 1, Item.DEFAULT_BOW), SECONDARY_WEAPON("secondaryWeapon", 1, Item.DEFAULT_SHEARS),
+        PRIMARY_WEAPON("primaryWeapon", 1, Item.DEFAULT_BOW),
+        SECONDARY_WEAPON("secondaryWeapon", 1, Item.DEFAULT_SHEARS),
 
-        ACTIVE("active", 2, Item.PERKS_ACTIVE), MISC("misc", 1, Item.PERKS_MISC), PASSIVE("passive", 1, Item.PERKS_PASSIVE),
+        ACTIVE("active", 2, Item.PERKS_ACTIVE),
+        MISC("misc", 1, Item.PERKS_MISC),
+        PASSIVE("passive", 1, Item.PERKS_PASSIVE),
 
         DOUBLE_JUMP("doubleJump", 1, null),
 

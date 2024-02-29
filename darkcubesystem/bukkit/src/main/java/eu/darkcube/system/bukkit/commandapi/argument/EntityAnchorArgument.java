@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
 import com.google.common.collect.Maps;
 import eu.darkcube.system.bukkit.commandapi.BukkitVector3d;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;

@@ -4,12 +4,24 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.command.argument;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -18,12 +30,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class PerkArgument implements ArgumentType<PerkSelector> {
     private static final DynamicCommandExceptionType INVALID_ENUM = Messages.INVALID_ENUM.newDynamicCommandExceptionType();
@@ -72,13 +78,15 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
     }
 
     @Override public PerkSelector parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
+        var cursor = reader.getCursor();
         reader.skipWhitespace();
-        String in = read(reader);
-        if (!single) if (in.equals("*")) {
-            return new PerkSelector(true, null, woolbattle);
+        var in = read(reader);
+        if (!single) {
+            if (in.equals("*")) {
+                return new PerkSelector(true, null, woolbattle);
+            }
         }
-        Perk type = fromStringFunction.apply(in);
+        var type = fromStringFunction.apply(in);
         if (type == null) {
             reader.setCursor(cursor);
             throw INVALID_ENUM.createWithContext(reader, in);
@@ -88,7 +96,7 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         List<String> suggestions = new ArrayList<>();
-        for (Perk t : values()) {
+        for (var t : values()) {
             suggestions.addAll(Arrays.asList(toStringFunction.apply(t)));
         }
         if (!single) suggestions.add("*");
@@ -96,8 +104,8 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
     }
 
     private String read(StringReader reader) {
-        char c = ' ';
-        StringBuilder b = new StringBuilder();
+        var c = ' ';
+        var b = new StringBuilder();
         while (reader.canRead() && reader.peek() != c) {
             b.append(reader.peek());
             reader.skip();
@@ -107,9 +115,9 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 
     private Function<String, Perk> defaultFromStringFunction() {
         final Map<String, Perk> map = new HashMap<>();
-        for (Perk t : values()) {
-            String[] arr = toStringFunction.apply(t);
-            for (String s : arr) {
+        for (var t : values()) {
+            var arr = toStringFunction.apply(t);
+            for (var s : arr) {
                 if (map.containsKey(s)) {
                     System.out.println("[TeamArgument] Ambiguous name: " + s);
                 } else {
@@ -122,7 +130,7 @@ public class PerkArgument implements ArgumentType<PerkSelector> {
 
     private Function<Perk, String[]> defaultToStringFunction() {
         final Map<Perk, String[]> map = new HashMap<>();
-        for (Perk t : values()) {
+        for (var t : values()) {
             map.put(t, new String[]{t.perkName().getName()});
         }
         return map::get;

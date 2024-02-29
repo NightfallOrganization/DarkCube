@@ -23,7 +23,7 @@ public class ElevatorPerk extends Perk {
     public static final PerkName ELEVATOR = new PerkName("ELEVATOR");
 
     public ElevatorPerk() {
-        super(ActivationType.PASSIVE, ELEVATOR, new Cooldown(Unit.ACTIVATIONS, 2), false, 0, CostType.PER_ACTIVATION, Item.PERK_ELEVATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ELEVATOR_COOLDOWN, wb));
+        super(ActivationType.PASSIVE, ELEVATOR, new Cooldown(Unit.ACTIVATIONS, 2), false, 0, Item.PERK_ELEVATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ELEVATOR_COOLDOWN, wb));
         addListener(new ListenerElevator());
     }
 

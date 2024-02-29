@@ -7,6 +7,20 @@
 
 package eu.darkcube.minigame.woolbattle.api.game;
 
+import java.util.Collection;
+
+import eu.darkcube.minigame.woolbattle.api.perk.PerkRegistry;
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
+
 public interface Game {
-    GamePhase phase();
+    @Api GamePhase phase();
+
+    @ApiStatus.Internal
+    void enableNextPhase();
+
+    @Api Collection<WBUser> users();
+
+    @Api PerkRegistry perkRegistry();
 }

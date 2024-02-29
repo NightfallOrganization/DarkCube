@@ -7,8 +7,16 @@
 
 package eu.darkcube.system.bukkit.commandapi.argument;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -17,10 +25,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 
@@ -55,9 +59,9 @@ public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 
     private Function<String, T> defaultFromStringFunction() {
         final Map<String, T> map = new HashMap<>();
-        for (T t : values) {
-            String[] arr = toStringFunction.apply(t);
-            for (String s : arr) {
+        for (var t : values) {
+            var arr = toStringFunction.apply(t);
+            for (var s : arr) {
                 if (map.containsKey(s)) {
                     System.out.println("[EnumArgument] Ambiguous name: " + s);
                 } else {
@@ -70,16 +74,16 @@ public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 
     private Function<T, String[]> defaultToStringFunction() {
         final Map<T, String[]> map = new HashMap<>();
-        for (T t : values) {
+        for (var t : values) {
             map.put(t, new String[]{t.name()});
         }
         return map::get;
     }
 
     @Override public T parse(StringReader reader) throws CommandSyntaxException {
-        int cursor = reader.getCursor();
-        String in = reader.readUnquotedString();
-        T type = fromStringFunction.apply(in);
+        var cursor = reader.getCursor();
+        var in = reader.readUnquotedString();
+        var type = fromStringFunction.apply(in);
         if (type == null) {
             reader.setCursor(cursor);
             throw INVALID_ENUM.createWithContext(reader, in);
@@ -89,7 +93,7 @@ public class EnumArgument<T extends Enum<?>> implements ArgumentType<T> {
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         List<String> suggestions = new ArrayList<>();
-        for (T t : values) {
+        for (var t : values) {
             suggestions.addAll(Arrays.asList(toStringFunction.apply(t)));
         }
         return ISuggestionProvider.suggest(suggestions, builder);

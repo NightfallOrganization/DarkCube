@@ -10,4 +10,5 @@ plugins {
 
 dependencies {
     api(parent!!.project("api"))
+    api(projects.darkcubesystem.server)
 }

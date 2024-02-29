@@ -7,12 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.command.arguments;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
+
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
 import eu.cloudnetservice.driver.service.ServiceEnvironmentType;
 import eu.cloudnetservice.driver.service.ServiceTask;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -21,9 +24,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
 
@@ -38,8 +38,8 @@ public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
     }
 
     @Override public ServiceTask parse(StringReader r) throws CommandSyntaxException {
-        ServiceTaskProvider provider = InjectionLayer.boot().instance(ServiceTaskProvider.class);
-        String t = r.readString();
+        var provider = InjectionLayer.boot().instance(ServiceTaskProvider.class);
+        var t = r.readString();
         if (provider.serviceTask(t) == null) {
             throw TASK_NOT_PRESENT.createWithContext(r, t);
         }
@@ -51,13 +51,7 @@ public class ServiceTaskArgument implements ArgumentType<ServiceTask> {
     }
 
     protected Stream<String> tasksStream() {
-        return InjectionLayer
-                .boot()
-                .instance(ServiceTaskProvider.class)
-                .serviceTasks()
-                .stream()
-                .filter(t -> t.processConfiguration().environment().equals(ServiceEnvironmentType.MINECRAFT_SERVER.name()))
-                .map(ServiceTask::name);
+        return InjectionLayer.boot().instance(ServiceTaskProvider.class).serviceTasks().stream().filter(t -> t.processConfiguration().environment().equals(ServiceEnvironmentType.MINECRAFT_SERVER.name())).map(ServiceTask::name);
 
     }
 }

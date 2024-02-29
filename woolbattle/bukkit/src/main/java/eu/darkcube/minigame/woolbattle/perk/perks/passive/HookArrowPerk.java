@@ -26,7 +26,7 @@ public class HookArrowPerk extends Perk {
     public static final PerkName HOOK_ARROW = new PerkName("HOOK_ARROW");
 
     public HookArrowPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.PASSIVE, HOOK_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 8, CostType.PER_ACTIVATION, Item.PERK_HOOK_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_HOOK_ARROW_COOLDOWN, wb));
+        super(ActivationType.PASSIVE, HOOK_ARROW, new Cooldown(Unit.ACTIVATIONS, 3), false, 8, Item.PERK_HOOK_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_HOOK_ARROW_COOLDOWN, wb));
         addListener(new HookArrowListener(woolbattle));
     }
 

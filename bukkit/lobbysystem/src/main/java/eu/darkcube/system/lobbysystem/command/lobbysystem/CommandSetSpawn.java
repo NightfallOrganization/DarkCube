@@ -9,12 +9,12 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.commandapi.util.Vector2f;
-import eu.darkcube.system.commandapi.util.Vector3d;
-import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.ILocationArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.RotationArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.Vec3Argument;
+import eu.darkcube.system.commandapi.argument.BooleanArgument;
+import eu.darkcube.system.commandapi.util.Vector2f;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
@@ -27,22 +27,7 @@ public class CommandSetSpawn extends LobbyCommand {
 
     public CommandSetSpawn() {
         super("setSpawn", b -> {
-            b
-                    .then(Commands
-                            .argument("location", Vec3Argument.vec3())
-                            .executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), null, false))
-                            .then(Commands
-                                    .argument("rotation", RotationArgument.rotation())
-                                    .executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), false))
-                                    .then(Commands
-                                            .argument("makenice", BooleanArgument.booleanArgument())
-                                            .executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), BooleanArgument.getBoolean(ctx, "makenice")))))
-                            .then(Commands
-                                    .argument("makenice", BooleanArgument.booleanArgument())
-                                    .executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), null, BooleanArgument.getBoolean(ctx, "makenice")))))
-                    .then(Commands
-                            .argument("makenice", BooleanArgument.booleanArgument())
-                            .executes(ctx -> setSpawn(ctx, null, null, BooleanArgument.getBoolean(ctx, "makenice"))));
+            b.then(Commands.argument("location", Vec3Argument.vec3()).executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), null, false)).then(Commands.argument("rotation", RotationArgument.rotation()).executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), false)).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), RotationArgument.getRotation(ctx, "rotation"), BooleanArgument.getBoolean(ctx, "makenice"))))).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> setSpawn(ctx, Vec3Argument.getLocation(ctx, "location"), null, BooleanArgument.getBoolean(ctx, "makenice"))))).then(Commands.argument("makenice", BooleanArgument.booleanArgument()).executes(ctx -> setSpawn(ctx, null, null, BooleanArgument.getBoolean(ctx, "makenice"))));
         });
     }
 

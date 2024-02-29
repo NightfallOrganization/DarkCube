@@ -7,14 +7,14 @@
 
 package eu.darkcube.system.event;
 
-import eu.darkcube.system.libs.org.jetbrains.annotations.Contract;
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import eu.darkcube.system.libs.org.jetbrains.annotations.Contract;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 /**
  * Represents an event listener (handler) in an event graph.

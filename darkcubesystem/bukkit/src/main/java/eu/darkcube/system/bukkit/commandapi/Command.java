@@ -4,13 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.bukkit.commandapi;
 
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+package eu.darkcube.system.bukkit.commandapi;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.function.Consumer;
+
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 public class Command {
 
@@ -33,7 +34,7 @@ public class Command {
         this.argumentBuilder = argumentBuilder;
         this.names = new String[this.aliases.length + 1];
         this.names[0] = this.name;
-        for (int i = 0; i < this.aliases.length; i++) {
+        for (var i = 0; i < this.aliases.length; i++) {
             this.aliases[i] = this.aliases[i].toLowerCase(Locale.ROOT);
         }
         System.arraycopy(this.aliases, 0, this.names, 1, this.names.length - 1);
@@ -44,7 +45,7 @@ public class Command {
     }
 
     public final LiteralArgumentBuilder<CommandSource> builder(String name) {
-        LiteralArgumentBuilder<CommandSource> b = Commands.literal(name);
+        var b = Commands.literal(name);
         argumentBuilder.accept(b);
         return b;
     }

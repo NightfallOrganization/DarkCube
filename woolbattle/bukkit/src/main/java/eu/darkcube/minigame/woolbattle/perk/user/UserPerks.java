@@ -4,19 +4,22 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.user;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
-import eu.darkcube.minigame.woolbattle.user.PlayerPerks;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserPerks {
     private static final AtomicInteger id = new AtomicInteger();
@@ -36,18 +39,14 @@ public class UserPerks {
         perks.clear();
         byType.clear();
         byName.clear();
-        PlayerPerks p = user.perksStorage();
-        for (ActivationType type : ActivationType.values()) {
-            PerkName[] perks = p.perks(type);
-            for (int i = 0; i < perks.length; i++) {
-                Perk perk = woolbattle.perkRegistry().perks().get(perks[i]);
+        var p = user.perksStorage();
+        for (var type : ActivationType.values()) {
+            var perks = p.perks(type);
+            for (var i = 0; i < perks.length; i++) {
+                var perk = woolbattle.perkRegistry().perks().get(perks[i]);
                 if (perk == null) {
-                    List<PerkName> listPerks = Arrays.asList(perks);
-                    perk = java.util.Arrays
-                            .stream(woolbattle.perkRegistry().perks(type))
-                            .filter(pe -> !listPerks.contains(pe.perkName()))
-                            .findAny()
-                            .orElseThrow(Error::new);
+                    var listPerks = Arrays.asList(perks);
+                    perk = java.util.Arrays.stream(woolbattle.perkRegistry().perks(type)).filter(pe -> !listPerks.contains(pe.perkName())).findAny().orElseThrow(Error::new);
                     p.perk(type, i, perk.perkName());
                     user.perksStorage(p);
                     System.out.println("Fixing perk: " + perks[i] + " -> " + perk.perkName());
@@ -55,16 +54,16 @@ public class UserPerks {
                 perk(perk, i);
             }
         }
-        for (Entry<ActivationType, Collection<UserPerk>> entry : new ArrayList<>(byType.entrySet())) {
+        for (var entry : new ArrayList<>(byType.entrySet())) {
             byType.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
         }
-        for (Entry<PerkName, Collection<UserPerk>> entry : new ArrayList<>(byName.entrySet())) {
+        for (var entry : new ArrayList<>(byName.entrySet())) {
             byName.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
         }
     }
 
     private void perk(Perk perk, int perkSlot) {
-        int id = UserPerks.id.getAndIncrement();
+        var id = UserPerks.id.getAndIncrement();
         UserPerk up;
         perks.put(id, up = perk.perkCreator().create(user, perk, id, perkSlot, woolbattle));
         byType.computeIfAbsent(perk.activationType(), (a) -> new ArrayList<>());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -29,10 +29,10 @@ public class LocationPart {
         } else if (!reader.canRead()) {
             throw LocationPart.EXPECTED_DOUBLE.createWithContext(reader);
         } else {
-            boolean flag = LocationPart.isRelative(reader);
-            int i = reader.getCursor();
-            double d0 = reader.canRead() && reader.peek() != ' ' ? reader.readDouble() : 0.0D;
-            String s = reader.getString().substring(i, reader.getCursor());
+            var flag = LocationPart.isRelative(reader);
+            var i = reader.getCursor();
+            var d0 = reader.canRead() && reader.peek() != ' ' ? reader.readDouble() : 0.0D;
+            var s = reader.getString().substring(i, reader.getCursor());
             if (flag && s.isEmpty()) {
                 return new LocationPart(true, 0.0D);
             }
@@ -50,7 +50,7 @@ public class LocationPart {
         } else if (!reader.canRead()) {
             throw LocationPart.EXPECTED_INT.createWithContext(reader);
         } else {
-            boolean flag = LocationPart.isRelative(reader);
+            var flag = LocationPart.isRelative(reader);
             double d0;
             if (reader.canRead() && reader.peek() != ' ') {
                 d0 = flag ? reader.readDouble() : (double) reader.readInt();
@@ -74,31 +74,30 @@ public class LocationPart {
         return flag;
     }
 
+    public boolean isRelative() {
+        return this.relative;
+    }
+
     public double get(double coord) {
         return this.relative ? this.value + coord : this.value;
     }
 
     @Override public int hashCode() {
-        int i = this.relative ? 1 : 0;
-        long j = Double.doubleToLongBits(this.value);
+        var i = this.relative ? 1 : 0;
+        var j = Double.doubleToLongBits(this.value);
         return 31 * i + (int) (j ^ j >>> 32);
     }
 
     @Override public boolean equals(Object p_equals_1_) {
         if (this == p_equals_1_) {
             return true;
-        } else if (!(p_equals_1_ instanceof LocationPart)) {
+        } else if (!(p_equals_1_ instanceof LocationPart locationpart)) {
             return false;
         } else {
-            LocationPart locationpart = (LocationPart) p_equals_1_;
             if (this.relative != locationpart.relative) {
                 return false;
             }
             return Double.compare(locationpart.value, this.value) == 0;
         }
-    }
-
-    public boolean isRelative() {
-        return this.relative;
     }
 }

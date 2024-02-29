@@ -7,9 +7,14 @@
 
 package eu.darkcube.system.bukkit.commandapi.argument;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
+
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.bukkit.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -18,11 +23,6 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
 
 public class RotationArgument implements ArgumentType<ILocationArgument> {
     public static final SimpleCommandExceptionType ROTATION_INCOMPLETE = Messages.ROTATION_INCOMPLETE.newSimpleCommandExceptionType();
@@ -37,14 +37,14 @@ public class RotationArgument implements ArgumentType<ILocationArgument> {
     }
 
     @Override public ILocationArgument parse(StringReader reader) throws CommandSyntaxException {
-        int i = reader.getCursor();
+        var i = reader.getCursor();
         if (!reader.canRead()) {
             throw RotationArgument.ROTATION_INCOMPLETE.createWithContext(reader);
         }
-        LocationPart yaw = LocationPart.parseDouble(reader, false);
+        var yaw = LocationPart.parseDouble(reader, false);
         if (reader.canRead() && reader.peek() == ' ') {
             reader.skip();
-            LocationPart pitch = LocationPart.parseDouble(reader, false);
+            var pitch = LocationPart.parseDouble(reader, false);
             return new LocationInput(yaw, pitch, new LocationPart(true, 0.0D));
         }
         reader.setCursor(i);
@@ -55,7 +55,7 @@ public class RotationArgument implements ArgumentType<ILocationArgument> {
         if (!(source.getSource() instanceof ISuggestionProvider)) {
             return Suggestions.empty();
         }
-        String s = builder.getRemaining();
+        var s = builder.getRemaining();
         Collection<ISuggestionProvider.Coordinates> collection;
         if (!s.isEmpty() && s.charAt(0) == '^') {
             collection = Collections.emptyList();

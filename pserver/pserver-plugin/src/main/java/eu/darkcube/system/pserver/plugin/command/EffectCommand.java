@@ -17,9 +17,9 @@ import java.util.Map;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.bukkit.commandapi.argument.EnumArgument;
+import eu.darkcube.system.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.builder.ArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
@@ -42,70 +42,31 @@ public class EffectCommand extends PServer {
                 CommandNode<CommandSource> give = Commands.literal("give").build();
                 {
                     {
-                        CommandNode<CommandSource> giveTargets = Commands
-                                .literal("targets")
-                                .then(Commands
-                                        .argument("targets", EntityArgument.entities())
-                                        .redirect(give, context -> context
-                                                .getSource()
-                                                .with("targets", EntityArgument.getEntities(context, "targets"))))
-                                .build();
+                        CommandNode<CommandSource> giveTargets = Commands.literal("targets").then(Commands.argument("targets", EntityArgument.entities()).redirect(give, context -> context.getSource().with("targets", EntityArgument.getEntities(context, "targets")))).build();
                         give.addChild(giveTargets);
-                        CommandNode<CommandSource> giveEffect = Commands
-                                .literal("effect")
-                                .then(Commands
-                                        .argument("effect", EnumArgument.enumArgument(PotionEffect.values(), effect -> new String[]{effect.getKey()}))
-                                        .executes(context -> {
-                                            CommandSource source = context.getSource();
-                                            int level = source.get("level", 1);
-                                            int duration = source.get("duration", 30);
-                                            boolean particles = source.get("particles", true);
-                                            boolean ambient = source.get("ambient", false);
-                                            boolean force = source.get("force", false);
-                                            Collection<? extends Entity> targets = source.get("targets", Collections.singleton(source.asPlayer()));
-                                            PotionEffect type = EnumArgument.getEnumArgument(context, "effect", PotionEffect.class);
-                                            return EffectCommand.giveEffect(context, targets, type, level, duration, ambient, particles, force);
-                                        }))
-                                .build();
+                        CommandNode<CommandSource> giveEffect = Commands.literal("effect").then(Commands.argument("effect", EnumArgument.enumArgument(PotionEffect.values(), effect -> new String[]{effect.getKey()})).executes(context -> {
+                            var source = context.getSource();
+                            int level = source.get("level", 1);
+                            int duration = source.get("duration", 30);
+                            boolean particles = source.get("particles", true);
+                            boolean ambient = source.get("ambient", false);
+                            boolean force = source.get("force", false);
+                            Collection<? extends Entity> targets = source.get("targets", Collections.singleton(source.asPlayer()));
+                            var type = EnumArgument.getEnumArgument(context, "effect", PotionEffect.class);
+                            return EffectCommand.giveEffect(context, targets, type, level, duration, ambient, particles, force);
+                        })).build();
                         give.addChild(giveEffect);
 
-                        CommandNode<CommandSource> giveLevel = Commands
-                                .literal("level")
-                                .then(Commands
-                                        .argument("level", IntegerArgumentType.integer(1, 256))
-                                        .redirect(give, context -> context
-                                                .getSource()
-                                                .with("level", IntegerArgumentType.getInteger(context, "level"))))
-                                .build();
+                        CommandNode<CommandSource> giveLevel = Commands.literal("level").then(Commands.argument("level", IntegerArgumentType.integer(1, 256)).redirect(give, context -> context.getSource().with("level", IntegerArgumentType.getInteger(context, "level")))).build();
                         give.addChild(giveLevel);
 
-                        CommandNode<CommandSource> giveDuration = Commands
-                                .literal("duration")
-                                .then(Commands
-                                        .argument("duration", IntegerArgumentType.integer(1, 99999))
-                                        .redirect(give, context -> context
-                                                .getSource()
-                                                .with("duration", IntegerArgumentType.getInteger(context, "duration"))))
-                                .build();
+                        CommandNode<CommandSource> giveDuration = Commands.literal("duration").then(Commands.argument("duration", IntegerArgumentType.integer(1, 99999)).redirect(give, context -> context.getSource().with("duration", IntegerArgumentType.getInteger(context, "duration")))).build();
                         give.addChild(giveDuration);
 
-                        CommandNode<CommandSource> giveParticles = Commands
-                                .literal("particles")
-                                .then(Commands
-                                        .argument("particles", BooleanArgument.booleanArgument())
-                                        .redirect(give, context -> context
-                                                .getSource()
-                                                .with("particles", BooleanArgument.getBoolean(context, "particles"))))
-                                .build();
+                        CommandNode<CommandSource> giveParticles = Commands.literal("particles").then(Commands.argument("particles", BooleanArgument.booleanArgument()).redirect(give, context -> context.getSource().with("particles", BooleanArgument.getBoolean(context, "particles")))).build();
                         give.addChild(giveParticles);
 
-                        ItemBuilder item = ItemBuilder
-                                .item()
-                                .material(Material.LEATHER_CHESTPLATE)
-                                .amount(5)
-                                .enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                                .unbreakable(true)
-                                .displayname(Component.text("Duckness stinkkt"));
+                        var item = ItemBuilder.item().material(Material.LEATHER_CHESTPLATE).amount(5).enchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4).unbreakable(true).displayname(Component.text("Duckness stinkkt"));
 
                         // ArgumentBuilder<CommandSource, ?> b_giveTargetsEffect =
                         // Commands.argument("effect",
@@ -146,9 +107,7 @@ public class EffectCommand extends PServer {
             {
                 ArgumentBuilder<CommandSource, ?> b_clear = Commands.literal("clear");
                 b_clear.executes(context -> {
-                    return EffectCommand.clearEffects(context, Collections.singleton(context
-                            .getSource()
-                            .asPlayer()), Arrays.asList(PotionEffect.values()));
+                    return EffectCommand.clearEffects(context, Collections.singleton(context.getSource().asPlayer()), Arrays.asList(PotionEffect.values()));
                 });
                 {
                     ArgumentBuilder<CommandSource, ?> b_clearTargets = Commands.argument("targets", EntityArgument.entities());
@@ -171,10 +130,10 @@ public class EffectCommand extends PServer {
     }
 
     private static int giveEffect(CommandContext<CommandSource> context, Collection<? extends Entity> targets, PotionEffect effect, int level, int duration, boolean ambient, boolean particles, boolean force) {
-        CommandSource source = context.getSource();
+        var source = context.getSource();
         Collection<LivingEntity> failed = new HashSet<>();
         Collection<LivingEntity> added = new HashSet<>();
-        for (Entity target : targets) {
+        for (var target : targets) {
             if (!(target instanceof LivingEntity living)) {
                 source.sendMessage(Message.INVALID_ENTITY, target.getName());
                 continue;
@@ -190,32 +149,32 @@ public class EffectCommand extends PServer {
         } else if (failed.size() == 0 || added.size() != 0) {
             source.sendMessage(Message.ADDED_EFFECT_MULTIPLE, effect.getKey(), added.size(), level, duration);
         }
-        for (LivingEntity living : failed) {
+        for (var living : failed) {
             source.sendMessage(Message.COULD_NOT_ADD_EFFECT, effect.getKey(), living.getName());
         }
         return 0;
     }
 
     private static int clearEffects(CommandContext<CommandSource> context, Collection<? extends Entity> targets, Collection<PotionEffect> potionEffects) {
-        CommandSource source = context.getSource();
+        var source = context.getSource();
         Map<LivingEntity, Collection<PotionEffect>> removed = new HashMap<>();
-        for (Entity target : targets) {
+        for (var target : targets) {
             if (!(target instanceof LivingEntity living)) {
                 source.sendMessage(Message.INVALID_ENTITY, target.getName());
                 continue;
             }
             removed.put(living, new ArrayList<>());
-            for (PotionEffect effect : potionEffects) {
+            for (var effect : potionEffects) {
                 if (living.hasPotionEffect(effect.getType())) {
                     living.removePotionEffect(effect.getType());
                     removed.get(living).add(effect);
                 }
             }
         }
-        boolean single = removed.size() == 1;
+        var single = removed.size() == 1;
         Collection<PotionEffect> totalRemovedEffects = new HashSet<>();
-        for (LivingEntity living : removed.keySet()) {
-            Collection<PotionEffect> effects = removed.get(living);
+        for (var living : removed.keySet()) {
+            var effects = removed.get(living);
             totalRemovedEffects.addAll(effects);
             if (single) {
                 if (effects.size() == 1) {

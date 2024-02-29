@@ -5,7 +5,7 @@ plugins {
 
 tasks {
     shadowJar.archiveClassifier = ""
-    jar.archiveClassifier = "pure"
+    jar.destinationDirectory = jar.temporaryDir
     assemble.dependsOn(shadowJar)
 }
 

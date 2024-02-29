@@ -9,7 +9,7 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem.border;
 
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
-import eu.darkcube.system.bukkit.commandapi.argument.BooleanArgument;
+import eu.darkcube.system.commandapi.argument.BooleanArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
