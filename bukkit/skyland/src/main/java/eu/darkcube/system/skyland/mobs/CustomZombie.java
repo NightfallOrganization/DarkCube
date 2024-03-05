@@ -14,6 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.util.Vector;
 
+@Deprecated(forRemoval = true)
 public class CustomZombie {
 
 	Villager zombie;
@@ -23,7 +24,7 @@ public class CustomZombie {
 		zombie = (Villager) loc.getWorld().spawnEntity(loc.add(new Vector(10, 0 ,0)), EntityType.VILLAGER);
 		System.out.println("zombie should appear");
 		FollowingMob fm = new FollowingMob(zombie, 5, new PlayerStats[] {new PlayerStats(
-				PlayerStatsType.ARMOR, 100)}, 1, true, "zombie", Rarity.RARE);
+				PlayerStatsType.ARMOR, 100)}, 1, true, "zombie", Rarity.RARE, new MonsterAbility[] {new AttackAbility()});
 		System.out.println("following mob ai added");
 
 		/*

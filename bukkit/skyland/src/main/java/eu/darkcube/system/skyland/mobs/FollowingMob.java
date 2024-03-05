@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
-
+@Deprecated(forRemoval = true)
 public class FollowingMob implements CustomMob{
 
 	Mob mob;
@@ -31,6 +31,7 @@ public class FollowingMob implements CustomMob{
 	Location targetL;
 	LivingEntity targetE;
 	boolean isTargetLoc;
+	Gson gson = new Gson();
 
 	NamespacedKey nameKey = new NamespacedKey(Skyland.getInstance(), "name");
 
@@ -44,10 +45,12 @@ public class FollowingMob implements CustomMob{
 	NamespacedKey statsKey = new NamespacedKey(Skyland.getInstance(), "stats");
 	//PlayerStats[] stats;
 
+	NamespacedKey abilitiesKey = new NamespacedKey(Skyland.getInstance(), "abilities");
+	MonsterAbility[] abilities;
 
 
 
-	public FollowingMob(Mob mob, int dmg, PlayerStats[] stats, int speed, boolean isAware, String name, Rarity rarity) {
+	public FollowingMob(Mob mob, int dmg, PlayerStats[] stats, int speed, boolean isAware, String name, Rarity rarity, MonsterAbility[] monsterAbilities) {
 		this.mob = mob;
 		entityType = mob.getType();
 		mob.setCustomNameVisible(true);
@@ -66,7 +69,8 @@ public class FollowingMob implements CustomMob{
 		mob.getPersistentDataContainer().set(rarityKey, PersistentDataType.STRING, rarity.toString());
 
 
-
+		mob.getPersistentDataContainer().set(abilitiesKey, PersistentDataType.STRING, gson.toJson(monsterAbilities));
+		abilities = monsterAbilities;
 	}
 
 	//todo rework constructor?
@@ -144,6 +148,13 @@ public class FollowingMob implements CustomMob{
 			setTargetL(mob.getLocation());
 		}
 
+		if (abilities == null){
+			abilities = fetchAbilities();
+		}
+
+		for (MonsterAbility ability : abilities) {
+			ability.trigger(this);
+		}
 
 	}
 
@@ -243,4 +254,27 @@ public class FollowingMob implements CustomMob{
 		mob.getPersistentDataContainer().set(rarityKey, PersistentDataType.STRING, rarity.toString());
 	}
 
+	public MonsterAbility[] fetchAbilities(){
+		//todo fix error
+		return gson.fromJson(mob.getPersistentDataContainer().get(abilitiesKey, PersistentDataType.STRING), MonsterAbility[].class);
+	}
+
+	public void saveMonsterAbilities(){
+		mob.getPersistentDataContainer().set(abilitiesKey, PersistentDataType.STRING, gson.toJson(abilities));
+	}
+
+	private class AbilityEntity {
+		Class<MonsterAbility> clazz;
+		NamespacedKey key;
+
+		private AbilityEntity(Class clazz, String name){
+			this.clazz = clazz;
+			this.key = new NamespacedKey(Skyland.getInstance(), "ability." + name);
+		}
+
+		private MonsterAbility loadAbility(String json, Gson gson){
+			return gson.fromJson(json, clazz);
+		}
+
+	}
 }
