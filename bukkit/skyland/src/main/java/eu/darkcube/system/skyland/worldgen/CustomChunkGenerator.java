@@ -183,23 +183,13 @@ public class CustomChunkGenerator extends ChunkGenerator {
 			}
 		}
 
-		/*
-		for (int i = 0; i < 16; i++) {
-			for (int j = 0; j < 16; j++) {
 
-				Random rndm = new Random();
-				int roll = rndm.nextInt(30);
-				if (roll < 28) {
-					chunkData.setBlock(i, 10, j, Material.DIRT);
-				} else {
-					chunkData.setBlock(i, 10, j, Material.AMETHYST_BLOCK);
-				}
-
-			}
-
-		 */
 	}
 
+	/**
+	 * 
+	 * @returns whether the block at x z is part of an island
+	 */
 	public boolean isIsland(int x, int z){
 		boolean isVoidIslands = true;
 		if (getIslandThiccness(x, z) < 35 || !isVoidIslands) {
@@ -241,51 +231,6 @@ public class CustomChunkGenerator extends ChunkGenerator {
 
 		return out;
 	}
-
-	public int getCurrentHeightTemp(SkylandBiome skylandBiome, int x, int z){
-		//int currentHeight = (int) ((generator.noise(chunkX * 16 + x, chunkZ * 16 +
-		// z, 0.5D, 0.5D, true) +1 ) * 50D + 50D);
-
-		BiomeGenModifiers biomeGenModifier = skylandBiome.getBiomeGenModifiers();
-
-		int currentHeight =
-				(int) ((generator.noise(x, z, biomeGenModifier.terrainFrequency, biomeGenModifier.terrainAmplitude,
-						true) + 1) * biomeGenModifier.maxTerrainHeight + biomeGenModifier.minTerrainHeight);
-		//currentHeight += (int) ((generator.noise(chunkX * 16 + x, chunkZ * 16 + z,
-		// 2D, 0.5D, true)) * 50D + 50D)/4;
-		currentHeight +=
-				(int) ((details.noise(x,z, biomeGenModifier.detailsFrequency,
-						biomeGenModifier.detailsAmplitude,
-						true)) * biomeGenModifier.maxDetailsHeight + biomeGenModifier.minDetailsHeight) / biomeGenModifier.detailsImpact;
-
-
-
-
-		int islandGenHeight = getIslandThiccness(x, z);
-		
-		if (getIslandIntensity(x,z) < 5){
-			currentHeight = (int) (currentHeight - (getIslandIntensity(x,z) - 5 )*-2);
-		}
-
-
-
-		return currentHeight;
-	}
-
-
-	public int getCurrentHeight(int x, int z){
-
-
-		return getCurrentHeightTemp(SkylandBiome.getBiome(x, z), x ,z);
-	}
-
-
-
-
-
-
-
-
 
 
 	public int getIslandIntensity(int x, int z){

@@ -33,7 +33,7 @@ public class TreePopulator extends BlockPopulator {
 			for (int z = 0; z < 16; z++) {
 
 				double roll = (islandGen.noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5D, 0.5D, true) + 1);
-				int treeFreq = 2; // tree everey treeFreq block
+				int treeFreq = 2; // tree every treeFreq block
 
 				if (((int) (roll * treeFreq)) % treeFreq == 0
 						&& SkylandBiome.getBiomeIntensity(chunkX * 16 + x, chunkZ * 16 + z) > 2) {
