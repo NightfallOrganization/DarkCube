@@ -66,7 +66,7 @@ public class ServerManager {
                 requireUpdate = false;
 
                 runQuery();
-                for (UpdateListener l : updateListeners) l.update(mergedInformations.values());
+                for (var l : updateListeners) l.update(mergedInformations.values());
             }
         }.runTaskTimer(lobby, 1, 1);
     }
@@ -80,7 +80,7 @@ public class ServerManager {
             var fut = new CompletableFuture<ServerInformation>();
             new BukkitRunnable() {
                 @Override public void run() {
-                    for (DefaultServerInformation information : mergedInformations.values()) {
+                    for (var information : mergedInformations.values()) {
                         if (information.snapshot.name().equals(serverName)) {
                             fut.complete(information);
                             return;
@@ -102,11 +102,11 @@ public class ServerManager {
         while ((r = queue.poll()) != null) r.run();
         mergedInformations.clear();
         informations.keySet().retainAll(services.keySet());
-        for (Map.Entry<UUID, ServiceInfoSnapshot> entry : services.entrySet()) {
-            Collection<DefaultServerInformation> c = informations.compute(entry.getKey(), (ignoredUuid, prev) -> {
+        for (var entry : services.entrySet()) {
+            var c = informations.compute(entry.getKey(), (ignoredUuid, prev) -> {
                 if (prev != null) {
-                    boolean v2 = false;
-                    for (DefaultServerInformation information : prev) {
+                    var v2 = false;
+                    for (var information : prev) {
                         information.snapshot(entry.getValue());
                         if ("LobbyV2".equals(information.displayNameString()) || information instanceof DefaultServerInformationV2) {
                             v2 = true;
@@ -118,14 +118,14 @@ public class ServerManager {
                     }
                     return prev;
                 }
-                DefaultServerInformation information = new DefaultServerInformation(lobby).snapshot(entry.getValue());
+                var information = new DefaultServerInformation(lobby).snapshot(entry.getValue());
                 if (!"LobbyV2".equals(information.displayNameString())) {
                     return List.of(information);
                 }
                 return parseV2(entry.getValue(), Collections.emptyList());
             });
             if (c != null) {
-                for (DefaultServerInformation information : c) {
+                for (var information : c) {
                     mergedInformations.put(information.uniqueId(), information);
                 }
             }
@@ -133,13 +133,13 @@ public class ServerManager {
     }
 
     private @Nullable Collection<DefaultServerInformation> parseV2(ServiceInfoSnapshot snapshot, Collection<? extends ServerInformation> existing) {
-        Document extra = snapshot.readProperty(DarkCubeServiceProperty.EXTRA);
+        var extra = snapshot.readProperty(DarkCubeServiceProperty.EXTRA);
         if (extra == null) return Collections.emptyList();
-        Document lobbyV2 = extra.readDocument("LobbyV2");
+        var lobbyV2 = extra.readDocument("LobbyV2");
         Map<String, DefaultServerInformation> map = new LinkedHashMap<>();
         keys:
-        for (String key : lobbyV2.keys()) {
-            for (ServerInformation information : existing) {
+        for (var key : lobbyV2.keys()) {
+            for (var information : existing) {
                 if (!(information instanceof DefaultServerInformationV2 v2)) continue;
                 v2.snapshot(snapshot);
                 if (v2.key().equals(key)) {
@@ -162,9 +162,9 @@ public class ServerManager {
     }
 
     CompletableFuture<ServerInformation.State> startConnectionRequest(UUID player, DefaultServerInformationV2 server) {
-        CompletableFuture<ServerInformation.State> future = new CompletableFuture<>();
-        UUID requestId = UUID.randomUUID();
-        ConnectionRequest request = new ConnectionRequest(future, player, server.snapshot.name());
+        var future = new CompletableFuture<ServerInformation.State>();
+        var requestId = UUID.randomUUID();
+        var request = new ConnectionRequest(future, player, server.snapshot.name());
         connectionRequests.put(requestId, request);
         ChannelMessage
                 .builder()
@@ -197,7 +197,7 @@ public class ServerManager {
     public class Listener {
 
         public Listener() {
-            for (ServiceInfoSnapshot service : InjectionLayer.boot().instance(CloudServiceProvider.class).services()) {
+            for (var service : InjectionLayer.boot().instance(CloudServiceProvider.class).services()) {
                 services.put(service.serviceId().uniqueId(), service);
             }
             triggerUpdate();
@@ -206,12 +206,12 @@ public class ServerManager {
         @EventListener public void handle(ChannelMessageReceiveEvent event) {
             if (!event.channel().equals("darkcube_lobbysystem_v2")) return;
             if (event.message().equals("connection_request_status")) {
-                UUID requestId = event.content().readUniqueId();
-                int status = event.content().readInt();
-                ConnectionRequest request = connectionRequests.getIfPresent(requestId);
+                var requestId = event.content().readUniqueId();
+                var status = event.content().readInt();
+                var request = connectionRequests.getIfPresent(requestId);
                 if (request == null) return;
                 if (status == 0) {
-                    String message = event.content().readString();
+                    var message = event.content().readString();
                     request.future.complete(new ServerInformation.State(false, new ConnectionFailedException(message)));
                 } else if (status == 2) {
                     request.future.complete(new ServerInformation.State(true, null));
@@ -222,7 +222,7 @@ public class ServerManager {
         }
 
         @EventListener public void handle(CloudServiceUpdateEvent event) {
-            ServiceInfoSnapshot service = event.serviceInfo();
+            var service = event.serviceInfo();
             queue.add(() -> services.computeIfPresent(service
                     .serviceId()
                     .uniqueId(), (ignoredUuid, ignoredServiceInfoSnapshot) -> service));
@@ -236,7 +236,7 @@ public class ServerManager {
                     System.out.println("[ConnectorNPC] Server connected: " + event.serviceInfo().serviceId().name());
                 } else if (event.lastLifeCycle() == ServiceLifeCycle.RUNNING) {
                     System.out.println("[ConnectorNPC] Server disconnected: " + event.serviceInfo().serviceId().name());
-                    ServiceInfoSnapshot snap = services.remove(event.serviceInfo().serviceId().uniqueId());
+                    var snap = services.remove(event.serviceInfo().serviceId().uniqueId());
                     if (snap == null) System.err.println("Failed to remove from services!!!");
                 }
             });

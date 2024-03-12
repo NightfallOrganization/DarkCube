@@ -14,16 +14,59 @@ import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 
 public interface WBUser {
     WoolBattleApi woolbattle();
 
     /**
-     * @return the user from the {@link eu.darkcube.system.userapi.UserAPI UserAPI}
+     * @return the user from the {@link UserAPI UserAPI}
      */
     User user();
+
+    int woolCount();
+
+    /**
+     * Gives the player wool.
+     *
+     * @param count the amount of wool to add
+     * @return the actual amount of wool added
+     */
+    default int addWool(int count) {
+        return addWool(count, true);
+    }
+
+    /**
+     * Gives the player wool.
+     *
+     * @param count      the amount of wool to add
+     * @param dropIfFull whether the wool should drop on full inventory
+     * @return the actual amount of wool added
+     */
+    int addWool(int count, boolean dropIfFull);
+
+    /**
+     * Takes wool from the player.
+     *
+     * @param count the amount of wool to take
+     * @return the actual amount of wool taken
+     */
+    default int removeWool(int count) {
+        return removeWool(count, true);
+    }
+
+    /**
+     * Takes wool from the player.
+     *
+     * @param count           the amount of wool to take
+     * @param updateInventory whether the inventory should be affected. This is used to remove wool silently without the player noticing. This can cause the inventory to become out-of-sync. This can also help to get the inventory back in sync.
+     * @return the actual amount of wool taken.
+     */
+    @ApiStatus.Experimental
+    int removeWool(int count, boolean updateInventory);
 
     Game game();
 
@@ -86,5 +129,4 @@ public interface WBUser {
     boolean particles();
 
     void particles(boolean particles);
-
 }

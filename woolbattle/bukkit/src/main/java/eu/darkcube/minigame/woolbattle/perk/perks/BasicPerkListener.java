@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -31,11 +32,13 @@ public abstract class BasicPerkListener extends PerkListener implements Register
         this.handle = new Handle(woolbattle);
     }
 
-    @Override public void registered() {
+    @Override
+    public void registered() {
         WoolBattleBukkit.registerListeners(this.handle);
     }
 
-    @Override public void unregistered() {
+    @Override
+    public void unregistered() {
         WoolBattleBukkit.unregisterListeners(this.handle);
     }
 
@@ -92,7 +95,8 @@ public abstract class BasicPerkListener extends PerkListener implements Register
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler private void handle(LaunchableInteractEvent event) {
+        @EventHandler
+        private void handle(LaunchableInteractEvent event) {
             if (!mayActivate()) return;
             ItemStack item = event.getItem();
             if (item == null) {

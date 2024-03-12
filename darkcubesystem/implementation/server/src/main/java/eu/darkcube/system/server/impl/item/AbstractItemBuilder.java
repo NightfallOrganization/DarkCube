@@ -55,31 +55,37 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         return attributeModifiers.computeIfAbsent(attribute, a -> new HashSet<>());
     }
 
-    @Override public @NotNull Material material() {
+    @Override
+    public @NotNull Material material() {
         return material;
     }
 
-    @Override public @NotNull AbstractItemBuilder material(@NotNull Material material) {
+    @Override
+    public @NotNull AbstractItemBuilder material(@NotNull Material material) {
         this.material = material;
         return this;
     }
 
-    @Override public int amount() {
+    @Override
+    public int amount() {
         return amount;
     }
 
-    @Override public @NotNull AbstractItemBuilder amount(int amount) {
+    @Override
+    public @NotNull AbstractItemBuilder amount(int amount) {
         this.amount = amount;
         return this;
     }
 
-    @Override public @NotNull Map<Attribute, Collection<AttributeModifier>> attributeModifiers() {
+    @Override
+    public @NotNull Map<Attribute, Collection<AttributeModifier>> attributeModifiers() {
         var result = new HashMap<>(attributeModifiers);
         result.replaceAll((a, v) -> Set.of(v.toArray(new AttributeModifier[0])));
         return Map.copyOf(result);
     }
 
-    @Override public @NotNull Map<Attribute, Collection<AttributeModifier>> attributeModifiers(EquipmentSlot slot) {
+    @Override
+    public @NotNull Map<Attribute, Collection<AttributeModifier>> attributeModifiers(EquipmentSlot slot) {
         Map<Attribute, Collection<AttributeModifier>> result = new HashMap<>();
         for (var entry : this.attributeModifiers.entrySet()) {
             for (var modifier : entry.getValue()) {
@@ -94,7 +100,8 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         return Map.copyOf(result);
     }
 
-    @Override public @NotNull Collection<AttributeModifier> attributeModifiers(@NotNull Attribute attribute) {
+    @Override
+    public @NotNull Collection<AttributeModifier> attributeModifiers(@NotNull Attribute attribute) {
         if (!attributeModifiers.containsKey(attribute)) return List.of();
         return List.copyOf(attributeModifiers.get(attribute));
     }
@@ -108,7 +115,8 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder attributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+    @Override
+    public @NotNull AbstractItemBuilder attributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
         for (var entry : this.attributeModifiers.entrySet()) {
             for (var entryModifier : entry.getValue()) {
                 if (entryModifier.uniqueId().equals(modifier.uniqueId())) {
@@ -120,7 +128,8 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder removeAttributeModifiers(EquipmentSlot slot) {
+    @Override
+    public @NotNull AbstractItemBuilder removeAttributeModifiers(EquipmentSlot slot) {
         var it = this.attributeModifiers.entrySet().iterator();
         while (it.hasNext()) {
             var entry = it.next();
@@ -134,7 +143,8 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder removeAttributeModifiers(@NotNull Attribute attribute) {
+    @Override
+    public @NotNull AbstractItemBuilder removeAttributeModifiers(@NotNull Attribute attribute) {
         attributeModifiers.remove(attribute);
         return this;
     }
@@ -154,145 +164,173 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder damage(int damage) {
+    @Override
+    public @NotNull AbstractItemBuilder damage(int damage) {
         this.damage = damage;
         return this;
     }
 
-    @Override public int damage() {
+    @Override
+    public int damage() {
         return damage;
     }
 
-    @Override public @NotNull AbstractItemBuilder enchant(@NotNull Enchantment enchant, int level) {
+    @Override
+    public @NotNull AbstractItemBuilder enchant(@NotNull Enchantment enchant, int level) {
         enchantments.put(enchant, level);
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder enchant(@NotNull Map<Enchantment, Integer> enchantments) {
+    @Override
+    public @NotNull AbstractItemBuilder enchant(@NotNull Map<Enchantment, Integer> enchantments) {
         this.enchantments.putAll(enchantments);
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder enchantments(@NotNull Map<Enchantment, Integer> enchantments) {
+    @Override
+    public @NotNull AbstractItemBuilder enchantments(@NotNull Map<Enchantment, Integer> enchantments) {
         this.enchantments.clear();
         this.enchantments.putAll(enchantments);
         return this;
     }
 
-    @Override public @NotNull Map<Enchantment, Integer> enchantments() {
+    @Override
+    public @NotNull Map<Enchantment, Integer> enchantments() {
         return Map.copyOf(enchantments);
     }
 
-    @Override public @NotNull Component displayname() {
+    @Override
+    public @NotNull Component displayname() {
         return displayname;
     }
 
-    @Override public @NotNull AbstractItemBuilder displayname(@Nullable Component displayname) {
-        this.displayname = displayname == null ? Component.empty() : Component
-                .empty()
-                .decoration(TextDecoration.ITALIC, false)
-                .append(displayname);
+    @Override
+    public @NotNull AbstractItemBuilder displayname(@Nullable Component displayname) {
+        this.displayname = displayname == null ? Component.empty() : Component.empty().decoration(TextDecoration.ITALIC, false).append(displayname);
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder displaynameRaw(@NotNull Component displayname) {
+    @Override
+    public @NotNull AbstractItemBuilder displaynameRaw(@NotNull Component displayname) {
         this.displayname = displayname;
         return this;
     }
 
-    @Override public @NotNull List<Component> lore() {
+    @Override
+    public @NotNull List<Component> lore() {
         return List.copyOf(lore);
     }
 
-    @Override public @NotNull AbstractItemBuilder lore(@NotNull Component line) {
+    @Override
+    public @NotNull AbstractItemBuilder lore(@NotNull Component line) {
         lore.add(Component.empty().decoration(TextDecoration.ITALIC, false).append(line));
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder lore(@NotNull Collection<Component> lore) {
+    @Override
+    public @NotNull AbstractItemBuilder lore(@NotNull Collection<Component> lore) {
         for (var component : lore) {
             lore(component);
         }
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder lore(Component... lines) {
+    @Override
+    public @NotNull AbstractItemBuilder lore(Component... lines) {
         return lore(Arrays.asList(lines));
     }
 
-    @Override public @NotNull AbstractItemBuilder lore(@NotNull Component line, int index) {
+    @Override
+    public @NotNull AbstractItemBuilder lore(@NotNull Component line, int index) {
         lore.add(index, Component.empty().decoration(TextDecoration.ITALIC, false).append(line));
         return this;
     }
 
-    @SuppressWarnings("removal") @Override @Deprecated(forRemoval = true) public AbstractItemBuilder lore(String... lines) {
+    @SuppressWarnings("removal")
+    @Override
+    @Deprecated(forRemoval = true)
+    public AbstractItemBuilder lore(String... lines) {
         for (var line : lines) {
             lore(LegacyComponentSerializer.legacySection().deserialize(line));
         }
         return this;
     }
 
-    @SuppressWarnings("removal") @Override @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
+    @Override
+    @Deprecated(forRemoval = true)
     public @NotNull AbstractItemBuilder lores(@NotNull Collection<String> lines) {
         lore.clear();
         lore(lines.toArray(new String[0]));
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder setLore(@NotNull Collection<Component> lore) {
+    @Override
+    public @NotNull AbstractItemBuilder setLore(@NotNull Collection<Component> lore) {
         this.lore.clear();
         lore(lore);
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder flag(@NotNull ItemFlag flag) {
+    @Override
+    public @NotNull AbstractItemBuilder flag(@NotNull ItemFlag flag) {
         flags.add(flag);
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder flag(@NotNull Collection<?> flags) {
+    @Override
+    public @NotNull AbstractItemBuilder flag(@NotNull Collection<?> flags) {
         this.flags.addAll(flags.stream().map(ItemFlag::of).toList());
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder flag(ItemFlag @NotNull ... flags) {
+    @Override
+    public @NotNull AbstractItemBuilder flag(ItemFlag @NotNull ... flags) {
         this.flags.addAll(Arrays.asList(flags));
         return this;
     }
 
-    @Override public @NotNull AbstractItemBuilder setFlags(@NotNull Collection<?> flags) {
+    @Override
+    public @NotNull AbstractItemBuilder setFlags(@NotNull Collection<?> flags) {
         this.flags.clear();
         flag(flags);
         return this;
     }
 
-    @Override public @NotNull List<ItemFlag> flags() {
+    @Override
+    public @NotNull List<ItemFlag> flags() {
         return Collections.unmodifiableList(flags);
     }
 
-    @Override public @NotNull AbstractItemBuilder unbreakable(boolean unbreakable) {
+    @Override
+    public @NotNull AbstractItemBuilder unbreakable(boolean unbreakable) {
         this.unbreakable = unbreakable;
         return this;
     }
 
-    @Override public boolean unbreakable() {
+    @Override
+    public boolean unbreakable() {
         return unbreakable;
     }
 
-    @Override public @NotNull AbstractItemBuilder glow(boolean glow) {
+    @Override
+    public @NotNull AbstractItemBuilder glow(boolean glow) {
         this.glow = glow;
         return this;
     }
 
-    @Override public boolean glow() {
+    @Override
+    public boolean glow() {
         return glow;
     }
 
-    @Override public @NotNull BasicItemPersistentDataStorage persistentDataStorage() {
+    @Override
+    public @NotNull BasicItemPersistentDataStorage persistentDataStorage() {
         return storage;
     }
 
-    @Override public <T extends BuilderMeta> @NotNull T meta(@NotNull Class<T> clazz) {
+    @Override
+    public <T extends BuilderMeta> @NotNull T meta(@NotNull Class<T> clazz) {
         if (clazz.getSuperclass() == Object.class) {
             for (var existing : metas) {
                 if (clazz.equals(existing.getClass())) {
@@ -312,30 +350,36 @@ public abstract class AbstractItemBuilder implements ItemBuilder {
         throw new ClassCastException("Invalid BuilderMeta");
     }
 
-    @Override public @NotNull AbstractItemBuilder meta(@NotNull BuilderMeta meta) {
+    @Override
+    public @NotNull AbstractItemBuilder meta(@NotNull BuilderMeta meta) {
         metas.removeIf(m -> m.getClass().equals(meta.getClass()));
         metas.add(meta);
         return this;
     }
 
-    @Override public @NotNull Set<BuilderMeta> metas() {
+    @Override
+    public @NotNull Set<BuilderMeta> metas() {
         return Set.copyOf(metas);
     }
 
-    @Override public @NotNull AbstractItemBuilder metas(@NotNull Set<BuilderMeta> metas) {
+    @Override
+    public @NotNull AbstractItemBuilder metas(@NotNull Set<BuilderMeta> metas) {
         this.metas.clear();
         metas.stream().map(BuilderMeta::clone).forEach(this::meta);
         return this;
     }
 
-    @Override public int repairCost() {
+    @Override
+    public int repairCost() {
         return repairCost;
     }
 
-    @Override public @NotNull AbstractItemBuilder repairCost(int repairCost) {
+    @Override
+    public @NotNull AbstractItemBuilder repairCost(int repairCost) {
         this.repairCost = repairCost;
         return this;
     }
 
-    @Override public abstract @NotNull ItemBuilder clone();
+    @Override
+    public abstract @NotNull ItemBuilder clone();
 }

@@ -8,16 +8,16 @@
 package eu.darkcube.minigame.woolbattle.api;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class WoolBattleApiImpl implements WoolBattleApi {
     private final WoolBattleBukkit woolbattle;
 
     public WoolBattleApiImpl(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
-        WoolBattleApiHolder.instance = this;
     }
 
-    @Override public LobbySystemLinkImpl lobbySystemLink() {
+    @Override public @NotNull LobbySystemLinkImpl lobbySystemLink() {
         return woolbattle.lobbySystemLink();
     }
 }

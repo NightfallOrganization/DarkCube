@@ -15,9 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
-import eu.darkcube.minigame.woolbattle.api.game.Ingame;
+import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
@@ -69,7 +68,7 @@ public class CommonUserPerks implements UserPerks {
     private void perk(Perk perk, int perkSlot) {
         var id = CommonUserPerks.id.getAndIncrement();
         UserPerk up;
-        perks.put(id, up = perk.perkCreator().create(user, perk, id, perkSlot));
+        perks.put(id, up = perk.perkCreator().create(user, perk, id, perkSlot, game));
         byType.computeIfAbsent(perk.activationType(), (a) -> new ArrayList<>());
         byName.computeIfAbsent(perk.perkName(), (a) -> new ArrayList<>());
         byType.get(perk.activationType()).add(up);

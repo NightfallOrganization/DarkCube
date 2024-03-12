@@ -20,7 +20,7 @@ public class MinestomEnchantmentProvider implements EnchantmentProvider {
     public MinestomEnchantmentProvider() {
         var enchantments = new HashMap<net.minestom.server.item.Enchantment, Enchantment>();
         for (var enchantment : net.minestom.server.item.Enchantment.values()) {
-            enchantments.put(enchantment, new MinestomEnchantment(enchantment));
+            enchantments.put(enchantment, new MinestomEnchantmentImpl(enchantment));
         }
         this.enchantments = enchantments;
     }

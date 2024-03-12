@@ -9,6 +9,9 @@ plugins {
 }
 
 dependencies {
-    api(parent!!.project("api"))
+    api(projects.woolbattle.api)
+    api(projects.pserver.pserverApi)
     api(projects.darkcubesystem.server)
+    api(libs.jctools.core)
+    api(libs.fastutil)
 }

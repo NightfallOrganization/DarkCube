@@ -8,30 +8,33 @@
 package eu.darkcube.minigame.woolbattle.api.event.user;
 
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface UserEvent {
-    WBUser user();
+    @NotNull WBUser user();
 
     class Event implements UserEvent {
-        private final WBUser user;
+        private final @NotNull WBUser user;
 
-        public Event(WBUser user) {
+        public Event(@NotNull WBUser user) {
             this.user = user;
         }
 
-        @Override public WBUser user() {
+        @Override
+        public @NotNull WBUser user() {
             return user;
         }
     }
 
     class Cancellable extends eu.darkcube.system.event.Cancellable.Event implements UserEvent {
-        private final WBUser user;
+        private final @NotNull WBUser user;
 
-        public Cancellable(WBUser user) {
+        public Cancellable(@NotNull WBUser user) {
             this.user = user;
         }
 
-        @Override public WBUser user() {
+        @Override
+        public @NotNull WBUser user() {
             return user;
         }
     }

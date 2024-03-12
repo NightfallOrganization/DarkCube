@@ -7,14 +7,16 @@
 
 package eu.darkcube.minigame.woolbattle.api.perk.user;
 
-import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
+import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
+@Api
 public interface UserPerk {
-
-    WoolBattleApi woolbattle();
+    @NotNull Game game();
 
     /**
      * @return a {@code unique id} for each user for each perk. This {@link UserPerk perk} is
@@ -27,12 +29,12 @@ public interface UserPerk {
     /**
      * @return the {@link Perk} associated with this {@link UserPerk}
      */
-    Perk perk();
+    @NotNull Perk perk();
 
     /**
      * @return the current item for this perk. May change for cooldown or other events at any time
      */
-    PerkItem currentPerkItem();
+    @NotNull PerkItem currentPerkItem();
 
     /**
      * Sets the perk to the specified {@code slot}
@@ -61,6 +63,6 @@ public interface UserPerk {
 
     void slotSilent(int slot);
 
-    WBUser owner();
+    @NotNull WBUser owner();
 
 }

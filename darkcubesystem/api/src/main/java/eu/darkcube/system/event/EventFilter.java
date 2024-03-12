@@ -33,15 +33,18 @@ public interface EventFilter<E, H> {
 
     static <E, H> EventFilter<E, H> from(@NotNull Class<E> eventType, @Nullable Class<H> handlerType, @Nullable Function<E, H> handlerGetter) {
         return new EventFilter<>() {
-            @Override public @Nullable H getHandler(@NotNull E event) {
+            @Override
+            public @Nullable H getHandler(@NotNull E event) {
                 return handlerGetter != null ? handlerGetter.apply(event) : null;
             }
 
-            @Override public @NotNull Class<E> eventType() {
+            @Override
+            public @NotNull Class<E> eventType() {
                 return eventType;
             }
 
-            @Override public @Nullable Class<H> handlerType() {
+            @Override
+            public @Nullable Class<H> handlerType() {
                 return handlerType;
             }
         };
@@ -56,7 +59,8 @@ public interface EventFilter<E, H> {
      */
     @Nullable H getHandler(@NotNull E event);
 
-    @ApiStatus.Internal default @Nullable H castHandler(@NotNull Object event) {
+    @ApiStatus.Internal
+    default @Nullable H castHandler(@NotNull Object event) {
         return getHandler((E) event);
     }
 

@@ -18,7 +18,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <E> the event type
  */
-@ApiStatus.Experimental public interface ListenerHandle<E> {
+@ApiStatus.Experimental
+public interface ListenerHandle<E> {
     /**
      * Calls the given event.
      * Will try to fast exit the execution when possible if {@link #hasListener()} return {@code false}.

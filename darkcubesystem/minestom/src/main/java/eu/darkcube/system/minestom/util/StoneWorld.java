@@ -11,10 +11,14 @@ import java.util.UUID;
 
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.color.Color;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.ItemEntity;
+import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.utils.NamespaceID;
@@ -37,7 +41,6 @@ public class StoneWorld {
                 .build();
 
         MinecraftServer.getBiomeManager().addBiome(biome);
-
         var dimensionType = DimensionType
                 .builder(NamespaceID.from("darkcube", "stone_world"))
                 .ambientLight(2.0F)

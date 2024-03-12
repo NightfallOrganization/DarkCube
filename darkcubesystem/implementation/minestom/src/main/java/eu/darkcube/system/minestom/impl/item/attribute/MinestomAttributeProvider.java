@@ -19,7 +19,7 @@ public class MinestomAttributeProvider implements AttributeProvider {
 
     @Override public @NotNull Attribute of(@NotNull Object platformAttribute) {
         if (platformAttribute instanceof Attribute attribute) return attribute;
-        if (platformAttribute instanceof net.minestom.server.attribute.Attribute attribute) return attributeMap.computeIfAbsent(attribute, MinestomAttribute::new);
+        if (platformAttribute instanceof net.minestom.server.attribute.Attribute attribute) return attributeMap.computeIfAbsent(attribute, MinestomAttributeImpl::new);
         throw new IllegalArgumentException("Invalid Attribute: " + platformAttribute);
     }
 }
