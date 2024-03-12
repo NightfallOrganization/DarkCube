@@ -17,7 +17,8 @@ import java.util.function.Predicate;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-@ApiStatus.Experimental public interface EventBinding<E> {
+@ApiStatus.Experimental
+public interface EventBinding<E> {
 
     static <E, T> @NotNull FilteredBuilder<E, T> filtered(@NotNull EventFilter<E, T> filter, @NotNull Predicate<T> predicate) {
         return new FilteredBuilder<>(filter, predicate);
@@ -56,11 +57,13 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
                 });
             }
             return new EventBinding<>() {
-                @Override public @NotNull Collection<Class<?>> eventTypes() {
+                @Override
+                public @NotNull Collection<Class<?>> eventTypes() {
                     return eventTypes;
                 }
 
-                @Override public @NotNull Consumer<E> consumer(@NotNull Class<?> eventType) {
+                @Override
+                public @NotNull Consumer<E> consumer(@NotNull Class<?> eventType) {
                     return consumers.get(eventType);
                 }
             };

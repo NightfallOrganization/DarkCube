@@ -29,7 +29,8 @@ public interface EventListener<T> {
 
     @NotNull Result run(@NotNull T event);
 
-    @Contract(pure = true) static <T> EventListener.@NotNull Builder<T> builder(@NotNull Class<T> eventType) {
+    @Contract(pure = true)
+    static <T> EventListener.@NotNull Builder<T> builder(@NotNull Class<T> eventType) {
         return new EventListener.Builder<>(eventType);
     }
 
@@ -42,7 +43,8 @@ public interface EventListener<T> {
      * @param <T>       The event type to handle
      * @return An event listener with the given properties
      */
-    @Contract(pure = true) static <T> @NotNull EventListener<T> of(@NotNull Class<T> eventType, @NotNull Consumer<@NotNull T> listener) {
+    @Contract(pure = true)
+    static <T> @NotNull EventListener<T> of(@NotNull Class<T> eventType, @NotNull Consumer<@NotNull T> listener) {
         return builder(eventType).handler(listener).build();
     }
 
@@ -62,7 +64,8 @@ public interface EventListener<T> {
          * Adds a filter to the executor of this listener. The executor will only
          * be called if this condition passes on the given event.
          */
-        @Contract(value = "_ -> this") public @NotNull EventListener.Builder<T> filter(Predicate<T> filter) {
+        @Contract(value = "_ -> this")
+        public @NotNull EventListener.Builder<T> filter(Predicate<T> filter) {
             this.filters.add(filter);
             return this;
         }
@@ -74,7 +77,8 @@ public interface EventListener<T> {
          *
          * @param ignoreCancelled True to stop processing the event when cancelled
          */
-        @Contract(value = "_ -> this") public @NotNull EventListener.Builder<T> ignoreCancelled(boolean ignoreCancelled) {
+        @Contract(value = "_ -> this")
+        public @NotNull EventListener.Builder<T> ignoreCancelled(boolean ignoreCancelled) {
             this.ignoreCancelled = ignoreCancelled;
             return this;
         }
@@ -84,7 +88,8 @@ public interface EventListener<T> {
          *
          * @param expireCount The number of times to execute
          */
-        @Contract(value = "_ -> this") public @NotNull EventListener.Builder<T> expireCount(int expireCount) {
+        @Contract(value = "_ -> this")
+        public @NotNull EventListener.Builder<T> expireCount(int expireCount) {
             this.expireCount = expireCount;
             return this;
         }
@@ -95,7 +100,8 @@ public interface EventListener<T> {
          *
          * @param expireWhen The condition to test
          */
-        @Contract(value = "_ -> this") public @NotNull EventListener.Builder<T> expireWhen(Predicate<T> expireWhen) {
+        @Contract(value = "_ -> this")
+        public @NotNull EventListener.Builder<T> expireWhen(Predicate<T> expireWhen) {
             this.expireWhen = expireWhen;
             return this;
         }
@@ -104,12 +110,14 @@ public interface EventListener<T> {
          * Sets the handler for this event listener. This will be executed if the listener passes
          * all conditions.
          */
-        @Contract(value = "_ -> this") public @NotNull EventListener.Builder<T> handler(Consumer<T> handler) {
+        @Contract(value = "_ -> this")
+        public @NotNull EventListener.Builder<T> handler(Consumer<T> handler) {
             this.handler = handler;
             return this;
         }
 
-        @Contract(value = "-> new", pure = true) public @NotNull EventListener<T> build() {
+        @Contract(value = "-> new", pure = true)
+        public @NotNull EventListener<T> build() {
             final boolean ignoreCancelled = this.ignoreCancelled;
             AtomicInteger expirationCount = new AtomicInteger(this.expireCount);
             final boolean hasExpirationCount = expirationCount.get() > 0;
@@ -119,11 +127,13 @@ public interface EventListener<T> {
             final var filters = new ArrayList<>(this.filters);
             final var handler = this.handler;
             return new EventListener<>() {
-                @Override public @NotNull Class<T> eventType() {
+                @Override
+                public @NotNull Class<T> eventType() {
                     return eventType;
                 }
 
-                @Override public @NotNull Result run(@NotNull T event) {
+                @Override
+                public @NotNull Result run(@NotNull T event) {
                     // Event cancellation
                     if (ignoreCancelled && event instanceof Cancellable c && c.cancelled()) {
                         return Result.INVALID;
@@ -156,6 +166,9 @@ public interface EventListener<T> {
     }
 
     enum Result {
-        SUCCESS, INVALID, EXPIRED, EXCEPTION
+        SUCCESS,
+        INVALID,
+        EXPIRED,
+        EXCEPTION
     }
 }

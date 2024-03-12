@@ -7,6 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
+import java.time.Duration;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalListener;
@@ -38,11 +43,6 @@ import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 
-import java.time.Duration;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 public class LobbySystemLinkImpl implements LobbySystemLink {
 
     private final WoolBattleBukkit woolbattle;
@@ -56,12 +56,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     public LobbySystemLinkImpl(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         this.updateTask = new UpdateTask(woolbattle);
-        this.connectionRequests = Caffeine
-                .newBuilder()
-                .scheduler(com.github.benmanes.caffeine.cache.Scheduler.systemScheduler())
-                .expireAfterWrite(Duration.ofSeconds(10))
-                .removalListener(newRemovalListener())
-                .build();
+        this.connectionRequests = Caffeine.newBuilder().scheduler(com.github.benmanes.caffeine.cache.Scheduler.systemScheduler()).expireAfterWrite(Duration.ofSeconds(10)).removalListener(newRemovalListener()).build();
     }
 
     private RemovalListener<UUID, ConnectionRequest> newRemovalListener() {
@@ -74,7 +69,8 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         };
     }
 
-    @Override public boolean enabled() {
+    @Override
+    public boolean enabled() {
         return enabled;
     }
 
@@ -98,14 +94,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     }
 
     private void sendIsLoaded() {
-        ChannelMessage
-                .builder()
-                .channel("darkcube_lobbysystem")
-                .message("pserver_loaded")
-                .targetServices()
-                .buffer(DataBuf.empty())
-                .build()
-                .send();
+        ChannelMessage.builder().channel("darkcube_lobbysystem").message("pserver_loaded").targetServices().buffer(DataBuf.empty()).build().send();
     }
 
     public void disable() {
@@ -124,7 +113,8 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         return pserver;
     }
 
-    @Override public void update() {
+    @Override
+    public void update() {
         if (!fullyLoaded) return;
         if (!enabled) return;
         GameState gameState = gameState();
@@ -179,7 +169,8 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         doc.append(map.size().toString(), createEntry(map));
     }
 
-    @NotNull private Document createEntry(@NotNull Map map) {
+    @NotNull
+    private Document createEntry(@NotNull Map map) {
         MapSize mapSize = map.size();
         Document.Mutable protocol = Document.newJsonDocument();
         protocol.append("mapSize", mapSize);
@@ -202,11 +193,9 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         return entry;
     }
 
-    @NotNull private Component displayName(@NotNull Map map) {
-        return Component
-                .text(map.getName(), NamedTextColor.LIGHT_PURPLE)
-                .append(Component.space())
-                .append(Component.text("(" + map.size() + ")", NamedTextColor.GRAY));
+    @NotNull
+    private Component displayName(@NotNull Map map) {
+        return Component.text(map.getName(), NamedTextColor.LIGHT_PURPLE).append(Component.space()).append(Component.text("(" + map.size() + ")", NamedTextColor.GRAY));
     }
 
     private int playingPlayers() {
@@ -235,17 +224,11 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         private void responseV2(ChannelMessageSender target, UUID requestId, int status, @Nullable String message) {
             DataBuf.Mutable buffer = DataBuf.empty().writeUniqueId(requestId).writeInt(status);
             if (message != null) buffer.writeString(message);
-            ChannelMessage
-                    .builder()
-                    .target(target.toTarget())
-                    .channel("darkcube_lobbysystem_v2")
-                    .message("connection_request_status")
-                    .buffer(buffer)
-                    .build()
-                    .send();
+            ChannelMessage.builder().target(target.toTarget()).channel("darkcube_lobbysystem_v2").message("connection_request_status").buffer(buffer).build().send();
         }
 
-        @EventListener public void handle(ChannelMessageReceiveEvent event) {
+        @EventListener
+        public void handle(ChannelMessageReceiveEvent event) {
             if (event.channel().equals("darkcube_lobbysystem_v2")) handleV2(event);
             else if (event.channel().equals("darkcube_lobbysystem")) handle_(event);
         }
@@ -309,7 +292,8 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
             super(woolbattle);
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             update();
         }
     }

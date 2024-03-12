@@ -7,6 +7,22 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
+import eu.darkcube.minigame.woolbattle.api.game.Game;
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.util.data.MetaDataStorage;
+
+@Api
 public interface World {
+    @Api
+    @NotNull
+    Game game();
+
+    @Api
+    @NotNull
+    MetaDataStorage metadata();
+
+    @Api
+    @NotNull
     Block blockAt(int x, int y, int z);
 }

@@ -9,23 +9,31 @@ package eu.darkcube.minigame.woolbattle.api.map;
 
 import java.util.Collection;
 
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
+
+@Api
 public interface MapManager {
-    Map getMap(String name, MapSize mapSize);
+    @Api
+    @Nullable
+    Map map(@NotNull String name, @NotNull MapSize mapSize);
 
-    Map createMap(String name, MapSize mapSize);
+    @Api
+    @NotNull
+    Map createMap(@NotNull String name, @NotNull MapSize mapSize);
 
-    /**
-     * This returns a random Map.
-     * A Map will always return the same Map until the end of the game.
-     *
-     * @param mapSize the {@link MapSize}
-     * @return a random map
-     */
-    Map defaultRandomPersistentMap(MapSize mapSize);
+    @Api
+    @NotNull
+    @UnmodifiableView
+    Collection<? extends Map> maps();
 
-    Collection<? extends Map> getMaps();
+    @Api
+    @NotNull
+    @UnmodifiableView
+    Collection<? extends Map> maps(@NotNull MapSize mapSize);
 
-    Collection<? extends Map> getMaps(MapSize mapSize);
-
-    void deleteMap(Map map);
+    @Api
+    void deleteMap(@NotNull Map map);
 }

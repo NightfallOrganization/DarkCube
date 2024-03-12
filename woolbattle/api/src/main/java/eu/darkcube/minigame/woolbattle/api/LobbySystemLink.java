@@ -9,8 +9,11 @@ package eu.darkcube.minigame.woolbattle.api;
 
 import eu.darkcube.system.annotations.Api;
 
-@Api public interface LobbySystemLink {
-    @Api boolean enabled();
+@Api
+public interface LobbySystemLink {
+    @Api
+    boolean enabled();
 
-    @Api void update();
+    @Api
+    void update();
 }

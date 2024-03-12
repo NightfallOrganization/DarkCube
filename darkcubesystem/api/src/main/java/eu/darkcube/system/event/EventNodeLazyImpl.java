@@ -36,22 +36,26 @@ final class EventNodeLazyImpl<E> extends EventNodeImpl<E> {
         this.owner = new WeakReference<>(owner);
     }
 
-    @Override public @NotNull EventNode<E> addChild(@NotNull EventNode<? extends E> child) {
+    @Override
+    public @NotNull EventNode<E> addChild(@NotNull EventNode<? extends E> child) {
         ensureMap();
         return super.addChild(child);
     }
 
-    @Override public @NotNull EventNode<E> addListener(@NotNull EventListener<? extends E> listener) {
+    @Override
+    public @NotNull EventNode<E> addListener(@NotNull EventListener<? extends E> listener) {
         ensureMap();
         return super.addListener(listener);
     }
 
-    @Override public @NotNull <E1 extends E> EventNode<E> addListener(@NotNull Class<E1> eventType, @NotNull Consumer<@NotNull E1> listener) {
+    @Override
+    public @NotNull <E1 extends E> EventNode<E> addListener(@NotNull Class<E1> eventType, @NotNull Consumer<@NotNull E1> listener) {
         ensureMap();
         return super.addListener(eventType, listener);
     }
 
-    @Override public @NotNull <E1 extends E, H> EventNode<E1> map(@NotNull H value, @NotNull EventFilter<E1, H> filter) {
+    @Override
+    public @NotNull <E1 extends E, H> EventNode<E1> map(@NotNull H value, @NotNull EventFilter<E1, H> filter) {
         final var owner = retrieveOwner();
         if (owner != value) {
             throw new IllegalArgumentException("Cannot map an object to an already mapped node.");
@@ -59,7 +63,8 @@ final class EventNodeLazyImpl<E> extends EventNodeImpl<E> {
         return (EventNode<E1>) this;
     }
 
-    @Override public void register(@NotNull EventBinding<? extends E> binding) {
+    @Override
+    public void register(@NotNull EventBinding<? extends E> binding) {
         ensureMap();
         super.register(binding);
     }

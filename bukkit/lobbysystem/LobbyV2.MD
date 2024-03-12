@@ -2,10 +2,12 @@ Format:
 
 ```
 {
-    "<key>"(2x1): {
-        "displayName": "<displayName>"(Mirror),
-        "onlinePlayers": <onlinePlayers>,
-        "maxPlayers": <maxPlayers>,
+    "<key>"("2x1"): {
+        "displayName": "<displayName>"({"text":"Mirror 4x2"}),
+        "playingPlayers": <onlinePlayers>,
+        "maxPlayingPlayers": <maxPlayers>,
+        "spectatingPlayers": <spectatingPlayers>,
+        "gameState": <gameState>,
         "document": {
             <dataToSend>
         }

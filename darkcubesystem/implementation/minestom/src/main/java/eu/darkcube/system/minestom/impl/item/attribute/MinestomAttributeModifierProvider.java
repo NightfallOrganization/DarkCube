@@ -15,7 +15,7 @@ import net.minestom.server.item.attribute.ItemAttribute;
 public class MinestomAttributeModifierProvider implements AttributeModifierProvider {
     @Override public @NotNull AttributeModifier of(@NotNull Object platformAttributeModifier) {
         if (platformAttributeModifier instanceof AttributeModifier attributeModifier) return attributeModifier;
-        if (platformAttributeModifier instanceof ItemAttribute itemAttribute) return new MinestomAttributeModifier(itemAttribute);
+        if (platformAttributeModifier instanceof ItemAttribute itemAttribute) return new MinestomAttributeModifierImpl(itemAttribute);
         throw new IllegalArgumentException("Invalid AttributeModifier: " + platformAttributeModifier);
     }
 }

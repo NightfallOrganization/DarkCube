@@ -14,7 +14,7 @@ import eu.darkcube.system.server.item.flag.ItemFlagProvider;
 import net.minestom.server.item.ItemHideFlag;
 
 public class MinestomItemFlagProvider implements ItemFlagProvider {
-    private final ItemFlag[] flags = EnumConverter.convert(ItemHideFlag.class, ItemFlag.class, MinestomItemFlag::new);
+    private final ItemFlag[] flags = EnumConverter.convert(ItemHideFlag.class, ItemFlag.class, MinestomItemFlagImpl::new);
 
     @Override public @NotNull ItemFlag of(@NotNull Object platformItemFlag) {
         if (platformItemFlag instanceof ItemFlag itemFlag) return itemFlag;
