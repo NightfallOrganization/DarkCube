@@ -32,7 +32,7 @@ public abstract class PerkListener implements Listener {
      * @return if the given perk is usable
      */
     public static boolean checkUsable(UserPerk perk, WoolBattleBukkit woolbattle) {
-        WBUser user = perk.owner();
+        var user = perk.owner();
         if (user.woolCount() < perk.perk().cost() || perk.cooldown() > 0) {
             woolbattle.ingame().playSoundNotEnoughWool(user);
             new Scheduler(woolbattle, perk.currentPerkItem()::setItem).runTask();
@@ -52,12 +52,12 @@ public abstract class PerkListener implements Listener {
      * @return if the checks are successful
      */
     public static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk, Consumer<UserPerk> itemMatchRunnable, WoolBattleBukkit woolbattle) {
-        ItemBuilder builder = ItemBuilder.item(usedItem);
+        var builder = ItemBuilder.item(usedItem);
         if (!builder.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
             return false;
         }
         @SuppressWarnings("DataFlowIssue") int perkId = builder.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
-        UserPerk userPerk = user.perks().perk(perkId);
+        var userPerk = user.perks().perk(perkId);
         if (!userPerk.perk().equals(perk)) {
             return false;
         }

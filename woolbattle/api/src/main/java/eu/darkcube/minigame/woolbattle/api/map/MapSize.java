@@ -7,8 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.api.map;
 
-public record MapSize(int teams, int teamSize) {
+import eu.darkcube.system.annotations.Api;
 
+@Api
+public record MapSize(int teams, int teamSize) {
+    @Api
     public static MapSize fromString(String s) {
         var a = s.split("x");
         if (a.length != 2) return null;
@@ -22,7 +25,8 @@ public record MapSize(int teams, int teamSize) {
         }
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return teams + "x" + teamSize;
     }
 }

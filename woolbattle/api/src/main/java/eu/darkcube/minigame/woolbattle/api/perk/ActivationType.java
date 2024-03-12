@@ -15,9 +15,9 @@ import eu.darkcube.minigame.woolbattle.api.util.item.Item;
  * ActivationType}
  * is not quite accurate.<br><br>
  * <p>
- * {@link Perk.ActivationType#PRIMARY_WEAPON PRIMARY_WEAPON},
- * {@link Perk.ActivationType#SECONDARY_WEAPON SECONDARY_WEAPON} and
- * {@link Perk.ActivationType#ARROW ARROW} are perks internally, makes it easier to track with
+ * {@link ActivationType#PRIMARY_WEAPON PRIMARY_WEAPON},
+ * {@link ActivationType#SECONDARY_WEAPON SECONDARY_WEAPON} and
+ * {@link ActivationType#ARROW ARROW} are perks internally, makes it easier to track with
  * existing system and helps with code reuse. This may also help for the future to make them
  * changeable
  */

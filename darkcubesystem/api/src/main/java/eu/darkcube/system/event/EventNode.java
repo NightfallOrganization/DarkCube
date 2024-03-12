@@ -28,7 +28,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> The event type accepted by this node
  */
-@ThreadSafe public sealed interface EventNode<T> permits EventNodeImpl {
+@ThreadSafe
+public sealed interface EventNode<T> permits EventNodeImpl {
 
     /**
      * Creates an event node which accepts any event type with no filtering.
@@ -36,7 +37,8 @@ import org.jetbrains.annotations.Nullable;
      * @param name The name of the node
      * @return An event node with no filtering
      */
-    @Contract(value = "_ -> new", pure = true) static @NotNull EventNode<Object> all(@NotNull String name) {
+    @Contract(value = "_ -> new", pure = true)
+    static @NotNull EventNode<Object> all(@NotNull String name) {
         return type(name, EventFilter.ALL);
     }
 
@@ -54,7 +56,8 @@ import org.jetbrains.annotations.Nullable;
      * @param <E>    The resulting event type of the node
      * @return A node with just an event type filter
      */
-    @Contract(value = "_, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter) {
+    @Contract(value = "_, _ -> new", pure = true)
+    static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter) {
         return create(name, filter, null);
     }
 
@@ -77,7 +80,8 @@ import org.jetbrains.annotations.Nullable;
      * @param <E>       The resulting event type of the node
      * @return A node with an event type filter as well as a condition on the event.
      */
-    @Contract(value = "_, _, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> event(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<E> predicate) {
+    @Contract(value = "_, _, _ -> new", pure = true)
+    static <E, V> @NotNull EventNode<E> event(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<E> predicate) {
         return create(name, filter, (e, h) -> predicate.test(e));
     }
 
@@ -102,7 +106,8 @@ import org.jetbrains.annotations.Nullable;
      * @param <V>       The handler type of the event filter
      * @return A node with an event type filter as well as a condition on the event.
      */
-    @Contract(value = "_, _, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull BiPredicate<E, V> predicate) {
+    @Contract(value = "_, _, _ -> new", pure = true)
+    static <E, V> @NotNull EventNode<E> type(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull BiPredicate<E, V> predicate) {
         return create(name, filter, predicate);
     }
 
@@ -124,7 +129,8 @@ import org.jetbrains.annotations.Nullable;
      * @param <V>       The handler type of the event filter
      * @return A node with an event type filter as well as a condition on the event.
      */
-    @Contract(value = "_, _, _ -> new", pure = true) static <E, V> @NotNull EventNode<E> value(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<V> predicate) {
+    @Contract(value = "_, _, _ -> new", pure = true)
+    static <E, V> @NotNull EventNode<E> value(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<V> predicate) {
         return create(name, filter, (e, h) -> predicate.test(h));
     }
 
@@ -152,7 +158,8 @@ import org.jetbrains.annotations.Nullable;
      * @param <E>        the event type
      * @return the handle linked to {@code handleType}
      */
-    @ApiStatus.Experimental <E extends T> @NotNull ListenerHandle<E> getHandle(@NotNull Class<E> handleType);
+    @ApiStatus.Experimental
+    <E extends T> @NotNull ListenerHandle<E> getHandle(@NotNull Class<E> handleType);
 
     /**
      * Execute a cancellable event with a callback to execute if the event is successful.
@@ -168,15 +175,20 @@ import org.jetbrains.annotations.Nullable;
         }
     }
 
-    @Contract(pure = true) @NotNull Class<T> getEventType();
+    @Contract(pure = true)
+    @NotNull Class<T> getEventType();
 
-    @Contract(pure = true) @NotNull String getName();
+    @Contract(pure = true)
+    @NotNull String getName();
 
-    @Contract(pure = true) int getPriority();
+    @Contract(pure = true)
+    int getPriority();
 
-    @Contract(value = "_ -> this") @NotNull EventNode<T> setPriority(int priority);
+    @Contract(value = "_ -> this")
+    @NotNull EventNode<T> setPriority(int priority);
 
-    @Contract(pure = true) @Nullable EventNode<? super T> getParent();
+    @Contract(pure = true)
+    @Nullable EventNode<? super T> getParent();
 
     /**
      * Returns an unmodifiable view of the children in this node.
@@ -184,7 +196,8 @@ import org.jetbrains.annotations.Nullable;
      * @see #addChild(EventNode)
      * @see #removeChild(EventNode)
      */
-    @Contract(pure = true) @NotNull Set<@NotNull EventNode<T>> getChildren();
+    @Contract(pure = true)
+    @NotNull Set<@NotNull EventNode<T>> getChildren();
 
     /**
      * Locates all child nodes with the given name and event type recursively starting at this node.
@@ -193,7 +206,8 @@ import org.jetbrains.annotations.Nullable;
      * @param eventType The event node type to filter for
      * @return All matching event nodes
      */
-    @Contract(pure = true) <E extends T> @NotNull List<EventNode<E>> findChildren(@NotNull String name, Class<E> eventType);
+    @Contract(pure = true)
+    <E extends T> @NotNull List<EventNode<E>> findChildren(@NotNull String name, Class<E> eventType);
 
     /**
      * Locates all child nodes with the given name and event type recursively starting at this node.
@@ -201,7 +215,8 @@ import org.jetbrains.annotations.Nullable;
      * @param name The event name to filter for
      * @return All matching event nodes
      */
-    @Contract(pure = true) default @NotNull List<EventNode<T>> findChildren(@NotNull String name) {
+    @Contract(pure = true)
+    default @NotNull List<EventNode<T>> findChildren(@NotNull String name) {
         return findChildren(name, getEventType());
     }
 
@@ -251,7 +266,8 @@ import org.jetbrains.annotations.Nullable;
      * @param child The child to add
      * @return this, can be used for chaining
      */
-    @Contract(value = "_ -> this") @NotNull EventNode<T> addChild(@NotNull EventNode<? extends T> child);
+    @Contract(value = "_ -> this")
+    @NotNull EventNode<T> addChild(@NotNull EventNode<? extends T> child);
 
     /**
      * Directly removes the given child from this node.
@@ -259,15 +275,19 @@ import org.jetbrains.annotations.Nullable;
      * @param child The child to remove
      * @return this, can be used for chaining
      */
-    @Contract(value = "_ -> this") @NotNull EventNode<T> removeChild(@NotNull EventNode<? extends T> child);
+    @Contract(value = "_ -> this")
+    @NotNull EventNode<T> removeChild(@NotNull EventNode<? extends T> child);
 
-    @Contract(value = "_ -> this") @NotNull EventNode<T> addListener(@NotNull EventListener<? extends T> listener);
+    @Contract(value = "_ -> this")
+    @NotNull EventNode<T> addListener(@NotNull EventListener<? extends T> listener);
 
-    @Contract(value = "_, _ -> this") default <E extends T> @NotNull EventNode<T> addListener(@NotNull Class<E> eventType, @NotNull Consumer<@NotNull E> listener) {
+    @Contract(value = "_, _ -> this")
+    default <E extends T> @NotNull EventNode<T> addListener(@NotNull Class<E> eventType, @NotNull Consumer<@NotNull E> listener) {
         return addListener(EventListener.of(eventType, listener));
     }
 
-    @Contract(value = "_ -> this") @NotNull EventNode<T> removeListener(@NotNull EventListener<? extends T> listener);
+    @Contract(value = "_ -> this")
+    @NotNull EventNode<T> removeListener(@NotNull EventListener<? extends T> listener);
 
     /**
      * Maps a specific object to a node.
@@ -279,16 +299,20 @@ import org.jetbrains.annotations.Nullable;
      * @param filter the filter to use
      * @return the node (which may have already been registered) directly linked to {@code value}
      */
-    @ApiStatus.Experimental <E extends T, H> @NotNull EventNode<E> map(@NotNull H value, @NotNull EventFilter<E, H> filter);
+    @ApiStatus.Experimental
+    <E extends T, H> @NotNull EventNode<E> map(@NotNull H value, @NotNull EventFilter<E, H> filter);
 
     /**
      * Prevents the node from {@link #map(Object, EventFilter)} to be called.
      *
      * @param value the value to unmap
      */
-    @ApiStatus.Experimental void unmap(@NotNull Object value);
+    @ApiStatus.Experimental
+    void unmap(@NotNull Object value);
 
-    @ApiStatus.Experimental void register(@NotNull EventBinding<? extends T> binding);
+    @ApiStatus.Experimental
+    void register(@NotNull EventBinding<? extends T> binding);
 
-    @ApiStatus.Experimental void unregister(@NotNull EventBinding<? extends T> binding);
+    @ApiStatus.Experimental
+    void unregister(@NotNull EventBinding<? extends T> binding);
 }

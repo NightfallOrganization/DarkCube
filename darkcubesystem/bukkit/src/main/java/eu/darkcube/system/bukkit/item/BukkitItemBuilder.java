@@ -12,5 +12,6 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 
 public interface BukkitItemBuilder extends ItemBuilder {
-    @Override @NotNull ItemStack build();
+    @Override
+    @NotNull ItemStack build();
 }

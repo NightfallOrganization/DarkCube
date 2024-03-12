@@ -23,7 +23,7 @@ public class MinestomMaterialProvider implements MaterialProvider {
     public MinestomMaterialProvider() {
         var registry = new HashMap<net.minestom.server.item.Material, Material>();
         for (var material : net.minestom.server.item.Material.values()) {
-            registry.put(material, new MinestomMaterial(material));
+            registry.put(material, new MinestomMaterialImpl(material));
         }
         this.registry = Map.copyOf(registry);
     }

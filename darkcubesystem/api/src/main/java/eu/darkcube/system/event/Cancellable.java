@@ -23,11 +23,13 @@ public interface Cancellable {
         public Event() {
         }
 
-        @Override public boolean cancelled() {
+        @Override
+        public boolean cancelled() {
             return cancelled;
         }
 
-        @Override public void cancelled(boolean cancelled) {
+        @Override
+        public void cancelled(boolean cancelled) {
             this.cancelled = cancelled;
         }
     }

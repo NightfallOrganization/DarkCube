@@ -39,11 +39,13 @@ public class Key {
         return this.plugin;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(key, plugin);
     }
 
-    @Override public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
@@ -51,7 +53,8 @@ public class Key {
         return Objects.equals(this.key, other.key) && Objects.equals(this.plugin, other.plugin);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return plugin + ":" + key;
     }
 

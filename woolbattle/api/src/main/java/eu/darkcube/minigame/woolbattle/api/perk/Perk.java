@@ -12,7 +12,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.listener.Listener;
+import eu.darkcube.minigame.woolbattle.api.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
@@ -31,6 +33,10 @@ public class Perk {
     private final boolean autoCountdownCooldown;
     private Cooldown cooldown;
     private int cost;
+
+    public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost, Item item) {
+        this(activationType, perkName, cooldownSeconds, cost, item, (user, perk, id, perkSlot, game) -> new DefaultUserPerk(user, id, perkSlot, perk, game));
+    }
 
     public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost, Item defaultItem, UserPerkCreator perkCreator) {
         this(activationType, perkName, new Cooldown(Cooldown.Unit.TICKS, cooldownSeconds * 20), cost, defaultItem, perkCreator);
@@ -123,7 +129,7 @@ public class Perk {
     }
 
     public interface UserPerkCreator {
-        UserPerk create(WBUser user, Perk perk, int id, int perkSlot);
+        UserPerk create(WBUser user, Perk perk, int id, int perkSlot, Game game);
     }
 
     public record Cooldown(Unit unit, int cooldown) {

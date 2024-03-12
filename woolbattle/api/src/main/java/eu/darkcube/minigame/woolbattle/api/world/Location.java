@@ -7,8 +7,19 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
-public record Location(World world, double x, double y, double z, float yaw, float pitch) {
-    public Location(World world, double x, double y, double z) {
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+
+public record Location(@NotNull World world, double x, double y, double z, float yaw, float pitch) implements Position.Directed {
+    public Location(@NotNull World world, double x, double y, double z) {
         this(world, x, y, z, 0, 0);
+    }
+
+    public Location(@NotNull World world, @NotNull Position.Directed position) {
+        this(world, position.x(), position.y(), position.z(), position.yaw(), position.pitch());
+    }
+
+    @Override
+    public Location clone() {
+        return new Location(world, x, y, z, yaw, pitch);
     }
 }

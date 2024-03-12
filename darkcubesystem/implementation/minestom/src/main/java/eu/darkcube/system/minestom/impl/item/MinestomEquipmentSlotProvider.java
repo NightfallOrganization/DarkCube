@@ -13,7 +13,7 @@ import eu.darkcube.system.server.item.EquipmentSlot;
 import eu.darkcube.system.server.item.EquipmentSlotProvider;
 
 public class MinestomEquipmentSlotProvider implements EquipmentSlotProvider {
-    private final EquipmentSlot[] slots = EnumConverter.convert(net.minestom.server.entity.EquipmentSlot.class, EquipmentSlot.class, MinestomEquipmentSlot::new);
+    private final EquipmentSlot[] slots = EnumConverter.convert(net.minestom.server.entity.EquipmentSlot.class, EquipmentSlot.class, MinestomEquipmentSlotImpl::new);
 
     @Override public @NotNull EquipmentSlot of(@NotNull Object platformObject) {
         if (platformObject instanceof EquipmentSlot slot) return slot;

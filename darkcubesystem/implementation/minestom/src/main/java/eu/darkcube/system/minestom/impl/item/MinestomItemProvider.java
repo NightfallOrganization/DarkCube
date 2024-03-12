@@ -17,11 +17,11 @@ import net.minestom.server.item.ItemStack;
 
 public class MinestomItemProvider implements ItemProvider {
     @Override public @NotNull ItemBuilder item(@Nullable Material material) {
-        return new MinestomItemBuilder().material(material == null ? Material.air() : material);
+        return new MinestomItemBuilderImpl().material(material == null ? Material.air() : material);
     }
 
     @Override public @NotNull ItemBuilder item(@NotNull JsonElement json) {
-        return MinestomItemBuilder.deserialize(json);
+        return MinestomItemBuilderImpl.deserialize(json);
     }
 
     @Override public @NotNull ItemBuilder item(@NotNull Object object) {

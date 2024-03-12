@@ -7,6 +7,15 @@
 
 package eu.darkcube.minigame.woolbattle.api.game;
 
+import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.util.GameState;
+
+@Api
 public interface GamePhase {
-    Game game();
+    @Api
+    @NotNull Game game();
+
+    @Api
+    @NotNull GameState gameState();
 }
