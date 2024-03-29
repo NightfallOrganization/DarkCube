@@ -9,10 +9,12 @@ package eu.darkcube.minigame.woolbattle.common.util.scheduler;
 
 import java.util.concurrent.CompletableFuture;
 
+import dev.derklaro.aerogel.Singleton;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskSchedule;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
+@Singleton
 public final class TaskScheduleProviderImpl implements TaskScheduleProvider {
     static final TaskSchedule NEXT_TICK = new Tick(1);
     static final TaskSchedule STOP = new Stop();

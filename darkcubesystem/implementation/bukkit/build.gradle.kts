@@ -42,7 +42,7 @@ tasks {
     }
 }
 
-val bukkit: Configuration by configurations.creating {
+configurations.register("impl") {
     isCanBeResolved = false
     outgoing.artifact(tasks.named("finalJar"))
 }

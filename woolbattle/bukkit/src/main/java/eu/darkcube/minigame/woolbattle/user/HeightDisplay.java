@@ -28,7 +28,8 @@ public final class HeightDisplay {
         return new HeightDisplay(true, -1, ChatColor.GOLD.getChar());
     }
 
-    @Override protected HeightDisplay clone() {
+    @Override
+    protected HeightDisplay clone() {
         return new HeightDisplay(enabled, maxDistance, color);
     }
 

@@ -16,18 +16,22 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public class CommonMap implements Map {
-    private final String name;
-    private final MapSize size;
+    private final @NotNull CommonMapManager mapManager;
+    private final @NotNull String name;
+    private final @NotNull MapSize size;
     private volatile int deathHeight;
-    private volatile ItemBuilder icon;
+    private volatile @NotNull ItemBuilder icon;
     private volatile boolean enabled;
 
-    public CommonMap(String name, MapSize size) {
+    public CommonMap(@NotNull CommonMapManager mapManager, @NotNull String name, @NotNull MapSize size, @NotNull ItemBuilder icon) {
+        this.mapManager = mapManager;
         this.name = name;
         this.size = size;
+        this.icon = icon;
     }
 
-    public CommonMap(String name, MapSize size, int deathHeight, ItemBuilder icon, boolean enabled) {
+    public CommonMap(@NotNull CommonMapManager mapManager, @NotNull String name, @NotNull MapSize size, int deathHeight, @NotNull ItemBuilder icon, boolean enabled) {
+        this.mapManager = mapManager;
         this.name = name;
         this.size = size;
         this.deathHeight = deathHeight;
@@ -43,6 +47,7 @@ public class CommonMap implements Map {
     @Override
     public void enabled(boolean enabled) {
         this.enabled = enabled;
+        save();
     }
 
     @Override
@@ -53,25 +58,27 @@ public class CommonMap implements Map {
     @Override
     public void deathHeight(int deathHeight) {
         this.deathHeight = deathHeight;
+        save();
     }
 
     @Override
-    public ItemBuilder icon() {
+    public @NotNull ItemBuilder icon() {
         return icon;
     }
 
     @Override
-    public void icon(ItemBuilder icon) {
+    public void icon(@NotNull ItemBuilder icon) {
         this.icon = icon;
+        save();
     }
 
     @Override
-    public MapSize size() {
+    public @NotNull MapSize size() {
         return size;
     }
 
     @Override
-    public String name() {
+    public @NotNull String name() {
         return name;
     }
 
@@ -85,12 +92,16 @@ public class CommonMap implements Map {
         return doc;
     }
 
-    public static CommonMap fromDocument(@NotNull Document document) {
+    public static CommonMap fromDocument(@NotNull CommonMapManager mapManager, @NotNull Document document) {
         var name = document.getString("name");
         var enabled = document.getBoolean("enabled");
         var deathHeight = document.getInt("deathHeight");
         var size = document.readObject("mapSize", MapSize.class);
         var icon = ItemBuilder.item(new Gson().fromJson(document.getString("icon"), JsonElement.class));
-        return new CommonMap(name, size, deathHeight, icon, enabled);
+        return new CommonMap(mapManager, name, size, deathHeight, icon, enabled);
+    }
+
+    private void save() {
+        mapManager.save(this);
     }
 }

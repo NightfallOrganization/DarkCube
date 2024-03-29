@@ -28,7 +28,8 @@ public abstract class BukkitCommandAPIUtils implements BukkitVersion.BukkitComma
         return args.length == 0 ? label : (label + " " + String.join(" ", args));
     }
 
-    @Override public List<String> tabComplete(CommandSender sender, Command command, String label, String[] args) {
+    @Override
+    public List<String> tabComplete(CommandSender sender, Command command, String label, String[] args) {
         var commandLine = join(label, args);
         var commandLineStart = join(label, Arrays.copyOfRange(args, 0, args.length - 1)) + " ";
         var source = CommandSource.create(sender);

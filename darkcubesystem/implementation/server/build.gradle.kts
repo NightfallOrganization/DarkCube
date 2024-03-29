@@ -12,3 +12,9 @@ dependencies {
     api(projects.darkcubesystem.implementation.common)
     api(projects.darkcubesystem.server)
 }
+
+tasks {
+    jar {
+        archiveBaseName = "darkcubesystem-server-implementation"
+    }
+}

@@ -34,8 +34,12 @@ public class CommonLobby extends CommonPhase implements Lobby {
         super.disable();
     }
 
+    public Location spawn() {
+        return spawn;
+    }
+
     private void setupWorld() {
-        world = game.woolbattle().worldHandler().loadLobbyWorld();
+        world = game.woolbattle().worldHandler().loadLobbyWorld(game);
         var spawnPosition = game.lobbyData().spawn();
         spawn = new Location(world, spawnPosition);
     }

@@ -5,22 +5,24 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.minestom.world;
+package eu.darkcube.minigame.woolbattle.minestom.world.impl;
 
-import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
+import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.instance.Instance;
 
 public class MinestomWorldImpl extends CommonWorld implements MinestomWorld {
-    private final Instance instance;
+    private final @NotNull Instance instance;
 
-    public MinestomWorldImpl(CommonGame game, Instance instance) {
-        super(game);
+    public MinestomWorldImpl(@NotNull PlatformWorldHandler worldHandler, @NotNull Instance instance) {
+        super(worldHandler);
         this.instance = instance;
     }
 
     @Override
-    public Instance instance() {
+    public @NotNull Instance instance() {
         return instance;
     }
 }

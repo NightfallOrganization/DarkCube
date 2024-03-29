@@ -4,7 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 import eu.darkcube.minigame.woolbattle.api.LobbySystemLinkImpl;
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApiImpl;
@@ -12,7 +18,11 @@ import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
-import eu.darkcube.minigame.woolbattle.map.*;
+import eu.darkcube.minigame.woolbattle.map.CloudNetMapLoader;
+import eu.darkcube.minigame.woolbattle.map.DefaultMapManager;
+import eu.darkcube.minigame.woolbattle.map.MapLoader;
+import eu.darkcube.minigame.woolbattle.map.MapManager;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.perk.PerkRegistry;
 import eu.darkcube.minigame.woolbattle.team.DefaultTeamManager;
 import eu.darkcube.minigame.woolbattle.team.TeamManager;
@@ -33,11 +43,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Function;
 
 public class WoolBattleBukkit extends DarkCubePlugin {
 
@@ -68,7 +73,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         WoolBattleBukkit.instance = this;
     }
 
-    @Deprecated public static WoolBattleBukkit instance() {
+    @Deprecated
+    public static WoolBattleBukkit instance() {
         return WoolBattleBukkit.instance;
     }
 
@@ -90,7 +96,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         }
     }
 
-    @Override public void onLoad() {
+    @Override
+    public void onLoad() {
         this.lobbySystemLink = new LobbySystemLinkImpl(this);
         LanguageHelper.load();
 
@@ -121,7 +128,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         VoidWorldPluginLoader.load();
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         mapLoader = new CloudNetMapLoader(this);
         mapManager = new DefaultMapManager();
 
@@ -139,7 +147,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         lobbySystemLink.enable();
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         lobbySystemLink.disable();
         commands.disableAll();
         listeners.unregisterAll();

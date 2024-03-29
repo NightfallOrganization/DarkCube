@@ -52,6 +52,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
     private static final DocProperty<UUID> GAME_ID = DocProperty.property("gameId", UUID.class);
     private static final DocProperty<MapSize> MAP_SIZE = DocProperty.property("mapSize", MapSize.class).withDefault(null);
     private static final DocProperty<String> MAP_NAME = DocProperty.property("mapName", String.class).withDefault(null);
+    private static final DocProperty<Boolean> ADMIN_SETUP = DocProperty.property("adminSetup", Boolean.class).withDefault(false);
     private static final Logger LOGGER = Logger.getLogger("CommonLobbySystemLink");
     private final CommonWoolBattleApi woolbattle;
     private final Cache<UUID, ConnectionRequest> connectionRequests;
@@ -65,7 +66,10 @@ public class CommonLobbySystemLink implements LobbySystemLink {
         this.connectionRequests = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofSeconds(10)).removalListener((UUID key, ConnectionRequest value, RemovalCause cause) -> {
             if (cause.wasEvicted()) { // Connection timed out
                 if (value != null) {
-                    value.game.checkUnload();
+                    var game = value.game;
+                    if (game != null) {
+                        game.checkUnload();
+                    }
                 } else {
                     LOGGER.severe("ConnectionRequest was null when it shouldn't be possible");
                 }
@@ -98,6 +102,10 @@ public class CommonLobbySystemLink implements LobbySystemLink {
         return enabled.get();
     }
 
+    public Cache<UUID, ConnectionRequest> connectionRequests() {
+        return connectionRequests;
+    }
+
     @Override
     public void update() {
         if (!enabled()) return;
@@ -118,6 +126,20 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                 var mapSize = entry.getKey();
                 var map = entry.getValue();
                 doc.append(mapSize.toString(), createEntry(map));
+            }
+            if (doc.empty()) {
+                // WoolBattle is not correctly set up. Create a dummy world to allow admins to join
+                var entry = Document.newJsonDocument();
+                var protocol = Document.newJsonDocument();
+                protocol.writeProperty(ADMIN_SETUP, true);
+
+                entry.writeProperty(DISPLAY_NAME, "Setup WoolBattle");
+                entry.writeProperty(PLAYING_PLAYERS, 0);
+                entry.writeProperty(MAX_PLAYING_PLAYERS, 1);
+                entry.writeProperty(SPECTATING_PLAYERS, 0);
+                entry.writeProperty(GAME_STATE, GameState.LOBBY);
+                entry.append("document", protocol);
+                doc.append("setup", entry);
             }
             root.append("LobbyV2", doc);
         });
@@ -167,7 +189,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
         return displayName(map);
     }
 
-    public record ConnectionRequest(UUID player, CommonGame game) {
+    public record ConnectionRequest(@NotNull UUID player, @Nullable CommonGame game) {
     }
 
     private class RequestListener {
@@ -206,6 +228,13 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                 @Nullable var mapSize = protocolDocument.readProperty(MAP_SIZE);
                 @Nullable var mapName = protocolDocument.readProperty(MAP_NAME);
                 @Nullable var gameId = protocolDocument.readProperty(GAME_ID);
+                @NotNull var adminSetup = protocolDocument.readProperty(ADMIN_SETUP);
+                if (adminSetup) {
+                    var connectionRequest = new ConnectionRequest(playerUniqueId, null);
+                    connectionRequests.put(requestId, connectionRequest);
+                    responseV2(sender, requestId, 2, null);
+                    return;
+                }
                 if (mapSize == null) {
                     responseV2(sender, requestId, 0, "invalid_protocol");
                     return;
@@ -223,7 +252,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                         responseV2(sender, requestId, 0, "out_of_date");
                         return;
                     }
-                    @NotNull var game = woolbattle.games().createGame();
+                    @NotNull var game = woolbattle.games().createGame(mapSize);
                     connect(game, playerUniqueId, requestId, sender, mapSize);
                 } else {
                     responseV2(sender, requestId, 0, "invalid_protocol");
@@ -235,6 +264,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
             var connectionRequest = new ConnectionRequest(playerUniqueId, game);
             connectionRequests.put(requestId, connectionRequest);
             responseV2(sender, requestId, 1, null);
+            LOGGER.info("Connecting " + playerUniqueId + " to game " + game.id() + " with requestId " + requestId);
             game.scheduler().schedule(() -> {
                 var phase = game.phase();
                 if (phase instanceof Ingame) {

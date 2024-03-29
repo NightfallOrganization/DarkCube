@@ -8,11 +8,12 @@
 package eu.darkcube.minigame.woolbattle.api.map;
 
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 @Api
 public record MapSize(int teams, int teamSize) {
     @Api
-    public static MapSize fromString(String s) {
+    public static @Nullable MapSize fromString(String s) {
         var a = s.split("x");
         if (a.length != 2) return null;
         try {

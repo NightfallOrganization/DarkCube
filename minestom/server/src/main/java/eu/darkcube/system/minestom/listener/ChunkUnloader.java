@@ -13,26 +13,42 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.entity.EntityDespawnEvent;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.instance.Instance;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.instance.Chunk;
 
 public class ChunkUnloader {
 
-    private static ConcurrentHashMap<Player, Instance> lastInstance = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Player, Chunk> lastChunk = new ConcurrentHashMap<>();
 
     public static void entityDespawn(EntityDespawnEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        lastInstance.put(player, event.getInstance());
+        lastChunk.put(player, player.getChunk());
+        System.out.println("Despawn");
+    }
+
+    public static void playerSpawn(PlayerSpawnEvent event) {
+        var player = event.getPlayer();
+        var chunk = lastChunk.remove(player);
+        if (chunk == null) return;
+        if (chunk.getViewers().isEmpty()) {
+            chunk.getInstance().unloadChunk(chunk);
+        }
     }
 
     public static void playerDisconnect(PlayerDisconnectEvent event) {
-        lastInstance.remove(event.getPlayer());
+        lastChunk.remove(event.getPlayer());
     }
 
     public static void playerChunkUnload(PlayerChunkUnloadEvent event) {
         var instance = event.getInstance();
         if (instance == null) { // TODO wait for minestom to fix this
-            instance = lastInstance.get(event.getPlayer());
+            instance = lastChunk.get(event.getPlayer()).getInstance();
         }
+        if (instance == null) {
+            System.out.println("Bad instance shitting");
+            return;
+        }
+        var playerChunk = event.getPlayer().getChunk();
         var chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
         if (chunk != null) {
             for (var player : instance.getPlayers()) {
@@ -40,7 +56,7 @@ public class ChunkUnloader {
                     return;
                 }
             }
-            instance.unloadChunk(chunk);
+            if (playerChunk != chunk) instance.unloadChunk(chunk);
         }
     }
 }

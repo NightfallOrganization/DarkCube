@@ -12,3 +12,9 @@ dependencies {
     compileOnlyApi(libs.cloudnet.wrapper)
     api(projects.darkcubesystem.api)
 }
+
+tasks {
+    jar {
+        archiveBaseName = "darkcubesystem-server"
+    }
+}

@@ -8,8 +8,11 @@
 package eu.darkcube.minigame.woolbattle.api.team;
 
 import java.util.Collection;
+import java.util.UUID;
 
+import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
@@ -17,6 +20,8 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
 public interface Team {
+    @NotNull Game game();
+
     @NotNull TeamType type();
 
     default boolean spectator() {
@@ -35,13 +40,15 @@ public interface Team {
      */
     @NotNull Component getName(@NotNull CommandExecutor executor);
 
-    @NotNull Style prefixStyle();
+    @NotNull Style nameStyle();
 
     @Unmodifiable @NotNull Collection<WBUser> users();
 
     int lifes();
 
     void lifes(int lifes);
+
+    @NotNull ColoredWool wool();
 
     /**
      * Adds lifes to this team.
@@ -58,4 +65,6 @@ public interface Team {
      * @return how many lifes the team now has
      */
     int removeLifes(int count);
+
+    @NotNull UUID uniqueId();
 }

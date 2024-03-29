@@ -7,12 +7,16 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
+import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
 import eu.darkcube.minigame.woolbattle.api.map.MapManager;
+import eu.darkcube.minigame.woolbattle.api.team.TeamRegistry;
 import eu.darkcube.minigame.woolbattle.api.util.MaterialProvider;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.SchedulerManager;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWoolProvider;
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.event.EventNode;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
@@ -25,30 +29,35 @@ public interface WoolBattleApi extends Key.Named {
     }
 
     @Api
-    @NotNull
-    GameManager games();
+    @NotNull GameManager games();
 
     @Api
-    @NotNull
-    LobbySystemLink lobbySystemLink();
+    @NotNull LobbySystemLink lobbySystemLink();
 
     @Api
-    @NotNull
-    EntityImplementations entityImplementations();
+    @NotNull EntityImplementations entityImplementations();
 
     @Api
-    @NotNull
-    MaterialProvider materialProvider();
+    @NotNull MaterialProvider materialProvider();
 
     @Api
-    @NotNull
-    MapManager mapManager();
+    @NotNull MapManager mapManager();
 
     @Api
-    @NotNull
-    SchedulerManager scheduler();
+    @NotNull SchedulerManager scheduler();
 
     @Api
-    @NotNull
-    PersistentDataStorage persistentDataStorage();
+    @NotNull PersistentDataStorage persistentDataStorage();
+
+    @Api
+    @NotNull WoolBattleCommands commands();
+
+    @Api
+    @NotNull TeamRegistry teamRegistry();
+
+    @Api
+    @NotNull ColoredWoolProvider woolProvider();
+
+    @Api
+    @NotNull EventNode<Object> eventManager();
 }

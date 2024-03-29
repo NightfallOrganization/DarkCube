@@ -7,21 +7,24 @@
 
 package eu.darkcube.minigame.woolbattle.common.world;
 
-import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonIngameWorld;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
+import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonGameWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.material.Material;
 
 public interface PlatformWorldHandler {
-    @NotNull
-    Material material(@NotNull CommonWorld world, int x, int y, int z);
+    @NotNull Material material(@NotNull CommonWorld world, int x, int y, int z);
 
     void material(@NotNull CommonWorld world, int x, int y, int z, @NotNull Material material);
 
-    @NotNull
-    CommonWorld loadLobbyWorld();
+    @NotNull CommonWorld loadSetupWorld();
 
-    @NotNull
-    CommonIngameWorld loadIngameWorld();
+    @NotNull CommonGameWorld loadLobbyWorld(@NotNull CommonGame game);
+
+    @NotNull CommonIngameWorld loadIngameWorld(@NotNull CommonGame game);
+
+    void dropAt(@NotNull CommonWorld world, double x, double y, double z, @NotNull ColoredWool wool, int amt);
 
     record LobbyWorld(CommonWorld world) {
     }

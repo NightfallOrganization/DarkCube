@@ -13,21 +13,48 @@ import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
+import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.api.world.World;
+import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.MetaDataStorage;
 
 public interface WBUser {
-    WoolBattleApi woolbattle();
+    @Api
+    @NotNull WoolBattleApi woolbattle();
 
     /**
      * @return the user from the {@link UserAPI UserAPI}
      */
-    User user();
+    @Api
+    @NotNull User user();
 
+    @Api
+    @NotNull MetaDataStorage metadata();
+
+    /**
+     * @return the amount of wool the user can carry.
+     */
+    @Api
+    int maxWoolSize();
+
+    /**
+     * @return the amount of wool added when breaking a block.
+     */
+    @Api
+    int woolBreakAmount();
+
+    @Api
     int woolCount();
+
+    @Api
+    void woolCount(int woolCount);
 
     /**
      * Gives the player wool.
@@ -35,6 +62,7 @@ public interface WBUser {
      * @param count the amount of wool to add
      * @return the actual amount of wool added
      */
+    @Api
     default int addWool(int count) {
         return addWool(count, true);
     }
@@ -46,6 +74,7 @@ public interface WBUser {
      * @param dropIfFull whether the wool should drop on full inventory
      * @return the actual amount of wool added
      */
+    @Api
     int addWool(int count, boolean dropIfFull);
 
     /**
@@ -54,6 +83,7 @@ public interface WBUser {
      * @param count the amount of wool to take
      * @return the actual amount of wool taken
      */
+    @Api
     default int removeWool(int count) {
         return removeWool(count, true);
     }
@@ -66,48 +96,63 @@ public interface WBUser {
      * @return the actual amount of wool taken.
      */
     @ApiStatus.Experimental
+    @Api
     int removeWool(int count, boolean updateInventory);
 
-    Game game();
+    @Api
+    @Nullable Game game();
 
     /**
      * @return the UUID for this player
      */
-    UUID uniqueId();
+    @Api
+    @NotNull UUID uniqueId();
 
     /**
      * @return the player's name
      */
-    String playerName();
+    @Api
+    @NotNull String playerName();
 
     /**
      * @return the team color combined with the players name
      */
-    Component teamPlayerName();
+    @Api
+    @NotNull Component teamPlayerName();
 
     /**
      * @return this player's language
      */
-    default Language language() {
+    @Api
+    default @NotNull Language language() {
         return user().language();
     }
 
     /**
      * @return the team this player is in
      */
-    Team team();
+    @Api
+    @Nullable Team team();
 
     /**
      * Sets the team this player is in
      *
      * @param team the new {@link Team}
      */
-    void team(Team team);
+    @Api
+    void team(@NotNull Team team);
+
+    @Api
+    @Nullable World world();
+
+    @Api
+    @Nullable Location location();
 
     /**
      * @return a copy of this user's {@link PlayerPerks} for storage
      */
-    PerksStorage perksStorage();
+    @Api
+    @NotNull PerksStorage perksStorage();
 
     /**
      * Set the player's perks. This will only affect storage (which will persist over games), and
@@ -115,7 +160,20 @@ public interface WBUser {
      *
      * @param perks the perks to store
      */
-    void perksStorage(PerksStorage perks);
+    @Api
+    void perksStorage(@NotNull PerksStorage perks);
+
+    @Api
+    @NotNull WoolSubtractDirection woolSubtractDirection();
+
+    @Api
+    void woolSubtractDirection(@NotNull WoolSubtractDirection woolSubtractDirection);
+
+    @Api
+    @NotNull HeightDisplay heightDisplay();
+
+    @Api
+    void heightDisplay(@NotNull HeightDisplay heightDisplay);
 
     /**
      * Queries the ingame perks.
@@ -124,9 +182,12 @@ public interface WBUser {
      *
      * @return the in-game perks.
      */
-    UserPerks perks();
+    @Api
+    @NotNull UserPerks perks();
 
+    @Api
     boolean particles();
 
+    @Api
     void particles(boolean particles);
 }
