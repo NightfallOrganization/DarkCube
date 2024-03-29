@@ -23,7 +23,6 @@ public class ChunkUnloader {
     public static void entityDespawn(EntityDespawnEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         lastChunk.put(player, player.getChunk());
-        System.out.println("Despawn");
     }
 
     public static void playerSpawn(PlayerSpawnEvent event) {
@@ -42,7 +41,8 @@ public class ChunkUnloader {
     public static void playerChunkUnload(PlayerChunkUnloadEvent event) {
         var instance = event.getInstance();
         if (instance == null) { // TODO wait for minestom to fix this
-            instance = lastChunk.get(event.getPlayer()).getInstance();
+            var chunk = lastChunk.get(event.getPlayer());
+            if (chunk != null) instance = chunk.getInstance();
         }
         if (instance == null) {
             System.out.println("Bad instance shitting");
@@ -57,6 +57,10 @@ public class ChunkUnloader {
                 }
             }
             if (playerChunk != chunk) instance.unloadChunk(chunk);
+            else if (playerChunk != null) {
+                System.out.println("Set playerChunk: " + playerChunk);
+                lastChunk.put(event.getPlayer(), playerChunk);
+            }
         }
     }
 }
