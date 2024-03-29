@@ -19,15 +19,13 @@ public class CommonBlock implements Block {
     protected final int x;
     protected final int y;
     protected final int z;
-    protected final int maxBlockDamage;
     protected final Location location;
 
-    public CommonBlock(CommonWorld world, int x, int y, int z, int maxBlockDamage) {
+    public CommonBlock(CommonWorld world, int x, int y, int z) {
         this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
-        this.maxBlockDamage = maxBlockDamage;
         this.location = new Location(world, x, y, z);
     }
 

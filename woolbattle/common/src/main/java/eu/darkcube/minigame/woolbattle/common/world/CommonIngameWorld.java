@@ -1,11 +1,4 @@
-/*
- * Copyright (c) 2024. [DarkCube]
- * All rights reserved.
- * You may not use or redistribute this software or any associated files without permission.
- * The above copyright notice shall be included in all copies of this software.
- */
-
-package eu.darkcube.minigame.woolbattle.common.game.ingame.world;
+package eu.darkcube.minigame.woolbattle.common.world;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,12 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
-import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
-import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonGameWorld;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonIngameBlock;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.Key;
 
-public class CommonIngameWorld extends CommonWorld {
+public class CommonIngameWorld extends CommonGameWorld {
     private final Set<CommonBlock> placedBlocks = ConcurrentHashMap.newKeySet();
     private final Map<CommonBlock, ColoredWool> brokenWool = new ConcurrentHashMap<>();
     private final Key blockDamageKey;

@@ -7,7 +7,6 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.game;
 
-import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitBlockEvent;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
@@ -17,7 +16,8 @@ public class MinestomListeners {
     public static void configure(EventNode<InstanceEvent> minestom, CommonGame game) {
         var events = game.eventManager();
         minestom.addListener(ProjectileCollideWithBlockEvent.class, event -> {
-            events.call(new ProjectileHitBlockEvent(projectile, block));
+            // events.call(new ProjectileHitBlockEvent(projectile, block));
+            // TODO
         });
     }
 }

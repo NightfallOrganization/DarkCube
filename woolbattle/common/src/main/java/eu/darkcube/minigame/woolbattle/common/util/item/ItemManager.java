@@ -15,7 +15,7 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
-public abstract class ItemManager {
+public class ItemManager {
     private static final Object[] EMPTY_ARRAY = new Object[0];
     private final Key itemId;
 
@@ -26,8 +26,6 @@ public abstract class ItemManager {
     public static ItemManager instance() {
         return ItemManagerImpl.MANAGER;
     }
-
-    public abstract void removeWoolFromUserInventory(WBUser user, int count);
 
     public ItemBuilder getItem(Item item, WBUser user) {
         return getItem(item, user, EMPTY_ARRAY);

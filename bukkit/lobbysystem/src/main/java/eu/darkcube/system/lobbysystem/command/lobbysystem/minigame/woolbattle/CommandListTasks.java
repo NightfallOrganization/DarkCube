@@ -12,27 +12,24 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 
-import java.util.Set;
-
 public class CommandListTasks extends LobbyCommand {
 
-	public CommandListTasks() {
-		super("listTasks", b -> b.executes(ctx -> {
-			Set<String> tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
-			Component ccb = Component.text(tasks.isEmpty() ? "Es gibt keine Tasks!" : "Tasks: ");
-			if (tasks.isEmpty()) {
-				ccb.color(NamedTextColor.RED);
-			} else {
-				ccb.color(NamedTextColor.GREEN);
-			}
-			for (String task : tasks) {
-				ccb.append(Component.text("\n- ").color(NamedTextColor.YELLOW))
-						.append(Component.text(task).color(NamedTextColor.AQUA));
-				// sb.append("\n§e- §b").append(task);
-			}
-			ctx.getSource().sendMessage(ccb);
-			return 0;
-		}));
-	}
+    public CommandListTasks() {
+        super("listTasks", b -> b.executes(ctx -> {
+            var tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
+            Component ccb = Component.text(tasks.isEmpty() ? "Es gibt keine Tasks!" : "Tasks: ");
+            if (tasks.isEmpty()) {
+                ccb = ccb.color(NamedTextColor.RED);
+            } else {
+                ccb = ccb.color(NamedTextColor.GREEN);
+            }
+            for (var task : tasks) {
+                ccb = ccb.append(Component.text("\n - ").color(NamedTextColor.YELLOW)).append(Component.text(task).color(NamedTextColor.AQUA));
+                // sb.append("\n§e- §b").append(task);
+            }
+            ctx.getSource().sendMessage(ccb);
+            return 0;
+        }));
+    }
 
 }

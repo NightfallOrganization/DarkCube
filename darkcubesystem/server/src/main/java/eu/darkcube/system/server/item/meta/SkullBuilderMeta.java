@@ -13,25 +13,26 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 public final class SkullBuilderMeta implements BuilderMeta {
-    private UserProfile owningPlayer;
+    private @Nullable UserProfile owningPlayer;
 
     public SkullBuilderMeta() {
     }
 
-    public SkullBuilderMeta(UserProfile owningPlayer) {
+    public SkullBuilderMeta(@Nullable UserProfile owningPlayer) {
         this.owningPlayer = owningPlayer;
     }
 
-    public UserProfile owningPlayer() {
+    public @Nullable UserProfile owningPlayer() {
         return owningPlayer;
     }
 
-    public SkullBuilderMeta owningPlayer(UserProfile owningPlayer) {
+    public @NotNull SkullBuilderMeta owningPlayer(@Nullable UserProfile owningPlayer) {
         this.owningPlayer = owningPlayer;
         return this;
     }
 
-    @Override public SkullBuilderMeta clone() {
+    @Override
+    public @NotNull SkullBuilderMeta clone() {
         return new SkullBuilderMeta(owningPlayer);
     }
 
@@ -78,14 +79,16 @@ public final class SkullBuilderMeta implements BuilderMeta {
             /**
              * @return The property value, likely to be base64 encoded
              */
-            @NotNull public String value() {
+            @NotNull
+            public String value() {
                 return value;
             }
 
             /**
              * @return A signature from Mojang for signed properties
              */
-            @Nullable public String signature() {
+            @Nullable
+            public String signature() {
                 return signature;
             }
 

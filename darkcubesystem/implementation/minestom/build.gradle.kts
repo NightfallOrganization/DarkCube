@@ -15,10 +15,16 @@ tasks {
     }
     jar {
         destinationDirectory = temporaryDir
+        archiveBaseName = "darkcubesystem-minestom-implementation"
     }
     assemble {
         dependsOn(shadowJar)
     }
+}
+
+configurations.register("impl") {
+    isCanBeResolved = false
+    outgoing.artifact(tasks.shadowJar)
 }
 
 dependencies {
@@ -26,6 +32,5 @@ dependencies {
     compileOnlyApi(projects.darkcubesystem.minestom)
     compileOnlyApi(projects.minestom.server)
 
-    runtimeOnly(projects.darkcubesystem.server) { isTransitive = false }
-    // minestom api is included in the server bootstrap project because of class loading
+    // minestom and server api is included in the server bootstrap project because of class loading
 }

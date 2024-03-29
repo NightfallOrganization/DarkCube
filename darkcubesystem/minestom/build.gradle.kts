@@ -12,5 +12,5 @@ dependencies {
     compileOnly("org.ow2.asm:asm:9.5") // in cloudnet but not exposed
     compileOnly("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
     api(projects.darkcubesystem.server)
-    compileOnlyApi(libs.bundles.minestom)
+    api(libs.bundles.minestom)
 }

@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
+import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -33,13 +34,16 @@ public class CommonGameManager implements GameManager {
     }
 
     @Override
-    public @NotNull CommonGame createGame() {
+    public @NotNull CommonGame createGame(MapSize mapSize) {
         UUID id;
         for (id = UUID.randomUUID(); games.containsKey(id); id = UUID.randomUUID()) ;
-        var game = new CommonGame(woolbattle, id);
+        var game = new CommonGame(woolbattle, id, mapSize);
         games.put(id, game);
+        woolbattle.eventManager().addChild(game.eventManager());
         return game;
     }
+
+    // TODO Unregister Events when game is finished
 
     @Override
     public @Nullable CommonGame game(@NotNull UUID id) {

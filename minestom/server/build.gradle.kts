@@ -11,12 +11,12 @@ plugins {
     id("darkcube-parent")
 }
 
-val minestomLibrary = configurations.register("minestomLibrary") {
+val minestomLibrary by configurations.register("minestomLibrary") {
     isCanBeConsumed = false
     isCanBeResolved = true
 }
 configurations.api.configure {
-    extendsFrom(minestomLibrary.get())
+    extendsFrom(minestomLibrary)
 }
 
 abstract class SetupLibrariesTask : DefaultTask() {
@@ -69,14 +69,14 @@ abstract class SetupLibrariesTask : DefaultTask() {
 
 tasks {
     val setupLibraries = register<SetupLibrariesTask>("setupLibraries")
-    register<UploadArtifacts>("uploadArtifacts"){
+    register<UploadArtifacts>("uploadArtifacts") {
         dependsOn(setupLibraries)
         files.from(setupLibraries.flatMap { it.outputDirectory })
     }
     jar {
         manifest {
             attributes["Main-Class"] = "eu.darkcube.system.minestom.Start"
-            attributes["Class-Path"] = minestomLibrary.get().files.joinToString(separator = " ") { "libraries/" + it.name }
+            attributes["Class-Path"] = minestomLibrary.files.joinToString(separator = " ") { "libraries/" + it.name }
         }
     }
     assemble {
@@ -91,12 +91,14 @@ dependencies {
     implementation("org.ow2.asm:asm:9.5") // in cloudnet but not exposed
     implementation("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
     // libraries to be added
-    "minestomLibrary"(projects.darkcubesystem.minestom) { isTransitive = false }
-    "minestomLibrary"("org.slf4j:jul-to-slf4j:2.0.11")
-    "minestomLibrary"("org.apache.logging.log4j:log4j-core:2.22.1")
-    "minestomLibrary"("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")
-    "minestomLibrary"(libs.jline)
-    "minestomLibrary"(libs.bundles.minestom) {
+    minestomLibrary(projects.darkcubesystem.server) { isTransitive = false }
+    minestomLibrary(projects.darkcubesystem.implementation.server) { isTransitive = false }
+    minestomLibrary(projects.darkcubesystem.minestom) { isTransitive = false }
+    minestomLibrary("org.slf4j:jul-to-slf4j:2.0.11")
+    minestomLibrary("org.apache.logging.log4j:log4j-core:2.22.1")
+    minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")
+    minestomLibrary(libs.jline)
+    minestomLibrary(libs.bundles.minestom) {
         exclude("org.jetbrains", "annotations")
     }
 }

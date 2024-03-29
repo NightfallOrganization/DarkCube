@@ -11,7 +11,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
-import eu.darkcube.minigame.woolbattle.minestom.WoolBattleMinestom;
+import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.MetaDataStorage;
@@ -21,10 +21,10 @@ import net.minestom.server.thread.Acquirable;
 @SuppressWarnings("UnstableApiUsage")
 public class MinestomEntity implements Entity {
     private final Acquirable<net.minestom.server.entity.Entity> entity;
-    private final WoolBattleMinestom woolbattle;
+    private final MinestomWoolBattle woolbattle;
 
     @ApiStatus.Experimental
-    public MinestomEntity(Acquirable<net.minestom.server.entity.Entity> entity, WoolBattleMinestom woolbattle) {
+    public MinestomEntity(Acquirable<net.minestom.server.entity.Entity> entity, MinestomWoolBattle woolbattle) {
         this.entity = entity;
         this.woolbattle = woolbattle;
     }

@@ -7,26 +7,19 @@
 
 package eu.darkcube.minigame.woolbattle.common.world;
 
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.api.world.World;
-import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.world.metadata.CommonWorldBlockMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.world.metadata.CommonWorldMetaDataStorage;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
-public class CommonWorld implements World {
-    protected final CommonGame game;
+public abstract class CommonWorld implements World {
     private final PlatformWorldHandler platform;
     private final CommonWorldMetaDataStorage metaData = new CommonWorldMetaDataStorage();
 
-    public CommonWorld(CommonGame game) {
-        this.game = game;
-        this.platform = game.woolbattle().worldHandler();
-    }
-
-    @Override
-    public @NotNull CommonGame game() {
-        return game;
+    public CommonWorld(@NotNull PlatformWorldHandler worldHandler) {
+        this.platform = worldHandler;
     }
 
     @Override
@@ -36,7 +29,16 @@ public class CommonWorld implements World {
 
     @Override
     public @NotNull CommonBlock blockAt(int x, int y, int z) {
-        return new CommonBlock(this, x, y, z, game.ingameData().maxBlockDamage());
+        return new CommonBlock(this, x, y, z);
+    }
+
+    @Override
+    public void dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count) {
+        while (count > 0) {
+            var amt = Math.min(64, count);
+            count -= amt;
+            platform.dropAt(this, x, y, z, wool, amt);
+        }
     }
 
     public PlatformWorldHandler platform() {

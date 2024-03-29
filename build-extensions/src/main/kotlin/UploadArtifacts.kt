@@ -123,6 +123,15 @@ abstract class UploadArtifacts : DefaultTask() {
         val fingerprint = this.fingerprint.get()
         JSch.setConfig("PreferredAuthentications", "publickey")
         val jsch = JSch()
+//        jsch.instanceLogger = object : Logger {
+//            override fun isEnabled(level: Int): Boolean {
+//                return true
+//            }
+//
+//            override fun log(level: Int, message: String?) {
+//                println(message)
+//            }
+//        }
 
         jsch.setKnownHosts(StringInputStream("$host ssh-ed25519 $fingerprint"))
         val session = jsch.getSession(user, host)

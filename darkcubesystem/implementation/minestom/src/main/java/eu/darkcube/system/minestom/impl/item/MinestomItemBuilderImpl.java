@@ -55,7 +55,7 @@ import org.jglrxavpok.hephaistos.parser.SNBTParser;
 
 public class MinestomItemBuilderImpl extends AbstractItemBuilder implements MinestomItemBuilder {
     private static final Logger LOGGER = Logger.getLogger("ItemBuilder");
-    private static final Gson gson = new GsonBuilder().registerTypeAdapter(ItemStack.class, new TypeAdapter<ItemStack>() {
+    private static final Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(ItemStack.class, new TypeAdapter<ItemStack>() {
         @Override
         public void write(JsonWriter writer, ItemStack value) throws IOException {
             if (value == null) {
@@ -187,6 +187,7 @@ public class MinestomItemBuilderImpl extends AbstractItemBuilder implements Mine
                     });
                     case SkullBuilderMeta skullBuilderMeta -> builder.meta(PlayerHeadMeta.class, m -> {
                         var owner = skullBuilderMeta.owningPlayer();
+                        if (owner == null) return;
                         var texture = owner.texture();
                         if (texture != null) {
                             m.playerSkin(new PlayerSkin(texture.value(), texture.signature()));

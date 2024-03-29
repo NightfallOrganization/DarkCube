@@ -7,7 +7,6 @@
 
 package eu.darkcube.system.minestom.impl;
 
-import dev.derklaro.aerogel.Injector;
 import dev.derklaro.aerogel.binding.BindingBuilder;
 import eu.cloudnetservice.driver.ComponentInfo;
 import eu.cloudnetservice.driver.event.EventManager;
@@ -49,7 +48,8 @@ public class DarkCubeSystemMinestomExtension extends Extension {
     private final PacketHandler<PacketRequestProtocolVersionDeclaration> versionDeclarationHandler = packet -> declareVersion();
     private final ServiceListener listener = new ServiceListener();
 
-    @Override public void preInitialize() {
+    @Override
+    public void preInitialize() {
         var ext = InjectionLayer.ext();
         install(ext, Version.class, new MinestomVersion());
         install(ext, AdventureSupport.class, new MinestomAdventureSupportImpl());
@@ -61,14 +61,15 @@ public class DarkCubeSystemMinestomExtension extends Extension {
         install(ext, EnchantmentProvider.class, new MinestomEnchantmentProvider());
         install(ext, AttributeProvider.class, new MinestomAttributeProvider());
         install(ext, AttributeModifierProvider.class, new MinestomAttributeModifierProvider());
+        InjectionLayer.boot().instance(EventManager.class).registerListener(listener);
     }
 
     private <T> void install(InjectionLayer<?> layer, Class<T> type, T instance) {
         layer.install(BindingBuilder.create().bind(type).toInstance(instance));
     }
 
-    @Override public void initialize() {
-        InjectionLayer.boot().instance(EventManager.class).registerListener(listener);
+    @Override
+    public void initialize() {
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, event -> {
             if (!DarkCubeServer.autoConfigure()) return;
             DarkCubeServer.playingPlayers().decrementAndGet();
@@ -81,7 +82,8 @@ public class DarkCubeSystemMinestomExtension extends Extension {
         });
     }
 
-    @Override public void postInitialize() {
+    @Override
+    public void postInitialize() {
         PacketAPI.instance().registerHandler(PacketRequestProtocolVersionDeclaration.class, versionDeclarationHandler);
         declareVersion();
         if (DarkCubeServer.autoConfigure()) {
@@ -90,7 +92,8 @@ public class DarkCubeSystemMinestomExtension extends Extension {
         }
     }
 
-    @Override public void terminate() {
+    @Override
+    public void terminate() {
         InjectionLayer.boot().instance(EventManager.class).unregisterListener(listener);
         PacketAPI.instance().unregisterHandler(versionDeclarationHandler);
     }

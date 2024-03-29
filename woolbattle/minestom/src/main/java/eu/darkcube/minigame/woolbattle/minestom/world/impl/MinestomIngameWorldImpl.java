@@ -5,13 +5,15 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.minestom.world;
+package eu.darkcube.minigame.woolbattle.minestom.world.impl;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
-import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
+import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.instance.Instance;
 
-public class MinestomIngameWorldImpl extends CommonWorld implements MinestomWorld {
+public class MinestomIngameWorldImpl extends CommonIngameWorld implements MinestomWorld {
     private final Instance instance;
 
     public MinestomIngameWorldImpl(CommonGame game, Instance instance) {
@@ -20,7 +22,7 @@ public class MinestomIngameWorldImpl extends CommonWorld implements MinestomWorl
     }
 
     @Override
-    public Instance instance() {
+    public @NotNull Instance instance() {
         return instance;
     }
 }

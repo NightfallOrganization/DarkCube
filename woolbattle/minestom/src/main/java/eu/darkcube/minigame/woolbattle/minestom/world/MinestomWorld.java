@@ -8,8 +8,9 @@
 package eu.darkcube.minigame.woolbattle.minestom.world;
 
 import eu.darkcube.minigame.woolbattle.api.world.World;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.instance.Instance;
 
 public interface MinestomWorld extends World {
-    Instance instance();
+    @NotNull Instance instance();
 }
