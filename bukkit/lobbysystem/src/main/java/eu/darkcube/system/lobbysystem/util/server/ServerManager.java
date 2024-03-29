@@ -7,12 +7,25 @@
 
 package eu.darkcube.system.lobbysystem.util.server;
 
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeoutException;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import eu.cloudnetservice.driver.channel.ChannelMessage;
-import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.event.events.channel.ChannelMessageReceiveEvent;
@@ -30,25 +43,13 @@ import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.pserver.common.PServerExecutor;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeoutException;
-
 public class ServerManager {
 
-    private final Cache<UUID, ConnectionRequest> connectionRequests = Caffeine
-            .newBuilder()
-            .scheduler(Scheduler.systemScheduler())
-            .expireAfterWrite(Duration.ofSeconds(10))
-            .removalListener((UUID ignoredUUID, ConnectionRequest value, RemovalCause cause) -> {
-                if (cause.wasEvicted() && value != null) {
-                    value.future().completeExceptionally(new TimeoutException());
-                }
-            })
-            .build();
+    private final Cache<UUID, ConnectionRequest> connectionRequests = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofSeconds(10)).removalListener((UUID ignoredUUID, ConnectionRequest value, RemovalCause cause) -> {
+        if (cause.wasEvicted() && value != null) {
+            value.future().completeExceptionally(new TimeoutException());
+        }
+    }).build();
     private final Lobby lobby;
     private final List<UpdateListener> updateListeners = new CopyOnWriteArrayList<>();
     private final Map<UUID, Collection<DefaultServerInformation>> informations = new HashMap<>();
@@ -61,7 +62,8 @@ public class ServerManager {
         this.lobby = lobby;
         InjectionLayer.boot().instance(EventManager.class).registerListener(new Listener());
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (!requireUpdate) return;
                 requireUpdate = false;
 
@@ -79,7 +81,8 @@ public class ServerManager {
         return pserver.serverName().thenCompose(serverName -> {
             var fut = new CompletableFuture<ServerInformation>();
             new BukkitRunnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     for (var information : mergedInformations.values()) {
                         if (information.snapshot.name().equals(serverName)) {
                             fut.complete(information);
@@ -130,6 +133,9 @@ public class ServerManager {
                 }
             }
         }
+        for (DefaultServerInformation value : mergedInformations.values()) {
+            System.out.println(value.displayNameString());
+        }
     }
 
     private @Nullable Collection<DefaultServerInformation> parseV2(ServiceInfoSnapshot snapshot, Collection<? extends ServerInformation> existing) {
@@ -166,14 +172,7 @@ public class ServerManager {
         var requestId = UUID.randomUUID();
         var request = new ConnectionRequest(future, player, server.snapshot.name());
         connectionRequests.put(requestId, request);
-        ChannelMessage
-                .builder()
-                .targetService(request.name())
-                .channel("darkcube_lobbysystem_v2")
-                .message("start_connection_request")
-                .buffer(DataBuf.empty().writeUniqueId(requestId).writeUniqueId(player).writeObject(server.document()))
-                .build()
-                .send();
+        ChannelMessage.builder().targetService(request.name()).channel("darkcube_lobbysystem_v2").message("start_connection_request").buffer(DataBuf.empty().writeUniqueId(requestId).writeUniqueId(player).writeObject(server.document())).build().send();
         return future;
     }
 
@@ -189,7 +188,8 @@ public class ServerManager {
             super(message);
         }
 
-        @Override public Throwable fillInStackTrace() {
+        @Override
+        public Throwable fillInStackTrace() {
             return this;
         }
     }
@@ -203,7 +203,8 @@ public class ServerManager {
             triggerUpdate();
         }
 
-        @EventListener public void handle(ChannelMessageReceiveEvent event) {
+        @EventListener
+        public void handle(ChannelMessageReceiveEvent event) {
             if (!event.channel().equals("darkcube_lobbysystem_v2")) return;
             if (event.message().equals("connection_request_status")) {
                 var requestId = event.content().readUniqueId();
@@ -221,15 +222,19 @@ public class ServerManager {
             }
         }
 
-        @EventListener public void handle(CloudServiceUpdateEvent event) {
+        @EventListener
+        public void handle(CloudServiceUpdateEvent event) {
             var service = event.serviceInfo();
-            queue.add(() -> services.computeIfPresent(service
-                    .serviceId()
-                    .uniqueId(), (ignoredUuid, ignoredServiceInfoSnapshot) -> service));
+            queue.add(() -> services.computeIfPresent(service.serviceId().uniqueId(), (ignoredUuid, ignoredServiceInfoSnapshot) -> service));
+            if (service.name().equals("minestom-1")) {
+                System.out.println(event.serviceInfo());
+            }
+            System.out.println("Trigger update because of serviceUpdate");
             triggerUpdate();
         }
 
-        @EventListener public void handle(CloudServiceLifecycleChangeEvent event) {
+        @EventListener
+        public void handle(CloudServiceLifecycleChangeEvent event) {
             queue.add(() -> {
                 if (event.newLifeCycle() == ServiceLifeCycle.RUNNING) {
                     services.put(event.serviceInfo().serviceId().uniqueId(), event.serviceInfo());
@@ -240,6 +245,7 @@ public class ServerManager {
                     if (snap == null) System.err.println("Failed to remove from services!!!");
                 }
             });
+            System.out.println("Trigger update because of lifecycle change");
             triggerUpdate();
         }
     }

@@ -5,14 +5,20 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 plugins {
-    `java-library`
+    java
     id("darkcube-parent")
     alias(libs.plugins.shadow)
 }
 
+val woolbattleShadow by configurations.register("woolbattleShadow")
+
 dependencies {
-    compileOnlyApi(projects.darkcubesystem.minestom)
-    api(parent!!.project("common"))
+    implementation(projects.darkcubesystem.minestom)
+    implementation(parent!!.project("common"))
+    woolbattleShadow(libs.jctools.core)
+    woolbattleShadow(libs.fastutil)
+    woolbattleShadow(project(":woolbattle:api").setTransitive(false))
+    woolbattleShadow(project(":woolbattle:common").setTransitive(false))
 }
 
 tasks {
@@ -30,6 +36,10 @@ tasks {
     shadowJar {
         archiveBaseName = "woolbattle"
         archiveClassifier = null
+        configurations = listOf(woolbattleShadow)
+        minimize()
+        relocate("it.unimi.dsi.fastutil", "eu.darkcube.minigame.woolbattle.libs.fastutil")
+        relocate("org.jctools", "eu.darkcube.minigame.woolbattle.libs.jctools")
     }
     assemble {
         dependsOn(shadowJar)

@@ -6,8 +6,9 @@
  */
 plugins {
     `java-library`
+    alias(libs.plugins.lombok)
 }
 
 dependencies {
-    compileOnly(projects.darkcubesystem.server)
+    api(projects.darkcubesystem.server)
 }

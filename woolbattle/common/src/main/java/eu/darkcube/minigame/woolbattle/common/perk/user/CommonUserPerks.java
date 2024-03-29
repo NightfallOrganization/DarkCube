@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
@@ -23,22 +22,25 @@ import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 
 public class CommonUserPerks implements UserPerks {
     private static final AtomicInteger id = new AtomicInteger();
 
-    private final Game game;
-    private final WBUser user;
+    private final CommonGame game;
+    private final CommonWBUser user;
     private final Map<Integer, UserPerk> perks = new HashMap<>();
     private final Map<ActivationType, Collection<UserPerk>> byType = new HashMap<>();
     private final Map<PerkName, Collection<UserPerk>> byName = new HashMap<>();
 
-    public CommonUserPerks(WBUser user) {
+    public CommonUserPerks(CommonWBUser user) {
         this.user = user;
         this.game = user.game();
     }
 
-    @Override public void reloadFromStorage() {
+    @Override
+    public void reloadFromStorage() {
         perks.clear();
         byType.clear();
         byName.clear();
@@ -78,27 +80,33 @@ public class CommonUserPerks implements UserPerks {
         }
     }
 
-    @Override public int count(PerkName perkName) {
+    @Override
+    public int count(PerkName perkName) {
         return (int) perks.values().stream().filter(p -> p.perk().perkName().equals(perkName)).count();
     }
 
-    @Override public Collection<UserPerk> perks() {
+    @Override
+    public Collection<UserPerk> perks() {
         return perks.values();
     }
 
-    @Override public Collection<UserPerk> perks(ActivationType type) {
+    @Override
+    public Collection<UserPerk> perks(ActivationType type) {
         return byType.getOrDefault(type, Collections.emptyList());
     }
 
-    @Override public Collection<UserPerk> perks(PerkName perkName) {
+    @Override
+    public Collection<UserPerk> perks(PerkName perkName) {
         return byName.getOrDefault(perkName, Collections.emptyList());
     }
 
-    @Override public UserPerk perk(int id) {
+    @Override
+    public UserPerk perk(int id) {
         return perks.get(id);
     }
 
-    @Override public WBUser user() {
+    @Override
+    public WBUser user() {
         return user;
     }
 }

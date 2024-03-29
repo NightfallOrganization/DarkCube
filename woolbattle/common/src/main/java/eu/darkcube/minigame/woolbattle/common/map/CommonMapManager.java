@@ -10,7 +10,6 @@ package eu.darkcube.minigame.woolbattle.common.map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,14 +24,22 @@ import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
+import eu.darkcube.system.server.item.ItemBuilder;
 
 public class CommonMapManager implements MapManager {
     private static final ConcurrentMap<String, CommonMap> EMPTY = new ConcurrentHashMap<>(0);
     private final Database database;
+    private final CommonWoolBattleApi woolbattle;
     private final ConcurrentMap<MapSize, ConcurrentMap<String, CommonMap>> maps = new ConcurrentHashMap<>();
 
     public CommonMapManager(CommonWoolBattleApi woolbattle) {
-        database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps" + woolbattle.databaseNameSuffixMaps());
+        this.woolbattle = woolbattle;
+        database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps_" + woolbattle.databaseNameSuffixMaps());
+        for (var entry : database.entries().entrySet()) {
+            var document = entry.getValue();
+            var map = CommonMap.fromDocument(this, document);
+            maps.computeIfAbsent(map.size(), v -> new ConcurrentHashMap<>()).put(map.name(), map);
+        }
     }
 
     @Override
@@ -46,13 +53,17 @@ public class CommonMapManager implements MapManager {
         maps.compute(mapSize, (k, v) -> {
             if (v == null) v = new ConcurrentHashMap<>();
             mapRef.set(v.computeIfAbsent(name, n -> {
-                var map = new CommonMap(n, mapSize);
+                var map = new CommonMap(this, n, mapSize, ItemBuilder.item(woolbattle.materialProvider().grassBlock()));
                 database.insert(databaseKey(map), map.toDocument());
                 return map;
             }));
             return v;
         });
         return mapRef.get();
+    }
+
+    void save(CommonMap map) {
+        database.insert(databaseKey(map), map.toDocument());
     }
 
     @Override

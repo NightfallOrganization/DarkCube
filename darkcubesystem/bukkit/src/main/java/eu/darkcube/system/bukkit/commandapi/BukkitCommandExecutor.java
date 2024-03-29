@@ -40,25 +40,30 @@ public class BukkitCommandExecutor implements CommandExecutor, ForwardingAudienc
         return new BukkitCommandExecutor(sender);
     }
 
-    @Override public @NotNull Iterable<? extends Audience> audiences() {
+    @Override
+    public @NotNull Iterable<? extends Audience> audiences() {
         return Collections.singleton(audience);
     }
 
-    @Override public Language language() {
+    @Override
+    public Language language() {
         if (sender instanceof Player) {
             return UserAPI.instance().user(((Player) sender).getUniqueId()).language();
         }
         return Language.DEFAULT;
     }
 
-    @Override public void language(Language language) {
+    @Override
+    public void language(Language language) {
         if (sender instanceof Player) {
             UserAPI.instance().user(((Player) sender).getUniqueId()).language(language);
+            return;
         }
         logger.warning("Can't set language of the console!");
     }
 
-    @Override public String commandPrefix() {
+    @Override
+    public String commandPrefix() {
         return sender instanceof Player ? "/" : CommandExecutor.super.commandPrefix();
     }
 

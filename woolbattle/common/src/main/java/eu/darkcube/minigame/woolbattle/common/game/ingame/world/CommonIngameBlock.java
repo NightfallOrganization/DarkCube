@@ -10,14 +10,17 @@ package eu.darkcube.minigame.woolbattle.common.game.ingame.world;
 import eu.darkcube.minigame.woolbattle.api.event.world.DamageBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.DestroyBlockEvent;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
+import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
 import eu.darkcube.system.server.item.material.Material;
 
 public class CommonIngameBlock extends CommonBlock {
     private final CommonIngameWorld world;
+    protected final int maxBlockDamage;
 
     public CommonIngameBlock(CommonIngameWorld world, int x, int y, int z, int maxBlockDamage) {
-        super(world, x, y, z, maxBlockDamage);
+        super(world, x, y, z);
         this.world = world;
+        this.maxBlockDamage = maxBlockDamage;
     }
 
     @Override

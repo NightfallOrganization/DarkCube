@@ -29,14 +29,14 @@ public class ServerConsole {
     private static volatile Terminal terminal;
 
     public static void init() {
-        Thread.ofVirtual().name("ServerConsole").start(() -> {
-            try {
-                run();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        });
         synchronized (ServerConsole.class) { // Wait for terminal to be created
+            Thread.ofVirtual().name("ServerConsole").start(() -> {
+                try {
+                    run();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            });
             try {
                 ServerConsole.class.wait();
             } catch (InterruptedException e) {
@@ -78,19 +78,13 @@ public class ServerConsole {
     }
 
     private record MinestomCompleter() implements Completer {
-        @Override public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+        @Override
+        public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
             final var commandManager = MinecraftServer.getCommandManager();
             final var consoleSender = commandManager.getConsoleSender();
             if (line.wordIndex() == 0) {
                 final var commandString = line.word().toLowerCase();
-                candidates.addAll(commandManager
-                        .getDispatcher()
-                        .getCommands()
-                        .stream()
-                        .map(Command::getName)
-                        .filter(name -> commandString.isBlank() || name.toLowerCase().startsWith(commandString))
-                        .map(Candidate::new)
-                        .toList());
+                candidates.addAll(commandManager.getDispatcher().getCommands().stream().map(Command::getName).filter(name -> commandString.isBlank() || name.toLowerCase().startsWith(commandString)).map(Candidate::new).toList());
             } else {
                 final var text = line.line();
                 final var suggestion = TabCompleteListener.getSuggestion(consoleSender, text);

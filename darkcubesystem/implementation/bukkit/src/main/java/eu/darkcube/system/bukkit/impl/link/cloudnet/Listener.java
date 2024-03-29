@@ -19,18 +19,21 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Listener implements org.bukkit.event.Listener {
 
-    @EventListener public void handle(ServiceInfoPropertiesConfigureEvent event) {
+    @EventListener
+    public void handle(ServiceInfoPropertiesConfigureEvent event) {
         event.propertyHolder().writeProperty(DarkCubeServiceProperty.GAME_STATE, DarkCubeServer.gameState()).writeProperty(DarkCubeServiceProperty.PLAYING_PLAYERS, DarkCubeServer.playingPlayers().get()).writeProperty(DarkCubeServiceProperty.SPECTATING_PLAYERS, DarkCubeServer.spectatingPlayers().get()).writeProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS, DarkCubeServer.maxPlayingPlayers().get()).writeProperty(DarkCubeServiceProperty.DISPLAY_NAME, DarkCubeServer.displayName()).writeProperty(DarkCubeServiceProperty.AUTOCONFIGURED, DarkCubeServer.autoConfigure()).writeProperty(DarkCubeServiceProperty.EXTRA, DarkCubeServer.extra());
     }
 
-    @EventHandler public void handle(PlayerJoinEvent event) {
+    @EventHandler
+    public void handle(PlayerJoinEvent event) {
         if (DarkCubeServer.autoConfigure()) {
             DarkCubeServer.playingPlayers().incrementAndGet();
             InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();
         }
     }
 
-    @EventHandler public void handle(PlayerQuitEvent event) {
+    @EventHandler
+    public void handle(PlayerQuitEvent event) {
         if (DarkCubeServer.autoConfigure()) {
             DarkCubeServer.playingPlayers().decrementAndGet();
             InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();

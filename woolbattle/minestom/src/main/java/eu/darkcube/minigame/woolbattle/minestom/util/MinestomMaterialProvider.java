@@ -7,23 +7,26 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.util;
 
-import static net.minestom.server.item.Material.BLACK_WOOL;
-import static net.minestom.server.item.Materials.*;
+import static net.minestom.server.item.Material.GRASS_BLOCK;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import eu.darkcube.minigame.woolbattle.api.util.MaterialProvider;
 import eu.darkcube.minigame.woolbattle.api.world.Block;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWoolProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.material.Material;
 
 public class MinestomMaterialProvider implements MaterialProvider {
-    private final List<Material> wool = Stream.of(WHITE_WOOL, ORANGE_WOOL, MAGENTA_WOOL, LIGHT_BLUE_WOOL, YELLOW_WOOL, LIME_WOOL, PINK_WOOL, GRAY_WOOL, LIGHT_GRAY_WOOL, CYAN_WOOL, PURPLE_WOOL, BLUE_WOOL, BROWN_WOOL, GREEN_WOOL, RED_WOOL, BLACK_WOOL).map(Material::of).toList();
+    private final List<Material> wool;
+
+    public MinestomMaterialProvider(MinestomColoredWoolProvider provider) {
+        this.wool = provider.woolMaterials();
+    }
 
     @Override
     public boolean isWool(@NotNull Material material) {
@@ -38,5 +41,10 @@ public class MinestomMaterialProvider implements MaterialProvider {
     @Override
     public @Nullable ColoredWool woolFrom(@NotNull ItemBuilder item) {
         return new MinestomColoredWool(item.material());
+    }
+
+    @Override
+    public @NotNull Material grassBlock() {
+        return Material.of(GRASS_BLOCK);
     }
 }

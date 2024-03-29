@@ -74,6 +74,11 @@ public enum Messages implements Message {
     COOLDOWN,
     CLICK_TO_SELECT,
     KILLSTREAK,
+    NO_MAPS_TO_MIGRATE,
+    MIGRATING_MAPS,
+    MAP_MIGRATION_COMPLETE,
+    LEFT_SETUP_MODE,
+    ENTERED_SETUP_MODE,
     WOOL_DIRECTION_SETTINGS_TITLE;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
@@ -92,11 +97,13 @@ public enum Messages implements Message {
         return language.getMessage(KEY_PREFIX + messageKey, replacements);
     }
 
-    @Override public String getPrefixModifier() {
+    @Override
+    public String getPrefixModifier() {
         return Message.super.getPrefixModifier();
     }
 
-    @Override public String key() {
+    @Override
+    public String key() {
         return key;
     }
 

@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.api.map;
 
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 @Api
@@ -25,14 +26,14 @@ public interface Map {
     void deathHeight(int deathHeight);
 
     @Api
-    ItemBuilder icon();
+    @NotNull ItemBuilder icon();
 
     @Api
-    void icon(ItemBuilder icon);
+    void icon(@NotNull ItemBuilder icon);
 
     @Api
-    MapSize size();
+    @NotNull MapSize size();
 
     @Api
-    String name();
+    @NotNull String name();
 }

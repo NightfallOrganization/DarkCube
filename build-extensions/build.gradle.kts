@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     implementation("com.github.mwiede:jsch:0.2.16")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.77")
     implementation("net.java.dev.jna:jna:4.5.0")
     implementation("net.java.dev.jna:jna-platform:5.13.0")
 }

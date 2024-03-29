@@ -8,7 +8,7 @@
 package eu.darkcube.minigame.woolbattle.minestom.entity;
 
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
-import eu.darkcube.minigame.woolbattle.minestom.WoolBattleMinestom;
+import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.thread.Acquirable;
@@ -16,7 +16,7 @@ import net.minestom.server.thread.Acquirable;
 @SuppressWarnings("UnstableApiUsage")
 public class MinestomProjectile extends MinestomEntity implements Projectile {
     @ApiStatus.Experimental
-    public MinestomProjectile(Acquirable<Entity> entity, WoolBattleMinestom woolbattle) {
+    public MinestomProjectile(Acquirable<Entity> entity, MinestomWoolBattle woolbattle) {
         super(entity, woolbattle);
     }
 }

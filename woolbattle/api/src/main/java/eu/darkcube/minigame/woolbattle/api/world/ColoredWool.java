@@ -7,6 +7,10 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
+import eu.darkcube.system.server.item.ItemBuilder;
+
 public interface ColoredWool {
     void apply(Block block);
+
+    ItemBuilder createSingleItem();
 }

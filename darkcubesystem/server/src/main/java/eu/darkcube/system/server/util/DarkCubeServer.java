@@ -4,16 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.server.util;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import eu.cloudnetservice.driver.ComponentInfo;
 import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.GameState;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 public final class DarkCubeServer {
 

@@ -24,4 +24,6 @@ public interface MaterialProvider {
     default @NotNull Material air() {
         return Material.air();
     }
+
+    @NotNull Material grassBlock();
 }
