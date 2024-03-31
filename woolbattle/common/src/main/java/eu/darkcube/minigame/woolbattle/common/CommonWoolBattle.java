@@ -10,6 +10,7 @@ import eu.darkcube.minigame.woolbattle.common.setup.SetupMode;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
+import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.TaskScheduleProviderImpl;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -64,4 +65,6 @@ public abstract class CommonWoolBattle {
     public abstract @NotNull CommonWoolBattleApi api();
 
     public abstract @NotNull UserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user);
+
+    public abstract @NotNull UserPermissions createPermissionsFor(@NotNull CommonWBUser user);
 }

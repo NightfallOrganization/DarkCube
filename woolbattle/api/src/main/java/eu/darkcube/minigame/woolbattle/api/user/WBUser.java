@@ -10,6 +10,7 @@ package eu.darkcube.minigame.woolbattle.api.user;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
+import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
@@ -25,7 +26,7 @@ import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
-public interface WBUser {
+public interface WBUser extends CommandSender {
     @Api
     @NotNull WoolBattleApi woolbattle();
 

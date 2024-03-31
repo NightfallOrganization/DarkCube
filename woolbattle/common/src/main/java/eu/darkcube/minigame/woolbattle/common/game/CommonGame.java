@@ -50,7 +50,7 @@ public class CommonGame implements Game {
     private volatile CommonPhase phase;
     private volatile CommonMap map;
 
-    public CommonGame(CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull MapSize mapSize) {
+    public CommonGame(@NotNull CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull MapSize mapSize) {
         this.woolbattle = woolbattle;
         this.id = id;
         this.eventManager = EventNode.value("game-" + id, EventFilter.ALL, event -> {
@@ -159,7 +159,16 @@ public class CommonGame implements Game {
     }
 
     public void checkUnload() {
-        // TODO
+        if (!users.isEmpty()) {
+            return;
+        }
+        // no users in game, unload it
+        woolbattle.games().unload(this);
+    }
+
+    void unload0() {
+        phase.disable();
+        phase = null;
     }
 
     public @NotNull JoinResult playerJoined(@NotNull CommonWBUser user) {
@@ -176,6 +185,7 @@ public class CommonGame implements Game {
         users.remove(user);
         playingPlayers.remove(user);
         spectatingPlayers.remove(user);
+        checkUnload();
     }
 
     /**
