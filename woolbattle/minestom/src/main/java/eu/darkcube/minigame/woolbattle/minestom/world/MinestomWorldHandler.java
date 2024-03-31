@@ -97,6 +97,13 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     }
 
     @Override
+    public void unloadWorld(@NotNull CommonWorld world) {
+        var minestomWorld = (MinestomWorld) world;
+        var instance = minestomWorld.instance();
+        instanceManager.unregisterInstance(instance);
+    }
+
+    @Override
     public void dropAt(@NotNull CommonWorld world, double x, double y, double z, @NotNull ColoredWool wool, int amt) {
         var instance = instance(world);
         var entity = new Entity(EntityType.ITEM);

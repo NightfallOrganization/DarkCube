@@ -1,6 +1,7 @@
 package eu.darkcube.minigame.woolbattle.minestom.listener;
 
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.Event;
@@ -10,7 +11,7 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 public class MinestomJoinListener {
     public static void register(MinestomWoolBattle woolbattle, EventNode<Event> node) {
         node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
-            var player = event.getPlayer();
+            var player = (MinestomPlayer) event.getPlayer();
             var joinResult = woolbattle.eventHandler().playerJoined(player.getUuid());
             if (joinResult == null) {
                 // denied

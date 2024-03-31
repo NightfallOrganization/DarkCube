@@ -24,6 +24,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.MetaDataStorage;
@@ -38,6 +39,7 @@ public class CommonWBUser implements WBUser {
     private final @Nullable CommonGame game;
     private final @NotNull CommonUserPerks perks;
     private final @NotNull UserInventoryAccess inventoryAccess;
+    private final @NotNull UserPermissions permissions;
     private final @NotNull MetaDataStorage metadata = new BasicMetaDataStorage();
     private volatile @Nullable CommonWorld world;
     private volatile @Nullable Location location;
@@ -54,6 +56,7 @@ public class CommonWBUser implements WBUser {
         this.keyWoolSubtractDirection = new Key(woolbattle, "woolSubtractDirection");
         this.keyPerks = new Key(woolbattle, "perks");
         this.inventoryAccess = woolbattle.woolbattle().createInventoryAccessFor(this);
+        this.permissions = woolbattle.woolbattle().createPermissionsFor(this);
     }
 
     @Override
@@ -240,5 +243,25 @@ public class CommonWBUser implements WBUser {
     @Override
     public void particles(boolean particles) {
         user.persistentData().set(keyParticles, BOOLEAN, particles);
+    }
+
+    @Override
+    public void language(Language language) {
+        user.language(language);
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return permissions.hasPermission(permission);
+    }
+
+    @Override
+    public boolean isPlayer() {
+        return true;
+    }
+
+    @Override
+    public @NotNull UUID playerUniqueId() {
+        return uniqueId();
     }
 }

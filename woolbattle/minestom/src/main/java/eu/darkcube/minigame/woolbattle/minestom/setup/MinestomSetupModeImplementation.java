@@ -11,6 +11,7 @@ import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.Key;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 
 public class MinestomSetupModeImplementation implements SetupMode.Implementation {
@@ -34,28 +35,27 @@ public class MinestomSetupModeImplementation implements SetupMode.Implementation
     @Override
     public void enter(@NotNull CommonWBUser oldUser) {
         var game = oldUser.game();
-        if (game != null) {
-            game.playerQuit(oldUser);
-        }
         var rawUser = oldUser.user();
         var user = new CommonWBUser(woolbattle, rawUser, null);
         woolbattle.woolbattle().player(user, woolbattle.woolbattle().player(oldUser));
         var player = woolbattle.woolbattle().player(user);
         enterSetupMode(user, (instance, pos) -> {
-            player.getAcquirable().sync(p -> {
-                p.setInstance(p.getInstance(), pos).thenRun(() -> {
-                    System.out.println("Set instance done");
-                }).join();
-            });
+            var lock = player.getAcquirable().lock();
+            player.setInstance(instance, pos).join();
+            lock.unlock();
+            if (game != null) {
+                game.playerQuit(oldUser);
+            }
         });
     }
 
     @Override
     public void leave(@NotNull CommonWBUser user) {
         var woolbattle = this.woolbattle.woolbattle();
-        woolbattle.setupMode().playerQuit(user);
         var player = woolbattle.player(user);
         player.kick("Left SetupMode");
+        player.remove();
+        woolbattle.setupMode().playerQuit(user);
     }
 
     public void enterSetupMode(@NotNull CommonWBUser user, @NotNull BiConsumer<Instance, Pos> teleportConsumer) {

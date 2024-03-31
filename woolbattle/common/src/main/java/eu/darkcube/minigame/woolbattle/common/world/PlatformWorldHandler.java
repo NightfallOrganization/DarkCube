@@ -26,6 +26,5 @@ public interface PlatformWorldHandler {
 
     void dropAt(@NotNull CommonWorld world, double x, double y, double z, @NotNull ColoredWool wool, int amt);
 
-    record LobbyWorld(CommonWorld world) {
-    }
+    void unloadWorld(@NotNull CommonWorld world);
 }

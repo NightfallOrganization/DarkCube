@@ -21,10 +21,10 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 
 public class CommonGameManager implements GameManager {
-    private final CommonWoolBattleApi woolbattle;
-    private final Map<UUID, CommonGame> games = new ConcurrentHashMap<>();
+    private final @NotNull CommonWoolBattleApi woolbattle;
+    private final @NotNull Map<@NotNull UUID, @NotNull CommonGame> games = new ConcurrentHashMap<>();
 
-    public CommonGameManager(CommonWoolBattleApi woolbattle) {
+    public CommonGameManager(@NotNull CommonWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
     }
 
@@ -43,10 +43,22 @@ public class CommonGameManager implements GameManager {
         return game;
     }
 
-    // TODO Unregister Events when game is finished
-
     @Override
     public @Nullable CommonGame game(@NotNull UUID id) {
         return games.get(id);
+    }
+
+    public void unload(@NotNull CommonGame game) {
+        var removed = games.remove(game.id());
+        if (removed != game) {
+            if (removed == null) {
+                woolbattle.woolbattle().logger().severe("Game was trying to unload but not registered: " + game);
+            } else {
+                woolbattle.woolbattle().logger().severe("Multiple games with same id: " + game + " and " + removed);
+            }
+            return;
+        }
+        woolbattle.eventManager().removeChild(game.eventManager());
+        game.unload0();
     }
 }
