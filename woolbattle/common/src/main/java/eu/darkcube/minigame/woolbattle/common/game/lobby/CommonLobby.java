@@ -32,6 +32,9 @@ public class CommonLobby extends CommonPhase implements Lobby {
     @Override
     public void disable() {
         super.disable();
+        game.woolbattle().worldHandler().unloadWorld(world);
+        world = null;
+        spawn = null;
     }
 
     public Location spawn() {

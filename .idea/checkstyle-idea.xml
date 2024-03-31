@@ -4,7 +4,6 @@
     <checkstyleVersion>10.12.5</checkstyleVersion>
     <scanScope>AllSourcesWithTests</scanScope>
     <copyLibs>true</copyLibs>
-    <option name="thirdPartyClasspath" />
     <option name="activeLocationIds">
       <option value="32e4b407-6de0-4637-9435-962b1eb7f350" />
     </option>

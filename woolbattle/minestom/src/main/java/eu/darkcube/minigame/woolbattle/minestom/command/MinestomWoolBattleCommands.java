@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -17,6 +18,7 @@ import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.system.commandapi.util.Vector2f;
 import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
@@ -194,7 +196,8 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
         @UnknownNullability String displayName = null;
         @NotNull String commandPrefix = "";
         @NotNull Map<String, Object> extra = new HashMap<>();
-        if (sender instanceof Player player) {
+        @NotNull eu.darkcube.minigame.woolbattle.api.command.CommandSender customSender;
+        if (sender instanceof MinestomPlayer player) {
             name = player.getUsername();
             var playerPos = player.getPosition();
             pos = new Vector3d(playerPos.x(), playerPos.y(), playerPos.z());
@@ -202,13 +205,16 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
             world = woolbattle.woolbattle().worlds().get(player.getInstance());
             player.get(Pointer.pointer(CommandSource.class, Key.key("asd")));
             commandPrefix = "/";
+            customSender = Objects.requireNonNullElseGet(player.user(), () -> new MinestomCommandSender(sender));
             var displayNameComponent = player.getDisplayName();
             if (world instanceof GameWorld gameWorld) game = gameWorld.game();
             if (displayNameComponent != null) displayName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
         } else if (sender instanceof ConsoleSender) {
             name = "console";
+            customSender = new MinestomCommandSender(sender);
+        } else {
+            customSender = new MinestomCommandSender(sender);
         }
-        var customSender = new MinestomCommandSender(sender);
         return new CommandSource(woolbattle, game, customSender, pos, rotation, world, name, displayName, extra, commandPrefix);
     }
 

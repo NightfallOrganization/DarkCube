@@ -15,10 +15,13 @@ import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
+import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomJoinListener;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserInventoryAccess;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -62,6 +65,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         eventManager.addListener(PlayerSettingsChangeEvent.class, event -> {
             System.out.println(event.getPlayer().getSettings().getViewDistance());
         });
+        MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             api.scheduler().processTick();
             for (var game : api.games().games()) {
@@ -91,16 +95,22 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     }
 
     @Override
-    public @NotNull UserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user) {
+    public @NotNull MinestomUserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user) {
         return new MinestomUserInventoryAccess(this, user);
     }
 
-    public @NotNull Player player(@NotNull CommonWBUser user) {
+    @Override
+    public @NotNull MinestomUserPermissions createPermissionsFor(@NotNull CommonWBUser user) {
+        return new MinestomUserPermissions(this, user);
+    }
+
+    public @NotNull MinestomPlayer player(@NotNull CommonWBUser user) {
         return user.metadata().get(playerKey);
     }
 
-    public void player(@NotNull CommonWBUser user, @NotNull Player player) {
+    public void player(@NotNull CommonWBUser user, @NotNull MinestomPlayer player) {
         user.metadata().set(playerKey, player);
+        player.user(user);
     }
 
     public @NotNull Map<@NotNull Instance, @NotNull MinestomWorld> worlds() {
