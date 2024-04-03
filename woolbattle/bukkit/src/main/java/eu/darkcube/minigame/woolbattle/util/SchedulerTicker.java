@@ -18,10 +18,15 @@ public class SchedulerTicker extends BukkitRunnable {
         this.woolbattle = woolbattle;
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
         for (SchedulerTask scheduler : woolbattle.schedulers()) {
-            if (scheduler.canExecute()) scheduler.run();
+            if (scheduler.canExecute()) {
+                try {
+                    scheduler.run();
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            }
         }
     }
 }

@@ -47,16 +47,16 @@ public class GrabberPerk extends Perk {
         }
 
         public boolean hasTarget(WBUser user) {
-            return user.user().getMetaDataStorage().has(DATA_GRABBED);
+            return user.user().metadata().has(DATA_GRABBED);
         }
 
         public boolean teleportTarget(WBUser user) {
             if (!hasTarget(user)) {
                 return false;
             }
-            WBUser grabbed = user.user().getMetaDataStorage().remove(DATA_GRABBED);
-            user.user().getMetaDataStorage().<Scheduler>remove(DATA_SCHEDULER).cancel();
-            UserPerk perk = user.user().getMetaDataStorage().remove(DATA_PERK);
+            WBUser grabbed = user.user().metadata().remove(DATA_GRABBED);
+            user.user().metadata().<Scheduler>remove(DATA_SCHEDULER).cancel();
+            UserPerk perk = user.user().metadata().remove(DATA_PERK);
             perk.currentPerkItem().setItem();
             grabbed.getBukkitEntity().teleport(user.getBukkitEntity());
             perk.cooldown(perk.perk().cooldown().cooldown());
@@ -64,8 +64,8 @@ public class GrabberPerk extends Perk {
         }
 
         public void setTarget(WBUser user, WBUser target) {
-            user.user().getMetaDataStorage().set(DATA_GRABBED, target);
-            user.user().getMetaDataStorage().<UserPerk>get(DATA_PERK).currentPerkItem().setItem();
+            user.user().metadata().set(DATA_GRABBED, target);
+            user.user().metadata().<UserPerk>get(DATA_PERK).currentPerkItem().setItem();
         }
 
         @Override protected boolean activateRight(UserPerk perk) {
@@ -73,20 +73,21 @@ public class GrabberPerk extends Perk {
             if (teleportTarget(user)) {
                 return true;
             }
-            if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
+            if (user.user().metadata().has(DATA_SCHEDULER)) {
                 return false;
             }
             payForThePerk(perk);
-            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler(woolbattle) {
+            user.user().metadata().set(DATA_SCHEDULER, new Scheduler(woolbattle) {
                 {
                     runTaskLater(TimeUnit.SECOND.itoTicks(5));
                 }
 
                 @Override public void run() {
                     perk.cooldown(perk.perk().cooldown().cooldown());
-                    user.user().getMetaDataStorage().remove(DATA_GRABBED);
-                    user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
-                    user.user().getMetaDataStorage().<UserPerk>remove(DATA_PERK).currentPerkItem().setItem();
+                    user.user().metadata().remove(DATA_GRABBED);
+                    user.user().metadata().remove(DATA_SCHEDULER);
+                    user.user().metadata().remove(DATA_PERK);
+                    perk.currentPerkItem().setItem();
                 }
             });
             Player p = user.getBukkitEntity();
@@ -94,7 +95,7 @@ public class GrabberPerk extends Perk {
             egg.setShooter(p);
             egg.setVelocity(p.getLocation().getDirection().multiply(1.5));
             egg.setMetadata("perk", new FixedMetadataValue(woolbattle, GrabberPerk.GRABBER));
-            user.user().getMetaDataStorage().set(DATA_PERK, perk);
+            user.user().metadata().set(DATA_PERK, perk);
             return false;
         }
 
