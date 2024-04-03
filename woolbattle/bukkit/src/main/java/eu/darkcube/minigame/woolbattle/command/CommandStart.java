@@ -7,5 +7,14 @@
 
 package eu.darkcube.minigame.woolbattle.command;
 
-public class CommandStart {
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+
+public class CommandStart extends WBCommandExecutor {
+
+    public CommandStart(WoolBattleBukkit woolbattle) {
+        super("start", b -> b.executes(ctx -> {
+            woolbattle.lobby().setOverrideTimer(0);
+            return 0;
+        }));
+    }
 }

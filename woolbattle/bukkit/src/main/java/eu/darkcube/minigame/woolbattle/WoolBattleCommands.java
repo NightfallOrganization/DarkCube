@@ -24,6 +24,7 @@ public class WoolBattleCommands {
         commands.add(new CommandSetMap(woolbattle));
         commands.add(new CommandSettings(woolbattle));
         commands.add(new CommandTimer(woolbattle));
+        commands.add(new CommandStart(woolbattle));
         commands.add(new CommandTroll(woolbattle));
         commands.add(new CommandVoteLifes(woolbattle));
         commands.add(new CommandWoolBattle(woolbattle));
