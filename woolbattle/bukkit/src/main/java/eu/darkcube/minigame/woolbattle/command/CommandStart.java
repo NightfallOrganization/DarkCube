@@ -9,15 +9,13 @@ package eu.darkcube.minigame.woolbattle.command;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 
 public class CommandStart extends WBCommandExecutor {
 
     public CommandStart(WoolBattleBukkit woolbattle) {
         super("start", b -> b.executes(ctx -> {
-            int time = IntegerArgumentType.getInteger(ctx, "time");
             woolbattle.lobby().setOverrideTimer(0);
-            ctx.getSource().sendMessage(Message.TIMER_CHANGED, time);
+            ctx.getSource().sendMessage(Message.TIMER_CHANGED, 0);
             return 0;
         }));
     }
