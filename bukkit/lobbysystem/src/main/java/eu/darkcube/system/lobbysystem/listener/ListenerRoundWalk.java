@@ -8,6 +8,7 @@
 package eu.darkcube.system.lobbysystem.listener;
 
 import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.Key;
@@ -24,16 +25,16 @@ import java.util.*;
 public class ListenerRoundWalk extends BaseListener {
 
     private final Set<Location> requiredLocations;
-    private final Map<Player, Set<Location>> playerLocationsVisited = new HashMap<>();
-    private final Map<Player, Location> playerStartLocation = new HashMap<>();
-    private final Key KEY_ROUND_COUNT;
-    private final Lobby plugin;
+    private final Key keyRoundCount;
+    private final Key keyVisitedLocations;
+    private final Key keyStartLocation;
 
     public ListenerRoundWalk(Lobby plugin) {
         super();
-        this.plugin = plugin;
 
-        this.KEY_ROUND_COUNT = new Key(plugin, "round_count");
+        this.keyRoundCount = new Key(plugin, "round_count");
+        this.keyVisitedLocations = new Key(plugin, "visited_locations");
+        this.keyStartLocation = new Key(plugin, "start_location");
 
         var world = plugin.getDataManager().getSpawn().getWorld();
 
@@ -44,46 +45,40 @@ public class ListenerRoundWalk extends BaseListener {
         requiredLocations.add(new Location(world, -8.5, 0, 0.5));
     }
 
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
+    @EventHandler public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         User user = UserAPI.instance().user(player.getUniqueId());
 
         for (Location location : requiredLocations) {
             if (distanceSquared2D(player.getLocation(), location) <= 5) {
-                playerLocationsVisited
-                        .computeIfAbsent(player, k -> new HashSet<>())
-                        .add(location);
+                Set<Location> visitedLocations = user.metadata().get(keyVisitedLocations);
+                if (visitedLocations == null) {
+                    visitedLocations = new HashSet<>();
+                    user.metadata().set(keyVisitedLocations, visitedLocations);
+                }
+                visitedLocations.add(location);
 
-                if (!playerStartLocation.containsKey(player)) {
-                    playerStartLocation.put(player, player.getLocation());
+                if (!user.metadata().has(keyStartLocation)) {
+                    user.metadata().set(keyStartLocation, player.getLocation());
                 }
             }
         }
 
-        if (playerLocationsVisited.containsKey(player) &&
-                playerLocationsVisited.get(player).containsAll(requiredLocations) &&
-                distanceSquared2D(player.getLocation(), playerStartLocation.get(player)) <= 5) {
+        if (user.metadata().has(keyVisitedLocations) && user
+                .metadata()
+                .<Set<Location>>get(keyVisitedLocations)
+                .containsAll(requiredLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keyStartLocation)) <= 5) {
 
-            playerLocationsVisited.remove(player);
+            user.metadata().remove(keyVisitedLocations);
 
-            int rounds = user.persistentData().get(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, () -> 0) + 1;
-            user.persistentData().set(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, rounds);
-
-            player.sendMessage("§7Umrundet: §d" + rounds + " §7mal");
+            int rounds = user.persistentData().get(keyRoundCount, PersistentDataTypes.INTEGER, () -> 0) + 1;
+            user.persistentData().set(keyRoundCount, PersistentDataTypes.INTEGER, rounds);
+            user.sendMessage(Message.ROUNDS_COMPLETED, rounds);
             player.playSound(player.getLocation(), Sound.LEVEL_UP, 0.5f, 0.5f);
 
-            BigInteger newcubes = user.cubes().add(BigInteger.valueOf(1));
-            user.cubes(newcubes);
+            BigInteger newCubes = user.cubes().add(BigInteger.valueOf(1));
+            user.cubes(newCubes);
         }
-    }
-
-    @EventHandler
-    public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-
-        playerLocationsVisited.remove(player);
-        playerStartLocation.remove(player);
     }
 
     private double distanceSquared2D(Location loc1, Location loc2) {
@@ -92,4 +87,3 @@ public class ListenerRoundWalk extends BaseListener {
         return dx * dx + dz * dz;
     }
 }
-

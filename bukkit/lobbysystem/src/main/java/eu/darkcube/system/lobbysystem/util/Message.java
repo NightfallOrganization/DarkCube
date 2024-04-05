@@ -41,6 +41,7 @@ public enum Message implements BaseMessage {
     SERVER_NOT_FOUND,
     STATE_LOBBY,
     STATE_INGAME,
+    ROUNDS_COMPLETED,
     GAMESERVER_STATE;
 
     public static final String PREFIX_ITEM = "ITEM_";
