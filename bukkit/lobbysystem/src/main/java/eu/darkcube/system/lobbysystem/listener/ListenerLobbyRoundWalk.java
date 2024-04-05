@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -56,13 +56,17 @@ public class ListenerLobbyRoundWalk extends BaseListener {
         User user = UserAPI.instance().user(player.getUniqueId());
 
         for (Location location : requiredLobbyLocations) {
-            if (distanceSquared2D(player.getLocation(), location) <= 25) {
+            if (distanceSquared2D(player.getLocation(), location) <= 300) {
                 Set<Location> visitedLocations = user.metadata().get(keyLobbyVisitedLocations);
                 if (visitedLocations == null) {
                     visitedLocations = new HashSet<>();
                     user.metadata().set(keyLobbyVisitedLocations, visitedLocations);
                 }
                 visitedLocations.add(location);
+
+//                if (visitedLocations.add(location)) {
+//                    player.sendMessage("§7Checkpoint");
+//                }
 
                 if (!user.metadata().has(keyLobbyStartLocation)) {
                     user.metadata().set(keyLobbyStartLocation, player.getLocation());
@@ -73,7 +77,7 @@ public class ListenerLobbyRoundWalk extends BaseListener {
         if (user.metadata().has(keyLobbyVisitedLocations) && user
                 .metadata()
                 .<Set<Location>>get(keyLobbyVisitedLocations)
-                .containsAll(requiredLobbyLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keyLobbyStartLocation)) <= 25) {
+                .containsAll(requiredLobbyLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keyLobbyStartLocation)) <= 300) {
 
             user.metadata().remove(keyLobbyVisitedLocations);
 
@@ -83,7 +87,7 @@ public class ListenerLobbyRoundWalk extends BaseListener {
             user.sendMessage(Message.ROUNDS_COMPLETED, rounds);
             player.playSound(player.getLocation(), Sound.LEVEL_UP, 0.5f, 0.5f);
 
-            BigInteger newCubes = user.cubes().add(BigInteger.valueOf(1));
+            BigInteger newCubes = user.cubes().add(BigInteger.valueOf(20));
             user.cubes(newCubes);
         }
     }
