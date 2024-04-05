@@ -64,10 +64,6 @@ public class ListenerLobbyRoundWalk extends BaseListener {
                 }
                 visitedLocations.add(location);
 
-//                if (visitedLocations.add(location)) {
-//                    player.sendMessage("§7Checkpoint");
-//                }
-
                 if (!user.metadata().has(keyLobbyStartLocation)) {
                     user.metadata().set(keyLobbyStartLocation, player.getLocation());
                 }
