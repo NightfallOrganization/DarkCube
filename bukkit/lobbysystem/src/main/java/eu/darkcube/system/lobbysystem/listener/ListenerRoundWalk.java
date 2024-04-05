@@ -16,38 +16,53 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListenerRoundWalk extends BaseListener {
-    private final Lobby plugin;
     private final Key KEY_ROUND_COUNT;
+    private List<Location> points;
 
     public ListenerRoundWalk(Lobby plugin) {
-        this.plugin = plugin;
         this.KEY_ROUND_COUNT = new Key(plugin, "round_count");
+        this.points = new ArrayList<>();
+
+        var world = plugin.getDataManager().getSpawn().getWorld();
+
+        points.add(new Location(world, 0.5, 0, -8.5));
+        points.add(new Location(world, 9.5, 0, 0.5));
+        points.add(new Location(world, 0.5, 0, 9.5));
+        points.add(new Location(world, -8.5, 0, 0.5));
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        User user = UserAPI.instance().user(event.getPlayer().getUniqueId());
         Player player = event.getPlayer();
-        Location spawn = plugin.getDataManager().getSpawn();
-        Location playerLocation = player.getLocation();
+        Location from = event.getFrom();
+        Location to = event.getTo();
 
-        if (!playerLocation.getWorld().equals(spawn.getWorld())) {
+        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ()) {
             return;
         }
 
-        double distance = playerLocation.distance(spawn);
+        for (Location point : points) {
+            if (Math.abs(to.getX() - point.getX()) <= 4 && Math.abs(to.getZ() - point.getZ()) <= 4) {
 
-        if (distance >= 7 && distance <= 11) {
+                if (!(Math.abs(from.getX() - point.getX()) <= 4 && Math.abs(from.getZ() - point.getZ()) <= 4)) {
 
-            int roundCount = user.persistentData().get(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, ()-> 0);
+                    User user = UserAPI.instance().user(player.getUniqueId());
 
-            roundCount++;
+                    int roundCount = user.persistentData().get(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, () -> 0);
 
-            user.persistentData().set(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, roundCount);
+                    roundCount++;
 
-            player.sendMessage("Umrundet: " + roundCount + " mal");
+                    user.persistentData().set(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, roundCount);
+
+                    player.sendMessage("Umrundet: " + roundCount + " mal");
+                    break;
+                }
+            }
         }
     }
 }
+
