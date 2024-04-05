@@ -6,7 +6,6 @@
  */
 package eu.darkcube.system.lobbysystem;
 
-import dev.derklaro.aerogel.binding.BindingBuilder;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.CloudServiceProvider;
@@ -125,7 +124,8 @@ public class Lobby extends Plugin {
             world.setFullTime(6000);
         }
 
-        new ListenerRoundWalk(this);
+        new ListenerSpawnRoundWalk(this);
+        new ListenerLobbyRoundWalk(this);
         new ListenerJoin();
         new ListenerScoreboard();
         new ListenerQuit();
