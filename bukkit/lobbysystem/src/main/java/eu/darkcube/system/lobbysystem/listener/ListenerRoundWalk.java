@@ -13,6 +13,7 @@ import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -58,7 +59,8 @@ public class ListenerRoundWalk extends BaseListener {
 
                     user.persistentData().set(KEY_ROUND_COUNT, PersistentDataTypes.INTEGER, roundCount);
 
-                    player.sendMessage("Umrundet: " + roundCount + " mal");
+                    player.sendMessage("§7Umrundet: §d" + roundCount + " §7mal");
+                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 50f, 0.5f);
                     break;
                 }
             }
