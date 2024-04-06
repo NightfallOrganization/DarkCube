@@ -10,6 +10,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.cloudnetservice.driver.document.DocumentFactory;
+import eu.cloudnetservice.driver.document.StandardSerialisationStyle;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.inventoryapi.item.AbstractItemBuilder;
 import eu.darkcube.system.inventoryapi.item.meta.*;
@@ -168,7 +169,7 @@ public class ItemBuilder1_20_2 extends AbstractItemBuilder {
             this.item.setItemMeta(meta);
         }
         ItemStack b = build();
-        if (!item.equals(b)) {
+        if (!item.equals(b) && !(item.getType() == b.getType() && item.getType() == Material.AIR)) {
             LOGGER.severe("Failed to clone item correctly: ");
             LOGGER.severe(" - " + CraftItemStack.asNMSCopy(item).save(new CompoundTag()));
             LOGGER.severe(" - " + net.minecraft.world.item.ItemStack
@@ -268,7 +269,9 @@ public class ItemBuilder1_20_2 extends AbstractItemBuilder {
             }
             if (!storage.storeToJsonDocument().empty()) meta
                     .getPersistentDataContainer()
-                    .set(persistentDataKey, PersistentDataType.STRING, storage.storeToJsonDocument().serializeToString());
+                    .set(persistentDataKey, PersistentDataType.STRING, storage
+                            .storeToJsonDocument()
+                            .serializeToString(StandardSerialisationStyle.COMPACT));
             item.setItemMeta(meta);
         }
         return item;
