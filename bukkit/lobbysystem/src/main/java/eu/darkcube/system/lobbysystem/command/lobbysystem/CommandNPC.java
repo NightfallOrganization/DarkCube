@@ -8,7 +8,11 @@
 package eu.darkcube.system.lobbysystem.command.lobbysystem;
 
 import eu.darkcube.system.lobbysystem.command.LobbyCommand;
-import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.*;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandGamemodeConnector;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetDailyReward;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetFisher;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetSumo;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetWoolBattle;
 
 public class CommandNPC extends LobbyCommand {
 
