@@ -52,14 +52,17 @@ public class ListenerFisher extends BaseListener {
                     }
                 }
 
-                if (addFishCubes >= 1) {
+                if (addFishCubes <= 0) {
+                    user.sendMessage(Message.NO_FISHES_IN_INVENTORY);
+                    p.playSound(p.getLocation(), Sound.VILLAGER_NO, 50f, 1f);
+                } else {
                     user.sendMessage(Message.REWARD_COINS, addFishCubes);
                     p.playSound(p.getLocation(), Sound.LEVEL_UP, 50f, 1f);
 
                     BigInteger newCubes = user.cubes().add(BigInteger.valueOf(addFishCubes));
                     user.cubes(newCubes);
-                }
 
+                }
             }
         }
     }
