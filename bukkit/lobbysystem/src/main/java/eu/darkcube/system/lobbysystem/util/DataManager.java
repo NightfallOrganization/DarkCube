@@ -45,6 +45,7 @@ public class DataManager {
         setDefault("border", new Border(Shape.CIRCLE, 100, Locations.DEFAULT, null).serializeToDocument());
         setDefault("woolbattleNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("dailyrewardNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
+        setDefault("fisherNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("woolbattleSpawn", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("winter", Document.newJsonDocument().append("value", true));
         winter = database.get("winter").getBoolean("value");
@@ -172,6 +173,14 @@ public class DataManager {
 
     public void setDailyRewardNPCLocation(Location loc) {
         database.insert("dailyrewardNPCLocation", Locations.toDocument(loc, false));
+    }
+
+    public Location getFisherNPCLocation() {
+        return Locations.fromDocument(database.get("fisherNPCLocation"), null);
+    }
+
+    public void setFisherNPCLocation(Location loc) {
+        database.insert("fisherNPCLocation", Locations.toDocument(loc, false));
     }
 
     public Border getBorder() {

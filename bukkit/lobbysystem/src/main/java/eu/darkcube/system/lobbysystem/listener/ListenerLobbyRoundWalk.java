@@ -81,7 +81,7 @@ public class ListenerLobbyRoundWalk extends BaseListener {
             user.persistentData().set(keyLobbyRoundCount, PersistentDataTypes.INTEGER, rounds);
 
             user.sendMessage(Message.ROUNDS_COMPLETED, rounds);
-            player.playSound(player.getLocation(), Sound.LEVEL_UP, 0.5f, 0.5f);
+            player.playSound(player.getLocation(), Sound.LEVEL_UP, 50f, 0.5f);
 
             BigInteger newCubes = user.cubes().add(BigInteger.valueOf(20));
             user.cubes(newCubes);
