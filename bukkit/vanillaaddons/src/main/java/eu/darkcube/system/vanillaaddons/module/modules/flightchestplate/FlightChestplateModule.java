@@ -68,7 +68,7 @@ public class FlightChestplateModule implements Listener, Module {
     }
 
     @Override public void onEnable() {
-        SmithingRecipe recipe = new SmithingTransformRecipe(new NamespacedKey(addons, "flight_chestplate_upgrade"), new ItemStack(Material.AIR), new MaterialChoice(Material.AIR),new MaterialChoice(Material.LEATHER_CHESTPLATE), new MaterialChoice(Material.NETHER_STAR), true);
+        SmithingRecipe recipe = new SmithingTransformRecipe(new NamespacedKey(addons, "flight_chestplate_upgrade"), new ItemStack(Material.AIR), new MaterialChoice(Material.AIR), new MaterialChoice(Material.LEATHER_CHESTPLATE), new MaterialChoice(Material.NETHER_STAR), true);
         Bukkit.addRecipe(recipe);
         Bukkit.getPluginManager().registerEvents(this, addons);
         Recipe.registerRecipe(this.recipe);
@@ -108,7 +108,7 @@ public class FlightChestplateModule implements Listener, Module {
             var bukkitModifier = ((BukkitAttributeModifier) modifier).<org.bukkit.attribute.AttributeModifier>bukkitType();
             if (bukkitModifier
                     .getName()
-                    .equals("flight_chestplate") && (bukkitModifier.getAmount() < 0 || bukkitModifier.getOperation() != org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER || bukkitModifier.getSlot() != EquipmentSlot.CHEST)) {
+                    .equals("flight_chestplate") && (bukkitModifier.getAmount() < 0 || bukkitModifier.getOperation() != org.bukkit.attribute.AttributeModifier. Operation.ADD_NUMBER || bukkitModifier.getSlot() != EquipmentSlot.CHEST)) {
                 first.removeAttributeModifier(Attribute.of(GENERIC_ARMOR), modifier);
                 first.attributeModifier(Attribute.of(GENERIC_ARMOR), AttributeModifier.of(new org.bukkit.attribute.AttributeModifier(bukkitModifier.getUniqueId(), bukkitModifier.getName(), 0, org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST)));
                 inv.setItem(1, first.build());
@@ -117,7 +117,7 @@ public class FlightChestplateModule implements Listener, Module {
 
         ItemBuilder second = inv.getItem(2) == null ? null : ItemBuilder.item(inv.getItem(2));
         if (second == null) return;
-        if (second.material() != eu.darkcube.system.server.item.material.Material.of(Material.NETHER_STAR)) return;
+        if (second.material() != eu.darkcube.system.server.item.material.Material.of(Material.NETHER_STAR) )return;
         if (speed >= 20) return;
         first.persistentDataStorage().set(SPEED_KEY, PersistentDataTypes.INTEGER, speed + 1);
         List<Component> lore = new ArrayList<>(first.lore());
@@ -126,6 +126,8 @@ public class FlightChestplateModule implements Listener, Module {
         event.setResult(first.build());
     }
 
+
+
     @EventHandler public void handle(PlayerRecipeDiscoverEvent event) {
         if (event.getRecipe().equals(new NamespacedKey(addons, "flight_chestplate_upgrade"))) {
             event.setCancelled(true);
@@ -133,19 +135,19 @@ public class FlightChestplateModule implements Listener, Module {
     }
 
     @EventHandler (priority = EventPriority.MONITOR) public void handle(BlockDispenseArmorEvent event) {
-        var target = event.getTargetEntity() ;
-        if (!(target instanceof Player player))return;
+        var target = event.getTargetEntity();
+        if (!(target instanceof Player player)) return;
         var itemStack = event.getItem();
         var item = ItemBuilder.item(itemStack);
-            if (this.canFly(item)) {
-                player.getPersistentDataContainer().set(STORAGE_KEY, PersistentDataType.BYTE, (byte) 1);
-                var speed = 0;
-                if (item.persistentDataStorage().has(SPEED_KEY))
-                    speed = item.persistentDataStorage().get(SPEED_KEY, PersistentDataTypes.INTEGER);
-                update(player, speed);
-            } else if (player.getPersistentDataContainer().has(STORAGE_KEY, PersistentDataType.BYTE)) {
-                player.getPersistentDataContainer().remove(STORAGE_KEY);
-                update(player, 0);
+        if (this.canFly(item)) {
+            player.getPersistentDataContainer().set(STORAGE_KEY, PersistentDataType.BYTE, (byte) 1);
+            var speed = 0;
+            if (item.persistentDataStorage().has(SPEED_KEY))
+                speed = item.persistentDataStorage().get(SPEED_KEY, PersistentDataTypes.INTEGER);
+            update(player, speed);
+        } else if (player.getPersistentDataContainer().has(STORAGE_KEY, PersistentDataType.BYTE)) {
+            player.getPersistentDataContainer().remove(STORAGE_KEY);
+            update(player, 0);
         }
     }
 
@@ -165,17 +167,19 @@ public class FlightChestplateModule implements Listener, Module {
         }
     }
 
-    //@EventHandler
-    //public void handle(InventoryCloseEvent event) {
-    //ItemStack chest = event.getPlayer().getInventory().getItem(EquipmentSlot.CHEST);
-    //ItemBuilder item = ItemBuilder.item(chest);
-    //if (!this.canFly(item) && event.getPlayer().getPersistentDataContainer()
-    //.has(STORAGE_KEY, PersistentDataType.BYTE)) {
-    //Player p = (Player) event.getPlayer();
-    //p.setAllowFlight(false);
-    //p.setFlySpeed(0.05F);
-    //}
-    //}
+
+
+    //	@EventHandler
+    //	public void handle(InventoryCloseEvent event) {
+    //		ItemStack chest = event.getPlayer().getInventory().getItem(EquipmentSlot.CHEST);
+    //		ItemBuilder item = ItemBuilder.item(chest);
+    //		if (!this.canFly(item) && event.getPlayer().getPersistentDataContainer()
+    //				.has(STORAGE_KEY, PersistentDataType.BYTE)) {
+    //			Player p = (Player) event.getPlayer();
+    //			p.setAllowFlight(false);
+    //			p.setFlySpeed(0.05F);
+    //		}
+    //	}
 
     @EventHandler public void handle(PlayerJoinEvent event) {
         if (event.getPlayer().getPersistentDataContainer().has(STORAGE_KEY, PersistentDataType.BYTE)) {
@@ -229,9 +233,7 @@ public class FlightChestplateModule implements Listener, Module {
         float currentSpeed = diff / MAX_SPEED * speed;
         int percent = Math.round(minSpeed / maxSpeed * 100 + currentSpeed / maxSpeed * 100);
         return Component.text("Geschwindigkeit: " + percent + "%").color(NamedTextColor.GRAY);
-    }
-
-    public boolean canFly(ItemBuilder item) {
+    }public boolean canFly(ItemBuilder item) {
         if (item == null) {
             return false;
         } else {
