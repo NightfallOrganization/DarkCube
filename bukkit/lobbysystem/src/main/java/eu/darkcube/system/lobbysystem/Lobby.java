@@ -19,10 +19,7 @@ import eu.darkcube.system.lobbysystem.gadget.listener.ListenerGrapplingHook;
 import eu.darkcube.system.lobbysystem.gadget.listener.ListenerHookArrow;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaRManager;
 import eu.darkcube.system.lobbysystem.listener.*;
-import eu.darkcube.system.lobbysystem.npc.ConnectorNPC;
-import eu.darkcube.system.lobbysystem.npc.DailyRewardNPC;
-import eu.darkcube.system.lobbysystem.npc.NPCManagement;
-import eu.darkcube.system.lobbysystem.npc.WoolBattleNPC;
+import eu.darkcube.system.lobbysystem.npc.*;
 import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
@@ -50,6 +47,7 @@ public class Lobby extends Plugin {
     private DataManager dataManager;
     private NPCManagement npcManagement;
     private NPCManagement.NPC woolbattleNpc;
+    private NPCManagement.NPC fisherNpc;
     private NPCManagement.NPC dailyRewardNpc;
     private JaRManager jaRManager;
     private GameRegistry gameRegistry;
@@ -114,6 +112,7 @@ public class Lobby extends Plugin {
         this.jaRManager = new JaRManager();
         this.woolbattleNpc = WoolBattleNPC.create();
         this.dailyRewardNpc = DailyRewardNPC.create();
+        this.fisherNpc = FisherNPC.create();
 
         CommandAPI.instance().register(new CommandBuild());
         CommandAPI.instance().register(new CommandLobbysystem(this));
@@ -143,6 +142,7 @@ public class Lobby extends Plugin {
         new ListenerFish();
         new ListenerGadget();
         new ListenerDailyReward();
+        new ListenerFisher();
         new ListenerHookArrow();
         new ListenerGrapplingHook();
         new ListenerBoostPlate();
@@ -255,6 +255,10 @@ public class Lobby extends Plugin {
 
     public NPCManagement.NPC getDailyRewardNpc() {
         return this.dailyRewardNpc;
+    }
+
+    public NPCManagement.NPC getFisherNpc() {
+        return this.fisherNpc;
     }
 
     public DataManager getDataManager() {
