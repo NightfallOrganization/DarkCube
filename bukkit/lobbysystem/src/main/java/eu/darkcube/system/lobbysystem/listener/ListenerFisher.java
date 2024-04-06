@@ -47,7 +47,7 @@ public class ListenerFisher extends BaseListener {
 
                 for (ItemStack item : p.getInventory().getContents()) {
                     if (item != null && item.getType() == Material.RAW_FISH) {
-                        fishCount += item.getAmount() * 3;
+                        fishCount += item.getAmount() * 5;
                         p.getInventory().remove(item);
                     }
                 }
