@@ -12,8 +12,8 @@ import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.vanillaaddons.AUser.Modifier;
 import eu.darkcube.system.vanillaaddons.inventory.InventoryRegistry;
-import eu.darkcube.system.vanillaaddons.listener.ArmorListener;
 import eu.darkcube.system.vanillaaddons.listener.InventoryListener;
+import eu.darkcube.system.vanillaaddons.module.Module;
 import eu.darkcube.system.vanillaaddons.module.ModuleManager;
 import eu.darkcube.system.vanillaaddons.module.modules.RandoShit;
 import eu.darkcube.system.vanillaaddons.module.modules.actionbar.ActionbarModule;
@@ -28,6 +28,12 @@ import eu.darkcube.system.vanillaaddons.module.modules.rtp.RTPModule;
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule;
 import eu.darkcube.system.vanillaaddons.module.modules.worldmechanics.WorldMechanicsModule;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.IOException;
@@ -80,7 +86,6 @@ public class VanillaAddons extends DarkCubePlugin {
         UserAPI.instance().addModifier(userModifier = new Modifier(this));
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new InventoryListener(), this);
-        pm.registerEvents(new ArmorListener(), this);
         moduleManager.enableAll();
 
     }

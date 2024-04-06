@@ -17,22 +17,15 @@ tasks {
     jar.configure {
         archiveClassifier = "pure"
     }
-    compileJava {
-        options.release = 17
-    }
     assemble.configure {
         dependsOn(shadowJar)
     }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
     compileOnly(project(":darkcubesystem"))
-    implementation("net.wesjd:anvilgui:1.7.0-SNAPSHOT")
-}
-
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    implementation("net.wesjd:anvilgui:1.9.3-SNAPSHOT")
 }
 
 repositories {
