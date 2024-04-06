@@ -42,21 +42,24 @@ public class ListenerFisher extends BaseListener {
                 npc.sendEmotes(e.player(), emotes.get(new Random().nextInt(emotes.size())).getId());
             } else {
                 Player p = e.player();
-                int fishCount = 0;
+                int addFishCubes = 0;
                 User user = UserAPI.instance().user(p.getUniqueId());
 
                 for (ItemStack item : p.getInventory().getContents()) {
                     if (item != null && item.getType() == Material.RAW_FISH) {
-                        fishCount += item.getAmount() * 5;
+                        addFishCubes += item.getAmount() * 5;
                         p.getInventory().remove(item);
                     }
                 }
 
-                user.sendMessage(Message.REWARD_COINS, fishCount);
-                p.playSound(p.getLocation(), Sound.LEVEL_UP, 50f, 1f);
+                if (addFishCubes >= 1) {
+                    user.sendMessage(Message.REWARD_COINS, addFishCubes);
+                    p.playSound(p.getLocation(), Sound.LEVEL_UP, 50f, 1f);
 
-                BigInteger newCubes = user.cubes().add(BigInteger.valueOf(fishCount));
-                user.cubes(newCubes);
+                    BigInteger newCubes = user.cubes().add(BigInteger.valueOf(addFishCubes));
+                    user.cubes(newCubes);
+                }
+
             }
         }
     }
