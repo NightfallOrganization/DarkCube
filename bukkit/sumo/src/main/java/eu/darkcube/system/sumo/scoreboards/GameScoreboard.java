@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.sumo.scoreboards;
 
+import eu.darkcube.system.sumo.manager.ItemManager;
 import eu.darkcube.system.sumo.manager.LifeManager;
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.ruler.MainRuler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -66,10 +68,16 @@ public class GameScoreboard implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         World newWorld = player.getWorld();
+//        String worldName = player.getWorld().getName();
 
         if (newWorld.equals(mainRuler.getActiveWorld())) {
             player.setScoreboard(scoreboard);
         }
+
+//        if (worldName.equals("world") && GameStates.isState(GameStates.ENDING)) {
+//            player.setScoreboard(scoreboard);
+//        }
+
     }
 
     @EventHandler

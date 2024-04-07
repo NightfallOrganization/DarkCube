@@ -23,7 +23,7 @@ public class Ending {
         this.plugin = plugin;
     }
 
-    public void execute(ChatColor teamColor) {
+    public void execute() {
         GameStates.setState(GameStates.ENDING);
         teleportPlayersToSpawn();
         startTimer();
@@ -34,7 +34,9 @@ public class Ending {
         if (world != null) {
             Location targetLocation = new Location(world, 0.5, 101, 0.5);
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.teleport(targetLocation);
+                if (!player.hasMetadata("leaving")) {
+                    player.teleport(targetLocation);
+                }
             }
         } else {
             System.out.println("Welt 'world' nicht gefunden!");
@@ -53,6 +55,10 @@ public class Ending {
     private class EndingTimerRunnable extends BukkitRunnable {
         @Override
         public void run() {
+
+            if (GameStates.isState(GameStates.PLAYING) || (GameStates.isState(GameStates.STARTING))) {
+                cancel();
+            }
 
             if (timer <= 3) {
                 playSoundToAllPlayers();

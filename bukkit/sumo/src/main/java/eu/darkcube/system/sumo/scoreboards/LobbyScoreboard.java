@@ -11,9 +11,11 @@ import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.other.GameStates;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.*;
@@ -92,6 +94,15 @@ public class LobbyScoreboard implements Listener {
         if (objective != null) {
             int onlinePlayers = Bukkit.getOnlinePlayers().size();
             this.online.setSuffix(Integer.toString(onlinePlayers));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.getWorld().getName().equals("world")) {
+            player.setScoreboard(scoreboard);
         }
     }
 

@@ -8,6 +8,7 @@
 package eu.darkcube.system.sumo.commands;
 
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.prefix.PrefixManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,13 +18,16 @@ import org.bukkit.ChatColor;
 
 public class SetTeamCommand implements CommandExecutor {
     private TeamManager teamManager;
+    private PrefixManager prefixManager;
 
-    public SetTeamCommand(TeamManager teamManager) {
+    public SetTeamCommand(TeamManager teamManager, PrefixManager prefixManager) {
         this.teamManager = teamManager;
+        this.prefixManager = prefixManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
         if (args.length != 2) {
             sender.sendMessage(ChatColor.RED + "§7Usage: /setteam [player] [team]");
             return false;
@@ -53,6 +57,7 @@ public class SetTeamCommand implements CommandExecutor {
 
         teamManager.setPlayerTeam(targetPlayer.getUniqueId(), teamColor);
         sender.sendMessage("§b" + targetPlayer.getName() + " §7wurde zu Team §b" + teamName + " §7gesetzt");
+        prefixManager.setPlayerPrefix(targetPlayer);
         return true;
     }
 }

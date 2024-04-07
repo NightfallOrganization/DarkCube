@@ -107,6 +107,10 @@ public class StartingTimer implements Listener {
         public void run() {
             lobbyScoreboard.updateTime(timer);
 
+            if (GameStates.isState(GameStates.PLAYING) || (GameStates.isState(GameStates.ENDING))) {
+                cancel();
+            }
+
             if (timer <= 3) {
                 playSoundToAllPlayers();
                 Bukkit.broadcastMessage("§7Spiel startet in §b" + timer);

@@ -24,9 +24,14 @@ public class TeamManager {
     }
 
     public ChatColor getPlayerTeam(UUID playerID) {
-        return playerTeams.getOrDefault(playerID, null);
+        return playerTeams.getOrDefault(playerID, ChatColor.GRAY);
+    }
+
+    public boolean isTeamEmpty(ChatColor teamColor) {
+        return !playerTeams.containsValue(teamColor);
     }
 
     public static final ChatColor TEAM_WHITE = ChatColor.WHITE;
-    public static final ChatColor TEAM_BLACK = ChatColor.BLACK;
+    public static final ChatColor TEAM_BLACK = ChatColor.DARK_GRAY;
+    public static final ChatColor TEAM_NONE = ChatColor.GRAY;
 }

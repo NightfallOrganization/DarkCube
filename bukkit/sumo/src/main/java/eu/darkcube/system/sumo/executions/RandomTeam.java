@@ -8,17 +8,22 @@
 package eu.darkcube.system.sumo.executions;
 
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.prefix.PrefixManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class RandomTeam {
     private TeamManager teamManager;
     private Random random;
+    private PrefixManager prefixManager;
 
-    public RandomTeam(TeamManager teamManager) {
+    public RandomTeam(TeamManager teamManager, PrefixManager prefixManager) {
         this.teamManager = teamManager;
         this.random = new Random();
+        this.prefixManager = prefixManager;
     }
 
     public void balanceTeams(Collection<UUID> playerIDs) {
@@ -28,6 +33,7 @@ public class RandomTeam {
 
         for (UUID playerID : playerIDs) {
             ChatColor team = teamManager.getPlayerTeam(playerID);
+
             if (team == TeamManager.TEAM_BLACK) {
                 blackTeamPlayers.add(playerID);
             } else if (team == TeamManager.TEAM_WHITE) {
@@ -39,12 +45,18 @@ public class RandomTeam {
 
         while (!unassignedPlayers.isEmpty()) {
             UUID playerID = unassignedPlayers.remove(random.nextInt(unassignedPlayers.size()));
-            if (blackTeamPlayers.size() <= whiteTeamPlayers.size()) {
-                teamManager.setPlayerTeam(playerID, TeamManager.TEAM_BLACK);
-                blackTeamPlayers.add(playerID);
-            } else {
-                teamManager.setPlayerTeam(playerID, TeamManager.TEAM_WHITE);
-                whiteTeamPlayers.add(playerID);
+
+            Player player = Bukkit.getPlayer(playerID);
+            if (player != null) {
+                if (blackTeamPlayers.size() <= whiteTeamPlayers.size()) {
+                    teamManager.setPlayerTeam(playerID, TeamManager.TEAM_BLACK);
+                    blackTeamPlayers.add(playerID);
+                    prefixManager.setPlayerPrefix(player); // Prefix nach der Teamzuweisung aktualisieren
+                } else {
+                    teamManager.setPlayerTeam(playerID, TeamManager.TEAM_WHITE);
+                    whiteTeamPlayers.add(playerID);
+                    prefixManager.setPlayerPrefix(player); // Prefix nach der Teamzuweisung aktualisieren
+                }
             }
         }
 

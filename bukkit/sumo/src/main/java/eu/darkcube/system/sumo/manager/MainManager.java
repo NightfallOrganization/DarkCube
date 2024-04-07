@@ -10,6 +10,7 @@ package eu.darkcube.system.sumo.manager;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.prefix.PrefixManager;
 import eu.darkcube.system.sumo.ruler.MainRuler;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import eu.darkcube.system.sumo.executions.Spectator;
@@ -20,28 +21,37 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import java.util.UUID;
 
 public class MainManager implements Listener {
     private LobbyScoreboard lobbyScoreboard;
     private MainRuler mainRuler;
+    private TeamManager teamManager;
+    private PrefixManager prefixManager;
 
-    public MainManager(LobbyScoreboard lobbyScoreboard, MainRuler mainRuler) {
+    public MainManager(LobbyScoreboard lobbyScoreboard, MainRuler mainRuler, TeamManager teamManager, PrefixManager prefixManager) {
         this.lobbyScoreboard = lobbyScoreboard;
         this.mainRuler = mainRuler;
+        this.teamManager = teamManager;
+        this.prefixManager = prefixManager;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
-        event.setJoinMessage(ChatColor.GRAY + player.getName() + " hat das Spiel betreten");
+        event.setJoinMessage(null);
 
         if (GameStates.getState() == GameStates.STARTING || GameStates.getState() == GameStates.ENDING) {
             Location spawnLocation = new Location(Bukkit.getWorld("world"), 0.5, 101, 0.5);
             player.setGameMode(GameMode.SURVIVAL);
             player.teleport(spawnLocation);
+            Bukkit.broadcastMessage(ChatColor.GRAY + player.getName() + " hat das Spiel betreten");
+
         } else if (GameStates.getState() == GameStates.PLAYING) {
             Spectator.setPlayerToSpectator(player);
+            player.setGameMode(GameMode.SPECTATOR);
         }
 
         if (GameStates.isState(GameStates.STARTING)) {
@@ -51,13 +61,27 @@ public class MainManager implements Listener {
         } else if (GameStates.isState(GameStates.ENDING)) {
             ItemManager.setEndingItems(player);
         }
+
+        prefixManager.setPlayerPrefix(player);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " hat das Spiel verlassen");
+        UUID playerID = event.getPlayer().getUniqueId();
+        event.setQuitMessage(null);
 
-        new Ending(Sumo.getInstance());
+        if ((GameStates.isState(GameStates.STARTING) || GameStates.isState(GameStates.PLAYING)) && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
+            Bukkit.broadcastMessage(ChatColor.GRAY + event.getPlayer().getName() + " hat das Spiel verlassen.");
+        }
+
+        event.getPlayer().setMetadata("leaving", new FixedMetadataValue(Sumo.getInstance(), true));
+        ChatColor playerTeam = teamManager.getPlayerTeam(playerID);
+        teamManager.setPlayerTeam(playerID, null);
+
+        if (teamManager.isTeamEmpty(playerTeam)) {
+            Ending ending = new Ending(Sumo.getInstance());
+            ending.execute();
+        }
 
     }
 

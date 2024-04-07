@@ -39,7 +39,7 @@ public class LifeManager {
 
             if (currentLives <= 0) {
                 Ending ending = new Ending(Sumo.getInstance());
-                ending.execute(teamColor);
+                ending.execute();
                 return;
             }
 
