@@ -12,7 +12,7 @@ import eu.darkcube.system.lobbysystem.Lobby;
 public class FisherNPC {
 
     public static NPCManagement.NPC create() {
-        NPCManagement.NPC npc = Lobby.getInstance().npcManagement().builder().profileHelper().name("§aFisher").skin(new FisherSkin()).builder().build();
+        NPCManagement.NPC npc = Lobby.getInstance().npcManagement().builder().profileHelper().name("§eFisher").skin(new FisherSkin()).builder().build();
         npc.location(Lobby.getInstance().getDataManager().getFisherNPCLocation());
 
         new NPCKnockbackThread(npc).runTaskTimer(Lobby.getInstance(), 5, 5);
