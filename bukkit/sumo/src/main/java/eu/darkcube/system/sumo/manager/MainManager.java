@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.sumo.manager;
 
+import eu.darkcube.system.sumo.Sumo;
+import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.ruler.MainRuler;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
@@ -54,6 +56,9 @@ public class MainManager implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " hat das Spiel verlassen");
+
+        new Ending(Sumo.getInstance());
+
     }
 
     @EventHandler
