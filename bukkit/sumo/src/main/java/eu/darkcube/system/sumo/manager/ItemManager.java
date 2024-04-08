@@ -32,11 +32,14 @@ public class ItemManager {
     }
 
     public static void setStartingItems(Player player) {
-        player.getInventory().setItem(0, createItem(Material.BREWING_STAND_ITEM, "§dFähigkeiten", "§7Wähle deine Macht!"));
-        player.getInventory().setItem(1, createItem(Material.BOOK, "§9Teams", "§7Wähle dein Team!"));
-        player.getInventory().setItem(4, createItem(Material.BLAZE_ROD, "§6Partikel §aAn §8╏ §7Ausschalten?", "§7Klicke um Partikel zu deaktivieren!"));
-        player.getInventory().setItem(7, createItem(Material.REDSTONE_COMPARATOR, "§cEinstellungen", "§7Stelle alles nach belieben ein!"));
-        player.getInventory().setItem(8, createItem(Material.PAPER, "§6Voting", "§7Stimme für Spielszenarien ab!"));
+//        player.getInventory().setItem(0, createItem(Material.BREWING_STAND_ITEM, "§dFähigkeiten", "§7Wähle deine Macht!"));
+//        player.getInventory().setItem(1, createItem(Material.BOOK, "§9Teams", "§7Wähle dein Team!"));
+//        player.getInventory().setItem(4, createItem(Material.BLAZE_ROD, "§6Partikel §aAn §8╏ §7Ausschalten?", "§7Klicke um Partikel zu deaktivieren!"));
+//        player.getInventory().setItem(7, createItem(Material.REDSTONE_COMPARATOR, "§cEinstellungen", "§7Stelle alles nach belieben ein!"));
+//        player.getInventory().setItem(8, createItem(Material.PAPER, "§6Voting", "§7Stimme für Spielszenarien ab!"));
+
+        player.getInventory().setItem(3, createItem(Material.BOOK, "§9Teams", "§7Wähle dein Team!"));
+        player.getInventory().setItem(5, createItem(Material.PAPER, "§6Voting", "§7Stimme für Spielszenarien ab!"));
     }
 
     public static void setPlayingItems(Player player) {

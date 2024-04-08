@@ -82,7 +82,7 @@ public class Sumo extends DarkCubePlugin {
         instance.getCommand("setlifes").setExecutor(new SetLifesCommand(lifeManager, gameScoreboard));
         instance.getCommand("setactivemap").setExecutor(new SetActiveMapCommand(mainRuler, respawn));
         instance.getCommand("start").setExecutor(new StartCommand(startingTimer));
-        instance.getCommand("setteam").setExecutor(new SetTeamCommand(teamManager, prefixManager));
+        instance.getCommand("setteam").setExecutor(new SetTeamCommand(teamManager, prefixManager, equipPlayer));
         instance.getCommand("timer").setExecutor(new TimerCommand(startingTimer));
         instance.getCommand("setgamestate").setExecutor(new SetGameStateCommand(respawn, equipPlayer, randomTeam, startingTimer));
         instance.getCommand("showgamestate").setExecutor(new ShowGameStateCommand());

@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.sumo.commands;
 
+import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
 import org.bukkit.command.Command;
@@ -19,10 +20,12 @@ import org.bukkit.ChatColor;
 public class SetTeamCommand implements CommandExecutor {
     private TeamManager teamManager;
     private PrefixManager prefixManager;
+    private EquipPlayer equipPlayer;
 
-    public SetTeamCommand(TeamManager teamManager, PrefixManager prefixManager) {
+    public SetTeamCommand(TeamManager teamManager, PrefixManager prefixManager, EquipPlayer equipPlayer) {
         this.teamManager = teamManager;
         this.prefixManager = prefixManager;
+        this.equipPlayer = equipPlayer;
     }
 
     @Override
@@ -55,6 +58,7 @@ public class SetTeamCommand implements CommandExecutor {
                 return false;
         }
 
+        equipPlayer.equipPlayerIfInTeam(targetPlayer);
         teamManager.setPlayerTeam(targetPlayer.getUniqueId(), teamColor);
         sender.sendMessage("§b" + targetPlayer.getName() + " §7wurde zu Team §b" + teamName + " §7gesetzt");
         prefixManager.setPlayerPrefix(targetPlayer);

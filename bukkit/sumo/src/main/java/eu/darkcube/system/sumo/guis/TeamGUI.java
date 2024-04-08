@@ -13,6 +13,7 @@ import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,7 +43,7 @@ public class TeamGUI implements Listener {
             Player player = event.getPlayer();
             ItemStack itemInHand = player.getItemInHand();
 
-            if (player.getInventory().getHeldItemSlot() == 1 && itemInHand.getType() == Material.BOOK) {
+            if (player.getInventory().getHeldItemSlot() == 3 && itemInHand.getType() == Material.BOOK) {
                 openTeamGUI(player);
                 event.setCancelled(true);
             }
@@ -92,6 +93,7 @@ public class TeamGUI implements Listener {
                 teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_BLACK);
                 equipPlayer.equipPlayerIfInTeam(player);
                 player.sendMessage("§7Du bist jetzt im Team §8Schwarz");
+                player.playSound(player.getLocation(), Sound., 50f, 1f);
                 prefixManager.setPlayerPrefix(player);
             }
 
