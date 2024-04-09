@@ -35,6 +35,7 @@ public class DataManager {
     private final Database database;
     private volatile Border border;
     private volatile Set<String> woolbattleTasks;
+    private volatile Set<String> sumoTasks;
     private Location jarPlate;
     private boolean jarEnabled;
     private boolean winter;
@@ -44,9 +45,12 @@ public class DataManager {
         setDefault("spawn", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("border", new Border(Shape.CIRCLE, 100, Locations.DEFAULT, null).serializeToDocument());
         setDefault("woolbattleNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
+        setDefault("sumoNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("dailyrewardNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("fisherNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("woolbattleSpawn", Locations.toDocument(Locations.DEFAULT, false));
+        setDefault("sumoSpawn", Locations.toDocument(Locations.DEFAULT, false));
+        setDefault("fisherSpawn", Locations.toDocument(Locations.DEFAULT, false));
         setDefault("winter", Document.newJsonDocument().append("value", true));
         winter = database.get("winter").getBoolean("value");
         setDefault("jumpAndRunEnabled", Document.newJsonDocument().append("value", true));
@@ -56,12 +60,14 @@ public class DataManager {
         jarPlate = Locations.fromDocument(database.get("jumpAndRunPlate"), null);
 
         setDefault("woolbattleTasks", Document.newJsonDocument().append("tasks", new HashSet<String>()));
+        setDefault("sumoTasks", Document.newJsonDocument().append("tasks", new HashSet<String>()));
         try {
             border = Border.GSON.fromJson(database.get("border").serializeToString(), Border.class);
         } catch (Exception ex) {
             border = new Border(Shape.CIRCLE, Double.MAX_VALUE, null, null);
         }
         fetchWoolBattleTasks();
+        fetchSumoTasks();
         new BukkitRunnable() {
             @Override public void run() {
                 Document doc = database.get("border");
@@ -70,6 +76,7 @@ public class DataManager {
                 }
                 border = Border.GSON.fromJson(doc.serializeToString(), Border.class);
                 fetchWoolBattleTasks();
+                fetchSumoTasks();
             }
         }.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60 * 2);
     }
@@ -125,6 +132,12 @@ public class DataManager {
         }.getType());
     }
 
+    public void fetchSumoTasks() {
+        sumoTasks = database.get("sumoTasks").readObject("tasks", new TypeToken<Set<String>>() {
+            private static final long serialVersionUID = 1461778882147270573L;
+        }.getType());
+    }
+
     public Set<String> getWoolBattleTasks() {
         return woolbattleTasks;
     }
@@ -132,6 +145,31 @@ public class DataManager {
     public void setWoolBattleTasks(Set<String> tasks) {
         this.woolbattleTasks = tasks;
         database.insert("woolbattleTasks", Document.newJsonDocument().append("tasks", tasks));
+    }
+
+    public Set<String> getSumoTasks() {
+        return sumoTasks;
+    }
+
+    public void setSumoTasks(Set<String> tasks) {
+        this.sumoTasks = tasks;
+        database.insert("sumoTasks", Document.newJsonDocument().append("tasks", tasks));
+    }
+
+    public void setSumoSpawn(Location loc) {
+        database.insert("sumoSpawn", Locations.toDocument(loc, false));
+    }
+
+    public Location getSumoSpawn() {
+        return Locations.fromDocument(database.get("sumoSpawn"), null);
+    }
+
+    public void setFisherSpawn(Location loc) {
+        database.insert("fisherSpawn", Locations.toDocument(loc, false));
+    }
+
+    public Location getFisherSpawn() {
+        return Locations.fromDocument(database.get("fisherSpawn"), null);
     }
 
     public Location getWoolBattleSpawn() {
@@ -165,6 +203,14 @@ public class DataManager {
 
     public void setWoolBattleNPCLocation(Location loc) {
         database.insert("woolbattleNPCLocation", Locations.toDocument(loc, false));
+    }
+
+    public Location getSumoNPCLocation() {
+        return Locations.fromDocument(database.get("sumoNPCLocation"), null);
+    }
+
+    public void setSumoNPCLocation(Location loc) {
+        database.insert("sumoNPCLocation", Locations.toDocument(loc, false));
     }
 
     public Location getDailyRewardNPCLocation() {
