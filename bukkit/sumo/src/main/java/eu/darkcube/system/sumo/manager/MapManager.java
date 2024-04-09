@@ -51,18 +51,16 @@ public class MapManager implements Listener {
 
     public void voteForMap(Player player, String mapName) {
         UUID playerUUID = player.getUniqueId();
-        // Prüfen, ob der Spieler bereits für diese Map gestimmt hat
+
         if (playerVotes.containsKey(playerUUID) && playerVotes.get(playerUUID).equals(mapName)) {
             return;
         }
 
-        // Wenn der Spieler zuvor für eine andere Map gestimmt hat, entferne diesen Vote
         if (playerVotes.containsKey(playerUUID)) {
             String previousVote = playerVotes.get(playerUUID);
             removeVote(previousVote);
         }
 
-        // Aktualisiere die Wahl des Spielers und füge einen Vote für die neue Map hinzu
         playerVotes.put(playerUUID, mapName);
         addVote(mapName);
         selectMapWithMostVotes();

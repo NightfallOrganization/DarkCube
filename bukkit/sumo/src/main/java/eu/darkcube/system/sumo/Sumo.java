@@ -57,7 +57,7 @@ public class Sumo extends DarkCubePlugin {
         var respawn = new Respawn(mapManager, lifeManager, teamManager);
         var equipPlayer = new EquipPlayer(teamManager);
         var randomTeam = new RandomTeam(teamManager, prefixManager);
-        var startingTimer = new StartingTimer(this, lobbyScoreboard, respawn, equipPlayer, teamManager, randomTeam);
+        var startingTimer = new StartingTimer(this, lobbyScoreboard, respawn, equipPlayer, teamManager, randomTeam, prefixManager);
         var damageManager = new DamageManager(teamManager, this);
         Spectator.setMainRuler(mapManager);
         var chatManager = new ChatManager();

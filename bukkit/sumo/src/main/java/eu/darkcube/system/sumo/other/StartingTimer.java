@@ -12,6 +12,7 @@ import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.executions.RandomTeam;
 import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.prefix.PrefixManager;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -37,14 +38,16 @@ public class StartingTimer implements Listener {
     private EquipPlayer equipPlayer;
     private TeamManager teamManager;
     private RandomTeam randomTeam;
+    private PrefixManager prefixManager;
 
-    public StartingTimer(Sumo plugin, LobbyScoreboard lobbyScoreboard, Respawn respawn, EquipPlayer equipPlayer, TeamManager teamManager, RandomTeam randomTeam) {
+    public StartingTimer(Sumo plugin, LobbyScoreboard lobbyScoreboard, Respawn respawn, EquipPlayer equipPlayer, TeamManager teamManager, RandomTeam randomTeam, PrefixManager prefixManager) {
         this.plugin = plugin;
         this.teamManager = teamManager;
         this.lobbyScoreboard = lobbyScoreboard;
         this.equipPlayer = equipPlayer;
         this.respawn = respawn;
         this.randomTeam = randomTeam;
+        this.prefixManager = prefixManager;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
@@ -129,6 +132,7 @@ public class StartingTimer implements Listener {
                     randomTeam.balanceTeams(playerIDs);
                     equipPlayer.equipPlayerIfInTeam(player);
                     respawn.teleportPlayerRandomly(player);
+                    prefixManager.setPlayerPrefix(player);
                 }
 
             }
