@@ -8,8 +8,10 @@
 package eu.darkcube.system.sumo.executions;
 
 import eu.darkcube.system.DarkCubeBukkit;
+import eu.darkcube.system.Plugin;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.LobbySystemLink;
 import eu.darkcube.system.util.GameState;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -29,6 +31,7 @@ public class Ending {
         GameStates.setState(GameStates.ENDING);
         teleportPlayersToSpawn();
         startTimer();
+        plugin.getLobbySystemLink().updateLobbyLink();
     }
 
     private void teleportPlayersToSpawn() {

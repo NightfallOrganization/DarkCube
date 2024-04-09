@@ -18,8 +18,6 @@ public class PrefixManager {
         ChatColor teamColor = teamManager.getPlayerTeam(player.getUniqueId());
         String coloredPrefix = teamColor + "";
 
-        player.setDisplayName(coloredPrefix + player.getName());
-
         updatePlayerNametag(player, coloredPrefix);
     }
 
@@ -40,6 +38,5 @@ public class PrefixManager {
         team.setPrefix(prefix);
         team.addEntry(player.getName());
 
-        player.setScoreboard(scoreboard);
     }
 }
