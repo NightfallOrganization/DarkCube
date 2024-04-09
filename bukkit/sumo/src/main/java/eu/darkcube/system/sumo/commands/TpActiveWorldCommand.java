@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.sumo.commands;
 
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,9 +16,9 @@ import org.bukkit.entity.Player;
 
 public class TpActiveWorldCommand implements CommandExecutor {
 
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
 
-    public TpActiveWorldCommand(MainRuler mainRuler) {
+    public TpActiveWorldCommand(MapManager mainRuler) {
         this.mainRuler = mainRuler;
     }
 

@@ -6,25 +6,25 @@
  */
 
 package eu.darkcube.system.sumo.commands;
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-public class MapVoteCommand implements CommandExecutor {
+public class SetMapCommand implements CommandExecutor {
 
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
 
-    public MapVoteCommand(MainRuler mainRuler) {
+    public SetMapCommand(MapManager mainRuler) {
         this.mainRuler = mainRuler;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length != 1) {
-            sender.sendMessage("§7Usage: /vote <mapName>");
+            sender.sendMessage("§7Usage: /setmap <mapName>");
             return true;
         }
 

@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.sumo.ruler;
 
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,7 +16,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -26,9 +26,9 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class MapRuler implements Listener {
 
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
 
-    public MapRuler(MainRuler mainRuler) {
+    public MapRuler(MapManager mainRuler) {
         this.mainRuler = mainRuler;
         maintainDaylight();
     }

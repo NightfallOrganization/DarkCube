@@ -101,7 +101,7 @@ public class LobbyScoreboard implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
 
-        if (player.getWorld().getName().equals("world")) {
+        if (player.getWorld().getName().equals("world") && GameStates.isState(GameStates.STARTING)) {
             player.setScoreboard(scoreboard);
         }
     }

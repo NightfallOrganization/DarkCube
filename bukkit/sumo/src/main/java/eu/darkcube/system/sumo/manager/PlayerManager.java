@@ -11,7 +11,6 @@ import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
-import eu.darkcube.system.sumo.ruler.MainRuler;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import eu.darkcube.system.sumo.executions.Spectator;
 import org.bukkit.*;
@@ -25,13 +24,13 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
 
-public class MainManager implements Listener {
+public class PlayerManager implements Listener {
     private LobbyScoreboard lobbyScoreboard;
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
     private TeamManager teamManager;
     private PrefixManager prefixManager;
 
-    public MainManager(LobbyScoreboard lobbyScoreboard, MainRuler mainRuler, TeamManager teamManager, PrefixManager prefixManager) {
+    public PlayerManager(LobbyScoreboard lobbyScoreboard, MapManager mainRuler, TeamManager teamManager, PrefixManager prefixManager) {
         this.lobbyScoreboard = lobbyScoreboard;
         this.mainRuler = mainRuler;
         this.teamManager = teamManager;
@@ -78,7 +77,7 @@ public class MainManager implements Listener {
         ChatColor playerTeam = teamManager.getPlayerTeam(playerID);
         teamManager.setPlayerTeam(playerID, null);
 
-        if (teamManager.isTeamEmpty(playerTeam)) {
+        if (teamManager.isTeamEmpty(playerTeam) && GameStates.isState(GameStates.PLAYING) && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
             Ending ending = new Ending(Sumo.getInstance());
             ending.execute();
         }

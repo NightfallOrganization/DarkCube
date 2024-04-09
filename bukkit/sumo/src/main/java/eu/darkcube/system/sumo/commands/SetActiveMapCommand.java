@@ -8,7 +8,7 @@
 package eu.darkcube.system.sumo.commands;
 
 import eu.darkcube.system.sumo.executions.Respawn;
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -17,11 +17,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SetActiveMapCommand implements CommandExecutor {
-    private MainRuler mainRuler;
+    private MapManager mapManager;
     private Respawn respawn;
 
-    public SetActiveMapCommand(MainRuler mainRuler, Respawn respawn) {
-        this.mainRuler = mainRuler;
+    public SetActiveMapCommand(MapManager mapManager, Respawn respawn) {
+        this.mapManager = mapManager;
         this.respawn = respawn;
     }
 
@@ -38,7 +38,7 @@ public class SetActiveMapCommand implements CommandExecutor {
             return true;
         }
 
-        mainRuler.setActiveWorld(world);
+        mapManager.setActiveWorld(world);
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             respawn.teleportPlayerRandomly(player);

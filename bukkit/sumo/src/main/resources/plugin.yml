@@ -6,9 +6,9 @@ api-version: 1.8
 depend: [System]
 
 commands:
-  mapvote:
+  setmap:
     description: Votet für die Maps
-    permission: sumo.mapvote.use
+    permission: sumo.setmap.use
   showactivemap:
     description: Zeigt die Aktive Map an
     permission: sumo.showactivemap.use
@@ -42,7 +42,7 @@ commands:
 
 
 Permissions:
-  sumo.mapvote.use:
+  sumo.setmap.use:
     default: op
   sumo.showactivemap.use:
     default: op

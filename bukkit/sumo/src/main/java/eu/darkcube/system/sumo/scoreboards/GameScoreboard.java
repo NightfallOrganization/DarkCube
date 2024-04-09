@@ -7,11 +7,7 @@
 
 package eu.darkcube.system.sumo.scoreboards;
 
-import eu.darkcube.system.sumo.manager.ItemManager;
-import eu.darkcube.system.sumo.manager.LifeManager;
-import eu.darkcube.system.sumo.manager.TeamManager;
-import eu.darkcube.system.sumo.other.GameStates;
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -23,7 +19,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scoreboard.*;
 
 public class GameScoreboard implements Listener {
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
     private Scoreboard scoreboard;
     private Objective objective;
     private Team blackTeam;
@@ -31,7 +27,7 @@ public class GameScoreboard implements Listener {
     private static final String ENTRY_BLACK = "§0§f ";
     private static final String ENTRY_WHITE = "§f§f ";
 
-    public GameScoreboard(MainRuler mainRuler) {
+    public GameScoreboard(MapManager mainRuler) {
         this.mainRuler = mainRuler;
         this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.objective = scoreboard.registerNewObjective("game", "dummy");
@@ -74,7 +70,7 @@ public class GameScoreboard implements Listener {
             player.setScoreboard(scoreboard);
         }
 
-//        if (worldName.equals("world") && GameStates.isState(GameStates.ENDING)) {
+//        if (!worldName.equals("world")) {
 //            player.setScoreboard(scoreboard);
 //        }
 

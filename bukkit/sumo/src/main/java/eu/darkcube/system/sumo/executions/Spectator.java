@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.sumo.executions;
 
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -15,9 +15,9 @@ import org.bukkit.World;
 
 public class Spectator {
 
-    private static MainRuler mainRuler;
+    private static MapManager mainRuler;
 
-    public static void setMainRuler(MainRuler mainRuler) {
+    public static void setMainRuler(MapManager mainRuler) {
         Spectator.mainRuler = mainRuler;
     }
 

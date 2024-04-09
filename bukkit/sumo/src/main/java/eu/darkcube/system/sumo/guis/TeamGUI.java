@@ -93,7 +93,7 @@ public class TeamGUI implements Listener {
                 teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_BLACK);
                 equipPlayer.equipPlayerIfInTeam(player);
                 player.sendMessage("§7Du bist jetzt im Team §8Schwarz");
-                player.playSound(player.getLocation(), Sound., 50f, 1f);
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 50f, 1f);
                 prefixManager.setPlayerPrefix(player);
             }
 
@@ -102,6 +102,7 @@ public class TeamGUI implements Listener {
                 teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_WHITE);
                 equipPlayer.equipPlayerIfInTeam(player);
                 player.sendMessage("§7Du bist jetzt im Team §fWeiß");
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 50f, 1f);
                 prefixManager.setPlayerPrefix(player);
             }
         }

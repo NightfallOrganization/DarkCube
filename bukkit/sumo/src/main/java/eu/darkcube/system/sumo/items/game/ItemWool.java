@@ -8,9 +8,8 @@
 package eu.darkcube.system.sumo.items.game;
 
 import eu.darkcube.system.Plugin;
-import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -23,7 +22,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Wool;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -34,11 +32,11 @@ import java.util.UUID;
 public class ItemWool implements Listener {
 
     private JavaPlugin plugin;
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
     private static TeamManager teamManager;
     private Map<UUID, Map<Integer, BukkitRunnable>> playerSlotTasks = new HashMap<>();
 
-    public ItemWool(TeamManager teamManager, Plugin plugin, MainRuler mainRuler) {
+    public ItemWool(TeamManager teamManager, Plugin plugin, MapManager mainRuler) {
         ItemWool.teamManager = teamManager;
         this.plugin = plugin;
         this.mainRuler = mainRuler;

@@ -6,16 +6,16 @@
  */
 
 package eu.darkcube.system.sumo.commands;
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class ShowActiveMapCommand implements CommandExecutor {
 
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
 
-    public ShowActiveMapCommand(MainRuler mainRuler) {
+    public ShowActiveMapCommand(MapManager mainRuler) {
         this.mainRuler = mainRuler;
     }
 

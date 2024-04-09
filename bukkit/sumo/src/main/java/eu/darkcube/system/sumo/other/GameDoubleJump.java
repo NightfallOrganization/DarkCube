@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.sumo.other;
 
-import eu.darkcube.system.sumo.ruler.MainRuler;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,12 +24,12 @@ import java.util.UUID;
 
 public class GameDoubleJump implements Listener {
     private final JavaPlugin plugin;
-    private final MainRuler mainRuler;
+    private final MapManager mainRuler;
     private final Map<UUID, Boolean> doubleJumpCountdown = new HashMap<>();
     private final Map<UUID, Boolean> isFlying = new HashMap<>();
     private final Map<UUID, Boolean> hasDoubleJumped = new HashMap<>();
 
-    public GameDoubleJump(JavaPlugin plugin, MainRuler mainRuler) {
+    public GameDoubleJump(JavaPlugin plugin, MapManager mainRuler) {
         this.plugin = plugin;
         this.mainRuler = mainRuler;
     }

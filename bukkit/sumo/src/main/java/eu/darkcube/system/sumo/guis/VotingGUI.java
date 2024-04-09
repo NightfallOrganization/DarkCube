@@ -24,16 +24,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class VotingGUI implements Listener {
 
-    private final String TITLE = "§9Teams";
+    private final String TITLE = "§6Voting";
     private final GUIPattern guiPattern = new GUIPattern();
-    private PrefixManager prefixManager;
-    private EquipPlayer equipPlayer;
-    TeamManager teamManager;
+    private VotingMapGUI votingMapGUI;
 
-    public VotingGUI(TeamManager teamManager, PrefixManager prefixManager, EquipPlayer equipPlayer) {
-        this.teamManager = teamManager;
-        this.prefixManager = prefixManager;
-        this.equipPlayer = equipPlayer;
+    public VotingGUI(VotingMapGUI votingMapGUI) {
+        this.votingMapGUI = votingMapGUI;
     }
 
     @EventHandler
@@ -43,40 +39,35 @@ public class VotingGUI implements Listener {
             ItemStack itemInHand = player.getItemInHand();
 
             if (player.getInventory().getHeldItemSlot() == 5 && itemInHand.getType() == Material.PAPER) {
-                openTeamGUI(player);
+                openVotingGUI(player);
                 event.setCancelled(true);
             }
         }
     }
 
-    public void openTeamGUI(Player player) {
+    public void openVotingGUI(Player player) {
         Inventory gui = Bukkit.createInventory(null, 45, TITLE);
 
         guiPattern.setPattern(gui);
 
-        // Buch auf Slot 4 setzen
-        ItemStack book = new ItemStack(Material.BOOK);
-        ItemMeta bookMeta = book.getItemMeta();
-        bookMeta.setDisplayName(TITLE);
-        bookMeta.setLore(java.util.Arrays.asList("§7Wähle dein Team!"));
-        book.setItemMeta(bookMeta);
-        gui.setItem(4, book);
+        // Papier auf Slot 4 setzen
+        ItemStack paper = new ItemStack(Material.PAPER);
+        ItemMeta paperMeta = paper.getItemMeta();
+        paperMeta.setDisplayName(TITLE);
+        paperMeta.setLore(java.util.Arrays.asList("§7Stimme für Spielszenarien ab!"));
+        paper.setItemMeta(paperMeta);
+        gui.setItem(4, paper);
 
-        // Schwarze Wolle auf Slot 21 setzen
-        ItemStack blackWool = new ItemStack(Material.WOOL, 1, (short) 15); // 15 ist der Datenwert für schwarze Wolle
-        ItemMeta blackWoolMeta = blackWool.getItemMeta();
-        blackWoolMeta.setDisplayName("§8Schwarz");
-        blackWool.setItemMeta(blackWoolMeta);
-        gui.setItem(21, blackWool);
-
-        // Weiße Wolle auf Slot 23 setzen
-        ItemStack whiteWool = new ItemStack(Material.WOOL, 1, (short) 0); // 0 ist der Datenwert für weiße Wolle
-        ItemMeta whiteWoolMeta = whiteWool.getItemMeta();
-        whiteWoolMeta.setDisplayName("§fWeiß");
-        whiteWool.setItemMeta(whiteWoolMeta);
-        gui.setItem(23, whiteWool);
+        // Papier auf Slot 22 setzen
+        ItemStack mappaper = new ItemStack(Material.PAPER);
+        ItemMeta mappaperMeta = mappaper.getItemMeta();
+        mappaperMeta.setDisplayName("§6Maps");
+        mappaperMeta.setLore(java.util.Arrays.asList("§7Stimme für deine Lieblingsmaps!"));
+        mappaper.setItemMeta(mappaperMeta);
+        gui.setItem(22, mappaper);
 
         player.openInventory(gui);
+
     }
 
     @EventHandler
@@ -86,22 +77,12 @@ public class VotingGUI implements Listener {
             if (event.getCurrentItem() == null) return;
 
             Player player = (Player) event.getWhoClicked();
+            ItemStack itemInHand = player.getItemInHand();
 
-            // Überprüfen, ob schwarze Wolle angeklickt wurde
-            if (event.getCurrentItem().getType() == Material.WOOL && event.getCurrentItem().getDurability() == 15) {
-                teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_BLACK);
-                equipPlayer.equipPlayerIfInTeam(player);
-                player.sendMessage("§7Du bist jetzt im Team §8Schwarz");
-                prefixManager.setPlayerPrefix(player);
+            if (itemInHand.getType() == Material.PAPER) {
+                votingMapGUI.openVotingMapGUI(player);
             }
 
-            // Überprüfen, ob weiße Wolle angeklickt wurde
-            else if (event.getCurrentItem().getType() == Material.WOOL && event.getCurrentItem().getDurability() == 0) {
-                teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_WHITE);
-                equipPlayer.equipPlayerIfInTeam(player);
-                player.sendMessage("§7Du bist jetzt im Team §fWeiß");
-                prefixManager.setPlayerPrefix(player);
-            }
         }
     }
 

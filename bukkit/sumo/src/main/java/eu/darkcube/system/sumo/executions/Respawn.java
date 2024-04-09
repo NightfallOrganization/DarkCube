@@ -9,8 +9,7 @@ package eu.darkcube.system.sumo.executions;
 
 import eu.darkcube.system.sumo.manager.LifeManager;
 import eu.darkcube.system.sumo.manager.TeamManager;
-import eu.darkcube.system.sumo.ruler.MainRuler;
-import org.bukkit.ChatColor;
+import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -18,15 +17,14 @@ import java.util.Random;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.scoreboard.Team;
 
 public class Respawn implements Listener {
-    private MainRuler mainRuler;
+    private MapManager mainRuler;
     private Random random;
     private LifeManager lifeManager;
     private TeamManager teamManager;
 
-    public Respawn(MainRuler mainRuler, LifeManager lifeManager, TeamManager teamManager) {
+    public Respawn(MapManager mainRuler, LifeManager lifeManager, TeamManager teamManager) {
         this.mainRuler = mainRuler;
         this.random = new Random();
         this.lifeManager = lifeManager;
