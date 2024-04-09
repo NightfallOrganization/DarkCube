@@ -7,13 +7,17 @@
 
 package eu.darkcube.system.sumo.commands;
 
+import eu.darkcube.system.DarkCubeBukkit;
+import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.executions.RandomTeam;
 import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.LobbySystemLink;
 import eu.darkcube.system.sumo.other.StartingTimer;
+import eu.darkcube.system.util.GameState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -31,12 +35,14 @@ public class SetGameStateCommand implements CommandExecutor {
     private EquipPlayer equipPlayer;
     private RandomTeam randomTeam;
     private StartingTimer startingTimer;
+    private LobbySystemLink lobbySystemLink;
 
-    public SetGameStateCommand(Respawn respawn, EquipPlayer equipPlayer, RandomTeam randomTeam, StartingTimer startingTimer) {
+    public SetGameStateCommand(Respawn respawn, EquipPlayer equipPlayer, RandomTeam randomTeam, StartingTimer startingTimer, LobbySystemLink lobbySystemLink) {
         this.respawn = respawn;
         this.equipPlayer = equipPlayer;
         this.randomTeam = randomTeam;
         this.startingTimer = startingTimer;
+        this.lobbySystemLink = lobbySystemLink;
     }
 
     @Override
@@ -63,6 +69,8 @@ public class SetGameStateCommand implements CommandExecutor {
     }
 
     private void onGameStateChange () {
+        lobbySystemLink.updateLobbyLink();
+
         if (GameStates.isState(GameStates.STARTING)) {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 Location spawnLocation = new Location(Bukkit.getWorld("world"), 0.5, 101, 0.5);
@@ -73,6 +81,7 @@ public class SetGameStateCommand implements CommandExecutor {
 
         if (GameStates.isState(GameStates.PLAYING)) {
             Set<UUID> playerIDs = Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
+
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 randomTeam.balanceTeams(playerIDs);
                 equipPlayer.equipPlayerIfInTeam(player);

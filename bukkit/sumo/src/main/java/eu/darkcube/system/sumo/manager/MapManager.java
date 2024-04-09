@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.sumo.manager;
 
+import eu.darkcube.system.sumo.Sumo;
+import eu.darkcube.system.sumo.other.LobbySystemLink;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import org.bukkit.World;
 import org.bukkit.Bukkit;
@@ -20,16 +22,15 @@ import java.util.*;
 
 public class MapManager implements Listener {
     private World activeWorld;
-    private JavaPlugin plugin;
+    private Sumo plugin;
     private LobbyScoreboard lobbyScoreboard;
     private static final List<String> AVAILABLE_MAPS = Arrays.asList("Origin", "Atlas", "Demonic");
     private final HashMap<String, Integer> mapVotes = new HashMap<>();
     private final HashMap<UUID, String> playerVotes = new HashMap<>();
 
-    public MapManager(JavaPlugin plugin, LobbyScoreboard lobbyScoreboard) {
+    public MapManager(Sumo plugin, LobbyScoreboard lobbyScoreboard) {
         this.plugin = plugin;
         this.lobbyScoreboard = lobbyScoreboard;
-        setRandomMap();
         // Initialisiert die Votes mit 0 für alle verfügbaren Maps
         AVAILABLE_MAPS.forEach(map -> mapVotes.put(map, 0));
     }
@@ -43,6 +44,7 @@ public class MapManager implements Listener {
         this.activeWorld = world;
         this.lobbyScoreboard.updateMap(world.getName());
         this.activeWorld.setGameRuleValue("keepInventory", "true");
+        plugin.getLobbySystemLink().updateLobbyLink();
     }
 
     public World getActiveWorld() {

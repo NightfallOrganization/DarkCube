@@ -10,6 +10,7 @@ package eu.darkcube.system.sumo.manager;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.LobbySystemLink;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import eu.darkcube.system.sumo.executions.Spectator;
@@ -17,9 +18,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
@@ -29,16 +28,31 @@ public class PlayerManager implements Listener {
     private MapManager mainRuler;
     private TeamManager teamManager;
     private PrefixManager prefixManager;
+    private LobbySystemLink lobbySystemLink;
 
-    public PlayerManager(LobbyScoreboard lobbyScoreboard, MapManager mainRuler, TeamManager teamManager, PrefixManager prefixManager) {
+    public PlayerManager(LobbyScoreboard lobbyScoreboard, MapManager mainRuler, TeamManager teamManager, PrefixManager prefixManager, LobbySystemLink lobbySystemLink) {
         this.lobbyScoreboard = lobbyScoreboard;
         this.mainRuler = mainRuler;
         this.teamManager = teamManager;
         this.prefixManager = prefixManager;
+        this.lobbySystemLink = lobbySystemLink;
+    }
+
+    @EventHandler
+    public void onPlayerLoggin(PlayerLoginEvent event) {
+
+        if(Bukkit.getOnlinePlayers().size() >= 4 && (GameStates.isState(GameStates.STARTING))) {
+            event.disallow(PlayerLoginEvent.Result.KICK_FULL, "§cThe server is full");
+        }
+
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Bukkit.getScheduler().runTaskLater(Sumo.getInstance(), () -> {
+            lobbySystemLink.updateLobbyLink();
+        }, 1L);
+
         Player player = event.getPlayer();
         event.setJoinMessage(null);
 
@@ -66,6 +80,10 @@ public class PlayerManager implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        Bukkit.getScheduler().runTaskLater(Sumo.getInstance(), () -> {
+            lobbySystemLink.updateLobbyLink();
+        }, 1L);
+
         UUID playerID = event.getPlayer().getUniqueId();
         event.setQuitMessage(null);
 

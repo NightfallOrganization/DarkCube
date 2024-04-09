@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.sumo.executions;
 
+import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.util.GameState;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
