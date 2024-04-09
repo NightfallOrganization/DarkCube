@@ -12,7 +12,7 @@ import eu.darkcube.system.lobbysystem.Lobby;
 public class SumoNPC {
 
     public static NPCManagement.NPC create() {
-        NPCManagement.NPC npc = Lobby.getInstance().npcManagement().builder().profileHelper().name("§fSumo").skin(new SumoSkin()).builder().build();
+        NPCManagement.NPC npc = Lobby.getInstance().npcManagement().builder().profileHelper().name("§fSumo &8❂").skin(new SumoSkin()).builder().build();
         npc.location(Lobby.getInstance().getDataManager().getSumoNPCLocation());
 
         new NPCKnockbackThread(npc).runTaskTimer(Lobby.getInstance(), 5, 5);
