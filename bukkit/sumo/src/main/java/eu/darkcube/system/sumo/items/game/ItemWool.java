@@ -8,6 +8,7 @@
 package eu.darkcube.system.sumo.items.game;
 
 import eu.darkcube.system.Plugin;
+import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.manager.MapManager;
 import org.bukkit.ChatColor;
@@ -30,22 +31,16 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ItemWool implements Listener {
-
-    private JavaPlugin plugin;
-    private MapManager mainRuler;
+    private final Map<UUID, BukkitRunnable> playerTasks = new HashMap<>();
     private static TeamManager teamManager;
-    private Map<UUID, Map<Integer, BukkitRunnable>> playerSlotTasks = new HashMap<>();
+    private MapManager mapManager;
 
-    public ItemWool(TeamManager teamManager, Plugin plugin, MapManager mainRuler) {
+    public ItemWool(TeamManager teamManager) {
         ItemWool.teamManager = teamManager;
-        this.plugin = plugin;
-        this.mainRuler = mainRuler;
     }
 
     public static ItemStack createWool(Player player) {
-
         ChatColor teamColor = teamManager.getPlayerTeam(player.getUniqueId());
-
         DyeColor color = (teamColor == TeamManager.TEAM_BLACK) ? DyeColor.BLACK : DyeColor.WHITE;
         Wool woolData = new Wool(color);
         ItemStack wool = woolData.toItemStack(10);
@@ -58,41 +53,60 @@ public class ItemWool implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
-        Block block = event.getBlockPlaced();
-
-        if (block.getType() == Material.WOOL) {
-            int slot = player.getInventory().getHeldItemSlot();
-            DyeColor color = ((Wool) block.getState().getData()).getColor();
-            String worldName = player.getWorld().getName();
-
-            playerSlotTasks.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
-            Map<Integer, BukkitRunnable> slotTasks = playerSlotTasks.get(player.getUniqueId());
-            if (slotTasks.containsKey(slot)) {
-                slotTasks.get(slot).cancel();
-            }
-
-            BukkitRunnable task = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    regenerateWool(player, slot, color, worldName);
-                    slotTasks.remove(slot);
-                }
-            };
-
-            slotTasks.put(slot, task);
-            task.runTaskLater(this.plugin, 20 * 10);
+        if (event.getBlockPlaced().getType() != Material.WOOL) {
+            return;
         }
+
+        Player player = event.getPlayer();
+        UUID playerUUID = player.getUniqueId();
+
+        if (playerTasks.containsKey(playerUUID)) {
+            return;
+        }
+
+        BukkitRunnable task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                adjustWoolInInventory(player);
+                playerTasks.remove(playerUUID);
+            }
+        };
+
+        playerTasks.put(playerUUID, task);
+        task.runTaskLater(Sumo.getInstance(), 200L); // 200 Ticks = 10 Sekunden
     }
 
-    private void regenerateWool(Player player, int slot, DyeColor color, String placedWorldName) {
-        if (player.getWorld().equals(mainRuler.getActiveWorld()) && player.getWorld().getName().equals(placedWorldName)) {
-            PlayerInventory inventory = player.getInventory();
+    private void adjustWoolInInventory(Player player) {
+        ItemStack wool = createWool(player);
+        int woolAmount = 0;
+        int firstWoolSlot = -1; // -1 bedeutet, dass noch kein Woll-Slot gefunden wurde.
 
-            if (inventory.getItem(slot) == null || inventory.getItem(slot).getType() == Material.AIR) {
-                ItemStack wool = new Wool(color).toItemStack(10);
-                inventory.setItem(slot, wool);
+        // Durchlaufen des Inventars, um die Menge der Wolle zu zählen.
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            if (item != null && item.getType() == Material.WOOL) {
+                woolAmount += item.getAmount();
+                if (firstWoolSlot == -1) firstWoolSlot = i;
             }
+        }
+
+        // Unterschied zur Zielmenge berechnen.
+        int difference = 10 - woolAmount;
+
+        if (difference > 0) {
+            // Fügt die Differenz hinzu, wenn weniger als 10 Blöcke vorhanden sind.
+            wool.setAmount(difference);
+            if (firstWoolSlot != -1) {
+                // Versucht, die Wolle im ersten gefundenen Woll-Slot hinzuzufügen.
+                player.getInventory().addItem(wool);
+            } else {
+                // Fügt die Wolle dem Inventar hinzu, wenn zuvor keine vorhanden war.
+                player.getInventory().addItem(wool);
+            }
+        } else if (difference < 0) {
+            // Entfernt die überschüssige Wolle, wenn mehr als 10 Blöcke vorhanden sind.
+            wool.setAmount(-difference);
+            player.getInventory().removeItem(wool);
         }
     }
 

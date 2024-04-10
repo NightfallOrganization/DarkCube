@@ -91,7 +91,6 @@ public class PlayerManager implements Listener {
             Bukkit.broadcastMessage(ChatColor.GRAY + event.getPlayer().getName() + " hat das Spiel verlassen.");
         }
 
-        event.getPlayer().setMetadata("leaving", new FixedMetadataValue(Sumo.getInstance(), true));
         ChatColor playerTeam = teamManager.getPlayerTeam(playerID);
         teamManager.setPlayerTeam(playerID, null);
 

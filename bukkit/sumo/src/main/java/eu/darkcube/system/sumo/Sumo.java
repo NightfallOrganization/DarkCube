@@ -50,12 +50,12 @@ public class Sumo extends DarkCubePlugin {
         var lobbyScoreboard = new LobbyScoreboard(this);
         var mapManager = new MapManager(this, lobbyScoreboard);
         var teamManager = new TeamManager();
+        var prefixManager = new PrefixManager(teamManager);
         var woolDespawner = new WoolDespawner(this);
         var gameScoreboard = new GameScoreboard(mapManager);
         var lifeManager = new LifeManager(teamManager, gameScoreboard);
         var gameDoubleJump = new GameDoubleJump(this, mapManager);
         var lobbyRuler = new LobbyRuler();
-        var prefixManager = new PrefixManager(teamManager);
         lobbySystemLink = new LobbySystemLink(mapManager, teamManager);
         var playerManager = new PlayerManager(lobbyScoreboard, mapManager, teamManager, prefixManager, lobbySystemLink);
         var respawn = new Respawn(mapManager, lifeManager, teamManager);
@@ -65,7 +65,7 @@ public class Sumo extends DarkCubePlugin {
         var damageManager = new DamageManager(teamManager, this);
         Spectator.setMainRuler(mapManager);
         var chatManager = new ChatManager();
-        var itemWool = new ItemWool(teamManager, this, mapManager);
+        var itemWool = new ItemWool(teamManager);
         var mapRuler = new MapRuler(mapManager);
         var teamGUI = new TeamGUI(teamManager, prefixManager, equipPlayer);
         var votingMapGUI = new VotingMapGUI(mapManager);
