@@ -95,6 +95,9 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
             } else if (state == GameState.INGAME) {
                 builder.damage(DyeColor.ORANGE.getWoolData());
                 builder.lore(Message.GAMESERVER_STATE.getMessage(user.user(), Message.STATE_INGAME));
+            } else if (state == GameState.STOPPING) {
+                builder.damage(DyeColor.BLACK.getWoolData());
+                builder.lore(Message.GAMESERVER_STATE.getMessage(user.user(), Message.STATE_STOPPING));
             } else {
                 throw new IllegalStateException();
             }
