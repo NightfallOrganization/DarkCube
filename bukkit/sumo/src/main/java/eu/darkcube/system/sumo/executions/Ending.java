@@ -32,21 +32,19 @@ public class Ending {
         teleportPlayersToSpawn();
         startTimer();
         plugin.getLobbySystemLink().updateLobbyLink();
+        System.out.println("Ending execute ausgeführt!!!");
     }
 
     private void teleportPlayersToSpawn() {
         World world = Bukkit.getWorld("world");
-        if (world != null) {
-            Location targetLocation = new Location(world, 0.5, 101, 0.5);
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!player.hasMetadata("leaving")) {
-                    player.teleport(targetLocation);
-                }
-            }
-        } else {
-            System.out.println("Welt 'world' nicht gefunden!");
+        Location targetLocation = new Location(world, 0.5, 101, 0.5);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.teleport(targetLocation);
+            System.out.println(player.getName() + " wurde teleportiert!!!");
         }
     }
+
 
     private void startTimer() {
         if (task != null) {
