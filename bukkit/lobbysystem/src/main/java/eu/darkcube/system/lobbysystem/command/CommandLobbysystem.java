@@ -19,6 +19,7 @@ public class CommandLobbysystem extends LobbyCommandExecutor {
                 .then(new CommandMinigame().builder())
                 .then(new CommandNPC().builder())
                 .then(new CommandBuild().builder())
+                .then(new CommandSetFisherSpawn().builder())
                 .then(new CommandBorder().builder())
                 .then(new CommandJumpAndRun().builder())
                 .then(new CommandPServer(lobby).builder())

@@ -46,6 +46,8 @@ public enum Item {
     INVENTORY_COMPASS_SPAWN(ItemBuilder.item(NETHER_STAR)),
     INVENTORY_COMPASS_SMASH(ItemBuilder.item(FIREBALL)),
     INVENTORY_COMPASS_WOOLBATTLE(ItemBuilder.item(BOW)),
+    INVENTORY_COMPASS_SUMO(ItemBuilder.item(STICK).glow(true)),
+    INVENTORY_COMPASS_FISHER(ItemBuilder.item(FISHING_ROD)),
     INVENTORY_COMPASS_MINERS(ItemBuilder.item(DIAMOND_PICKAXE).flag(ItemFlag.HIDE_ATTRIBUTES)),
 
     GADGET_HOOK_ARROW(ItemBuilder

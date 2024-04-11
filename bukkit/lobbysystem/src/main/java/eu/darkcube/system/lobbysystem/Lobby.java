@@ -47,6 +47,7 @@ public class Lobby extends Plugin {
     private DataManager dataManager;
     private NPCManagement npcManagement;
     private NPCManagement.NPC woolbattleNpc;
+    private NPCManagement.NPC sumoNpc;
     private NPCManagement.NPC fisherNpc;
     private NPCManagement.NPC dailyRewardNpc;
     private JaRManager jaRManager;
@@ -113,6 +114,7 @@ public class Lobby extends Plugin {
         this.woolbattleNpc = WoolBattleNPC.create();
         this.dailyRewardNpc = DailyRewardNPC.create();
         this.fisherNpc = FisherNPC.create();
+        this.sumoNpc = SumoNPC.create();
 
         CommandAPI.instance().register(new CommandBuild());
         CommandAPI.instance().register(new CommandLobbysystem(this));
@@ -136,6 +138,7 @@ public class Lobby extends Plugin {
         new ListenerInteract();
         new ListenerLobbySwitcher(this);
         new ListenerWoolBattleNPC();
+        new ListenerSumoNPC();
         new ListenerConnectorNPC(this);
         new ListenerMinigameServer(this);
         new ListenerItemDropPickup();
@@ -251,6 +254,10 @@ public class Lobby extends Plugin {
 
     public NPCManagement.NPC getWoolBattleNPC() {
         return this.woolbattleNpc;
+    }
+
+    public NPCManagement.NPC getSumoNPC() {
+        return this.sumoNpc;
     }
 
     public NPCManagement.NPC getDailyRewardNpc() {

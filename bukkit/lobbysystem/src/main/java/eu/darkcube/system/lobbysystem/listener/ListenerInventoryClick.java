@@ -12,6 +12,7 @@ import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
 import eu.darkcube.system.lobbysystem.inventory.InventorySettings;
+import eu.darkcube.system.lobbysystem.inventory.InventorySumo;
 import eu.darkcube.system.lobbysystem.inventory.InventoryWoolBattle;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerOwn;
@@ -73,6 +74,12 @@ public class ListenerInventoryClick extends BaseListener {
             close = true;
         } else if (itemid.equals(Item.INVENTORY_COMPASS_JUMPANDRUN.getItemId())) {
             user.teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_COMPASS_SUMO.getItemId()) && !(user.getOpenInventory() instanceof InventorySumo)) {
+            user.teleport(Lobby.getInstance().getDataManager().getSumoSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_COMPASS_FISHER.getItemId())) {
+            user.teleport(Lobby.getInstance().getDataManager().getFisherSpawn());
             close = true;
         } else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItemId())) {
             user.setAnimations(false);
