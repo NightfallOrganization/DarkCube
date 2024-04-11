@@ -11,6 +11,7 @@ import eu.darkcube.system.Plugin;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.manager.MapManager;
+import eu.darkcube.system.sumo.other.GameStates;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -33,7 +34,6 @@ import java.util.UUID;
 public class ItemWool implements Listener {
     private final Map<UUID, BukkitRunnable> playerTasks = new HashMap<>();
     private static TeamManager teamManager;
-    private MapManager mapManager;
 
     public ItemWool(TeamManager teamManager) {
         ItemWool.teamManager = teamManager;
@@ -53,12 +53,12 @@ public class ItemWool implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        UUID playerUUID = player.getUniqueId();
+
         if (event.getBlockPlaced().getType() != Material.WOOL) {
             return;
         }
-
-        Player player = event.getPlayer();
-        UUID playerUUID = player.getUniqueId();
 
         if (playerTasks.containsKey(playerUUID)) {
             return;
@@ -67,7 +67,11 @@ public class ItemWool implements Listener {
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
-                adjustWoolInInventory(player);
+
+                if (GameStates.isState(GameStates.PLAYING)) {
+                    adjustWoolInInventory(player);
+                }
+
                 playerTasks.remove(playerUUID);
             }
         };
