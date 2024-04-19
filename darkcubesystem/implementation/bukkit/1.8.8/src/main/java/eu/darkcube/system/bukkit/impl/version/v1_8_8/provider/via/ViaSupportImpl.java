@@ -14,10 +14,12 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.mapping.PacketMappings;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
+import com.viaversion.viaversion.util.GsonUtil;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.impl.DarkCubeSystemBukkit;
 import eu.darkcube.system.bukkit.provider.via.AbstractViaSupport;
@@ -26,7 +28,15 @@ import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.provider.via.AbstractViaSupport;
+import eu.darkcube.system.util.ReflectionUtils;
 import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class ViaSupportImpl extends AbstractViaSupport {
 
@@ -72,8 +82,12 @@ public class ViaSupportImpl extends AbstractViaSupport {
                         var suggestion = data.suggestions()[i];
                         var tooltip = data.tooltips()[i];
                         wrapper.write(Type.STRING, suggestion);
-                        wrapper.write(Type.BOOLEAN, tooltip != Component.empty());
-                        if (tooltip != Component.empty()) wrapper.write(Type.STRING, GsonComponentSerializer.gson().serialize(tooltip));
+
+                        @Nullable var transformedTooltip = tooltip != Component.empty() ? GsonComponentSerializer
+                                .gson()
+                                .serialize(tooltip) : null;
+                        var json = transformedTooltip == null ? null : GsonUtil.getGson().fromJson(transformedTooltip, JsonElement.class);
+                        wrapper.write(Type.OPTIONAL_COMPONENT, json);
                     }
                     return;
                 } else {
