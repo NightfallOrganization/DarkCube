@@ -18,5 +18,6 @@ dependencies {
     compileOnly(libs.luckperms)
     runtimeOnly(project("v1_8_8"))
     runtimeOnly(project("v1_20_2", "reobf"))
+    runtimeOnly(project("v1_20_4", "reobf"))
     annotationProcessor(libs.cloudnetInjectProcessor)
 }
