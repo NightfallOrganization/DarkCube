@@ -13,22 +13,27 @@ import com.viaversion.viaversion.api.protocol.packet.mapping.PacketMapping;
 import com.viaversion.viaversion.api.protocol.packet.mapping.PacketMappings;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
+import com.viaversion.viaversion.util.GsonUtil;
 import eu.darkcube.system.DarkCubeSystem;
 import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.provider.via.AbstractViaSupport;
 import eu.darkcube.system.util.ReflectionUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ViaSupport1_8_8 extends AbstractViaSupport {
 
@@ -36,7 +41,10 @@ public class ViaSupport1_8_8 extends AbstractViaSupport {
 
     public void enable() {
         DarkCubeSystem.systemPlugin().sendConsole("[ViaSupport] Enabling ViaVersion support");
-        Protocol1_13To1_12_2 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class);
+        @NotNull Protocol1_13To1_12_2 protocol = Objects.requireNonNull(Via
+                .getManager()
+                .getProtocolManager()
+                .getProtocol(Protocol1_13To1_12_2.class));
         PacketMappings clientboundMappings = ReflectionUtils.getValue(protocol, AbstractProtocol.class, true, "clientboundMappings", PacketMappings.class);
         ClientboundPackets1_12_1 unmapped = ClientboundPackets1_12_1.TAB_COMPLETE;
         ClientboundPackets1_13 mapped = ClientboundPackets1_13.TAB_COMPLETE;
@@ -72,8 +80,12 @@ public class ViaSupport1_8_8 extends AbstractViaSupport {
                         String suggestion = data.suggestions()[i];
                         Component tooltip = data.tooltips()[i];
                         wrapper.write(Type.STRING, suggestion);
-                        wrapper.write(Type.BOOLEAN, tooltip != Component.empty());
-                        if (tooltip != Component.empty()) wrapper.write(Type.STRING, GsonComponentSerializer.gson().serialize(tooltip));
+
+                        @Nullable var transformedTooltip = tooltip != Component.empty() ? GsonComponentSerializer
+                                .gson()
+                                .serialize(tooltip) : null;
+                        var json = transformedTooltip == null ? null : GsonUtil.getGson().fromJson(transformedTooltip, JsonElement.class);
+                        wrapper.write(Type.OPTIONAL_COMPONENT, json);
                     }
                     return;
                 } else {
