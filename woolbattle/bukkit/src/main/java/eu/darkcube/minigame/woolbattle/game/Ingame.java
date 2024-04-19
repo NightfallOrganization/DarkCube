@@ -6,6 +6,7 @@
  */
 package eu.darkcube.minigame.woolbattle.game;
 
+import eu.cloudnetservice.common.log.Logger;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.world.EventDamageBlock;
 import eu.darkcube.minigame.woolbattle.event.world.EventDestroyBlock;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
@@ -159,7 +161,13 @@ public class Ingame extends GamePhase {
         woolbattle.lobbySystemLink().update();
 
         var map = woolbattle.gameData().map(); // TODO this should never be null
-        if (map == null) map = woolbattle.mapManager().defaultRandomPersistentMap(woolbattle.gameData().mapSize());
+        if (map == null) {
+            var data = woolbattle.gameData();
+            Logger
+                    .getGlobal()
+                    .log(Level.SEVERE, "Map was null when starting (" + data.mapSize() + ", " + data.votedMap() + "," + data.forceMap() + ")", new Exception());
+            System.exit(-1);
+        }
         CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(map);
         woolbattle.sendMessage(Message.STARTING_GAME);
         for (WBUser user : WBUser.onlineUsers()) {

@@ -31,6 +31,7 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -237,18 +238,12 @@ public class Lobby extends GamePhase {
     }
 
     public void recalculateMap() {
-        eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP
-                .values()
-                .stream()
-                .filter(m -> m.vote.isEnabled())
-                .collect(Collectors.toList()), woolbattle
+        @NotNull eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values(), woolbattle
                 .mapManager()
                 .getMaps(woolbattle.gameData().mapSize())
                 .stream()
                 .filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
                 .collect(Collectors.toSet()), woolbattle.gameData().map());
-
-        if (map != null && !map.isEnabled()) map = null;
 
         woolbattle.gameData().votedMap(map);
     }

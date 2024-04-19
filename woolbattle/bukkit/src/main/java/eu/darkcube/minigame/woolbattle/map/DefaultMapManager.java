@@ -41,9 +41,9 @@ public class DefaultMapManager implements MapManager {
                     .getValue()
                     .values()
                     .stream()
-                    .skip(ThreadLocalRandom.current().nextInt(entry.getValue().size()))
-                    .findFirst()
-                    .ifPresent(map -> defaultMaps.put(entry.getKey(), map));
+                    .filter(Map::isEnabled)
+                    .reduce((map, map2) -> ThreadLocalRandom.current().nextBoolean() ? map : map2)
+                    .ifPresent(m -> defaultMaps.put(m.size(), m));
         }
     }
 
