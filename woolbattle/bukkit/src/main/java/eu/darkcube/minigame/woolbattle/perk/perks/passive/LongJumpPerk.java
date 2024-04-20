@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.event.perk.other.DoubleJumpEvent;
@@ -30,7 +31,8 @@ public class LongJumpPerk extends Perk {
             super(perk);
         }
 
-        @EventHandler public void handle(DoubleJumpEvent event) {
+        @EventHandler
+        public void handle(DoubleJumpEvent event) {
             for (UserPerk ignored : event.user().perks().perks(perk().perkName())) {
                 Vector velocity = event.velocity();
                 double y = velocity.getY();

@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.perk.perks;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.LaunchableInteractEvent;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
@@ -18,8 +20,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BasicPerkListener extends PerkListener implements RegisterNotifyListener {
 

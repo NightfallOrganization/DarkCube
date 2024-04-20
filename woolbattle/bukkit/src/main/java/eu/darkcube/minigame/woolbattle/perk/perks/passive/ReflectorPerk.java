@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
+
+import java.util.Random;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowArrowHitPlayerEvent;
@@ -18,8 +21,6 @@ import eu.darkcube.system.util.data.Key;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
-
-import java.util.Random;
 
 public class ReflectorPerk extends Perk {
     public static final PerkName REFLECTOR = new PerkName("REFLECTOR");
@@ -71,14 +72,16 @@ public class ReflectorPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(PlayerHitPlayerEvent event) {
+        @EventHandler
+        public void handle(PlayerHitPlayerEvent event) {
             store(event.target());
             if (attack(event.attacker(), event.target())) {
                 event.setCancelled(true);
             }
         }
 
-        @EventHandler public void handle(BowArrowHitPlayerEvent event) {
+        @EventHandler
+        public void handle(BowArrowHitPlayerEvent event) {
             store(event.target());
             if (attack(event.shooter(), event.target())) {
                 event.setCancelled(true);

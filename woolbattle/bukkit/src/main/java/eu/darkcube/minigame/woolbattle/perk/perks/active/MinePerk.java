@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -22,10 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MinePerk extends Perk {
     public static final PerkName MINE = new PerkName("MINE");
@@ -43,7 +43,8 @@ public class MinePerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(BlockPlaceEvent event) {
+        @EventHandler
+        public void handle(BlockPlaceEvent event) {
             if (event.getItemInHand() == null) return;
             var item = event.getItemInHand();
             var user = WBUser.getUser(event.getPlayer());
@@ -63,7 +64,8 @@ public class MinePerk extends Perk {
             })).runTask();
         }
 
-        @EventHandler public void handle(PlayerInteractEvent event) {
+        @EventHandler
+        public void handle(PlayerInteractEvent event) {
             Player p = event.getPlayer();
             WBUser user = WBUser.getUser(p);
             if (!user.getTeam().canPlay()) return;
@@ -92,7 +94,8 @@ public class MinePerk extends Perk {
             }).runTaskLater(2);
         }
 
-        @Override protected boolean mayActivate() {
+        @Override
+        protected boolean mayActivate() {
             return false;
         }
     }

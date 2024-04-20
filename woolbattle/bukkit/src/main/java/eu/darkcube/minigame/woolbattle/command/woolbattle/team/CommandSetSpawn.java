@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -23,9 +24,7 @@ import org.bukkit.entity.Player;
 
 public class CommandSetSpawn extends WBCommand {
     public CommandSetSpawn(WoolBattleBukkit woolbattle) {
-        super("setSpawn", b -> b.then(Commands
-                .argument("map", MapArgument.mapArgument(woolbattle, MapArgument.ToStringFunction.function(ctx -> MapSizeArgument.mapSize(ctx, "mapSize"))))
-                .executes(ctx -> set(woolbattle, ctx))));
+        super("setSpawn", b -> b.then(Commands.argument("map", MapArgument.mapArgument(woolbattle, MapArgument.ToStringFunction.function(ctx -> MapSizeArgument.mapSize(ctx, "mapSize")))).executes(ctx -> set(woolbattle, ctx))));
     }
 
     private static int set(WoolBattleBukkit woolbattle, CommandContext<CommandSource> ctx) throws CommandSyntaxException {
@@ -42,9 +41,7 @@ public class CommandSetSpawn extends WBCommand {
         map.ingameData().spawn(team.getDisplayNameKey(), loc);
 
         player.sendMessage("§7Du hast den Spawn für die Map '" + map.getName() + "' neu gesetzt!");
-        woolbattle.mapLoader().save(map).thenRun(() -> {
-            player.sendMessage("§aErfolgreich gespeichert!");
-        });
+        woolbattle.mapLoader().save(map).thenRun(() -> player.sendMessage("§aErfolgreich gespeichert!"));
         return 0;
     }
 }

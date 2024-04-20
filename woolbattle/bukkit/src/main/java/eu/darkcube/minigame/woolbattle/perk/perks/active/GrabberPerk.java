@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -68,7 +69,8 @@ public class GrabberPerk extends Perk {
             user.user().metadata().<UserPerk>get(DATA_PERK).currentPerkItem().setItem();
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             WBUser user = perk.owner();
             if (teleportTarget(user)) {
                 return true;
@@ -82,7 +84,8 @@ public class GrabberPerk extends Perk {
                     runTaskLater(TimeUnit.SECOND.itoTicks(5));
                 }
 
-                @Override public void run() {
+                @Override
+                public void run() {
                     perk.cooldown(perk.perk().cooldown().cooldown());
                     user.user().metadata().remove(DATA_GRABBED);
                     user.user().metadata().remove(DATA_SCHEDULER);
@@ -99,11 +102,13 @@ public class GrabberPerk extends Perk {
             return false;
         }
 
-        @Override protected void activated(UserPerk perk) {
+        @Override
+        protected void activated(UserPerk perk) {
             perk.cooldown(perk.perk().cooldown().cooldown());
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent e) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent e) {
             if (e.getDamager() instanceof Egg && e.getEntity() instanceof Player && ((Egg) e.getDamager()).getShooter() instanceof Player) {
                 Egg egg = (Egg) e.getDamager();
                 if (egg.hasMetadata("perk") && egg.getMetadata("perk").get(0).value().equals(GrabberPerk.GRABBER)) {
@@ -115,10 +120,7 @@ public class GrabberPerk extends Perk {
                     }
                     Player p = (Player) egg.getShooter();
                     WBUser user = WBUser.getUser(p);
-                    if (woolbattle
-                            .ingame()
-                            .playerUtil()
-                            .attack(user, targetUser) || (user.getTeam() == targetUser.getTeam() && user != targetUser)) {
+                    if (woolbattle.ingame().playerUtil().attack(user, targetUser) || (user.getTeam() == targetUser.getTeam() && user != targetUser)) {
                         if (user.getTeam() == targetUser.getTeam() && user != targetUser) {
                             e.setCancelled(true);
                         }

@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -36,26 +37,28 @@ public class GrandpasClockPerk extends Perk {
             super(perk, woolbattle);
         }
 
-        @Override protected boolean activate(UserPerk perk) {
+        @Override
+        protected boolean activate(UserPerk perk) {
             WBUser user = perk.owner();
-            if (user.user().getMetaDataStorage().has(DATA_OLD_POS)) {
-                user.getBukkitEntity().teleport(user.user().getMetaDataStorage().<Location>remove(DATA_OLD_POS));
-                user.user().getMetaDataStorage().<Scheduler>remove(DATA_TICKER).cancel();
+            if (user.user().metadata().has(DATA_OLD_POS)) {
+                user.getBukkitEntity().teleport(user.user().metadata().<Location>remove(DATA_OLD_POS));
+                user.user().metadata().<Scheduler>remove(DATA_TICKER).cancel();
                 user.getBukkitEntity().playSound(user.getBukkitEntity().getBedSpawnLocation(), Sound.ENDERMAN_TELEPORT, 100, 1);
                 return true;
             }
-            user.user().getMetaDataStorage().set(DATA_OLD_POS, user.getBukkitEntity().getLocation());
-            user.user().getMetaDataStorage().set(DATA_TICKER, new Scheduler(woolbattle) {
+            user.user().metadata().set(DATA_OLD_POS, user.getBukkitEntity().getLocation());
+            user.user().metadata().set(DATA_TICKER, new Scheduler(woolbattle) {
                 private int count = 0;
 
                 {
                     runTaskTimer(10);
                 }
 
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (count++ == 6) {
-                        user.getBukkitEntity().teleport(user.user().getMetaDataStorage().<Location>remove(DATA_OLD_POS));
-                        user.user().getMetaDataStorage().remove(DATA_TICKER);
+                        user.getBukkitEntity().teleport(user.user().metadata().<Location>remove(DATA_OLD_POS));
+                        user.user().metadata().remove(DATA_TICKER);
                         user.getBukkitEntity().playSound(user.getBukkitEntity().getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
                         cancel();
                         activated(perk);

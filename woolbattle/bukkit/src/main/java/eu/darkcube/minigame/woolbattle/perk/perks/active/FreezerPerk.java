@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -37,13 +38,15 @@ public class FreezerPerk extends Perk {
             super(perk, woolbattle);
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
             snowball.setMetadata("perk", new FixedMetadataValue(woolbattle, perk.perk().perkName().toString()));
             return true;
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent event) {
             if (!(event.getEntity() instanceof Player)) {
                 return;
             }
@@ -56,18 +59,12 @@ public class FreezerPerk extends Perk {
             }
             Player p = (Player) snowball.getShooter();
             Player hit = (Player) event.getEntity();
-            if (!snowball.getMetadata("perk").isEmpty() && snowball
-                    .getMetadata("perk")
-                    .get(0)
-                    .asString()
-                    .equals(FreezerPerk.FREEZER.getName())) {
+            if (!snowball.getMetadata("perk").isEmpty() && snowball.getMetadata("perk").get(0).asString().equals(FreezerPerk.FREEZER.getName())) {
                 event.setCancelled(true);
                 WBUser user = WBUser.getUser(hit);
                 if (user.projectileImmunityTicks() > 0) return;
                 if (user.getTeam().getType() != WBUser.getUser(p).getTeam().getType()) {
-                    user
-                            .getBukkitEntity()
-                            .addPotionEffect(new PotionEffect(PotionEffectType.SLOW, TimeUnit.SECOND.itoTicks(3), 6, true, false), true);
+                    user.getBukkitEntity().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, TimeUnit.SECOND.itoTicks(3), 6, true, false), true);
                 }
             }
         }

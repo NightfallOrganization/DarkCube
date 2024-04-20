@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -37,7 +38,8 @@ public class WallGeneratorPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             new WallBlockPlacerScheduler(perk).runTaskTimer(1);
             return true;
         }
@@ -66,7 +68,8 @@ public class WallGeneratorPerk extends Perk {
                 normal = calculateNormal();
             }
 
-            @Override public void run() {
+            @Override
+            public void run() {
                 WBUser user = perk.owner();
                 Player p = user.getBukkitEntity();
                 if (p.isSneaking()) {

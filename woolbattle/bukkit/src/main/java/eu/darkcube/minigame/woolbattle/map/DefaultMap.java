@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.map;
 
 import eu.cloudnetservice.driver.document.Document;
@@ -41,39 +42,47 @@ public class DefaultMap implements Map, Serializable {
         icon = new ItemStack(Material.GRASS);
     }
 
-    @Override public int deathHeight() {
+    @Override
+    public int deathHeight() {
         return deathHeight;
     }
 
-    @Override public void deathHeight(int deathHeight) {
+    @Override
+    public void deathHeight(int deathHeight) {
         this.deathHeight = deathHeight;
         save();
     }
 
-    @Override public boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return enabled;
     }
 
-    @Override public ItemStack getIcon() {
+    @Override
+    public ItemStack getIcon() {
         return icon;
     }
 
-    @Override public void setIcon(ItemStack icon) {
+    @Override
+    public void setIcon(ItemStack icon) {
         this.icon = icon;
         save();
     }
 
-    @Override public void enable() {
+    @Override
+    public void enable() {
         enabled = true;
         save();
     }
 
-    @Override public void disable() {
+    @Override
+    public void disable() {
         enabled = false;
         save();
     }
 
-    @Override public MapSize size() {
+    @Override
+    public MapSize size() {
         return size;
     }
 
@@ -81,15 +90,18 @@ public class DefaultMap implements Map, Serializable {
         this.ingameData = ingameData;
     }
 
-    @Override public @Nullable MapIngameData ingameData() {
+    @Override
+    public @Nullable MapIngameData ingameData() {
         return ingameData;
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return name;
     }
 
-    @Override public String serialize() {
+    @Override
+    public String serialize() {
         return Serializable.super.serialize();
     }
 

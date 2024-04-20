@@ -12,13 +12,13 @@ import org.bukkit.DyeColor;
 
 public class ConvertingRuleDyeColor extends ConvertingRule<DyeColor> {
 
-	@Override
-	public Class<DyeColor> getConvertingClass() {
-		return DyeColor.class;
-	}
+    @Override
+    public Class<DyeColor> getConvertingClass() {
+        return DyeColor.class;
+    }
 
-	@Override
-	public String convert(DyeColor object) {
-		return object.name().toLowerCase();
-	}
+    @Override
+    public String convert(DyeColor object) {
+        return object.name().toLowerCase();
+    }
 }

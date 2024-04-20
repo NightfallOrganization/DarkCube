@@ -7,12 +7,24 @@
 
 package eu.darkcube.minigame.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.command.*;
-import eu.darkcube.system.bukkit.commandapi.CommandAPI;
-import eu.darkcube.system.bukkit.commandapi.Command;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.darkcube.minigame.woolbattle.command.CommandDisableStats;
+import eu.darkcube.minigame.woolbattle.command.CommandFix;
+import eu.darkcube.minigame.woolbattle.command.CommandIsStats;
+import eu.darkcube.minigame.woolbattle.command.CommandRevive;
+import eu.darkcube.minigame.woolbattle.command.CommandSetLifes;
+import eu.darkcube.minigame.woolbattle.command.CommandSetMap;
+import eu.darkcube.minigame.woolbattle.command.CommandSetTeam;
+import eu.darkcube.minigame.woolbattle.command.CommandSettings;
+import eu.darkcube.minigame.woolbattle.command.CommandStart;
+import eu.darkcube.minigame.woolbattle.command.CommandTimer;
+import eu.darkcube.minigame.woolbattle.command.CommandTroll;
+import eu.darkcube.minigame.woolbattle.command.CommandVoteLifes;
+import eu.darkcube.minigame.woolbattle.command.CommandWoolBattle;
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 
 public class WoolBattleCommands {
     private final List<Command> commands = new ArrayList<>();

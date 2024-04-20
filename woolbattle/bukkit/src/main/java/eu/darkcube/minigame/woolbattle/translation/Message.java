@@ -4,14 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.translation;
+
+import java.util.function.Function;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.Language;
-
-import java.util.function.Function;
 
 public enum Message implements BaseMessage {
 
@@ -87,8 +88,7 @@ public enum Message implements BaseMessage {
         this.key = this.name();
     }
 
-    public static Component getMessage(String messageKey, Language language,
-                                       Object... replacements) {
+    public static Component getMessage(String messageKey, Language language, Object... replacements) {
         return language.getMessage(KEY_PREFIX + messageKey, replacements);
     }
 

@@ -7,6 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.game.ingame;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAttackUser;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserKill;
@@ -32,7 +37,12 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -40,11 +50,6 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.DisplaySlot;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class PlayerUtil {
 
@@ -76,7 +81,7 @@ public class PlayerUtil {
         p.setSaturation(0);
         user.resetTicksAfterLastHit();
         if (user.getTeam() == null) user.setTeam(woolbattle.teamManager().getSpectator());
-//        if (!user.getTeam().isSpectator()) {
+        //        if (!user.getTeam().isSpectator()) {
         user.perks().reloadFromStorage();
         loadScoreboard(user);
         user.getBukkitEntity().closeInventory();
@@ -85,7 +90,7 @@ public class PlayerUtil {
         if (loc == null) loc = woolbattle.lobby().getSpawn();
         user.getBukkitEntity().teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
-//        }
+        //        }
     }
 
     public void loadScoreboard(WBUser user) {
@@ -105,10 +110,7 @@ public class PlayerUtil {
         for (Team team : woolbattle.teamManager().getTeams()) {
             ScoreboardTeam t = sb.getTeam(team.getType().getLivesScoreboardTag());
             t.addPlayer(team.getType().getInvisibleTag());
-            t.setSuffix(Component
-                    .text(Characters.SHIFT_SHIFT_LEFT.toString())
-                    .color(NamedTextColor.GOLD)
-                    .append(team.getName(user.user())));
+            t.setSuffix(Component.text(Characters.SHIFT_SHIFT_LEFT.toString()).color(NamedTextColor.GOLD).append(team.getName(user.user())));
             obj.setScore(team.getType().getInvisibleTag(), i++);
             reloadScoreboardLifes(sb, team);
         }
@@ -318,7 +320,7 @@ public class PlayerUtil {
     }
 
     public void fixSpectator(WBUser user) {
-//        if (user.getTeam() != null ) ingame.lastTeam.put(user, user.getTeam());
+        //        if (user.getTeam() != null ) ingame.lastTeam.put(user, user.getTeam());
         Player p = user.getBukkitEntity();
         Scoreboard sb = new Scoreboard(user);
         WBUser.onlineUsers().forEach(u -> {
@@ -355,10 +357,6 @@ public class PlayerUtil {
         if (llifes.length() > 3) {
             llifes = llifes.substring(0, 3);
         }
-        sb
-                .getTeam(team.getType().getLivesScoreboardTag())
-                .setPrefix(LegacyComponentSerializer
-                        .legacySection()
-                        .deserialize(ChatColor.translateAlternateColorCodes('&', "&6" + Characters.SHIFT_SHIFT_RIGHT + " &4" + Characters.HEART + "&r" + llifes + "&4" + Characters.HEART + " ")));
+        sb.getTeam(team.getType().getLivesScoreboardTag()).setPrefix(LegacyComponentSerializer.legacySection().deserialize(ChatColor.translateAlternateColorCodes('&', "&6" + Characters.SHIFT_SHIFT_RIGHT + " &4" + Characters.HEART + "&r" + llifes + "&4" + Characters.HEART + " ")));
     }
 }

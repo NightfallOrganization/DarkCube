@@ -60,7 +60,7 @@ abstract class TokenReplacement : DefaultTask() {
 
     fun input(sourceDirectorySet: SourceDirectorySet) {
         for (srcDirTree in sourceDirectorySet.srcDirTrees) {
-            sources.add(project.files(srcDirTree), srcDirTree, srcDirTree.patterns.includes, srcDirTree.patterns.excludes)
+            sources.add(project.files(srcDirTree), srcDirTree)
         }
     }
 

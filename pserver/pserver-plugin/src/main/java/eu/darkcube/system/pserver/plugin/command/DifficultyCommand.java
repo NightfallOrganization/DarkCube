@@ -7,10 +7,10 @@
 
 package eu.darkcube.system.pserver.plugin.command;
 
-import eu.darkcube.system.bukkit.commandapi.argument.WorldArgument;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.bukkit.commandapi.argument.EnumArgument;
+import eu.darkcube.system.bukkit.commandapi.argument.WorldArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.command.impl.PServer;
@@ -21,12 +21,7 @@ import org.bukkit.World;
 public class DifficultyCommand extends PServer {
 
     public DifficultyCommand() {
-        super("difficulty", new String[0], b -> b.then(Commands
-                .argument("difficulty", EnumArgument.enumArgument(Difficulty.values(), s -> new String[]{s.name().toLowerCase()}))
-                .executes(context -> difficulty(context, EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class), null))
-                .then(Commands
-                        .argument("world", WorldArgument.world())
-                        .executes(context -> difficulty(context, EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class), WorldArgument.getWorld(context, "world"))))));
+        super("difficulty", new String[0], b -> b.then(Commands.argument("difficulty", EnumArgument.enumArgument(Difficulty.values(), s -> new String[]{s.name().toLowerCase()})).executes(context -> difficulty(context, EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class), null)).then(Commands.argument("world", WorldArgument.world()).executes(context -> difficulty(context, EnumArgument.getEnumArgument(context, "difficulty", Difficulty.class), WorldArgument.getWorld(context, "world"))))));
     }
 
     private static int difficulty(CommandContext<CommandSource> context, Difficulty difficulty, World world) {

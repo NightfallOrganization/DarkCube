@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.pserver.plugin.link.luckperms;
 
 import eu.darkcube.system.pserver.common.PServerProvider;
@@ -16,7 +17,8 @@ import org.bukkit.entity.Player;
 
 public class CustomContextCalculator implements ContextCalculator<Player> {
 
-    @Override public void calculate(Player target, ContextConsumer consumer) {
+    @Override
+    public void calculate(Player target, ContextConsumer consumer) {
         consumer.accept("pserver", Boolean.toString(PServerProvider.instance().isPServer()));
         if (PServerProvider.instance().isPServer()) {
             if (PServerPlugin.instance().ownerCache().owners().contains(target.getUniqueId())) {
@@ -27,7 +29,8 @@ public class CustomContextCalculator implements ContextCalculator<Player> {
         }
     }
 
-    @Override public ContextSet estimatePotentialContexts() {
+    @Override
+    public ContextSet estimatePotentialContexts() {
         MutableContextSet set = MutableContextSet.create();
         set.add("pserver", Boolean.toString(true));
         set.add("pserver", Boolean.toString(false));

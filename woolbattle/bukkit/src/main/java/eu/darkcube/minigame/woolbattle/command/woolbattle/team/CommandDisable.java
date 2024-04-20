@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.command.woolbattle.team;
 
 import eu.darkcube.minigame.woolbattle.command.WBCommand;
@@ -17,37 +18,12 @@ public class CommandDisable extends WBCommand {
         super("disable", b -> b.executes(ctx -> {
             TeamType team = TeamTypeArgument.teamType(ctx, "team");
             if (!team.isEnabled()) {
-                ctx.getSource().sendMessage(Component.text("Dieses Team ist bereits deaktiviert!")
-                        .color(NamedTextColor.RED));
+                ctx.getSource().sendMessage(Component.text("Dieses Team ist bereits deaktiviert!").color(NamedTextColor.RED));
                 return 0;
             }
             team.setEnabled(false);
-            ctx.getSource().sendMessage(Component.text(
-                            "Du hast das Team '" + team.getDisplayNameKey() + "' deaktiviert!")
-                    .color(NamedTextColor.GRAY));
+            ctx.getSource().sendMessage(Component.text("Du hast das Team '" + team.getDisplayNameKey() + "' deaktiviert!").color(NamedTextColor.GRAY));
             return 0;
         }));
     }
-    //	public CommandDisable() {
-    //		super(WoolBattle.getInstance(), "disable", new Command[0], "Deaktiviert das Team");
-    //	}
-    //
-    //	@Override
-    //	public boolean execute(CommandSender sender, String[] args) {
-    //		if (args.length == 0) {
-    //			TeamType team = TeamType.byDisplayNameKey(getSpaced());
-    //			if (team == null || team.isDeleted()) {
-    //				sender.sendMessage("§cEs konnte kein Team mit dem Namen '" + getSpaced() + "' gefunden werden.");
-    //				return true;
-    //			}
-    //			if (!team.isEnabled()) {
-    //				sender.sendMessage("§cDieses Team ist bereits deaktiviert!");
-    //				return true;
-    //			}
-    //			team.setEnabled(false);
-    //			sender.sendMessage("§7Du hast das Team '" + team.getDisplayNameKey() + "' deaktiviert!");
-    //			return true;
-    //		}
-    //		return false;
-    //	}
 }

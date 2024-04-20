@@ -24,7 +24,8 @@ public class WoolBattleLink extends Link {
         super();
     }
 
-    @Override protected void link() throws Throwable {
+    @Override
+    protected void link() throws Throwable {
         var api = WoolBattleBukkit.instance();
         StatsLink.enabled = false;
         CommandAPI.instance().unregisterPrefixlessByPrefix("woolbattle");
@@ -37,6 +38,7 @@ public class WoolBattleLink extends Link {
         System.out.println("§cDisabled woolbattle stats!");
     }
 
-    @Override protected void unlink() {
+    @Override
+    protected void unlink() {
     }
 }

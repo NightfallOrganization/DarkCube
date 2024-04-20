@@ -32,6 +32,7 @@ public class MinestomTemplateInventory extends MinestomInventory {
 
     @Override
     protected ItemStack getItem0(int slot) {
+        return null; // TODO
     }
 
     @Override
@@ -51,7 +52,7 @@ public class MinestomTemplateInventory extends MinestomInventory {
      * Starts the animation, etc.
      */
     protected void setItems(@NotNull Player player, @NotNull User user) {
-        
+
     }
 
     private static @Nullable SortedMap<Integer, ItemReferenceImpl> @NotNull [] deepCopy(@Nullable SortedMap<Integer, ItemReferenceImpl> @NotNull [] maps) {

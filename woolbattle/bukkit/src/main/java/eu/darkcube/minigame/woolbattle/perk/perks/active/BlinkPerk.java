@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.List;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -19,8 +22,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public class BlinkPerk extends Perk {
     public static final PerkName BLINK = new PerkName("BLINK");
@@ -38,12 +39,12 @@ public class BlinkPerk extends Perk {
 
         private static boolean teleport(WBUser user) {
             Player p = user.getBukkitEntity();
-            int dist = 15;
+            var dist = 15;
             if (p.isSneaking()) {
-                RayTrace raytrace = new RayTrace(p.getEyeLocation().toVector(), p.getEyeLocation().getDirection());
+                var raytrace = new RayTrace(p.getEyeLocation().toVector(), p.getEyeLocation().getDirection());
                 List<Vector> positions = raytrace.traverse(dist, 0.1);
-                for (Vector position : positions) {
-                    Location pos = position.toLocation(p.getWorld());
+                for (var position : positions) {
+                    var pos = position.toLocation(p.getWorld());
                     if (!ListenerBlink.checkBlock(pos)) {
                         if (ListenerBlink.checkBlock(pos.add(0, 1, 0)) && ListenerBlink.checkBlock(pos.add(0, 1, 0))) {
                             pos.subtract(0, 2, 0).setDirection(p.getEyeLocation().getDirection());
@@ -54,17 +55,17 @@ public class BlinkPerk extends Perk {
                     }
                 }
             }
-            Vector v = user.getBukkitEntity().getEyeLocation().getDirection().normalize();
+            var v = user.getBukkitEntity().getEyeLocation().getDirection().normalize();
             for (; dist > 1; dist--) {
-                Location loc = user.getBukkitEntity().getEyeLocation().add(v.clone().multiply(dist));
-                Location loc2 = loc.clone().add(0, 1, 0);
+                var loc = user.getBukkitEntity().getEyeLocation().add(v.clone().multiply(dist));
+                var loc2 = loc.clone().add(0, 1, 0);
                 if (loc.getBlock().getType() == Material.AIR && loc2.getBlock().getType() == Material.AIR) {
-                    boolean freeUp = ListenerBlink.checkLayer(loc2.clone().add(0, 1, 0));
-                    boolean freeHead = ListenerBlink.checkLayer(loc2);
-                    boolean freeFoot = ListenerBlink.checkLayer(loc);
-                    boolean freeDown = ListenerBlink.checkLayer(loc.clone().subtract(0, 1, 0));
+                    var freeUp = ListenerBlink.checkLayer(loc2.clone().add(0, 1, 0));
+                    var freeHead = ListenerBlink.checkLayer(loc2);
+                    var freeFoot = ListenerBlink.checkLayer(loc);
+                    var freeDown = ListenerBlink.checkLayer(loc.clone().subtract(0, 1, 0));
 
-                    boolean free = freeUp && freeHead && freeFoot && freeDown;
+                    var free = freeUp && freeHead && freeFoot && freeDown;
                     if (free) {
                         user.getBukkitEntity().teleport(loc.setDirection(v));
                     } else {
@@ -81,8 +82,8 @@ public class BlinkPerk extends Perk {
         }
 
         private static boolean checkLayer(Location layer) {
-            for (int x = -1; x < 2; x++) {
-                for (int z = -1; z < 2; z++) {
+            for (var x = -1; x < 2; x++) {
+                for (var z = -1; z < 2; z++) {
                     if (layer.clone().add(x, 0, z).getBlock().getType() != Material.AIR) {
                         return false;
                     }
@@ -91,7 +92,8 @@ public class BlinkPerk extends Perk {
             return true;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             return ListenerBlink.teleport(perk.owner());
         }
 

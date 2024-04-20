@@ -11,7 +11,6 @@ import eu.darkcube.system.pserver.plugin.permission.UserPermissions;
 
 public class UserProperties {
 
-	public static final UserProperty<UserPermissions> PERMISSIONS = new UserProperty<>(
-					"permissions", UserPermissions.class);
+    public static final UserProperty<UserPermissions> PERMISSIONS = new UserProperty<>("permissions", UserPermissions.class);
 
 }

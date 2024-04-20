@@ -4,14 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.team;
+
+import java.util.Objects;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
-
-import java.util.Objects;
 
 public class TeamType implements Comparable<TeamType> {
 
@@ -36,9 +37,7 @@ public class TeamType implements Comparable<TeamType> {
         this.namecolor = namecolor;
         this.uniqueId = uniqueId;
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < this.uniqueId; i++) {
-            builder.append(ChatColor.DARK_BLUE);
-        }
+        builder.append(String.valueOf(ChatColor.DARK_BLUE).repeat(Math.max(0, this.uniqueId)));
         builder.append(ChatColor.DARK_RED);
         this.scoreboardTag = this.weight + "I" + this.uniqueId;
         this.invisibleTag = builder.toString();

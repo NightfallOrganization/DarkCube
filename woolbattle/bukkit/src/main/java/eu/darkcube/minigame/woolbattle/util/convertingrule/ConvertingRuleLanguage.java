@@ -12,14 +12,14 @@ import eu.darkcube.system.util.Language;
 
 public class ConvertingRuleLanguage extends ConvertingRule<Language> {
 
-	@Override
-	public Class<Language> getConvertingClass() {
-		return Language.class;
-	}
+    @Override
+    public Class<Language> getConvertingClass() {
+        return Language.class;
+    }
 
-	@Override
-	public String convert(Language object) {
-		return object.getLocale().getDisplayName(object.getLocale()).toLowerCase();
-	}
+    @Override
+    public String convert(Language object) {
+        return object.getLocale().getDisplayName(object.getLocale()).toLowerCase();
+    }
 
 }

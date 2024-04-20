@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -32,7 +33,8 @@ public class RopePerk extends Perk {
             super(perk, woolbattle);
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             Player p = perk.owner().getBukkitEntity();
             Vector vec = p.getLocation().getDirection().setY(0).normalize();
             double ax = Math.abs(vec.getX());

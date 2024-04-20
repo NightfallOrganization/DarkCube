@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.user;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -23,7 +24,8 @@ public class CooldownUserPerk extends DefaultUserPerk {
         return this.cooldown() > 0;
     }
 
-    @Override protected Item currentItem() {
+    @Override
+    protected Item currentItem() {
         return useCooldownItem() ? cooldownItem : super.currentItem();
     }
 }

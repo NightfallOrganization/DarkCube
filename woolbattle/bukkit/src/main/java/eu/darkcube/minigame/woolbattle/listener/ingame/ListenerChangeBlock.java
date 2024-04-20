@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -20,7 +21,9 @@ public class ListenerChangeBlock extends Listener<EntityChangeBlockEvent> {
         this.woolbattle = woolbattle;
     }
 
-    @Override @EventHandler public void handle(EntityChangeBlockEvent e) {
+    @Override
+    @EventHandler
+    public void handle(EntityChangeBlockEvent e) {
         if (e.getEntityType() == EntityType.FALLING_BLOCK) {
             if (e.getTo() == Material.WOOL) {
                 woolbattle.ingame().placedBlocks.add(e.getBlock());

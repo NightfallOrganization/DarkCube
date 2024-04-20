@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -67,18 +68,20 @@ public class LineBuilderPerk extends Perk {
             return y;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             WBUser user = perk.owner();
-            if (!user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
-                user.user().getMetaDataStorage().set(DATA_SCHEDULER, new TheScheduler(perk));
+            if (!user.user().metadata().has(DATA_SCHEDULER)) {
+                user.user().metadata().set(DATA_SCHEDULER, new TheScheduler(perk));
             }
-            TheScheduler s = user.user().getMetaDataStorage().get(DATA_SCHEDULER);
+            TheScheduler s = user.user().metadata().get(DATA_SCHEDULER);
             s.lastLine = s.tick;
             return false;
         }
 
-        @Override protected boolean activateLeft(UserPerk perk) {
-            perk.owner().user().getMetaDataStorage().remove(DATA_SCHEDULER);
+        @Override
+        protected boolean activateLeft(UserPerk perk) {
+            perk.owner().user().metadata().remove(DATA_SCHEDULER);
             return false;
         }
 
@@ -97,13 +100,14 @@ public class LineBuilderPerk extends Perk {
                 runTaskTimer(1);
             }
 
-            @Override public void run() {
+            @Override
+            public void run() {
                 tick++;
                 if (cooldownTicks > 1) {
                     cooldownTicks--;
                 } else {
                     if (tick - lastLine > 5) {
-                        user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
+                        user.user().metadata().remove(DATA_SCHEDULER);
                         cancel();
                         return;
                     }
@@ -114,7 +118,7 @@ public class LineBuilderPerk extends Perk {
                 }
                 if (cooldownTicks > perk.perk().cooldown().cooldown()) {
                     perk.cooldown(perk.perk().cooldown().cooldown());
-                    user.user().getMetaDataStorage().remove(DATA_SCHEDULER);
+                    user.user().metadata().remove(DATA_SCHEDULER);
                     cancel();
                     return;
                 }
@@ -141,11 +145,13 @@ public class LineBuilderPerk extends Perk {
             super(owner, id, perkSlot, perk, Item.PERK_LINE_BUILDER_COOLDOWN, woolbattle);
         }
 
-        @Override public boolean useCooldownItem() {
+        @Override
+        public boolean useCooldownItem() {
             return useCooldownItem;
         }
 
-        @Override public void cooldown(int cooldown) {
+        @Override
+        public void cooldown(int cooldown) {
             super.cooldown(cooldown);
             if (cooldown() >= perk().cooldown().cooldown()) {
                 useCooldownItem = true;
