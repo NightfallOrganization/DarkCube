@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
 
+import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -16,8 +18,6 @@ import eu.darkcube.minigame.woolbattle.util.ObjectiveTeam;
 import eu.darkcube.minigame.woolbattle.util.ScoreboardObjective;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
-
-import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 
 public class ScoreboardHelper {
 

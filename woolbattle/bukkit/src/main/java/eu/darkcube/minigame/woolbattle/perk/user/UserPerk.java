@@ -15,8 +15,8 @@ public interface UserPerk {
 
     /**
      * @return a {@code unique id} for each user for each perk. This {@link UserPerk perk} is
-     * identifiable by the {@code id} and no other {@link UserPerk perk} is. A user even might have
-     * the same {@link Perk} twice, and they will have different {@code id}s.
+     *         identifiable by the {@code id} and no other {@link UserPerk perk} is. A user even might have
+     *         the same {@link Perk} twice, and they will have different {@code id}s.
      * @see UserPerks#perk(int)
      */
     int id();

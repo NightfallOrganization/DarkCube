@@ -12,14 +12,14 @@ import org.bukkit.ChatColor;
 
 public class ConvertingRuleChatColor extends ConvertingRule<ChatColor> {
 
-	@Override
-	public Class<ChatColor> getConvertingClass() {
-		return ChatColor.class;
-	}
+    @Override
+    public Class<ChatColor> getConvertingClass() {
+        return ChatColor.class;
+    }
 
-	@Override
-	public String convert(ChatColor object) {
-		return object.name().toLowerCase();
-	}
+    @Override
+    public String convert(ChatColor object) {
+        return object.name().toLowerCase();
+    }
 
 }

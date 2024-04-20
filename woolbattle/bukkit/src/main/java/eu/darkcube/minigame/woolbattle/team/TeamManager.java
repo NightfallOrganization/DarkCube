@@ -7,13 +7,13 @@
 
 package eu.darkcube.minigame.woolbattle.team;
 
+import java.util.Collection;
+import java.util.UUID;
+
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
-
-import java.util.Collection;
-import java.util.UUID;
 
 public interface TeamManager {
 

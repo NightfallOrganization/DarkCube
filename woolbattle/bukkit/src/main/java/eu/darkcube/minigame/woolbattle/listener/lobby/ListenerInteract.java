@@ -13,8 +13,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class ListenerInteract implements Listener {
 
-	@EventHandler
-	public void handle(InventoryClickEvent e) {
-		e.setCancelled(true);
-	}
+    @EventHandler
+    public void handle(InventoryClickEvent e) {
+        e.setCancelled(true);
+    }
 }

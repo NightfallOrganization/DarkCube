@@ -7,14 +7,20 @@
 
 package eu.darkcube.minigame.woolbattle;
 
-import eu.darkcube.minigame.woolbattle.listener.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.darkcube.minigame.woolbattle.listener.ListenerAntiMonster;
+import eu.darkcube.minigame.woolbattle.listener.ListenerChat;
+import eu.darkcube.minigame.woolbattle.listener.ListenerFoodLevelChange;
+import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClick;
+import eu.darkcube.minigame.woolbattle.listener.ListenerInventoryClose;
+import eu.darkcube.minigame.woolbattle.listener.ListenerLaunchable;
+import eu.darkcube.minigame.woolbattle.listener.ListenerPlayerInteract;
 import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerWeatherChange;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WoolBattleListeners {
     private final List<Listener> listeners = new ArrayList<>();

@@ -4,7 +4,14 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener.ingame;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerHeightDisplay;
@@ -19,8 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.util.*;
-
 public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
 
     private final WoolBattleBukkit woolbattle;
@@ -30,7 +35,10 @@ public class ListenerPlayerMove extends Listener<PlayerMoveEvent> {
         this.woolbattle = woolbattle;
     }
 
-    @SuppressWarnings("deprecation") @Override @EventHandler public void handle(PlayerMoveEvent e) {
+    @SuppressWarnings("deprecation")
+    @Override
+    @EventHandler
+    public void handle(PlayerMoveEvent e) {
         SchedulerHeightDisplay.display(woolbattle, WBUser.getUser(e.getPlayer()));
 
         if (e.getPlayer().getGameMode() != GameMode.SURVIVAL) {

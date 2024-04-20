@@ -17,127 +17,119 @@ import java.util.Set;
 
 public class Arrays {
 
-	private static final Collection<ConvertingRule<?>> CONVERTING_RULES = new HashSet<>();
+    private static final Collection<ConvertingRule<?>> CONVERTING_RULES = new HashSet<>();
 
-	public static <T> T[] addBefore(T[] array, T t) {
-		List<T> list = new ArrayList<>();
-		list.add(t);
-		list.addAll(Arrays.asList(array));
-		return list.toArray(array);
-	}
+    public static <T> T[] addBefore(T[] array, T t) {
+        List<T> list = new ArrayList<>();
+        list.add(t);
+        list.addAll(Arrays.asList(array));
+        return list.toArray(array);
+    }
 
-	@SafeVarargs
-	public static <T> T[] addAfter(T[] array, T... t) {
-		List<T> list = new ArrayList<>(array.length + 1);
-		list.addAll(Arrays.asList(array));
-		list.addAll(Arrays.asList(t));
-		return list.toArray(array);
-	}
+    @SafeVarargs
+    public static <T> T[] addAfter(T[] array, T... t) {
+        List<T> list = new ArrayList<>(array.length + 1);
+        list.addAll(Arrays.asList(array));
+        list.addAll(Arrays.asList(t));
+        return list.toArray(array);
+    }
 
-	public static <T> T[] addAfter(T[] array, T t) {
-		List<T> list = new ArrayList<>(array.length + 1);
-		list.addAll(Arrays.asList(array));
-		list.add(t);
-		return list.toArray(array);
-	}
+    public static <T> T[] addAfter(T[] array, T t) {
+        List<T> list = new ArrayList<>(array.length + 1);
+        list.addAll(Arrays.asList(array));
+        list.add(t);
+        return list.toArray(array);
+    }
 
-	@SafeVarargs
-	public static <T> List<T> asList(T... array) {
-		return new ArrayList<>(java.util.Arrays.asList(array));
-	}
+    @SafeVarargs
+    public static <T> List<T> asList(T... array) {
+        return new ArrayList<>(java.util.Arrays.asList(array));
+    }
 
-	public static <T> List<T> asList(Collection<? extends T> collection) {
-		return new ArrayList<>(collection);
-	}
+    public static <T> List<T> asList(Collection<? extends T> collection) {
+        return new ArrayList<>(collection);
+    }
 
-	@SafeVarargs
-	public static <T> Set<T> asSet(T... array) {
-		return new HashSet<>(Arrays.asList(array));
-	}
+    @SafeVarargs
+    public static <T> Set<T> asSet(T... array) {
+        return new HashSet<>(Arrays.asList(array));
+    }
 
-	public static <T> Set<T> asSet(Collection<? extends T> collection) {
-		return new HashSet<>(collection);
-	}
+    public static <T> Set<T> asSet(Collection<? extends T> collection) {
+        return new HashSet<>(collection);
+    }
 
-	public static <T> List<String> toSortedStringList(T[] array, T[] exclusion, String start) {
-		return Arrays.toSortedStringList(Arrays.asList(array), Arrays.asList(exclusion), start);
-	}
+    public static <T> List<String> toSortedStringList(T[] array, T[] exclusion, String start) {
+        return Arrays.toSortedStringList(Arrays.asList(array), Arrays.asList(exclusion), start);
+    }
 
-	public static <T> List<String> toSortedStringList(T[] array, String start) {
-		return Arrays.toSortedStringList(Arrays.asList(array), start);
-	}
+    public static <T> List<String> toSortedStringList(T[] array, String start) {
+        return Arrays.toSortedStringList(Arrays.asList(array), start);
+    }
 
-	public static <T> List<String> toSortedStringList(Collection<? extends T> collection,
-			Collection<? extends T> exclusion, String start) {
-		collection = new ArrayList<>(collection);
-		collection.removeAll(exclusion);
-		return Arrays.toSortedStringList(collection, start);
-	}
+    public static <T> List<String> toSortedStringList(Collection<? extends T> collection, Collection<? extends T> exclusion, String start) {
+        collection = new ArrayList<>(collection);
+        collection.removeAll(exclusion);
+        return Arrays.toSortedStringList(collection, start);
+    }
 
-	public static <T> List<String> toSortedStringList(Collection<? extends T> collection, String start) {
-		if (collection.size() == 0)
-			return new ArrayList<>();
-		if (start == null)
-			start = "";
-		List<String> list = new ArrayList<>();
-		Class<?> clazz = new ArrayList<>(collection).get(0).getClass();
-		Method method = null;
-		for (Method mt : ConvertingRule.class.getDeclaredMethods()) {
-			if (mt.getReturnType().equals(String.class)) {
-				method = mt;
-				break;
-			}
-		}
-		if (method == null)
-			throw new IllegalStateException();
-		ConvertingRule<?> theRule = null;
-		for (ConvertingRule<?> rule : Arrays.CONVERTING_RULES) {
-			if (rule.getConvertingClass().isAssignableFrom(clazz)) {
-				if (theRule == null) {
-					theRule = rule;
-					continue;
-				}
-				if (theRule.getConvertingClass().isAssignableFrom(rule.getConvertingClass())) {
-					theRule = rule;
-				}
-			}
-		}
-		if (theRule != null) {
-			for (T t : collection) {
-				try {
-					String converted = (String) method.invoke(theRule, t);
-					if (converted.startsWith(start)) {
-						list.add(converted);
-					}
-				} catch (IllegalAccessException ex) {
-					ex.printStackTrace();
-				} catch (IllegalArgumentException ex) {
-					ex.printStackTrace();
-				} catch (InvocationTargetException ex) {
-					ex.printStackTrace();
-				}
-			}
-		} else {
-			for (T t : collection) {
-				String converted = t.toString();
-				if (converted.startsWith(start)) {
-					list.add(converted);
-				}
-			}
-		}
-		return list;
-	}
+    public static <T> List<String> toSortedStringList(Collection<? extends T> collection, String start) {
+        if (collection.isEmpty()) return new ArrayList<>();
+        if (start == null) start = "";
+        List<String> list = new ArrayList<>();
+        var clazz = new ArrayList<>(collection).getFirst().getClass();
+        Method method = null;
+        for (var mt : ConvertingRule.class.getDeclaredMethods()) {
+            if (mt.getReturnType().equals(String.class)) {
+                method = mt;
+                break;
+            }
+        }
+        if (method == null) throw new IllegalStateException();
+        ConvertingRule<?> theRule = null;
+        for (var rule : Arrays.CONVERTING_RULES) {
+            if (rule.getConvertingClass().isAssignableFrom(clazz)) {
+                if (theRule == null) {
+                    theRule = rule;
+                    continue;
+                }
+                if (theRule.getConvertingClass().isAssignableFrom(rule.getConvertingClass())) {
+                    theRule = rule;
+                }
+            }
+        }
+        if (theRule != null) {
+            for (var t : collection) {
+                try {
+                    var converted = (String) method.invoke(theRule, t);
+                    if (converted.startsWith(start)) {
+                        list.add(converted);
+                    }
+                } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } else {
+            for (var t : collection) {
+                var converted = t.toString();
+                if (converted.startsWith(start)) {
+                    list.add(converted);
+                }
+            }
+        }
+        return list;
+    }
 
-	public static boolean addConvertingRule(ConvertingRule<?> rule) {
-		return Arrays.CONVERTING_RULES.add(rule);
-	}
+    public static boolean addConvertingRule(ConvertingRule<?> rule) {
+        return Arrays.CONVERTING_RULES.add(rule);
+    }
 
-	public static abstract class ConvertingRule<T> {
+    public abstract static class ConvertingRule<T> {
 
-		public abstract Class<T> getConvertingClass();
+        public abstract Class<T> getConvertingClass();
 
-		public abstract String convert(T object);
+        public abstract String convert(T object);
 
-	}
+    }
 
 }

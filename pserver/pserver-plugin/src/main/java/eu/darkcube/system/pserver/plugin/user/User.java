@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
+import java.util.UUID;
+
 import com.google.gson.JsonObject;
 import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.Language;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public interface User {
 
@@ -23,7 +23,8 @@ public interface User {
 
     UUID getUUID();
 
-    @Nullable Player getOnlinePlayer();
+    @Nullable
+    Player getOnlinePlayer();
 
     JsonObject getExtra();
 

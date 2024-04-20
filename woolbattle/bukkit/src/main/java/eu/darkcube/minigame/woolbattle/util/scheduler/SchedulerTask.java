@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.util.scheduler;
 
 import eu.darkcube.system.annotations.Api;
@@ -40,19 +41,23 @@ public final class SchedulerTask implements Comparable<SchedulerTask> {
         weight(weight);
     }
 
-    @Api public boolean repeating() {
+    @Api
+    public boolean repeating() {
         return repeat != 0;
     }
 
-    @Api public long repeat() {
+    @Api
+    public long repeat() {
         return repeat;
     }
 
-    @Api public long delay() {
+    @Api
+    public long delay() {
         return delay;
     }
 
-    @Api public int weight() {
+    @Api
+    public int weight() {
         return weight;
     }
 
@@ -89,7 +94,8 @@ public final class SchedulerTask implements Comparable<SchedulerTask> {
         return lastExecution();
     }
 
-    @Override public int compareTo(SchedulerTask o) {
+    @Override
+    public int compareTo(SchedulerTask o) {
         return weight.compareTo(o.weight);
     }
 }

@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.game.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -17,7 +18,8 @@ public class SchedulerPerkCooldown extends Scheduler implements ConfiguredSchedu
         super(woolbattle);
     }
 
-    @Override public void run() {
+    @Override
+    public void run() {
         for (WBUser user : WBUser.onlineUsers()) {
             for (UserPerk perk : user.perks().perks()) {
                 if (perk.perk().autoCountdownCooldown()) {
@@ -29,11 +31,13 @@ public class SchedulerPerkCooldown extends Scheduler implements ConfiguredSchedu
         }
     }
 
-    @Override public void start() {
+    @Override
+    public void start() {
         runTaskTimer(1);
     }
 
-    @Override public void stop() {
+    @Override
+    public void stop() {
         cancel();
     }
 }

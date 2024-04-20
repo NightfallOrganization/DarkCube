@@ -56,12 +56,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
         var replaceAtAll = woolbattle.ingame().enabled() && atall;
 
         if (ingame && user.getTeam().isSpectator()) {
-            woolbattle.sendMessageWithoutPrefix(msg, user
-                    .getTeam()
-                    .getUsers()
-                    .stream()
-                    .map(WBUser::getBukkitEntity)
-                    .collect(Collectors.toSet()));
+            woolbattle.sendMessageWithoutPrefix(msg, user.getTeam().getUsers().stream().map(WBUser::getBukkitEntity).collect(Collectors.toSet()));
             woolbattle.sendConsoleWithoutPrefix(msg);
         } else {
             for (var t : WBUser.onlineUsers()) {
@@ -70,9 +65,7 @@ public class ListenerChat extends Listener<AsyncPlayerChatEvent> {
                 if (be == null) continue;
                 if (atall || t.getTeam().getType().equals(user.getTeam().getType())) {
                     if (replaceAtAll) {
-                        pmsg = pmsg.replaceFirst(woolbattle.atall, LegacyComponentSerializer
-                                .legacySection()
-                                .serialize(Message.AT_ALL.getMessage(t)));
+                        pmsg = pmsg.replaceFirst(woolbattle.atall, LegacyComponentSerializer.legacySection().serialize(Message.AT_ALL.getMessage(t)));
                     }
                     be.sendMessage(pmsg);
                 }

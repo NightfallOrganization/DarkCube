@@ -12,13 +12,13 @@ import eu.darkcube.minigame.woolbattle.util.Arrays.ConvertingRule;
 
 public class ConvertingRuleTeam extends ConvertingRule<Team> {
 
-	@Override
-	public Class<Team> getConvertingClass() {
-		return Team.class;
-	}
+    @Override
+    public Class<Team> getConvertingClass() {
+        return Team.class;
+    }
 
-	@Override
-	public String convert(Team object) {
-		return object.getType().getDisplayNameKey();
-	}
+    @Override
+    public String convert(Team object) {
+        return object.getType().getDisplayNameKey();
+    }
 }

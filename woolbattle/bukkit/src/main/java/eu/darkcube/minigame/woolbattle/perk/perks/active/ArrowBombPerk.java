@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.Random;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -24,8 +27,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
-
 public class ArrowBombPerk extends Perk {
     public static final PerkName ARROW_BOMB = new PerkName("ARROW_BOMB");
 
@@ -43,14 +44,16 @@ public class ArrowBombPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             Snowball snowball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
             snowball.setVelocity(snowball.getVelocity()); // de-sync fix
             snowball.setMetadata("perk", new FixedMetadataValue(woolbattle, perk));
             return true;
         }
 
-        @EventHandler public void handle(ProjectileHitEvent event) {
+        @EventHandler
+        public void handle(ProjectileHitEvent event) {
             if (!(event.getEntity() instanceof Snowball)) return;
             Snowball snowball = (Snowball) event.getEntity();
             if (!snowball.hasMetadata("perk")) return;
@@ -79,7 +82,8 @@ public class ArrowBombPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent event) {
             if (event.getDamager() instanceof Snowball) {
                 Snowball snowball = (Snowball) event.getDamager();
                 if (!snowball.hasMetadata("perk")) return;

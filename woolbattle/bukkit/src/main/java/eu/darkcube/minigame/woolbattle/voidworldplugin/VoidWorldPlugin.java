@@ -4,7 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.voidworldplugin;
+
+import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Logger;
 
 import com.avaje.ebean.EbeanServer;
 import eu.darkcube.minigame.woolbattle.listener.ListenerVoidWorld;
@@ -12,7 +20,11 @@ import net.minecraft.server.v1_8_R3.ChunkProviderServer;
 import net.minecraft.server.v1_8_R3.EntityTracker;
 import net.minecraft.server.v1_8_R3.IChunkProvider;
 import net.minecraft.server.v1_8_R3.IDataManager;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,13 +35,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
-
-import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Logger;
 
 public class VoidWorldPlugin implements Plugin {
     private static VoidWorldPlugin instance;
@@ -52,10 +57,7 @@ public class VoidWorldPlugin implements Plugin {
     }
 
     public final World loadWorld(String world) {
-        if (!new File(this.getServer().getWorldContainer(), world).exists() && !new File(this
-                .getServer()
-                .getWorldContainer()
-                .getParent(), world).exists()) {
+        if (!new File(this.getServer().getWorldContainer(), world).exists() && !new File(this.getServer().getWorldContainer().getParent(), world).exists()) {
             System.out.println("World " + world + " not found");
             return null;
         }
@@ -119,52 +121,65 @@ public class VoidWorldPlugin implements Plugin {
         return world;
     }
 
-    @Override public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         return null;
     }
 
-    @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         return false;
     }
 
-    @Override public File getDataFolder() {
+    @Override
+    public File getDataFolder() {
         return null;
     }
 
-    @Override public PluginDescriptionFile getDescription() {
+    @Override
+    public PluginDescriptionFile getDescription() {
         return description;
     }
 
-    @Override public FileConfiguration getConfig() {
+    @Override
+    public FileConfiguration getConfig() {
         return null;
     }
 
-    @Override public InputStream getResource(String var1) {
+    @Override
+    public InputStream getResource(String var1) {
         return null;
     }
 
-    @Override public void saveConfig() {
+    @Override
+    public void saveConfig() {
     }
 
-    @Override public void saveDefaultConfig() {
+    @Override
+    public void saveDefaultConfig() {
     }
 
-    @Override public void saveResource(String string, boolean bool) {
+    @Override
+    public void saveResource(String string, boolean bool) {
 
     }
 
-    @Override public void reloadConfig() {
+    @Override
+    public void reloadConfig() {
     }
 
-    @Override public PluginLoader getPluginLoader() {
+    @Override
+    public PluginLoader getPluginLoader() {
         return loader;
     }
 
-    @Override public Server getServer() {
+    @Override
+    public Server getServer() {
         return server;
     }
 
-    @Override public boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return enabled;
     }
 
@@ -180,45 +195,55 @@ public class VoidWorldPlugin implements Plugin {
         }
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         HandlerList.unregisterAll(listenerVoidWorld);
     }
 
-    @Override public void onLoad() {
+    @Override
+    public void onLoad() {
 
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         Bukkit.getPluginManager().registerEvents(listenerVoidWorld = new ListenerVoidWorld(), this);
     }
 
-    @Override public boolean isNaggable() {
+    @Override
+    public boolean isNaggable() {
         return naggable;
     }
 
-    @Override public void setNaggable(boolean naggable) {
+    @Override
+    public void setNaggable(boolean naggable) {
         this.naggable = naggable;
     }
 
-    @Override public EbeanServer getDatabase() {
+    @Override
+    public EbeanServer getDatabase() {
         return null;
     }
 
-    @Override public ChunkGenerator getDefaultWorldGenerator(String var1, String var2) {
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String var1, String var2) {
         return new ChunkGenerator() {
 
-            @Override public ChunkData generateChunkData(World world, Random random, int x, int z, BiomeGrid biome) {
+            @Override
+            public ChunkData generateChunkData(World world, Random random, int x, int z, BiomeGrid biome) {
                 return this.createChunkData(world);
             }
 
         };
     }
 
-    @Override public Logger getLogger() {
+    @Override
+    public Logger getLogger() {
         return logger;
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "WoolBattleVoidWorld";
     }
 

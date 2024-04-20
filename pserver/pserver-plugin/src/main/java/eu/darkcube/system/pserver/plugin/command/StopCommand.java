@@ -13,11 +13,11 @@ import org.bukkit.Bukkit;
 
 public class StopCommand extends PServer {
 
-	public StopCommand() {
-		super("stop", new String[] {"shutdown"}, b -> b.executes(source -> {
-			source.getSource().sendMessage(Message.SHUTTING_DOWN_SERVER);
-			Bukkit.shutdown();
-			return 0;
-		}));
-	}
+    public StopCommand() {
+        super("stop", new String[]{"shutdown"}, b -> b.executes(source -> {
+            source.getSource().sendMessage(Message.SHUTTING_DOWN_SERVER);
+            Bukkit.shutdown();
+            return 0;
+        }));
+    }
 }

@@ -192,7 +192,8 @@ public class Perk {
             return maxCount;
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return type;
         }
 
@@ -224,14 +225,16 @@ public class Perk {
             return cooldown;
         }
 
-        public static abstract class Unit {
+        public abstract static class Unit {
             public static final Unit TICKS = new Unit() {
-                @Override public int itemCount(int cooldown) {
+                @Override
+                public int itemCount(int cooldown) {
                     return cooldown / 20 + 1;
                 }
             };
             public static final Unit ACTIVATIONS = new Unit() {
-                @Override public int itemCount(int cooldown) {
+                @Override
+                public int itemCount(int cooldown) {
                     return cooldown;
                 }
             };

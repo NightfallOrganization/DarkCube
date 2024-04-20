@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -32,7 +33,8 @@ public class SafetyPlatformPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             boolean suc = setBlocks(perk.owner());
             if (!suc) woolbattle.ingame().playSoundNotEnoughWool(perk.owner());
             return suc;
