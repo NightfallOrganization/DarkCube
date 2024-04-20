@@ -5,10 +5,13 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.api.event.world;
+package eu.darkcube.minigame.woolbattle.api.event.world.block;
 
 import eu.darkcube.minigame.woolbattle.api.world.Block;
 
+/**
+ * A block is destroyed as a result of damage actions. No clear origin.
+ */
 public class DestroyBlockEvent extends BlockEvent.Cancellable {
     public DestroyBlockEvent(Block block) {
         super(block);

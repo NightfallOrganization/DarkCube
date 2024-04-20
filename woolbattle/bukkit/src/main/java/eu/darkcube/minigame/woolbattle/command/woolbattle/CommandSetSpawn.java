@@ -12,15 +12,13 @@ import eu.darkcube.minigame.woolbattle.command.WBCommand;
 import eu.darkcube.minigame.woolbattle.util.Locations;
 import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.commandapi.argument.BooleanArgument;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 public class CommandSetSpawn extends WBCommand {
     public CommandSetSpawn(WoolBattleBukkit woolbattle) {
         super("setSpawn", b -> b.then(Commands.argument("makeNice", BooleanArgument.booleanArgument()).executes(ctx -> {
-            Player p = ctx.getSource().asPlayer();
-            Location loc = p.getLocation();
-            boolean makeNice = BooleanArgument.getBoolean(ctx, "makeNice");
+            var p = ctx.getSource().asPlayer();
+            var loc = p.getLocation();
+            var makeNice = BooleanArgument.getBoolean(ctx, "makeNice");
             if (makeNice) {
                 loc = Locations.getNiceLocation(loc);
                 p.teleport(loc);

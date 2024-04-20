@@ -32,7 +32,8 @@ public class EnchantmentStorageBuilderMeta implements BuilderMeta {
         return enchantments;
     }
 
-    @Override public BuilderMeta clone() {
+    @Override
+    public BuilderMeta clone() {
         return new EnchantmentStorageBuilderMeta(enchantments);
     }
 }

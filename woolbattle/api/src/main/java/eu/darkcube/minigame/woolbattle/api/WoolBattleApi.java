@@ -10,6 +10,7 @@ package eu.darkcube.minigame.woolbattle.api;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
+import eu.darkcube.minigame.woolbattle.api.game.lobby.LobbyData;
 import eu.darkcube.minigame.woolbattle.api.map.MapManager;
 import eu.darkcube.minigame.woolbattle.api.team.TeamRegistry;
 import eu.darkcube.minigame.woolbattle.api.util.MaterialProvider;
@@ -60,4 +61,7 @@ public interface WoolBattleApi extends Key.Named {
 
     @Api
     @NotNull EventNode<Object> eventManager();
+
+    @Api
+    @NotNull LobbyData lobbyData();
 }

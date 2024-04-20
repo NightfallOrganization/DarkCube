@@ -9,21 +9,25 @@ package eu.darkcube.system.util.data;
 
 import java.util.Objects;
 
+import eu.darkcube.system.libs.net.kyori.adventure.key.Namespaced;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public class Key {
+public final class Key implements eu.darkcube.system.libs.net.kyori.adventure.key.Key {
 
-    private final @NotNull String plugin;
-    private final @NotNull String key;
+    private final @NotNull String namespace;
+    private final @NotNull String value;
 
-    public Key(@NotNull Named named, @NotNull String key) {
-        this.plugin = named.getName();
-        this.key = key;
+    public Key(@NotNull Namespaced namespaced, @NotNull String value) {
+        this(namespaced.namespace(), value);
     }
 
-    public Key(@NotNull String plugin, @NotNull String key) {
-        this.plugin = plugin;
-        this.key = key;
+    public Key(@NotNull Named named, @NotNull String value) {
+        this(named.getName(), value);
+    }
+
+    public Key(@NotNull String namespace, @NotNull String value) {
+        this.namespace = namespace;
+        this.value = value;
     }
 
     public static Key fromString(@NotNull String string) {
@@ -31,17 +35,24 @@ public class Key {
         return new Key(a[0], a[1]);
     }
 
-    public @NotNull String key() {
-        return this.key;
+    @Override
+    public @NotNull String namespace() {
+        return namespace;
     }
 
-    public @NotNull String plugin() {
-        return this.plugin;
+    @Override
+    public @NotNull String value() {
+        return value;
+    }
+
+    @Override
+    public @NotNull String asString() {
+        return toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, plugin);
+        return Objects.hash(value, namespace);
     }
 
     @Override
@@ -50,12 +61,12 @@ public class Key {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         var other = (Key) obj;
-        return Objects.equals(this.key, other.key) && Objects.equals(this.plugin, other.plugin);
+        return Objects.equals(this.value, other.value) && Objects.equals(this.namespace, other.namespace);
     }
 
     @Override
     public String toString() {
-        return plugin + ":" + key;
+        return namespace + ":" + value;
     }
 
     public interface Named {

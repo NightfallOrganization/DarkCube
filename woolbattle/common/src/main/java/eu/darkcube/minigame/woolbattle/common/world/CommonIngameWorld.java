@@ -16,7 +16,7 @@ public class CommonIngameWorld extends CommonGameWorld {
     private final Map<CommonBlock, ColoredWool> brokenWool = new ConcurrentHashMap<>();
     private final Key blockDamageKey;
 
-    public CommonIngameWorld(CommonGame game) {
+    public CommonIngameWorld(@NotNull CommonGame game) {
         super(game);
         this.blockDamageKey = new Key(game.woolbattle(), "blockDamage");
     }

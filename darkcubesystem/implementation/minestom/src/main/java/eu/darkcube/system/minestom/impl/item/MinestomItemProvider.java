@@ -16,15 +16,18 @@ import eu.darkcube.system.server.item.material.Material;
 import net.minestom.server.item.ItemStack;
 
 public class MinestomItemProvider implements ItemProvider {
-    @Override public @NotNull ItemBuilder item(@Nullable Material material) {
+    @Override
+    public @NotNull ItemBuilder item(@Nullable Material material) {
         return new MinestomItemBuilderImpl().material(material == null ? Material.air() : material);
     }
 
-    @Override public @NotNull ItemBuilder item(@NotNull JsonElement json) {
+    @Override
+    public @NotNull ItemBuilder item(@NotNull JsonElement json) {
         return MinestomItemBuilderImpl.deserialize(json);
     }
 
-    @Override public @NotNull ItemBuilder item(@NotNull Object object) {
+    @Override
+    public @NotNull ItemBuilder item(@NotNull Object object) {
         return switch (object) {
             case Material material -> item(material);
             case net.minestom.server.item.Material material -> item(Material.of(material));
@@ -32,5 +35,9 @@ public class MinestomItemProvider implements ItemProvider {
             case ItemBuilder builder -> builder.clone();
             default -> throw new IllegalArgumentException("Invalid item input: " + object);
         };
+    }
+
+    public @NotNull ItemBuilder item(@NotNull ItemStack item) {
+        return new MinestomItemBuilderImpl(item);
     }
 }

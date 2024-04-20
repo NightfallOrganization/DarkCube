@@ -25,13 +25,14 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
     private final MinestomMaterialProvider materialProvider = new MinestomMaterialProvider(woolProvider);
     private final MinestomEntityImplementations entityImplementations = new MinestomEntityImplementations();
     private final MinestomWorldHandler worldHandler = new MinestomWorldHandler(this, MinecraftServer.getInstanceManager(), MinecraftServer.getBiomeManager());
-    private final MinestomGamePhaseCreator gamePhaseCreator = new MinestomGamePhaseCreator();
+    private final MinestomGamePhaseCreator gamePhaseCreator;
     private final MinestomWoolBattleCommands commands = new MinestomWoolBattleCommands(this, MinecraftServer.getCommandManager());
     private final CompletableFuture<Void> fullyLoadedFuture = new CompletableFuture<>(); // TODO complete this
 
     public MinestomWoolBattleApi(MinestomWoolBattle woolbattle) {
         super("minestom");
         this.woolbattle = woolbattle;
+        this.gamePhaseCreator = new MinestomGamePhaseCreator(woolbattle);
     }
 
     @Override

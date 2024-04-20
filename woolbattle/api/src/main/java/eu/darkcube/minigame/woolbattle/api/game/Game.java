@@ -25,6 +25,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 import eu.darkcube.system.util.GameState;
 
+@Api
 public interface Game {
     @Api
     @NotNull WoolBattleApi woolbattle();
@@ -34,6 +35,9 @@ public interface Game {
 
     @Api
     @NotNull Map map();
+
+    @Api
+    void map(@NotNull Map map);
 
     @Api
     @NotNull UUID id();

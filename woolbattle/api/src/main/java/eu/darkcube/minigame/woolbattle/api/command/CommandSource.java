@@ -13,7 +13,6 @@ import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.commandapi.util.Vector2f;
 import eu.darkcube.system.commandapi.util.Vector3d;
-import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -121,7 +120,7 @@ public class CommandSource implements ISuggestionProvider, ForwardingAudience.Si
     }
 
     @Override
-    public @NotNull Audience audience() {
+    public @NotNull CommandSender audience() {
         return sender;
     }
 }

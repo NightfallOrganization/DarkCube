@@ -4,9 +4,11 @@ import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
 
 public class MinestomJoinListener {
     public static void register(MinestomWoolBattle woolbattle, EventNode<Event> node) {
@@ -31,7 +33,7 @@ public class MinestomJoinListener {
             } else {
                 woolbattle.logger().info("Player " + user.playerName() + " connecting to game " + game.id());
                 var result = game.playerJoined(user);
-                if (result.location() == null) {
+                if (result.location() == null) { // no spawn location found, enter setup mode
                     game.playerQuit(user);
                     woolbattle.setupModeImplementation().enterSetupMode(user, (instance, point) -> {
                         event.setSpawningInstance(instance);
@@ -40,8 +42,25 @@ public class MinestomJoinListener {
                     return;
                 }
                 var loc = result.location();
-                event.getPlayer().setRespawnPoint(new Pos(loc.x(), loc.y(), loc.z(), loc.yaw(), loc.pitch()));
+                user.location(loc);
+                player.setRespawnPoint(new Pos(loc.x(), loc.y(), loc.z(), loc.yaw(), loc.pitch()));
                 event.setSpawningInstance(((MinestomWorld) loc.world()).instance());
+            }
+        });
+        node.addListener(PlayerSpawnEvent.class, event -> {
+            var player = (MinestomPlayer) event.getPlayer();
+            var user = player.user();
+            if (user == null) return;
+            if (event.isFirstSpawn()) {
+                player.setGameMode(GameMode.SURVIVAL);
+                // now it is safe to interact with the player. In AsyncPlayerConfigurationEvent only setRespawnPoint and setSpawningInstance can be done.
+                // gotta do things like set the inventory
+                var game = user.game();
+                if (game == null) {
+                    // user is in setup mode. We do not do anything here at this time
+                    return;
+                }
+                game.playerSetup(user);
             }
         });
     }

@@ -19,7 +19,12 @@ public record Location(@NotNull World world, double x, double y, double z, float
     }
 
     @Override
-    public Location clone() {
+    public @NotNull Location clone() {
         return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    @Override
+    public @NotNull Location aligned() {
+        return new Location(world, simple().aligned());
     }
 }

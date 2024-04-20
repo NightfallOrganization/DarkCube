@@ -15,6 +15,8 @@ import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import eu.darkcube.system.internal.PacketDeclareProtocolVersion;
 import eu.darkcube.system.internal.PacketRequestProtocolVersionDeclaration;
 import eu.darkcube.system.minestom.impl.adventure.MinestomAdventureSupportImpl;
+import eu.darkcube.system.minestom.impl.inventory.MinestomInventoryProvider;
+import eu.darkcube.system.minestom.impl.inventory.MinestomInventoryTypeProvider;
 import eu.darkcube.system.minestom.impl.item.MinestomEquipmentSlotProvider;
 import eu.darkcube.system.minestom.impl.item.MinestomItemProvider;
 import eu.darkcube.system.minestom.impl.item.attribute.MinestomAttributeModifierProvider;
@@ -26,6 +28,8 @@ import eu.darkcube.system.minestom.impl.item.material.MinestomMaterialProvider;
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.server.inventory.InventoryProvider;
+import eu.darkcube.system.server.inventory.InventoryTypeProvider;
 import eu.darkcube.system.server.item.EquipmentSlotProvider;
 import eu.darkcube.system.server.item.ItemProvider;
 import eu.darkcube.system.server.item.attribute.AttributeModifierProvider;
@@ -61,6 +65,8 @@ public class DarkCubeSystemMinestomExtension extends Extension {
         install(ext, EnchantmentProvider.class, new MinestomEnchantmentProvider());
         install(ext, AttributeProvider.class, new MinestomAttributeProvider());
         install(ext, AttributeModifierProvider.class, new MinestomAttributeModifierProvider());
+        install(ext, InventoryTypeProvider.class, new MinestomInventoryTypeProvider());
+        install(ext, InventoryProvider.class, new MinestomInventoryProvider());
         InjectionLayer.boot().instance(EventManager.class).registerListener(listener);
     }
 

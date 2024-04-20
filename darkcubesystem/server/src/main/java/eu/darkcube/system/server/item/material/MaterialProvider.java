@@ -10,9 +10,12 @@ package eu.darkcube.system.server.item.material;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface MaterialProvider {
-    @NotNull Material of(@NotNull Object platformMaterial) throws IllegalArgumentException;
+    @NotNull
+    Material of(@NotNull Object platformMaterial) throws IllegalArgumentException;
 
-    @NotNull Material spawner() throws UnsupportedOperationException;
+    @NotNull
+    Material spawner() throws UnsupportedOperationException;
 
-    @NotNull Material air();
+    @NotNull
+    Material air();
 }

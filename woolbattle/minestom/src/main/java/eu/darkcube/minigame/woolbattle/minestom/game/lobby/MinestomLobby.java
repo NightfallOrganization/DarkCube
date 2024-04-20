@@ -9,11 +9,16 @@ package eu.darkcube.minigame.woolbattle.minestom.game.lobby;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
+import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyInventoryClickListener;
+import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbySetupUserListener;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class MinestomLobby extends CommonLobby {
-    public MinestomLobby(@NotNull CommonGame game) {
+    public MinestomLobby(@NotNull CommonGame game, MinestomWoolBattle woolbattle) {
         super(game);
+        this.listeners.addListener(new MinestomLobbyInventoryClickListener().create());
+        this.listeners.addListener(new MinestomLobbySetupUserListener(woolbattle).create());
     }
 
     @Override

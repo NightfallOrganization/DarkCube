@@ -10,7 +10,7 @@ package eu.darkcube.minigame.woolbattle.common.map;
 import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
-import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.minigame.woolbattle.common.util.GsonUtil;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
@@ -97,7 +97,7 @@ public class CommonMap implements Map {
         var enabled = document.getBoolean("enabled");
         var deathHeight = document.getInt("deathHeight");
         var size = document.readObject("mapSize", MapSize.class);
-        var icon = ItemBuilder.item(new Gson().fromJson(document.getString("icon"), JsonElement.class));
+        var icon = ItemBuilder.item(GsonUtil.gson().fromJson(document.getString("icon"), JsonElement.class));
         return new CommonMap(mapManager, name, size, deathHeight, icon, enabled);
     }
 

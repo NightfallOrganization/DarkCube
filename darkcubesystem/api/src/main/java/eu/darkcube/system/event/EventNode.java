@@ -130,7 +130,7 @@ public sealed interface EventNode<T> permits EventNodeImpl {
      * @return A node with an event type filter as well as a condition on the event.
      */
     @Contract(value = "_, _, _ -> new", pure = true)
-    static <E, V> @NotNull EventNode<E> value(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<V> predicate) {
+    static <E, V> @NotNull EventNode<E> value(@NotNull String name, @NotNull EventFilter<E, V> filter, @NotNull Predicate<@NotNull V> predicate) {
         return create(name, filter, (e, h) -> predicate.test(h));
     }
 

@@ -9,7 +9,7 @@ package eu.darkcube.system.bukkit.inventoryapi.v1;
 
 public enum PageArrow {
 
-	PREVIOUS,
-	NEXT
+    PREVIOUS,
+    NEXT
 
 }
