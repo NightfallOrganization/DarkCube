@@ -85,7 +85,6 @@ public class CloudNetMapLoader implements MapLoader {
                     }
                 }
                 zipIn.close();
-                Thread.sleep(5000);
                 if (ingameData == null) throw new InternalError("IngameData could not be loaded! Most likely no data.json found");
                 CloudNetMapIngameData finalIngameData = ingameData;
                 new Scheduler(woolbattle, () -> {
