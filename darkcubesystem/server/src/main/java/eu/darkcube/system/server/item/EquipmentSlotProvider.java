@@ -10,5 +10,6 @@ package eu.darkcube.system.server.item;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface EquipmentSlotProvider {
-    @NotNull EquipmentSlot of(@NotNull Object platformObject);
+    @NotNull
+    EquipmentSlot of(@NotNull Object platformObject);
 }

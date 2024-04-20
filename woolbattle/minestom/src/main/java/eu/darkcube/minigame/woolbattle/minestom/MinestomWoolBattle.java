@@ -10,18 +10,26 @@ package eu.darkcube.minigame.woolbattle.minestom;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import dev.derklaro.aerogel.binding.BindingBuilder;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
-import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
-import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
+import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInventoryListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomItemListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomJoinListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomMoveListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomQuitListener;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
+import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -29,10 +37,6 @@ import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.Key;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.GameMode;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.player.PlayerSettingsChangeEvent;
-import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.thread.Acquirable;
 import net.minestom.server.timer.TaskSchedule;
@@ -53,18 +57,20 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     @Override
     public void start() {
+        var ext = InjectionLayer.ext();
+        ext.install(BindingBuilder.create().bind(Items.Provider.class).toInstance(new MinestomItemsProvider()));
+
         super.start();
+        
         var eventManager = MinecraftServer.getGlobalEventHandler();
         MinestomJoinListener.register(this, eventManager);
-        eventManager.addListener(PlayerSpawnEvent.class, event -> {
-            if (!event.isFirstSpawn()) return;
-            var vd = event.getPlayer().getSettings().getViewDistance();
-            System.out.println(vd);
-            event.getPlayer().setGameMode(GameMode.CREATIVE);
-        });
-        eventManager.addListener(PlayerSettingsChangeEvent.class, event -> {
-            System.out.println(event.getPlayer().getSettings().getViewDistance());
-        });
+        MinestomQuitListener.register(this, eventManager);
+        MinestomMoveListener.register(this, eventManager);
+        MinestomBlockListener.register(this, eventManager);
+        MinestomItemListener.register(this, eventManager);
+        MinestomInventoryListener.register(this, eventManager);
+        MinestomAnimationListener.register(this, eventManager);
+
         MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             api.scheduler().processTick();
@@ -86,7 +92,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     @Override
     public void broadcastTeamUpdate(@NotNull CommonWBUser user, @Nullable CommonTeam oldTeam, @Nullable CommonTeam newTeam) {
-
+        logger().info("User " + user.playerName() + " switched to team " + (newTeam == null ? "null" : newTeam.key()) + " from  " + (oldTeam == null ? "null" : oldTeam.key()));
     }
 
     @Override

@@ -9,12 +9,16 @@ package eu.darkcube.minigame.woolbattle.common;
 
 import java.util.concurrent.CompletableFuture;
 
+import dev.derklaro.aerogel.binding.BindingBuilder;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGameManager;
 import eu.darkcube.minigame.woolbattle.common.game.GamePhaseCreator;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobbyData;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMapManager;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeamRegistry;
+import eu.darkcube.minigame.woolbattle.common.util.item.ItemManager;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.CommonSchedulerManager;
 import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.system.event.EventNode;
@@ -31,6 +35,7 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
     private final @NotNull CommonLobbySystemLink lobbySystemLink;
     private final @NotNull CommonTeamRegistry teamRegistry;
     private final @NotNull CommonSchedulerManager scheduler;
+    private final @NotNull CommonLobbyData lobbyData;
     private final @NotNull PersistentDataStorage persistentDataStorage;
     private final @NotNull EventNode<Object> eventManager;
 
@@ -43,6 +48,8 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         this.persistentDataStorage = new SynchronizedPersistentDataStorage(new Key(this, getName()));
         this.teamRegistry = new CommonTeamRegistry(this);
         this.eventManager = EventNode.all("woolbattle");
+        this.lobbyData = new CommonLobbyData(this);
+        InjectionLayer.ext().install(BindingBuilder.create().bind(ItemManager.class).toInstance(new ItemManager(this)));
     }
 
     @Override
@@ -87,6 +94,11 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
     public @NotNull String databaseNameSuffixMaps() {
         return databaseNameSuffixMaps;
+    }
+
+    @Override
+    public @NotNull CommonLobbyData lobbyData() {
+        return lobbyData;
     }
 
     @Override

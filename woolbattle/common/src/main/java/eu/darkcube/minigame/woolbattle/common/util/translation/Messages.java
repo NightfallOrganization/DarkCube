@@ -79,7 +79,10 @@ public enum Messages implements Message {
     MAP_MIGRATION_COMPLETE,
     LEFT_SETUP_MODE,
     ENTERED_SETUP_MODE,
-    WOOL_DIRECTION_SETTINGS_TITLE;
+    WOOL_DIRECTION_SETTINGS_TITLE,
+    GAME_NOT_FOUND,
+    NOT_IN_A_WORLD,
+    SET_LOBBY_SPAWN;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final Function<String, String> KEY_MODFIIER = s -> KEY_PREFIX + s;

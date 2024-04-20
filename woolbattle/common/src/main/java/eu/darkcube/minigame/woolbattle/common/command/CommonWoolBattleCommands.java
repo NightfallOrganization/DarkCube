@@ -8,6 +8,9 @@ import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.command.commands.WoolBattleRootCommand;
 import eu.darkcube.system.libs.com.mojang.brigadier.CommandDispatcher;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import eu.darkcube.system.libs.com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
@@ -49,5 +52,13 @@ public abstract class CommonWoolBattleCommands implements WoolBattleCommands {
     }
 
     protected void register0(WoolBattleCommand command, String name, LiteralCommandNode<CommandSource> node) {
+    }
+
+    public static LiteralArgumentBuilder<CommandSource> literal(String name) {
+        return LiteralArgumentBuilder.literal(name);
+    }
+
+    public static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type) {
+        return RequiredArgumentBuilder.argument(name, type);
     }
 }

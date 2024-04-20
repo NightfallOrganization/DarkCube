@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import eu.darkcube.minigame.woolbattle.api.event.user.UserEnterSetupEvent;
-import eu.darkcube.minigame.woolbattle.api.event.user.UserLeaveSetupModeEvent;
+import eu.darkcube.minigame.woolbattle.api.event.setup.UserEnterSetupEvent;
+import eu.darkcube.minigame.woolbattle.api.event.setup.UserLeaveSetupModeEvent;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
@@ -42,7 +42,7 @@ public class SetupMode {
         woolbattle.logger().info("Player " + user.playerName() + " left SetupMode");
         woolbattle.api().eventManager().call(new UserLeaveSetupModeEvent(user));
         users.remove(user);
-        if(users.isEmpty()) {
+        if (users.isEmpty()) {
             woolbattle.api().worldHandler().unloadWorld(world);
             world = null;
         }

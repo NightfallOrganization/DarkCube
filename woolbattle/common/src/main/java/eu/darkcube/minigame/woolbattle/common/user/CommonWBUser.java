@@ -20,7 +20,10 @@ import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.perk.user.CommonUserPerks;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
+import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
@@ -29,7 +32,7 @@ import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
-public class CommonWBUser implements WBUser {
+public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     private final @NotNull Key keyParticles;
     private final @NotNull Key keyHeightDisplay;
     private final @NotNull Key keyWoolSubtractDirection;
@@ -41,7 +44,6 @@ public class CommonWBUser implements WBUser {
     private final @NotNull UserInventoryAccess inventoryAccess;
     private final @NotNull UserPermissions permissions;
     private final @NotNull MetaDataStorage metadata = new BasicMetaDataStorage();
-    private volatile @Nullable CommonWorld world;
     private volatile @Nullable Location location;
     private volatile int woolCount;
     private volatile @Nullable CommonTeam team;
@@ -123,7 +125,7 @@ public class CommonWBUser implements WBUser {
         var dropCount = event.amount() - addCount;
         woolCount(woolCount + addCount);
         if (event.dropRemaining()) {
-            var world = this.world;
+            var world = this.world();
             var location = this.location;
             var team = this.team;
             if (world != null && location != null && team != null && world == location.world()) {
@@ -184,11 +186,8 @@ public class CommonWBUser implements WBUser {
 
     @Override
     public @Nullable CommonWorld world() {
-        return world;
-    }
-
-    public void world(@Nullable CommonWorld world) {
-        this.world = world;
+        var l = location;
+        return l == null ? null : (CommonWorld) l.world();
     }
 
     @Override
@@ -196,6 +195,7 @@ public class CommonWBUser implements WBUser {
         return location;
     }
 
+    @ApiStatus.Internal
     public void location(@Nullable Location location) {
         this.location = location;
     }
@@ -263,5 +263,10 @@ public class CommonWBUser implements WBUser {
     @Override
     public @NotNull UUID playerUniqueId() {
         return uniqueId();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        return user;
     }
 }

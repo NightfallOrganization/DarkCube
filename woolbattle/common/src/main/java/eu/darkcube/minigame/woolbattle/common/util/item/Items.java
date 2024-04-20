@@ -113,20 +113,27 @@ public enum Items implements CommonItem {
     PERK_BERSERKER,
     ;
 
-    private final ItemBuilder builder;
     private final String key;
+    private ItemBuilder builder;
 
     Items() {
-        builder = ProviderReference.PROVIDER.builder(this);
         key = this.name();
     }
 
-    @Override public String key() {
+    @Override
+    public String key() {
         return key;
     }
 
-    @Override public ItemBuilder builder() {
+    @Override
+    public ItemBuilder builder() {
         return builder.clone();
+    }
+
+    static {
+        for (var item : values()) {
+            item.builder = ProviderReference.PROVIDER.builder(item);
+        }
     }
 
     public interface Provider {

@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.api.world;
 
 import eu.cloudnetservice.driver.document.Document;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataType;
 
 public interface Position extends Cloneable {
@@ -32,7 +33,17 @@ public interface Position extends Cloneable {
         float pitch();
 
         @Override
-        Directed clone();
+        @NotNull Directed clone();
+
+        @NotNull Directed aligned();
+
+        default @NotNull Directed simple() {
+            return simple(this);
+        }
+
+        static @NotNull Directed simple(@NotNull Directed position) {
+            return new Simple(position.x(), position.y(), position.z(), position.yaw(), position.pitch());
+        }
 
         PersistentDataType<Directed> TYPE = new PersistentDataType<>() {
             @Override
@@ -64,9 +75,71 @@ public interface Position extends Cloneable {
         };
 
         record Simple(double x, double y, double z, float yaw, float pitch) implements Directed {
+            private static final float F360 = 360f;
+            private static final float F180 = 180f;
+
             @Override
-            public Position.Directed.Simple clone() {
-                return new Position.Directed.Simple(x, y, z, yaw, pitch);
+            public @NotNull Directed.Simple clone() {
+                return new Directed.Simple(x, y, z, yaw, pitch);
+            }
+
+            @Override
+            public @NotNull Directed.Simple aligned() {
+                return new Directed.Simple(nice(x), nice(y), nice(z), getNiceYaw(yaw), getNicePitch(pitch));
+            }
+
+            @Override
+            public @NotNull Directed simple() {
+                return this;
+            }
+
+            private static double nice(double c) {
+                return ((int) (c * 2)) / 2D;
+            }
+
+            private static float getNicePitch(float y) {
+                y += 90f;
+                var interval = 22.5f;
+                if (Math.round(y % interval) == y % interval) return y - 90f;
+                var hInterval = interval / 2f;
+                for (var i = F180; i >= 0f; i -= interval) {
+                    var val1 = i - hInterval;
+                    var val2 = i + hInterval;
+
+                    if (y >= val1 && y <= val2) {
+                        y = i;
+                        y %= F180;
+                        break;
+                    }
+                }
+                return y - 90f;
+            }
+
+            private static float getNiceYaw(float y) {
+                var interval = 22.5f;
+                var hInterval = interval / 2f;
+                y = antiNegYaw(y, hInterval);
+                for (var i = F360; i >= 0f; i -= interval) {
+                    var val1 = i - hInterval;
+                    var val2 = i + hInterval;
+                    if (y >= val1 && y < val2) {
+                        y = i;
+                        y %= F360;
+                        break;
+                    }
+                }
+                return y;
+            }
+
+            private static float antiNegYaw(float x, float hInterval) {
+                if (x < (0f - hInterval)) {
+                    x = F360 + x;
+                }
+                if (x >= F360) {
+                    x %= F360;
+                    x = -x;
+                }
+                return x;
             }
         }
     }

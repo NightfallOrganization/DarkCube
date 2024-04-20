@@ -7,8 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.ingame.world;
 
-import eu.darkcube.minigame.woolbattle.api.event.world.DamageBlockEvent;
-import eu.darkcube.minigame.woolbattle.api.event.world.DestroyBlockEvent;
+import eu.darkcube.minigame.woolbattle.api.event.world.block.DamageBlockEvent;
+import eu.darkcube.minigame.woolbattle.api.event.world.block.DestroyBlockEvent;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
 import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
 import eu.darkcube.system.server.item.material.Material;

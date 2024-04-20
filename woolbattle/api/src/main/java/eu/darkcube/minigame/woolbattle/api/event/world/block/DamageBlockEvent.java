@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.api.event.world;
+package eu.darkcube.minigame.woolbattle.api.event.world.block;
 
 import eu.darkcube.minigame.woolbattle.api.world.Block;
 

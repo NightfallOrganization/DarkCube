@@ -7,6 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.util;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -16,34 +21,30 @@ import eu.darkcube.minigame.woolbattle.util.gson.TypeAdapterLocation;
 import eu.darkcube.minigame.woolbattle.util.gson.TypeAdapterMap;
 import org.bukkit.Location;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 public class GsonSerializer {
 
     public static final Gson gson;
 
     static {
-        GsonBuilder b = new GsonBuilder()
-                .registerTypeAdapter(Location.class, TypeAdapterLocation.INSTANCE)
-                .registerTypeHierarchyAdapter(Map.class, TypeAdapterMap.INSTANCE)
-                .disableHtmlEscaping();
+        GsonBuilder b = new GsonBuilder().registerTypeAdapter(Location.class, TypeAdapterLocation.INSTANCE).registerTypeHierarchyAdapter(Map.class, TypeAdapterMap.INSTANCE).disableHtmlEscaping();
         b.addSerializationExclusionStrategy(new ExclusionStrategy() {
-            @Override public boolean shouldSkipField(FieldAttributes f) {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
                 return f.getAnnotation(DontSerialize.class) != null;
             }
 
-            @Override public boolean shouldSkipClass(Class<?> var1) {
+            @Override
+            public boolean shouldSkipClass(Class<?> var1) {
                 return var1.isAnnotationPresent(DontSerialize.class);
             }
         });
         gson = b.create();
-//		JsonDocument.GSON = gson;
+        //		JsonDocument.GSON = gson;
     }
 
-    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface DontSerialize {
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface DontSerialize {
 
     }
 }

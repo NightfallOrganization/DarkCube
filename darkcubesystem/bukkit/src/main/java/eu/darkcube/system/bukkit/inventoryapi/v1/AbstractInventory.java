@@ -4,7 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.bukkit.inventoryapi.v1;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -18,9 +22,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 public abstract class AbstractInventory implements IInventory {
 
@@ -66,32 +67,38 @@ public abstract class AbstractInventory implements IInventory {
         HandlerList.unregisterAll(this.listener);
     }
 
-    @Override public InventoryType getType() {
+    @Override
+    public InventoryType getType() {
         return this.inventoryType;
     }
 
-    @Override public Inventory getHandle() {
+    @Override
+    public Inventory getHandle() {
         return this.handle;
     }
 
-    @Override public void open(HumanEntity player) {
+    @Override
+    public void open(HumanEntity player) {
         player.openInventory(this.handle);
         this.opened.add(player);
     }
 
-    @Override public boolean isOpened(HumanEntity player) {
+    @Override
+    public boolean isOpened(HumanEntity player) {
         return this.opened.contains(player);
     }
 
     protected class InventoryListener implements Listener {
 
-        @EventHandler public void handle(InventoryCloseEvent event) {
+        @EventHandler
+        public void handle(InventoryCloseEvent event) {
             if (isOpened(event.getPlayer())) {
                 handleClose(event.getPlayer());
             }
         }
 
-        @EventHandler public void handle(InventoryClickEvent event) {
+        @EventHandler
+        public void handle(InventoryClickEvent event) {
             if (!(event.getWhoClicked() instanceof Player)) return;
             if (isOpened(event.getWhoClicked())) {
                 IInventoryClickEvent e = new IInventoryClickEvent(event, AbstractInventory.this);

@@ -10,7 +10,7 @@ package eu.darkcube.minigame.woolbattle.api.game;
 import java.util.Collection;
 import java.util.UUID;
 
-import eu.darkcube.minigame.woolbattle.api.map.MapSize;
+import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public interface GameManager {
     @UnmodifiableView @NotNull Collection<? extends Game> games();
 
     @Api
-    @NotNull Game createGame(MapSize mapSize);
+    @NotNull Game createGame(@NotNull Map map);
 
     @Api
     @Nullable Game game(@NotNull UUID id);

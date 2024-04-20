@@ -19,17 +19,20 @@ public class BasicItemPersistentDataStorage extends LocalPersistentDataStorage i
         this.builder = builder;
     }
 
-    @Override public <T> ItemPersistentDataStorage iset(Key key, PersistentDataType<T> type, T data) {
+    @Override
+    public <T> ItemPersistentDataStorage iset(Key key, PersistentDataType<T> type, T data) {
         set(key, type, data);
         return this;
     }
 
-    @Override public <T> ItemPersistentDataStorage isetIfNotPresent(Key key, PersistentDataType<T> type, T data) {
+    @Override
+    public <T> ItemPersistentDataStorage isetIfNotPresent(Key key, PersistentDataType<T> type, T data) {
         setIfNotPresent(key, type, data);
         return this;
     }
 
-    @Override public ItemBuilder builder() {
+    @Override
+    public ItemBuilder builder() {
         return builder;
     }
 }

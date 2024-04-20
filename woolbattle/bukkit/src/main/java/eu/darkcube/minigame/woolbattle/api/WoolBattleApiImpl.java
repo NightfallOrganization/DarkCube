@@ -11,6 +11,7 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
+import eu.darkcube.minigame.woolbattle.api.game.lobby.LobbyData;
 import eu.darkcube.minigame.woolbattle.api.map.MapManager;
 import eu.darkcube.minigame.woolbattle.api.team.TeamRegistry;
 import eu.darkcube.minigame.woolbattle.api.util.MaterialProvider;
@@ -79,6 +80,11 @@ public class WoolBattleApiImpl implements WoolBattleApi {
 
     @Override
     public @NotNull EventNode<Object> eventManager() {
+        return null;
+    }
+
+    @Override
+    public @NotNull LobbyData lobbyData() {
         return null;
     }
 

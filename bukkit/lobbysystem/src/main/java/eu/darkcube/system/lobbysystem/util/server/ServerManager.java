@@ -133,9 +133,6 @@ public class ServerManager {
                 }
             }
         }
-        for (DefaultServerInformation value : mergedInformations.values()) {
-            System.out.println(value.displayNameString());
-        }
     }
 
     private @Nullable Collection<DefaultServerInformation> parseV2(ServiceInfoSnapshot snapshot, Collection<? extends ServerInformation> existing) {
@@ -217,6 +214,7 @@ public class ServerManager {
                 } else if (status == 2) {
                     request.future.complete(new ServerInformation.State(true, null));
                     connectionRequests.invalidate(requestId);
+                    System.out.println("[ConnectorNPC] Connecting player " + request.player() + " to " + request.name());
                     lobby.playerManager().playerExecutor(request.player()).connect(request.name());
                 }
             }
@@ -226,10 +224,6 @@ public class ServerManager {
         public void handle(CloudServiceUpdateEvent event) {
             var service = event.serviceInfo();
             queue.add(() -> services.computeIfPresent(service.serviceId().uniqueId(), (ignoredUuid, ignoredServiceInfoSnapshot) -> service));
-            if (service.name().equals("minestom-1")) {
-                System.out.println(event.serviceInfo());
-            }
-            System.out.println("Trigger update because of serviceUpdate");
             triggerUpdate();
         }
 
@@ -245,7 +239,6 @@ public class ServerManager {
                     if (snap == null) System.err.println("Failed to remove from services!!!");
                 }
             });
-            System.out.println("Trigger update because of lifecycle change");
             triggerUpdate();
         }
     }

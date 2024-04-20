@@ -9,12 +9,11 @@ package eu.darkcube.minigame.woolbattle.common.game;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
-import eu.darkcube.minigame.woolbattle.api.map.MapSize;
+import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -22,7 +21,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 
 public class CommonGameManager implements GameManager {
     private final @NotNull CommonWoolBattleApi woolbattle;
-    private final @NotNull Map<@NotNull UUID, @NotNull CommonGame> games = new ConcurrentHashMap<>();
+    private final @NotNull java.util.Map<@NotNull UUID, @NotNull CommonGame> games = new ConcurrentHashMap<>();
 
     public CommonGameManager(@NotNull CommonWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
@@ -34,13 +33,18 @@ public class CommonGameManager implements GameManager {
     }
 
     @Override
-    public @NotNull CommonGame createGame(MapSize mapSize) {
-        UUID id;
-        for (id = UUID.randomUUID(); games.containsKey(id); id = UUID.randomUUID()) ;
-        var game = new CommonGame(woolbattle, id, mapSize);
-        games.put(id, game);
-        woolbattle.eventManager().addChild(game.eventManager());
-        return game;
+    public @NotNull CommonGame createGame(@NotNull Map map) {
+        while (true) {
+            var id = UUID.randomUUID();
+            var game = new CommonGame(woolbattle, id, map);
+            var old = games.putIfAbsent(id, game);
+            if (old != null) continue;
+            game.init();
+            woolbattle.eventManager().addChild(game.eventManager());
+            woolbattle.woolbattle().logger().info("Created game " + game.id());
+            woolbattle.lobbySystemLink().update();
+            return game;
+        }
     }
 
     @Override
@@ -60,5 +64,7 @@ public class CommonGameManager implements GameManager {
         }
         woolbattle.eventManager().removeChild(game.eventManager());
         game.unload0();
+        woolbattle.woolbattle().logger().info("Unloaded game " + game.id());
+        woolbattle.lobbySystemLink().update();
     }
 }

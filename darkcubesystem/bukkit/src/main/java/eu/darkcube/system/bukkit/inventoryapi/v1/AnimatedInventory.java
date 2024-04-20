@@ -4,14 +4,8 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.bukkit.inventoryapi.v1;
 
-import eu.darkcube.system.bukkit.DarkCubePlugin;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.util.AsyncExecutor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+package eu.darkcube.system.bukkit.inventoryapi.v1;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +15,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
+
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.util.AsyncExecutor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class AnimatedInventory extends AbstractInventory {
 
@@ -71,7 +72,8 @@ public abstract class AnimatedInventory extends AbstractInventory {
         }
     }
 
-    @Override protected void destroy() {
+    @Override
+    protected void destroy() {
         super.destroy();
         this.stopAnimation();
     }
@@ -79,9 +81,7 @@ public abstract class AnimatedInventory extends AbstractInventory {
     public static class AnimationInformation {
 
         public final long showAfter;
-
         public final int slot;
-
         public final ItemStack item;
 
         public AnimationInformation(long showAfter, int slot, ItemStack item) {
@@ -98,7 +98,8 @@ public abstract class AnimatedInventory extends AbstractInventory {
 
     protected class AnimationRunnable extends BukkitRunnable {
 
-        @Override public void run() {
+        @Override
+        public void run() {
             boolean updated = false;
             final long started = animationStarted.get();
             final long time = System.currentTimeMillis();

@@ -10,5 +10,6 @@ package eu.darkcube.system.server.item.flag;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface ItemFlagProvider {
-    @NotNull ItemFlag of(@NotNull Object platformItemFlag);
+    @NotNull
+    ItemFlag of(@NotNull Object platformItemFlag);
 }
