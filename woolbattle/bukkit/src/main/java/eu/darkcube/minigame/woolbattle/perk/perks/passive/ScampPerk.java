@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.event.perk.other.PlayerHitPlayerEvent;
@@ -25,7 +26,8 @@ public class ScampPerk extends Perk {
     }
 
     public class ScampListener implements Listener {
-        @EventHandler public void handle(PlayerHitPlayerEvent event) {
+        @EventHandler
+        public void handle(PlayerHitPlayerEvent event) {
             WBUser attacker = event.attacker();
             WBUser target = event.target();
             for (UserPerk perk : attacker.perks().perks(perkName())) {

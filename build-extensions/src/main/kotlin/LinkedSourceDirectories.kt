@@ -6,7 +6,6 @@
  */
 import org.gradle.api.file.DirectoryTree
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
@@ -16,20 +15,14 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.work.Incremental
 import java.util.function.Consumer
 
-/*
- * Copyright (c) 2023. [DarkCube]
- * All rights reserved.
- * You may not use or redistribute this software or any associated files without permission.
- * The above copyright notice shall be included in all copies of this software.
- */
 class LinkedSourceDirectories {
 
     @Optional
     @Nested
     private var head: Node? = null
 
-    fun add(files: FileCollection, tree: DirectoryTree, includes: Set<String>, excludes: Set<String>) {
-        val node = Node(files, tree, includes, excludes)
+    fun add(files: FileCollection, tree: DirectoryTree) {
+        val node = Node(files, tree)
         if (head == null) head = node
         else last()!!.next = node
     }
@@ -62,7 +55,7 @@ class LinkedSourceDirectories {
     }
 
     class Node(
-        @Incremental @InputFiles @PathSensitive(PathSensitivity.RELATIVE) val files: FileCollection, @Internal val tree: DirectoryTree, @Input val includes: Set<String>, excludes: Set<String>, @Nested @Optional var next: Node? = null
+        @Incremental @InputFiles @PathSensitive(PathSensitivity.RELATIVE) val files: FileCollection, @Internal val tree: DirectoryTree, @Nested @Optional var next: Node? = null
     )
 
 }

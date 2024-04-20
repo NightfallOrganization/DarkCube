@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -37,7 +38,8 @@ public class HookArrowPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true) public void handle(BowArrowHitPlayerEvent event) {
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void handle(BowArrowHitPlayerEvent event) {
             if (event.arrow().hasMetadata("hookArrow")) {
                 int removed = event.shooter().removeWool(cost());
                 if (removed < cost()) {
@@ -48,7 +50,8 @@ public class HookArrowPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(BowShootArrowEvent event) {
+        @EventHandler
+        public void handle(BowShootArrowEvent event) {
             for (UserPerk perk : event.user().perks().perks(perkName())) {
                 if (perk.cooldown() == 0) {
                     perk.cooldown(cooldown().cooldown());

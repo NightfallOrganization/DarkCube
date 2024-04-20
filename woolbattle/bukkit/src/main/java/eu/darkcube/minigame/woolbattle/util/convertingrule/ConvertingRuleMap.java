@@ -12,14 +12,14 @@ import eu.darkcube.minigame.woolbattle.util.Arrays.ConvertingRule;
 
 public class ConvertingRuleMap extends ConvertingRule<Map> {
 
-	@Override
-	public Class<Map> getConvertingClass() {
-		return Map.class;
-	}
+    @Override
+    public Class<Map> getConvertingClass() {
+        return Map.class;
+    }
 
-	@Override
-	public String convert(Map object) {
-		return object.getName();
-	}
+    @Override
+    public String convert(Map object) {
+        return object.getName();
+    }
 
 }

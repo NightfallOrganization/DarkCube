@@ -7,19 +7,18 @@
 
 package eu.darkcube.minigame.woolbattle.listener.endgame;
 
+import eu.darkcube.minigame.woolbattle.listener.Listener;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import eu.darkcube.minigame.woolbattle.listener.Listener;
-
 public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
 
-	@Override
-	@EventHandler
-	public void handle(PlayerQuitEvent e) {
-		e.setQuitMessage(null);
-		var user = WBUser.getUser(e.getPlayer());
-		user.setTeam(null);
-	}
+    @Override
+    @EventHandler
+    public void handle(PlayerQuitEvent e) {
+        e.setQuitMessage(null);
+        var user = WBUser.getUser(e.getPlayer());
+        user.setTeam(null);
+    }
 }

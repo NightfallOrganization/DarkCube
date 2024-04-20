@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
@@ -31,7 +32,8 @@ public class ArrowRainPerk extends Perk {
     }
 
     private static class ArrowRainListener implements Listener {
-        @EventHandler(priority = EventPriority.HIGHEST) public void handle(BowShootArrowEvent event) {
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void handle(BowShootArrowEvent event) {
             int arrows = 0;
             for (UserPerk perk : event.user().perks().perks(ARROW_RAIN)) {
                 if (perk.cooldown() > 0) {

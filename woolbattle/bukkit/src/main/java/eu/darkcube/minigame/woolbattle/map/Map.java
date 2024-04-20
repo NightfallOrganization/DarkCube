@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.map;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -27,13 +28,8 @@ public interface Map {
 
     MapSize size();
 
-    @Nullable MapIngameData ingameData();
-
-//	void delete();
-//
-//	void setSpawn(String name, Location loc);
-//
-//	Location getSpawn(String name);
+    @Nullable
+    MapIngameData ingameData();
 
     String getName();
 

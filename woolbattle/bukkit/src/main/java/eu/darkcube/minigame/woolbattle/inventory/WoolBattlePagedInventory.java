@@ -4,17 +4,22 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.inventory;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
-import eu.darkcube.system.bukkit.inventoryapi.v1.*;
+import eu.darkcube.system.bukkit.inventoryapi.v1.AsyncPagedInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.DefaultAsyncPagedInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.PageArrow;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventory {
     protected final WBUser user;
@@ -108,12 +113,8 @@ public abstract class WoolBattlePagedInventory extends DefaultAsyncPagedInventor
 
     @Override
     protected void insertArrowItems() {
-        arrowSlots.putIfAbsent(PageArrow.PREVIOUS,
-                new Integer[]{IInventory.slot(2, 1), IInventory.slot(3, 1),
-                        IInventory.slot(4, 1)});
-        arrowSlots.putIfAbsent(PageArrow.NEXT,
-                new Integer[]{IInventory.slot(2, 9), IInventory.slot(3, 9),
-                        IInventory.slot(4, 9)});
+        arrowSlots.putIfAbsent(PageArrow.PREVIOUS, new Integer[]{IInventory.slot(2, 1), IInventory.slot(3, 1), IInventory.slot(4, 1)});
+        arrowSlots.putIfAbsent(PageArrow.NEXT, new Integer[]{IInventory.slot(2, 9), IInventory.slot(3, 9), IInventory.slot(4, 9)});
         arrowItem.put(PageArrow.PREVIOUS, Item.PREV_PAGE.getItem(user));
         arrowItem.put(PageArrow.NEXT, Item.NEXT_PAGE.getItem(user));
         super.insertArrowItems();

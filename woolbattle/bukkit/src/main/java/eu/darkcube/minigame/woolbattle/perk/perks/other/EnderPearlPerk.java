@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -43,13 +44,15 @@ public class EnderPearlPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             EnderPearl enderPearl = perk.owner().getBukkitEntity().launchProjectile(EnderPearl.class);
             enderPearl.setMetadata("perk", new FixedMetadataValue(woolbattle, perk));
             return true;
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent event) {
             if (!(event.getEntity() instanceof Player)) return;
             if (!(event.getDamager() instanceof EnderPearl)) return;
             WBUser user = WBUser.getUser((Player) event.getEntity());
@@ -65,7 +68,8 @@ public class EnderPearlPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(ProjectileHitEvent event) {
+        @EventHandler
+        public void handle(ProjectileHitEvent event) {
             if (!(event.getEntity() instanceof EnderPearl)) return;
             EnderPearl ep = (EnderPearl) event.getEntity();
             if (!ep.hasMetadata("perk")) return;
@@ -98,7 +102,8 @@ public class EnderPearlPerk extends Perk {
 
         private void tp(Player p, Location loc) {
             new Scheduler(woolbattle) {
-                @Override public void run() {
+                @Override
+                public void run() {
                     loc.setDirection(p.getLocation().getDirection());
                     p.teleport(loc);
                 }

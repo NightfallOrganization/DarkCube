@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -27,8 +30,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 public class GrapplingHookPerk extends Perk {
     public static final PerkName GRAPPLING_HOOK = new PerkName("GRAPPLING_HOOK");
 
@@ -46,28 +47,33 @@ public class GrapplingHookPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override public void registered() {
+        @Override
+        public void registered() {
             super.registered();
             WoolBattleBukkit.registerListeners(handle);
         }
 
-        @Override public void unregistered() {
+        @Override
+        public void unregistered() {
             WoolBattleBukkit.unregisterListeners(handle);
             super.unregistered();
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             FishHook hook = perk.owner().getBukkitEntity().launchProjectile(FishHook.class);
             hook.setVelocity(hook.getVelocity().multiply(1.5));
             hook.setMetadata("perk", new FixedMetadataValue(woolbattle, perk));
             return false;
         }
 
-        @Override protected boolean mayActivate() {
+        @Override
+        protected boolean mayActivate() {
             return false;
         }
 
-        @EventHandler public void handle(PlayerFishEvent event) {
+        @EventHandler
+        public void handle(PlayerFishEvent event) {
             FishHook hook = event.getHook();
             PlayerFishEvent.State state = event.getState();
             if (!hook.hasMetadata("perk")) return;
@@ -75,12 +81,7 @@ public class GrapplingHookPerk extends Perk {
             if (!(objectPerk instanceof UserPerk)) return;
             UserPerk perk = (UserPerk) objectPerk;
             if (!perk.perk().equals(perk())) return;
-            if (state == PlayerFishEvent.State.IN_GROUND || state == PlayerFishEvent.State.CAUGHT_ENTITY || hook
-                    .getLocation()
-                    .subtract(0, 1, 0)
-                    .getBlock()
-                    .getType()
-                    .isSolid()) {
+            if (state == PlayerFishEvent.State.IN_GROUND || state == PlayerFishEvent.State.CAUGHT_ENTITY || hook.getLocation().subtract(0, 1, 0).getBlock().getType().isSolid()) {
                 if (!checkUsable(perk, woolbattle)) {
                     hook.remove();
                     return;
@@ -99,7 +100,8 @@ public class GrapplingHookPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent event) {
             if (event.getDamager() instanceof FishHook) {
                 if (!event.getDamager().hasMetadata("perk")) return;
                 Object operk = event.getDamager().getMetadata("perk").get(0).value();
@@ -113,7 +115,8 @@ public class GrapplingHookPerk extends Perk {
 
         private class Handle implements Listener {
 
-            @EventHandler private void handle(ProjectileLaunchEvent event) {
+            @EventHandler
+            private void handle(ProjectileLaunchEvent event) {
                 if (!(event.getEntity() instanceof FishHook)) {
                     return;
                 }

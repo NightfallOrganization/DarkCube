@@ -10,7 +10,7 @@ package eu.darkcube.minigame.woolbattle.command;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 
-public class CommandStart extends WBCommandExecutor {
+public class CommandStart extends WBCommand {
 
     public CommandStart(WoolBattleBukkit woolbattle) {
         super("start", b -> b.executes(ctx -> {

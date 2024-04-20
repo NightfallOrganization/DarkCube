@@ -7,9 +7,9 @@
 
 package eu.darkcube.minigame.woolbattle.map;
 
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.CompletableFuture;
+
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface MapLoader {
 

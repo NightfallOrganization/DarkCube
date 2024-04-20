@@ -7,20 +7,18 @@
 
 package eu.darkcube.system.pserver.plugin.command;
 
-import org.bukkit.entity.Player;
-
 import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import eu.darkcube.system.pserver.plugin.inventory.UserManagmentInventory;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
+import org.bukkit.entity.Player;
 
 public class UsersCommand extends PServer {
 
-	public UsersCommand() {
-		super("users", new String[0], b -> b.executes(context -> {
-			Player p = context.getSource().asPlayer();
-			new UserManagmentInventory(
-							UserManager.getInstance().getUser(p)).open();
-			return 0;
-		}));
-	}
+    public UsersCommand() {
+        super("users", new String[0], b -> b.executes(context -> {
+            Player p = context.getSource().asPlayer();
+            new UserManagmentInventory(UserManager.getInstance().getUser(p)).open();
+            return 0;
+        }));
+    }
 }

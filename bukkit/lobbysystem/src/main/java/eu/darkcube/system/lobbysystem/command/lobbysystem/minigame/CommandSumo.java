@@ -7,19 +7,18 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame;
 
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.sumo.CommandAddTask;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.sumo.CommandListTasks;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.sumo.CommandRemoveTask;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.sumo.CommandSetSpawn;
 
-public class CommandSumo extends LobbyCommandExecutor {
+public class CommandSumo extends LobbyCommand {
 
-	public CommandSumo() {
-		super("sumo", b -> {
-			b.then(new CommandAddTask().builder()).then(new CommandListTasks().builder())
-					.then(new CommandRemoveTask().builder()).then(new CommandSetSpawn().builder());
-		});
-	}
+    public CommandSumo() {
+        super("sumo", b -> {
+            b.then(new CommandAddTask().builder()).then(new CommandListTasks().builder()).then(new CommandRemoveTask().builder()).then(new CommandSetSpawn().builder());
+        });
+    }
 
 }

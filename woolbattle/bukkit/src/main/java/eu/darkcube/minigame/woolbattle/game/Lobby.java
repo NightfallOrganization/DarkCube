@@ -7,6 +7,12 @@
 
 package eu.darkcube.minigame.woolbattle.game;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import eu.darkcube.minigame.woolbattle.Config;
 import eu.darkcube.minigame.woolbattle.GameData;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -14,8 +20,19 @@ import eu.darkcube.minigame.woolbattle.game.lobby.LobbyDeathLineTask;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyOverrideTimer;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyTimer;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyTimerTask;
-import eu.darkcube.minigame.woolbattle.listener.lobby.*;
-import eu.darkcube.minigame.woolbattle.listener.lobby.item.*;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerBlockBreak;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerBlockPlace;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerEntityDamage;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerInteract;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerDropItem;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerJoin;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerLogin;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerQuit;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemParticles;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemPerks;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemSettings;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemTeams;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemVoting;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -44,12 +61,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class Lobby extends GamePhase {
 
     public final Map<WBUser, Vote<eu.darkcube.minigame.woolbattle.map.Map>> VOTES_MAP;
@@ -64,7 +75,7 @@ public class Lobby extends GamePhase {
 
     public Lobby(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
-        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(woolbattle), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle), new ListenerInteractMenuBack());
+        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(woolbattle), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle));
 
         this.VOTES_MAP = new HashMap<>();
         this.VOTES_EP_GLITCH = new HashMap<>();
@@ -78,7 +89,8 @@ public class Lobby extends GamePhase {
         addScheduler(new LobbyDeathLineTask(this, woolbattle), new LobbyTimerTask(this, overrideTimer, woolbattle));
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         unloadGame();
         woolbattle.lobbySystemLink().update();
         woolbattle.gameData(new GameData(woolbattle));
@@ -101,7 +113,8 @@ public class Lobby extends GamePhase {
         this.maxPlayerCount = -1;
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
     }
 
     public void unloadGame() {

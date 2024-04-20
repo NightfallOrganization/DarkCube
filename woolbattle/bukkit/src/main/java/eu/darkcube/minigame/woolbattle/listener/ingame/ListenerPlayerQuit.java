@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -23,7 +24,9 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         this.woolbattle = woolbattle;
     }
 
-    @Override @EventHandler public void handle(PlayerQuitEvent e) {
+    @Override
+    @EventHandler
+    public void handle(PlayerQuitEvent e) {
         e.setQuitMessage(null);
         Player p = e.getPlayer();
         WBUser user = WBUser.getUser(p);

@@ -4,7 +4,10 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.ArrayList;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -23,8 +26,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-
 public class SlimePlatformPerk extends Perk {
     public static final PerkName SLIME_PLATFORM = new PerkName("SLIME_PLATFORM");
 
@@ -41,7 +42,8 @@ public class SlimePlatformPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
 
             Player p = perk.owner().getBukkitEntity();
 
@@ -55,7 +57,8 @@ public class SlimePlatformPerk extends Perk {
             return true;
         }
 
-        @SuppressWarnings("deprecation") private void setBlock(Location block, ArrayList<Block> l) {
+        @SuppressWarnings("deprecation")
+        private void setBlock(Location block, ArrayList<Block> l) {
             if (block.getBlock().getType() == Material.AIR) {
                 woolbattle.ingame().place(block.getBlock(), b -> {
                     BlockState state = b.getState();
@@ -74,7 +77,8 @@ public class SlimePlatformPerk extends Perk {
             }
         }
 
-        @EventHandler public void moveEvent(PlayerMoveEvent e) {
+        @EventHandler
+        public void moveEvent(PlayerMoveEvent e) {
 
             WBUser user = WBUser.getUser(e.getPlayer());
             if (!user.getTeam().canPlay()) return;

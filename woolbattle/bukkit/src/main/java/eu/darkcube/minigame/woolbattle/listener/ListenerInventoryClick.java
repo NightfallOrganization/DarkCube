@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -22,7 +23,9 @@ public class ListenerInventoryClick extends Listener<InventoryClickEvent> {
         this.woolbattle = woolbattle;
     }
 
-    @Override @EventHandler public void handle(InventoryClickEvent e) {
+    @Override
+    @EventHandler
+    public void handle(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player)) {
             return;
         }

@@ -7,17 +7,17 @@
 
 package eu.darkcube.system.pserver.plugin.command;
 
-import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
+import java.util.Collection;
+import java.util.Collections;
+
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-
-import java.util.Collection;
-import java.util.Collections;
 
 public class KillCommand extends PServer {
 

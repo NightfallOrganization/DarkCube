@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -36,7 +37,8 @@ public class TntArrowPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(BowShootArrowEvent event) {
+        @EventHandler
+        public void handle(BowShootArrowEvent event) {
             Arrow arrow = event.arrow();
             for (UserPerk perk : event.user().perks().perks(TNT_ARROW)) {
                 if (perk.cooldown() > 0) {
@@ -45,7 +47,8 @@ public class TntArrowPerk extends Perk {
                 }
                 perk.cooldown(perk.perk().cooldown().cooldown());
                 new Scheduler(woolbattle) {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (arrow.isDead() || !arrow.isValid()) {
                             this.cancel();
                             if (event.user().removeWool(perk.perk().cost()) != perk.perk().cost()) {

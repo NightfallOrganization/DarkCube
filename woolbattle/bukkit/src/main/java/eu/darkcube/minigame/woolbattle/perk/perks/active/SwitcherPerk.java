@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -38,13 +39,15 @@ public class SwitcherPerk extends Perk {
             super(perk, woolbattle);
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             Snowball ball = perk.owner().getBukkitEntity().launchProjectile(Snowball.class);
             ball.setMetadata("perk", new FixedMetadataValue(woolbattle, perk.perk().perkName().getName()));
             return true;
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent e) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent e) {
             if (!(e.getEntity() instanceof Player)) {
                 return;
             }
@@ -57,17 +60,12 @@ public class SwitcherPerk extends Perk {
             }
             Player p = (Player) snowball.getShooter();
             Player hit = (Player) e.getEntity();
-            if (!snowball.getMetadata("perk").isEmpty() && snowball
-                    .getMetadata("perk")
-                    .get(0)
-                    .asString()
-                    .equals(SwitcherPerk.SWITCHER.getName())) {
+            if (!snowball.getMetadata("perk").isEmpty() && snowball.getMetadata("perk").get(0).asString().equals(SwitcherPerk.SWITCHER.getName())) {
                 e.setCancelled(true);
                 WBUser user = WBUser.getUser(hit);
                 if (user.projectileImmunityTicks() > 0) return;
                 if (!woolbattle.ingame().playerUtil().canAttack(WBUser.getUser(p), user)) return;
-                if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30))
-                    woolbattle.ingame().playerUtil().attack(WBUser.getUser(p), user);
+                if (user.getTicksAfterLastHit() < TimeUnit.SECOND.toTicks(30)) woolbattle.ingame().playerUtil().attack(WBUser.getUser(p), user);
                 Location loc = p.getLocation();
                 p.teleport(hit);
                 hit.teleport(loc);

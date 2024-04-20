@@ -9,8 +9,8 @@ package eu.darkcube.minigame.woolbattle.listener;
 
 public interface RegisterNotifyListener {
 
-	void registered();
+    void registered();
 
-	void unregistered();
+    void unregistered();
 
 }

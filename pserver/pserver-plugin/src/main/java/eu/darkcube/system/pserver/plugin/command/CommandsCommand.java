@@ -13,15 +13,15 @@ import eu.darkcube.system.pserver.plugin.command.impl.PServer;
 
 public class CommandsCommand extends PServer {
 
-	public CommandsCommand() {
-		super("commands", new String[] {"befehle", "help"}, b -> b.executes(context -> {
-			CommandSource source = context.getSource();
-			source.sendMessage(Message.COMMANDS_PREFIX, PServer.COMMAND_NAMES.size());
-			for (String name : PServer.COMMAND_NAMES) {
-				source.sendMessage(Message.COMMANDS_COMMANDINFO, name);
-			}
-			return 0;
-		}));
-	}
+    public CommandsCommand() {
+        super("commands", new String[]{"befehle", "help"}, b -> b.executes(context -> {
+            CommandSource source = context.getSource();
+            source.sendMessage(Message.COMMANDS_PREFIX, PServer.COMMAND_NAMES.size());
+            for (String name : PServer.COMMAND_NAMES) {
+                source.sendMessage(Message.COMMANDS_COMMANDINFO, name);
+            }
+            return 0;
+        }));
+    }
 
 }

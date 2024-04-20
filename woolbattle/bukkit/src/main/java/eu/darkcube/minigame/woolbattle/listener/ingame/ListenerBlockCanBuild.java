@@ -4,12 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener.ingame;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import net.minecraft.server.v1_8_R3.AxisAlignedBB;
-import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -27,19 +26,19 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
         this.woolbattle = woolbattle;
     }
 
-    @Override @EventHandler public void handle(BlockCanBuildEvent e) {
+    @Override
+    @EventHandler
+    public void handle(BlockCanBuildEvent e) {
         if (e.getBlock().getType() != Material.AIR) {
             e.setBuildable(false);
             return;
         }
         if (e.getMaterial() == Material.WOOL) {
             e.setBuildable(true);
-            Block block = CraftMagicNumbers.getBlock(e.getMaterial());
-            AxisAlignedBB box = block.a(((CraftWorld) e.getBlock().getWorld()).getHandle(), new BlockPosition(e.getBlock().getX(), e
-                    .getBlock()
-                    .getY(), e.getBlock().getZ()), block.getBlockData());
-            for (Entity ent : e.getBlock().getWorld().getEntities()) {
-                AxisAlignedBB entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
+            var block = CraftMagicNumbers.getBlock(e.getMaterial());
+            var box = block.a(((CraftWorld) e.getBlock().getWorld()).getHandle(), new BlockPosition(e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ()), block.getBlockData());
+            for (var ent : e.getBlock().getWorld().getEntities()) {
+                var entityBox = ((CraftEntity) ent).getHandle().getBoundingBox();
                 if (box.b(entityBox)) {
                     if (preventsBlockPlacement(ent)) {
                         e.setBuildable(false);
@@ -52,7 +51,7 @@ public class ListenerBlockCanBuild extends Listener<BlockCanBuildEvent> {
 
     private boolean preventsBlockPlacement(Entity entity) {
         if (entity instanceof Player) {
-            Player p = (Player) entity;
+            var p = (Player) entity;
             return !woolbattle.teamManager().getSpectator().contains(p.getUniqueId());
         }
         return false;

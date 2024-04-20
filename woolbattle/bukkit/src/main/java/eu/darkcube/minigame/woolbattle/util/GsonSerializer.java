@@ -39,7 +39,7 @@ public class GsonSerializer {
             }
         });
         gson = b.create();
-        //		JsonDocument.GSON = gson;
+        // JsonDocument.GSON = gson;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.user;
 
+import java.util.logging.Logger;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.perks.other.DoubleJumpPerk;
@@ -14,8 +16,6 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
-
-import java.util.logging.Logger;
 
 public class WBUserModifier implements UserModifier {
 
@@ -30,7 +30,9 @@ public class WBUserModifier implements UserModifier {
         if (USER == null) USER = new Key(woolbattle, "user");
     }
 
-    @SuppressWarnings("DataFlowIssue") @Override public void onLoad(User user) {
+    @SuppressWarnings("DataFlowIssue")
+    @Override
+    public void onLoad(User user) {
         user.persistentData().clearCache();
         var u = new DefaultWBUser(woolbattle, user);
         var oldDataVersion = 0;
@@ -53,7 +55,8 @@ public class WBUserModifier implements UserModifier {
         u.perks().reloadFromStorage();
     }
 
-    @Override public void onUnload(User user) {
+    @Override
+    public void onUnload(User user) {
         user.metadata().remove(USER);
         user.persistentData().clearCache();
     }

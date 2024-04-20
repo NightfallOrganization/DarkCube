@@ -4,7 +4,17 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.util;
+
+import java.io.Serial;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import eu.darkcube.system.bukkit.util.ReflectionUtils;
 import eu.darkcube.system.bukkit.util.ReflectionUtils.PackageType;
@@ -14,15 +24,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * <b>ParticleEffect Library</b>
@@ -409,7 +410,7 @@ public enum ParticleEffect {
 
     // Initialize map for quick name and id lookup
     static {
-        for (ParticleEffect effect : ParticleEffect.values()) {
+        for (var effect : ParticleEffect.values()) {
             ParticleEffect.NAME_MAP.put(effect.name, effect);
             ParticleEffect.ID_MAP.put(effect.id, effect);
         }
@@ -442,7 +443,7 @@ public enum ParticleEffect {
      * @return The particle effect
      */
     public static ParticleEffect fromName(String name) {
-        for (Entry<String, ParticleEffect> entry : ParticleEffect.NAME_MAP.entrySet()) {
+        for (var entry : ParticleEffect.NAME_MAP.entrySet()) {
             if (!entry.getKey().equalsIgnoreCase(name)) {
                 continue;
             }
@@ -458,7 +459,7 @@ public enum ParticleEffect {
      * @return The particle effect
      */
     public static ParticleEffect fromId(int id) {
-        for (Entry<Integer, ParticleEffect> entry : ParticleEffect.ID_MAP.entrySet()) {
+        for (var entry : ParticleEffect.ID_MAP.entrySet()) {
             if (entry.getKey() != id) {
                 continue;
             }
@@ -474,7 +475,7 @@ public enum ParticleEffect {
      * @return Whether water is at this location or not
      */
     private static boolean isWater(Location location) {
-        Material material = location.getBlock().getType();
+        var material = location.getBlock().getType();
         return material == Material.WATER || material == Material.STATIONARY_WATER;
     }
 
@@ -485,9 +486,9 @@ public enum ParticleEffect {
      * @return Whether the distance exceeds 256 or not
      */
     private static boolean isLongDistance(Location location, Collection<? extends Player> players) {
-        String world = location.getWorld().getName();
-        for (Player player : players) {
-            Location playerLocation = player.getLocation();
+        var world = location.getWorld().getName();
+        for (var player : players) {
+            var playerLocation = player.getLocation();
             if (!world.equals(playerLocation.getWorld().getName()) || playerLocation.distanceSquared(location) < 65536) {
                 continue;
             }
@@ -1001,7 +1002,7 @@ public enum ParticleEffect {
      * @author DarkBlade12
      * @since 1.6
      */
-    public static abstract class ParticleData {
+    public abstract static class ParticleData {
         private final Material material;
         private final byte data;
         private final int[] packetData;
@@ -1012,7 +1013,8 @@ public enum ParticleEffect {
          * @param material Material of the item/block
          * @param data     Data value of the item/block
          */
-        @SuppressWarnings("deprecation") public ParticleData(Material material, byte data) {
+        @SuppressWarnings("deprecation")
+        public ParticleData(Material material, byte data) {
             this.material = material;
             this.data = data;
             this.packetData = new int[]{material.getId(), data};
@@ -1115,7 +1117,7 @@ public enum ParticleEffect {
      * @author DarkBlade12
      * @since 1.7
      */
-    public static abstract class ParticleColor {
+    public abstract static class ParticleColor {
         /**
          * Returns the value for the offsetX field
          *
@@ -1226,7 +1228,8 @@ public enum ParticleEffect {
          *
          * @return The offsetX value
          */
-        @Override public float getValueX() {
+        @Override
+        public float getValueX() {
             return this.red / 255F;
         }
 
@@ -1235,7 +1238,8 @@ public enum ParticleEffect {
          *
          * @return The offsetY value
          */
-        @Override public float getValueY() {
+        @Override
+        public float getValueY() {
             return this.green / 255F;
         }
 
@@ -1244,7 +1248,8 @@ public enum ParticleEffect {
          *
          * @return The offsetZ value
          */
-        @Override public float getValueZ() {
+        @Override
+        public float getValueZ() {
             return this.blue / 255F;
         }
     }
@@ -1282,7 +1287,8 @@ public enum ParticleEffect {
          *
          * @return The offsetX value
          */
-        @Override public float getValueX() {
+        @Override
+        public float getValueX() {
             return this.note / 24F;
         }
 
@@ -1291,7 +1297,8 @@ public enum ParticleEffect {
          *
          * @return zero
          */
-        @Override public float getValueY() {
+        @Override
+        public float getValueY() {
             return 0;
         }
 
@@ -1300,7 +1307,8 @@ public enum ParticleEffect {
          *
          * @return zero
          */
-        @Override public float getValueZ() {
+        @Override
+        public float getValueZ() {
             return 0;
         }
 
@@ -1317,6 +1325,7 @@ public enum ParticleEffect {
      * @since 1.6
      */
     private static final class ParticleDataException extends RuntimeException {
+        @Serial
         private static final long serialVersionUID = 3203085387160737484L;
 
         /**
@@ -1340,6 +1349,7 @@ public enum ParticleEffect {
      * @since 1.7
      */
     private static final class ParticleColorException extends RuntimeException {
+        @Serial
         private static final long serialVersionUID = 3203085387160737484L;
 
         /**
@@ -1363,6 +1373,7 @@ public enum ParticleEffect {
      * @since 1.6
      */
     private static final class ParticleVersionException extends RuntimeException {
+        @Serial
         private static final long serialVersionUID = 3203085387160737484L;
 
         /**
@@ -1535,7 +1546,7 @@ public enum ParticleEffect {
             try {
                 this.packet = ParticlePacket.packetConstructor.newInstance();
                 if (ParticlePacket.version < 8) {
-                    String name = this.effect.getName();
+                    var name = this.effect.getName();
                     if (this.data != null) {
                         name += this.data.getPacketDataString();
                     }
@@ -1544,7 +1555,7 @@ public enum ParticleEffect {
                     ReflectionUtils.setValue(this.packet, true, "a", ParticlePacket.enumParticle.getEnumConstants()[this.effect.getId()]);
                     ReflectionUtils.setValue(this.packet, true, "j", this.longDistance);
                     if (this.data != null) {
-                        int[] packetData = this.data.getPacketData();
+                        var packetData = this.data.getPacketData();
                         ReflectionUtils.setValue(this.packet, true, "k", this.effect == ParticleEffect.ITEM_CRACK ? packetData : new int[]{packetData[0] | (packetData[1] << 12)});
                     }
                     ReflectionUtils.setValue(this.packet, true, "b", (float) center.getX());
@@ -1589,7 +1600,7 @@ public enum ParticleEffect {
          */
         public void sendTo(Location center, Collection<? extends Player> players) throws IllegalArgumentException {
             if (!players.isEmpty()) {
-                for (Player player : players) {
+                for (var player : players) {
                     this.sendTo(center, player);
                 }
             }
@@ -1608,9 +1619,9 @@ public enum ParticleEffect {
             if (range < 1) {
                 throw new IllegalArgumentException("The range is lower than 1");
             }
-            String worldName = center.getWorld().getName();
-            double squared = range * range;
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            var worldName = center.getWorld().getName();
+            var squared = range * range;
+            for (var player : Bukkit.getOnlinePlayers()) {
                 if (!player.getWorld().getName().equals(worldName) || player.getLocation().distanceSquared(center) > squared) {
                     continue;
                 }
@@ -1629,6 +1640,7 @@ public enum ParticleEffect {
          * @since 1.5
          */
         private static final class VersionIncompatibleException extends RuntimeException {
+            @Serial
             private static final long serialVersionUID = 3203085387160737484L;
 
             /**
@@ -1652,6 +1664,7 @@ public enum ParticleEffect {
          * @since 1.4
          */
         private static final class PacketInstantiationException extends RuntimeException {
+            @Serial
             private static final long serialVersionUID = 3203085387160737484L;
 
             /**
@@ -1675,6 +1688,7 @@ public enum ParticleEffect {
          * @since 1.4
          */
         private static final class PacketSendingException extends RuntimeException {
+            @Serial
             private static final long serialVersionUID = 3203085387160737484L;
 
             /**
