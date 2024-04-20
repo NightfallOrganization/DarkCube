@@ -27,8 +27,10 @@ import eu.darkcube.system.server.item.material.Material;
 import eu.darkcube.system.server.item.meta.BuilderMeta;
 import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
 
-@Api public interface ItemBuilder {
-    @Api static @NotNull ItemBuilder item() {
+@Api
+public interface ItemBuilder {
+    @Api
+    static @NotNull ItemBuilder item() {
         return item((Material) null);
     }
 
@@ -44,71 +46,115 @@ import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
      * @param object the object by which the ItemBuilder should be created.
      * @return a new {@link ItemBuilder}
      */
-    @Api static @NotNull ItemBuilder item(Object object) {
+    @Api
+    static @NotNull ItemBuilder item(Object object) {
         return ItemProvider.itemProvider().item(object);
     }
 
-    @Api static @NotNull ItemBuilder item(Material material) {
+    @Api
+    static @NotNull ItemBuilder item(Material material) {
         return ItemProvider.itemProvider().item(material);
     }
 
-    @Api static @NotNull ItemBuilder item(JsonElement json) {
+    @Api
+    static @NotNull ItemBuilder item(JsonElement json) {
         return ItemProvider.itemProvider().item(json);
     }
 
-    @Api @NotNull Material material();
+    @Api
+    @NotNull
+    Material material();
 
-    @Api @NotNull ItemBuilder material(@NotNull Material material);
+    @Api
+    @NotNull
+    ItemBuilder material(@NotNull Material material);
 
-    @Api default @NotNull ItemBuilder material(@NotNull Object material) {
+    @Api
+    default @NotNull ItemBuilder material(@NotNull Object material) {
         return material(Material.of(material));
     }
 
-    @Api int amount();
-
-    @Api @NotNull ItemBuilder amount(int amount);
-
-    @Api boolean canBeRepairedBy(ItemBuilder item);
-
-    @Api @NotNull @Unmodifiable Map<@NotNull Attribute, @NotNull @Unmodifiable Collection<@NotNull AttributeModifier>> attributeModifiers();
+    @Api
+    int amount();
 
     @Api
-    @NotNull @Unmodifiable Map<@NotNull Attribute, @NotNull @Unmodifiable Collection<@NotNull AttributeModifier>> attributeModifiers(EquipmentSlot slot);
-
-    @Api @NotNull Collection<@NotNull AttributeModifier> attributeModifiers(@NotNull Attribute attribute);
+    @NotNull
+    ItemBuilder amount(int amount);
 
     @Api
-    @NotNull ItemBuilder attributeModifiers(@NotNull Map<@NotNull Attribute, @NotNull Collection<@NotNull AttributeModifier>> attributeModifiers);
+    boolean canBeRepairedBy(ItemBuilder item);
 
-    @Api @NotNull ItemBuilder attributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier);
+    @Api
+    @NotNull
+    @Unmodifiable
+    Map<@NotNull Attribute, @NotNull @Unmodifiable Collection<@NotNull AttributeModifier>> attributeModifiers();
 
-    @Api default @NotNull ItemBuilder attributeModifier(@NotNull Object attribute, @NotNull Object modifier) {
+    @Api
+    @NotNull
+    @Unmodifiable
+    Map<@NotNull Attribute, @NotNull @Unmodifiable Collection<@NotNull AttributeModifier>> attributeModifiers(EquipmentSlot slot);
+
+    @Api
+    @NotNull
+    Collection<@NotNull AttributeModifier> attributeModifiers(@NotNull Attribute attribute);
+
+    @Api
+    @NotNull
+    ItemBuilder attributeModifiers(@NotNull Map<@NotNull Attribute, @NotNull Collection<@NotNull AttributeModifier>> attributeModifiers);
+
+    @Api
+    @NotNull
+    ItemBuilder attributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier);
+
+    @Api
+    default @NotNull ItemBuilder attributeModifier(@NotNull Object attribute, @NotNull Object modifier) {
         return attributeModifier(Attribute.of(attribute), AttributeModifier.of(modifier));
     }
 
-    @Api @NotNull ItemBuilder removeAttributeModifiers(@Nullable EquipmentSlot slot);
+    @Api
+    @NotNull
+    ItemBuilder removeAttributeModifiers(@Nullable EquipmentSlot slot);
 
-    @Api @NotNull ItemBuilder removeAttributeModifiers(@NotNull Attribute attribute);
+    @Api
+    @NotNull
+    ItemBuilder removeAttributeModifiers(@NotNull Attribute attribute);
 
-    @Api @NotNull ItemBuilder removeAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier);
+    @Api
+    @NotNull
+    ItemBuilder removeAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier);
 
-    @Api @NotNull ItemBuilder damage(int damage);
+    @Api
+    @NotNull
+    ItemBuilder damage(int damage);
 
-    @Api int damage();
+    @Api
+    int damage();
 
-    @Api @NotNull ItemBuilder enchant(@NotNull Enchantment enchant, int level);
+    @Api
+    @NotNull
+    ItemBuilder enchant(@NotNull Enchantment enchant, int level);
 
-    @Api default @NotNull ItemBuilder enchant(@NotNull Object enchantment, int level) {
+    @Api
+    default @NotNull ItemBuilder enchant(@NotNull Object enchantment, int level) {
         return enchant(Enchantment.of(enchantment), level);
     }
 
-    @Api @NotNull ItemBuilder enchant(@NotNull Map<@NotNull Enchantment, @NotNull Integer> enchantments);
+    @Api
+    @NotNull
+    ItemBuilder enchant(@NotNull Map<@NotNull Enchantment, @NotNull Integer> enchantments);
 
-    @Api @NotNull ItemBuilder enchantments(@NotNull Map<@NotNull Enchantment, @NotNull Integer> enchantments);
+    @Api
+    @NotNull
+    ItemBuilder enchantments(@NotNull Map<@NotNull Enchantment, @NotNull Integer> enchantments);
 
-    @Api @NotNull @Unmodifiable Map<@NotNull Enchantment, @NotNull Integer> enchantments();
+    @Api
+    @NotNull
+    @Unmodifiable
+    Map<@NotNull Enchantment, @NotNull Integer> enchantments();
 
-    @Api @NotNull Component displayname();
+    @Api
+    @NotNull
+    Component displayname();
 
     /**
      * Sets the displayname of the Item.
@@ -117,7 +163,9 @@ import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
      * @return this builder
      * @deprecated Use {@link ItemBuilder#displayname(Component)}
      */
-    @Api @Deprecated(forRemoval = true) default @NotNull ItemBuilder displayname(@Nullable String displayname) {
+    @Api
+    @Deprecated(forRemoval = true)
+    default @NotNull ItemBuilder displayname(@Nullable String displayname) {
         if (displayname == null) {
             return displayname((Component) null);
         }
@@ -130,7 +178,9 @@ import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
      * @param displayname the displayname
      * @return this builder
      */
-    @Api @NotNull ItemBuilder displayname(@Nullable Component displayname);
+    @Api
+    @NotNull
+    ItemBuilder displayname(@Nullable Component displayname);
 
     /**
      * Displayname via this method will start italic.
@@ -138,17 +188,30 @@ import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
      * @param displayname the displayname
      * @return this builder
      */
-    @Api @NotNull ItemBuilder displaynameRaw(@NotNull Component displayname);
+    @Api
+    @NotNull
+    ItemBuilder displaynameRaw(@NotNull Component displayname);
 
-    @Api @NotNull @Unmodifiable List<@NotNull Component> lore();
+    @Api
+    @NotNull
+    @Unmodifiable
+    List<@NotNull Component> lore();
 
-    @Api @NotNull ItemBuilder lore(@NotNull Component line);
+    @Api
+    @NotNull
+    ItemBuilder lore(@NotNull Component line);
 
-    @Api @NotNull ItemBuilder lore(@NotNull Collection<@NotNull Component> lore);
+    @Api
+    @NotNull
+    ItemBuilder lore(@NotNull Collection<@NotNull Component> lore);
 
-    @Api @NotNull ItemBuilder lore(@NotNull Component... lines);
+    @Api
+    @NotNull
+    ItemBuilder lore(@NotNull Component... lines);
 
-    @Api @NotNull ItemBuilder lore(@NotNull Component line, int index);
+    @Api
+    @NotNull
+    ItemBuilder lore(@NotNull Component line, int index);
 
     /**
      * Adds lore.
@@ -157,7 +220,9 @@ import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
      * @return this builder
      * @deprecated Use {@link ItemBuilder#lore(Component...)}
      */
-    @Api @Deprecated(forRemoval = true) ItemBuilder lore(String... lines);
+    @Api
+    @Deprecated(forRemoval = true)
+    ItemBuilder lore(String... lines);
 
     /**
      * Sets lore.
@@ -167,60 +232,104 @@ import eu.darkcube.system.server.item.storage.ItemPersistentDataStorage;
      * @deprecated Use {@link ItemBuilder#lore(Collection)}
      */
 
-    @Api @Deprecated(forRemoval = true) @NotNull ItemBuilder lores(@NotNull Collection<@NotNull String> lines);
+    @Api
+    @Deprecated(forRemoval = true)
+    @NotNull
+    ItemBuilder lores(@NotNull Collection<@NotNull String> lines);
 
-    @Api @NotNull ItemBuilder setLore(@NotNull Collection<@NotNull Component> lore);
+    @Api
+    @NotNull
+    ItemBuilder setLore(@NotNull Collection<@NotNull Component> lore);
 
-    @Api @NotNull ItemBuilder flag(@NotNull ItemFlag flag);
+    @Api
+    @NotNull
+    ItemBuilder flag(@NotNull ItemFlag flag);
 
-    @Api default @NotNull ItemBuilder flag(@NotNull Object flag) {
+    @Api
+    default @NotNull ItemBuilder flag(@NotNull Object flag) {
         return flag(ItemFlag.of(flag));
     }
 
-    @Api @NotNull ItemBuilder flag(@NotNull Collection<@NotNull ?> flags);
+    @Api
+    @NotNull
+    ItemBuilder flag(@NotNull Collection<@NotNull ?> flags);
 
-    @Api @NotNull ItemBuilder flag(@NotNull ItemFlag @NotNull ... flags);
+    @Api
+    @NotNull
+    ItemBuilder flag(@NotNull ItemFlag @NotNull ... flags);
 
-    @Api default @NotNull ItemBuilder flag(@NotNull Object @NotNull ... flags) {
+    @Api
+    default @NotNull ItemBuilder flag(@NotNull Object @NotNull ... flags) {
         for (var flag : flags) {
             flag(flag);
         }
         return this;
     }
 
-    @Api @NotNull ItemBuilder setFlags(@NotNull Collection<@NotNull ?> flags);
+    @Api
+    @NotNull
+    ItemBuilder setFlags(@NotNull Collection<@NotNull ?> flags);
 
-    @Api @NotNull @Unmodifiable List<@NotNull ItemFlag> flags();
+    @Api
+    @NotNull
+    @Unmodifiable
+    List<@NotNull ItemFlag> flags();
 
-    @Api @NotNull ItemBuilder unbreakable(boolean unbreakable);
+    @Api
+    @NotNull
+    ItemBuilder unbreakable(boolean unbreakable);
 
-    @Api boolean unbreakable();
+    @Api
+    boolean unbreakable();
 
-    @Api @NotNull ItemBuilder glow(boolean glow);
+    @Api
+    @NotNull
+    ItemBuilder glow(boolean glow);
 
-    @Api boolean glow();
+    @Api
+    boolean glow();
 
-    @Api @NotNull ItemPersistentDataStorage persistentDataStorage();
+    @Api
+    @NotNull
+    ItemPersistentDataStorage persistentDataStorage();
 
-    @Api <T extends BuilderMeta> @NotNull T meta(@NotNull Class<T> clazz);
+    @Api
+    <T extends BuilderMeta> @NotNull T meta(@NotNull Class<T> clazz);
 
-    @Api @NotNull ItemBuilder meta(@NotNull BuilderMeta meta);
+    @Api
+    @NotNull
+    ItemBuilder meta(@NotNull BuilderMeta meta);
 
-    @Api @NotNull @Unmodifiable Set<BuilderMeta> metas();
+    @Api
+    @NotNull
+    @Unmodifiable
+    Set<BuilderMeta> metas();
 
-    @Api @NotNull ItemBuilder metas(@NotNull Set<BuilderMeta> metas);
+    @Api
+    @NotNull
+    ItemBuilder metas(@NotNull Set<BuilderMeta> metas);
 
-    @Api @NotNull ItemBuilder clone();
+    @Api
+    @NotNull
+    ItemBuilder clone();
 
-    @Api int repairCost();
+    @Api
+    int repairCost();
 
-    @Api @NotNull ItemBuilder repairCost(int repairCost);
+    @Api
+    @NotNull
+    ItemBuilder repairCost(int repairCost);
 
-    @Api @NotNull JsonElement serialize();
+    @Api
+    @NotNull
+    JsonElement serialize();
 
-    @Api @NotNull <T> T build();
+    @Api
+    @NotNull
+    <T> T build();
 
-    @Api default @NotNull Object buildSafe() {
+    @Api
+    default @NotNull Object buildSafe() {
         return build();
     }
 }

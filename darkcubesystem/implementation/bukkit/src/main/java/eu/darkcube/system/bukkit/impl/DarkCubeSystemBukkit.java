@@ -30,13 +30,13 @@ import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.server.version.ServerVersion;
 import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.AsyncExecutor;
-import eu.darkcube.system.version.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 
-@ApiStatus.Internal public final class DarkCubeSystemBukkit extends DarkCubePlugin implements Listener {
+@ApiStatus.Internal
+public final class DarkCubeSystemBukkit extends DarkCubePlugin implements Listener {
     private final LinkManager linkManager = new LinkManager();
     private final BukkitVersionHandler versionHandler;
 
@@ -47,7 +47,8 @@ import org.bukkit.event.player.PlayerKickEvent;
         PacketAPI.instance().classLoader(getClassLoader());
     }
 
-    @Override public void onLoad() {
+    @Override
+    public void onLoad() {
         versionHandler.onLoad();
         AsyncExecutor.start();
         EntityOptions.registerOptions();
@@ -57,14 +58,16 @@ import org.bukkit.event.player.PlayerKickEvent;
         linkManager.addLink(() -> new CloudNetLink(this));
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         AsyncExecutor.stop();
         AdventureSupport.adventureSupport().audienceProvider().close();
         linkManager.unregisterLinks();
         versionHandler.onDisable();
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         InjectionLayer.ext().install(BindingBuilder.create().bind(AdventureSupport.class).toInstance(new BukkitAdventureSupportImpl(this)));
         versionHandler.onEnable();
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -91,7 +94,8 @@ import org.bukkit.event.player.PlayerKickEvent;
         new PacketDeclareProtocolVersion(InjectionLayer.boot().instance(ComponentInfo.class).componentName(), supported).sendAsync();
     }
 
-    @EventHandler public void handle(PlayerKickEvent event) {
+    @EventHandler
+    public void handle(PlayerKickEvent event) {
         if (Objects.equals(event.getReason(), "disconnect.spam")) {
             event.setCancelled(true);
         }

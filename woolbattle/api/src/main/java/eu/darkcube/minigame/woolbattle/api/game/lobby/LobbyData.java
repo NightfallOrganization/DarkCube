@@ -14,9 +14,10 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 @Api
 public interface LobbyData {
     @Api
-    @NotNull
-    Position.Directed spawn();
+    @NotNull Position.Directed spawn();
 
     @Api
     void spawn(@NotNull Position.Directed spawn);
+
+    @NotNull LobbyData clone();
 }

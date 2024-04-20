@@ -96,6 +96,10 @@ public class CommonTeam implements Team {
         return uniqueId;
     }
 
+    public String key() {
+        return key;
+    }
+
     public @NotNull Collection<WBUser> usersModifiable() {
         return users;
     }

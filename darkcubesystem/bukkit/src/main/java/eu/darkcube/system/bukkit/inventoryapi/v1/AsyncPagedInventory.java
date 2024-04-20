@@ -103,7 +103,8 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
         }
     }
 
-    @Override protected void tick() {
+    @Override
+    protected void tick() {
         this.currentSort.addAndGet(1);
         List<Integer> updateDone = new ArrayList<>();
         for (int slot : this.updateAtSort.keySet()) {
@@ -122,7 +123,8 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
         this.postTick(!updateDone.isEmpty());
     }
 
-    @Override protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
+    @Override
+    protected void asyncOfferAnimations(Collection<AnimationInformation> informations) {
         Map<Integer, ItemStack> items = new HashMap<>();
         this.fillItems(items);
 
@@ -143,7 +145,8 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
         this.calculatePageItems();
     }
 
-    @Override protected void destroy() {
+    @Override
+    protected void destroy() {
         super.destroy();
         HandlerList.unregisterAll(this.listener);
         this.items.clear();
@@ -207,14 +210,10 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
         if (!this.shouldDisplaySort(sort)) {
             return null;
         }
-        if (Arrays
-                .asList(this.arrowSlots.getOrDefault(PageArrow.PREVIOUS, new Integer[0]))
-                .contains(slot) && this.isArrowVisible(PageArrow.PREVIOUS)) {
+        if (Arrays.asList(this.arrowSlots.getOrDefault(PageArrow.PREVIOUS, new Integer[0])).contains(slot) && this.isArrowVisible(PageArrow.PREVIOUS)) {
             return this.addArrowMeta(this.arrowItem.get(PageArrow.PREVIOUS), PageArrow.PREVIOUS);
         }
-        if (Arrays
-                .asList(this.arrowSlots.getOrDefault(PageArrow.NEXT, new Integer[0]))
-                .contains(slot) && this.isArrowVisible(PageArrow.NEXT)) {
+        if (Arrays.asList(this.arrowSlots.getOrDefault(PageArrow.NEXT, new Integer[0])).contains(slot) && this.isArrowVisible(PageArrow.NEXT)) {
             return this.addArrowMeta(this.arrowItem.get(PageArrow.NEXT), PageArrow.NEXT);
         }
         return this.pageItems.getOrDefault(slot, this.staticItems.getOrDefault(slot, this.fallbackItems.getOrDefault(slot, null)));
@@ -225,29 +224,19 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
             System.out.println("Broken inventory: No arrow item " + this);
             return arrowItem;
         }
-        return ItemBuilder
-                .item(arrowItem)
-                .persistentDataStorage()
-                .iset(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING, arrow.name())
-                .builder()
-                .build();
+        return ItemBuilder.item(arrowItem).persistentDataStorage().iset(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING, arrow.name()).builder().build();
     }
 
     private PageArrow getArrowType(ItemStack arrowItem) {
         Map<String, PageArrow> arrowNames = new HashMap<>();
         Arrays.stream(PageArrow.values()).forEach(a -> arrowNames.put(a.name(), a));
-        return arrowNames.get(ItemBuilder
-                .item(arrowItem)
-                .persistentDataStorage()
-                .get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
+        return arrowNames.get(ItemBuilder.item(arrowItem).persistentDataStorage().get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
     }
 
     private boolean isArrowItem(ItemStack arrowItem) {
         var arrowNames = Arrays.stream(PageArrow.values()).map(Enum::name).toList();
         var b = ItemBuilder.item(arrowItem);
-        return b.persistentDataStorage().has(AsyncPagedInventory.META_KEY_ARROW_TYPE) && arrowNames.contains(b
-                .persistentDataStorage()
-                .get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
+        return b.persistentDataStorage().has(AsyncPagedInventory.META_KEY_ARROW_TYPE) && arrowNames.contains(b.persistentDataStorage().get(AsyncPagedInventory.META_KEY_ARROW_TYPE, PersistentDataTypes.STRING));
     }
 
     public boolean shouldDisplaySort(double sort) {
@@ -288,7 +277,8 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
 
     protected class PagedListener implements Listener {
 
-        @EventHandler public void handle(InventoryClickEvent event) {
+        @EventHandler
+        public void handle(InventoryClickEvent event) {
             var human = event.getWhoClicked();
             if (isOpened(human)) {
                 if (event.getView().getTopInventory().equals(event.getClickedInventory())) {
@@ -297,7 +287,8 @@ public abstract class AsyncPagedInventory extends AnimatedInventory {
             }
         }
 
-        @EventHandler public void handle(InventoryDragEvent event) {
+        @EventHandler
+        public void handle(InventoryDragEvent event) {
             if (isOpened(event.getWhoClicked())) {
                 event.setCancelled(true);
             }

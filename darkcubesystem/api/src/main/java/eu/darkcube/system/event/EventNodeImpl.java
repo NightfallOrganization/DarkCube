@@ -344,7 +344,7 @@ non-sealed class EventNodeImpl<T> implements EventNode<T> {
             this.updated = false;
         }
 
-        @Nullable Consumer<E> updatedListener() {
+        @Nullable Consumer<@NotNull E> updatedListener() {
             if (updated) return listener;
             synchronized (GLOBAL_CHILD_LOCK) {
                 if (updated) return listener;

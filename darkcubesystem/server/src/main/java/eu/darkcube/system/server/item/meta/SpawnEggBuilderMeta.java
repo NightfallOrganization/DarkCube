@@ -26,7 +26,8 @@ public final class SpawnEggBuilderMeta implements BuilderMeta {
         return this;
     }
 
-    @Override public SpawnEggBuilderMeta clone() {
+    @Override
+    public SpawnEggBuilderMeta clone() {
         return new SpawnEggBuilderMeta(entityTag);
     }
 }

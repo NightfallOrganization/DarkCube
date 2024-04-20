@@ -33,11 +33,13 @@ public class IInventoryClickEvent extends Event implements Cancellable {
         return handlerList;
     }
 
-    @Override public boolean isCancelled() {
+    @Override
+    public boolean isCancelled() {
         return bukkitEvent.isCancelled();
     }
 
-    @Override public void setCancelled(boolean cancel) {
+    @Override
+    public void setCancelled(boolean cancel) {
         bukkitEvent.setCancelled(cancel);
     }
 
@@ -57,7 +59,8 @@ public class IInventoryClickEvent extends Event implements Cancellable {
         return builder;
     }
 
-    @Override public HandlerList getHandlers() {
+    @Override
+    public HandlerList getHandlers() {
         return handlerList;
     }
 }

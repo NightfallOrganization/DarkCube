@@ -28,7 +28,8 @@ public final class LeatherArmorBuilderMeta implements BuilderMeta {
         return this;
     }
 
-    @Override public LeatherArmorBuilderMeta clone() {
+    @Override
+    public LeatherArmorBuilderMeta clone() {
         return new LeatherArmorBuilderMeta(color);
     }
 }

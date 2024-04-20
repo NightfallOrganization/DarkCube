@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.event.EventManager;
+import eu.cloudnetservice.driver.event.InvocationOrder;
 import eu.cloudnetservice.driver.event.events.service.CloudServiceUpdateEvent;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
@@ -50,11 +51,13 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 
     protected abstract Set<String> getCloudTasks();
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && this.done;
     }
 
-    @Override protected final void destroy() {
+    @Override
+    protected final void destroy() {
         InjectionLayer.boot().instance(EventManager.class).unregisterListener(this.listener);
         this.destroy0();
         super.destroy();
@@ -63,16 +66,11 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     protected void destroy0() {
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         Lobby lobby = Lobby.getInstance();
 
-        List<ServerInformation> informations = lobby
-                .serverManager()
-                .informations()
-                .stream()
-                .filter(ServerInformation.filterByTask(getCloudTasks()))
-                .filter(ServerInformation.ONLINE_FILTER)
-                .collect(Collectors.toList());
+        List<ServerInformation> informations = lobby.serverManager().informations().stream().filter(ServerInformation.filterByTask(getCloudTasks())).filter(ServerInformation.ONLINE_FILTER).collect(Collectors.toList());
 
         List<ItemSortingInfo> itemSortingInfos = new ArrayList<>();
         for (ServerInformation information : informations) {
@@ -116,7 +114,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user.user()));
         super.insertFallbackItems();
     }
@@ -141,7 +140,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     }
 
     public class Listener {
-        @EventListener public void handle(CloudServiceUpdateEvent ignored) {
+        @EventListener(order = InvocationOrder.MONITOR)
+        public void handle(CloudServiceUpdateEvent ignored) {
             MinigameInventory.this.recalculate();
         }
     }

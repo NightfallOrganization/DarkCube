@@ -4,7 +4,15 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.module.node.data;
+
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.common.collect.HashBiMap;
 import eu.cloudnetservice.driver.database.Database;
@@ -17,13 +25,6 @@ import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataClearSet;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataRemove;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataSet;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeQuery;
-
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SynchronizedPersistentDataStorages {
     static final Database database;
@@ -55,9 +56,9 @@ public class SynchronizedPersistentDataStorages {
         SynchronizedPersistentDataStorage storage = ref == null ? null : ref.get();
         if (storage == null) {
             storage = new SynchronizedPersistentDataStorage(key);
-            if (database.contains(key.key())) {
-                Document doc = database.get(key.key());
-                database.delete(key.key());
+            if (database.contains(key.value())) {
+                Document doc = database.get(key.value());
+                database.delete(key.value());
                 database.insert(key.toString(), doc);
                 storage.loadFromJsonDocument(doc);
             } else if (database.contains(key.toString())) {
@@ -80,8 +81,9 @@ public class SynchronizedPersistentDataStorages {
             start();
         }
 
-        @Override public void run() {
-            //noinspection InfiniteLoopStatement
+        @Override
+        public void run() {
+            // noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     Reference<? extends SynchronizedPersistentDataStorage> reference = queue.remove();

@@ -1,5 +1,7 @@
 package eu.darkcube.minigame.woolbattle.minestom.user;
 
+import java.util.ArrayList;
+
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
@@ -51,32 +53,40 @@ public class MinestomUserInventoryAccess implements UserInventoryAccess {
     }
 
     private static void removeItems(PlayerInventory inventory, ItemStack itemToRemove, int count, WoolSubtractDirection direction) {
-        if (direction == WoolSubtractDirection.RIGHT_TO_LEFT) {
-            // var toDelete = count;
-            // var deleted = 0;
-            // for (var i = count - 1; i >= 0; i--) {
-            //     do {
-            //         var last = last(inventory, itemToRemove);
-            //         if (last == -1) {
-            //             break;
-            //         }
-            //         var item = inventory.getItemStack(last);
-            //         var amount = item.amount();
-            //         if (amount <= toDelete) {
-            //             toDelete -= amount;
-            //             inventory.takeItemStack()
-            //         }
-            //     } while (toDelete > 0);
-            // }
-            removeItems(inventory, itemToRemove.withAmount(count), inventory.getInnerSize() - 1, 0, -1);
-        } else {
-            removeItems(inventory, itemToRemove.withAmount(count), 0, inventory.getInnerSize(), 1);
-        }
+        // var toDelete = count;
+        // var deleted = 0;
+        // for (var i = count - 1; i >= 0; i--) {
+        //     do {
+        //         var last = last(inventory, itemToRemove);
+        //         if (last == -1) {
+        //             break;
+        //         }
+        //         var item = inventory.getItemStack(last);
+        //         var amount = item.amount();
+        //         if (amount <= toDelete) {
+        //             toDelete -= amount;
+        //             inventory.takeItemStack()
+        //         }
+        //     } while (toDelete > 0);
+        // }
+        removeItems(inventory, itemToRemove.withAmount(count), inventory.getSize(), direction == WoolSubtractDirection.RIGHT_TO_LEFT);
     }
 
-    private static void removeItems(@NotNull PlayerInventory inventory, @NotNull ItemStack itemToRemove, int start, int end, int step) {
-        var pair = TransactionType.TAKE.process(inventory, itemToRemove, (a, b) -> true, start, end, step);
-        TransactionOption.ALL.fill(inventory, pair.left(), pair.right());
+    private static void removeItems(@NotNull PlayerInventory inventory, @NotNull ItemStack itemToRemove, int size, boolean reverse) {
+        var slots = new ArrayList<Integer>(size);
+        if (reverse) {
+            for (var i = size - 1; i >= 0; i--) {
+                slots.add(i);
+            }
+        } else {
+            for (var i = 0; i < size; i++) {
+                slots.add(i);
+            }
+        }
+        var type = TransactionType.take(slots);
+        TransactionOption.ALL.fill(type, inventory, itemToRemove);
+        // var pair = TransactionType.TAKE.process(inventory, itemToRemove, (a, b) -> true, start, end, step);
+        // TransactionOption.ALL.fill(inventory, pair.left(), pair.right());
     }
 
     // private static int last(PlayerInventory inventory, ItemStack item) {

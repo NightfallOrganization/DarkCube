@@ -12,7 +12,8 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.item.firework.FireworkEffect;
 
-@Api public final class FireworkBuilderMeta implements BuilderMeta {
+@Api
+public final class FireworkBuilderMeta implements BuilderMeta {
     private @Nullable FireworkEffect fireworkEffect;
 
     public FireworkBuilderMeta(@Nullable FireworkEffect fireworkEffect) {
@@ -26,21 +27,25 @@ import eu.darkcube.system.server.item.firework.FireworkEffect;
     public FireworkBuilderMeta() {
     }
 
-    @Api public @Nullable FireworkEffect fireworkEffect() {
+    @Api
+    public @Nullable FireworkEffect fireworkEffect() {
         return fireworkEffect;
     }
 
-    @Api public @NotNull FireworkBuilderMeta fireworkEffect(@Nullable FireworkEffect fireworkEffect) {
+    @Api
+    public @NotNull FireworkBuilderMeta fireworkEffect(@Nullable FireworkEffect fireworkEffect) {
         this.fireworkEffect = fireworkEffect;
         return this;
     }
 
-    @Api public @NotNull FireworkBuilderMeta fireworkEffect(@Nullable Object fireworkEffect) {
+    @Api
+    public @NotNull FireworkBuilderMeta fireworkEffect(@Nullable Object fireworkEffect) {
         if (fireworkEffect == null) return fireworkEffect(null);
         return fireworkEffect(FireworkEffect.of(fireworkEffect));
     }
 
-    @Override public FireworkBuilderMeta clone() {
+    @Override
+    public FireworkBuilderMeta clone() {
         return new FireworkBuilderMeta(fireworkEffect);
     }
 }

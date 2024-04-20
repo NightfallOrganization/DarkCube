@@ -8,11 +8,17 @@
 package eu.darkcube.minigame.woolbattle.api.event.entity;
 
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
-import eu.darkcube.system.event.Cancellable;
+import eu.darkcube.minigame.woolbattle.api.event.world.WorldEvent;
+import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public interface EntityEvent {
+public interface EntityEvent extends WorldEvent {
     @NotNull Entity entity();
+
+    @Override
+    default @NotNull World world() {
+        return entity().location().world();
+    }
 
     class Event implements EntityEvent {
         private final @NotNull Entity entity;

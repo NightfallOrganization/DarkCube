@@ -252,7 +252,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                         responseV2(sender, requestId, 0, "out_of_date");
                         return;
                     }
-                    @NotNull var game = woolbattle.games().createGame(mapSize);
+                    @NotNull var game = woolbattle.games().createGame(map);
                     connect(game, playerUniqueId, requestId, sender, mapSize);
                 } else {
                     responseV2(sender, requestId, 0, "invalid_protocol");

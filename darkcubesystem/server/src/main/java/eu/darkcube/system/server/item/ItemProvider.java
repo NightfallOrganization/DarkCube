@@ -14,7 +14,9 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.item.material.Material;
 
-@ApiStatus.Experimental @Api public interface ItemProvider {
+@ApiStatus.Experimental
+@Api
+public interface ItemProvider {
     static ItemProvider itemProvider() {
         return ItemProviderImpl.itemProvider();
     }
@@ -25,7 +27,9 @@ import eu.darkcube.system.server.item.material.Material;
      * @param material the Material to use
      * @return an ItemBuilder for the Material
      */
-    @Api @NotNull ItemBuilder item(@Nullable Material material);
+    @Api
+    @NotNull
+    ItemBuilder item(@Nullable Material material);
 
     /**
      * Deserializes a JsonElement to an ItemBuilder.
@@ -33,7 +37,9 @@ import eu.darkcube.system.server.item.material.Material;
      * @param json the Json to deserialize
      * @return an ItemBuilder created by the json
      */
-    @Api @NotNull ItemBuilder item(@NotNull JsonElement json);
+    @Api
+    @NotNull
+    ItemBuilder item(@NotNull JsonElement json);
 
     /**
      * Tries to construct an ItemBuilder for the given object.
@@ -47,5 +53,7 @@ import eu.darkcube.system.server.item.material.Material;
      * @param object the object by which the ItemBuilder should be created.
      * @return a new {@link ItemBuilder}
      */
-    @Api @NotNull ItemBuilder item(@NotNull Object object);
+    @Api
+    @NotNull
+    ItemBuilder item(@NotNull Object object);
 }

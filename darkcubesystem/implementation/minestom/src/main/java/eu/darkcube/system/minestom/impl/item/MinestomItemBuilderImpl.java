@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.minestom.impl.item;
 
+import static net.minestom.server.item.Enchantment.INFINITY;
+import static net.minestom.server.item.Enchantment.PROTECTION;
 import static net.minestom.server.item.Material.BOW;
 
 import java.io.IOException;
@@ -39,7 +41,6 @@ import eu.darkcube.system.server.item.meta.LeatherArmorBuilderMeta;
 import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.PlayerSkin;
-import net.minestom.server.item.Enchantment;
 import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.metadata.EnchantedBookMeta;
@@ -156,8 +157,12 @@ public class MinestomItemBuilderImpl extends AbstractItemBuilder implements Mine
         var builder = ItemStack.builder(material);
         builder.amount(amount);
         builder.meta(meta -> {
-            meta.setTag(REPAIR_COST, repairCost);
-            meta.unbreakable(unbreakable);
+            if (repairCost != 0) {
+                meta.setTag(REPAIR_COST, repairCost);
+            }
+            if (unbreakable) {
+                meta.unbreakable(true);
+            }
             if (displayname != Component.empty()) {
                 meta.displayName(AdventureUtils.convert(displayname));
             }
@@ -165,11 +170,13 @@ public class MinestomItemBuilderImpl extends AbstractItemBuilder implements Mine
                 meta.enchantment(((MinestomEnchantmentImpl) entry.getKey()).minestomType(), entry.getValue().shortValue());
             }
 
-            meta.hideFlag(flags.stream().map(flag -> ((MinestomItemFlagImpl) flag).minestomType()).toArray(ItemHideFlag[]::new));
+            if (!flags.isEmpty()) {
+                meta.hideFlag(flags.stream().map(flag -> ((MinestomItemFlagImpl) flag).minestomType()).toArray(ItemHideFlag[]::new));
+            }
             if (!lore.isEmpty()) meta.lore(lore.stream().map(AdventureUtils::convert).toList());
             if (glow) {
                 if (enchantments.isEmpty()) {
-                    meta.enchantment(material == BOW ? Enchantment.PROTECTION : Enchantment.INFINITY, (short) 1);
+                    meta.enchantment(material == BOW ? PROTECTION : INFINITY, (short) 1);
                     meta.hideFlag(ItemHideFlag.HIDE_ENCHANTS);
                 }
             }
