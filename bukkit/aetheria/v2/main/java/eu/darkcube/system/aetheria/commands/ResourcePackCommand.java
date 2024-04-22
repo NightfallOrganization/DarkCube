@@ -8,7 +8,7 @@
 package eu.darkcube.system.aetheria.commands;
 
 import eu.darkcube.system.aetheria.Aetheria;
-import eu.darkcube.system.aetheria.util.ResourcePackUtil;
+import eu.darkcube.system.aetheria.other.ResourcePackUtil;
 import eu.darkcube.system.commandapi.v3.CommandExecutor;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;

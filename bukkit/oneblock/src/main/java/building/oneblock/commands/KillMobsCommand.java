@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.aetheria.commands;
+package building.oneblock.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,9 +23,9 @@ public class KillMobsCommand implements CommandExecutor {
                         e.remove();
                     }
                 }
-                player.sendMessage("§7Alle Mobs wurden §aentfernt§7!");
+                player.sendMessage("§7Alle Mobs wurden §eentfernt§7!");
             } else {
-                player.sendMessage("§7Du hast keine Berechtigung, diesen Befehl auszuführen!");
+                player.sendMessage("§cDu hast keine Berechtigung, diesen Befehl auszuführen!");
             }
         }
         return true;

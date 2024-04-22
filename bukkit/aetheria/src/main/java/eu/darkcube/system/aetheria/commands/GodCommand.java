@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. [DarkCube]
+ * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -15,41 +15,54 @@ import org.bukkit.entity.Player;
 
 public class GodCommand implements CommandExecutor {
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 0 && sender instanceof Player) {
-            toggleGodMode((Player) sender, sender);
-            return true;
-        } else if (args.length == 1) {
-            Player target = Bukkit.getServer().getPlayer(args[0]);
-            if (target != null) {
-                toggleGodMode(target, sender);
-                sender.sendMessage("§7God mode toggled for §a" + target.getName());
-                return true;
-            } else {
-                sender.sendMessage("§cSpieler nicht gefunden.");
-                return false;
-            }
-        } else {
-            sender.sendMessage("§cUsage: /god [player]");
+    @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");
             return false;
         }
-    }
 
-    private void toggleGodMode(Player player, CommandSender sender) {
-        if (player.isInvulnerable()) {
-            player.setInvulnerable(false);
-            player.sendMessage("§7Godmodus §aAUS");
-            if (sender != player) {
-                sender.sendMessage("§7God mode disabled for §a" + player.getName());
-            }
-        } else {
-            player.setInvulnerable(true);
-            player.sendMessage("§7Godmodus §aAN");
-            if (sender != player) {
-                sender.sendMessage("§7God mode enabled for §a" + player.getName());
-            }
+        if (!command.getName().equalsIgnoreCase("god") || (args.length > 1)) {
+
+            sender.sendMessage("§7Unbekannter Befehl. Nutze §a/god (Person) §7um dich oder andere in den God zu setzten");
+            return false;
+
         }
+
+        if ((args.length == 1) && (Bukkit.getPlayer(args[0]) != null)) {
+            Player player = Bukkit.getPlayer(args[0]);
+
+            if (!player.isInvulnerable()) {
+
+                player.setInvulnerable(true);
+                player.setSaturation(40000);
+                sender.sendMessage("§a" + player.getName() + "§7 wurde in den Godmodus gesetzt");
+                return true;
+            } else if (player.isInvulnerable()) {
+                player.setInvulnerable(false);
+                sender.sendMessage("§a" + player.getName() + "§7 wurde aus den Godmodus gesetzt");
+                return true;
+            }
+        } else if (args.length == 0) {
+            Player player = (Player) sender;
+
+            if (!player.isInvulnerable()) {
+
+                player.setInvulnerable(true);
+                player.setSaturation(20);
+                sender.sendMessage("§7Godmodus §aAN");
+                return false;
+            } else if (player.isInvulnerable()) {
+                player.setInvulnerable(false);
+                player.setSaturation(20);
+                sender.sendMessage("§7Godmodus §aAUS");
+                return true;
+            }
+
+        }
+
+        sender.sendMessage("§7Unbekannter Befehl. Nutze §a/god (Person) §7um dich oder andere in den God zu setzten");
+        return false;
     }
 
 }

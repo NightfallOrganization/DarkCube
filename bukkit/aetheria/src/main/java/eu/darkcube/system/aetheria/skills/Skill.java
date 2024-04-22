@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. [DarkCube]
+ * Copyright (c) 2023. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,68 +7,55 @@
 
 package eu.darkcube.system.aetheria.skills;
 
-import com.google.gson.Gson;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Entity;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
 
 public abstract class Skill {
     protected String name;
-    protected int cooldown;
-    protected boolean isActive;
+    protected static final long COOLDOWN_IN_SECONDS = 10; // Zum Beispiel 10 Sekunden
+    protected HashMap<Player, Long> cooldowns = new HashMap<>();
+    private boolean isActive;
 
-    public Skill(String name, int cooldown) {
+    public Skill(String name) {
         this.name = name;
-        this.cooldown = cooldown;
-        this.isActive = false; // Standardmäßig ist ein Skill deaktiviert
     }
 
-    public abstract void execute(Entity executor);
-
-
-    // Aktiviert den Skill
-    public void activate() {
-        this.isActive = true;
-        // Zusätzliche Logik bei Aktivierung kann hier implementiert werden
+    public String getName() {
+        return name;
     }
 
-    // Deaktiviert den Skill
-    public void deactivate() {
-        this.isActive = false;
-        // Zusätzliche Logik bei Deaktivierung kann hier implementiert werden
-    }
-
-    // Überprüft, ob der Skill aktiviert ist
-    public boolean isActive() {
-        return this.isActive;
-    }
-
-    // Speichern des Skill-Zustands in der Entität
-    public void saveState(Entity entity, JavaPlugin plugin) {
-        NamespacedKey key = new NamespacedKey(plugin, "skill_active_" + name);
-        entity.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) (this.isActive ? 1 : 0));
-    }
-
-    // Laden des Skill-Zustands aus der Entität
-    public static boolean loadState(Entity entity, JavaPlugin plugin, String skillName) {
-        NamespacedKey key = new NamespacedKey(plugin, "skill_active_" + skillName);
-        Byte storedValue = entity.getPersistentDataContainer().get(key, PersistentDataType.BYTE);
-        return storedValue != null && storedValue == 1;
-    }
-
-    // Methode zum Anwenden eines Skills auf eine Entität
-    public void applySkillToEntity(Entity entity, JavaPlugin plugin) {
-        this.activate(); // Aktiviere den Skill
-        this.saveState(entity, plugin); // Speichere den Zustand des Skills in der Entität
-    }
-
-    // Methode zum Ausführen eines Skills von einer Entität, falls der Skill aktiv ist
-    public static void executeSkillFromEntity(Entity entity, JavaPlugin plugin, String skillName, Skill skill) {
-        boolean isActive = loadState(entity, plugin, skillName);
-        if (isActive) {
-            skill.execute(entity); // Führe den Skill aus, wenn er aktiv ist
+    public final void activate(Player player) {
+        if (!isActive) {
+            player.sendMessage("§7Der Skill §a" + name + " §7ist ein passiver Skill und kann nicht aktiviert werden.");
+            return;
+        }
+        if (canUse(player)) {
+            activateSkill(player);
+            cooldowns.put(player, System.currentTimeMillis());
+        } else {
+            long timeLeft = (cooldowns.get(player) + COOLDOWN_IN_SECONDS * 1000 - System.currentTimeMillis()) / 1000;
+            player.sendMessage("§7Du musst noch §a" + timeLeft + " §7Sekunden warten, bevor du diesen Skill wieder verwenden kannst");
         }
     }
 
+    public Skill(String name, boolean isActive) {
+        this.name = name;
+        this.isActive = isActive;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    protected abstract void activateSkill(Player player);
+
+    private boolean canUse(Player player) {
+        if (!cooldowns.containsKey(player)) {
+            return true;
+        }
+
+        long timeSinceLastUse = System.currentTimeMillis() - cooldowns.get(player);
+        return timeSinceLastUse >= COOLDOWN_IN_SECONDS * 1000;
+    }
 }

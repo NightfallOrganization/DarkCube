@@ -1,0 +1,77 @@
+package building.oneblock;
+
+import building.oneblock.commands.*;
+import building.oneblock.items.CrookItem;
+import building.oneblock.items.RodOfTheSkyItem;
+import building.oneblock.manager.*;
+import building.oneblock.ruler.MainRuler;
+import building.oneblock.ruler.OneBlockWorldRuler;
+import building.oneblock.ruler.SpawnRuler;
+import building.oneblock.util.ability.ItemCollector;
+import building.oneblock.util.ability.SneakGrow;
+import building.oneblock.util.ability.ToolHelper;
+import building.oneblock.util.ability.WoodBlockBreaker;
+import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public final class OneBlock extends JavaPlugin {
+    private static OneBlock instance;
+
+    public OneBlock() {
+        instance = this;
+    }
+
+    public static OneBlock getInstance() {
+        return instance;
+    }
+
+    @Override
+    public void onEnable() {
+        WorldManager.loadWorlds();
+
+        var oneBlockManager = new OneBlockManager();
+        var playerManager = new PlayerManager();
+        var itemCollector = new ItemCollector();
+        var spawnRuler = new SpawnRuler();
+        var mainRuler = new MainRuler();
+        var oneBlockWorldRuler = new OneBlockWorldRuler();
+        var sneakGrow = new SneakGrow();
+        var crookItem = new CrookItem();
+        var rodOfTheSkyitem = new RodOfTheSkyItem();
+        var woodBlockBreaker = new WoodBlockBreaker();
+        var toolHelper = new ToolHelper();
+        var respawnManager = new RespawnManager();
+//        new ItemManager(this);
+
+        instance.getServer().getPluginManager().registerEvents(oneBlockManager, this);
+        instance.getServer().getPluginManager().registerEvents(playerManager, this);
+        instance.getServer().getPluginManager().registerEvents(itemCollector, this);
+        instance.getServer().getPluginManager().registerEvents(spawnRuler, this);
+        instance.getServer().getPluginManager().registerEvents(mainRuler, this);
+        instance.getServer().getPluginManager().registerEvents(oneBlockWorldRuler, this);
+        instance.getServer().getPluginManager().registerEvents(sneakGrow, this);
+        instance.getServer().getPluginManager().registerEvents(crookItem, this);
+        instance.getServer().getPluginManager().registerEvents(woodBlockBreaker, this);
+        instance.getServer().getPluginManager().registerEvents(toolHelper, this);
+        instance.getServer().getPluginManager().registerEvents(respawnManager, this);
+        instance.getServer().getPluginManager().registerEvents(rodOfTheSkyitem, this);
+
+        instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
+        instance.getCommand("gm").setExecutor(new GMCommand());
+        instance.getCommand("tpworld").setExecutor(new TPWorldCommand());
+        instance.getCommand("god").setExecutor(new GodCommand());
+        instance.getCommand("fly").setExecutor(new FlyCommand(this));
+        instance.getCommand("startworld").setExecutor(new StartWorldCommand());
+        instance.getCommand("loadworld").setExecutor(new LoadWorldCommand());
+        instance.getCommand("heal").setExecutor(new HealCommand());
+        instance.getCommand("feed").setExecutor(new FeedCommand());
+        instance.getCommand("max").setExecutor(new MaxCommand());
+        instance.getCommand("day").setExecutor(new DayCommand());
+        instance.getCommand("night").setExecutor(new NightCommand());
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+    }
+}
