@@ -1,9 +1,11 @@
 package building.oneblock.ruler;
 
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +17,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -30,12 +33,20 @@ public class SpawnRuler implements Listener {
         }
     }
 
+//    @EventHandler
+//    public void onWorldLoad(WorldLoadEvent event) {
+//        World world = event.getWorld();
+//        if (world.equals(SPAWN)) {
+//            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+//            world.setTime(6000);
+//        }
+//    }
+
+
     @EventHandler
-    public void onWorldLoad(WorldLoadEvent event) {
-        World world = event.getWorld();
-        if (world.equals(SPAWN)) {
-            world.setGameRuleValue("doDaylightCycle", "false");
-            world.setTime(8000);
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getEntity().getWorld().equals(SPAWN)) {
+            event.setCancelled(true);
         }
     }
 

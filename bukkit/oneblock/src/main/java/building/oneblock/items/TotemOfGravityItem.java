@@ -34,4 +34,10 @@ public class TotemOfGravityItem {
 
         Bukkit.addRecipe(recipe);
     }
+
+    public static void unregisterTotemofGravityRecipe() {
+        NamespacedKey key = new NamespacedKey(OneBlock.getInstance(), "totem_of_gravity");
+        Bukkit.removeRecipe(key);
+    }
+
 }

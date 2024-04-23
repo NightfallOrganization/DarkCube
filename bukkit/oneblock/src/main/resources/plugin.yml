@@ -41,6 +41,9 @@ commands:
   night:
     description: Setze Nacht
     permission: oneblock.night.use
+  spawn:
+    description: Teleportiert den Spieler zum Spawn
+    permission: oneblock.spawn.use
 
 Permissions:
   oneblock.gm.use:
@@ -66,4 +69,6 @@ Permissions:
   oneblock.day.use:
     default: op
   oneblock.night.use:
+    default: op
+  oneblock.spawn.use:
     default: op

@@ -4,6 +4,7 @@ import building.oneblock.commands.*;
 import building.oneblock.items.CrookItem;
 import building.oneblock.items.RodOfTheSkyItem;
 import building.oneblock.manager.*;
+import building.oneblock.npc.NPCCreator;
 import building.oneblock.ruler.MainRuler;
 import building.oneblock.ruler.OneBlockWorldRuler;
 import building.oneblock.ruler.SpawnRuler;
@@ -29,8 +30,12 @@ public final class OneBlock extends JavaPlugin {
     public void onEnable() {
         WorldManager.loadWorlds();
 
+//        var itemManager = new ItemManager(this);
+//        itemManager.createAllRecipes();
+
+        var spawnManager = new SpawnManager();
         var oneBlockManager = new OneBlockManager();
-        var playerManager = new PlayerManager();
+        var playerManager = new PlayerManager(spawnManager);
         var itemCollector = new ItemCollector();
         var spawnRuler = new SpawnRuler();
         var mainRuler = new MainRuler();
@@ -39,9 +44,10 @@ public final class OneBlock extends JavaPlugin {
         var crookItem = new CrookItem();
         var rodOfTheSkyitem = new RodOfTheSkyItem();
         var woodBlockBreaker = new WoodBlockBreaker();
-        var toolHelper = new ToolHelper();
         var respawnManager = new RespawnManager();
-//        new ItemManager(this);
+//        var npcManager = new NPCManager(this);
+//        var npcCreator = new NPCCreator(npcManager);
+//        npcCreator.createNPC();
 
         instance.getServer().getPluginManager().registerEvents(oneBlockManager, this);
         instance.getServer().getPluginManager().registerEvents(playerManager, this);
@@ -52,9 +58,9 @@ public final class OneBlock extends JavaPlugin {
         instance.getServer().getPluginManager().registerEvents(sneakGrow, this);
         instance.getServer().getPluginManager().registerEvents(crookItem, this);
         instance.getServer().getPluginManager().registerEvents(woodBlockBreaker, this);
-        instance.getServer().getPluginManager().registerEvents(toolHelper, this);
         instance.getServer().getPluginManager().registerEvents(respawnManager, this);
         instance.getServer().getPluginManager().registerEvents(rodOfTheSkyitem, this);
+//        instance.getServer().getPluginManager().registerEvents(npcCreator, this);
 
         instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
         instance.getCommand("gm").setExecutor(new GMCommand());
@@ -68,10 +74,13 @@ public final class OneBlock extends JavaPlugin {
         instance.getCommand("max").setExecutor(new MaxCommand());
         instance.getCommand("day").setExecutor(new DayCommand());
         instance.getCommand("night").setExecutor(new NightCommand());
+        instance.getCommand("spawn").setExecutor(new SpawnCommand(spawnManager));
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+//        var itemManager = new ItemManager(this);
+//        itemManager.removeAllRecipes();
     }
+
 }
