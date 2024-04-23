@@ -33,7 +33,6 @@ public class SpawnCommand implements CommandExecutor {
 
                 public void run() {
                     if (player.getLocation().distance(originalLocation) > 0.5) {
-                        player.sendMessage("§cTeleport abgebrochen!");
                         user.sendMessage(Message.TIMER);
                         player.playSound(originalLocation, Sound.ENTITY_VILLAGER_NO, 50, 1);
                         cancel();
