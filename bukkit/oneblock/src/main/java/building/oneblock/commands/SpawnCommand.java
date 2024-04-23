@@ -2,6 +2,9 @@ package building.oneblock.commands;
 
 import building.oneblock.OneBlock;
 import building.oneblock.manager.SpawnManager;
+import building.oneblock.util.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -23,6 +26,7 @@ public class SpawnCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             Location originalLocation = player.getLocation();
+            User user = UserAPI.instance().user(player.getUniqueId());
 
             new BukkitRunnable() {
                 int countdown = 5;
@@ -30,6 +34,7 @@ public class SpawnCommand implements CommandExecutor {
                 public void run() {
                     if (player.getLocation().distance(originalLocation) > 0.5) {
                         player.sendMessage("§cTeleport abgebrochen!");
+                        user.sendMessage(Message.TIMER);
                         player.playSound(originalLocation, Sound.ENTITY_VILLAGER_NO, 50, 1);
                         cancel();
                     } else {
