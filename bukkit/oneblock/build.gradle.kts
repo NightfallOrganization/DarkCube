@@ -6,7 +6,33 @@
  */
 
 plugins {
+    alias(libs.plugins.shadow)
     java
+}
+
+tasks {
+    jar {
+        destinationDirectory = temporaryDir
+    }
+    assemble {
+        dependsOn(shadowJar)
+    }
+    shadowJar {
+        this.archiveClassifier = null
+
+        relocate("com.github.juliarn.npclib", "building.oneblock.libs.npclib")
+
+        exclude("**/packetevents/**")
+        exclude("**/gson/**")
+        exclude("assets/")
+        exclude("license.txt")
+        exclude("net/kyori/adventure/**")
+        exclude("net/kyori/examination/**")
+
+        dependencies {
+            include(dependencyFilter.dependency("io.github.juliarn:npc-lib-bukkit"))
+        }
+    }
 }
 
 dependencies {
