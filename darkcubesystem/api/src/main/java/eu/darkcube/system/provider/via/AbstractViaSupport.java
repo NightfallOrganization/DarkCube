@@ -8,6 +8,7 @@
 package eu.darkcube.system.provider.via;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
 import java.util.UUID;
 
@@ -28,10 +29,10 @@ public abstract class AbstractViaSupport implements ViaSupport {
     }
 
     @Override public int[] supportedVersions() {
-        return Via.getManager().getProtocolManager().getSupportedVersions().stream().mapToInt(i -> i).toArray();
+        return Via.getManager().getProtocolManager().getSupportedVersions().stream().mapToInt(ProtocolVersion::getVersion).toArray();
     }
 
     @Override public int serverVersion() {
-        return Via.getAPI().getServerVersion().highestSupportedVersion();
+        return Via.getAPI().getServerVersion().highestSupportedProtocolVersion().getVersion();
     }
 }

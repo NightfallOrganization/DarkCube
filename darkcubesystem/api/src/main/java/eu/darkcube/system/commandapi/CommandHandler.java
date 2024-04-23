@@ -29,6 +29,7 @@ public class CommandHandler implements TabExecutor {
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command cmd,
 			String label, String[] args) {
 		Command CMD = instance.main_command;
+		System.out.println("Tab complete");
 		if (!CMD.hasPermission(sender))
 			return Collections.emptyList();
 		Command oldCMD = CMD;
