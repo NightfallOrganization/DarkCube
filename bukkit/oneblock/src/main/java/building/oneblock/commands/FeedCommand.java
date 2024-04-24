@@ -33,6 +33,8 @@ public class FeedCommand implements CommandExecutor {
             target.setFoodLevel(20);
             User targetuser = UserAPI.instance().user(target.getUniqueId());
             targetuser.sendMessage(Message.COMMAND_FEED);
+            user.sendMessage(Message.COMMAND_FED, target.getName());
+
             sender.sendMessage("§7Du hast §e" + target.getName() + " §7gefüttert");
         } else {
             sender.sendMessage("§cUsage: /feed or /feed [player]");
