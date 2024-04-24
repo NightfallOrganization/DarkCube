@@ -11,7 +11,13 @@ import eu.darkcube.system.BaseMessage;
 
 public enum Message implements BaseMessage {
 
-    TIMER;
+    TIMER,
+    ONLY_PLAYERS_CAN_USE,
+    COMMAND_DAY_SET,
+    COMMAND_NIGHT_SET,
+    COMMAND_FEED,
+    COMMAND_FED,
+    PLAYER_NOT_FOUND;
 
     public static final String PREFIX_ITEM = "ITEM_";
     public static final String PREFIX_LORE = "LORE_";

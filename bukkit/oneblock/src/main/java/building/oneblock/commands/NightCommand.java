@@ -1,10 +1,12 @@
 package building.oneblock.commands;
 
+import building.oneblock.util.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.ChatColor;
 
 public class NightCommand implements CommandExecutor {
 
@@ -12,10 +14,13 @@ public class NightCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
             player.getWorld().setTime(13000);
-            player.sendMessage(ChatColor.GREEN + "§7Die Zeit wurde auf §eNacht §7gesetzt");
+            user.sendMessage(Message.COMMAND_NIGHT_SET);
         } else {
-            sender.sendMessage(ChatColor.RED + "§cNur Spieler können diesen Befehl ausführen");
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
         }
         return true;
     }

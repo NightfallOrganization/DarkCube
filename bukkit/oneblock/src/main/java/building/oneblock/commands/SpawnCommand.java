@@ -53,7 +53,9 @@ public class SpawnCommand implements CommandExecutor {
 
             return true;
         } else {
-            sender.sendMessage("§cNur Spieler können diesen Befehl ausführen.");
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
             return false;
         }
     }
