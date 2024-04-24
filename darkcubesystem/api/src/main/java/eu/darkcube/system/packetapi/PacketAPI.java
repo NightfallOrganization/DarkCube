@@ -75,7 +75,7 @@ public class PacketAPI {
     }
 
     public void sendPacket(Packet packet) {
-        preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().send();
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetAll().build().sendQuery();
     }
 
     public void sendPacketAsync(Packet packet) {
@@ -83,7 +83,7 @@ public class PacketAPI {
     }
 
     public void sendPacket(Packet packet, ServiceInfoSnapshot snapshot) {
-        preparePacket(packet, null, TYPE_NO_RESPONSE).targetService(snapshot.name()).build().send();
+        preparePacket(packet, null, TYPE_NO_RESPONSE).targetService(snapshot.name()).build().sendQuery();
     }
 
     public void sendPacketAsync(Packet packet, ServiceInfoSnapshot snapshot) {

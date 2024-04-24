@@ -201,6 +201,7 @@ public class UserLocalPersistentDataStorage implements CommonPersistentDataStora
         } finally {
             lock.writeLock().unlock();
         }
+        new PacketNWUserPersistentDataRemove(uniqueId, key).sendAsync();
         if (changed) notifyNotifiers();
     }
 
@@ -212,6 +213,7 @@ public class UserLocalPersistentDataStorage implements CommonPersistentDataStora
         } finally {
             lock.writeLock().unlock();
         }
+        new PacketNWUserPersistentDataMerge(uniqueId, data.immutableCopy()).sendAsync();
         notifyNotifiers();
     }
 
@@ -224,6 +226,7 @@ public class UserLocalPersistentDataStorage implements CommonPersistentDataStora
         } finally {
             lock.writeLock().unlock();
         }
+        new PacketNWUserPersistentDataMerge(uniqueId, document.immutableCopy()).sendAsync();
         notifyNotifiers();
     }
 
