@@ -14,15 +14,18 @@ public class FeedCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
+            return true;
+        }
+
         Player player = (Player) sender;
         User user = UserAPI.instance().user(player.getUniqueId());
 
         if (args.length == 0) {
-            if (!(sender instanceof Player)) {
-                user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
-                return true;
-            }
-            player.setFoodLevel(20);
+            player.setFoodLevel(80);
             user.sendMessage(Message.COMMAND_FEED);
         } else if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
@@ -30,12 +33,10 @@ public class FeedCommand implements CommandExecutor {
                 user.sendMessage(Message.PLAYER_NOT_FOUND);
                 return true;
             }
-            target.setFoodLevel(20);
+            target.setFoodLevel(80);
             User targetuser = UserAPI.instance().user(target.getUniqueId());
             targetuser.sendMessage(Message.COMMAND_FEED);
             user.sendMessage(Message.COMMAND_FED, target.getName());
-
-            sender.sendMessage("§7Du hast §e" + target.getName() + " §7gefüttert");
         } else {
             sender.sendMessage("§cUsage: /feed or /feed [player]");
         }

@@ -7,8 +7,10 @@
 
 package building.oneblock.commands;
 
+import building.oneblock.util.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,21 +37,58 @@ public class FlyCommand implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Nur Spieler können diesen Befehl ausführen.");
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
             return true;
         }
 
         Player player = (Player) sender;
+        User user = UserAPI.instance().user(player.getUniqueId());
 
         if (args.length == 1) {
             player = Bukkit.getPlayerExact(args[0]);
             if (player == null) {
-                sender.sendMessage(ChatColor.RED + "§cSpieler nicht gefunden.");
+                user.sendMessage(Message.PLAYER_NOT_FOUND);
                 return true;
             }
         }
 
+        if (args.length == 0) {
+            flyCheck(sender);
+
+        } else if (args.length == 1) {
+            Player target = Bukkit.getPlayer(args[0]);
+
+            if (target == null) {
+                user.sendMessage(Message.PLAYER_NOT_FOUND);
+                return true;
+            }
+
+            flyCheck(target);
+
+            NamespacedKey key = new NamespacedKey(plugin, "flymode");
+            PersistentDataContainer container = target.getPersistentDataContainer();
+            boolean isFlying = container.get(key, PersistentDataType.BYTE) == 1;
+
+            if (isFlying) {
+                user.sendMessage(Message.COMMAND_HAVE_FLY_ON, target.getName());
+            } else {
+                user.sendMessage(Message.COMMAND_HAVE_FLY_OFF, target.getName());
+            }
+
+            return true;
+        }
+
+        return true;
+    }
+
+    private void flyCheck(CommandSender sender) {
+        Player player = (Player) sender;
+        User user = UserAPI.instance().user(player.getUniqueId());
         NamespacedKey key = new NamespacedKey(plugin, "flymode");
         PersistentDataContainer container = player.getPersistentDataContainer();
 
@@ -59,18 +98,22 @@ public class FlyCommand implements CommandExecutor, Listener {
             container.set(key, PersistentDataType.BYTE, (byte) (isFlying ? 0 : 1));
             player.setAllowFlight(!isFlying);
             player.setFlying(!isFlying);
-            player.sendMessage(ChatColor.YELLOW + (isFlying ? "§7Flugmodus §edeaktiviert" : "§7Flugmodus §eaktiviert"));
+
+            if (isFlying) {
+                user.sendMessage(Message.COMMAND_FLY_OFF);
+            } else {
+                user.sendMessage(Message.COMMAND_FLY_ON);
+            }
+
         } else {
 
             container.set(key, PersistentDataType.BYTE, (byte) 1);
             player.setAllowFlight(true);
             player.setFlying(true);
-            player.sendMessage(ChatColor.YELLOW + "§7Flugmodus §eaktiviert");
+            user.sendMessage(Message.COMMAND_FLY_ON);
         }
 
-        return true;
     }
-
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

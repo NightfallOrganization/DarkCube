@@ -7,6 +7,9 @@
 
 package building.oneblock.commands;
 
+import building.oneblock.util.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,11 +23,14 @@ public class TPWorldCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§cNur Spieler können diesen Befehl ausführen");
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
             return true;
         }
 
         Player player = (Player) sender;
+        User user = UserAPI.instance().user(player.getUniqueId());
 
         if (args.length == 0 || args.length > 4) {
             return false;
@@ -32,7 +38,7 @@ public class TPWorldCommand implements CommandExecutor {
 
         World world = Bukkit.getWorld(args[0]);
         if (world == null) {
-            player.sendMessage("§cWelt nicht gefunden");
+            user.sendMessage(Message.ONEBLOCK_WORLD_NOT_FOUND);
             return true;
         }
 
@@ -47,13 +53,13 @@ public class TPWorldCommand implements CommandExecutor {
                 double z = Double.parseDouble(args[3]);
                 location = new Location(world, x, y, z);
             } catch (NumberFormatException e) {
-                player.sendMessage("§cUngültige Koordinaten");
+                user.sendMessage(Message.ONEBLOCK_INVALID_COORDINATES);
                 return true;
             }
         }
 
         player.teleport(location);
-        player.sendMessage("§7Teleportiert zur Welt: §e" + world.getName());
+        user.sendMessage(Message.COMMAND_TELEPORT_WORLD, world.getName());
         return true;
     }
 

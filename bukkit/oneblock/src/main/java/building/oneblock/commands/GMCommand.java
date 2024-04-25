@@ -7,6 +7,9 @@
 
 package building.oneblock.commands;
 
+import building.oneblock.util.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
@@ -18,13 +21,17 @@ public class GMCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§cNur Spieler können diesen Befehl ausführen");
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
             return true;
         }
 
         Player player = (Player) sender;
+        User user = UserAPI.instance().user(player.getUniqueId());
+
         if (args.length == 0 || args.length > 2) {
-            player.sendMessage("§cUsage: /gm [number] [player]");
+            player.sendMessage("§cUsage: /gm [value] [player]");
             return false; // Falsche Anzahl an Argumenten
         }
 
@@ -49,16 +56,17 @@ public class GMCommand implements CommandExecutor {
 
         if (args.length == 1) {
             player.setGameMode(gameMode);
-            player.sendMessage("§7Dein Spielmodus wurde zu §e" + gameMode.name() + " §7geändert");
+            user.sendMessage(Message.COMMAND_GAMEMODE_CHANGE, gameMode.name());
         } else {
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null) {
-                player.sendMessage("§cSpieler nicht gefunden.");
+                user.sendMessage(Message.PLAYER_NOT_FOUND);
                 return true;
             }
             target.setGameMode(gameMode);
-            target.sendMessage("§7Dein Spielmodus wurde zu §e" + gameMode.name() + " §7geändert");
-            player.sendMessage("§7Der Gamemode von §e" + target.getName() + " §7wurde auf §e " + gameMode.name() + " §7gesetzt");
+            User usertarget = UserAPI.instance().user(target.getUniqueId());
+            usertarget.sendMessage(Message.COMMAND_GAMEMODE_CHANGE, gameMode.name());
+            user.sendMessage(Message.COMMAND_GAMEMODE_SET, target.getName(), gameMode.name());
         }
 
         return true;

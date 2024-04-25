@@ -2,10 +2,12 @@ package building.oneblock.manager;
 
 import building.oneblock.OneBlock;
 import building.oneblock.npc.NPC;
+import building.oneblock.util.Message;
 import com.github.juliarn.npclib.api.Npc;
 import com.github.juliarn.npclib.api.NpcActionController;
 import com.github.juliarn.npclib.api.Platform;
 import com.github.juliarn.npclib.api.event.AttackNpcEvent;
+import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import com.github.juliarn.npclib.api.event.ShowNpcEvent;
 import com.github.juliarn.npclib.api.profile.Profile;
 import com.github.juliarn.npclib.api.profile.ProfileProperty;
@@ -14,6 +16,8 @@ import com.github.juliarn.npclib.bukkit.BukkitPlatform;
 import com.github.juliarn.npclib.bukkit.BukkitWorldAccessor;
 import com.github.juliarn.npclib.bukkit.protocol.BukkitProtocolAdapter;
 import com.github.juliarn.npclib.bukkit.util.BukkitPlatformUtil;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -35,15 +39,31 @@ public class NPCManager {
         }).worldAccessor(BukkitWorldAccessor.worldAccessor()).packetFactory(BukkitProtocolAdapter.protocolLib()).build();
 
 
-        platform.eventManager().registerEventHandler(AttackNpcEvent.class, event -> {
+        platform.eventManager().registerEventHandler(InteractNpcEvent.class, event -> {
+            if (event.hand() != InteractNpcEvent.Hand.MAIN_HAND) {
+                return;
+            }
+
             Player player = event.player();
+            User user = UserAPI.instance().user(player.getUniqueId());
             Npc<World, Player, ItemStack, Plugin> npc = event.npc();
 
             if (player.hasPermission("oneblock.level.3")) {
-                player.sendMessage("§7Mindestanforderung: Level §e3");
-//                connectToServer(player, "Aetheria-1");
+                user.sendMessage(Message.MINIMUM_REQUIREMENT);
             } else {
-                player.sendMessage("§7Mindestanforderung: Level §e3");
+                user.sendMessage(Message.MINIMUM_REQUIREMENT);
+            }
+        });
+
+        platform.eventManager().registerEventHandler(AttackNpcEvent.class, event -> {
+            Player player = event.player();
+            User user = UserAPI.instance().user(player.getUniqueId());
+            Npc<World, Player, ItemStack, Plugin> npc = event.npc();
+
+            if (player.hasPermission("oneblock.level.3")) {
+                user.sendMessage(Message.MINIMUM_REQUIREMENT);
+            } else {
+                user.sendMessage(Message.MINIMUM_REQUIREMENT);
             }
         });
 

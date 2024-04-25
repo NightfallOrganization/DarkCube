@@ -2,6 +2,9 @@ package building.oneblock.commands;
 
 import building.oneblock.OneBlock;
 import building.oneblock.manager.WorldManager;
+import building.oneblock.util.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -18,40 +21,53 @@ public class StartWorldCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§7Nur Spieler können diesen Befehl verwenden");
+            Player player = (Player) sender;
+            User user = UserAPI.instance().user(player.getUniqueId());
+            user.sendMessage(Message.ONLY_PLAYERS_CAN_USE);
             return true;
         }
 
         Player player = (Player) sender;
+        User user = UserAPI.instance().user(player.getUniqueId());
         startActionBarTask(player);
 
         World playerWorld = WorldManager.createPlayerSpecificVoidWorld(player.getName());
 
-        if (playerWorld != null) {
-            Location location = new Location(playerWorld, 0.5, 100, 0.5);
-            player.teleportAsync(location).thenAccept(success -> {
-                player.sendMessage("§7Willkommen in deiner neuen §eOneBlock §7Welt!");
-                stopActionBarTask();
-            });
+        Bukkit.getScheduler().scheduleSyncDelayedTask(OneBlock.getInstance(), new Runnable() {
+            public void run() {
 
-        } else {
-            player.sendMessage("§7Es gab ein Problem beim Erstellen deiner Welt. Wende dich bitte an ein Teammitglied!");
-            stopActionBarTask();
-        }
+                if (playerWorld != null) {
+                    Location location = new Location(playerWorld, 0.5, 100, 0.5);
+                    player.teleportAsync(location).thenAccept(success -> {
+                        user.sendMessage(Message.ONEBLOCK_WELCOME_WORLD);
+                        stopActionBarTask();
+                    });
+
+                } else {
+                    user.sendMessage(Message.ONEBLOCK_CREATING_WORLD_ERROR);
+                    stopActionBarTask();
+                }
+
+            }
+        }, 100L); // 100 Ticks entsprechen 5 Sekunden bei 20 Ticks pro Sekunde
 
         return true;
     }
 
     private void startActionBarTask(Player player) {
+        User user = UserAPI.instance().user(player.getUniqueId());
+
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(OneBlock.getInstance(), new Runnable() {
             private boolean dot = false;
 
             @Override
             public void run() {
                 if (dot) {
-                    player.sendActionBar("§eWelt wird erstellt ..");
+                    user.sendActionBar(Message.ONEBLOCK_CREATING_WORLD_1);
+//                    player.sendActionBar("§7Starting ..");
                 } else {
-                    player.sendActionBar("§eWelt wird erstellt ...");
+                    user.sendActionBar(Message.ONEBLOCK_CREATING_WORLD_2);
+//                    player.sendActionBar("§7Starting ...");
                 }
                 dot = !dot;
             }

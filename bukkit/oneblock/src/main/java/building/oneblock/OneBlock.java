@@ -59,6 +59,7 @@ public final class OneBlock extends JavaPlugin {
         var npcManager = new NPCManager(this);
         var npcCreator = new NPCCreator(npcManager);
         var flyCommand = new FlyCommand(this);
+
         npcCreator.createNPC();
 
         instance.getServer().getPluginManager().registerEvents(oneBlockManager, this);
@@ -75,6 +76,7 @@ public final class OneBlock extends JavaPlugin {
         instance.getServer().getPluginManager().registerEvents(npcCreator, this);
         instance.getServer().getPluginManager().registerEvents(flyCommand, this);
 
+//        instance.getCommand("menu").setExecutor(new MenuCommand());
         instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
         instance.getCommand("gm").setExecutor(new GMCommand());
         instance.getCommand("tpworld").setExecutor(new TPWorldCommand());
