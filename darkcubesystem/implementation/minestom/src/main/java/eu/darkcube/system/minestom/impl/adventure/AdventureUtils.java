@@ -8,9 +8,12 @@
 package eu.darkcube.system.minestom.impl.adventure;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.Contract;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.chat.ChatType;
@@ -87,12 +90,13 @@ public class AdventureUtils {
         return ChatType.chatType(convert(chatType.key()));
     }
 
-    public static BossBar.Flag convert(eu.darkcube.system.libs.net.kyori.adventure.bossbar.BossBar.Flag flag) {
+    public static BossBar.@Nullable Flag convert(eu.darkcube.system.libs.net.kyori.adventure.bossbar.BossBar.Flag flag) {
         if (flag == null) return null;
         return A_FLAG[flag.ordinal()];
     }
 
-    @SuppressWarnings({"UnstableApiUsage", "deprecation"}) public static MessageType convert(eu.darkcube.system.libs.net.kyori.adventure.audience.MessageType messageType) {
+    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
+    public static MessageType convert(eu.darkcube.system.libs.net.kyori.adventure.audience.MessageType messageType) {
         return A_MESSAGE_TYPE[messageType.ordinal()];
     }
 
@@ -100,7 +104,8 @@ public class AdventureUtils {
         return Book.book(convert(book.title()), convert(book.author()), convertComponents(book.pages()));
     }
 
-    public static Sound.Source convert(eu.darkcube.system.libs.net.kyori.adventure.sound.Sound.Source source) {
+    @Contract("!null -> !null, null -> null")
+    public static @Nullable Sound.Source convert(eu.darkcube.system.libs.net.kyori.adventure.sound.Sound.Source source) {
         if (source == null) return null;
         return A_SOURCE[source.ordinal()];
     }
@@ -114,14 +119,15 @@ public class AdventureUtils {
         return SoundStop.all();
     }
 
-    @SuppressWarnings("PatternValidation") public static Key convert(eu.darkcube.system.libs.net.kyori.adventure.key.Key key) {
+    @SuppressWarnings("PatternValidation")
+    public static @Nullable Key convert(eu.darkcube.system.libs.net.kyori.adventure.key.Key key) {
         if (key == null) return null;
         return Key.key(key.namespace(), key.value());
     }
 
-    public static Sound convert(eu.darkcube.system.libs.net.kyori.adventure.sound.Sound sound) {
+    public static @Nullable Sound convert(eu.darkcube.system.libs.net.kyori.adventure.sound.Sound sound) {
         if (sound == null) return null;
-        return Sound.sound(convert(sound.name()), convert(sound.source()), sound.volume(), sound.pitch());
+        return Sound.sound(convert(sound.name()), Objects.requireNonNull(convert(sound.source())), sound.volume(), sound.pitch());
     }
 
     public static List<Component> convertComponents(List<eu.darkcube.system.libs.net.kyori.adventure.text.Component> components) {

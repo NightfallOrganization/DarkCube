@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.command;
 
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.*;
@@ -43,7 +50,6 @@ import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandExecutor;
 import net.minestom.server.command.builder.suggestion.SuggestionCallback;
 import net.minestom.server.command.builder.suggestion.SuggestionEntry;
-import net.minestom.server.entity.Player;
 
 public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
     private final Map<String, Command> wrappers = new ConcurrentHashMap<>();
@@ -51,6 +57,7 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
     private final SuggestionCallback suggestionCallback = (sender, context, suggestion) -> {
         var source = sourceFor(sender);
         var commandLine = suggestion.getInput();
+        // \00 is minestom internal command shit. I don't like it, but it's what I have to work with
         if (commandLine.endsWith(" \00")) {
             commandLine = commandLine.substring(0, commandLine.length() - 1);
         }

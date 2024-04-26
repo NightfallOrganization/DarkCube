@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -39,8 +39,8 @@ dependencies {
     api(projects.darkcubesystem.implementation.common)
 
     "nodeCompileOnly"(libs.cloudnet.node)
-    "nodeCompileOnly"(sourceSets.getByName("main").output)
+    "nodeCompileOnly"(sourceSets.main.map { it.output })
 
     "wrapperCompileOnly"(libs.cloudnet.wrapper)
-    "wrapperCompileOnly"(sourceSets.getByName("main").output)
+    "wrapperCompileOnly"(sourceSets.main.map { it.output })
 }

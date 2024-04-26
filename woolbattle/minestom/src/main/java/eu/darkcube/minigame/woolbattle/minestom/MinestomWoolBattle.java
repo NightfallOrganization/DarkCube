@@ -50,6 +50,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     private final @NotNull MinestomSetupModeImplementation setupModeImplementation;
 
     public MinestomWoolBattle() {
+        super();
         api = new MinestomWoolBattleApi(this);
         this.playerKey = new Key(api, "minestomPlayer");
         setupModeImplementation = new MinestomSetupModeImplementation(api);
@@ -61,7 +62,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         ext.install(BindingBuilder.create().bind(Items.Provider.class).toInstance(new MinestomItemsProvider()));
 
         super.start();
-        
+
         var eventManager = MinecraftServer.getGlobalEventHandler();
         MinestomJoinListener.register(this, eventManager);
         MinestomQuitListener.register(this, eventManager);

@@ -29,7 +29,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.server.version.ServerVersion;
 import eu.darkcube.system.util.AdventureSupport;
-import eu.darkcube.system.util.AsyncExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -50,7 +49,6 @@ public final class DarkCubeSystemBukkit extends DarkCubePlugin implements Listen
     @Override
     public void onLoad() {
         versionHandler.onLoad();
-        AsyncExecutor.start();
         EntityOptions.registerOptions();
         PacketAPI.init();
         CommandAPI.init();
@@ -60,7 +58,6 @@ public final class DarkCubeSystemBukkit extends DarkCubePlugin implements Listen
 
     @Override
     public void onDisable() {
-        AsyncExecutor.stop();
         AdventureSupport.adventureSupport().audienceProvider().close();
         linkManager.unregisterLinks();
         versionHandler.onDisable();

@@ -17,7 +17,9 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.meta.SpawnEggBuilderMeta;
 
 public class BukkitItemsProvider implements Items.Provider {
-    @SuppressWarnings("DuplicateBranchesInSwitch") @Override public ItemBuilder builder(Items items) {
+    @SuppressWarnings("DuplicateBranchesInSwitch")
+    @Override
+    public ItemBuilder builder(Items items) {
         return switch (items) {
             case LOBBY_TEAMS -> item(BOOK);
             case LOBBY_PERKS -> item(BOW).glow(true);
@@ -119,6 +121,8 @@ public class BukkitItemsProvider implements Items.Provider {
             case PERK_FREEZE_ARROW -> item(ARROW);
             case PERK_FREEZE_ARROW_COOLDOWN -> item(ARROW);
             case PERK_BERSERKER -> item(DIAMOND_SWORD);
+            case GRAY_GLASS_PANE -> item(STAINED_GLASS_PANE).damage(7);
+            case BLACK_GLASS_PANE -> item(STAINED_GLASS_PANE).damage(15);
         };
     }
 }

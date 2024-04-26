@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -27,13 +27,15 @@ import eu.darkcube.system.impl.common.userapi.CommonUserData;
 import eu.darkcube.system.impl.common.userapi.UserLocalPacketHandlers;
 import eu.darkcube.system.impl.common.userapi.UserLocalPersistentDataStorage;
 
-@Singleton public class NodeUserAPI extends CommonUserAPI {
+@Singleton
+public class NodeUserAPI extends CommonUserAPI {
     private final PlayerManager playerManager;
     private final Database database;
     private final UserLocalPacketHandlers packetHandlers = new UserLocalPacketHandlers(this);
     private final NodeDataSaver dataSaver;
 
-    @Inject public NodeUserAPI(DatabaseProvider databaseProvider, ServiceRegistry serviceRegistry) {
+    @Inject
+    public NodeUserAPI(DatabaseProvider databaseProvider, ServiceRegistry serviceRegistry) {
         this.playerManager = serviceRegistry.firstProvider(PlayerManager.class);
         this.database = databaseProvider.database("userapi_users");
         this.dataSaver = new NodeDataSaver(this.database);
@@ -47,7 +49,8 @@ import eu.darkcube.system.impl.common.userapi.UserLocalPersistentDataStorage;
         new PacketNWUpdateName(uniqueId, playerName).sendAsync();
     }
 
-    @Override protected CommonUser loadUser(UUID uniqueId) {
+    @Override
+    protected CommonUser loadUser(UUID uniqueId) {
         var data = this.database.get(uniqueId.toString());
         if (data == null) data = Document.emptyDocument();
         String name = data.getString("name");

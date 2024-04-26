@@ -13,12 +13,16 @@ import eu.darkcube.minigame.woolbattle.api.game.GameManager;
 import eu.darkcube.minigame.woolbattle.api.game.lobby.LobbyData;
 import eu.darkcube.minigame.woolbattle.api.map.MapManager;
 import eu.darkcube.minigame.woolbattle.api.team.TeamRegistry;
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.MaterialProvider;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.SchedulerManager;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWoolProvider;
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.event.EventNode;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 
@@ -30,38 +34,60 @@ public interface WoolBattleApi extends Key.Named {
     }
 
     @Api
-    @NotNull GameManager games();
+    @NotNull
+    GameManager games();
 
     @Api
-    @NotNull LobbySystemLink lobbySystemLink();
+    @NotNull
+    LobbySystemLink lobbySystemLink();
 
     @Api
-    @NotNull EntityImplementations entityImplementations();
+    @NotNull
+    EntityImplementations entityImplementations();
 
     @Api
-    @NotNull MaterialProvider materialProvider();
+    @NotNull
+    MaterialProvider materialProvider();
 
     @Api
-    @NotNull MapManager mapManager();
+    @NotNull
+    MapManager mapManager();
 
     @Api
-    @NotNull SchedulerManager scheduler();
+    @NotNull
+    SchedulerManager scheduler();
 
     @Api
-    @NotNull PersistentDataStorage persistentDataStorage();
+    @NotNull
+    PersistentDataStorage persistentDataStorage();
 
     @Api
-    @NotNull WoolBattleCommands commands();
+    @NotNull
+    WoolBattleCommands commands();
 
     @Api
-    @NotNull TeamRegistry teamRegistry();
+    @NotNull
+    TeamRegistry teamRegistry();
 
     @Api
-    @NotNull ColoredWoolProvider woolProvider();
+    @NotNull
+    ColoredWoolProvider woolProvider();
 
     @Api
-    @NotNull EventNode<Object> eventManager();
+    @NotNull
+    EventNode<Object> eventManager();
 
     @Api
-    @NotNull LobbyData lobbyData();
+    @NotNull
+    LobbyData lobbyData();
+
+    /**
+     * Get a user by the UserAPI {@link User}. May be null in case no {@link WBUser} was found
+     *
+     * @param user the {@link UserAPI} type
+     * @return the {@link WBUser}, null if not found
+     */
+    @Api
+    @Nullable
+    WBUser user(User user);
 }

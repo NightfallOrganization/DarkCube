@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -9,28 +9,47 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+val shadowContent by configurations.register("shadowContent")
+val extensionSourceSet by sourceSets.register("extension")
+
+val extensionJar = tasks.register<Jar>("extensionJar") {
+    from(extensionSourceSet.output)
+    destinationDirectory = temporaryDir
+}
+
 tasks {
     shadowJar {
+        configurations = listOf(shadowContent)
         archiveClassifier = null
-    }
-    jar {
         destinationDirectory = temporaryDir
-        archiveBaseName = "darkcubesystem-minestom-implementation"
-    }
-    assemble {
-        dependsOn(shadowJar)
     }
 }
 
-configurations.register("impl") {
+configurations.named("extensionCompileOnly").configure {
+    extendsFrom(configurations.compileClasspath.get())
+}
+
+configurations.register("plugin") {
     isCanBeResolved = false
-    outgoing.artifact(tasks.shadowJar)
+    outgoing.artifact(extensionJar) {
+        this.name = "minestom"
+        this.classifier = ""
+    }
+}
+configurations.register("inject") {
+    isCanBeResolved = false
+    outgoing.artifact(tasks.shadowJar) {
+        this.name = "minestom"
+        this.classifier = ""
+    }
 }
 
 dependencies {
-    compileOnlyApi(projects.darkcubesystem.implementation.server)
-    compileOnlyApi(projects.darkcubesystem.minestom)
-    compileOnlyApi(projects.minestom.server)
+    api(projects.darkcubesystem.implementation.server)
+    api(projects.darkcubesystem.minestom)
+    "extensionImplementation"(sourceSets.main.map { it.output })
 
-    // minestom and server api is included in the server bootstrap project because of class loading
+    shadowContent(projects.darkcubesystem.implementation.server) { isTransitive = false }
+    shadowContent(projects.darkcubesystem.minestom) { isTransitive = false }
+    shadowContent(projects.darkcubesystem.server) { isTransitive = false }
 }

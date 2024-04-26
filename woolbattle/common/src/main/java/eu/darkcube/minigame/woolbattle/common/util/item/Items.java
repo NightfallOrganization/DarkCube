@@ -111,6 +111,8 @@ public enum Items implements CommonItem {
     PERK_FREEZE_ARROW,
     PERK_FREEZE_ARROW_COOLDOWN,
     PERK_BERSERKER,
+    GRAY_GLASS_PANE,
+    BLACK_GLASS_PANE,
     ;
 
     private final String key;
