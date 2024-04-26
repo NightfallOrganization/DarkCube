@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.server.inventory.listener;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -25,7 +32,8 @@ public interface InventoryListener {
     }
 
     /**
-     * Called once all items in an inventory are visible
+     * Called once all items in an inventory are visible.
+     * This does not imply that items won't change as a result of async computation or other operations.
      *
      * @param inventory the inventory
      */
@@ -65,9 +73,10 @@ public interface InventoryListener {
      * Inventories are unmodifiable, so click events are cancelled.
      *
      * @param inventory the affected inventory
+     * @param user      the user that clicked
      * @param slot      the slot the item is in
      * @param item      the item
      */
-    default void onClick(@NotNull Inventory inventory, int slot, @NotNull ItemBuilder item) {
+    default void onClick(@NotNull Inventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
     }
 }

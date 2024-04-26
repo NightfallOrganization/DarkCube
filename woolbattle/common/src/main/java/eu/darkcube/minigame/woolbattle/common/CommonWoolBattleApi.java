@@ -18,11 +18,14 @@ import eu.darkcube.minigame.woolbattle.common.game.GamePhaseCreator;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobbyData;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMapManager;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeamRegistry;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.item.ItemManager;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.CommonSchedulerManager;
 import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.system.event.EventNode;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.SynchronizedPersistentDataStorage;
@@ -68,7 +71,7 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return "woolbattle";
     }
 
@@ -103,6 +106,9 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
     @Override
     public abstract @NotNull CommonWoolBattleCommands commands();
+
+    @Override
+    public abstract @Nullable CommonWBUser user(User user);
 
     public abstract @NotNull CommonWoolBattle woolbattle();
 

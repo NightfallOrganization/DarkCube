@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -9,21 +9,30 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-configurations {
-    register("embed") {
-        isTransitive = false
-    }
+val plugins by configurations.register("plugins") {
+    isTransitive = false
+}
+val inject by configurations.register("inject") {
+    isTransitive = false
 }
 
 tasks {
     register<Jar>("finalJar") {
         dependsOn(shadowJar)
-        dependsOn(configurations.named("embed"))
+        dependsOn(plugins)
+        dependsOn(inject)
         from(shadowJar.get().outputs.files.map { zipTree(it) })
-        configurations.named("embed").configure {
+        plugins.run {
             incoming.files.forEach {
                 from(it) {
                     this.into("plugins")
+                }
+            }
+        }
+        inject.run {
+            incoming.files.forEach {
+                from(it) {
+                    this.into("inject")
                 }
             }
         }
@@ -43,8 +52,11 @@ tasks {
 
 dependencies {
     api(project("api"))
-    runtimeOnly(project("implementation"))
-    "embed"(project("implementation:bukkit", "impl"))
-    "embed"(project("implementation:velocity"))
-    "embed"(project("implementation:minestom", "impl"))
+    runtimeOnly(project("implementation")) {
+        exclude(group = libs.cloudnet.driver.get().group)
+    }
+    plugins(project("implementation:bukkit")) { targetConfiguration = "impl" }
+    plugins(project("implementation:velocity"))
+    plugins(project("implementation:minestom")) { targetConfiguration = "plugin" }
+    inject(project("implementation:minestom")) { targetConfiguration = "inject" }
 }

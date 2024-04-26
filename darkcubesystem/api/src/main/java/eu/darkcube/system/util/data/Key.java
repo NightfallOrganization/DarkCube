@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -69,7 +69,13 @@ public final class Key implements eu.darkcube.system.libs.net.kyori.adventure.ke
         return namespace + ":" + value;
     }
 
-    public interface Named {
+    public interface Named extends Namespaced {
+        @NotNull
         String getName();
+
+        @Override
+        default @NotNull String namespace() {
+            return getName();
+        }
     }
 }

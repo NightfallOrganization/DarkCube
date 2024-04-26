@@ -17,6 +17,8 @@
           <package name="" withSubpackages="true" static="false" />
         </value>
       </option>
+      <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
+      <option name="JD_INDENT_ON_CONTINUATION" value="true" />
     </JavaCodeStyleSettings>
     <JetCodeStyleSettings>
       <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
@@ -37,6 +39,7 @@
       <option name="BLANK_LINES_BEFORE_PACKAGE" value="1" />
       <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
       <option name="WRAP_FIRST_METHOD_IN_CALL_CHAIN" value="true" />
+      <option name="WRAP_COMMENTS" value="true" />
       <option name="ENUM_CONSTANTS_WRAP" value="2" />
     </codeStyleSettings>
     <codeStyleSettings language="kotlin">

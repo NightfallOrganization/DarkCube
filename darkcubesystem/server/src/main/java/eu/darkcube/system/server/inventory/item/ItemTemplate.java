@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.server.inventory.item;
 
 import java.util.Map;
@@ -17,10 +24,14 @@ import eu.darkcube.system.userapi.User;
  * because the slots may differ. This is not forced though.
  */
 public interface ItemTemplate {
+    static @NotNull ItemTemplate create() {
+        return ItemTemplateProviderImpl.itemTemplateProvider().create();
+    }
+
     /**
      * Set an item at every slot in the specified array
      *
-     * @param item  the item to set, see {@link InventoryTemplate#setItem(int, Object)} for allowed types
+     * @param item  the item to set, see {@link InventoryTemplate#setItem(int, int, Object)} for allowed types
      * @param slots the slots to set the item at
      * @return an {@link ItemReference} bundling all the slots
      */
@@ -30,7 +41,7 @@ public interface ItemTemplate {
     /**
      * Set an item at the specified slot
      *
-     * @param item the item to set, see {@link InventoryTemplate#setItem(int, Object)} for allowed types
+     * @param item the item to set, see {@link InventoryTemplate#setItem(int, int, Object)} for allowed types
      * @param slot the slot to set the item at
      * @return an {@link ItemReference} for the item
      */

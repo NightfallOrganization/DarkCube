@@ -10,13 +10,17 @@ package eu.darkcube.minigame.woolbattle.minestom;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.command.MinestomWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntityImplementations;
 import eu.darkcube.minigame.woolbattle.minestom.game.MinestomGamePhaseCreator;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.util.MinestomMaterialProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWoolProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorldHandler;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.userapi.User;
 import net.minestom.server.MinecraftServer;
 
 public class MinestomWoolBattleApi extends CommonWoolBattleApi {
@@ -68,6 +72,13 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
     @Override
     public @NotNull MinestomColoredWoolProvider woolProvider() {
         return woolProvider;
+    }
+
+    @Override
+    public @Nullable CommonWBUser user(User user) {
+        var player = (MinestomPlayer) MinecraftServer.getConnectionManager().getOnlinePlayerByUuid(user.uniqueId());
+        if (player == null) return null;
+        return player.user();
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -28,13 +28,15 @@ public class DarkCubeVelocity {
     private final ProxyServer server;
     private final Logger logger;
 
-    @Inject public DarkCubeVelocity(ProxyServer server, Logger logger) {
+    @Inject
+    public DarkCubeVelocity(ProxyServer server, Logger logger) {
         this.server = server;
         this.logger = logger;
     }
 
-    @Subscribe public void handle(ProxyInitializeEvent event) {
-        PacketAPI.getInstance().registerHandler(PacketDeclareProtocolVersion.class, packet -> {
+    @Subscribe
+    public void handle(ProxyInitializeEvent event) {
+        PacketAPI.instance().registerHandler(PacketDeclareProtocolVersion.class, packet -> {
             logger.info("Server " + packet.serverName() + " has protocol versions " + Arrays.toString(packet.protocolVersions()));
             Via.proxyPlatform().protocolDetectorService().setProtocolVersions(packet.serverName(), packet.protocolVersions());
             return null;
@@ -42,7 +44,8 @@ public class DarkCubeVelocity {
         new PacketRequestProtocolVersionDeclaration().sendAsync();
     }
 
-    @Subscribe public void handle(LoginEvent event) {
+    @Subscribe
+    public void handle(LoginEvent event) {
         new PacketWNPlayerLogin(event.getPlayer().getUniqueId(), event.getPlayer().getUsername()).sendQuery(PacketWNPlayerLogin.Response.class);
     }
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
 import org.gradle.jvm.tasks.Jar
 
 /*
@@ -14,24 +20,27 @@ plugins {
 val bukkitVersion: Configuration by configurations.creating {
     isCanBeConsumed = false
 }
+val shadowContent by configurations.register("shadowContent") { isTransitive = false }
 
-tasks {
-    val finalJar = register<Jar>("finalJar") {
-        dependsOn(shadowJar)
-        dependsOn(bukkitVersion)
-        from(shadowJar.map { jar -> jar.outputs.files.map { zipTree(it) } })
-        bukkitVersion.run {
-            incoming.files.forEach {
-                val zip = zipTree(it)
-                val version = zip.matching { include("version-info") }.singleFile.readText()
-                from(it) {
-                    rename { "$version.jar" }
-                    into("versions")
-                }
+val finalJar = tasks.register<Jar>("finalJar") {
+    dependsOn(tasks.shadowJar)
+    dependsOn(bukkitVersion)
+    from(tasks.shadowJar.map { jar -> jar.outputs.files.map { zipTree(it) } })
+    bukkitVersion.run {
+        incoming.files.forEach {
+            val zip = zipTree(it)
+            val version = zip.matching { include("version-info") }.singleFile.readText()
+            from(it) {
+                rename { "$version.jar" }
+                into("versions")
             }
         }
     }
+}
+
+tasks {
     shadowJar {
+        configurations = listOf(shadowContent)
         destinationDirectory = temporaryDir
     }
     jar {
@@ -44,21 +53,21 @@ tasks {
 
 configurations.register("impl") {
     isCanBeResolved = false
-    outgoing.artifact(tasks.named("finalJar"))
+    outgoing.artifact(finalJar)
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-    compileOnlyApi(projects.darkcubesystem.bukkit)
-    compileOnlyApi(projects.darkcubesystem.implementation.server)
+    api(projects.darkcubesystem.bukkit)
+    api(projects.darkcubesystem.implementation.server)
     compileOnlyApi(libs.cloudnet.wrapper)
-    compileOnly(libs.viaversion)
-    compileOnly(libs.viaversion.common)
-    compileOnly(libs.luckperms)
+    implementation(libs.viaversion)
+    implementation(libs.viaversion.common)
+    implementation(libs.luckperms)
 
-    runtimeOnly(projects.darkcubesystem.implementation.server) { isTransitive = false }
-    runtimeOnly(projects.darkcubesystem.bukkit) { isTransitive = false }
-    runtimeOnly(projects.darkcubesystem.server) { isTransitive = false }
+    shadowContent(projects.darkcubesystem.implementation.server)
+    shadowContent(projects.darkcubesystem.bukkit)
+    shadowContent(projects.darkcubesystem.server)
     bukkitVersion(project("v1_8_8"))
     bukkitVersion(project("latest", "reobf"))
 }

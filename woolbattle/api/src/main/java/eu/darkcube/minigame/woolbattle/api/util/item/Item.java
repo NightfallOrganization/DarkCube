@@ -8,9 +8,10 @@
 package eu.darkcube.minigame.woolbattle.api.util.item;
 
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.system.server.inventory.item.ItemFactory;
 import eu.darkcube.system.server.item.ItemBuilder;
 
-public interface Item {
+public interface Item extends ItemFactory {
     /**
      * @return a copy of the {@link ItemBuilder}
      */

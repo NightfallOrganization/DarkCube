@@ -7,21 +7,29 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
+import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
+import static eu.darkcube.system.server.inventory.Inventory.createChestTemplate;
+
 import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyBreakBlockListener;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyPlaceBlockListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserDropItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserJoinGameListener;
+import eu.darkcube.minigame.woolbattle.common.util.item.Items;
+import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.util.GameState;
 
 public class CommonLobby extends CommonPhase implements Lobby {
     protected CommonWorld world;
     protected Location spawn;
+    protected InventoryTemplate teamsInventoryTemplate;
 
     public CommonLobby(@NotNull CommonGame game) {
         super(game, GameState.LOBBY);
@@ -29,6 +37,29 @@ public class CommonLobby extends CommonPhase implements Lobby {
         this.listeners.addListener(new LobbyPlaceBlockListener().create());
         this.listeners.addListener(new LobbyUserJoinGameListener(this).create());
         this.listeners.addListener(new LobbyUserDropItemListener().create());
+        this.listeners.addListener(new LobbyItemListener(this).create());
+
+        this.teamsInventoryTemplate = createChestTemplate(key("woolbattle", "lobby_select_team"), 5 * 9);
+        this.teamsInventoryTemplate.setItems(0, woolbattle.defaultInventoryTemplate());
+        this.teamsInventoryTemplate.title(Messages.INVENTORY_TEAMS);
+        this.teamsInventoryTemplate.setItem(1, 4, Items.LOBBY_TEAMS);
+        this.teamsInventoryTemplate.setItem(-1, 2, Items.LOBBY_TEAMS);
+        setDelayed(teamsInventoryTemplate, Items.LOBBY_TEAMS, 1, 1000, 6);
+        setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_BOOTS, 2, 2000, 6);
+        setDelayed(teamsInventoryTemplate, Items.PERK_BOOSTER, 1, 1000, 23);
+        setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_CHESTPLATE, 2, 2000, 23);
+        this.teamsInventoryTemplate.animation().calculateManifold(22, 1);
+    }
+
+    private void setDelayed(InventoryTemplate template, Items item, int priority, int delay, int slot) {
+        template.setItem(priority, slot, user -> {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return item.createItem(user);
+        }).makeAsync();
     }
 
     @Override
@@ -53,5 +84,9 @@ public class CommonLobby extends CommonPhase implements Lobby {
         world = game.woolbattle().worldHandler().loadLobbyWorld(game);
         var spawnPosition = game.lobbyData().spawn();
         spawn = new Location(world, spawnPosition);
+    }
+
+    public InventoryTemplate teamsInventoryTemplate() {
+        return teamsInventoryTemplate;
     }
 }

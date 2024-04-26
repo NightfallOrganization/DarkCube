@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -15,13 +15,8 @@ import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.internal.logging.services.LoggingServiceRegistry
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
-import java.io.ByteArrayOutputStream
-import java.io.FilterOutputStream
-import java.io.PrintStream
-import java.nio.charset.StandardCharsets
 
 class TokenReplacementPlugin : Plugin<Project> {
     override fun apply(project: Project) {

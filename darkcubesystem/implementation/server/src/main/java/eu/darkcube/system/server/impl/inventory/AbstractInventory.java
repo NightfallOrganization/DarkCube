@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.server.impl.inventory;
 
 import java.util.Collection;
@@ -18,12 +25,14 @@ import eu.darkcube.system.userapi.User;
 public abstract class AbstractInventory<PlatformItemStack> implements Inventory {
     protected final @Nullable Component title;
     protected final @NotNull InventoryType type;
+    protected final int size;
     protected final @NotNull List<@NotNull User> opened = new CopyOnWriteArrayList<>();
-    protected final @NotNull Collection<@NotNull InventoryListener> listeners = new CopyOnWriteArrayList<>();
+    protected final @NotNull List<@NotNull InventoryListener> listeners = new CopyOnWriteArrayList<>();
 
-    public AbstractInventory(@Nullable Component title, @NotNull InventoryType type) {
+    public AbstractInventory(@Nullable Component title, @NotNull InventoryType type, int size) {
         this.title = title;
         this.type = type;
+        this.size = size;
     }
 
     @Override
@@ -40,6 +49,11 @@ public abstract class AbstractInventory<PlatformItemStack> implements Inventory 
     @Override
     public InventoryType type() {
         return type;
+    }
+
+    @Override
+    public int size() {
+        return size;
     }
 
     protected PlatformItemStack retrieveItem(@NotNull Object item) {
