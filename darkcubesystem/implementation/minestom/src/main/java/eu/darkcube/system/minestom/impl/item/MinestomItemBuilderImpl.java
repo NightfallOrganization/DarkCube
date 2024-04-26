@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.logging.Logger;
 
 import eu.cloudnetservice.driver.document.DocumentFactory;
+import eu.cloudnetservice.driver.document.StandardSerialisationStyle;
 import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.libs.com.google.gson.GsonBuilder;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
@@ -109,7 +110,7 @@ public class MinestomItemBuilderImpl extends AbstractItemBuilder implements Mine
                 flag(flag);
             }
         }
-        lore(AdventureUtils.convertComponentsBack(meta.getLore()));
+        lore.addAll(AdventureUtils.convertComponentsBack(meta.getLore()));
         damage(meta.getDamage());
         {
             var fireworkEffect = item.meta(FireworkEffectMeta.class).getFireworkEffect();
@@ -181,7 +182,7 @@ public class MinestomItemBuilderImpl extends AbstractItemBuilder implements Mine
                 }
             }
             attributeModifiers.forEach((attribute, modifiers) -> meta.attributes(modifiers.stream().map(modifier -> ((MinestomAttributeModifierImpl) modifier).minestomType()).toList()));
-            if (material.registry().maxDamage() != 0) {
+            if (material.registry().maxDamage() != 0 && damage != 0) {
                 meta.damage(damage);
             }
             for (var builderMeta : metas) {
@@ -212,7 +213,7 @@ public class MinestomItemBuilderImpl extends AbstractItemBuilder implements Mine
             }
             var json = storage.storeToJsonDocument();
             if (!json.empty()) {
-                meta.setTag(TAG_DOCUMENT, json.serializeToString());
+                meta.setTag(TAG_DOCUMENT, json.serializeToString(StandardSerialisationStyle.COMPACT));
             }
         });
         return builder.build();

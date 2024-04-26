@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.server.impl.inventory.item;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -39,5 +46,10 @@ public class ItemReferenceImpl implements ItemReference {
     @Override
     public ItemReferenceImpl clone() {
         return new ItemReferenceImpl(item, async);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemReferenceImpl{" + "item=" + item + ", async=" + async + '}';
     }
 }

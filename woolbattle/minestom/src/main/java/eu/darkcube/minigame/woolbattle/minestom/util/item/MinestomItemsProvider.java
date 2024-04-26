@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.util.item;
 
 import static eu.darkcube.system.server.item.ItemBuilder.item;
@@ -113,6 +120,8 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_FREEZE_ARROW -> item(ARROW);
             case PERK_FREEZE_ARROW_COOLDOWN -> item(ARROW);
             case PERK_BERSERKER -> item(DIAMOND_SWORD);
+            case GRAY_GLASS_PANE -> item(GRAY_STAINED_GLASS_PANE);
+            case BLACK_GLASS_PANE -> item(BLACK_STAINED_GLASS_PANE);
         };
     }
 }

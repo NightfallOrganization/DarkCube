@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -11,11 +11,8 @@ import java.io.File;
 import java.util.Locale;
 import java.util.Optional;
 
-import dev.derklaro.aerogel.Element;
 import dev.derklaro.aerogel.Name;
 import dev.derklaro.aerogel.SpecifiedInjector;
-import dev.derklaro.aerogel.binding.BindingBuilder;
-import dev.derklaro.aerogel.util.Qualifiers;
 import dev.derklaro.reflexion.Reflexion;
 import eu.cloudnetservice.driver.ComponentInfo;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
@@ -24,11 +21,7 @@ import eu.cloudnetservice.driver.module.ModuleTask;
 import eu.cloudnetservice.driver.module.driver.DriverModule;
 
 public class DarkCubeSystemModule extends DriverModule {
-    public static final String PLUGIN_NAME = new File(DarkCubeSystemModule.class
-            .getProtectionDomain()
-            .getCodeSource()
-            .getLocation()
-            .getPath()).getName();
+    public static final String PLUGIN_NAME = new File(DarkCubeSystemModule.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
     private ModuleImplementation implementation = null;
 
     @ModuleTask(lifecycle = ModuleLifeCycle.STARTED)
@@ -53,7 +46,8 @@ public class DarkCubeSystemModule extends DriverModule {
         }
     }
 
-    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED) public void stop(@Name("module") InjectionLayer<SpecifiedInjector> injectionLayer) {
+    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED)
+    public void stop(@Name("module") InjectionLayer<SpecifiedInjector> injectionLayer) {
         if (implementation == null) return;
         implementation.stop(injectionLayer);
         implementation = null;

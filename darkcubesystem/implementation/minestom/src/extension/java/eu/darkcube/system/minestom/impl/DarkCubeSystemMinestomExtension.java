@@ -28,8 +28,10 @@ import eu.darkcube.system.minestom.impl.item.material.MinestomMaterialProvider;
 import eu.darkcube.system.packetapi.Packet;
 import eu.darkcube.system.packetapi.PacketAPI;
 import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.server.impl.inventory.item.ItemTemplateProviderImpl;
 import eu.darkcube.system.server.inventory.InventoryProvider;
 import eu.darkcube.system.server.inventory.InventoryTypeProvider;
+import eu.darkcube.system.server.inventory.item.ItemTemplateProvider;
 import eu.darkcube.system.server.item.EquipmentSlotProvider;
 import eu.darkcube.system.server.item.ItemProvider;
 import eu.darkcube.system.server.item.attribute.AttributeModifierProvider;
@@ -67,6 +69,7 @@ public class DarkCubeSystemMinestomExtension extends Extension {
         install(ext, AttributeModifierProvider.class, new MinestomAttributeModifierProvider());
         install(ext, InventoryTypeProvider.class, new MinestomInventoryTypeProvider());
         install(ext, InventoryProvider.class, new MinestomInventoryProvider());
+        install(ext, ItemTemplateProvider.class, new ItemTemplateProviderImpl());
         InjectionLayer.boot().instance(EventManager.class).registerListener(listener);
     }
 

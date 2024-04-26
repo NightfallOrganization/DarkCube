@@ -1,11 +1,12 @@
-import org.gradle.api.internal.file.FileOperations
-
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
+import org.gradle.api.internal.file.FileOperations
+
 plugins {
     `java-library`
     id("darkcube-parent")
@@ -91,9 +92,6 @@ dependencies {
     implementation("org.ow2.asm:asm:9.5") // in cloudnet but not exposed
     implementation("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
     // libraries to be added
-    minestomLibrary(projects.darkcubesystem.server) { isTransitive = false }
-    minestomLibrary(projects.darkcubesystem.implementation.server) { isTransitive = false }
-    minestomLibrary(projects.darkcubesystem.minestom) { isTransitive = false }
     minestomLibrary("org.slf4j:jul-to-slf4j:2.0.11")
     minestomLibrary("org.apache.logging.log4j:log4j-core:2.22.1")
     minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")

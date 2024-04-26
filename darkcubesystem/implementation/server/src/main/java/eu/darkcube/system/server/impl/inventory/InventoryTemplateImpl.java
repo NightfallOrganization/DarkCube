@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.server.impl.inventory;
 
 import java.util.ArrayList;
@@ -27,7 +34,7 @@ public abstract class InventoryTemplateImpl<PlatformPlayer> implements Inventory
     protected final @NotNull Key key;
     protected final @NotNull InventoryType type;
     protected final int size;
-    protected final @NotNull AnimatedTemplateSettingsImpl animation;
+    protected final @NotNull AnimatedTemplateSettingsImpl<PlatformPlayer> animation;
     protected final @NotNull PagedTemplateSettingsImpl pagination;
     protected final @NotNull List<InventoryListener> listeners;
     protected final SortedMap<Integer, ItemReferenceImpl>[] contents;
@@ -37,7 +44,7 @@ public abstract class InventoryTemplateImpl<PlatformPlayer> implements Inventory
         this.key = key;
         this.type = type;
         this.size = size;
-        this.animation = new AnimatedTemplateSettingsImpl(this);
+        this.animation = new AnimatedTemplateSettingsImpl<>(this);
         this.pagination = new PagedTemplateSettingsImpl(this);
         this.listeners = new ArrayList<>();
         this.contents = new SortedMap[size];
@@ -58,7 +65,7 @@ public abstract class InventoryTemplateImpl<PlatformPlayer> implements Inventory
     }
 
     @Override
-    public @NotNull AnimatedTemplateSettingsImpl animation() {
+    public @NotNull AnimatedTemplateSettingsImpl<PlatformPlayer> animation() {
         return animation;
     }
 
@@ -98,7 +105,13 @@ public abstract class InventoryTemplateImpl<PlatformPlayer> implements Inventory
     @Override
     public void setItems(int priority, @NotNull ItemTemplate template) {
         for (var entry : template.contents().entrySet()) {
-            setItem(priority, entry.getKey(), entry.getValue());
+            var reference = (ItemReferenceImpl) entry.getValue();
+            var ref = setItem(priority, entry.getKey(), reference.item());
+            if (reference.isAsync()) {
+                ref.makeAsync();
+            } else {
+                ref.makeSync();
+            }
         }
     }
 

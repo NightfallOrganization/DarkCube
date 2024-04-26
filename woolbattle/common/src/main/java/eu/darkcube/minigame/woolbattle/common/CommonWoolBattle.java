@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common;
 
 import java.util.logging.Logger;
@@ -13,12 +20,14 @@ import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
+import eu.darkcube.minigame.woolbattle.common.util.item.DefaultItemTemplate;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.TaskScheduleProviderImpl;
 import eu.darkcube.minigame.woolbattle.common.util.translation.LanguageRegistry;
 import eu.darkcube.minigame.woolbattle.common.world.SimpleWorldDataProvider;
 import eu.darkcube.minigame.woolbattle.common.world.WorldDataProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.server.inventory.item.ItemTemplate;
 
 public abstract class CommonWoolBattle {
 
@@ -27,6 +36,7 @@ public abstract class CommonWoolBattle {
     private final @NotNull SetupMode setupMode;
     private final @NotNull WorldDataProvider worldDataProvider;
     private final @NotNull LanguageRegistry languageRegistry;
+    private final @NotNull ItemTemplate defaultItemTemplate;
 
     public CommonWoolBattle() {
         eventHandler = new CommonEventHandler(this);
@@ -35,6 +45,8 @@ public abstract class CommonWoolBattle {
         InjectionLayer.ext().install(BindingBuilder.create().bind(WoolBattleArguments.class).toInstance(new CommonWoolBattleArguments()));
         this.worldDataProvider = new SimpleWorldDataProvider();
         this.languageRegistry = new LanguageRegistry();
+
+        this.defaultItemTemplate = DefaultItemTemplate.create();
     }
 
     public void start() {
@@ -43,6 +55,7 @@ public abstract class CommonWoolBattle {
         api.lobbySystemLink().enable();
         api.commands().registerDefaults(api);
         languageRegistry.register();
+        DefaultItemTemplate.setup(this.defaultItemTemplate);
     }
 
     public void stop() {
@@ -83,4 +96,8 @@ public abstract class CommonWoolBattle {
     public abstract @NotNull UserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user);
 
     public abstract @NotNull UserPermissions createPermissionsFor(@NotNull CommonWBUser user);
+
+    public @NotNull ItemTemplate defaultInventoryTemplate() {
+        return defaultItemTemplate;
+    }
 }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.server.inventory.animated;
 
 import java.time.Duration;
@@ -29,4 +36,13 @@ public interface AnimatedTemplateSettings extends InventoryTemplateSettings {
      */
     @NotNull
     Duration getShowAfter(int slot);
+
+    /**
+     * Replaces all {@link Duration#ZERO} with the manifold distance to the given slot.
+     * The manifold distance in ticks is then multiplied by delay (floating)
+     *
+     * @param slot  the starting slot
+     * @param delay the manifold multiply
+     */
+    void calculateManifold(int slot, float delay);
 }
