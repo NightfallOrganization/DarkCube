@@ -11,7 +11,7 @@ annotations = "24.0.1"
 hologramlib = "2.6.0-SNAPSHOT"
 velocity = "3.1.1"
 minestom = "7f15222468"
-shadow = "8.1.1"
+shadow = "8.1.7"
 blossom = "1.3.1"
 paperweight-userdev = "1.5.12"
 
@@ -38,6 +38,6 @@ cloudnetInjectProcessor = { group = "eu.cloudnetservice.cloudnet", name = "platf
 [bundles]
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }

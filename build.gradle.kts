@@ -5,28 +5,8 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-import java.nio.charset.StandardCharsets
+import eu.darkcube.build.DarkCubePlugin
 
 allprojects {
-    repositories {
-        maven {
-            name = "DarkCube"
-            credentials(PasswordCredentials::class)
-            url = uri("https://nexus.darkcube.eu/repository/darkcube-group/")
-        }
-    }
-    pluginManager.withPlugin("java") {
-        val extension: JavaPluginExtension = extensions.getByType(JavaPluginExtension::class)
-        extension.toolchain.languageVersion = JavaLanguageVersion.of(21)
-    }
-
-    tasks.withType<JavaCompile>().configureEach {
-        options.encoding = StandardCharsets.UTF_8.name()
-        options.setIncremental(true)
-        options.isDeprecation = true
-//        options.isFork = true
-    }
-    tasks.withType<Javadoc>().configureEach {
-        options.encoding = StandardCharsets.UTF_8.name()
-    }
+    plugins.apply(DarkCubePlugin::class)
 }
