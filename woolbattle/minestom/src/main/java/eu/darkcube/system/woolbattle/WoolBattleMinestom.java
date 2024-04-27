@@ -16,7 +16,6 @@ public class WoolBattleMinestom {
     public void start(String[] args) {
         System.out.println(Arrays.toString(args));
         MinecraftServer server = MinecraftServer.init();
-        MinecraftServer.setTerminalPrompt(null);
         server.start(System.getProperty("service.bind.host"), Integer.getInteger("service.bind.port"));
     }
 }

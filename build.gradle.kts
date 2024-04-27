@@ -17,7 +17,7 @@ allprojects {
     }
     pluginManager.withPlugin("java") {
         val extension: JavaPluginExtension = extensions.getByType(JavaPluginExtension::class)
-        extension.toolchain.languageVersion = JavaLanguageVersion.of(17)
+        extension.toolchain.languageVersion = JavaLanguageVersion.of(21)
     }
 
     tasks.withType<JavaCompile>().configureEach {
