@@ -10,10 +10,18 @@ pluginManagement {
     includeBuild("build-extensions")
     repositories {
         gradlePluginPortal()
+        maven("https://nexus.darkcube.eu/repository/darkcube/") {
+            name = "DarkCube"
+            credentials(PasswordCredentials::class)
+        }
         maven {
             url = uri("https://repo.papermc.io/repository/maven-public/")
         }
     }
+}
+
+plugins {
+    id("eu.darkcube.darkcube.settings") version "1.0-SNAPSHOT"
 }
 
 rootProject.name = "DarkCube"
