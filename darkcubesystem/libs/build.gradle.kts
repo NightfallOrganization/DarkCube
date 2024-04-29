@@ -9,9 +9,13 @@ plugins {
     id("java-library")
 }
 
+val embed = configurations.create("embed")
+
 dependencies {
-    api(project("adventure"))
-    api(project("annotations"))
-    api(project("brigadier"))
-    api(project("gson"))
+    embed(libs.bundles.adventure)
+    embed(libs.brigadier)
+    embed(libs.gson)
+    embed(libs.annotations)
 }
+
+sourceRemapper.remap(embed, "eu.darkcube.system.libs", configurations.named("api"))

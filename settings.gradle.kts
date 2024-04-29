@@ -21,7 +21,7 @@ pluginManagement {
 }
 
 plugins {
-    id("eu.darkcube.darkcube.settings") version "1.0-SNAPSHOT"
+    id("eu.darkcube.darkcube.settings") version "1.0.1"
 }
 
 rootProject.name = "DarkCube"
@@ -30,9 +30,9 @@ include("bukkit:autovoidworld")
 include("bukkit:bauserver")
 //include "bukkit:bedwars"
 include("bukkit:changepermissionmessage")
-includeSubProjects("darkcubesystem", "api", "module", "velocity", "common")
-includeSubProjects("darkcubesystem:libs", "brigadier", "gson", "annotations")
-includeSubProjects("darkcubesystem:libs:adventure", "adventure-api", "adventure-key", "adventure-nbt", "adventure-platform-api", "adventure-platform-bukkit", "adventure-platform-facet", "adventure-platform-viaversion", "adventure-text-serializer-bungeecord", "adventure-text-serializer-gson", "adventure-text-serializer-gson-legacy-impl", "adventure-text-serializer-legacy", "adventure-text-serializer-plain", "examination-api", "examination-string")
+includeSubProjects("darkcubesystem", "api", "module", "velocity", "common", "libs")
+//includeSubProjects("darkcubesystem:libs", "brigadier", "gson", "annotations")
+//includeSubProjects("darkcubesystem:libs:adventure", "adventure-api", "adventure-key", "adventure-nbt", "adventure-platform-api", "adventure-platform-bukkit", "adventure-platform-facet", "adventure-platform-viaversion", "adventure-text-serializer-bungeecord", "adventure-text-serializer-gson", "adventure-text-serializer-gson-legacy-impl", "adventure-text-serializer-legacy", "adventure-text-serializer-plain", "examination-api", "examination-string")
 includeSubProjects("darkcubesystem:bukkit", "1.8.8", "1.20.2", "1.20.4")
 
 includeSubProjects("woolbattle", "bukkit", "api", "minestom")
