@@ -11,6 +11,7 @@ plugins {
 dependencies {
     compileOnly(parent!!.project("common"))
     compileOnly(libs.cloudnetDriver)
+    compileOnly(libs.viaversion)
     compileOnly(libs.viaversion.velocity)
     compileOnly(libs.viaversion.bukkit)
     compileOnly(libs.velocity)
