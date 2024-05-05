@@ -21,18 +21,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class CrookItem implements Listener {
     public static ItemStack createCrookItem() {
-        ItemStack totemOfGravity = new ItemStack(Material.WOODEN_HOE, 1);
-        ItemMeta meta = totemOfGravity.getItemMeta();
+        ItemStack crook = new ItemStack(Material.WOODEN_HOE, 1);
+        ItemMeta meta = crook.getItemMeta();
 
         if (meta != null) {
             meta.setCustomModelData(1);
             meta.setDisplayName("§6Crook");
             meta.addEnchant(Enchantment.DIG_SPEED, 10, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            totemOfGravity.setItemMeta(meta);
+            crook.setItemMeta(meta);
         }
 
-        return totemOfGravity;
+        return crook;
     }
 
     public static void registerCrookRecipe() {
@@ -51,7 +51,7 @@ public class CrookItem implements Listener {
         RecipeChoice planksChoice = new RecipeChoice.MaterialChoice(planks);
 
         recipe.setIngredient('A', planksChoice);
-        recipe.setIngredient('B', Material.DEEPSLATE_EMERALD_ORE);
+        recipe.setIngredient('B', Material.STICK);
 
         Bukkit.addRecipe(recipe);
     }

@@ -47,6 +47,18 @@ commands:
   menu:
     description: Öffnet das Oneblock Menu
     permission: oneblock.menu.use
+  cor:
+    description: Alle Cor Commands
+    permission: oneblock.cor.use
+  myslots:
+    description: Zeigt alle Slots der Welten an
+    permission: oneblock.myslots.use
+  deleteworld:
+    description: Löscht eine OneBlock Welt
+    permission: oneblock.deleteworld.use
+  setblocksmined:
+    description: Setzt die abgebauten Blöcke einer OneBlock Welt
+    permission: oneblock.setblocksmined.use
 
 Permissions:
   oneblock.gm.use:
@@ -76,4 +88,12 @@ Permissions:
   oneblock.spawn.use:
     default: op
   oneblock.menu.use:
+    default: op
+  oneblock.cor.use:
+    default: op
+  oneblock.myslots.use:
+    default: op
+  oneblock.deleteworld.use:
+    default: op
+  oneblock.setblocksmined.use:
     default: op

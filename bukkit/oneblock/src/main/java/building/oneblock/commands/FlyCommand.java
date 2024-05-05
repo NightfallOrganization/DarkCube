@@ -132,22 +132,12 @@ public class FlyCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
-        Player player = event.getPlayer();
-        NamespacedKey key = new NamespacedKey(plugin, "flymode");
-        byte flyStatus = player.getPersistentDataContainer().getOrDefault(key, PersistentDataType.BYTE, (byte) 0);
-
-        if (flyStatus == 1) {
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                player.setAllowFlight(true);
-                player.setFlying(true);
-            });
-        }
+        checkAndApplyFlyMode(event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> checkAndApplyFlyMode(player), 20L); // 20L steht für 20 Ticks, also 1 Sekunde
+        checkAndApplyFlyMode(event.getPlayer());
     }
 
     private void checkAndApplyFlyMode(Player player) {

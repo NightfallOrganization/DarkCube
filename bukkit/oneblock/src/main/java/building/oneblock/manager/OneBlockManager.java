@@ -1,6 +1,7 @@
 package building.oneblock.manager;
 
 import building.oneblock.OneBlock;
+import building.oneblock.manager.player.DataStorageManager;
 import building.oneblock.util.StageBlocks;
 import building.oneblock.util.WorldRepository;
 import org.bukkit.Bukkit;
@@ -18,8 +19,6 @@ import java.util.Map;
 import java.util.Random;
 
 public class OneBlockManager implements Listener {
-    private final Map<String, Integer> worldProgress = new HashMap<>();
-    private final WorldRepository worldRepository = new WorldRepository();
     private final Map<Integer, List<Material>> stageBlocks = StageBlocks.createStageBlocksMap();
     private final Map<Integer, Integer> stageThresholds = Map.of(
             1, 1,
@@ -31,45 +30,25 @@ public class OneBlockManager implements Listener {
             7, 24000,
             8, 48000
     );
+    private final DataStorageManager storageManager;
 
-    public OneBlockManager() {
-        Bukkit.getWorlds().forEach(world -> {
-            if (!world.getName().equals("world") && !world.getName().equals("world_nether")) {
-                try {
-                    List<String> data = worldRepository.loadWorldData(world.getName());
-                    if (!data.isEmpty()) {
-                        worldProgress.put(world.getName(), Integer.parseInt(data.get(0)));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    public OneBlockManager(DataStorageManager storageManager) {
+        this.storageManager = storageManager;
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         World world = event.getBlock().getWorld();
-
         if (!world.getName().equals("world") && !world.getName().equals("world_nether")) {
             Block block = event.getBlock();
             if (block.getX() == 0 && block.getY() == 99 && block.getZ() == 0) {
-                int progress = worldProgress.getOrDefault(world.getName(), 0) + 1;
-                worldProgress.put(world.getName(), progress);
-
-                try {
-                    worldRepository.saveWorldData(world.getName(), List.of(String.valueOf(progress)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                int progress = storageManager.getBlocksMined(world) + 1;
+                storageManager.setBlocksMined(world, progress);
 
                 int currentStage = getCurrentStage(progress);
                 int previousStage = getCurrentStage(progress - 1);
 
-//                System.out.println("Progress: " + progress + ", Stage: " + currentStage);
-
                 if (currentStage > previousStage) {
-//                    newStage();
                     for (Player player : world.getPlayers()) {
                         player.sendMessage("§eOneBlock§7: Stage §e" + currentStage + " §7wurde erreicht");
                     }

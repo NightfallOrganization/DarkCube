@@ -10,8 +10,6 @@ package building.oneblock.commands;
 import building.oneblock.gui.MenuGUI;
 import building.oneblock.util.Message;
 import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,7 +26,7 @@ public class MenuCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            menuGUI.openGUI(player);
+            menuGUI.openMenuGUI(player);
             return true;
         } else {
             CommandSource commandSender = CommandSource.create(sender);
