@@ -6,11 +6,24 @@
  */
 
 plugins {
+    id("glyph-width-loader")
     alias(libs.plugins.shadow)
     java
 }
 
+sourceSets {
+    register("generated")
+}
+
 tasks {
+    register<GlyphWidthLoader>("generateGlyphWidths") {
+        version = "latest"
+        resourcePacks = listOf("https://aetheria.darkcube.eu/Aetheria.zip")
+        outputFile = sourceSets.getByName("generated").output.resourcesDir!!.resolve("glyph-widths.bin")
+    }
+    processResources.configure {
+        dependsOn("generateGlyphWidths")
+    }
     jar {
         destinationDirectory = temporaryDir
     }
@@ -19,6 +32,7 @@ tasks {
     }
     shadowJar {
         this.archiveClassifier = null
+        from(sourceSets.getByName("generated").output.resourcesDir)
 
         relocate("com.github.juliarn.npclib", "building.oneblock.libs.npclib")
 
@@ -30,6 +44,7 @@ tasks {
         exclude("net/kyori/examination/**")
 
         dependencies {
+            include(project(":common:glyph-width-loader"))
             include(dependencyFilter.dependency("io.github.juliarn:npc-lib-bukkit"))
         }
     }
@@ -42,4 +57,5 @@ dependencies {
     compileOnly("io.github.juliarn", "npc-lib-api", "3.0.0-beta6")
     compileOnly("io.github.juliarn", "npc-lib-common", "3.0.0-beta6")
     implementation("io.github.juliarn", "npc-lib-bukkit", "3.0.0-beta6")
+    implementation(project(":common:glyph-width-loader"))
 }
