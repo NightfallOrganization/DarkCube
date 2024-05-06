@@ -8,7 +8,6 @@
 package building.oneblock.util;
 
 import building.oneblock.OneBlock;
-import eu.darkcube.system.aetheria.Aetheria;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 

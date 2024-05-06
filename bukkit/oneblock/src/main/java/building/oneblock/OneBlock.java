@@ -6,6 +6,7 @@ import building.oneblock.gui.MenuEditGUI;
 import building.oneblock.gui.MenuGUI;
 import building.oneblock.items.CrookItem;
 import building.oneblock.items.RodOfTheSkyItem;
+import building.oneblock.listener.CraftingTableListener;
 import building.oneblock.listener.MenuGUIListener;
 import building.oneblock.manager.*;
 import building.oneblock.manager.player.*;
@@ -19,14 +20,17 @@ import building.oneblock.util.StartWorld;
 import building.oneblock.util.ability.ItemCollector;
 import building.oneblock.util.ability.SneakGrow;
 import building.oneblock.util.ability.WoodBlockBreaker;
+import eu.darkcube.system.glyphwidthloader.GlyphWidthManager;
 import eu.darkcube.system.util.Language;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.IOException;
 
 public final class OneBlock extends JavaPlugin {
     private static OneBlock instance;
+    private final GlyphWidthManager glyphWidthManager = new GlyphWidthManager();
 
     public OneBlock() {
         instance = this;
@@ -39,6 +43,12 @@ public final class OneBlock extends JavaPlugin {
     @Override
     public void onEnable() {
         WorldManager.loadWorlds();
+
+        try {
+            glyphWidthManager.loadGlyphDataFromClassLoader(getClassLoader(), "glyph-widths.bin");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
         var itemManager = new ItemManager(this);
         itemManager.createAllRecipes();
@@ -75,6 +85,7 @@ public final class OneBlock extends JavaPlugin {
         var menuGUI = new MenuGUI(playerManager, worldSlotManager);
         var startWorld = new StartWorld(worldSlotManager);
         var menuGUIListener = new MenuGUIListener(menuGUI, menuEditGUI, worldSlotManager);
+        var craftingTableListener = new CraftingTableListener();
 
         npcCreator.createNPC();
 
@@ -93,6 +104,7 @@ public final class OneBlock extends JavaPlugin {
         instance.getServer().getPluginManager().registerEvents(rodOfTheSkyitem, this);
         instance.getServer().getPluginManager().registerEvents(npcCreator, this);
         instance.getServer().getPluginManager().registerEvents(flyCommand, this);
+        instance.getServer().getPluginManager().registerEvents(craftingTableListener, this);
 
         instance.getCommand("menu").setExecutor(new MenuCommand(menuGUI));
         instance.getCommand("killmobs").setExecutor(new KillMobsCommand());
@@ -120,6 +132,10 @@ public final class OneBlock extends JavaPlugin {
     public void onDisable() {
 //        var itemManager = new ItemManager(this);
 //        itemManager.removeAllRecipes();
+    }
+
+    public GlyphWidthManager glyphWidthManager() {
+        return glyphWidthManager;
     }
 
 }
