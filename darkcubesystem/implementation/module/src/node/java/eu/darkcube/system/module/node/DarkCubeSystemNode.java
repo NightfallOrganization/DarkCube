@@ -16,7 +16,7 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.module.ModuleImplementation;
 import eu.darkcube.system.module.node.data.SynchronizedPersistentDataStorages;
 import eu.darkcube.system.module.node.userapi.NodeUserAPI;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.UserAPI;
 
 @Singleton

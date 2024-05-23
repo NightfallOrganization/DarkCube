@@ -25,9 +25,9 @@ import eu.darkcube.system.minestom.impl.item.enchant.MinestomEnchantmentProvider
 import eu.darkcube.system.minestom.impl.item.firework.MinestomFireworkEffectProvider;
 import eu.darkcube.system.minestom.impl.item.flag.MinestomItemFlagProvider;
 import eu.darkcube.system.minestom.impl.item.material.MinestomMaterialProvider;
-import eu.darkcube.system.packetapi.Packet;
-import eu.darkcube.system.packetapi.PacketAPI;
-import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.cloudnet.packetapi.Packet;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketHandler;
 import eu.darkcube.system.server.impl.inventory.item.ItemTemplateProviderImpl;
 import eu.darkcube.system.server.inventory.InventoryProvider;
 import eu.darkcube.system.server.inventory.InventoryTypeProvider;

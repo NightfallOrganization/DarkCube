@@ -9,8 +9,8 @@ plugins {
 }
 
 dependencies {
-    api(projects.darkcubesystem.implementation.common)
-    api(projects.darkcubesystem.server)
+    api(darkcubesystem.implementation.common)
+    api(darkcubesystem.server)
 }
 
 tasks {

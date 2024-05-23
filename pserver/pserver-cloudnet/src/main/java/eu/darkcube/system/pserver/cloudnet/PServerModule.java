@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.pserver.cloudnet;
 
 import eu.cloudnetservice.driver.document.Document;
@@ -14,7 +15,7 @@ import eu.cloudnetservice.driver.module.ModuleTask;
 import eu.cloudnetservice.driver.module.driver.DriverModule;
 import eu.cloudnetservice.node.command.CommandProvider;
 import eu.darkcube.system.packetapi.HandlerGroup;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
@@ -35,11 +36,7 @@ import java.util.stream.Collectors;
 
 public class PServerModule extends DriverModule {
 
-    public static final String PLUGIN_NAME = new File(PServerModule.class
-            .getProtectionDomain()
-            .getCodeSource()
-            .getLocation()
-            .getPath()).getName();
+    public static final String PLUGIN_NAME = new File(PServerModule.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
     private static PServerModule instance;
     public Listener listener;
     public String sqlDatabase;
@@ -55,7 +52,8 @@ public class PServerModule extends DriverModule {
         return PServerModule.instance;
     }
 
-    @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.LOADED) public void loadConfig() {
+    @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.LOADED)
+    public void loadConfig() {
         configuration = this.readConfig(PServerConfiguration.class, () -> new PServerConfiguration("h2", defaultExclusions()), DocumentFactory.json());
         this.sqlDatabase = configuration.database();
     }
@@ -76,7 +74,7 @@ public class PServerModule extends DriverModule {
 
     @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.STARTED)
     public void load(EventManager eventManager, CommandProvider commandProvider) {
-//        ClassLoaderFixRelocation.load(logger, eventManager, commandProvider);
+        //        ClassLoaderFixRelocation.load(logger, eventManager, commandProvider);
         logger.info("Enabling module PServer");
         NodeServiceInfoUtil.init();
         NodePServerProvider.init();
@@ -127,7 +125,8 @@ public class PServerModule extends DriverModule {
         commandProvider.register(CommandPServers.class);
     }
 
-    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED) public void stop() {
+    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED)
+    public void stop() {
         NodePServerProvider.instance().cleanup();
     }
 

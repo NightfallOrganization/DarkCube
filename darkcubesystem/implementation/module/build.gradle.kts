@@ -36,7 +36,7 @@ configurations {
 dependencies {
     compileOnly(libs.cloudnet.driver)
     compileOnly(libs.cloudnet.bridge)
-    api(projects.darkcubesystem.implementation.common)
+    api(darkcubesystem.implementation.common)
 
     "nodeCompileOnly"(libs.cloudnet.node)
     "nodeCompileOnly"(sourceSets.main.map { it.output })

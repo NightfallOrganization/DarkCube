@@ -26,7 +26,7 @@ import eu.darkcube.system.bukkit.provider.via.ViaSupport;
 import eu.darkcube.system.internal.PacketDeclareProtocolVersion;
 import eu.darkcube.system.internal.PacketRequestProtocolVersionDeclaration;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.server.version.ServerVersion;
 import eu.darkcube.system.util.AdventureSupport;
 import org.bukkit.Bukkit;

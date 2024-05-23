@@ -6,9 +6,10 @@
  */
 plugins {
     `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 dependencies {
-    compileOnlyApi(projects.darkcubesystem)
+    compileOnlyApi(darkcubesystem.api.cloudnet)
     compileOnlyApi(libs.cloudnet.driver)
 }

@@ -6,7 +6,8 @@
  */
 
 plugins {
-    id("java-library")
+    `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
