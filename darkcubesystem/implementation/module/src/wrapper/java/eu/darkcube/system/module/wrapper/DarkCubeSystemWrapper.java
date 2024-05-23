@@ -14,7 +14,7 @@ import dev.derklaro.aerogel.binding.BindingBuilder;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.module.ModuleImplementation;
 import eu.darkcube.system.module.wrapper.userapi.WrapperUserAPI;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.AsyncExecutor;
 

@@ -4,12 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons;
 
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserModifier;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.vanillaaddons.inventory.Inventory;
 
 public class AUser {
@@ -25,7 +26,7 @@ public class AUser {
     }
 
     public static AUser user(User user) {
-        return user.metadata().get(new Key(VanillaAddons.getPlugin(VanillaAddons.class).getName(), "user"));
+        return user.metadata().get(Key.key(VanillaAddons.getPlugin(VanillaAddons.class), "user"));
     }
 
     public InventoryType openInventory() {
@@ -75,11 +76,13 @@ public class AUser {
             this.auser = new Key(addons.getName(), "user");
         }
 
-        @Override public void onLoad(User user) {
+        @Override
+        public void onLoad(User user) {
             user.metadata().set(auser, new AUser(addons, user));
         }
 
-        @Override public void onUnload(User user) {
+        @Override
+        public void onUnload(User user) {
             user.metadata().remove(auser);
         }
     }

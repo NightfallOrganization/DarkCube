@@ -45,11 +45,11 @@ configurations.register("inject") {
 }
 
 dependencies {
-    api(projects.darkcubesystem.implementation.server)
-    api(projects.darkcubesystem.minestom)
+    api(darkcubesystem.implementation.server)
+    api(darkcubesystem.minestom)
     "extensionImplementation"(sourceSets.main.map { it.output })
 
-    shadowContent(projects.darkcubesystem.implementation.server) { isTransitive = false }
-    shadowContent(projects.darkcubesystem.minestom) { isTransitive = false }
-    shadowContent(projects.darkcubesystem.server) { isTransitive = false }
+    shadowContent(darkcubesystem.implementation.server) { isTransitive = false }
+    shadowContent(darkcubesystem.minestom) { isTransitive = false }
+    shadowContent(darkcubesystem.server) { isTransitive = false }
 }

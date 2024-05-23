@@ -10,6 +10,7 @@ import org.gradle.api.internal.file.FileOperations
 plugins {
     `java-library`
     id("darkcube-parent")
+    id("eu.darkcube.darkcube")
 }
 
 val minestomLibrary by configurations.register("minestomLibrary") {
@@ -86,9 +87,8 @@ tasks {
 }
 
 dependencies {
-    api(projects.darkcubesystem.minestom) {
-        exclude("org.jetbrains", "annotations")
-    }
+    api(darkcubesystem.minestom) { exclude("org.jetbrains", "annotations") }
+    api(darkcubesystem.server.cloudnet) { exclude("org.jetbrains", "annotations") }
     implementation("org.ow2.asm:asm:9.5") // in cloudnet but not exposed
     implementation("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
     // libraries to be added

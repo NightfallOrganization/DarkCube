@@ -5,8 +5,8 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-import eu.darkcube.build.DarkCubePlugin
-
-allprojects {
-    plugins.apply(DarkCubePlugin::class)
+gradle.taskGraph.whenReady {
+    allTasks.filterIsInstance<JavaExec>().forEach {
+        it.setExecutable(it.javaLauncher.get().executablePath.asFile.absolutePath)
+    }
 }

@@ -7,8 +7,8 @@
 
 package eu.darkcube.system.module.node.data;
 
-import eu.darkcube.system.packetapi.Packet;
-import eu.darkcube.system.packetapi.PacketHandler;
+import eu.darkcube.system.cloudnet.packetapi.Packet;
+import eu.darkcube.system.cloudnet.packetapi.PacketHandler;
 import eu.darkcube.system.util.data.packets.PacketWrapperNodeDataRemove;
 
 class HandlerRemove implements PacketHandler<PacketWrapperNodeDataRemove> {

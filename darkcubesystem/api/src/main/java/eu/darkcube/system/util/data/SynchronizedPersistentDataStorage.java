@@ -4,12 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.util.data;
 
 import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.util.data.packets.*;
 
 import java.lang.ref.Reference;
@@ -100,11 +101,13 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         storages.add(new WeakReference<>(this));
     }
 
-    @Override public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
+    @Override
+    public @UnmodifiableView @NotNull PersistentDataStorage unmodifiable() {
         return new UnmodifiablePersistentDataStorage(this);
     }
 
-    @Override public @NotNull Collection<Key> keys() {
+    @Override
+    public @NotNull Collection<Key> keys() {
         List<Key> keys = new ArrayList<>();
         try {
             lock.readLock().lock();
@@ -117,7 +120,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return Collections.unmodifiableCollection(keys);
     }
 
-    @Override public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override
+    public <T> void set(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.writeLock().lock();
             data = type.clone(data);
@@ -135,7 +139,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override
+    public <T> T remove(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         T ret;
         try {
             lock.writeLock().lock();
@@ -156,7 +161,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return ret;
     }
 
-    @Override public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
+    @Override
+    public <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
@@ -181,7 +187,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override public @NotNull <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
+    @Override
+    public @NotNull <T> T get(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull Supplier<T> defaultValue) {
         try {
             lock.readLock().lock();
             if (cache.containsKey(key)) {
@@ -215,7 +222,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         return ret;
     }
 
-    @Override public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
+    @Override
+    public <T> void setIfNotPresent(@NotNull Key key, @NotNull PersistentDataType<T> type, @NotNull T data) {
         try {
             lock.readLock().lock();
             if (this.data.contains(key.toString())) {
@@ -241,7 +249,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override public boolean has(@NotNull Key key) {
+    @Override
+    public boolean has(@NotNull Key key) {
         try {
             lock.readLock().lock();
             return data.contains(key.toString());
@@ -250,7 +259,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override public void clear() {
+    @Override
+    public void clear() {
         try {
             lock.writeLock().lock();
             clearData();
@@ -266,7 +276,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         for (String s : new ArrayList<>(data.keys())) data.remove(s);
     }
 
-    @Override public void loadFromJsonDocument(Document document) {
+    @Override
+    public void loadFromJsonDocument(Document document) {
         try {
             lock.writeLock().lock();
             clearData();
@@ -279,7 +290,8 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         notifyNotifiers();
     }
 
-    @Override public Document storeToJsonDocument() {
+    @Override
+    public Document storeToJsonDocument() {
         try {
             lock.readLock().lock();
             return data.immutableCopy();
@@ -288,11 +300,13 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
+    @Override
+    public @UnmodifiableView @NotNull Collection<@NotNull UpdateNotifier> updateNotifiers() {
         return Collections.unmodifiableCollection(updateNotifiers);
     }
 
-    @Override public void clearCache() {
+    @Override
+    public void clearCache() {
         try {
             lock.writeLock().lock();
             cache.clear();
@@ -301,11 +315,13 @@ public class SynchronizedPersistentDataStorage implements PersistentDataStorage 
         }
     }
 
-    @Override public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override
+    public void addUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.add(notifier);
     }
 
-    @Override public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
+    @Override
+    public void removeUpdateNotifier(@NotNull UpdateNotifier notifier) {
         updateNotifiers.remove(notifier);
     }
 

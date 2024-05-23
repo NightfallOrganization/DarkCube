@@ -7,6 +7,7 @@
 plugins {
     `java-library`
     alias(libs.plugins.shadow)
+    id("eu.darkcube.darkcube")
 }
 
 tasks {

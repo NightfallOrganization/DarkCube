@@ -8,12 +8,13 @@ plugins {
     java
     id("darkcube-parent")
     alias(libs.plugins.shadow)
+    id("eu.darkcube.darkcube")
 }
 
 val woolbattleShadow by configurations.register("woolbattleShadow")
 
 dependencies {
-    implementation(projects.darkcubesystem.minestom)
+    implementation(darkcubesystem.minestom)
     implementation(parent!!.project("common"))
     woolbattleShadow(libs.jctools.core)
     woolbattleShadow(libs.fastutil)

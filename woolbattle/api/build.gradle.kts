@@ -6,9 +6,10 @@
  */
 plugins {
     `java-library`
+    id("eu.darkcube.darkcube")
     alias(libs.plugins.lombok)
 }
 
 dependencies {
-    api(projects.darkcubesystem.server)
+    api(darkcubesystem.server)
 }
