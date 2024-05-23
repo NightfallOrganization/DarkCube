@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.internal;
 
-import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.cloudnet.packetapi.Packet;
 
 public class PacketDeclareProtocolVersion extends Packet {
     private final String serverName;

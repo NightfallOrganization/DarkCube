@@ -8,6 +8,7 @@
 plugins {
     alias(libs.plugins.shadow)
     `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 tasks {
@@ -26,7 +27,7 @@ tasks {
 }
 
 dependencies {
-    compileOnly(project(":darkcubesystem:bukkit"))
+    compileOnly(darkcubesystem.bukkit)
     compileOnly(project(":bukkit:statsapi"))
     compileOnly(project(":pserver:pserver-api"))
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")

@@ -6,11 +6,12 @@
  */
 plugins {
     `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
     compileOnlyApi(projects.pserver.pserverApi)
-    compileOnlyApi(projects.darkcubesystem.bukkit)
+    compileOnlyApi(darkcubesystem.bukkit)
     compileOnlyApi(libs.cloudnet.wrapper)
 }

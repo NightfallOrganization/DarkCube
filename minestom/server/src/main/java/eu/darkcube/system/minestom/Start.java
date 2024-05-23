@@ -12,7 +12,7 @@ import eu.darkcube.system.minestom.command.LoadedChunksCommand;
 import eu.darkcube.system.minestom.command.StopCommand;
 import eu.darkcube.system.minestom.console.ServerConsole;
 import eu.darkcube.system.minestom.listener.ChunkUnloader;
-import eu.darkcube.system.minestom.util.CloudNetIntegration;
+import eu.darkcube.system.server.cloudnet.CloudNetIntegration;
 import net.hollowcube.minestom.extensions.ExtensionBootstrap;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.entity.EntityDespawnEvent;

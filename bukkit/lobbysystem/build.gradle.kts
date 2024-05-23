@@ -6,6 +6,8 @@
  */
 
 plugins {
+    `java-library`
+    id("eu.darkcube.darkcube")
     alias(libs.plugins.shadow)
 }
 
@@ -42,8 +44,7 @@ tasks {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-    compileOnly(project(":darkcubesystem"))
-    compileOnly(project(":darkcubesystem:bukkit"))
+    compileOnly(darkcubesystem.bukkit)
     compileOnly(project(":pserver:pserver-bukkit"))
     compileOnly(project(":pserver:pserver-api"))
     api(project(":common:labymod-emotes"))

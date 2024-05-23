@@ -58,16 +58,16 @@ configurations.register("impl") {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-    api(projects.darkcubesystem.bukkit)
-    api(projects.darkcubesystem.implementation.server)
+    api(darkcubesystem.bukkit)
+    api(darkcubesystem.implementation.server)
     compileOnlyApi(libs.cloudnet.wrapper)
     implementation(libs.viaversion)
     implementation(libs.viaversion.common)
     implementation(libs.luckperms)
 
-    shadowContent(projects.darkcubesystem.implementation.server)
-    shadowContent(projects.darkcubesystem.bukkit)
-    shadowContent(projects.darkcubesystem.server)
+    shadowContent(darkcubesystem.implementation.server)
+    shadowContent(darkcubesystem.bukkit)
+    shadowContent(darkcubesystem.server)
     bukkitVersion(project("v1_8_8"))
     bukkitVersion(project("latest", "reobf"))
 }

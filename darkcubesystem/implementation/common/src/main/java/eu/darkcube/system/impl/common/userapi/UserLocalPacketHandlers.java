@@ -8,7 +8,7 @@
 package eu.darkcube.system.impl.common.userapi;
 
 import eu.darkcube.system.packetapi.HandlerGroup;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.userapi.packets.PacketWNQueryUser;
 import eu.darkcube.system.userapi.packets.PacketWNUserPersistentDataLoad;
 import eu.darkcube.system.userapi.packets.PacketWNUserPersistentDataRemove;

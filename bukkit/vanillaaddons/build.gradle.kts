@@ -7,6 +7,7 @@
 plugins {
     `java-library`
     alias(libs.plugins.shadow)
+    id("eu.darkcube.darkcube")
 }
 
 tasks {
@@ -24,7 +25,7 @@ tasks {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
-    compileOnly(project(":darkcubesystem"))
+    compileOnly(darkcubesystem.bukkit)
     implementation("net.wesjd:anvilgui:1.9.3-SNAPSHOT")
 }
 repositories {

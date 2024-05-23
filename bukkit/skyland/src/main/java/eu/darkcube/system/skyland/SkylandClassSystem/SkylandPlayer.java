@@ -4,31 +4,38 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.skyland.SkylandClassSystem;
 
-import eu.darkcube.system.skyland.Equipment.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.skyland.Equipment.Equipment;
+import eu.darkcube.system.skyland.Equipment.EquipmentType;
+import eu.darkcube.system.skyland.Equipment.Equipments;
+import eu.darkcube.system.skyland.Equipment.PlayerStats;
+import eu.darkcube.system.skyland.Equipment.PlayerStatsType;
+import eu.darkcube.system.skyland.Equipment.Weapon;
+import eu.darkcube.system.skyland.Equipment.Weapons;
 import eu.darkcube.system.skyland.Skyland;
 import eu.darkcube.system.skyland.staticval.Globals;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 public class SkylandPlayer implements SkylandEntity {
 
     public static final PersistentDataType<List<SkylandPlayerClass>> skylandClassList = PersistentDataTypes.list(SkylandPlayerClass.TYPE);
-    private static final Key MONEY_KEY = new Key(Skyland.getInstance(), "money");
-    private static final Key ACTIVE_CLASS_KEY = new Key(Skyland.getInstance(), "active_class_key");
-    private static final Key SKYLAND_PLAYER_CLASSES = new Key(Skyland.getInstance(), "skyland_player_classes");
+    private static final Key MONEY_KEY = Key.key(Skyland.getInstance(), "money");
+    private static final Key ACTIVE_CLASS_KEY = Key.key(Skyland.getInstance(), "active_class_key");
+    private static final Key SKYLAND_PLAYER_CLASSES = Key.key(Skyland.getInstance(), "skyland_player_classes");
     private final User user;
-    //todo
+    // todo
 
     public SkylandPlayer(User user) {
         this.user = user;
@@ -66,12 +73,12 @@ public class SkylandPlayer implements SkylandEntity {
             }
         }
 
-        //todo get from inv need duckness for additional slot
+        // todo get from inv need duckness for additional slot
         return out;
     }
 
     public Weapon getActiveWeapon() {
-        //returns null if there isnt a weapon in the main hand
+        // returns null if there isnt a weapon in the main hand
         System.out.println("loading from main hand");
 
         if (getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
@@ -92,10 +99,11 @@ public class SkylandPlayer implements SkylandEntity {
         return null;
     }
 
-    @Override public PlayerStats[] getStats() {
+    @Override
+    public PlayerStats[] getStats() {
 
         ArrayList<PlayerStats> playerStats = new ArrayList<>();
-        //playerStats.add(activeClass);
+        // playerStats.add(activeClass);
 
         for (Equipment eq : getEquipment()) {
             playerStats.addAll(List.of(eq.getStats()));
@@ -104,7 +112,8 @@ public class SkylandPlayer implements SkylandEntity {
         return PlayerStats.mergePstats(playerStats);
     }
 
-    @Override public int getAttackDmg() {
+    @Override
+    public int getAttackDmg() {
         int strength = 0;
 
         for (PlayerStats ps : getStats()) {
@@ -119,7 +128,7 @@ public class SkylandPlayer implements SkylandEntity {
             System.out.println("no weapon found default dmg = 1");
             return 1;
         }
-        //here strength effectiveness is calculated
+        // here strength effectiveness is calculated
 
     }
 
@@ -169,7 +178,8 @@ public class SkylandPlayer implements SkylandEntity {
         user.persistentData().set(MONEY_KEY, PersistentDataTypes.BIGINTEGER, money);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "SkylandPlayer{" + "user=" + user + "activeClass=" + getActiveClass().getsClass() + "Money=" + getMoney() + '}';
     }
 

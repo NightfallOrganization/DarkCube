@@ -33,11 +33,11 @@ public class CloudNetIntegration {
     public static void init() {
         var transformerRegistry = InjectionLayer.boot().instance(TransformerRegistry.class);
         transformerRegistry.registerTransformer(MINESTOM_PACKAGE, CLASS_MINECRAFT_SERVER, new CloudNetTransformer());
-
     }
 
     private record CloudNetTransformer() implements Transformer {
-        @Override public void transform(@NotNull String s, @NotNull ClassNode classNode) {
+        @Override
+        public void transform(@NotNull String s, @NotNull ClassNode classNode) {
             addGetExtensionManager(classNode);
         }
 

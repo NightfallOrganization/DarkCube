@@ -6,12 +6,13 @@
  */
 plugins {
     `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
     compileOnly(project(":pserver:pserver-bukkit"))
-    compileOnly(project(":darkcubesystem:bukkit"))
+    compileOnly(darkcubesystem.bukkit)
     compileOnly(project(":woolbattle:bukkit"))
     compileOnly(libs.luckperms)
 }

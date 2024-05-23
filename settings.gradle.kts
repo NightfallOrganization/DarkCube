@@ -14,8 +14,16 @@ pluginManagement {
             name = "DarkCube"
             credentials(PasswordCredentials::class)
         }
-        maven {
-            url = uri("https://repo.papermc.io/repository/maven-public/")
+        maven("https://nexus.darkcube.eu/repository/darkcube-group/") {
+            name = "DarkCube"
+            credentials(PasswordCredentials::class)
+        }
+    }
+}
+dependencyResolutionManagement {
+    versionCatalogs {
+        register("darkcubesystem") {
+            from(files("gradle/darkcubesystem.versions.toml"))
         }
     }
 }
@@ -72,8 +80,8 @@ include("common:glyph-width-loader")
 include("pserver")
 include("pserver:pserver-api")
 include("pserver:pserver-bukkit")
-include("pserver:pserver-cloudnet")
-include("pserver:pserver-plugin")
+//include("pserver:pserver-cloudnet")
+//include("pserver:pserver-plugin")
 //includeSubProjects("replay", "api", "module")
 //includeSubProjects("replay:bukkit", "1.8.8")
 

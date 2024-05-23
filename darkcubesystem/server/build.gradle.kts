@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     compileOnlyApi(libs.cloudnet.wrapper)
-    api(projects.darkcubesystem.api)
+    api(darkcubesystem.api)
 }
 
 tasks {

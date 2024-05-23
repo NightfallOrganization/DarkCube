@@ -8,7 +8,7 @@
 package eu.darkcube.system.lobbysystem.util.packet;
 
 import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.cloudnet.packetapi.Packet;
 
 import java.util.UUID;
 

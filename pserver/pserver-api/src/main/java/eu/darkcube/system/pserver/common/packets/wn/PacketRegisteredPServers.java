@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.pserver.common.packets.wn;
 
-import eu.darkcube.system.packetapi.Packet;
+import eu.darkcube.system.cloudnet.packetapi.Packet;
 import eu.darkcube.system.pserver.common.UniqueId;
 
 import java.util.Collection;

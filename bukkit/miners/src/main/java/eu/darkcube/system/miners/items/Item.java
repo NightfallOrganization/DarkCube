@@ -9,10 +9,10 @@ package eu.darkcube.system.miners.items;
 
 import static eu.darkcube.system.server.item.ItemBuilder.item;
 
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.Language;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -67,7 +67,7 @@ public enum Item {
     }
 
     public static class ItemKey { // Quick fix, change later
-        public static final Key ITEM = new Key(Miners.getInstance(), "item");
+        public static final Key ITEM = Key.key(Miners.getInstance(), "item");
     }
 
 }

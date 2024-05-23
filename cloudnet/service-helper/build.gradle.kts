@@ -4,13 +4,13 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 plugins {
-    id("java-library")
+    `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 dependencies {
     compileOnly(libs.cloudnet.node)
     compileOnly(libs.cloudnet.bridge)
-    compileOnly(rootProject.project("darkcubesystem"))
+    compileOnly(darkcubesystem.api.cloudnet)
 }
