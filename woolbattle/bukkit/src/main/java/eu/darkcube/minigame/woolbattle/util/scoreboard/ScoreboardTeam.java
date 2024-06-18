@@ -7,6 +7,7 @@
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
 
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.TextComponent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.scoreboard.NameTagVisibility;
 
@@ -50,20 +51,33 @@ public class ScoreboardTeam {
 
     public void setPrefix(String prefix) {
         String p = prefix;
-        if (p.length() > 16)
-            p = p.substring(0, 16);
+        if (p.length() > 16) p = p.substring(0, 16);
         team.setPrefix(p);
     }
 
     public void setPrefix(Component prefix) {
-        setPrefix(LegacyComponentSerializer.legacySection().serialize(prefix));
+        setPrefix(serialize(prefix));
     }
 
     public void setSuffix(Component suffix) {
-        String s = LegacyComponentSerializer.legacySection().serialize(suffix);
-        if (s.length() > 16)
-            s = s.substring(0, 16);
+        String s = serialize(suffix);
+        if (s.length() > 16) s = s.substring(0, 16);
         team.setSuffix(s);
+    }
+
+    private String serialize(Component component) {
+        var replaced = false;
+        if (component instanceof TextComponent text) {
+            if (text.content().isEmpty()) {
+                component = text.content(" ");
+                replaced = true;
+            }
+        }
+        var ser = LegacyComponentSerializer.legacySection().serialize(component);
+        if (replaced) {
+            ser = ser.replaceFirst(" ", "");
+        }
+        return ser;
     }
 
     public void nameTagVisibility(NameTagVisibility visibility) {
