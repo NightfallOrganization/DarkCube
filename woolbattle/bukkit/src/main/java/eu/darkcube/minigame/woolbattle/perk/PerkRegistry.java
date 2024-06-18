@@ -59,7 +59,7 @@ public class PerkRegistry {
         register(new SpiderPerk(woolbattle));
         register(new HookArrowPerk(woolbattle));
         register(new DrawArrowPerk(woolbattle));
-
+        register(new PiercingArrowPerk(woolbattle));
         register(new FreezeArrowPerk(woolbattle));
         register(new BerserkerPerk(woolbattle));
         register(new StomperPerk(woolbattle));
