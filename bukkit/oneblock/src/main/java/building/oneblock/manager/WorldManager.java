@@ -7,7 +7,7 @@
 
 package building.oneblock.manager;
 
-import building.oneblock.VoidGenerator;
+import building.oneblock.voidgen.VoidGenerator;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

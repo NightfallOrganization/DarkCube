@@ -84,6 +84,7 @@ public class PlayerManager implements Listener {
             lobbySystemLink.updateLobbyLink();
         }, 1L);
 
+        Player player = event.getPlayer();
         UUID playerID = event.getPlayer().getUniqueId();
         event.setQuitMessage(null);
 
@@ -92,13 +93,14 @@ public class PlayerManager implements Listener {
         }
 
         ChatColor playerTeam = teamManager.getPlayerTeam(playerID);
-        teamManager.setPlayerTeam(playerID, null);
+        teamManager.removePlayerTeam(playerID);
 
         if (teamManager.isTeamEmpty(playerTeam) && GameStates.isState(GameStates.PLAYING) && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
             Ending ending = new Ending(Sumo.getInstance());
             ending.execute();
         }
 
+        prefixManager.removePlayerPrefix(player);
     }
 
     @EventHandler

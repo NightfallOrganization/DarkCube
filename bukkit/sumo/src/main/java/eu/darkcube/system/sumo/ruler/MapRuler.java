@@ -7,7 +7,10 @@
 
 package eu.darkcube.system.sumo.ruler;
 
+import eu.darkcube.system.sumo.Sumo;
+import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.manager.MapManager;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,17 +18,24 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.entity.EntityType;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 public class MapRuler implements Listener {
-
     private MapManager mainRuler;
 
     public MapRuler(MapManager mainRuler) {
@@ -59,6 +69,17 @@ public class MapRuler implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getInventory().getType() == InventoryType.CRAFTING) {
+            if (event.getSlotType() == InventoryType.SlotType.CRAFTING) {
+                if (event.getAction() == InventoryAction.PLACE_ALL ||
+                        event.getAction() == InventoryAction.PLACE_ONE ||
+                        event.getAction() == InventoryAction.PLACE_SOME) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
         World activeWorld = mainRuler.getActiveWorld();
         if (event.getWhoClicked().getWorld().equals(activeWorld)) {
             if (event.getClickedInventory() instanceof PlayerInventory) {
@@ -66,6 +87,18 @@ public class MapRuler implements Listener {
                 if ((event.getSlot() == 36 || event.getSlot() == 37 || event.getSlot() == 38 || event.getSlot() == 39) &&
                         inventory.getItem(event.getSlot()) != null) {
                     event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getInventory().getType() == InventoryType.CRAFTING) {
+            for (int slot : event.getRawSlots()) {
+                if (slot >= 1 && slot <= 4) {
+                    event.setCancelled(true);
+                    break;
                 }
             }
         }
@@ -120,4 +153,5 @@ public class MapRuler implements Listener {
 
         event.setCancelled(true);
     }
+
 }

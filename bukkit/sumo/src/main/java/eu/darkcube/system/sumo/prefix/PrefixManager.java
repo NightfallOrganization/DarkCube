@@ -21,6 +21,19 @@ public class PrefixManager {
         updatePlayerNametag(player, coloredPrefix);
     }
 
+    public void removePlayerPrefix(Player player) {
+        Scoreboard scoreboard = player.getScoreboard();
+        String teamName = player.getName();
+
+        Team team = scoreboard.getTeam(teamName);
+        if (team != null) {
+            team.removeEntry(player.getName());
+            if (team.getSize() == 0) {
+                team.unregister();
+            }
+        }
+    }
+
     private void updatePlayerNametag(Player player, String prefix) {
         if (player.getScoreboard() == Bukkit.getScoreboardManager().getMainScoreboard()) {
             Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();

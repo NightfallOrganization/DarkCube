@@ -18,7 +18,8 @@ public class SkillDash extends Skill {
         super("Dash", true);
     }
 
-    @Override public void activateSkill(Player player) {
+    @Override
+    public void activateSkill(Player player) {
         Vector direction = player.getLocation().getDirection();
 
         // Begrenze die Y-Komponente des Vektors.

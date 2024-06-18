@@ -7,7 +7,6 @@
 
 package eu.darkcube.system.sumo;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.DarkCubeBukkit;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.sumo.commands.*;
@@ -32,6 +31,7 @@ import eu.darkcube.system.sumo.other.StartingTimer;
 import eu.darkcube.system.sumo.ruler.LobbyRuler;
 import eu.darkcube.system.sumo.manager.MapManager;
 import eu.darkcube.system.sumo.ruler.MapRuler;
+import org.bukkit.generator.ChunkGenerator;
 
 public class Sumo extends DarkCubePlugin {
     private static Sumo instance;
@@ -47,10 +47,10 @@ public class Sumo extends DarkCubePlugin {
 
         var mapLoader = new MapLoader();
         mapLoader.loadWorlds();
-        var lobbyScoreboard = new LobbyScoreboard(this);
-        var mapManager = new MapManager(this, lobbyScoreboard);
         var teamManager = new TeamManager();
         var prefixManager = new PrefixManager(teamManager);
+        var lobbyScoreboard = new LobbyScoreboard(this);
+        var mapManager = new MapManager(this, lobbyScoreboard);
         var woolDespawner = new WoolDespawner(this);
         var gameScoreboard = new GameScoreboard(mapManager);
         var lifeManager = new LifeManager(teamManager, gameScoreboard);

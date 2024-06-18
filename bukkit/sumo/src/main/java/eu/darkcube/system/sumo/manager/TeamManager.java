@@ -23,6 +23,10 @@ public class TeamManager {
         playerTeams.put(playerID, teamColor);
     }
 
+    public void removePlayerTeam(UUID playerID) {
+        playerTeams.remove(playerID);
+    }
+
     public ChatColor getPlayerTeam(UUID playerID) {
         return playerTeams.getOrDefault(playerID, ChatColor.GRAY);
     }

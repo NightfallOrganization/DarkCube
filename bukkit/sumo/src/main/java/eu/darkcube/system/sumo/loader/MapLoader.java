@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.sumo.loader;
 
+import eu.darkcube.system.sumo.voidgen.VoidGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.Listener;
@@ -27,7 +28,9 @@ public class MapLoader implements Listener {
     private void loadWorld(String name) {
         if (Bukkit.getWorld(name) == null) {
             Bukkit.getServer().getLogger().info("Loading world: " + name);
-            new WorldCreator(name).createWorld();
+            WorldCreator creator = new WorldCreator(name);
+            creator.generator(new VoidGenerator());
+            creator.createWorld();
         }
     }
 

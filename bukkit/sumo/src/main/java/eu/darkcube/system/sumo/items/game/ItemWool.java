@@ -33,6 +33,7 @@ import java.util.UUID;
 
 public class ItemWool implements Listener {
     private final Map<UUID, BukkitRunnable> playerTasks = new HashMap<>();
+    private final Map<UUID, Integer> playerLastWoolSlot = new HashMap<>(); // Neuer HashMap um den letzten Slot zu speichern
     private static TeamManager teamManager;
 
     public ItemWool(TeamManager teamManager) {
@@ -60,6 +61,10 @@ public class ItemWool implements Listener {
             return;
         }
 
+        // Speichere den Slot des platzierten Blocks
+        int placedSlot = event.getPlayer().getInventory().getHeldItemSlot();
+        playerLastWoolSlot.put(playerUUID, placedSlot);
+
         if (playerTasks.containsKey(playerUUID)) {
             return;
         }
@@ -77,41 +82,47 @@ public class ItemWool implements Listener {
         };
 
         playerTasks.put(playerUUID, task);
-        task.runTaskLater(Sumo.getInstance(), 200L); // 200 Ticks = 10 Sekunden
+        task.runTaskLater(Sumo.getInstance(), 200L);
     }
 
     private void adjustWoolInInventory(Player player) {
         ItemStack wool = createWool(player);
-        int woolAmount = 0;
-        int firstWoolSlot = -1; // -1 bedeutet, dass noch kein Woll-Slot gefunden wurde.
+        UUID playerUUID = player.getUniqueId();
 
-        // Durchlaufen des Inventars, um die Menge der Wolle zu zählen.
+        int woolAmount = 0;
+        int lastWoolSlot = playerLastWoolSlot.getOrDefault(playerUUID, -1); // Verwende den gespeicherten Slot
+
+        // Wolle im Inventar zählen
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             ItemStack item = player.getInventory().getItem(i);
             if (item != null && item.getType() == Material.WOOL) {
                 woolAmount += item.getAmount();
-                if (firstWoolSlot == -1) firstWoolSlot = i;
             }
         }
 
-        // Unterschied zur Zielmenge berechnen.
+        // Wolle im Cursor zählen
+        ItemStack cursorItem = player.getItemOnCursor();
+        if (cursorItem != null && cursorItem.getType() == Material.WOOL) {
+            woolAmount += cursorItem.getAmount();
+        }
+
         int difference = 10 - woolAmount;
 
         if (difference > 0) {
-            // Fügt die Differenz hinzu, wenn weniger als 10 Blöcke vorhanden sind.
             wool.setAmount(difference);
-            if (firstWoolSlot != -1) {
-                // Versucht, die Wolle im ersten gefundenen Woll-Slot hinzuzufügen.
-                player.getInventory().addItem(wool);
+            if (lastWoolSlot != -1) {
+                ItemStack existingItem = player.getInventory().getItem(lastWoolSlot);
+                if (existingItem == null || existingItem.getType() == Material.AIR) {
+                    player.getInventory().setItem(lastWoolSlot, wool); // Setze die Wolle in den letzten Slot
+                } else {
+                    player.getInventory().addItem(wool); // Falls der Slot belegt ist, füge die Wolle hinzu
+                }
             } else {
-                // Fügt die Wolle dem Inventar hinzu, wenn zuvor keine vorhanden war.
-                player.getInventory().addItem(wool);
+                player.getInventory().addItem(wool); // Wenn kein Slot gespeichert wurde, füge die Wolle hinzu
             }
         } else if (difference < 0) {
-            // Entfernt die überschüssige Wolle, wenn mehr als 10 Blöcke vorhanden sind.
             wool.setAmount(-difference);
             player.getInventory().removeItem(wool);
         }
     }
-
 }

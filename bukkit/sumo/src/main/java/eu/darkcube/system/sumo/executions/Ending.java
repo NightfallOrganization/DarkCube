@@ -40,11 +40,11 @@ public class Ending {
         Location targetLocation = new Location(world, 0.5, 101, 0.5);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            player.setGameMode(GameMode.SURVIVAL);
             player.teleport(targetLocation);
             System.out.println(player.getName() + " wurde teleportiert!!!");
         }
     }
-
 
     private void startTimer() {
         if (task != null) {
@@ -78,6 +78,9 @@ public class Ending {
     }
 
     private void onTimerEnd() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.kickPlayer("");
+        }
         Bukkit.shutdown();
     }
 
