@@ -12,7 +12,6 @@ import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.perk.perks.other.ArrowPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
-import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,8 +32,9 @@ public class PiercingArrowPerk extends Perk {
         }
 
         @EventHandler public void handle(BowShootArrowEvent event) {
-            ArrowPerk.claimArrow(woolbattle, event.arrow(), event.user(), 2, 3);
+            if (event.user().perks().count(PIERCING_ARROW) != 0) {
+                ArrowPerk.claimArrow(woolbattle, event.arrow(), event.user(), 2, 3);
+            }
         }
-
     }
 }

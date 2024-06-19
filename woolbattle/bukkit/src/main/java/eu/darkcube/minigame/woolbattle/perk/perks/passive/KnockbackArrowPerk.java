@@ -32,7 +32,9 @@ public class KnockbackArrowPerk extends Perk {
         }
 
         @EventHandler public void handle(BowShootArrowEvent event) {
-            ArrowPerk.claimArrow(woolbattle, event.arrow(), event.user(), 4, 1);
+            if (event.user().perks().count(KNOCKBACK_ARROW) != 0) {
+                ArrowPerk.claimArrow(woolbattle, event.arrow(), event.user(), 4, 1);
+            }
         }
 
     }
