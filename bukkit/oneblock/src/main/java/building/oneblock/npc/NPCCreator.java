@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import static building.oneblock.manager.WorldManager.SPAWN;
 
-public class NPCCreator implements Listener {
+public class NPCCreator {
     private NPCManager npcManager;
 
     public NPCCreator(NPCManager npcManager) {
