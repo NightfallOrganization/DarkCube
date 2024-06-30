@@ -42,12 +42,16 @@ include("bukkit:darkessentials")
 //include "bukkit:holograms"
 include("bukkit:jumpleague")
 //include "bukkit:knockout"
-include("bukkit:citybuild")
+//include("bukkit:aetheria")
+include("bukkit:oneblock")
+include("bukkit:woolbattleteamfight")
+include("bukkit:jumpleaguemodules")
 include("bukkit:lobbysystem")
 include("bukkit:luckperms-prefixplugin")
 include("bukkit:miners")
 include("bukkit:skyland")
 include("bukkit:vanillaaddons")
+include("bukkit:sumo")
 //include "bukkit:smash"
 include("bukkit:statsapi")
 //include("bungee")
