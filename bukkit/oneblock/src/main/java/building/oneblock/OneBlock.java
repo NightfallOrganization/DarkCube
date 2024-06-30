@@ -102,7 +102,6 @@ public final class OneBlock extends JavaPlugin {
         instance.getServer().getPluginManager().registerEvents(woodBlockBreaker, this);
         instance.getServer().getPluginManager().registerEvents(respawnManager, this);
         instance.getServer().getPluginManager().registerEvents(rodOfTheSkyitem, this);
-        instance.getServer().getPluginManager().registerEvents(npcCreator, this);
         instance.getServer().getPluginManager().registerEvents(flyCommand, this);
         instance.getServer().getPluginManager().registerEvents(craftingTableListener, this);
 

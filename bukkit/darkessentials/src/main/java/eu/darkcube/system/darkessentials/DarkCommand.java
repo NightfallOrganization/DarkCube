@@ -19,6 +19,10 @@ public class DarkCommand extends CommandExecutor {
         super("darkessentials", name, aliases, argumentBuilder);
     }
 
+    public DarkCommand(String name, Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
+        super("darkessentials", name, new String[0], argumentBuilder);
+    }
+
     public DarkCommand(String name, String permission, String[] aliases, Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
         super("darkessentials", name, permission, aliases, argumentBuilder);
     }

@@ -4,13 +4,11 @@ import eu.darkcube.system.commandapi.v3.CommandSource;
 import eu.darkcube.system.commandapi.v3.Commands;
 import eu.darkcube.system.commandapi.v3.arguments.EnumArgument;
 import eu.darkcube.system.darkessentials.DarkCommand;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
+import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
-
 import java.util.Locale;
 
 public class GameModeCommand extends DarkCommand {
@@ -34,7 +32,7 @@ public class GameModeCommand extends DarkCommand {
 
     private static void gameMode(CommandContext<CommandSource> context, GameMode gamemode) throws CommandSyntaxException {
         context.getSource().asPlayer().setGameMode(gamemode);
-        context.getSource().sendMessage(Component.text("§7[§eDark§6Cube§7] GameMode geändert zu §e" + gamemode));
+        context.getSource().sendMessage(Message.GAMEMODE_CHANGE, gamemode);
     }
 
 }

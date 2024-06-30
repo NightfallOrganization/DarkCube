@@ -65,7 +65,7 @@ public enum Message implements BaseMessage {
 
     public static final String PREFIX_ITEM = "ITEM_";
     public static final String PREFIX_LORE = "LORE_";
-    public static final String KEY_PREFIX = "LOBBY_";
+    public static final String KEY_PREFIX = "ONEBLOCK_";
 
     private final String key;
 

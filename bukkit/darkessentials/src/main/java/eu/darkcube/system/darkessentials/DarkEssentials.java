@@ -11,8 +11,9 @@ import com.google.gson.reflect.TypeToken;
 import eu.darkcube.system.DarkCubePlugin;
 import eu.darkcube.system.Plugin;
 import eu.darkcube.system.commandapi.v3.CommandAPI;
-import eu.darkcube.system.darkessentials.command.DayCommand;
-import eu.darkcube.system.darkessentials.command.GameModeCommand;
+import eu.darkcube.system.darkessentials.command.*;
+import eu.darkcube.system.darkessentials.util.LanguageHelper;
+import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.libs.net.kyori.adventure.title.Title;
@@ -40,8 +41,17 @@ public class DarkEssentials extends DarkCubePlugin {
 
     @Override
     public void onEnable() {
+
+        LanguageHelper.initialize();
+
         CommandAPI.instance().register(new DayCommand());
+        CommandAPI.instance().register(new NightCommand());
         CommandAPI.instance().register(new GameModeCommand());
+        CommandAPI.instance().register(new FlyCommand());
+        CommandAPI.instance().register(new FeedCommand());
+        CommandAPI.instance().register(new TpWorldCommand());
+        CommandAPI.instance().register(new HealCommand());
+        CommandAPI.instance().register(new MaxCommand());
     }
 
 }
