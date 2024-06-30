@@ -42,7 +42,7 @@ include("bukkit:darkessentials")
 //include "bukkit:holograms"
 include("bukkit:jumpleague")
 //include "bukkit:knockout"
-include("bukkit:aetheria")
+//include("bukkit:aetheria")
 include("bukkit:oneblock")
 include("bukkit:woolbattleteamfight")
 include("bukkit:jumpleaguemodules")
