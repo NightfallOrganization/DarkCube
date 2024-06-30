@@ -1,0 +1,19 @@
+main: eu.darkcube.system.jumpleaguemodules.Main
+name: JumpLeagueModules
+author: EliteDarkness
+version: 1.0
+api-version: 1.8
+depend: [System]
+commands:
+  getrespawn:
+    description: Bekomme ein Respawn Item
+    usage: /getrespawn
+    permission: jumpleaguemodules.getrespawn.use
+  setheight:
+    description: Setze die Höhe der JumpLeagueModules
+    usage: /setheight
+    permission: jumpleaguemodules.setheight.use
+
+Permissions:
+  jumpleaguemodules.setheight.use:
+    default: not op

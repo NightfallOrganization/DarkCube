@@ -1,0 +1,66 @@
+main: eu.darkcube.system.sumo.Sumo
+name: Sumo
+author: EliteDarkness
+version: 2.0
+api-version: 1.8
+depend: [System]
+
+commands:
+  setmap:
+    description: Votet für die Maps
+    permission: sumo.setmap.use
+  showactivemap:
+    description: Zeigt die Aktive Map an
+    permission: sumo.showactivemap.use
+  tpactiveworld:
+    description: Teleportiert sich zur aktiven Map
+    permission: sumo.tpactiveworld.use
+  showgamestate:
+    description: Zeigt den Game Status
+    permission: sumo.showgamestate.use
+  setgamestate:
+    description: Setzt den Game Status
+    permission: sumo.setgamestate.use
+  timer:
+    description: Setzt den Timer
+    permission: sumo.timer.use
+  setteam:
+    description: Setzt das Team für den Spieler
+    permission: sumo.setteam.use
+  start:
+    description: Startet die Runde
+    permission: sumo.start.use
+  setactivemap:
+    description: Setzt die aktive Map
+    permission: sumo.setactivemap.use
+  setlifes:
+    description: Setzt die Leben für ein Team
+    permission: sumo.setlifes.use
+  showteamlifes:
+    description: Zeigt die Leben für ein Team
+    permission: sumo.showteamlifes.use
+
+
+Permissions:
+  sumo.setmap.use:
+    default: op
+  sumo.showactivemap.use:
+    default: op
+  sumo.tpactiveworld.use:
+    default: op
+  sumo.showgamestate.use:
+    default: op
+  sumo.setgamestate.use:
+    default: op
+  sumo.timer.use:
+    default: op
+  sumo.setteam.use:
+    default: op
+  sumo.start.use:
+    default: op
+  sumo.setactivemap.use:
+    default: op
+  sumo.setlifes.use:
+    default: op
+  sumo.showteamlifes.use:
+    default: op
