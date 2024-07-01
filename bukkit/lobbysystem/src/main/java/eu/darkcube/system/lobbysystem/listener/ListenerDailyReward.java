@@ -11,9 +11,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import eu.darkcube.system.bukkit.util.BukkitAdventureSupport;
 import eu.darkcube.system.labymod.emotes.Emotes;
@@ -51,7 +51,8 @@ public class ListenerDailyReward extends BaseListener {
         return minCubes + new Random().nextInt(maxCubes - minCubes + 1);
     }
 
-    @EventHandler public void handle(InventoryClickEvent e) {
+    @EventHandler
+    public void handle(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
         LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
         if (user.getOpenInventory().getType() != InventoryDailyReward.type_daily_reward) {
@@ -66,7 +67,7 @@ public class ListenerDailyReward extends BaseListener {
         }
         int id = ItemBuilder.item(item).persistentDataStorage().get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
 
-        Set<Integer> used = user.getRewardSlotsUsed();
+        var used = new HashSet<>(user.getRewardSlotsUsed());
         // used.clear();
         if (used.contains(id)) {
             p.playSound(p.getLocation(), Sound.VILLAGER_NO, 1, 1);
@@ -84,15 +85,12 @@ public class ListenerDailyReward extends BaseListener {
         item.setItemMeta(meta);
         user.setLastDailyReward(System.currentTimeMillis());
         e.setCurrentItem(item);
-        BukkitAdventureSupport
-                .adventureSupport()
-                .audienceProvider()
-                .player(p)
-                .sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
+        BukkitAdventureSupport.adventureSupport().audienceProvider().player(p).sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
         p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
     }
 
-    @EventHandler public void handle(PlayerNPCInteractEvent e) {
+    @EventHandler
+    public void handle(PlayerNPCInteractEvent e) {
         if (e.hand() != PlayerNPCInteractEvent.Hand.MAIN_HAND) {
             return;
         }

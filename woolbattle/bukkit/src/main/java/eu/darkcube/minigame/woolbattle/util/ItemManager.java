@@ -13,10 +13,10 @@ import java.util.Map;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.Language;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -24,13 +24,10 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemManager {
 
-    public static final Key ITEM_ID = new Key(WoolBattleBukkit.instance(), "itemId");
+    public static final Key ITEM_ID = Key.key(WoolBattleBukkit.instance(), "item_id");
 
     public static void removeItems(WBUser user, Inventory invToRemoveFrom, ItemStack itemToRemove, int count) {
-        if (WoolBattleBukkit
-                .instance()
-                .ingame()
-                .enabled() && itemToRemove.getType() == Material.WOOL && user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
+        if (WoolBattleBukkit.instance().ingame().enabled() && itemToRemove.getType() == Material.WOOL && user.woolSubtractDirection() == WoolSubtractDirection.RIGHT_TO_LEFT) {
             Map<Integer, ItemStack> leftOver = new HashMap<>();
             itemToRemove = new ItemStack(itemToRemove);
             itemToRemove.setAmount(1);
@@ -85,11 +82,7 @@ public class ItemManager {
     }
 
     public static ItemStack getItem(Item item, WBUser user, Object[] replacements, Object... loreReplacements) {
-        var builder = item
-                .getBuilder()
-                .persistentDataStorage()
-                .iset(ITEM_ID, PersistentDataTypes.STRING, item.getItemId())
-                .builder();
+        var builder = item.getBuilder().persistentDataStorage().iset(ITEM_ID, PersistentDataTypes.STRING, item.getItemId()).builder();
         var language = user.getLanguage();
         var name = ItemManager.getDisplayName(item, language, replacements);
         builder.displayname(name);

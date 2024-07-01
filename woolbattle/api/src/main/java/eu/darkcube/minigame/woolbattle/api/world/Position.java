@@ -7,7 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
-import eu.cloudnetservice.driver.document.Document;
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataType;
 
@@ -33,9 +34,11 @@ public interface Position extends Cloneable {
         float pitch();
 
         @Override
-        @NotNull Directed clone();
+        @NotNull
+        Directed clone();
 
-        @NotNull Directed aligned();
+        @NotNull
+        Directed aligned();
 
         default @NotNull Directed simple() {
             return simple(this);
@@ -47,25 +50,25 @@ public interface Position extends Cloneable {
 
         PersistentDataType<Directed> TYPE = new PersistentDataType<>() {
             @Override
-            public Directed deserialize(Document doc, String key) {
-                var d = doc.readDocument(key);
-                var x = d.getDouble("x");
-                var y = d.getDouble("y");
-                var z = d.getDouble("z");
-                var yaw = d.getFloat("yaw");
-                var pitch = d.getFloat("pitch");
+            public Directed deserialize(JsonElement json) {
+                var d = json.getAsJsonObject();
+                var x = d.get("x").getAsDouble();
+                var y = d.get("y").getAsDouble();
+                var z = d.get("z").getAsDouble();
+                var yaw = d.get("yaw").getAsFloat();
+                var pitch = d.get("pitch").getAsFloat();
                 return new Simple(x, y, z, yaw, pitch);
             }
 
             @Override
-            public void serialize(Document.Mutable doc, String key, Directed data) {
-                var d = Document.newJsonDocument();
-                d.append("x", data.x());
-                d.append("y", data.y());
-                d.append("z", data.z());
-                d.append("yaw", data.yaw());
-                d.append("pitch", data.pitch());
-                doc.append(key, d);
+            public JsonElement serialize(Directed data) {
+                var d = new JsonObject();
+                d.addProperty("x", data.x());
+                d.addProperty("y", data.y());
+                d.addProperty("z", data.z());
+                d.addProperty("yaw", data.yaw());
+                d.addProperty("pitch", data.pitch());
+                return d;
             }
 
             @Override

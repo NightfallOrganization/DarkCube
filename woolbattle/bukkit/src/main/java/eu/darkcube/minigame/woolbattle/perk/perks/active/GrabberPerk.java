@@ -17,7 +17,7 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,9 +42,9 @@ public class GrabberPerk extends Perk {
         public ListenerGrabber(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);
             this.woolbattle = woolbattle;
-            DATA_GRABBED = new Key(woolbattle, "grabber_grabbed");
-            DATA_SCHEDULER = new Key(woolbattle, "grabber_scheduler");
-            DATA_PERK = new Key(woolbattle, "perk_grabber");
+            DATA_GRABBED = Key.key(woolbattle, "grabber_grabbed");
+            DATA_SCHEDULER = Key.key(woolbattle, "grabber_scheduler");
+            DATA_PERK = Key.key(woolbattle, "perk_grabber");
         }
 
         public boolean hasTarget(WBUser user) {

@@ -18,8 +18,8 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.inventory.ItemStack;
 
 public class PerksInventory extends WoolBattlePagedInventory {
@@ -29,16 +29,18 @@ public class PerksInventory extends WoolBattlePagedInventory {
 
     public PerksInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_PERKS.getMessage(user), user);
-        PERKS_TYPE = new Key(woolbattle, "perks_type");
-        PERKS_TYPE_NUMBER = new Key(woolbattle, "perks_type_number");
+        PERKS_TYPE = Key.key(woolbattle, "perks_type");
+        PERKS_TYPE_NUMBER = Key.key(woolbattle, "perks_type_number");
         complete();
     }
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && PERKS_TYPE != null;
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         String typeId = ItemManager.getId(event.item(), PERKS_TYPE);
@@ -48,7 +50,8 @@ public class PerksInventory extends WoolBattlePagedInventory {
         user.setOpenInventory(new PerksTypeInventory(woolbattle, user, type, number));
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         PerkRegistry registry = woolbattle.perkRegistry();
         int i = 0;
         for (Perk.ActivationType type : Perk.ActivationType.values()) {

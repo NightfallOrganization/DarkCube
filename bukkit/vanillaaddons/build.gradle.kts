@@ -24,9 +24,9 @@ tasks {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
+    compileOnly(libs.paper.latest)
     compileOnly(darkcubesystem.bukkit)
-    implementation("net.wesjd:anvilgui:1.9.3-SNAPSHOT")
+    implementation("net.wesjd:anvilgui:1.9.4-SNAPSHOT")
 }
 repositories {
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }

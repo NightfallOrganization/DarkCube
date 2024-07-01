@@ -30,7 +30,7 @@ import org.bukkit.DyeColor;
 
 public class DefaultTeamManager implements TeamManager {
 
-    private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_teams");
+    private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_teams_old");
     private final Collection<Team> teams;
     private final WoolBattleBukkit woolbattle;
     private final Map<MapSize, Collection<TeamType>> teamTypes = new HashMap<>();

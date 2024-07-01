@@ -18,8 +18,8 @@ import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
@@ -30,7 +30,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class TeamsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
-    private final Key TEAM = new Key(woolbattle, "team_id");
+    private final Key TEAM = Key.key(woolbattle, "team_id");
     private final TeamsListener listener = new TeamsListener();
 
     public TeamsInventory(WoolBattleBukkit woolbattle, WBUser user) {
@@ -39,11 +39,13 @@ public class TeamsInventory extends WoolBattlePagedInventory {
         complete();
     }
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && TEAM != null;
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         String teamId = ItemManager.getId(event.item(), TEAM);
@@ -62,7 +64,8 @@ public class TeamsInventory extends WoolBattlePagedInventory {
         Bukkit.getPluginManager().callEvent(new Refresh());
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         int i = 0;
         for (Team team : woolbattle.teamManager().getTeams()) {
             if (team.isSpectator()) continue;
@@ -78,12 +81,14 @@ public class TeamsInventory extends WoolBattlePagedInventory {
         }
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_TEAMS.getItem(user));
         super.insertFallbackItems();
     }
 
-    @Override protected void destroy() {
+    @Override
+    protected void destroy() {
         HandlerList.unregisterAll(listener);
         super.destroy();
     }
@@ -98,13 +103,15 @@ public class TeamsInventory extends WoolBattlePagedInventory {
             return handlers;
         }
 
-        @Override public HandlerList getHandlers() {
+        @Override
+        public HandlerList getHandlers() {
             return handlers;
         }
     }
 
     private class TeamsListener implements Listener {
-        @EventHandler public void handle(Refresh event) {
+        @EventHandler
+        public void handle(Refresh event) {
             recalculate();
         }
     }

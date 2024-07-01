@@ -7,20 +7,20 @@
 
 package eu.darkcube.system.lobbysystem.user;
 
+import java.util.Collection;
+import java.util.UUID;
+
 import eu.cloudnetservice.driver.database.Database;
 import eu.cloudnetservice.driver.database.DatabaseProvider;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
-import eu.darkcube.system.util.data.Key;
-
-import java.util.Collection;
-import java.util.UUID;
 
 public class UserWrapper implements UserModifier {
-    public static final Key key = new Key(Lobby.getInstance(), "user");
+    public static final Key key = Key.key(Lobby.getInstance(), "user");
 
     public static LobbyUser fromUser(User user) {
         return user.metadata().get(key);
@@ -47,21 +47,20 @@ public class UserWrapper implements UserModifier {
                 u.setRewardSlotsUsed(data.getRewardSlotsUsed());
                 long time3 = System.currentTimeMillis();
                 if (System.currentTimeMillis() - time1 > 100) {
-                    Lobby
-                            .getInstance()
-                            .getLogger()
-                            .info("Migration of lobbydata took very long: " + (System.currentTimeMillis() - time1) + " | " + (System.currentTimeMillis() - time2) + " | " + (System.currentTimeMillis() - time3));
+                    Lobby.getInstance().getLogger().info("Migration of lobbydata took very long: " + (System.currentTimeMillis() - time1) + " | " + (System.currentTimeMillis() - time2) + " | " + (System.currentTimeMillis() - time3));
                 }
             }
             databaseProvider.deleteDatabase("lobbysystem_userdata");
         }
     }
 
-    @Override public void onLoad(User user) {
+    @Override
+    public void onLoad(User user) {
         user.metadata().set(key, new LobbyUser(user));
     }
 
-    @Override public void onUnload(User user) {
+    @Override
+    public void onUnload(User user) {
         user.metadata().remove(key);
     }
 }

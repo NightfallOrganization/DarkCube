@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.woolbattle;
 
+import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.system.bukkit.commandapi.Commands;
@@ -30,7 +31,8 @@ public class CommandRemoveTask extends LobbyCommand {
 
     public CommandRemoveTask() {
         super("removeTask", b -> b.then(Commands.argument("task", new ArgumentType<String>() {
-            @Override public String parse(StringReader reader) throws CommandSyntaxException {
+            @Override
+            public String parse(StringReader reader) throws CommandSyntaxException {
                 var task = reader.readString();
                 if (!Lobby.getInstance().getDataManager().getWoolBattleTasks().contains(task)) {
                     throw TASK_NOT_PRESENT.createWithContext(reader, task);
@@ -38,12 +40,13 @@ public class CommandRemoveTask extends LobbyCommand {
                 return task;
             }
 
-            @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+            @Override
+            public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
                 return ISuggestionProvider.suggest(Lobby.getInstance().getDataManager().getWoolBattleTasks(), builder);
             }
         }).executes(ctx -> {
             var task = ctx.getArgument("task", String.class);
-            var tasks = Lobby.getInstance().getDataManager().getWoolBattleTasks();
+            var tasks = new HashSet<>(Lobby.getInstance().getDataManager().getWoolBattleTasks());
             tasks.remove(task);
             Lobby.getInstance().getDataManager().setWoolBattleTasks(tasks);
             ctx.getSource().sendMessage(Component.text("Task erfolgreich entfernt!").color(NamedTextColor.GREEN));

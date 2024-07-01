@@ -16,7 +16,7 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 
@@ -30,8 +30,8 @@ public class GrandpasClockPerk extends Perk {
 
     public static class ListenerGrandpasClock extends BasicPerkListener {
 
-        private final Key DATA_OLD_POS = new Key(woolbattle, "grandpas_clock_old_pos");
-        private final Key DATA_TICKER = new Key(woolbattle, "grandpas_clock_ticker");
+        private final Key DATA_OLD_POS = Key.key(woolbattle, "grandpas_clock_old_pos");
+        private final Key DATA_TICKER = Key.key(woolbattle, "grandpas_clock_ticker");
 
         public ListenerGrandpasClock(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);

@@ -9,54 +9,52 @@ package eu.darkcube.minigame.woolbattle.common.util;
 
 import java.util.Map;
 
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
-public class CommonRedirectMetaDataStorage<Key> implements MetaDataStorage {
+public class CommonRedirectMetaDataStorage<KeyType> implements MetaDataStorage {
 
-    private final Map<Key, BasicMetaDataStorage> map;
-    private final Key key;
+    private final Map<KeyType, BasicMetaDataStorage> map;
+    private final KeyType key;
 
-    public CommonRedirectMetaDataStorage(Map<Key, BasicMetaDataStorage> map, Key key) {
+    public CommonRedirectMetaDataStorage(Map<KeyType, BasicMetaDataStorage> map, KeyType key) {
         this.map = map;
         this.key = key;
     }
 
     @Override
-    public void set(eu.darkcube.system.util.data.Key key, Object value) {
+    public void set(Key key, Object value) {
         synchronized (map) {
-            var blockMeta = map.get(this.key);
-            if (blockMeta == null) {
-                blockMeta = new BasicMetaDataStorage();
-                map.put(this.key, blockMeta);
-            }
+            var blockMeta = map.computeIfAbsent(this.key, k -> new BasicMetaDataStorage());
             blockMeta.set(key, value);
         }
     }
 
     @Override
-    public <T> T get(eu.darkcube.system.util.data.Key key) {
+    public <T> @Nullable T get(Key key) {
         var blockMeta = map.get(this.key);
         if (blockMeta == null) return null;
         return blockMeta.get(key);
     }
 
     @Override
-    public <T> T getOr(eu.darkcube.system.util.data.Key key, T orElse) {
+    public <T> T getOr(Key key, T orElse) {
         var blockMeta = map.get(this.key);
         if (blockMeta == null) return orElse;
         return blockMeta.getOr(key, orElse);
     }
 
     @Override
-    public boolean has(eu.darkcube.system.util.data.Key key) {
+    public boolean has(Key key) {
         var blockMeta = map.get(this.key);
         if (blockMeta == null) return false;
         return blockMeta.has(key);
     }
 
     @Override
-    public <T> T remove(eu.darkcube.system.util.data.Key key) {
+    public <T> T remove(Key key) {
         synchronized (map) {
             var blockMeta = map.get(this.key);
             if (blockMeta == null) return null;

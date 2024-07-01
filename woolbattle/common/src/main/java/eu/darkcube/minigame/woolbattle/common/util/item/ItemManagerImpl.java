@@ -7,8 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.common.util.item;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 
 class ItemManagerImpl {
-    static final ItemManager MANAGER = InjectionLayer.ext().instance(ItemManager.class);
+    static final ItemManager MANAGER = WoolBattleProvider.PROVIDER.service(ItemManager.class);
 }

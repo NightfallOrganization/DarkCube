@@ -9,17 +9,17 @@ package eu.darkcube.minigame.woolbattle.api.util;
 
 import java.util.function.Consumer;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public final class PerkUtils {
-    private static final Implementation IMPLEMENTATION = InjectionLayer.ext().instance(Implementation.class);
+    private static final Implementation IMPLEMENTATION = WoolBattleProvider.PROVIDER.service(Implementation.class);
 
     private PerkUtils() {
     }

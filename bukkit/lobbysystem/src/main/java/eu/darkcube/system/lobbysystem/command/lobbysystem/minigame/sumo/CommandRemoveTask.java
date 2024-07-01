@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.sumo;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,7 +47,7 @@ public class CommandRemoveTask extends LobbyCommand {
             }
         }).executes(ctx -> {
             String task = ctx.getArgument("task", String.class);
-            Set<String> tasks = Lobby.getInstance().getDataManager().getSumoTasks();
+            Set<String> tasks = new HashSet<>(Lobby.getInstance().getDataManager().getSumoTasks());
             tasks.remove(task);
             Lobby.getInstance().getDataManager().setSumoTasks(tasks);
             ctx.getSource().sendMessage(Component.text("Task erfolgreich entfernt!").color(NamedTextColor.GREEN));

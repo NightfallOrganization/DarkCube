@@ -8,18 +8,21 @@
 package eu.darkcube.system.lobbysystem.parser;
 
 import eu.cloudnetservice.driver.document.Document;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 public class Locations extends Parser {
 
-    public static final Location DEFAULT = new Location(Bukkit.getWorlds().get(0), -927.5, 28, -755.5, -180, 0);
+    public static final Location DEFAULT = new Location(Bukkit.getWorlds().getFirst(), 0.5, 80, 0.5, -180, 0);
+    public static final PersistentDataType<Location> TYPE = PersistentDataTypes.create(jsonElement -> fromJson(jsonElement.getAsJsonObject(), DEFAULT), location -> toJson(location, null), Location::clone);
 
     public static final float F360 = 360f;
 
     public static Location getNiceLocation(Location loc) {
-        Location l = loc.clone();
+        var l = loc.clone();
         l.setYaw(Locations.getNiceY(l.getYaw()));
         l.setPitch(Locations.getNiceY(l.getPitch()));
         l.setX(getNiceCoord(l.getX()));
@@ -29,15 +32,15 @@ public class Locations extends Parser {
     }
 
     private static float getNiceY(float y) {
-        float interval = 45f;
-        float hInterval = interval / 2f;
+        var interval = 45f;
+        var hInterval = interval / 2f;
 
         y = Locations.antiNegY(y, hInterval);
 
-        for (float i = Locations.F360; i >= 0f; i -= interval) {
+        for (var i = Locations.F360; i >= 0f; i -= interval) {
 
-            float val1 = i - hInterval;
-            float val2 = i + hInterval;
+            var val1 = i - hInterval;
+            var val2 = i + hInterval;
 
             if (y >= val1 && y < val2) {
                 y = i;
@@ -59,22 +62,22 @@ public class Locations extends Parser {
             if (location == null) {
                 return oldLoc;
             }
-            String[] locs = location.split(":");
-            String X = locs[0];
-            String Y = locs[1];
-            String Z = locs[2];
-            String Yaw = locs[3];
-            String Pitch = locs[4];
-            String World = locs[5];
-            String IgnoreDirection = locs[6];
-            double x = Parser.parseDouble(X);
-            double y = Parser.parseDouble(Y);
-            double z = Parser.parseDouble(Z);
-            float yaw = Parser.parseFloat(Yaw);
-            float pitch = Parser.parseFloat(Pitch);
-            World world = Parser.parseWorld(World);
-            boolean ignoreDirection = Parser.parseBoolean(IgnoreDirection);
-            Location loc = new Location(world, x, y, z, yaw, pitch);
+            var locs = location.split(":");
+            var X = locs[0];
+            var Y = locs[1];
+            var Z = locs[2];
+            var Yaw = locs[3];
+            var Pitch = locs[4];
+            var World = locs[5];
+            var IgnoreDirection = locs[6];
+            var x = Parser.parseDouble(X);
+            var y = Parser.parseDouble(Y);
+            var z = Parser.parseDouble(Z);
+            var yaw = Parser.parseFloat(Yaw);
+            var pitch = Parser.parseFloat(Pitch);
+            var world = Parser.parseWorld(World);
+            var ignoreDirection = Parser.parseBoolean(IgnoreDirection);
+            var loc = new Location(world, x, y, z, yaw, pitch);
             if (oldLoc != null && ignoreDirection) loc.setDirection(oldLoc.getDirection());
             return loc;
         } catch (Throwable ignored) {
@@ -83,11 +86,11 @@ public class Locations extends Parser {
     }
 
     public static String serialize(Location loc, boolean ignoreDirection) {
-        double x = loc.getX();
-        double y = loc.getY();
-        double z = loc.getZ();
-        float yaw = loc.getYaw();
-        float pitch = loc.getPitch();
+        var x = loc.getX();
+        var y = loc.getY();
+        var z = loc.getZ();
+        var yaw = loc.getYaw();
+        var pitch = loc.getPitch();
         return x + ":" + y + ":" + z + ":" + yaw + ":" + pitch + ":" + loc.getWorld().getName() + ":" + ignoreDirection;
     }
 
@@ -110,27 +113,48 @@ public class Locations extends Parser {
         return x;
     }
 
+    public static JsonObject toJson(Location loc, Boolean ignoreDirection) {
+        var json = new JsonObject();
+        json.addProperty("x", loc.getX());
+        json.addProperty("y", loc.getY());
+        json.addProperty("z", loc.getZ());
+        json.addProperty("yaw", loc.getYaw());
+        json.addProperty("pit", loc.getPitch());
+        json.addProperty("wor", loc.getWorld().getName());
+        if (ignoreDirection != null) {
+            json.addProperty("igd", ignoreDirection);
+        }
+        return json;
+    }
+
+    public static Location fromJson(JsonObject json, Location oldLoc) {
+        var x = json.get("x").getAsDouble();
+        var y = json.get("y").getAsDouble();
+        var z = json.get("z").getAsDouble();
+        var yaw = json.get("yaw").getAsFloat();
+        var pitch = json.get("pit").getAsFloat();
+        var world = Bukkit.getWorld(json.get("wor").getAsString());
+        var ignoreDirection = !json.has("igd") ? null : json.get("igd").getAsBoolean();
+        var loc = new Location(world, x, y, z, yaw, pitch);
+        if (oldLoc != null && ignoreDirection != null && ignoreDirection) {
+            loc.setDirection(oldLoc.getDirection());
+        }
+        return loc;
+    }
+
     public static Document toDocument(Location loc, boolean ignoreDirection) {
-        return Document
-                .newJsonDocument()
-                .append("x", loc.getX())
-                .append("y", loc.getY())
-                .append("z", loc.getZ())
-                .append("yaw", loc.getYaw())
-                .append("pit", loc.getPitch())
-                .append("wor", loc.getWorld().getName())
-                .append("igd", ignoreDirection);
+        return Document.newJsonDocument().append("x", loc.getX()).append("y", loc.getY()).append("z", loc.getZ()).append("yaw", loc.getYaw()).append("pit", loc.getPitch()).append("wor", loc.getWorld().getName()).append("igd", ignoreDirection);
     }
 
     public static Location fromDocument(Document doc, Location oldLoc) {
-        double x = doc.getDouble("x");
-        double y = doc.getDouble("y");
-        double z = doc.getDouble("z");
-        float yaw = doc.getFloat("yaw");
-        float pit = doc.getFloat("pit");
-        World world = Bukkit.getWorld(doc.getString("wor"));
-        boolean ignoreDirection = doc.getBoolean("igd");
-        Location loc = new Location(world, x, y, z, yaw, pit);
+        var x = doc.getDouble("x");
+        var y = doc.getDouble("y");
+        var z = doc.getDouble("z");
+        var yaw = doc.getFloat("yaw");
+        var pit = doc.getFloat("pit");
+        var world = Bukkit.getWorld(doc.getString("wor"));
+        var ignoreDirection = doc.getBoolean("igd");
+        var loc = new Location(world, x, y, z, yaw, pit);
         if (oldLoc != null && ignoreDirection) {
             loc.setDirection(oldLoc.getDirection());
         }

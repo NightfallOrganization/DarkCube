@@ -49,7 +49,7 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
 import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.server.util.DarkCubeServer;
+import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
@@ -131,7 +131,7 @@ public class Lobby extends GamePhase {
         woolbattle.gameData().mapSize(null);
         woolbattle.gameData().votedMap(null);
         woolbattle.gameData().forceMap(null);
-        DarkCubeServer.extra(doc -> doc.append("configured", false));
+        DarkCubeServerCloudNet.extra(doc -> doc.append("configured", false));
         System.out.println("Unloaded Game");
         if (publishUpdate) woolbattle.lobbySystemLink().update();
     }
@@ -150,7 +150,7 @@ public class Lobby extends GamePhase {
         recalculateMap();
         recalculateEpGlitch();
         WBUser.onlineUsers().forEach(this::setupScoreboard);
-        DarkCubeServer.extra(doc -> doc.append("configured", true));
+        DarkCubeServerCloudNet.extra(doc -> doc.append("configured", true));
         woolbattle.lobbySystemLink().update();
         System.out.println("Loaded game " + mapSize);
     }

@@ -17,24 +17,26 @@ import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.inventory.ItemStack;
 
 public class VotingLifesInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle_voting_lifes");
-    private final Key LIFES = new Key(woolbattle, "voting_lifes");
+    private final Key LIFES = Key.key(woolbattle, "voting_lifes");
 
     public VotingLifesInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_LIFES.getMessage(user), user);
         complete();
     }
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && LIFES != null;
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         String stringLifes = ItemManager.getId(event.item(), LIFES);
@@ -45,14 +47,16 @@ public class VotingLifesInventory extends WoolBattlePagedInventory {
         recalculate();
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         set(IInventory.slot(3, 3), 3);
         set(IInventory.slot(3, 4), 10);
         set(IInventory.slot(3, 6), 20);
         set(IInventory.slot(3, 7), 30);
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING_LIFES.getItem(user));
         super.insertFallbackItems();
     }

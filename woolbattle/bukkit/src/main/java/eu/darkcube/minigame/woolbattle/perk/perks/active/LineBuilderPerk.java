@@ -19,7 +19,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.Line;
 import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -34,7 +34,7 @@ public class LineBuilderPerk extends Perk {
 
     public static class ListenerLineBuilder extends BasicPerkListener {
 
-        private final Key DATA_SCHEDULER = new Key(woolbattle, "linebuilderScheduler");
+        private final Key DATA_SCHEDULER = Key.key(woolbattle, "linebuilder_scheduler");
 
         public ListenerLineBuilder(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);

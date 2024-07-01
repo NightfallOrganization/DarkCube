@@ -22,7 +22,7 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -55,10 +55,10 @@ public class GhostPerk extends Perk {
         public ListenerGhost(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);
             this.woolbattle = woolbattle;
-            DATA_GHOST_PERK = new Key(woolbattle, "ghost_perk");
-            DATA_GHOST_POS = new Key(woolbattle, "ghost_pos");
-            DATA_GHOST_ATTACKS = new Key(woolbattle, "ghost_attacks");
-            DATA_GHOST_FORCE_ATTACKABLE = new Key(woolbattle, "ghost_force_attackable");
+            DATA_GHOST_PERK = Key.key(woolbattle, "ghost_perk");
+            DATA_GHOST_POS = Key.key(woolbattle, "ghost_pos");
+            DATA_GHOST_ATTACKS = Key.key(woolbattle, "ghost_attacks");
+            DATA_GHOST_FORCE_ATTACKABLE = Key.key(woolbattle, "ghost_force_attackable");
         }
 
         public void reset(WBUser user) {

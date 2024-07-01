@@ -9,22 +9,22 @@ package eu.darkcube.minigame.woolbattle.api.user;
 
 import java.util.logging.Logger;
 
-import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.libs.net.kyori.adventure.Adventure;
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.data.PersistentDataType;
 
 public final class HeightDisplay implements Cloneable {
     private static final Logger logger = Logger.getLogger("HeightDisplay");
     public static final PersistentDataType<HeightDisplay> TYPE = new PersistentDataType<>() {
-        @Override public HeightDisplay deserialize(Document doc, String key) {
-            var d = doc.readDocument(key);
-            var enabled = d.getBoolean("enabled");
-            var maxDistance = d.getInt("maxDistance");
-            var colorString = d.getString("color");
+        @Override
+        public HeightDisplay deserialize(JsonElement json) {
+            var d = json.getAsJsonObject();
+            var enabled = d.get("enabled").getAsBoolean();
+            var maxDistance = d.get("maxDistance").getAsInt();
+            var colorString = d.get("color").getAsString();
             TextColor color = null;
             if (colorString.length() == 1) {
                 var format = LegacyComponentSerializer.parseChar(colorString.charAt(0));
@@ -38,15 +38,17 @@ public final class HeightDisplay implements Cloneable {
             return new HeightDisplay(enabled, maxDistance, color);
         }
 
-        @Override public void serialize(Document.Mutable doc, String key, HeightDisplay data) {
-            var d = Document.newJsonDocument();
-            d.append("enabled", data.enabled());
-            d.append("maxDistance", data.maxDistance());
-            d.append("color", data.color().asHexString());
-            doc.append(key, d);
+        @Override
+        public JsonElement serialize(HeightDisplay data) {
+            var d = new JsonObject();
+            d.addProperty("enabled", data.enabled());
+            d.addProperty("maxDistance", data.maxDistance());
+            d.addProperty("color", data.color().asHexString());
+            return d;
         }
 
-        @Override public HeightDisplay clone(HeightDisplay object) {
+        @Override
+        public HeightDisplay clone(HeightDisplay object) {
             return object.clone();
         }
     };
@@ -64,7 +66,8 @@ public final class HeightDisplay implements Cloneable {
         return new HeightDisplay(true, -1, NamedTextColor.GOLD);
     }
 
-    @Override public HeightDisplay clone() {
+    @Override
+    public HeightDisplay clone() {
         return new HeightDisplay(enabled, maxDistance, color);
     }
 

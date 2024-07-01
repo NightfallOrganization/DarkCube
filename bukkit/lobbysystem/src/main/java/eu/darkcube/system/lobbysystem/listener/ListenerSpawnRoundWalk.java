@@ -7,20 +7,21 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
+import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
+
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.math.BigInteger;
-import java.util.*;
 
 public class ListenerSpawnRoundWalk extends BaseListener {
 
@@ -32,9 +33,9 @@ public class ListenerSpawnRoundWalk extends BaseListener {
     public ListenerSpawnRoundWalk(Lobby plugin) {
         super();
 
-        this.keySpawnRoundCount = new Key(plugin, "spawn_round_count");
-        this.keySpawnVisitedLocations = new Key(plugin, "spawn_visited_locations");
-        this.keySpawnStartLocation = new Key(plugin, "spawn_start_location");
+        this.keySpawnRoundCount = Key.key(plugin, "spawn_round_count");
+        this.keySpawnVisitedLocations = Key.key(plugin, "spawn_visited_locations");
+        this.keySpawnStartLocation = Key.key(plugin, "spawn_start_location");
 
         var world = plugin.getDataManager().getSpawn().getWorld();
 
@@ -45,7 +46,8 @@ public class ListenerSpawnRoundWalk extends BaseListener {
         requiredSpawnLocations.add(new Location(world, -8.5, 0, 0.5));
     }
 
-    @EventHandler public void onPlayerMove(PlayerMoveEvent event) {
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         User user = UserAPI.instance().user(player.getUniqueId());
 
@@ -64,10 +66,7 @@ public class ListenerSpawnRoundWalk extends BaseListener {
             }
         }
 
-        if (user.metadata().has(keySpawnVisitedLocations) && user
-                .metadata()
-                .<Set<Location>>get(keySpawnVisitedLocations)
-                .containsAll(requiredSpawnLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keySpawnStartLocation)) <= 5) {
+        if (user.metadata().has(keySpawnVisitedLocations) && user.metadata().<Set<Location>>get(keySpawnVisitedLocations).containsAll(requiredSpawnLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keySpawnStartLocation)) <= 5) {
 
             user.metadata().remove(keySpawnVisitedLocations);
 

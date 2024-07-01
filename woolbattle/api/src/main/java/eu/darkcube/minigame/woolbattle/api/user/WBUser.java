@@ -28,16 +28,19 @@ import eu.darkcube.system.util.data.MetaDataStorage;
 
 public interface WBUser extends CommandSender {
     @Api
-    @NotNull WoolBattleApi woolbattle();
+    @NotNull
+    WoolBattleApi woolbattle();
 
     /**
      * @return the user from the {@link UserAPI UserAPI}
      */
     @Api
-    @NotNull User user();
+    @NotNull
+    User user();
 
     @Api
-    @NotNull MetaDataStorage metadata();
+    @NotNull
+    MetaDataStorage metadata();
 
     /**
      * @return the amount of wool the user can carry.
@@ -101,25 +104,29 @@ public interface WBUser extends CommandSender {
     int removeWool(int count, boolean updateInventory);
 
     @Api
-    @Nullable Game game();
+    @Nullable
+    Game game();
 
     /**
      * @return the UUID for this player
      */
     @Api
-    @NotNull UUID uniqueId();
+    @NotNull
+    UUID uniqueId();
 
     /**
      * @return the player's name
      */
     @Api
-    @NotNull String playerName();
+    @NotNull
+    String playerName();
 
     /**
      * @return the team color combined with the players name
      */
     @Api
-    @NotNull Component teamPlayerName();
+    @NotNull
+    Component teamPlayerName();
 
     /**
      * @return this player's language
@@ -133,7 +140,8 @@ public interface WBUser extends CommandSender {
      * @return the team this player is in
      */
     @Api
-    @Nullable Team team();
+    @Nullable
+    Team team();
 
     /**
      * Sets the team this player is in
@@ -144,16 +152,19 @@ public interface WBUser extends CommandSender {
     void team(@NotNull Team team);
 
     @Api
-    @Nullable World world();
+    @Nullable
+    World world();
 
     @Api
-    @Nullable Location location();
+    @Nullable
+    Location location();
 
     /**
-     * @return a copy of this user's {@link PlayerPerks} for storage
+     * @return a copy of this user's {@link PerksStorage}
      */
     @Api
-    @NotNull PerksStorage perksStorage();
+    @NotNull
+    PerksStorage perksStorage();
 
     /**
      * Set the player's perks. This will only affect storage (which will persist over games), and
@@ -165,13 +176,15 @@ public interface WBUser extends CommandSender {
     void perksStorage(@NotNull PerksStorage perks);
 
     @Api
-    @NotNull WoolSubtractDirection woolSubtractDirection();
+    @NotNull
+    WoolSubtractDirection woolSubtractDirection();
 
     @Api
     void woolSubtractDirection(@NotNull WoolSubtractDirection woolSubtractDirection);
 
     @Api
-    @NotNull HeightDisplay heightDisplay();
+    @NotNull
+    HeightDisplay heightDisplay();
 
     @Api
     void heightDisplay(@NotNull HeightDisplay heightDisplay);
@@ -184,7 +197,8 @@ public interface WBUser extends CommandSender {
      * @return the in-game perks.
      */
     @Api
-    @NotNull UserPerks perks();
+    @NotNull
+    UserPerks perks();
 
     @Api
     boolean particles();

@@ -33,7 +33,11 @@ public class LobbyItemListener extends ConfiguredListener<UserClickItemEvent> {
         } else if (itemId.equals(Items.LOBBY_VOTING_EP_GLITCH.itemId())) {
 
         } else if (itemId.equals(Items.LOBBY_TEAMS.itemId())) {
-            lobby.teamsInventoryTemplate().open(user.user());
+            try {
+                lobby.teamsInventoryTemplate().open(user.user());
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         } else if (itemId.equals(Items.LOBBY_PARTICLES_OFF.itemId())) {
             user.particles(true);
             System.out.println("Particles on");

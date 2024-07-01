@@ -10,8 +10,8 @@ package eu.darkcube.minigame.woolbattle.common.game.lobby;
 import eu.darkcube.minigame.woolbattle.api.game.lobby.LobbyData;
 import eu.darkcube.minigame.woolbattle.api.world.Position.Directed;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.util.data.Key;
 
 public class CommonLobbyData implements LobbyData {
     private final @NotNull CommonWoolBattleApi woolbattle;
@@ -47,6 +47,6 @@ public class CommonLobbyData implements LobbyData {
     }
 
     private Key lobbySpawn(CommonWoolBattleApi woolbattle) {
-        return new Key(woolbattle, "lobbySpawn");
+        return Key.key(woolbattle, "lobby_spawn");
     }
 }

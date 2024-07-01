@@ -19,8 +19,8 @@ import eu.darkcube.minigame.woolbattle.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,7 +35,7 @@ public class BerserkerPerk extends Perk {
 
     public BerserkerPerk(WoolBattleBukkit woolbattle) {
         super(ActivationType.PASSIVE, BERSERKER, new Cooldown(Unit.ACTIVATIONS, 0), 0, Item.PERK_BERSERKER, BerserkerUserPerk::new);
-        combo = new Key(woolbattle, "perk_berserker_combo");
+        combo = Key.key(woolbattle, "perk_berserker_combo");
         addListener(new BerserkerListener(woolbattle));
     }
 
@@ -44,20 +44,23 @@ public class BerserkerPerk extends Perk {
 
         public BerserkerUserPerk(WBUser owner, Perk perk, int id, int perkSlot, WoolBattleBukkit woolbattle) {
             super(owner, perk, id, perkSlot, woolbattle);
-            combo = new Key(woolbattle, "perk_berserker_combo");
+            combo = Key.key(woolbattle, "perk_berserker_combo");
         }
 
         private int getHits() {
             return owner().user().metadata().getOr(combo, 0);
         }
 
-        @Override public PerkItem currentPerkItem() {
+        @Override
+        public PerkItem currentPerkItem() {
             return new PerkItem(this::currentItem, this) {
-                @Override protected void modify(ItemBuilder item) {
+                @Override
+                protected void modify(ItemBuilder item) {
                     item.glow(!item.glow());
                 }
 
-                @Override protected int itemAmount() {
+                @Override
+                protected int itemAmount() {
                     return getHits();
                 }
             };
@@ -71,7 +74,8 @@ public class BerserkerPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(EventUserAttackUser event) {
+        @EventHandler
+        public void handle(EventUserAttackUser event) {
             if (event.target().user().metadata().has(combo)) {
                 event.target().user().metadata().remove(combo);
                 for (UserPerk perk : event.target().perks().perks(perkName())) {
@@ -80,7 +84,8 @@ public class BerserkerPerk extends Perk {
             }
         }
 
-        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true) public void handle(BowArrowHitPlayerEvent event) {
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void handle(BowArrowHitPlayerEvent event) {
             for (UserPerk perk : event.shooter().perks().perks(perkName())) {
                 int combo = event.shooter().user().metadata().getOr(BerserkerPerk.this.combo, 0) + 1;
                 event.shooter().user().metadata().set(BerserkerPerk.this.combo, combo);
@@ -88,24 +93,13 @@ public class BerserkerPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(PlayerHitPlayerEvent event) {
+        @EventHandler
+        public void handle(PlayerHitPlayerEvent event) {
             for (UserPerk perk : event.attacker().perks().perks(perkName())) {
                 if (woolbattle.ingame().playerUtil().attack(event.attacker(), event.target())) {
-                    boolean far = event
-                            .target()
-                            .getBukkitEntity()
-                            .getLocation()
-                            .distanceSquared(event.attacker().getBukkitEntity().getLocation()) > 200 * 200;
-                    double x = far ? (Math.random() - Math.random()) : event.target().getBukkitEntity().getLocation().getX() - event
-                            .attacker()
-                            .getBukkitEntity()
-                            .getLocation()
-                            .getX();
-                    double z = far ? Math.random() - Math.random() : event.target().getBukkitEntity().getLocation().getZ() - event
-                            .attacker()
-                            .getBukkitEntity()
-                            .getLocation()
-                            .getZ();
+                    boolean far = event.target().getBukkitEntity().getLocation().distanceSquared(event.attacker().getBukkitEntity().getLocation()) > 200 * 200;
+                    double x = far ? (Math.random() - Math.random()) : event.target().getBukkitEntity().getLocation().getX() - event.attacker().getBukkitEntity().getLocation().getX();
+                    double z = far ? Math.random() - Math.random() : event.target().getBukkitEntity().getLocation().getZ() - event.attacker().getBukkitEntity().getLocation().getZ();
                     while (x * x + z * z < 1.0E-4D) {
                         x = (Math.random() - Math.random()) * 0.01D;
                         z = (Math.random() - Math.random()) * 0.01D;

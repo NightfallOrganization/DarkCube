@@ -7,7 +7,6 @@
 
 package eu.darkcube.minigame.woolbattle.api.command.arguments;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
@@ -15,9 +14,11 @@ import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface WoolBattleArguments {
-    @NotNull ArgumentType<@NotNull ? extends Game> gameArgument0(@NotNull WoolBattleApi woolbattle);
+    @NotNull
+    ArgumentType<@NotNull ? extends Game> gameArgument0(@NotNull WoolBattleApi woolbattle);
 
-    @NotNull Game game0(@NotNull CommandContext<?> ctx, @NotNull String name);
+    @NotNull
+    Game game0(@NotNull CommandContext<?> ctx, @NotNull String name);
 
     static @NotNull ArgumentType<@NotNull ? extends Game> gameArgument(@NotNull WoolBattleApi woolbattle) {
         return instance().gameArgument0(woolbattle);
@@ -28,6 +29,6 @@ public interface WoolBattleArguments {
     }
 
     private static WoolBattleArguments instance() {
-        return InjectionLayer.ext().instance(WoolBattleArguments.class);
+        return WoolBattleApi.instance().commandArguments();
     }
 }

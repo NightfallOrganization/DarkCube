@@ -10,8 +10,7 @@ package eu.darkcube.minigame.woolbattle.minestom;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import dev.derklaro.aerogel.binding.BindingBuilder;
-import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
@@ -31,10 +30,11 @@ import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserInventoryAccess
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
-import eu.darkcube.system.util.data.Key;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.instance.Instance;
@@ -52,14 +52,14 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     public MinestomWoolBattle() {
         super();
         api = new MinestomWoolBattleApi(this);
-        this.playerKey = new Key(api, "minestomPlayer");
+        WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, api);
+        this.playerKey = Key.key(api, "minestom_player");
         setupModeImplementation = new MinestomSetupModeImplementation(api);
     }
 
     @Override
     public void start() {
-        var ext = InjectionLayer.ext();
-        ext.install(BindingBuilder.create().bind(Items.Provider.class).toInstance(new MinestomItemsProvider()));
+        WoolBattleProvider.PROVIDER.register(Items.Provider.class, new MinestomItemsProvider());
 
         super.start();
 

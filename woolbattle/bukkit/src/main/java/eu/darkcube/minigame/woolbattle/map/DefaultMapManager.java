@@ -21,7 +21,7 @@ import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
 
 public class DefaultMapManager implements MapManager {
 
-    private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps");
+    private final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps_old");
     private final java.util.Map<MapSize, java.util.Map<String, Map>> maps = new HashMap<>();
     private final java.util.Map<MapSize, Map> defaultMaps = new HashMap<>();
 
