@@ -32,6 +32,7 @@ tasks {
     }
     shadowJar {
         this.archiveClassifier = null
+        dependsOn(named(sourceSets.getByName("generated").processResourcesTaskName))
         from(sourceSets.getByName("generated").output.resourcesDir)
 
         relocate("com.github.juliarn.npclib", "building.oneblock.libs.npclib")
