@@ -9,14 +9,11 @@ package eu.darkcube.system.sumo.other;
 
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
-import eu.darkcube.system.DarkCubeBukkit;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
 import eu.darkcube.system.sumo.manager.MapManager;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.util.GameState;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -43,28 +40,28 @@ public class LobbySystemLink {
 
         World mapname = mapManager.getActiveWorld();
 
-        DarkCubeBukkit.displayName("§d" + mapname.getName() + " §7(2x2)");
-        DarkCubeBukkit.playingPlayers().set(playingPlayers);
-        DarkCubeBukkit.maxPlayingPlayers().set(4);
+        DarkCubeServerCloudNet.displayName("§d" + mapname.getName() + " §7(2x2)");
+        DarkCubeServerCloudNet.playingPlayers().set(playingPlayers);
+        DarkCubeServerCloudNet.maxPlayingPlayers().set(4);
 
         if (GameStates.isState(GameStates.STARTING)) {
-            DarkCubeBukkit.gameState(GameState.LOBBY);
+            DarkCubeServerCloudNet.gameState(GameState.LOBBY);
 
-            if(!Bukkit.getOnlinePlayers().isEmpty()) {
-                DarkCubeBukkit.extra(doc -> doc.append("configured", true));
+            if (!Bukkit.getOnlinePlayers().isEmpty()) {
+                DarkCubeServerCloudNet.extra(doc -> doc.append("configured", true));
             } else {
-                DarkCubeBukkit.extra(doc -> doc.remove("configured"));
+                DarkCubeServerCloudNet.extra(doc -> doc.remove("configured"));
             }
 
         }
 
         if (GameStates.isState(GameStates.PLAYING)) {
-            DarkCubeBukkit.gameState(GameState.INGAME);
-            DarkCubeBukkit.extra(doc -> doc.append("configured", true));
+            DarkCubeServerCloudNet.gameState(GameState.INGAME);
+            DarkCubeServerCloudNet.extra(doc -> doc.append("configured", true));
         }
 
         if (GameStates.isState(GameStates.ENDING)) {
-            DarkCubeBukkit.gameState(GameState.STOPPING);
+            DarkCubeServerCloudNet.gameState(GameState.STOPPING);
         }
 
         InjectionLayer.boot().instance(ServiceInfoHolder.class).publishServiceInfoUpdate();

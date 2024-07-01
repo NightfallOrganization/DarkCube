@@ -7,14 +7,15 @@
 
 package eu.darkcube.system.sumo.manager;
 
-import eu.darkcube.system.Plugin;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import java.util.UUID;
+import org.bukkit.plugin.Plugin;
 
 public class DamageManager implements Listener {
 

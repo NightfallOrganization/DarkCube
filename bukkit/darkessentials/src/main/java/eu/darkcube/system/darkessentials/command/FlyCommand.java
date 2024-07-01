@@ -1,10 +1,19 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.darkessentials.command;
 
-import eu.darkcube.system.commandapi.v3.*;
-import eu.darkcube.system.commandapi.v3.arguments.EntityArgument;
-import eu.darkcube.system.commandapi.v3.arguments.Vec2Argument;
-import eu.darkcube.system.commandapi.v3.arguments.Vec3Argument;
-import eu.darkcube.system.commandapi.v3.arguments.WorldArgument;
+import java.util.Collection;
+import java.util.List;
+
+import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.darkessentials.DarkCommand;
 import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
@@ -12,13 +21,8 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxExce
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Collection;
-import java.util.List;
 
 public class FlyCommand extends DarkCommand {
 

@@ -4,9 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.user;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +44,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 class DefaultWBUser implements WBUser {
 
     private static final Key KEY_WOOL_SUBTRACT_DIRECTION = Key.key(WoolBattleBukkit.instance(), "wool_subtract_direction");
@@ -67,10 +62,8 @@ class DefaultWBUser implements WBUser {
         @Override
         public JsonElement serialize(HeightDisplay data) {
             var d = new JsonObject();
-            d.addProperty("enabled", data.enabled)
-                    ;
-            d.addProperty("maxDistance", data.maxDistance)
-                    ;
+            d.addProperty("enabled", data.enabled);
+            d.addProperty("maxDistance", data.maxDistance);
             d.addProperty("color", data.color);
             return d;
         }
@@ -89,8 +82,8 @@ class DefaultWBUser implements WBUser {
         @Override
         public PlayerPerks deserialize(JsonElement json) {
             var doc = json.getAsJsonObject();
-            Document docPerks = doc.getAsJsonObject("perks");
-            Document docPerkSlots = doc.getAsJsonObject("perkSlots");
+            var docPerks = doc.getAsJsonObject("perks");
+            var docPerkSlots = doc.getAsJsonObject("perkSlots");
             Map<ActivationType, PerkName[]> perks = new HashMap<>();
             Map<ActivationType, int[]> perkSlots = new HashMap<>();
             for (String documentKey : docPerks.keySet()) {
@@ -108,9 +101,9 @@ class DefaultWBUser implements WBUser {
 
         @Override
         public JsonElement serialize(PlayerPerks data) {
-            Document.Mutable d = new JsonObject();
-            Document.Mutable docPerks = new JsonObject();
-            Document.Mutable docPerkSlots = new JsonObject();
+            var d = new JsonObject();
+            var docPerks = new JsonObject();
+            var docPerkSlots = new JsonObject();
             for (ActivationType type : ActivationType.values()) {
                 docPerks.add(type.name(), TYPE_LIST_PERK_NAME.serialize(Arrays.asList(data.perks(type))));
                 docPerkSlots.add(type.name(), TYPE_INT_ARRAY.serialize(data.perkInvSlots(type)));
@@ -173,9 +166,7 @@ class DefaultWBUser implements WBUser {
         user.persistentData().setIfNotPresent(KEY_HEIGHT_DISPLAY, TYPE_HEIGHT_DISPLAY, HeightDisplay.getDefault());
         user.persistentData().setIfNotPresent(KEY_PARTICLES, TYPE_PARTICLES, true);
         user.persistentData().setIfNotPresent(KEY_PERKS, TYPE_PERKS, new DefaultPlayerPerks());
-        user
-                .persistentData()
-                .setIfNotPresent(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection.getDefault());
+        user.persistentData().setIfNotPresent(KEY_WOOL_SUBTRACT_DIRECTION, TYPE_WOOL_SUBTRACT_DIRECTION, WoolSubtractDirection.getDefault());
         spawnProtectionTicks = 0;
         trollmode = false;
         kills = 0;

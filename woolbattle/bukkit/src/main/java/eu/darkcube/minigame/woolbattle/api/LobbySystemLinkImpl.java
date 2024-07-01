@@ -174,19 +174,23 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         protocol.append("mapSize", mapSize);
 
         var onlinePlayers = 0;
+        var spectatingPlayers = 0;
         var gameData = woolbattle.gameData();
         if (gameData != null && gameData.mapSize() != null && gameData.mapSize().equals(mapSize)) {
             if (!woolbattle.lobby().enabled()) {
                 onlinePlayers = (int) WBUser.onlineUsers().stream().filter(u -> u.getTeam().canPlay()).count();
+                spectatingPlayers = (int) WBUser.onlineUsers().stream().filter(u -> !u.getTeam().canPlay()).count();
             } else {
                 onlinePlayers = Bukkit.getOnlinePlayers().size();
             }
         }
 
         var entry = Document.newJsonDocument();
+        entry.append("gameState", gameState());
         entry.append("displayName", GsonComponentSerializer.gson().serialize(displayName(map)));
-        entry.append("onlinePlayers", onlinePlayers);
-        entry.append("maxPlayers", mapSize.teams() * mapSize.teamSize());
+        entry.append("playingPlayers", onlinePlayers);
+        entry.append("maxPlayingPlayers", mapSize.teams() * mapSize.teamSize());
+        entry.append("spectatingPlayers", spectatingPlayers);
         entry.append("document", protocol);
         return entry;
     }

@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.sumo.commands;
 
-import eu.darkcube.system.DarkCubeBukkit;
-import eu.darkcube.system.DarkCubeSystem;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.executions.EquipPlayer;
@@ -17,18 +19,13 @@ import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.other.LobbySystemLink;
 import eu.darkcube.system.sumo.other.StartingTimer;
-import eu.darkcube.system.util.GameState;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class SetGameStateCommand implements CommandExecutor {
     private Respawn respawn;
@@ -68,7 +65,7 @@ public class SetGameStateCommand implements CommandExecutor {
         return false;
     }
 
-    private void onGameStateChange () {
+    private void onGameStateChange() {
         lobbySystemLink.updateLobbyLink();
 
         if (GameStates.isState(GameStates.STARTING)) {

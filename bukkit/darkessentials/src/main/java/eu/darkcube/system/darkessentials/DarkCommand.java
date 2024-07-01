@@ -7,13 +7,13 @@
 
 package eu.darkcube.system.darkessentials;
 
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
-
 import java.util.function.Consumer;
 
-public class DarkCommand extends CommandExecutor {
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+public class DarkCommand extends Command {
 
     public DarkCommand(String name, String[] aliases, Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
         super("darkessentials", name, aliases, argumentBuilder);

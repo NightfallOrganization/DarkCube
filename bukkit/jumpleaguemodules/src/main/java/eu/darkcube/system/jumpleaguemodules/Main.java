@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,14 +7,12 @@
 
 package eu.darkcube.system.jumpleaguemodules;
 
-import eu.darkcube.system.DarkCubePlugin;
-import org.bukkit.Location;
-import org.bukkit.WorldCreator;
-import org.bukkit.event.Listener;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
+
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import org.bukkit.Location;
 
 public class Main extends DarkCubePlugin {
 
@@ -34,17 +32,17 @@ public class Main extends DarkCubePlugin {
         getServer().getPluginManager().registerEvents(new CustomItem(), this);
         getServer().getPluginManager().registerEvents(new CustomItemListener(this), this);
 
-//        if (getServer().getWorld("world") != null) {
-//            // Wenn die Welt "world" existiert, dann lösche sie
-//            if (!deleteWorld(new File(getServer().getWorld("world").getName()))) {
-//                // Wenn es Probleme beim Löschen gibt, logge eine Nachricht
-//                getLogger().warning("Could not delete the existing 'world'.");
-//            }
-//        }
-//
-//        WorldCreator creator = new WorldCreator("world");
-//        creator.generator(new VoidWorldGenerator());
-//        getServer().createWorld(creator);
+        //        if (getServer().getWorld("world") != null) {
+        //            // Wenn die Welt "world" existiert, dann lösche sie
+        //            if (!deleteWorld(new File(getServer().getWorld("world").getName()))) {
+        //                // Wenn es Probleme beim Löschen gibt, logge eine Nachricht
+        //                getLogger().warning("Could not delete the existing 'world'.");
+        //            }
+        //        }
+        //
+        //        WorldCreator creator = new WorldCreator("world");
+        //        creator.generator(new VoidWorldGenerator());
+        //        getServer().createWorld(creator);
     }
 
     public boolean deleteWorld(File path) {

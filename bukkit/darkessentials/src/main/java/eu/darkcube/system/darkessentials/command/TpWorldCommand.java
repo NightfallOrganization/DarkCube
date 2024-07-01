@@ -1,12 +1,19 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.system.darkessentials.command;
 
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.commandapi.v3.Vector2f;
-import eu.darkcube.system.commandapi.v3.Vector3d;
-import eu.darkcube.system.commandapi.v3.arguments.Vec2Argument;
-import eu.darkcube.system.commandapi.v3.arguments.Vec3Argument;
-import eu.darkcube.system.commandapi.v3.arguments.WorldArgument;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.bukkit.commandapi.argument.Vec2Argument;
+import eu.darkcube.system.bukkit.commandapi.argument.Vec3Argument;
+import eu.darkcube.system.bukkit.commandapi.argument.WorldArgument;
+import eu.darkcube.system.commandapi.util.Vector2f;
+import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.darkessentials.DarkCommand;
 import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
