@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,28 +7,43 @@
 
 package eu.darkcube.system.sumo;
 
-import eu.darkcube.system.DarkCubeBukkit;
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.sumo.commands.*;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
+import eu.darkcube.system.sumo.commands.SetActiveMapCommand;
+import eu.darkcube.system.sumo.commands.SetGameStateCommand;
+import eu.darkcube.system.sumo.commands.SetLifesCommand;
+import eu.darkcube.system.sumo.commands.SetMapCommand;
+import eu.darkcube.system.sumo.commands.SetTeamCommand;
+import eu.darkcube.system.sumo.commands.ShowActiveMapCommand;
+import eu.darkcube.system.sumo.commands.ShowGameStateCommand;
+import eu.darkcube.system.sumo.commands.ShowTeamLivesCommand;
+import eu.darkcube.system.sumo.commands.StartCommand;
+import eu.darkcube.system.sumo.commands.TimerCommand;
+import eu.darkcube.system.sumo.commands.TpActiveWorldCommand;
 import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.executions.RandomTeam;
+import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.executions.Spectator;
 import eu.darkcube.system.sumo.guis.TeamGUI;
 import eu.darkcube.system.sumo.guis.VotingGUI;
 import eu.darkcube.system.sumo.guis.VotingMapGUI;
 import eu.darkcube.system.sumo.items.game.ItemWool;
 import eu.darkcube.system.sumo.loader.MapLoader;
-import eu.darkcube.system.sumo.manager.*;
-import eu.darkcube.system.sumo.other.*;
+import eu.darkcube.system.sumo.manager.DamageManager;
+import eu.darkcube.system.sumo.manager.LifeManager;
+import eu.darkcube.system.sumo.manager.MapManager;
+import eu.darkcube.system.sumo.manager.PlayerManager;
+import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.other.GameDoubleJump;
+import eu.darkcube.system.sumo.other.LobbySystemLink;
+import eu.darkcube.system.sumo.other.StartingTimer;
+import eu.darkcube.system.sumo.other.WoolDespawner;
 import eu.darkcube.system.sumo.prefix.ChatManager;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
+import eu.darkcube.system.sumo.ruler.LobbyRuler;
+import eu.darkcube.system.sumo.ruler.MapRuler;
 import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
-import eu.darkcube.system.sumo.executions.Respawn;
-import eu.darkcube.system.sumo.ruler.LobbyRuler;
-import eu.darkcube.system.sumo.manager.MapManager;
-import eu.darkcube.system.sumo.ruler.MapRuler;
-import org.bukkit.generator.ChunkGenerator;
 
 public class Sumo extends DarkCubePlugin {
     private static Sumo instance;
@@ -68,7 +83,7 @@ public class Sumo extends DarkCubePlugin {
         var votingMapGUI = new VotingMapGUI(mapManager);
         var votingGUI = new VotingGUI(votingMapGUI);
 
-        DarkCubeBukkit.autoConfigure(false);
+        DarkCubeServerCloudNet.autoConfigure(false);
         mapManager.setRandomMap();
         lobbySystemLink.updateLobbyLink();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,21 +7,27 @@
 
 package eu.darkcube.system.woolbattleteamfight;
 
-
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.woolbattleteamfight.commands.SetTeamCommand;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.woolbattleteamfight.commands.MyTeamCommand;
+import eu.darkcube.system.woolbattleteamfight.commands.SetTeamCommand;
 import eu.darkcube.system.woolbattleteamfight.commands.StartCommand;
 import eu.darkcube.system.woolbattleteamfight.commands.TimerCommand;
-import eu.darkcube.system.woolbattleteamfight.game.*;
+import eu.darkcube.system.woolbattleteamfight.game.ArmorManager;
+import eu.darkcube.system.woolbattleteamfight.game.ArrowManager;
+import eu.darkcube.system.woolbattleteamfight.game.CoreManager;
+import eu.darkcube.system.woolbattleteamfight.game.DeathMessage;
+import eu.darkcube.system.woolbattleteamfight.game.GameItemManager;
+import eu.darkcube.system.woolbattleteamfight.game.GameScoreboard;
+import eu.darkcube.system.woolbattleteamfight.guis.TeamGUI;
 import eu.darkcube.system.woolbattleteamfight.items.other.Bow;
 import eu.darkcube.system.woolbattleteamfight.items.other.DoubleJump;
 import eu.darkcube.system.woolbattleteamfight.items.other.EnderPearl;
 import eu.darkcube.system.woolbattleteamfight.items.perks.Rettungskapsel;
 import eu.darkcube.system.woolbattleteamfight.items.perks.Switcher;
+import eu.darkcube.system.woolbattleteamfight.lobby.LobbyItemManager;
+import eu.darkcube.system.woolbattleteamfight.lobby.LobbyScoreboardManager;
+import eu.darkcube.system.woolbattleteamfight.lobby.LobbyTimer;
 import eu.darkcube.system.woolbattleteamfight.ruler.GameRuler;
-import eu.darkcube.system.woolbattleteamfight.guis.TeamGUI;
-import eu.darkcube.system.woolbattleteamfight.lobby.*;
 import eu.darkcube.system.woolbattleteamfight.ruler.LobbyRuler;
 import eu.darkcube.system.woolbattleteamfight.ruler.MainRuler;
 import eu.darkcube.system.woolbattleteamfight.team.MapTeamSpawns;
@@ -29,7 +35,6 @@ import eu.darkcube.system.woolbattleteamfight.team.TeamColors;
 import eu.darkcube.system.woolbattleteamfight.team.TeamManager;
 import eu.darkcube.system.woolbattleteamfight.wool.WoolBreaker;
 import eu.darkcube.system.woolbattleteamfight.wool.WoolManager;
-import eu.darkcube.system.woolbattleteamfight.game.ArmorManager;
 
 public class Main extends DarkCubePlugin {
     private static Main instance;
@@ -38,7 +43,6 @@ public class Main extends DarkCubePlugin {
     private GameScoreboard gameScoreboard;
     private DoubleJump doubleJump;
     private GameItemManager gameItemManager;
-
 
     public Main() {
         super("woolbattleteamfight");
