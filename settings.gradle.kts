@@ -10,10 +10,6 @@ pluginManagement {
     includeBuild("build-extensions")
     repositories {
         gradlePluginPortal()
-        maven("https://nexus.darkcube.eu/repository/darkcube/") {
-            name = "DarkCube"
-            credentials(PasswordCredentials::class)
-        }
         maven("https://nexus.darkcube.eu/repository/darkcube-group/") {
             name = "DarkCube"
             credentials(PasswordCredentials::class)

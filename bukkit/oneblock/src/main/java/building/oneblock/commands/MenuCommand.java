@@ -9,7 +9,7 @@ package building.oneblock.commands;
 
 import building.oneblock.gui.MenuGUI;
 import building.oneblock.util.Message;
-import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

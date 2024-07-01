@@ -7,7 +7,10 @@
 
 package eu.darkcube.system.sumo.other;
 
-import eu.darkcube.system.DarkCubeBukkit;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.executions.RandomTeam;
@@ -15,20 +18,15 @@ import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
-import eu.darkcube.system.util.GameState;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 public class StartingTimer implements Listener {
     private int timer = 15;
@@ -68,6 +66,7 @@ public class StartingTimer implements Listener {
             stopTimer();
         }
     }
+
     private void stopTimer() {
         if (task != null) {
             task.cancel();

@@ -7,29 +7,24 @@
 
 package eu.darkcube.system.sumo.items.game;
 
-import eu.darkcube.system.Plugin;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
-import eu.darkcube.system.sumo.manager.MapManager;
 import eu.darkcube.system.sumo.other.GameStates;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Wool;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class ItemWool implements Listener {
     private final Map<UUID, BukkitRunnable> playerTasks = new HashMap<>();
