@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.DarkCubeServiceProperty;
+import eu.darkcube.system.cloudnet.DarkCubeServiceProperty;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;

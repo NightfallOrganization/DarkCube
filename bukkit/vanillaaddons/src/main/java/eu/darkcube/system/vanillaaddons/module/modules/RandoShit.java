@@ -4,7 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules;
+
+import java.util.Iterator;
+import java.util.List;
 
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
@@ -26,15 +30,12 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.spigotmc.event.entity.EntityDismountEvent;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class RandoShit implements Module, Listener {
     private final VanillaAddons addons;
@@ -43,15 +44,18 @@ public class RandoShit implements Module, Listener {
         this.addons = addons;
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, addons);
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         HandlerList.unregisterAll(this);
     }
 
-    @EventHandler public void onItemBreak(PlayerItemDamageEvent event) {
+    @EventHandler
+    public void onItemBreak(PlayerItemDamageEvent event) {
         ItemStack item = event.getItem();
         Player player = event.getPlayer();
         if (this.isValidMaterial(item.getType())) {
@@ -68,7 +72,8 @@ public class RandoShit implements Module, Listener {
         }
     }
 
-    @EventHandler public void onRightClickStairs(PlayerInteractEvent event) {
+    @EventHandler
+    public void onRightClickStairs(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Player player = event.getPlayer();
             Block clickedBlock = event.getClickedBlock();
@@ -76,11 +81,7 @@ public class RandoShit implements Module, Listener {
                 if (clickedBlock.getRelative(BlockFace.UP).isPassable()) {
                     BlockData var5 = clickedBlock.getBlockData();
                     if (var5 instanceof Stairs stairs) {
-                        Location location = new Location(clickedBlock.getWorld(), clickedBlock.getLocation().getX() + 0.5, clickedBlock
-                                .getLocation()
-                                .getY() - 1.2, clickedBlock.getLocation().getZ() + 0.5, this.getYaw(stairs
-                                .getFacing()
-                                .getOppositeFace()), 0.0F);
+                        Location location = new Location(clickedBlock.getWorld(), clickedBlock.getLocation().getX() + 0.5, clickedBlock.getLocation().getY() - 1.2, clickedBlock.getLocation().getZ() + 0.5, this.getYaw(stairs.getFacing().getOppositeFace()), 0.0F);
                         ArmorStand armorStand = player.getWorld().spawn(location, ArmorStand.class);
                         armorStand.setCustomName("SIT_" + player.getUniqueId());
                         armorStand.setCustomNameVisible(false);
@@ -94,7 +95,8 @@ public class RandoShit implements Module, Listener {
         }
     }
 
-    @EventHandler public void onDismount(EntityDismountEvent event) {
+    @EventHandler
+    public void onDismount(EntityDismountEvent event) {
         Entity var4 = event.getEntity();
         if (var4 instanceof Player player) {
             var4 = event.getDismounted();
@@ -123,7 +125,8 @@ public class RandoShit implements Module, Listener {
         };
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST) public void onDamage(EntityDamageEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Player player) {
             if (this.hasBrokenPiece(player)) {

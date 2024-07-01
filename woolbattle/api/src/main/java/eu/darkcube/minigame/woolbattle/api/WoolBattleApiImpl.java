@@ -7,10 +7,10 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 interface WoolBattleApiImpl {
-    WoolBattleApi instance = InjectionLayer.ext().instance(WoolBattleApi.class);
+    WoolBattleApi instance = WoolBattleProvider.PROVIDER.service(WoolBattleApi.class);
 }

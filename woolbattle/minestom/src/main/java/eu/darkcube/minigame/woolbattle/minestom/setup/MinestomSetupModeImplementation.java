@@ -15,10 +15,9 @@ import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.util.data.Key;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 
 public class MinestomSetupModeImplementation implements SetupMode.Implementation {
@@ -27,7 +26,7 @@ public class MinestomSetupModeImplementation implements SetupMode.Implementation
 
     public MinestomSetupModeImplementation(@NotNull MinestomWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
-        this.worldKey = new Key(woolbattle, "join_world");
+        this.worldKey = Key.key(woolbattle, "join_world");
     }
 
     public @NotNull Key worldKey() {

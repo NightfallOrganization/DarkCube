@@ -16,9 +16,8 @@ import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
-import eu.darkcube.minigame.woolbattle.api.util.item.Item;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 
 public class ArrowPerk extends Perk {
     public static final PerkName ARROW = new PerkName("ARROW");
@@ -63,22 +62,22 @@ public class ArrowPerk extends Perk {
     }
 
     private static Key particles(Game game) {
-        return new Key(game.woolbattle(), "particles");
+        return Key.key(game.woolbattle(), "particles");
     }
 
     private static Key user(Game game) {
-        return new Key(game.woolbattle(), "user");
+        return Key.key(game.woolbattle(), "user");
     }
 
     private static Key perk(Game game) {
-        return new Key(game.woolbattle(), "perk");
+        return Key.key(game.woolbattle(), "perk");
     }
 
     private static Key strength(Game game) {
-        return new Key(game.woolbattle(), "strength");
+        return Key.key(game.woolbattle(), "strength");
     }
 
     private static Key blockDamage(Game game) {
-        return new Key(game.woolbattle(), "blockDamage");
+        return Key.key(game.woolbattle(), "blockDamage");
     }
 }

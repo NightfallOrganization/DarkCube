@@ -31,8 +31,10 @@ dependencies {
     compileOnly(project(":bukkit:statsapi"))
     compileOnly(project(":pserver:pserver-api"))
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
-    compileOnlyApi(parent!!.project("common"))
-    runtimeOnly(parent!!.project("common"))
+    compileOnlyApi(projects.woolbattle.common)
+    runtimeOnly(projects.woolbattle.api) {
+        isTransitive = false
+    }
     compileOnlyApi(libs.cloudnet.bridge)
     compileOnlyApi(libs.cloudnet.wrapper)
 }

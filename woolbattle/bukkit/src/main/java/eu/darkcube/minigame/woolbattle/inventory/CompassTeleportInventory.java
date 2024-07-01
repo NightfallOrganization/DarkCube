@@ -16,9 +16,9 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -30,16 +30,18 @@ public class CompassTeleportInventory extends WoolBattlePagedInventory {
 
     public CompassTeleportInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_COMPASS.getMessage(user), user);
-        USER = new Key(woolbattle, "tp_user_id");
+        USER = Key.key(woolbattle, "tp_user_id");
         done = true;
         complete();
     }
 
-    @Override public boolean done() {
+    @Override
+    public boolean done() {
         return super.done() && done;
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         String uid = ItemManager.getId(event.item(), USER);
@@ -54,17 +56,14 @@ public class CompassTeleportInventory extends WoolBattlePagedInventory {
         this.user.getBukkitEntity().closeInventory();
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         int i = 0;
         for (WBUser user : WBUser.onlineUsers()) {
             if (user.getTeam().isSpectator()) {
                 continue;
             }
-            ItemBuilder b = ItemBuilder
-                    .item(Material.SKULL_ITEM)
-                    .meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(user.getPlayerName())))
-                    .damage(3)
-                    .displayname(user.getTeamPlayerName());
+            ItemBuilder b = ItemBuilder.item(Material.SKULL_ITEM).meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(user.getPlayerName()))).damage(3).displayname(user.getTeamPlayerName());
             ItemManager.setId(b, USER, user.getUniqueId().toString());
             items.put(i++, b.build());
         }

@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.api;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
+import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
 import eu.darkcube.minigame.woolbattle.api.game.lobby.LobbyData;
@@ -67,6 +68,11 @@ public class WoolBattleApiImpl implements WoolBattleApi {
     }
 
     @Override
+    public @NotNull WoolBattleArguments commandArguments() {
+        return null;
+    }
+
+    @Override
     public @NotNull WoolBattleCommands commands() {
         return null;
     }
@@ -97,7 +103,7 @@ public class WoolBattleApiImpl implements WoolBattleApi {
     }
 
     @Override
-    public @NotNull String getName() {
+    public @NotNull String namespace() {
         return "woolbattle";
     }
 }

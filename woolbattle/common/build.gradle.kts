@@ -7,13 +7,13 @@
 plugins {
     `java-library`
     id("eu.darkcube.darkcube")
-    alias(libs.plugins.lombok)
 }
 
 dependencies {
+    implementation(projects.woolbattle.provider)
     api(projects.woolbattle.api)
     api(projects.pserver.pserverApi)
-    api(darkcubesystem.server)
+    api(darkcubesystem.server.cloudnet)
     api(libs.jctools.core)
     api(libs.fastutil)
 }

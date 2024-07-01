@@ -20,7 +20,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
 import eu.darkcube.system.annotations.Api;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
@@ -36,7 +36,7 @@ public class SpiderPerk extends Perk {
 
     public SpiderPerk(WoolBattleBukkit woolbattle) {
         super(ActivationType.PASSIVE, SPIDER, new Cooldown(Unit.TICKS, 60), 2, Item.PERK_SPIDER, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_SPIDER_COOLDOWN, wb));
-        CLIMBING = new Key(woolbattle, "perk_spider_climbing");
+        CLIMBING = Key.key(woolbattle, "perk_spider_climbing");
         SpiderSchedulerListener schedulerListener = new SpiderSchedulerListener(woolbattle);
         addScheduler(schedulerListener);
         addListener(schedulerListener);

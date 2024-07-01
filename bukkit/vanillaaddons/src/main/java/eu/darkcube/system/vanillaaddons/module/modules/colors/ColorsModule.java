@@ -28,18 +28,20 @@ public class ColorsModule implements Module, Listener {
         this.addons = addons;
     }
 
-    @EventHandler(priority = EventPriority.LOW) public void handle(PrepareAnvilEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void handle(PrepareAnvilEvent event) {
         if (event.getResult() != null) {
             var item = ItemBuilder.item(event.getResult());
             if (item.displayname() == Component.empty()) return;
             var name = LegacyComponentSerializer.legacySection().serialize(item.displayname());
             name = ChatColor.translateAlternateColorCodes('&', name);
-            item.displayname(LegacyComponentSerializer.legacySection().deserialize(name));
+            item.displaynameRaw(LegacyComponentSerializer.legacySection().deserialize(name));
             event.setResult(item.build());
         }
     }
 
-    @EventHandler public void onSignChange(SignChangeEvent e) {
+    @EventHandler
+    public void onSignChange(SignChangeEvent e) {
         for (var i = 0; i < e.lines().size(); ++i) {
             var cline = e.line(i);
             if (cline == null) continue;
@@ -48,11 +50,13 @@ public class ColorsModule implements Module, Listener {
         }
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, addons);
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         HandlerList.unregisterAll(this);
     }
 }

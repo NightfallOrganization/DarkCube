@@ -42,8 +42,8 @@ import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -92,8 +92,8 @@ public class Ingame extends GamePhase {
 
     public <T> T getMetaData(Block block, String key, T defaultValue) {
         if (block.hasMetadata("WoolBattleMetaStorage")) {
-            var storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0).value();
-            return storage.getOr(new Key(woolbattle, key), defaultValue);
+            var storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").getFirst().value();
+            return storage.getOr(Key.key(woolbattle, key), defaultValue);
         }
         return defaultValue;
     }
@@ -102,11 +102,11 @@ public class Ingame extends GamePhase {
         BasicMetaDataStorage storage;
         var has = block.hasMetadata("WoolBattleMetaStorage");
         if (has) {
-            storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0).value();
+            storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").getFirst().value();
         } else {
             storage = new BasicMetaDataStorage();
         }
-        var k = new Key(woolbattle, key);
+        var k = Key.key(woolbattle, key);
         if (value == null) {
             if (storage.has(k)) {
                 storage.remove(k);

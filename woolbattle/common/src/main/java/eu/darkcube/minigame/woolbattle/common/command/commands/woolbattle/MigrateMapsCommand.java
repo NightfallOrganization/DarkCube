@@ -13,9 +13,9 @@ import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommand;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.material.Material;
-import eu.darkcube.system.util.data.Key;
 
 public class MigrateMapsCommand extends WoolBattleCommand {
     public MigrateMapsCommand(CommonWoolBattleApi woolbattle) {
@@ -53,7 +53,7 @@ public class MigrateMapsCommand extends WoolBattleCommand {
                         for (var split : iconString.split(",")) {
                             if (split.startsWith("id:\"minecraft:") && split.endsWith("\"")) {
                                 var materialName = split.substring(14, split.length() - 1);
-                                var materialKey = new Key("minecraft", materialName);
+                                var materialKey = Key.key("minecraft", materialName);
                                 Material material;
                                 try {
                                     material = Material.of(materialKey);

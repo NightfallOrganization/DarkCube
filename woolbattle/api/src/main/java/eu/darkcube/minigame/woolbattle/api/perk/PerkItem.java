@@ -9,16 +9,16 @@ package eu.darkcube.minigame.woolbattle.api.perk;
 
 import java.util.function.Supplier;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public class PerkItem {
-    private final Implementation implementation = InjectionLayer.ext().instance(Implementation.class);
+    private final Implementation implementation = WoolBattleProvider.PROVIDER.service(Implementation.class);
 
     private final Key perkId;
     private final Supplier<Item> itemSupplier;
@@ -64,7 +64,7 @@ public class PerkItem {
     }
 
     public static Key perkId(Game game) {
-        return new Key(game.woolbattle(), "perk_id");
+        return Key.key(game.woolbattle(), "perk_id");
     }
 
     public interface Implementation {

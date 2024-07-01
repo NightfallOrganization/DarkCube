@@ -1,5 +1,0 @@
-{
-  "entrypoint": "eu.darkcube.system.minestom.impl.DarkCubeSystemMinestomExtension",
-  "name": "DarkCubeSystem",
-  "version": "1.1"
-}

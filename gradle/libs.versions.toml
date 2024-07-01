@@ -24,15 +24,13 @@ jctools-core = "4.0.3"
 fastutil = "8.5.13"
 lombok-plugin = "8.6"
 
+paper-latest = "1.20.6-R0.1-SNAPSHOT"
+paper-legacy = "1.8.8-R0.1-SNAPSHOT"
+
 [libraries]
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
-adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
-adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
-adventure-text-serializer-gson-legacy-impl = { group = "net.kyori", name = "adventure-text-serializer-gson-legacy-impl", version.ref = "adventure" }
-adventure-text-serializer-legacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
-adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventure-platform" }
-brigadier = { group = "com.mojang", name = "brigadier", version.ref = "brigadier" }
+paper-legacy = { group = "org.spigotmc", name = "spigot-api", version.ref = "paper-legacy" }
+paper-latest = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-latest" }
+
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 hologramlib = { group = "com.github.unldenis.hologram", name = "hologram-lib", version.ref = "hologramlib" }
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }

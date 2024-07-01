@@ -17,10 +17,10 @@ import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
-import eu.darkcube.system.util.data.Key;
 
 public class SetupMode {
     private final @NotNull CommonWoolBattle woolbattle;
@@ -76,14 +76,14 @@ public class SetupMode {
 
     public synchronized @NotNull Position.Directed spawnPoint() {
         if (spawnPoint == null) {
-            spawnPoint = woolbattle.api().persistentDataStorage().get(new Key(woolbattle.api(), "setup_respawn_point"), Position.Directed.TYPE, () -> new Position.Directed.Simple(0.5, 100, 0.5, 0, 0));
+            spawnPoint = woolbattle.api().persistentDataStorage().get(Key.key(woolbattle.api(), "setup_respawn_point"), Position.Directed.TYPE, () -> new Position.Directed.Simple(0.5, 100, 0.5, 0, 0));
         }
         return spawnPoint;
     }
 
     public synchronized void spawnPoint(@NotNull Position.Directed spawnPoint) {
         this.spawnPoint = spawnPoint;
-        woolbattle.api().persistentDataStorage().set(new Key(woolbattle.api(), "setup_respawn_point"), Position.Directed.TYPE, spawnPoint.clone());
+        woolbattle.api().persistentDataStorage().set(Key.key(woolbattle.api(), "setup_respawn_point"), Position.Directed.TYPE, spawnPoint.clone());
     }
 
     public interface Implementation {

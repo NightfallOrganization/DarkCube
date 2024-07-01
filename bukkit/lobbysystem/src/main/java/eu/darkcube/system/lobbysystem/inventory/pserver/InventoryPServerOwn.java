@@ -19,6 +19,7 @@ import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.bukkit.inventoryapi.v1.PageArrow;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.pserver.PServerDataManager;
@@ -30,7 +31,6 @@ import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +38,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
 
-    public static final Key META_KEY_PSERVERID = new Key(Lobby.getInstance(), "lobbysystem.pserver.own.pserverid");
+    public static final Key META_KEY_PSERVERID = Key.key(Lobby.getInstance(), "lobbysystem.pserver.own.pserverid");
     public static final String ITEMID_EXISTING = "InventoryPServerOwnPServerSlotExisting";
     private static final InventoryType type_pserver_own = InventoryType.of("pserver_own");
     private static final String PSERVER_COUNT_PERMISSION = "pserver.own.count.";
@@ -50,7 +50,8 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
         this.listener.register();
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         String itemid = Item.getItemId(event.item());
@@ -63,7 +64,8 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         Player p = user.asPlayer();
         if (p == null) return;
         super.fillItems(items);
@@ -72,9 +74,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
             if (info.getValue()) {
                 if (info.getPermission().startsWith(InventoryPServerOwn.PSERVER_COUNT_PERMISSION)) {
                     try {
-                        pservercount = Math.max(pservercount, Integer.parseInt(info
-                                .getPermission()
-                                .substring(InventoryPServerOwn.PSERVER_COUNT_PERMISSION.length())));
+                        pservercount = Math.max(pservercount, Integer.parseInt(info.getPermission().substring(InventoryPServerOwn.PSERVER_COUNT_PERMISSION.length())));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -102,8 +102,7 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
                 item.lore(Message.PSERVEROWN_STATUS.getMessage(user.user(), mstate));
             }
 
-            if (pserverId != null)
-                item.persistentDataStorage().set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING, pserverId.toString());
+            if (pserverId != null) item.persistentDataStorage().set(InventoryPServerOwn.META_KEY_PSERVERID, PersistentDataTypes.STRING, pserverId.toString());
 
             items.put(slot, item.build());
         }
@@ -112,13 +111,15 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void insertArrowItems() {
+    @Override
+    protected void insertArrowItems() {
         this.arrowSlots.put(PageArrow.PREVIOUS, new Integer[]{IInventory.slot(3, 2), IInventory.slot(4, 2)});
         this.arrowSlots.put(PageArrow.NEXT, new Integer[]{IInventory.slot(3, 8), IInventory.slot(4, 8)});
         super.insertArrowItems();
     }
 
-    @Override protected void insertDefaultItems0() {
+    @Override
+    protected void insertDefaultItems0() {
         super.insertDefaultItems0();
 
         this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.user()));
@@ -127,7 +128,8 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
         this.fallbackItems.put(IInventory.slot(1, 7), Item.LIME_GLASS_PANE.getItem(this.user.user()));
     }
 
-    @Override protected void destroy() {
+    @Override
+    protected void destroy() {
         super.destroy();
         listener.unregister();
     }
@@ -142,7 +144,8 @@ public class InventoryPServerOwn extends LobbyAsyncPagedInventory {
             InjectionLayer.boot().instance(EventManager.class).unregisterListener(this);
         }
 
-        @EventListener public void handle(PServerUpdateEvent event) {
+        @EventListener
+        public void handle(PServerUpdateEvent event) {
             recalculate();
         }
 

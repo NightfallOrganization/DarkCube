@@ -11,11 +11,11 @@ import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public class ItemManager {
@@ -25,7 +25,7 @@ public class ItemManager {
 
     public ItemManager(CommonWoolBattleApi api) {
         this.api = api;
-        itemId = new Key(api, "item_id");
+        itemId = Key.key(api, "item_id");
     }
 
     public static ItemManager instance() {

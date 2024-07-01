@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.perk.perks.other.DoubleJumpPerk;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserModifier;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public class WBUserModifier implements UserModifier {
@@ -26,8 +26,8 @@ public class WBUserModifier implements UserModifier {
 
     public WBUserModifier(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
-        this.DATA_VERSION = new Key(woolbattle, "data_version");
-        if (USER == null) USER = new Key(woolbattle, "user");
+        this.DATA_VERSION = Key.key(woolbattle, "data_version");
+        if (USER == null) USER = Key.key(woolbattle, "user");
     }
 
     @SuppressWarnings("DataFlowIssue")

@@ -9,11 +9,7 @@ package eu.darkcube.minigame.woolbattle.common;
 
 import java.util.logging.Logger;
 
-import dev.derklaro.aerogel.binding.BindingBuilder;
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
-import eu.darkcube.minigame.woolbattle.common.command.arguments.CommonWoolBattleArguments;
 import eu.darkcube.minigame.woolbattle.common.event.CommonEventHandler;
 import eu.darkcube.minigame.woolbattle.common.setup.SetupMode;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
@@ -25,6 +21,7 @@ import eu.darkcube.minigame.woolbattle.common.util.scheduler.TaskScheduleProvide
 import eu.darkcube.minigame.woolbattle.common.util.translation.LanguageRegistry;
 import eu.darkcube.minigame.woolbattle.common.world.SimpleWorldDataProvider;
 import eu.darkcube.minigame.woolbattle.common.world.WorldDataProvider;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.item.ItemTemplate;
@@ -41,8 +38,7 @@ public abstract class CommonWoolBattle {
     public CommonWoolBattle() {
         eventHandler = new CommonEventHandler(this);
         setupMode = new SetupMode(this);
-        InjectionLayer.ext().install(BindingBuilder.create().bind(TaskScheduleProvider.class).toInstance(new TaskScheduleProviderImpl()));
-        InjectionLayer.ext().install(BindingBuilder.create().bind(WoolBattleArguments.class).toInstance(new CommonWoolBattleArguments()));
+        WoolBattleProvider.PROVIDER.register(TaskScheduleProvider.class, new TaskScheduleProviderImpl());
         this.worldDataProvider = new SimpleWorldDataProvider();
         this.languageRegistry = new LanguageRegistry();
 

@@ -7,7 +7,6 @@
 
 package eu.darkcube.minigame.woolbattle.api.perk.user;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
@@ -15,10 +14,11 @@ import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class DefaultUserPerk implements UserPerk {
-    private final Implementation implementation = InjectionLayer.ext().instance(Implementation.class);
+    private final Implementation implementation = WoolBattleProvider.PROVIDER.service(Implementation.class);
     private final int id;
     private final Perk perk;
     private final WBUser owner;

@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryLoading;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
@@ -27,7 +28,6 @@ import eu.darkcube.system.pserver.common.PServerExecutor.AccessLevel;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.inventory.ItemStack;
@@ -35,8 +35,8 @@ import org.bukkit.inventory.ItemStack;
 public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInventory {
 
     public static final String ITEMID = "pserver_gameserver";
-    public static final Key SLOT = new Key(Lobby.getInstance(), "pserver.gameserver.slot");
-    public static final Key SERVICE = new Key(Lobby.getInstance(), "pserver.gameserver.service");
+    public static final Key SLOT = Key.key(Lobby.getInstance(), "pserver.gameserver.slot");
+    public static final Key SERVICE = Key.key(Lobby.getInstance(), "pserver.gameserver.service");
     public static final PersistentDataType<RegistryEntry> SERVICE_TYPE = RegistryEntry.TYPE;
     protected final int[] itemSort;
     private final Item item;
@@ -62,7 +62,8 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
         this.complete();
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         var itemid = Item.getItemId(event.item());
@@ -71,12 +72,7 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
             user.setOpenInventory(new InventoryLoading(getTitle(), user.user(), lobbyUser -> {
                 var registryEntry = event.item().persistentDataStorage().get(SERVICE, SERVICE_TYPE);
                 if (registryEntry == null) return InventoryGameServerSelection.this;
-                var ps = new PServerBuilder()
-                        .type(Type.GAMEMODE)
-                        .taskName(registryEntry.taskName())
-                        .accessLevel(AccessLevel.PUBLIC)
-                        .create()
-                        .join();
+                var ps = new PServerBuilder().type(Type.GAMEMODE).taskName(registryEntry.taskName()).accessLevel(AccessLevel.PUBLIC).create().join();
                 ps.storage().setAsync(SERVICE, SERVICE_TYPE, registryEntry).join();
                 ps.addOwner(user.user().uniqueId()).join();
                 return new InventoryPServerConfiguration(user.user(), ps.id());
@@ -84,11 +80,13 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
         }
     }
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && this.done;
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         int slot = 0;
         var serviceTasks = this.supplier.get();
         for (var entry : serviceTasks) {
@@ -102,7 +100,8 @@ public abstract class InventoryGameServerSelection extends LobbyAsyncPagedInvent
         }
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         this.fallbackItems.put(IInventory.slot(1, 5), this.item.getItem(this.auser));
         super.insertFallbackItems();
     }

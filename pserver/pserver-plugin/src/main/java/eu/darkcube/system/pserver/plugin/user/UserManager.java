@@ -9,15 +9,15 @@ package eu.darkcube.system.pserver.plugin.user;
 
 import java.util.UUID;
 
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.entity.Player;
 
 public class UserManager {
 
     private static UserManager instance;
-    private final Key userKey = new Key("PServerPlugin", "pserver_user");
+    private final Key userKey = Key.key("pserverplugin", "pserver_user");
     private final UserModifier userModifier = new UserModifier() {
         @Override
         public void onLoad(eu.darkcube.system.userapi.User user) {

@@ -16,18 +16,18 @@ import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryLobbySwitcher extends LobbyAsyncPagedInventory {
-    public static final Key server = new Key(Lobby.getInstance(), "server");
+    public static final Key server = Key.key(Lobby.getInstance(), "server");
     private static final InventoryType type_lobby_switcher = InventoryType.of("lobby_switcher");
     // @formatter:off
     private static final int[] SLOTS = new int[] {

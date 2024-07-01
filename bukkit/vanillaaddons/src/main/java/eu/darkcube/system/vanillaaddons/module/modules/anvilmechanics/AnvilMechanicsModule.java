@@ -38,25 +38,25 @@ public class AnvilMechanicsModule implements Module, Listener {
 
     public AnvilMechanicsModule(VanillaAddons addons) {
         this.addons = addons;
-        enchantmentLimitation.put(Enchantment.DURABILITY, 8);
-        levelsAfter.put(Enchantment.DURABILITY, new HashMap<>());
-        levelsAfter.get(Enchantment.DURABILITY).put(4, 39);
+        enchantmentLimitation.put(Enchantment.UNBREAKING, 8);
+        levelsAfter.put(Enchantment.UNBREAKING, new HashMap<>());
+        // levelsAfter.get(Enchantment.UNBREAKING).put(4, 39);
     }
 
     // Lowest priority to initialize this event with the correct result and allow modification by
     // plugins later
-    @EventHandler(priority = EventPriority.LOWEST) public void handle(PrepareAnvilEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void handle(PrepareAnvilEvent event) {
         if (event.getInventory().getLocation() == null) return;
         var mat = event.getInventory().getLocation().getBlock().getType();
         if (mat != Material.ANVIL && mat != Material.CHIPPED_ANVIL && mat != Material.DAMAGED_ANVIL) return;
         var first = event.getInventory().getFirstItem() == null ? null : ItemBuilder.item(event.getInventory().getFirstItem());
         var second = event.getInventory().getSecondItem() == null ? null : ItemBuilder.item(event.getInventory().getSecondItem());
         var result = event.getResult() == null ? null : ItemBuilder.item(event.getResult());
-        var data = simulateAnvil(event.getView().getPlayer(), first, second, result, event.getInventory().getRenameText(), event
-                .getInventory()
-                .getRepairCost(), event.getInventory().getRepairCostAmount(), event.getInventory().getMaximumRepairCost());
+        var data = simulateAnvil(event.getView().getPlayer(), first, second, result, event.getInventory().getRenameText(), event.getInventory().getRepairCost(), event.getInventory().getRepairCostAmount(), event.getInventory().getMaximumRepairCost());
         result = data.result;
-        event.getInventory().setRepairCost(Math.min(data.levelCost, 39));
+        event.getInventory().setMaximumRepairCost(Integer.MAX_VALUE / 2);
+        event.getInventory().setRepairCost(Math.min(39, data.levelCost));
         event.getInventory().setRepairCostAmount(data.itemCost);
         event.setResult(result == null ? null : result.build());
     }
@@ -77,12 +77,9 @@ public class AnvilMechanicsModule implements Module, Listener {
         var repair = false;
 
         if (second != null) {
-            var enchantedBook = second.material() == of(Material.ENCHANTED_BOOK) && !second
-                    .meta(EnchantmentStorageBuilderMeta.class)
-                    .enchantments()
-                    .isEmpty();
+            var enchantedBook = second.material() == of(Material.ENCHANTED_BOOK) && !second.meta(EnchantmentStorageBuilderMeta.class).enchantments().isEmpty();
             if (((BukkitMaterial) result.material()).bukkitType().getMaxDurability() != 0 && first.canBeRepairedBy(second)) {
-                int k = Math.min(result.damage(), ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() / 4);
+                var k = Math.min(result.damage(), ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() / 4);
                 if (k <= 0) {
                     return originalData;
                 }
@@ -96,17 +93,15 @@ public class AnvilMechanicsModule implements Module, Listener {
                 if (extraCost > 0) repair = true;
                 repairItemCountCost = i1;
             } else {
-                if (!enchantedBook && (result.material() != second.material() || ((BukkitMaterial) result.material())
-                        .bukkitType()
-                        .getMaxDurability() == 0)) {
+                if (!enchantedBook && (result.material() != second.material() || ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() == 0)) {
                     return originalData;
                 }
                 if (((BukkitMaterial) result.material()).bukkitType().getMaxDurability() != 0 && !enchantedBook) {
-                    int k = ((BukkitMaterial) first.material()).bukkitType().getMaxDurability() - first.damage();
-                    int i1 = ((BukkitMaterial) second.material()).bukkitType().getMaxDurability() - second.damage();
-                    int l = i1 + ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() * 12 / 100;
+                    var k = ((BukkitMaterial) first.material()).bukkitType().getMaxDurability() - first.damage();
+                    var i1 = ((BukkitMaterial) second.material()).bukkitType().getMaxDurability() - second.damage();
+                    var l = i1 + ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() * 12 / 100;
                     var j1 = k + l;
-                    int k1 = ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() - j1;
+                    var k1 = ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() - j1;
 
                     if (k1 < 0) k1 = 0;
 
@@ -132,9 +127,7 @@ public class AnvilMechanicsModule implements Module, Listener {
                         }
 
                         for (var enchantment1 : resultEnchantments.keySet()) {
-                            if (!enchantment1.equals(enchantment) && ((BukkitEnchantment) enchantment)
-                                    .bukkitType()
-                                    .conflictsWith(((BukkitEnchantment) enchantment1).bukkitType())) {
+                            if (!enchantment1.equals(enchantment) && ((BukkitEnchantment) enchantment).bukkitType().conflictsWith(((BukkitEnchantment) enchantment1).bukkitType())) {
                                 canEnchantItem1 = false;
                                 extraCost++;
                             }
@@ -150,32 +143,27 @@ public class AnvilMechanicsModule implements Module, Listener {
 
                             resultEnchantments.put(enchantment, secondLevel);
 
-                            if (levelsAfter.containsKey(((BukkitEnchantment) enchantment).bukkitType())) {
-                                var map = levelsAfter.get(((BukkitEnchantment) enchantment).bukkitType());
-                                var minlevel = -1;
-                                for (var i = secondLevel; i >= 0; i--) {
-                                    if (map.containsKey(i)) {
-                                        minlevel = map.get(i);
-                                        break;
-                                    }
-                                }
-                                extraCost += minlevel;
-                            }
+                            // if (levelsAfter.containsKey(((BukkitEnchantment) enchantment).bukkitType())) {
+                            //     var map = levelsAfter.get(((BukkitEnchantment) enchantment).bukkitType());
+                            //     var minlevel = -1;
+                            //     for (var i = secondLevel; i >= 0; i--) {
+                            //         if (map.containsKey(i)) {
+                            //             minlevel = map.get(i);
+                            //             break;
+                            //         }
+                            //     }
+                            //     extraCost += minlevel;
+                            // }
 
-                            var rarityCost = switch (((BukkitEnchantment) enchantment).bukkitType().getRarity()) {
-                                case COMMON -> 1;
-                                case UNCOMMON -> 2;
-                                case RARE -> 4;
-                                case VERY_RARE -> 8;
-                            };
+                            var anvilCost = ((BukkitEnchantment) enchantment).bukkitType().getAnvilCost();
 
                             if (enchantedBook) {
-                                rarityCost = Math.max(1, rarityCost / 2);
+                                anvilCost = Math.max(1, anvilCost / 2);
                             }
 
-                            extraCost += rarityCost * secondLevel;
+                            extraCost += anvilCost * secondLevel;
                             if (first.amount() > 1) {
-                                extraCost = 40;
+                                extraCost = Integer.MAX_VALUE / 2;
                             }
                         }
                     }
@@ -192,9 +180,7 @@ public class AnvilMechanicsModule implements Module, Listener {
                 extraCost += b1;
                 result.displaynameRaw(Component.empty());
             }
-        } else if (first.displayname() == Component.empty() || !renameText.equals(LegacyComponentSerializer
-                .legacySection()
-                .serialize(first.displayname()))) {
+        } else if (first.displayname() == Component.empty() || !renameText.equals(LegacyComponentSerializer.legacySection().serialize(first.displayname()))) {
             b1 = 1;
             extraCost += b1;
             result.displaynameRaw(LegacyComponentSerializer.legacySection().deserialize(renameText));
@@ -204,8 +190,8 @@ public class AnvilMechanicsModule implements Module, Listener {
         if (extraCost <= 0) {
             result = null;
         }
-        //if (b1 == extraCost && b1 > 0 && cost >= maximumRepairCost) {
-        //cost = maximumRepairCost - 1;
+        // if (b1 == extraCost && b1 > 0 && cost >= maximumRepairCost) {
+        // cost = maximumRepairCost - 1;
         //}
         if (cost >= maximumRepairCost && player.getGameMode() != GameMode.CREATIVE) {
             cost = maximumRepairCost;
@@ -221,9 +207,9 @@ public class AnvilMechanicsModule implements Module, Listener {
             if (!repair) result.repairCost(resultRepairCost);
             else cost = 1;
 
-            if (result.material() == of(Material.ENCHANTED_BOOK))
+            if (result.material() == of(Material.ENCHANTED_BOOK)) {
                 result.meta(EnchantmentStorageBuilderMeta.class).enchantments(resultEnchantments);
-            else result.enchantments(resultEnchantments);
+            } else result.enchantments(resultEnchantments);
         }
         return new Data(first, second, result, cost, repairItemCountCost);
     }
@@ -233,20 +219,20 @@ public class AnvilMechanicsModule implements Module, Listener {
     }
 
     private Map<eu.darkcube.system.server.item.enchant.Enchantment, Integer> enchantments(ItemBuilder item) {
-        return new HashMap<>(item.material() == of(Material.ENCHANTED_BOOK) ? item
-                .meta(EnchantmentStorageBuilderMeta.class)
-                .enchantments() : item.enchantments());
+        return new HashMap<>(item.material() == of(Material.ENCHANTED_BOOK) ? item.meta(EnchantmentStorageBuilderMeta.class).enchantments() : item.enchantments());
     }
 
     private int calculateIncreasedRepairCost(int cost) {
         return cost * 2 + 1;
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, addons);
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         HandlerList.unregisterAll(this);
     }
 
