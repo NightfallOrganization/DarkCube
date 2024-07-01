@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.api;
 
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
+import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
 import eu.darkcube.minigame.woolbattle.api.game.GameManager;
 import eu.darkcube.minigame.woolbattle.api.game.lobby.LobbyData;
@@ -19,15 +20,15 @@ import eu.darkcube.minigame.woolbattle.api.util.scheduler.SchedulerManager;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWoolProvider;
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.event.EventNode;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Namespaced;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 
 @Api
-public interface WoolBattleApi extends Key.Named {
+public interface WoolBattleApi extends Namespaced {
     @Api
     static @NotNull WoolBattleApi instance() {
         return WoolBattleApiImpl.instance;
@@ -60,6 +61,10 @@ public interface WoolBattleApi extends Key.Named {
     @Api
     @NotNull
     PersistentDataStorage persistentDataStorage();
+
+    @Api
+    @NotNull
+    WoolBattleArguments commandArguments();
 
     @Api
     @NotNull

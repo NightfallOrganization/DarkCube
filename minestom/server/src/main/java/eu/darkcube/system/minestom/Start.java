@@ -21,6 +21,7 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.permission.Permission;
+import org.slf4j.LoggerFactory;
 
 public class Start {
     public static void main(String[] args) {
@@ -30,11 +31,14 @@ public class Start {
         System.setProperty("minestom.entity-view-distance", "32");
         System.setProperty("minestom.experiment.pose-updates", "true");
 
+        LoggerFactory.getLogger("DarkCube").info("Starting Minestom Server...");
+
         try {
             CloudNetIntegration.init();
         } catch (Throwable throwable) {
-            // throwable.printStackTrace();
+            throwable.printStackTrace();
         }
+
         // BungeeCordProxy.enable();
 
         var server = ExtensionBootstrap.init();
@@ -65,34 +69,6 @@ public class Start {
                 event.setCancelled(true);
             }
         });
-
-        // for (int i = 0; i < 5; i++) {
-        //     var instance = MinecraftServer.getInstanceManager().createInstanceContainer(DimensionType.OVERWORLD);
-        //     var s = i;
-        //     instance.setGenerator(unit -> {
-        //         unit.modifier().fillHeight(unit.absoluteStart().blockY(), 60 + s, Block.STONE);
-        //     });
-        //     instance.setChunkSupplier(LightingChunk::new);
-        //     instance.setTimeRate(0);
-        //     instance.setTime(12000);
-        // }
-        //
-        // MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, event -> {
-        //     event.getPlayer().setRespawnPoint(new Pos(0, 64, 0));
-        //     event.getPlayer().setPermissionLevel(4);
-        //     event.setSpawningInstance(MinecraftServer.getInstanceManager().getInstances().stream().findFirst().orElseThrow());
-        // });
-        //
-        // var command = new Command("randominstance");
-        // command.setDefaultExecutor((sender, context) -> {
-        //     var array = MinecraftServer.getInstanceManager().getInstances().toArray(new Instance[0]);
-        //     var i = ThreadLocalRandom.current().nextInt(array.length);
-        //     var instance = array[i];
-        //     sender.asPlayer().setInstance(instance, sender.asPlayer().getRespawnPoint());
-        // });
-        // MinecraftServer.getCommandManager().register(command);
-        // MinecraftServer.getBiomeManager().loadVanillaBiomes();
-        // MinecraftServer.setCompressionThreshold(0);
 
         server.start(System.getProperty("service.bind.host"), Integer.getInteger("service.bind.port"));
         ServerConsole.init();

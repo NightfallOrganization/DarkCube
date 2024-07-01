@@ -45,7 +45,7 @@ public class WrapperPServerExecutor implements PServerExecutor {
 
     WrapperPServerExecutor(UniqueId id) {
         this.id = id;
-        this.storage = CustomPersistentDataProvider.dataProvider().persistentData("pserver", Key.key("", id.toString()));
+        this.storage = CustomPersistentDataProvider.dataProvider().persistentData("pserver_data", Key.key("", id.toString()));
     }
 
     @Override

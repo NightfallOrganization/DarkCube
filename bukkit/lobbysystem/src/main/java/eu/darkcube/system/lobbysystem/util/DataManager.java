@@ -7,78 +7,78 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
-import com.google.common.reflect.TypeToken;
-import eu.cloudnetservice.driver.database.Database;
-import eu.cloudnetservice.driver.database.DatabaseProvider;
-import eu.cloudnetservice.driver.document.Document;
-import eu.cloudnetservice.driver.inject.InjectionLayer;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection;
 import eu.darkcube.system.lobbysystem.parser.Locations;
 import eu.darkcube.system.lobbysystem.util.Border.Shape;
 import eu.darkcube.system.pserver.common.PServerExecutor;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Location;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 public class DataManager {
 
-    private static final Key K_TASK = new Key("PServer", "task");
+    private static final Key K_TASK = Key.key("pserver", "task");
     private static final PersistentDataType<String> T_TASK = PersistentDataTypes.STRING;
     private static final Pattern WB_LEGACY_PSERVER = Pattern.compile("(?<task>woolbattle)(?<data>\\d*x\\d*)");
-    private final Database database;
-    private volatile Border border;
-    private volatile Set<String> woolbattleTasks;
-    private volatile Set<String> sumoTasks;
-    private Location jarPlate;
-    private boolean jarEnabled;
-    private boolean winter;
+    private static final PersistentDataType<Set<String>> TYPE_TASKS = PersistentDataTypes.set(PersistentDataTypes.STRING);
+    private final Lobby lobby;
+    private final Key keySpawn;
+    private final Key keyBorder;
+    private final Key keyWoolBattleNPCLocation;
+    private final Key keySumoNPCLocation;
+    private final Key keyDailyRewardNPCLocation;
+    private final Key keyFisherNPCLocation;
+    private final Key keyWoolBattleSpawn;
+    private final Key keySumoSpawn;
+    private final Key keyFisherSpawn;
+    private final Key keyWinter;
+    private final Key keyJumpAndRunEnabled;
+    private final Key keyJumpAndRunSpawn;
+    private final Key keyJumpAndRunPlate;
+    private final Key keyWoolBattleTasks;
+    private final Key keySumoTasks;
 
-    public DataManager() {
-        database = InjectionLayer.boot().instance(DatabaseProvider.class).database("lobbysystem_data");
-        setDefault("spawn", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("border", new Border(Shape.CIRCLE, 100, Locations.DEFAULT, null).serializeToDocument());
-        setDefault("woolbattleNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("sumoNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("dailyrewardNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("fisherNPCLocation", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("woolbattleSpawn", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("sumoSpawn", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("fisherSpawn", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("winter", Document.newJsonDocument().append("value", true));
-        winter = database.get("winter").getBoolean("value");
-        setDefault("jumpAndRunEnabled", Document.newJsonDocument().append("value", true));
-        jarEnabled = database.get("jumpAndRunEnabled").getBoolean("value");
-        setDefault("jumpAndRunSpawn", Locations.toDocument(Locations.DEFAULT, false));
-        setDefault("jumpAndRunPlate", Locations.toDocument(Locations.DEFAULT, false));
-        jarPlate = Locations.fromDocument(database.get("jumpAndRunPlate"), null);
+    public DataManager(Lobby lobby) {
+        this.lobby = lobby;
+        this.keySpawn = Key.key(lobby, "spawn");
+        this.keyBorder = Key.key(lobby, "border");
+        this.keyWoolBattleNPCLocation = Key.key(lobby, "woolbattle_npc_location");
+        this.keySumoNPCLocation = Key.key(lobby, "sumo_npc_location");
+        this.keyDailyRewardNPCLocation = Key.key(lobby, "daily_reward_npc_location");
+        this.keyFisherNPCLocation = Key.key(lobby, "fisher_npc_location");
+        this.keyWoolBattleSpawn = Key.key(lobby, "woolbattle_spawn");
+        this.keySumoSpawn = Key.key(lobby, "sumo_spawn");
+        this.keyFisherSpawn = Key.key(lobby, "fisher_spawn");
+        this.keyWinter = Key.key(lobby, "winter");
+        this.keyJumpAndRunEnabled = Key.key(lobby, "jump_and_run_enabled");
+        this.keyJumpAndRunSpawn = Key.key(lobby, "jump_and_run_spawn");
+        this.keyJumpAndRunPlate = Key.key(lobby, "jump_and_run_plate");
+        this.keyWoolBattleTasks = Key.key(lobby, "woolbattle_tasks");
+        this.keySumoTasks = Key.key(lobby, "sumo_tasks");
 
-        setDefault("woolbattleTasks", Document.newJsonDocument().append("tasks", new HashSet<String>()));
-        setDefault("sumoTasks", Document.newJsonDocument().append("tasks", new HashSet<String>()));
-        try {
-            border = Border.GSON.fromJson(database.get("border").serializeToString(), Border.class);
-        } catch (Exception ex) {
-            border = new Border(Shape.CIRCLE, Double.MAX_VALUE, null, null);
-        }
-        fetchWoolBattleTasks();
-        fetchSumoTasks();
-        new BukkitRunnable() {
-            @Override public void run() {
-                Document doc = database.get("border");
-                if (doc == null) {
-                    return;
-                }
-                border = Border.GSON.fromJson(doc.serializeToString(), Border.class);
-                fetchWoolBattleTasks();
-                fetchSumoTasks();
-            }
-        }.runTaskTimerAsynchronously(Lobby.getInstance(), 20 * 60 * 2, 20 * 60 * 2);
+        // Getting all these values also sets default values
+        getSpawn();
+        getBorder();
+        getWoolBattleNPCLocation();
+        getSumoNPCLocation();
+        getDailyRewardNPCLocation();
+        getFisherNPCLocation();
+        getWoolBattleSpawn();
+        getSumoSpawn();
+        getFisherSpawn();
+        isWinter();
+        isJumpAndRunEnabled();
+        getJumpAndRunSpawn();
+        getJumpAndRunPlate();
+        getWoolBattleTasks();
+        getSumoTasks();
     }
 
     public static void convertPServer(PServerExecutor executor) {
@@ -92,8 +92,8 @@ public class DataManager {
             System.err.println("Wrong pserver: " + taskName);
             return;
         }
-        String task = matcher.group("task");
-        String data = matcher.group("data");
+        var task = matcher.group("task");
+        var data = matcher.group("data");
         var entry = Lobby.getInstance().gameRegistry().entry(task, data);
         if (entry == null) {
             System.err.println("No entry registered for " + taskName);
@@ -105,144 +105,122 @@ public class DataManager {
     }
 
     public boolean isJumpAndRunEnabled() {
-        return jarEnabled;
+        return lobby.persistentDataStorage().get(keyJumpAndRunEnabled, PersistentDataTypes.BOOLEAN, () -> true);
     }
 
     public void setJumpAndRunEnabled(boolean enabled) {
-        jarEnabled = enabled;
-        database.insert("jumpAndRunEnabled", Document.newJsonDocument().append("value", enabled));
+        lobby.persistentDataStorage().set(keyJumpAndRunEnabled, PersistentDataTypes.BOOLEAN, enabled);
     }
 
     public boolean isWinter() {
-        return winter;
+        return lobby.persistentDataStorage().get(keyWinter, PersistentDataTypes.BOOLEAN, () -> true);
     }
 
     public void setWinter(boolean winter) {
-        this.winter = winter;
-        database.insert("winter", Document.newJsonDocument().append("value", winter));
+        lobby.persistentDataStorage().set(keyWinter, PersistentDataTypes.BOOLEAN, winter);
     }
 
-    private void setDefault(String key, Document val) {
-        if (!database.contains(key)) database.insert(key, val);
-    }
-
-    public void fetchWoolBattleTasks() {
-        woolbattleTasks = database.get("woolbattleTasks").readObject("tasks", new TypeToken<Set<String>>() {
-            private static final long serialVersionUID = 1461778882147270573L;
-        }.getType());
-    }
-
-    public void fetchSumoTasks() {
-        sumoTasks = database.get("sumoTasks").readObject("tasks", new TypeToken<Set<String>>() {
-            private static final long serialVersionUID = 1461778882147270573L;
-        }.getType());
-    }
-
-    public Set<String> getWoolBattleTasks() {
-        return woolbattleTasks;
+    public @Unmodifiable Set<String> getWoolBattleTasks() {
+        return lobby.persistentDataStorage().get(keyWoolBattleTasks, TYPE_TASKS, HashSet::new);
     }
 
     public void setWoolBattleTasks(Set<String> tasks) {
-        this.woolbattleTasks = tasks;
-        database.insert("woolbattleTasks", Document.newJsonDocument().append("tasks", tasks));
+        lobby.persistentDataStorage().set(keyWoolBattleTasks, TYPE_TASKS, tasks);
     }
 
-    public Set<String> getSumoTasks() {
-        return sumoTasks;
+    public @Unmodifiable Set<String> getSumoTasks() {
+        return lobby.persistentDataStorage().get(keySumoTasks, TYPE_TASKS, HashSet::new);
     }
 
     public void setSumoTasks(Set<String> tasks) {
-        this.sumoTasks = tasks;
-        database.insert("sumoTasks", Document.newJsonDocument().append("tasks", tasks));
+        lobby.persistentDataStorage().set(keySumoTasks, TYPE_TASKS, tasks);
     }
 
     public void setSumoSpawn(Location loc) {
-        database.insert("sumoSpawn", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keySumoSpawn, Locations.TYPE, loc);
     }
 
     public Location getSumoSpawn() {
-        return Locations.fromDocument(database.get("sumoSpawn"), null);
+        return lobby.persistentDataStorage().get(keySumoSpawn, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setFisherSpawn(Location loc) {
-        database.insert("fisherSpawn", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyFisherSpawn, Locations.TYPE, loc);
     }
 
     public Location getFisherSpawn() {
-        return Locations.fromDocument(database.get("fisherSpawn"), null);
+        return lobby.persistentDataStorage().get(keyFisherSpawn, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public Location getWoolBattleSpawn() {
-        return Locations.fromDocument(database.get("woolbattleSpawn"), null);
+        return lobby.persistentDataStorage().get(keyWoolBattleSpawn, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setWoolBattleSpawn(Location loc) {
-        database.insert("woolbattleSpawn", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyWoolBattleSpawn, Locations.TYPE, loc);
     }
 
     public Location getJumpAndRunSpawn() {
-        return Locations.fromDocument(database.get("jumpAndRunSpawn"), null);
+        return lobby.persistentDataStorage().get(keyJumpAndRunSpawn, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setJumpAndRunSpawn(Location loc) {
-        database.insert("jumpAndRunSpawn", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyJumpAndRunSpawn, Locations.TYPE, loc);
     }
 
     public Location getJumpAndRunPlate() {
-        return jarPlate;
+        return lobby.persistentDataStorage().get(keyJumpAndRunPlate, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setJumpAndRunPlate(Location loc) {
-        jarPlate = loc;
-        database.insert("jumpAndRunPlate", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyJumpAndRunPlate, Locations.TYPE, loc);
     }
 
     public Location getWoolBattleNPCLocation() {
-        return Locations.fromDocument(database.get("woolbattleNPCLocation"), null);
+        return lobby.persistentDataStorage().get(keyWoolBattleNPCLocation, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setWoolBattleNPCLocation(Location loc) {
-        database.insert("woolbattleNPCLocation", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyWoolBattleNPCLocation, Locations.TYPE, loc);
     }
 
     public Location getSumoNPCLocation() {
-        return Locations.fromDocument(database.get("sumoNPCLocation"), null);
+        return lobby.persistentDataStorage().get(keySumoNPCLocation, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setSumoNPCLocation(Location loc) {
-        database.insert("sumoNPCLocation", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keySumoNPCLocation, Locations.TYPE, loc);
     }
 
     public Location getDailyRewardNPCLocation() {
-        return Locations.fromDocument(database.get("dailyrewardNPCLocation"), null);
+        return lobby.persistentDataStorage().get(keyDailyRewardNPCLocation, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setDailyRewardNPCLocation(Location loc) {
-        database.insert("dailyrewardNPCLocation", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyDailyRewardNPCLocation, Locations.TYPE, loc);
     }
 
     public Location getFisherNPCLocation() {
-        return Locations.fromDocument(database.get("fisherNPCLocation"), null);
+        return lobby.persistentDataStorage().get(keyFisherNPCLocation, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setFisherNPCLocation(Location loc) {
-        database.insert("fisherNPCLocation", Locations.toDocument(loc, false));
+        lobby.persistentDataStorage().set(keyFisherNPCLocation, Locations.TYPE, loc);
     }
 
     public Border getBorder() {
-        return border;
+        return lobby.persistentDataStorage().get(keyBorder, Border.TYPE, () -> new Border(Shape.CIRCLE, 100, Locations.DEFAULT, null));
     }
 
     public void setBorder(Border border) {
-        database.insert("border", border.serializeToDocument());
-        this.border = border;
+        lobby.persistentDataStorage().set(keyBorder, Border.TYPE, border);
     }
 
     public Location getSpawn() {
-        return Locations.fromDocument(database.get("spawn"), null);
+        return lobby.persistentDataStorage().get(keySpawn, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
     public void setSpawn(Location spawn) {
-        database.insert("spawn", Locations.toDocument(spawn, false));
+        lobby.persistentDataStorage().set(keySpawn, Locations.TYPE, spawn);
     }
 }

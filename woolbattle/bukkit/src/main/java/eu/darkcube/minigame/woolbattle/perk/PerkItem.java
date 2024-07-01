@@ -13,8 +13,8 @@ import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.util.Item;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -24,7 +24,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class PerkItem {
 
-    public static final Key KEY_PERK_ID = new Key(WoolBattleBukkit.instance(), "perk_id");
+    public static final Key KEY_PERK_ID = Key.key(WoolBattleBukkit.instance(), "perk_id");
     public static final PersistentDataType<Integer> TYPE_PERK_ID = PersistentDataTypes.INTEGER;
 
     private final Supplier<Item> itemSupplier;

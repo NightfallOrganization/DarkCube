@@ -24,25 +24,27 @@ import eu.darkcube.minigame.woolbattle.util.Vote;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.inventory.ItemStack;
 
 public class VotingMapsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-maps");
-    private final Key MAP = new Key(woolbattle, "voting-map");
+    private final Key MAP = Key.key(woolbattle, "voting-map");
 
     public VotingMapsInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_MAPS.getMessage(user), user);
         complete();
     }
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && MAP != null;
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         String mapName = ItemManager.getId(event.item(), MAP);
@@ -63,7 +65,8 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
         recalculate();
     }
 
-    @Override protected void fillItems(java.util.Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(java.util.Map<Integer, ItemStack> items) {
         MapSize mapSize = woolbattle.gameData().mapSize();
         if (mapSize == null) return;
         List<Map> maps = woolbattle.mapManager().getMaps(mapSize).stream().filter(Map::isEnabled).collect(Collectors.toList());
@@ -78,7 +81,8 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
         }
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         super.insertFallbackItems();
         fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING_MAPS.getItem(user));
     }

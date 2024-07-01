@@ -102,7 +102,7 @@ public interface PServerExecutor {
     CompletableFuture<@NotNull AccessLevel> accessLevel();
 
     /**
-     * @return a {@link PServerPersistentDataStorage} for this pserver
+     * @return a {@link PersistentDataStorage} for this pserver
      */
     PersistentDataStorage storage();
 

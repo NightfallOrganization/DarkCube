@@ -15,22 +15,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.inventory.ItemStack;
 
 public enum Item implements BaseMessage {
 
-    ARROW_NEXT(item(ARROW)), ARROW_PREVIOUS(item(ARROW)), USER_MANAGMENT_PERMISSIONS(item(BOOK)),
+    ARROW_NEXT(item(ARROW)),
+    ARROW_PREVIOUS(item(ARROW)),
+    USER_MANAGMENT_PERMISSIONS(item(BOOK)),
 
     ;
 
     public static final String PREFIX = "ITEM_";
     public static final String PREFIX_LORE = "LORE_";
-    public static final Key ITEMID_KEY = new Key(PServerPlugin.instance(), "itemid");
+    public static final Key ITEMID_KEY = Key.key(PServerPlugin.instance(), "item_id");
 
     private final String key;
     private final boolean hasLore;
@@ -65,7 +67,8 @@ public enum Item implements BaseMessage {
         return hasLore;
     }
 
-    @Override public String key() {
+    @Override
+    public String key() {
         return key;
     }
 

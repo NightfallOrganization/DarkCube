@@ -14,10 +14,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.user.PerksStorage;
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
@@ -25,37 +26,37 @@ public class CommonPerksStorage implements PerksStorage {
     private static final PersistentDataType<PerkName[]> PERK_NAME_ARRAY = PersistentDataTypes.array(PerkName.TYPE, PerkName.class);
     public static final PersistentDataType<PerksStorage> TYPE = new PersistentDataType<>() {
         @Override
-        public CommonPerksStorage deserialize(Document doc, String key) {
-            var d = doc.readDocument(key);
-            var docPerks = d.readDocument("perks");
-            var docPerkSlots = d.readDocument("perkSlots");
+        public CommonPerksStorage deserialize(JsonElement json) {
+            var d = json.getAsJsonObject();
+            var docPerks = d.getAsJsonObject("perks");
+            var docPerkSlots = d.getAsJsonObject("perkSlots");
             var perks = new HashMap<ActivationType, PerkName[]>();
             var perkSlots = new HashMap<ActivationType, int[]>();
-            for (var documentKey : docPerks.keys()) {
+            for (var documentKey : docPerks.keySet()) {
                 var type = ActivationType.valueOf(documentKey);
-                var array = PERK_NAME_ARRAY.deserialize(docPerks, documentKey);
+                var array = PERK_NAME_ARRAY.deserialize(docPerks.get(documentKey));
                 perks.put(type, array);
             }
-            for (var documentKey : docPerkSlots.keys()) {
+            for (var documentKey : docPerkSlots.keySet()) {
                 var type = ActivationType.valueOf(documentKey);
-                var array = PersistentDataTypes.INT_ARRAY.deserialize(docPerkSlots, documentKey);
+                var array = PersistentDataTypes.INT_ARRAY.deserialize(docPerkSlots.get(documentKey));
                 perkSlots.put(type, array);
             }
             return new CommonPerksStorage(perks, perkSlots);
         }
 
         @Override
-        public void serialize(Document.Mutable doc, String key, PerksStorage data) {
-            var d = Document.newJsonDocument();
-            var docPerks = Document.newJsonDocument();
-            var docPerkSlots = Document.newJsonDocument();
+        public JsonElement serialize(PerksStorage data) {
+            var d = new JsonObject();
+            var docPerks = new JsonObject();
+            var docPerkSlots = new JsonObject();
             for (var type : ActivationType.values()) {
-                PERK_NAME_ARRAY.serialize(docPerks, type.name(), data.perks(type));
-                PersistentDataTypes.INT_ARRAY.serialize(docPerks, type.name(), data.perkInvSlots(type));
+                docPerks.add(type.name(), PERK_NAME_ARRAY.serialize(data.perks(type)));
+                docPerkSlots.add(type.name(), PersistentDataTypes.INT_ARRAY.serialize(data.perkInvSlots(type)));
             }
-            d.append("perks", docPerks);
-            d.append("perkSlots", docPerkSlots);
-            doc.append(key, d);
+            d.add("perks", docPerks);
+            d.add("perkSlots", docPerkSlots);
+            return d;
         }
 
         @Override

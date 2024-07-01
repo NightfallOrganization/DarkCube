@@ -73,7 +73,7 @@ public class AUser {
 
         public Modifier(VanillaAddons addons) {
             this.addons = addons;
-            this.auser = new Key(addons.getName(), "user");
+            this.auser = Key.key(addons, "user");
         }
 
         @Override

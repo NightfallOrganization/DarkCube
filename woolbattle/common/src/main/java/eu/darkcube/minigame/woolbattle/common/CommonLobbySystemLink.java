@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common;
 
-import static eu.darkcube.system.DarkCubeServiceProperty.*;
+import static eu.darkcube.system.cloudnet.DarkCubeServiceProperty.*;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.space;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor.GRAY;
@@ -45,7 +45,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComp
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.common.PServerProvider;
-import eu.darkcube.system.server.util.DarkCubeServer;
+import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
 import eu.darkcube.system.util.GameState;
 
 public class CommonLobbySystemLink implements LobbySystemLink {
@@ -80,7 +80,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
 
     public void enable() {
         if (!enabled.compareAndSet(false, true)) return;
-        DarkCubeServer.autoConfigure(false);
+        DarkCubeServerCloudNet.autoConfigure(false);
         InjectionLayer.boot().instance(EventManager.class).registerListener(requestListener);
         woolbattle.fullyLoadedFuture().thenRun(() -> {
             this.fullyLoaded = true;
@@ -110,9 +110,9 @@ public class CommonLobbySystemLink implements LobbySystemLink {
     public void update() {
         if (!enabled()) return;
         if (!fullyLoaded) return;
-        DarkCubeServer.gameState(GameState.LOBBY);
-        DarkCubeServer.displayName("LobbyV2");
-        DarkCubeServer.extra(root -> {
+        DarkCubeServerCloudNet.gameState(GameState.LOBBY);
+        DarkCubeServerCloudNet.displayName("LobbyV2");
+        DarkCubeServerCloudNet.extra(root -> {
             var doc = Document.newJsonDocument();
             for (var game : woolbattle.games().games()) {
                 var key = game.id().toString();

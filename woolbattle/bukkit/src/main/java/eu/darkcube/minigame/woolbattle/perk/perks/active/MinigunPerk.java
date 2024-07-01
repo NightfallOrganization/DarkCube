@@ -18,7 +18,7 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
@@ -39,7 +39,7 @@ public class MinigunPerk extends Perk {
 
     public static class ListenerMinigun extends BasicPerkListener {
 
-        private final Key DATA_SCHEDULER = new Key(woolbattle, "minigunScheduler");
+        private final Key DATA_SCHEDULER = Key.key(woolbattle, "minigun_scheduler");
 
         public ListenerMinigun(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);

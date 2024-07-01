@@ -15,9 +15,11 @@ val woolbattleShadow by configurations.register("woolbattleShadow")
 
 dependencies {
     implementation(darkcubesystem.minestom)
-    implementation(parent!!.project("common"))
+    implementation(projects.woolbattle.provider)
+    implementation(projects.woolbattle.common)
     woolbattleShadow(libs.jctools.core)
     woolbattleShadow(libs.fastutil)
+    woolbattleShadow(projects.woolbattle.provider) { isTransitive = false }
     woolbattleShadow(projects.woolbattle.api) { isTransitive = false }
     woolbattleShadow(projects.woolbattle.common) { isTransitive = false }
 }

@@ -12,12 +12,12 @@ import java.util.Objects;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
@@ -33,14 +33,14 @@ import org.bukkit.inventory.ItemStack;
 public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInventory, Teleporter> {
     public static final InventoryType TYPE = InventoryType.of("teleporter");
 
-    @Override protected AddonsAsyncPagedInventory openInventory(AUser user) {
+    @Override
+    protected AddonsAsyncPagedInventory openInventory(AUser user) {
         var teleporter = data();
-        final var KEY_TYPE = new Key(user.addons(), "teleporter_inventory_type");
-        var i = new AddonsAsyncPagedInventory(TYPE, Component
-                .text("\uDAFF\uDFEFⲌ")
-                .color(NamedTextColor.WHITE), () -> true) {
+        final var KEY_TYPE = Key.key(user.addons(), "teleporter_inventory_type");
+        var i = new AddonsAsyncPagedInventory(TYPE, Component.text("\uDAFF\uDFEFⲌ").color(NamedTextColor.WHITE), () -> true) {
 
-            @Override protected void inventoryClick(IInventoryClickEvent event) {
+            @Override
+            protected void inventoryClick(IInventoryClickEvent event) {
                 if (Objects.equals(event.bukkitEvent().getClickedInventory(), event.bukkitEvent().getView().getTopInventory())) {
                     event.setCancelled(true);
                 }
@@ -50,11 +50,11 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
                 if (!item.persistentDataStorage().has(KEY_TYPE)) return;
                 int type = item.persistentDataStorage().get(KEY_TYPE, PersistentDataTypes.INTEGER);
                 if (type == 0) {
-                    //noinspection DataFlowIssue
+                    // noinspection DataFlowIssue
                     if (event.bukkitEvent().getCursor() == null || event.bukkitEvent().getCursor().getItemMeta() == null) return;
                     if (data().owner() == null) data().owner(user.user().uniqueId());
                     if (!user.user().uniqueId().equals(data().owner())) return;
-                    //noinspection DataFlowIssue
+                    // noinspection DataFlowIssue
                     data().icon(event.bukkitEvent().getCursor());
                     TeleporterListener.saveTeleporters(VanillaAddons.instance(), data().block().block().getWorld());
                     insertFallbackItems();
@@ -74,44 +74,12 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
                 }
             }
 
-            @Override protected void insertFallbackItems() {
-                ItemStack icon = ItemBuilder
-                        .item(teleporter.icon())
-                        .displayname(Component.text("Icon").color(TextColor.color(120, 120, 120)))
-                        .lore(Component.translatable(teleporter.icon().translationKey()))
-                        .flag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_UNBREAKABLE)
-                        .persistentDataStorage()
-                        .iset(KEY_TYPE, PersistentDataTypes.INTEGER, 0)
-                        .builder()
-                        .build();
-                ItemStack name = ItemBuilder
-                        .item(Material.NAME_TAG)
-                        .displayname(Component.text("Name").color(TextColor.color(120, 120, 120)))
-                        .lore(Component.join(JoinConfiguration.separator(Component.space()), Component
-                                .text("Name:")
-                                .color(TextColor.color(120, 120, 120)), data().dname()))
-                        .persistentDataStorage()
-                        .iset(KEY_TYPE, PersistentDataTypes.INTEGER, 1)
-                        .builder()
-                        .build();
-                ItemStack access = ItemBuilder
-                        .item(teleporter.access().getType())
-                        .displayname(Component.join(JoinConfiguration.separator(Component.space()), Component
-                                .text("Zugriff:")
-                                .color(TextColor.color(120, 120, 120)), Component
-                                .text(teleporter.access().name().toLowerCase())
-                                .color(TextColor.color(170, 0, 170))))
-                        .persistentDataStorage()
-                        .iset(KEY_TYPE, PersistentDataTypes.INTEGER, 2)
-                        .builder()
-                        .build();
-                ItemStack trustedList = ItemBuilder
-                        .item(Material.POPPY)
-                        .displayname(Component.text("Vertrauenswürdige Spieler").color(TextColor.color(120, 120, 120)))
-                        .persistentDataStorage()
-                        .iset(KEY_TYPE, PersistentDataTypes.INTEGER, 3)
-                        .builder()
-                        .build();
+            @Override
+            protected void insertFallbackItems() {
+                ItemStack icon = ItemBuilder.item(teleporter.icon()).displayname(Component.text("Icon").color(TextColor.color(120, 120, 120))).lore(Component.translatable(teleporter.icon().translationKey())).flag(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_ITEM_SPECIFICS, ItemFlag.HIDE_UNBREAKABLE).persistentDataStorage().iset(KEY_TYPE, PersistentDataTypes.INTEGER, 0).builder().build();
+                ItemStack name = ItemBuilder.item(Material.NAME_TAG).displayname(Component.text("Name").color(TextColor.color(120, 120, 120))).lore(Component.join(JoinConfiguration.separator(Component.space()), Component.text("Name:").color(TextColor.color(120, 120, 120)), data().dname())).persistentDataStorage().iset(KEY_TYPE, PersistentDataTypes.INTEGER, 1).builder().build();
+                ItemStack access = ItemBuilder.item(teleporter.access().getType()).displayname(Component.join(JoinConfiguration.separator(Component.space()), Component.text("Zugriff:").color(TextColor.color(120, 120, 120)), Component.text(teleporter.access().name().toLowerCase()).color(TextColor.color(170, 0, 170)))).persistentDataStorage().iset(KEY_TYPE, PersistentDataTypes.INTEGER, 2).builder().build();
+                ItemStack trustedList = ItemBuilder.item(Material.POPPY).displayname(Component.text("Vertrauenswürdige Spieler").color(TextColor.color(120, 120, 120))).persistentDataStorage().iset(KEY_TYPE, PersistentDataTypes.INTEGER, 3).builder().build();
                 if (teleporter.owner() == null) teleporter.owner(user.user().uniqueId());
                 if (user.user().uniqueId().equals(teleporter.owner())) {
                     fallbackItems.put(IInventory.slot(3, 2), name);
@@ -122,7 +90,7 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
                     fallbackItems.put(IInventory.slot(3, 4), name);
                     fallbackItems.put(IInventory.slot(3, 6), icon);
                 }
-//				super.insertFallbackItems();
+                //				super.insertFallbackItems();
             }
         };
         var p = Bukkit.getPlayer(user.user().uniqueId());
@@ -130,6 +98,7 @@ public class TeleporterInventory extends AbstractInventory<AddonsAsyncPagedInven
         return i;
     }
 
-    @Override protected void closeInventory(AUser user, AddonsAsyncPagedInventory inventory) {
+    @Override
+    protected void closeInventory(AUser user, AddonsAsyncPagedInventory inventory) {
     }
 }

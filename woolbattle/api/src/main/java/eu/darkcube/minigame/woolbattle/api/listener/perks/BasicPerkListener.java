@@ -17,15 +17,14 @@ import eu.darkcube.minigame.woolbattle.api.event.user.UserInteractEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
-import eu.darkcube.system.event.EventNode;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 
 public abstract class BasicPerkListener extends PerkListener {
     protected final Key perkKey;
 
     public BasicPerkListener(Game game, Perk perk) {
         super(game, perk);
-        this.perkKey = new Key(game.woolbattle(),"perk");
+        this.perkKey = Key.key(game.woolbattle(), "perk");
         this.listeners.addListener(UserInteractEvent.class, event -> {
             if (!mayActivate()) return;
             var item = event.item();

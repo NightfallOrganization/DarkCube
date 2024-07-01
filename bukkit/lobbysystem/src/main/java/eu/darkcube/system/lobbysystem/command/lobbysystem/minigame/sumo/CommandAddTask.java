@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.sumo;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class CommandAddTask extends LobbyCommand {
             }
         }).executes(ctx -> {
             ServiceTask task = ServiceTaskArgument.getServiceTask(ctx, "task");
-            Set<String> tasks = Lobby.getInstance().getDataManager().getSumoTasks();
+            Set<String> tasks = new HashSet<>(Lobby.getInstance().getDataManager().getSumoTasks());
             if (tasks.contains(task.name())) {
                 ctx.getSource().sendMessage(Component.text("Dieser Task ist bereits festgelegt!").color(NamedTextColor.RED));
                 return 0;

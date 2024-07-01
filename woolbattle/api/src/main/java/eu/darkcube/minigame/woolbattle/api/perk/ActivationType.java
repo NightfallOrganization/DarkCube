@@ -7,8 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.api.perk;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 
 /**
  * This is the class for all perk types. May need renaming in the future, {@code
@@ -40,10 +40,11 @@ public enum ActivationType {
     ActivationType(String type, int maxCount) {
         this.type = type;
         this.maxCount = maxCount;
-        this.displayItem = InjectionLayer.ext().instance(ItemProvider.class).getItem(type);
+        this.displayItem = WoolBattleProvider.PROVIDER.service(ItemProvider.class).getItem(type);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return type;
     }
 

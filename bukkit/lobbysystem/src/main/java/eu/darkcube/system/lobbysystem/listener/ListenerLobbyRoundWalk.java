@@ -7,21 +7,21 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
+import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
+
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ListenerLobbyRoundWalk extends BaseListener {
 
@@ -33,9 +33,9 @@ public class ListenerLobbyRoundWalk extends BaseListener {
     public ListenerLobbyRoundWalk(Lobby plugin) {
         super();
 
-        this.keyLobbyRoundCount = new Key(plugin, "lobby_round_count");
-        this.keyLobbyVisitedLocations = new Key(plugin, "lobby_visited_locations");
-        this.keyLobbyStartLocation = new Key(plugin, "lobby_start_location");
+        this.keyLobbyRoundCount = Key.key(plugin, "lobby_round_count");
+        this.keyLobbyVisitedLocations = Key.key(plugin, "lobby_visited_locations");
+        this.keyLobbyStartLocation = Key.key(plugin, "lobby_start_location");
 
         var world = plugin.getDataManager().getSpawn().getWorld();
 
@@ -51,7 +51,8 @@ public class ListenerLobbyRoundWalk extends BaseListener {
         requiredLobbyLocations.add(new Location(world, -63.5, 0, -62.5));
     }
 
-    @EventHandler public void onPlayerMove(PlayerMoveEvent event) {
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         User user = UserAPI.instance().user(player.getUniqueId());
 
@@ -70,10 +71,7 @@ public class ListenerLobbyRoundWalk extends BaseListener {
             }
         }
 
-        if (user.metadata().has(keyLobbyVisitedLocations) && user
-                .metadata()
-                .<Set<Location>>get(keyLobbyVisitedLocations)
-                .containsAll(requiredLobbyLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keyLobbyStartLocation)) <= 300) {
+        if (user.metadata().has(keyLobbyVisitedLocations) && user.metadata().<Set<Location>>get(keyLobbyVisitedLocations).containsAll(requiredLobbyLocations) && distanceSquared2D(player.getLocation(), user.metadata().get(keyLobbyStartLocation)) <= 300) {
 
             user.metadata().remove(keyLobbyVisitedLocations);
 

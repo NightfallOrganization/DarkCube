@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.util.item;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public enum Items implements CommonItem {
@@ -143,6 +143,6 @@ public enum Items implements CommonItem {
     }
 
     private interface ProviderReference {
-        Provider PROVIDER = InjectionLayer.ext().instance(Provider.class);
+        Provider PROVIDER = WoolBattleProvider.PROVIDER.service(Provider.class);
     }
 }

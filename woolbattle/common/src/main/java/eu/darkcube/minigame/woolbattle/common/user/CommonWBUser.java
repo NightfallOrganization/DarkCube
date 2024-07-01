@@ -29,6 +29,7 @@ import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.net.kyori.adventure.audience.ForwardingAudience;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -36,7 +37,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
 public class CommonWBUser implements WBUser, ForwardingAudience.Single {
@@ -60,10 +60,10 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         this.user = user;
         this.game = game;
         this.perks = new CommonUserPerks(this);
-        this.keyParticles = new Key(woolbattle, "particles");
-        this.keyHeightDisplay = new Key(woolbattle, "heightDisplay");
-        this.keyWoolSubtractDirection = new Key(woolbattle, "woolSubtractDirection");
-        this.keyPerks = new Key(woolbattle, "perks");
+        this.keyParticles = Key.key(woolbattle, "particles");
+        this.keyHeightDisplay = Key.key(woolbattle, "height_display");
+        this.keyWoolSubtractDirection = Key.key(woolbattle, "wool_subtract_direction");
+        this.keyPerks = Key.key(woolbattle, "perks");
         this.inventoryAccess = woolbattle.woolbattle().createInventoryAccessFor(this);
         this.permissions = woolbattle.woolbattle().createPermissionsFor(this);
     }

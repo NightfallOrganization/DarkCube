@@ -15,6 +15,7 @@ import java.util.Set;
 import eu.darkcube.system.bukkit.inventoryapi.v1.AsyncPagedInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
@@ -22,7 +23,6 @@ import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInven
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryDailyReward extends LobbyAsyncPagedInventory {
-    public static final Key reward = new Key(Lobby.getInstance().getName(), "reward");
+    public static final Key reward = Key.key(Lobby.getInstance(), "reward");
     public static final InventoryType type_daily_reward = InventoryType.of("daily_reward");
 
     private boolean displayedRewards = false;
@@ -55,7 +55,8 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
         // InventoryType.DAILY_REWARD);
     }
 
-    @Override protected void postTick(boolean changedInformation) {
+    @Override
+    protected void postTick(boolean changedInformation) {
         if (!displayedRewards) {
             displayedRewards = currentSort.get() >= this.sort[IInventory.slot(3, 5)];
         }
@@ -66,7 +67,8 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(this.user.getLastDailyReward());
         Calendar c2 = Calendar.getInstance();
@@ -76,10 +78,7 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
         }
 
         ItemStack used = ItemBuilder.item(Material.SULPHUR).displayname(Message.REWARD_ALREADY_USED.getMessage(this.user.user())).build();
-        ItemStack unused = ItemBuilder
-                .item(Material.GLOWSTONE_DUST)
-                .displayname(Component.text("???").color(NamedTextColor.YELLOW))
-                .build();
+        ItemStack unused = ItemBuilder.item(Material.GLOWSTONE_DUST).displayname(Component.text("???").color(NamedTextColor.YELLOW)).build();
         Set<Integer> usedSlots = this.user.getRewardSlotsUsed();
         if (usedSlots.contains(1)) {
             items.put(21, reward(used, 1));
@@ -98,12 +97,9 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void insertFallbackItems() {
-        ItemStack l = ItemBuilder
-                .item(Material.STAINED_GLASS_PANE)
-                .displayname(Component.text(" ").color(NamedTextColor.GOLD))
-                .damage(7)
-                .build();
+    @Override
+    protected void insertFallbackItems() {
+        ItemStack l = ItemBuilder.item(Material.STAINED_GLASS_PANE).displayname(Component.text(" ").color(NamedTextColor.GOLD)).damage(7).build();
         this.fallbackItems.put(IInventory.slot(1, 1), l);
         this.fallbackItems.put(IInventory.slot(1, 2), l);
         this.fallbackItems.put(IInventory.slot(1, 3), l);
@@ -133,21 +129,13 @@ public class InventoryDailyReward extends LobbyAsyncPagedInventory {
 
     }
 
-    @Override protected void playSound0() {
-        this.opened
-                .stream()
-                .filter(Player.class::isInstance)
-                .map(Player.class::cast)
-                .forEach(p -> p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1));
+    @Override
+    protected void playSound0() {
+        this.opened.stream().filter(Player.class::isInstance).map(Player.class::cast).forEach(p -> p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1));
     }
 
     private ItemStack reward(ItemStack old, int reward) {
-        return ItemBuilder
-                .item(old)
-                .persistentDataStorage()
-                .iset(InventoryDailyReward.reward, PersistentDataTypes.INTEGER, reward)
-                .builder()
-                .build();
+        return ItemBuilder.item(old).persistentDataStorage().iset(InventoryDailyReward.reward, PersistentDataTypes.INTEGER, reward).builder().build();
     }
 
     // private void animate(User user, boolean instant) {

@@ -4,32 +4,8 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.lobbysystem.npc;
 
-import com.github.juliarn.npclib.api.flag.NpcFlag;
-import com.github.unldenis.hologram.line.Line;
-import com.github.unldenis.hologram.line.TextLine;
-import com.github.unldenis.hologram.placeholder.Placeholders;
-import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.lobbysystem.util.server.DefaultServerInformationV2;
-import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
-import eu.darkcube.system.lobbysystem.util.server.ServerManager;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.data.Key;
-import eu.darkcube.system.util.data.PersistentDataType;
-import eu.darkcube.system.util.data.PersistentDataTypes;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
-import org.bukkit.scheduler.BukkitRunnable;
+package eu.darkcube.system.lobbysystem.npc;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,23 +14,50 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import com.github.juliarn.npclib.api.flag.NpcFlag;
+import com.github.unldenis.hologram.line.Line;
+import com.github.unldenis.hologram.line.TextLine;
+import com.github.unldenis.hologram.placeholder.Placeholders;
+import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.lobbysystem.util.server.DefaultServerInformationV2;
+import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.lobbysystem.util.server.ServerManager;
+import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.scheduler.BukkitRunnable;
+
 public class ConnectorNPC {
 
-    private static final Key npcsKey = new Key(Lobby.getInstance(), "npcs");
+    private static final Key npcsKey = Key.key(Lobby.getInstance(), "npcs");
     private static final Collection<ConnectorNPC> npcs = ConcurrentHashMap.newKeySet();
     private static final NpcFlag<ConnectorNPC> flagConnectorNpc = NpcFlag.flag("connectorNpc", null);
     private static final PersistentDataType<List<String>> strings = PersistentDataTypes.list(PersistentDataTypes.STRING);
     private static final AtomicInteger uidCounter = new AtomicInteger();
     private static final PersistentDataType<List<ConnectorNPC>> type = PersistentDataTypes.list(new PersistentDataType<>() {
-        @Override public ConnectorNPC deserialize(Document doc, String key) {
-            Document d = doc.readDocument(key);
-            int id = d.getInt("id");
-            String taskName = d.getString("task");
-            String v2Key = d.getString("v2key");
+        @Override
+        public ConnectorNPC deserialize(JsonElement json) {
+            var d = json.getAsJsonObject();
+            var id = d.get("id").getAsInt();
+            var taskName = d.get("task").getAsString();
+            var v2KeyJson = d.get("v2key");
+            var v2Key = v2KeyJson != null ? v2KeyJson.getAsString() : null;
             List<String> permissions;
-            if (d.contains("permissions")) {
-                permissions = strings.deserialize(d, "permissions");
-                for (String permission : permissions) {
+            if (d.has("permissions")) {
+                permissions = strings.deserialize(d.get("permissions"));
+                for (var permission : permissions) {
                     if (Bukkit.getPluginManager().getPermission(permission) == null) {
                         Bukkit.getPluginManager().addPermission(new Permission(permission));
                     }
@@ -62,21 +65,23 @@ public class ConnectorNPC {
             } else {
                 permissions = new ArrayList<>();
             }
-            Location loc = BukkitPersistentDataTypes.LOCATION.deserialize(d, "location");
+            var loc = BukkitPersistentDataTypes.LOCATION.deserialize(d.get("location"));
             return new ConnectorNPC(taskName, id, loc, permissions, v2Key);
         }
 
-        @Override public void serialize(Document.Mutable doc, String key, ConnectorNPC data) {
-            Document.Mutable d = Document.newJsonDocument();
-            d.append("task", data.taskName);
-            strings.serialize(d, "permissions", data.permissions);
-            d.append("id", data.id);
-            if (data.v2Key != null) d.append("v2key", data.v2Key);
-            BukkitPersistentDataTypes.LOCATION.serialize(d, "location", data.location);
-            doc.append(key, d);
+        @Override
+        public JsonElement serialize(ConnectorNPC data) {
+            var d = new JsonObject();
+            d.addProperty("task", data.taskName);
+            d.add("permissions", strings.serialize(data.permissions));
+            d.addProperty("id", data.id);
+            if (data.v2Key != null) d.addProperty("v2key", data.v2Key);
+            d.add("location", BukkitPersistentDataTypes.LOCATION.serialize(data.location));
+            return d;
         }
 
-        @Override public ConnectorNPC clone(ConnectorNPC object) {
+        @Override
+        public ConnectorNPC clone(ConnectorNPC object) {
             return new ConnectorNPC(object.taskName, object.id, object.location, object.permissions, object.v2Key);
         }
     });
@@ -104,10 +109,10 @@ public class ConnectorNPC {
     public ConnectorNPC(String taskName, Location location) {
         this.taskName = taskName;
         this.location = location;
-        int id = 1;
+        var id = 1;
         w:
         while (true) {
-            for (ConnectorNPC npc : npcs) {
+            for (var npc : npcs) {
                 if (npc.taskName.equals(taskName) && npc.id == id) {
                     id++;
                     continue w;
@@ -151,20 +156,22 @@ public class ConnectorNPC {
     }
 
     public void connect(Player player) {
-        for (Player p : connectingPlayers) {
+        for (var p : connectingPlayers) {
             if (p == player) // Cooldown of 1 sec
                 return;
         }
         connectingPlayers.add(player);
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 connectingPlayers.remove(player);
             }
         }.runTaskLater(Lobby.getInstance(), 20);
         new BukkitRunnable() {
-            @Override public void run() {
-                User user = UserAPI.instance().user(player.getUniqueId());
-                ServerInformation c = currentServer.server;
+            @Override
+            public void run() {
+                var user = UserAPI.instance().user(player.getUniqueId());
+                var c = currentServer.server;
                 if (c == null) return;
                 c.connectPlayer(user.uniqueId());
             }
@@ -174,12 +181,12 @@ public class ConnectorNPC {
     public void show() {
         npcs.add(this);
         if (location.getWorld() == null) location.setWorld(Bukkit.getWorlds().get(0));
-        NPCManagement.Builder builder = Lobby.getInstance().npcManagement().builder();
+        var builder = Lobby.getInstance().npcManagement().builder();
         if (uid == -1) uid = uidCounter.incrementAndGet();
         builder.profileHelper().skin(new DailyRewardNPC.DailyRewardSkin()).name("§8NPC-" + uid);
         builder.trackingRule((ignoredNpc, player) -> {
             if (permissions.isEmpty()) return true;
-            for (String permission : permissions) if (player.hasPermission(permission)) return true;
+            for (var permission : permissions) if (player.hasPermission(permission)) return true;
             return false;
         });
         npc = builder.build();
@@ -205,32 +212,27 @@ public class ConnectorNPC {
     }
 
     private CHologram createHologram(Location location) {
-        CHologram hologram = new CHologram(hologramPlaceholders());
+        var hologram = new CHologram(hologramPlaceholders());
         hologram.location(location);
         return hologram;
     }
 
     private Placeholders hologramPlaceholders() {
-        Placeholders h = new Placeholders(Placeholders.STRING);
+        var h = new Placeholders(Placeholders.STRING);
         h.add("%%online%%", p -> {
-            ServerInformation info = currentServer.server;
+            var info = currentServer.server;
             if (info == null) {
                 return Message.CONNECTOR_NPC_SERVER_STARTING.getMessageString(UserAPI.instance().user(p.getUniqueId()));
             }
-            int online = info.onlinePlayers();
-            int maxPlayers = info.maxPlayers();
-            return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(UserAPI
-                    .instance()
-                    .user(p.getUniqueId()), online, maxPlayers == -1 ? 100 : maxPlayers);
+            var online = info.onlinePlayers();
+            var maxPlayers = info.maxPlayers();
+            return Message.CONNECTOR_NPC_SERVER_ONLINE.getMessageString(UserAPI.instance().user(p.getUniqueId()), online, maxPlayers == -1 ? 100 : maxPlayers);
         });
         h.add("%%description%%", p -> {
-            ServerInformation server = currentServer.server;
+            var server = currentServer.server;
             if (server != null) {
-                Component displayName = server.displayName();
-                return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(UserAPI.instance().user(p.getUniqueId()), Component
-                        .empty()
-                        .append(displayName == null ? Component.text(server.taskName()) : displayName)
-                        .applyFallbackStyle(Style.style(NamedTextColor.LIGHT_PURPLE)));
+                var displayName = server.displayName();
+                return Message.CONNECTOR_NPC_SERVER_DESCRIPTION.getMessageString(UserAPI.instance().user(p.getUniqueId()), Component.empty().append(displayName == null ? Component.text(server.taskName()) : displayName).applyFallbackStyle(Style.style(NamedTextColor.LIGHT_PURPLE)));
             }
             return " ";
         });
@@ -254,8 +256,9 @@ public class ConnectorNPC {
     }
 
     public static class UpdateListener implements ServerManager.UpdateListener {
-        @Override public void update(Collection<? extends ServerInformation> informations) {
-            for (ConnectorNPC npc : npcs) {
+        @Override
+        public void update(Collection<? extends ServerInformation> informations) {
+            for (var npc : npcs) {
                 npc.currentServer.update(informations);
             }
         }
@@ -266,10 +269,7 @@ public class ConnectorNPC {
         private volatile ServerInformation server = null;
 
         private void update(Collection<? extends ServerInformation> informations) {
-            Stream<? extends ServerInformation> stream = informations
-                    .stream()
-                    .filter(ServerInformation.filterByTask(taskName))
-                    .filter(ServerInformation.ONLINE_FILTER);
+            var stream = informations.stream().filter(ServerInformation.filterByTask(taskName)).filter(ServerInformation.ONLINE_FILTER);
             if (v2Key != null) {
                 stream = stream.filter(i -> {
                     if (!(i instanceof DefaultServerInformationV2 v2)) return false;
@@ -287,7 +287,7 @@ public class ConnectorNPC {
         private boolean descriptionVisible = false;
 
         public CHologram(Placeholders placeholders) {
-            Lobby lobby = Lobby.getInstance();
+            var lobby = Lobby.getInstance();
             this.online = new TextLine(new Line(lobby), "%%online%%", placeholders);
             this.description = new TextLine(new Line(lobby), "%%description%%", placeholders);
         }
@@ -299,16 +299,16 @@ public class ConnectorNPC {
         }
 
         private void update() {
-            NPCManagement.NPC npc = ConnectorNPC.this.npc;
-            boolean newVisible = currentServer.server != null;
+            var npc = ConnectorNPC.this.npc;
+            var newVisible = currentServer.server != null;
             if (newVisible != descriptionVisible) {
                 if (npc != null) {
                     if (newVisible) {
-                        for (Player player : npc.trackedPlayers()) {
+                        for (var player : npc.trackedPlayers()) {
                             description.show(player);
                         }
                     } else {
-                        for (Player player : npc.trackedPlayers()) {
+                        for (var player : npc.trackedPlayers()) {
                             description.hide(player);
                         }
                     }
@@ -316,7 +316,7 @@ public class ConnectorNPC {
                 this.descriptionVisible = newVisible;
             }
             if (npc != null) {
-                for (Player player : npc.trackedPlayers()) {
+                for (var player : npc.trackedPlayers()) {
                     online.update(player);
                     if (descriptionVisible) description.update(player);
                 }

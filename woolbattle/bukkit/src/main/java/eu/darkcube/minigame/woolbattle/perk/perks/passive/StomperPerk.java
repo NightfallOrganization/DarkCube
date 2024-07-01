@@ -21,7 +21,7 @@ import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect.OrdinaryColor;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -39,9 +39,9 @@ public class StomperPerk extends Perk {
 
     public StomperPerk(WoolBattleBukkit woolbattle) {
         super(ActivationType.PASSIVE, STOMPER, new Cooldown(Unit.ACTIVATIONS, 0), 10, Item.PERK_STOMPER, DefaultUserPerk::new);
-        wasOnGround = new Key(woolbattle, "perk_stomper_was_on_ground");
-        active = new Key(woolbattle, "perk_stomper_active");
-        startPos = new Key(woolbattle, "perk_stomper_start_pos");
+        wasOnGround = Key.key(woolbattle, "perk_stomper_was_on_ground");
+        active = Key.key(woolbattle, "perk_stomper_active");
+        startPos = Key.key(woolbattle, "perk_stomper_start_pos");
         addListener(new StomperListener());
         addScheduler(new StomperScheduler(woolbattle));
     }

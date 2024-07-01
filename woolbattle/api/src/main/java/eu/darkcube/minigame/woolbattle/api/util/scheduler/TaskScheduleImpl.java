@@ -7,10 +7,10 @@
 
 package eu.darkcube.minigame.woolbattle.api.util.scheduler;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 interface TaskScheduleImpl {
-    TaskScheduleProvider provider = InjectionLayer.ext().instance(TaskScheduleProvider.class);
+    TaskScheduleProvider provider = WoolBattleProvider.PROVIDER.service(TaskScheduleProvider.class);
 }
