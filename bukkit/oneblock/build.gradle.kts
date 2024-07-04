@@ -7,9 +7,9 @@
 
 plugins {
     id("glyph-width-loader")
-    id("eu.darkcube.darkcube")
     alias(libs.plugins.shadow)
     java
+    id("eu.darkcube.darkcube")
 }
 
 sourceSets {

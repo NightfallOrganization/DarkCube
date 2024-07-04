@@ -6,7 +6,7 @@
  */
 
 plugins {
-    `java-library`
+    java
     id("eu.darkcube.darkcube")
     alias(libs.plugins.shadow)
 }
@@ -47,7 +47,7 @@ dependencies {
     compileOnly(darkcubesystem.bukkit)
     compileOnly(project(":pserver:pserver-bukkit"))
     compileOnly(project(":pserver:pserver-api"))
-    api(project(":common:labymod-emotes"))
+    implementation(project(":common:labymod-emotes"))
 //    runtimeOnly("com.github.juliarn", "npc-lib-bukkit", "3.0.0-SNAPSHOT", classifier = "shadow")
     implementation("io.github.juliarn:npc-lib-bukkit:3.0.0-beta6")
     compileOnly("io.github.juliarn:npc-lib-common:3.0.0-beta6")
