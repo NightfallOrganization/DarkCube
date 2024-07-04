@@ -7,7 +7,7 @@
 
 plugins {
     alias(libs.plugins.shadow)
-    `java-library`
+    java
     id("eu.darkcube.darkcube")
 }
 
@@ -31,10 +31,10 @@ dependencies {
     compileOnly(project(":bukkit:statsapi"))
     compileOnly(project(":pserver:pserver-api"))
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
-    compileOnlyApi(projects.woolbattle.common)
+    compileOnly(projects.woolbattle.common)
     runtimeOnly(projects.woolbattle.api) {
         isTransitive = false
     }
-    compileOnlyApi(libs.cloudnet.bridge)
-    compileOnlyApi(libs.cloudnet.wrapper)
+    compileOnly(libs.cloudnet.bridge)
+    compileOnly(libs.cloudnet.wrapper)
 }
