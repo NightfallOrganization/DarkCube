@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 plugins {
-    `java-library`
+    java
     id("eu.darkcube.darkcube")
 }
 
