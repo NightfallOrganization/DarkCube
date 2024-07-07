@@ -8,59 +8,75 @@
 package eu.darkcube.system.darkessentials.command;
 
 import java.util.Collection;
+import java.util.List;
 
+import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.darkessentials.DarkCommand;
 import eu.darkcube.system.darkessentials.util.Message;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
 
 public class GodCommand extends DarkCommand {
 
     public GodCommand() {
-        super("fly", new String[]{"flying"}, builder -> builder.executes(context -> {
+        //@formatter:off
+        super("god", new String[]{"godmode"}, builder -> {
+            builder.executes(context -> executeCommand(context, List.of(context.getSource().asPlayer())))
 
-            boolean isFlying = context.getSource().asPlayer().isFlying();
-            if (isFlying) {
-                context.getSource().asPlayer().setAllowFlight(false);
-                context.getSource().asPlayer().setFlying(false);
-                context.getSource().sendMessage(Message.FLY_OFF);
-            } else {
-                context.getSource().asPlayer().setAllowFlight(true);
-                context.getSource().asPlayer().setFlying(true);
-                context.getSource().sendMessage(Message.FLY_ON);
-            }
+                    .then(Commands.argument("player", EntityArgument.players())
+                            .executes(context -> executeCommand(context, EntityArgument.getPlayers(context, "player")))
+                    );
 
-            return 0;
+        });
+        //@formatter:on
+    }
 
-        }).then(Commands.argument("players", EntityArgument.players()).executes(context -> {
-
-            Collection<Player> players = EntityArgument.getPlayers(context, "players");
-            boolean isFlying = context.getSource().asPlayer().isFlying();
-
-            for (Player player : players) {
-                User user = UserAPI.instance().user(player.getUniqueId());
-                String playerName = player.getName();
-                String playerSenderName = context.getSource().asPlayer().getName();
-
-                if (isFlying) {
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                    user.sendMessage(Message.FLY_SET_OFF, playerSenderName);
-                    context.getSource().sendMessage(Message.FLY_SETTED_OFF, playerName);
-                } else {
-                    player.setAllowFlight(true);
-                    player.setFlying(true);
-                    user.sendMessage(Message.FLY_SET_ON, playerSenderName);
-                    context.getSource().sendMessage(Message.FLY_SETTED_ON, playerName);
-                }
-            }
-
-            return 0;
-
-        })));
+    private static int executeCommand(CommandContext<CommandSource> context, @NotNull Collection<Player> players) throws CommandSyntaxException {
+        // TODO
+        // for (Player player : players) {
+        //     boolean isGodmode = player.isGodmode();
+        //     User user = UserAPI.instance().user(player.getUniqueId());
+        //
+        //     Key key = Key.key("test", "test_this");
+        //     user.metadata().set(key, "whatever");
+        //
+        //     user.metadata().get(key);
+        //
+        //     String playerName = player.getName();
+        //     String playerSenderName = context.getSource().getName();
+        //
+        //     player.setAllowFlight(!isGodmode);
+        //     player.setFlying(!isGodmode);
+        //
+        //     CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
+        //     if (sender.equals(player)) {
+        //         if (isGodmode) {
+        //             user.sendMessage(Message.GOD_OFF);
+        //         } else {
+        //             user.sendMessage(Message.GOD_ON);
+        //         }
+        //     } else {
+        //         if (isGodmode) {
+        //             user.sendMessage(Message.GOD_SET_OFF, playerSenderName);
+        //             context.getSource().sendMessage(Message.GOD_SETTED_OFF, playerName);
+        //         } else {
+        //             user.sendMessage(Message.GOD_SET_ON, playerSenderName);
+        //             context.getSource().sendMessage(Message.GOD_SETTED_ON, playerName);
+        //         }
+        //     }
+        // }
+        return 0;
     }
 
 }
