@@ -30,26 +30,28 @@ public class StartWorld {
     }
 
     private void startWorldTask(Player player, int slot) {
-        User user = UserAPI.instance().user(player.getUniqueId());
         startActionBarTask(player);
-
         World playerWorld = WorldManager.createPlayerSpecificVoidWorld(player.getName());
+        // teleportIfWorldIsCreated(slot, playerWorld, player);
+    }
+
+    public void teleportIfWorldIsCreated(int slot, World playerWorld, Player player) {
+        User user = UserAPI.instance().user(player.getUniqueId());
 
         if (playerWorld != null) {
             Location location = new Location(playerWorld, 0.5, 100, 0.5);
-//            Bukkit.getScheduler().runTaskLater(OneBlock.getInstance(), () -> {
-                player.teleportAsync(location).thenAccept(success -> {
-                    user.sendMessage(Message.ONEBLOCK_WELCOME_WORLD);
-                    stopActionBarTask();
-                    worldSlotManager.setWorld(slot, playerWorld, player);
-                });
-//            }, 100L); // 100 ticks entsprechen 5 Sekunden
+            //            Bukkit.getScheduler().runTaskLater(OneBlock.getInstance(), () -> {
+            player.teleportAsync(location).thenAccept(success -> {
+                user.sendMessage(Message.ONEBLOCK_WELCOME_WORLD);
+                stopActionBarTask();
+                worldSlotManager.setWorld(slot, playerWorld, player);
+            });
+            //            }, 100L); // 100 ticks entsprechen 5 Sekunden
 
         } else {
             user.sendMessage(Message.ONEBLOCK_CREATING_WORLD_ERROR);
             stopActionBarTask();
         }
-
     }
 
     public void startActionBarTask(Player player) {
