@@ -13,16 +13,21 @@ import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetDailyRew
 import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetFisher;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetSumo;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetWoolBattle;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.npc.CommandSetWoolBattleModern;
 
 public class CommandNPC extends LobbyCommand {
 
-	public CommandNPC() {
+    public CommandNPC() {
+        // @formatter:off
 		super("npc", b -> b
 				.then(new CommandSetWoolBattle().builder())
 				.then(new CommandSetDailyReward().builder())
 				.then(new CommandSetFisher().builder())
 				.then(new CommandSetSumo().builder())
-				.then(new CommandGamemodeConnector().builder()));
-	}
+				.then(new CommandGamemodeConnector().builder())
+				.then(new CommandSetWoolBattleModern().builder())
+        );
+        //@formatter:on
+    }
 
 }

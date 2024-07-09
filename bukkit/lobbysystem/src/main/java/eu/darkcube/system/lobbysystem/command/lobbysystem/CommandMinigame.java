@@ -10,14 +10,18 @@ package eu.darkcube.system.lobbysystem.command.lobbysystem;
 import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.CommandSumo;
 import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.CommandWoolBattle;
+import eu.darkcube.system.lobbysystem.command.lobbysystem.minigame.CommandWoolBattleModern;
 
 public class CommandMinigame extends LobbyCommand {
 
-	public CommandMinigame() {
+    public CommandMinigame() {
+        //@formatter:off
 		super("minigame", b -> {
 			b.then(new CommandWoolBattle().builder());
+			b.then(new CommandWoolBattleModern().builder());
 			b.then(new CommandSumo().builder());
 		});
-	}
+		//@formatter:on
+    }
 
 }

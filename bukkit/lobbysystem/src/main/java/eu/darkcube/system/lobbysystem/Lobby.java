@@ -49,12 +49,14 @@ import eu.darkcube.system.lobbysystem.listener.ListenerScoreboard;
 import eu.darkcube.system.lobbysystem.listener.ListenerSpawnRoundWalk;
 import eu.darkcube.system.lobbysystem.listener.ListenerSumoNPC;
 import eu.darkcube.system.lobbysystem.listener.ListenerWeather;
+import eu.darkcube.system.lobbysystem.listener.ListenerWoolBattleModernNPC;
 import eu.darkcube.system.lobbysystem.listener.ListenerWoolBattleNPC;
 import eu.darkcube.system.lobbysystem.npc.ConnectorNPC;
 import eu.darkcube.system.lobbysystem.npc.DailyRewardNPC;
 import eu.darkcube.system.lobbysystem.npc.FisherNPC;
 import eu.darkcube.system.lobbysystem.npc.NPCManagement;
 import eu.darkcube.system.lobbysystem.npc.SumoNPC;
+import eu.darkcube.system.lobbysystem.npc.WoolBattleModernNPC;
 import eu.darkcube.system.lobbysystem.npc.WoolBattleNPC;
 import eu.darkcube.system.lobbysystem.pserver.PServerSupport;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
@@ -86,6 +88,7 @@ public class Lobby extends Plugin {
     private DataManager dataManager;
     private NPCManagement npcManagement;
     private NPCManagement.NPC woolbattleNpc;
+    private NPCManagement.NPC woolbattleModernNpc;
     private NPCManagement.NPC sumoNpc;
     private NPCManagement.NPC fisherNpc;
     private NPCManagement.NPC dailyRewardNpc;
@@ -145,6 +148,7 @@ public class Lobby extends Plugin {
         this.dataManager = new DataManager(this);
         this.jaRManager = new JaRManager();
         this.woolbattleNpc = WoolBattleNPC.create();
+        this.woolbattleModernNpc = WoolBattleModernNPC.create();
         this.dailyRewardNpc = DailyRewardNPC.create();
         this.fisherNpc = FisherNPC.create();
         this.sumoNpc = SumoNPC.create();
@@ -171,6 +175,7 @@ public class Lobby extends Plugin {
         new ListenerInteract();
         new ListenerLobbySwitcher(this);
         new ListenerWoolBattleNPC();
+        new ListenerWoolBattleModernNPC();
         new ListenerSumoNPC();
         new ListenerConnectorNPC(this);
         new ListenerMinigameServer(this);
@@ -288,6 +293,10 @@ public class Lobby extends Plugin {
 
     public NPCManagement.NPC getWoolBattleNPC() {
         return this.woolbattleNpc;
+    }
+
+    public NPCManagement.NPC getWoolBattleModernNPC() {
+        return this.woolbattleModernNpc;
     }
 
     public NPCManagement.NPC getSumoNPC() {
