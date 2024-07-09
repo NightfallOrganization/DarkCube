@@ -18,14 +18,13 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.util.Vector;
 
 public class MinePerk extends Perk {
     public static final PerkName MINE = new PerkName("MINE");
@@ -66,11 +65,11 @@ public class MinePerk extends Perk {
 
         @EventHandler
         public void handle(PlayerInteractEvent event) {
-            Player p = event.getPlayer();
-            WBUser user = WBUser.getUser(p);
+            var p = event.getPlayer();
+            var user = WBUser.getUser(p);
             if (!user.getTeam().canPlay()) return;
             if (event.getAction() != Action.PHYSICAL) return;
-            Block block = event.getClickedBlock();
+            var block = event.getClickedBlock();
             if (block == null) return;
             UserPerk perk = woolbattle.ingame().getMetaData(block, "perk", null);
             if (perk == null) return;
@@ -81,10 +80,10 @@ public class MinePerk extends Perk {
             block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
 
             new Scheduler(woolbattle, () -> {
-                Vector playerLoc = p.getLocation().toVector();
-                Vector blockLoc = block.getLocation().add(0.5, 0, 0.5).toVector();
+                var playerLoc = p.getLocation().toVector();
+                var blockLoc = block.getLocation().add(0.5, 0, 0.5).toVector();
 
-                Vector velocity = playerLoc.subtract(blockLoc).normalize();
+                var velocity = playerLoc.subtract(blockLoc).normalize();
                 velocity.multiply(Math.pow(playerLoc.distance(blockLoc), 0.4) / 6);
                 if (woolbattle.ingame().playerUtil().attack(perk.owner(), user)) {
                     p.damage(0);
@@ -92,6 +91,37 @@ public class MinePerk extends Perk {
                 velocity.setY(1.3);
                 p.setVelocity(velocity);
             }).runTaskLater(2);
+        }
+
+        @EventHandler
+        public void handle(BlockPhysicsEvent event) {
+            var block = event.getBlock();
+            UserPerk perk = woolbattle.ingame().getMetaData(block, "perk", null);
+            if (perk == null) return;
+            if (!perk.perk().perkName().equals(MinePerk.MINE)) return;
+
+            event.setCancelled(true);
+            woolbattle.ingame().destroy(block);
+            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
+
+            var blockLoc = block.getLocation().add(0.5, 0, 0.5);
+            for (var p : Bukkit.getOnlinePlayers()) {
+                if (p.getLocation().distanceSquared(blockLoc) > 9) {
+                    continue;
+                }
+                var user = WBUser.getUser(p);
+
+                var playerLoc = p.getLocation().toVector();
+                var blockVec = block.getLocation().add(0.5, 0, 0.5).toVector();
+
+                var velocity = playerLoc.subtract(blockVec).normalize();
+                velocity.multiply(Math.pow(playerLoc.distance(blockVec), 0.4) / 6);
+                if (woolbattle.ingame().playerUtil().attack(perk.owner(), user)) {
+                    p.damage(0);
+                }
+                velocity.setY(1.3);
+                p.setVelocity(velocity);
+            }
         }
 
         @Override
