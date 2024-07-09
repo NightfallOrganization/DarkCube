@@ -1,46 +1,59 @@
 package eu.darkcube.system.sumo.prefix;
 
+import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
 public class PrefixManager {
-    private TeamManager teamManager;
+    private Sumo sumo;
 
-    public PrefixManager(TeamManager teamManager) {
-        this.teamManager = teamManager;
-    }
-
-    public void setPlayerPrefix(Player player) {
-        ChatColor teamColor = teamManager.getPlayerTeam(player.getUniqueId());
-        String coloredPrefix = teamColor + "";
-
-        updatePlayerNametag(player, coloredPrefix);
+    public PrefixManager(Sumo sumo) {
+        this.sumo = sumo;
     }
 
     public void removePlayerPrefix(Player player) {
-        Scoreboard scoreboard = player.getScoreboard();
-        String teamName = player.getName();
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
-        Team team = scoreboard.getTeam(teamName);
-        if (team != null) {
-            team.removeEntry(player.getName());
-            if (team.getSize() == 0) {
+            Scoreboard scoreboard = onlinePlayer.getScoreboard();
+            String teamName = player.getName();
+
+            Team team = scoreboard.getTeam(teamName);
+            if (team != null) {
                 team.unregister();
             }
         }
     }
 
-    private void updatePlayerNametag(Player player, String prefix) {
-        if (player.getScoreboard() == Bukkit.getScoreboardManager().getMainScoreboard()) {
-            Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-            player.setScoreboard(scoreboard);
+    public void setupOtherPlayers(Player player) {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            Scoreboard scoreboard = onlinePlayer.getScoreboard();
+            setup(scoreboard, player);
         }
+    }
 
-        Scoreboard scoreboard = player.getScoreboard();
+    public void setupPlayer(Player player) {
+        var scoreboard = player.getScoreboard();
+        var doneSelf = false;
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer == player) doneSelf = true;
+            setup(scoreboard, onlinePlayer);
+        }
+        if (!doneSelf) {
+            setup(scoreboard, player);
+        }
+    }
+
+    private String calculatePrefix(Player player) {
+        ChatColor teamColor = sumo.getTeamManager().getPlayerTeam(player.getUniqueId());
+        return teamColor.toString();
+    }
+
+    private void setup(Scoreboard scoreboard, Player player) {
         String teamName = player.getName();
 
         Team team = scoreboard.getTeam(teamName);
@@ -48,8 +61,9 @@ public class PrefixManager {
             team = scoreboard.registerNewTeam(teamName);
         }
 
-        team.setPrefix(prefix);
-        team.addEntry(player.getName());
-
+        team.setPrefix(calculatePrefix(player));
+        if (!team.hasEntry(player.getName())) {
+            team.addEntry(player.getName());
+        }
     }
 }

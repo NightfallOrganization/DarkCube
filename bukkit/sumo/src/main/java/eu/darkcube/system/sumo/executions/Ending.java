@@ -9,6 +9,9 @@ package eu.darkcube.system.sumo.executions;
 
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -65,7 +68,11 @@ public class Ending {
 
             if (timer <= 3) {
                 playSoundToAllPlayers();
-                Bukkit.broadcastMessage("§7Spiel endet in §b" + timer);
+
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
+                    user.sendMessage(Message.BC_GAME_END, timer);
+                }
             }
 
             timer--;

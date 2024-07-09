@@ -56,9 +56,9 @@ public class SetLifesCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.GREEN + "§7Die Leben wurden auf §b" + lives + " §7gesetzt");
 
         if (teamColor == TeamManager.TEAM_BLACK) {
-            gameScoreboard.updateBlackLives(lives);
+            gameScoreboard.updateBlackLives();
         } else if (teamColor == TeamManager.TEAM_WHITE) {
-            gameScoreboard.updateWhiteLives(lives);
+            gameScoreboard.updateWhiteLives();
         }
 
         return true;

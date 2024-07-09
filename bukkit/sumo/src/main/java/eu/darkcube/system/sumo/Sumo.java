@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.sumo;
 
+import java.io.IOException;
+
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
 import eu.darkcube.system.sumo.commands.SetActiveMapCommand;
@@ -36,6 +38,7 @@ import eu.darkcube.system.sumo.manager.PlayerManager;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.other.GameDoubleJump;
 import eu.darkcube.system.sumo.other.LobbySystemLink;
+import eu.darkcube.system.sumo.other.Message;
 import eu.darkcube.system.sumo.other.StartingTimer;
 import eu.darkcube.system.sumo.other.WoolDespawner;
 import eu.darkcube.system.sumo.prefix.ChatManager;
@@ -44,28 +47,38 @@ import eu.darkcube.system.sumo.ruler.LobbyRuler;
 import eu.darkcube.system.sumo.ruler.MapRuler;
 import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
+import eu.darkcube.system.util.Language;
 
 public class Sumo extends DarkCubePlugin {
     private static Sumo instance;
     private LobbySystemLink lobbySystemLink;
+    private LifeManager lifeManager;
+    private TeamManager teamManager;
 
     public Sumo() {
         super("sumo");
+        instance = this;
     }
 
     @Override
     public void onEnable() {
-        instance = this;
+
+        try {
+            Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties", s -> Message.KEY_PREFIX + s);
+            Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties", s -> Message.KEY_PREFIX + s);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         var mapLoader = new MapLoader();
         mapLoader.loadWorlds();
-        var teamManager = new TeamManager();
-        var prefixManager = new PrefixManager(teamManager);
-        var lobbyScoreboard = new LobbyScoreboard(this);
+        var prefixManager = new PrefixManager(this);
+        teamManager = new TeamManager(prefixManager);
+        var lobbyScoreboard = new LobbyScoreboard(this, prefixManager);
         var mapManager = new MapManager(this, lobbyScoreboard);
         var woolDespawner = new WoolDespawner(this);
-        var gameScoreboard = new GameScoreboard(mapManager);
-        var lifeManager = new LifeManager(teamManager, gameScoreboard);
+        var gameScoreboard = new GameScoreboard(this, mapManager, prefixManager);
+        lifeManager = new LifeManager(teamManager, gameScoreboard);
         var gameDoubleJump = new GameDoubleJump(this, mapManager);
         var lobbyRuler = new LobbyRuler();
         lobbySystemLink = new LobbySystemLink(mapManager, teamManager);
@@ -76,6 +89,7 @@ public class Sumo extends DarkCubePlugin {
         var startingTimer = new StartingTimer(this, lobbyScoreboard, respawn, equipPlayer, teamManager, randomTeam, prefixManager);
         var damageManager = new DamageManager(teamManager, this);
         Spectator.setMainRuler(mapManager);
+        Spectator.setPrefixManager(prefixManager);
         var chatManager = new ChatManager();
         var itemWool = new ItemWool(teamManager);
         var mapRuler = new MapRuler(mapManager);
@@ -110,7 +124,7 @@ public class Sumo extends DarkCubePlugin {
         instance.getCommand("start").setExecutor(new StartCommand(startingTimer));
         instance.getCommand("setteam").setExecutor(new SetTeamCommand(teamManager, prefixManager, equipPlayer));
         instance.getCommand("timer").setExecutor(new TimerCommand(startingTimer));
-        instance.getCommand("setgamestate").setExecutor(new SetGameStateCommand(respawn, equipPlayer, randomTeam, startingTimer, lobbySystemLink));
+        instance.getCommand("setgamestate").setExecutor(new SetGameStateCommand(respawn, equipPlayer, randomTeam, startingTimer, lobbySystemLink, prefixManager));
         instance.getCommand("showgamestate").setExecutor(new ShowGameStateCommand());
         instance.getCommand("setmap").setExecutor(new SetMapCommand(mapManager));
         instance.getCommand("showactivemap").setExecutor(new ShowActiveMapCommand(mapManager));
@@ -119,6 +133,14 @@ public class Sumo extends DarkCubePlugin {
 
     public static Sumo getInstance() {
         return instance;
+    }
+
+    public LifeManager getLifeManager() {
+        return lifeManager;
+    }
+
+    public TeamManager getTeamManager() {
+        return teamManager;
     }
 
     public LobbySystemLink getLobbySystemLink() {

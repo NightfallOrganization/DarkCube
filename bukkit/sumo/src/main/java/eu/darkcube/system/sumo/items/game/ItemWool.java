@@ -11,9 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -36,12 +41,15 @@ public class ItemWool implements Listener {
     }
 
     public static ItemStack createWool(Player player) {
+        User user = UserAPI.instance().user(player.getUniqueId());
+        String itemName = Message.ITEM_WOOL.convertToString(user);
+
         ChatColor teamColor = teamManager.getPlayerTeam(player.getUniqueId());
         DyeColor color = (teamColor == TeamManager.TEAM_BLACK) ? DyeColor.BLACK : DyeColor.WHITE;
         Wool woolData = new Wool(color);
         ItemStack wool = woolData.toItemStack(10);
         ItemMeta meta = wool.getItemMeta();
-        meta.setDisplayName("§7Wool");
+        meta.setDisplayName(itemName);
         wool.setItemMeta(meta);
 
         return wool;

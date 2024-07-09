@@ -9,8 +9,10 @@ package eu.darkcube.system.sumo.manager;
 
 import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
+import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import org.bukkit.ChatColor;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -47,9 +49,9 @@ public class LifeManager {
             teamLives.put(teamColor, newLives);
 
             if (teamColor == TeamManager.TEAM_BLACK) {
-                gameScoreboard.updateBlackLives(newLives);
+                gameScoreboard.updateBlackLives();
             } else if (teamColor == TeamManager.TEAM_WHITE) {
-                gameScoreboard.updateWhiteLives(newLives);
+                gameScoreboard.updateWhiteLives();
             }
 
         }

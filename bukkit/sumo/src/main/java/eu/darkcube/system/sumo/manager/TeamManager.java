@@ -10,21 +10,28 @@ package eu.darkcube.system.sumo.manager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import eu.darkcube.system.sumo.prefix.PrefixManager;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class TeamManager {
     private final Map<UUID, ChatColor> playerTeams;
+    private final PrefixManager prefixManager;
 
-    public TeamManager() {
+    public TeamManager(PrefixManager prefixManager) {
+        this.prefixManager = prefixManager;
         playerTeams = new HashMap<>();
     }
 
-    public void setPlayerTeam(UUID playerID, ChatColor teamColor) {
-        playerTeams.put(playerID, teamColor);
+    public void setPlayerTeam(Player player, ChatColor teamColor) {
+        playerTeams.put(player.getUniqueId(), teamColor);
+        prefixManager.setupOtherPlayers(player);
     }
 
-    public void removePlayerTeam(UUID playerID) {
-        playerTeams.remove(playerID);
+    public void removePlayerTeam(Player player) {
+        playerTeams.remove(player.getUniqueId());
+        prefixManager.removePlayerPrefix(player);
     }
 
     public ChatColor getPlayerTeam(UUID playerID) {

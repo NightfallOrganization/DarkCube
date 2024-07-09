@@ -58,10 +58,9 @@ public class SetTeamCommand implements CommandExecutor {
                 return false;
         }
 
+        teamManager.setPlayerTeam(targetPlayer, teamColor);
         equipPlayer.equipPlayerIfInTeam(targetPlayer);
-        teamManager.setPlayerTeam(targetPlayer.getUniqueId(), teamColor);
         sender.sendMessage("§b" + targetPlayer.getName() + " §7wurde zu Team §b" + teamName + " §7gesetzt");
-        prefixManager.setPlayerPrefix(targetPlayer);
         return true;
     }
 }

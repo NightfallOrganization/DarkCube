@@ -10,7 +10,10 @@ package eu.darkcube.system.sumo.guis;
 import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.Message;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -47,14 +50,16 @@ public class VotingGUI implements Listener {
 
     public void openVotingGUI(Player player) {
         Inventory gui = Bukkit.createInventory(null, 45, TITLE);
-
+        User user = UserAPI.instance().user(player.getUniqueId());
+        String itemMapLoreName = Message.ITEM_LORE_MAPS.convertToString(user);
+        String itemVotingLoreName = Message.ITEM_LORE_VOTING.convertToString(user);
         guiPattern.setPattern(gui);
 
         // Papier auf Slot 4 setzen
         ItemStack paper = new ItemStack(Material.PAPER);
         ItemMeta paperMeta = paper.getItemMeta();
         paperMeta.setDisplayName(TITLE);
-        paperMeta.setLore(java.util.Arrays.asList("§7Stimme für Spielszenarien ab!"));
+        paperMeta.setLore(java.util.Arrays.asList(itemVotingLoreName));
         paper.setItemMeta(paperMeta);
         gui.setItem(4, paper);
 
@@ -62,7 +67,7 @@ public class VotingGUI implements Listener {
         ItemStack mappaper = new ItemStack(Material.PAPER);
         ItemMeta mappaperMeta = mappaper.getItemMeta();
         mappaperMeta.setDisplayName("§6Maps");
-        mappaperMeta.setLore(java.util.Arrays.asList("§7Stimme für deine Lieblingsmaps!"));
+        mappaperMeta.setLore(java.util.Arrays.asList(itemMapLoreName));
         mappaper.setItemMeta(mappaperMeta);
         gui.setItem(22, mappaper);
 

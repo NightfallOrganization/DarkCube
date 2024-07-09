@@ -19,6 +19,7 @@ import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.other.LobbySystemLink;
 import eu.darkcube.system.sumo.other.StartingTimer;
+import eu.darkcube.system.sumo.prefix.PrefixManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -33,13 +34,15 @@ public class SetGameStateCommand implements CommandExecutor {
     private RandomTeam randomTeam;
     private StartingTimer startingTimer;
     private LobbySystemLink lobbySystemLink;
+    private PrefixManager prefixManager;
 
-    public SetGameStateCommand(Respawn respawn, EquipPlayer equipPlayer, RandomTeam randomTeam, StartingTimer startingTimer, LobbySystemLink lobbySystemLink) {
+    public SetGameStateCommand(Respawn respawn, EquipPlayer equipPlayer, RandomTeam randomTeam, StartingTimer startingTimer, LobbySystemLink lobbySystemLink, PrefixManager prefixManager) {
         this.respawn = respawn;
         this.equipPlayer = equipPlayer;
         this.randomTeam = randomTeam;
         this.startingTimer = startingTimer;
         this.lobbySystemLink = lobbySystemLink;
+        this.prefixManager = prefixManager;
     }
 
     @Override
@@ -78,11 +81,14 @@ public class SetGameStateCommand implements CommandExecutor {
 
         if (GameStates.isState(GameStates.PLAYING)) {
             Set<UUID> playerIDs = Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
+            randomTeam.balanceTeams(playerIDs);
 
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                randomTeam.balanceTeams(playerIDs);
                 equipPlayer.equipPlayerIfInTeam(player);
                 respawn.teleportPlayerRandomly(player);
+            }
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                prefixManager.setupPlayer(onlinePlayer);
             }
         }
 

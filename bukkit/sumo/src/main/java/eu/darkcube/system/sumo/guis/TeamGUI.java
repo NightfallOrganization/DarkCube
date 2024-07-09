@@ -10,7 +10,10 @@ package eu.darkcube.system.sumo.guis;
 import eu.darkcube.system.sumo.executions.EquipPlayer;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.other.GameStates;
+import eu.darkcube.system.sumo.other.Message;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -52,14 +55,15 @@ public class TeamGUI implements Listener {
 
     public void openTeamGUI(Player player) {
         Inventory gui = Bukkit.createInventory(null, 45, TITLE);
-
+        User user = UserAPI.instance().user(player.getUniqueId());
+        String itemTeamLoreName = Message.ITEM_LORE_TEAMS_BOOK.convertToString(user);
         guiPattern.setPattern(gui);
 
-        // Buch auf Slot 4 setzen
+        // Buch auf Slot 4 setzenw1
         ItemStack book = new ItemStack(Material.BOOK);
         ItemMeta bookMeta = book.getItemMeta();
         bookMeta.setDisplayName(TITLE);
-        bookMeta.setLore(java.util.Arrays.asList("§7Wähle dein Team!"));
+        bookMeta.setLore(java.util.Arrays.asList(itemTeamLoreName));
         book.setItemMeta(bookMeta);
         gui.setItem(4, book);
 
@@ -90,20 +94,18 @@ public class TeamGUI implements Listener {
 
             // Überprüfen, ob schwarze Wolle angeklickt wurde
             if (event.getCurrentItem().getType() == Material.WOOL && event.getCurrentItem().getDurability() == 15) {
-                teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_BLACK);
+                teamManager.setPlayerTeam(player, TeamManager.TEAM_BLACK);
                 equipPlayer.equipPlayerIfInTeam(player);
                 player.sendMessage("§7Du bist jetzt im Team §8Schwarz");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 50f, 1f);
-                prefixManager.setPlayerPrefix(player);
             }
 
             // Überprüfen, ob weiße Wolle angeklickt wurde
             else if (event.getCurrentItem().getType() == Material.WOOL && event.getCurrentItem().getDurability() == 0) {
-                teamManager.setPlayerTeam(player.getUniqueId(), TeamManager.TEAM_WHITE);
+                teamManager.setPlayerTeam(player, TeamManager.TEAM_WHITE);
                 equipPlayer.equipPlayerIfInTeam(player);
                 player.sendMessage("§7Du bist jetzt im Team §fWeiß");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 50f, 1f);
-                prefixManager.setPlayerPrefix(player);
             }
         }
     }

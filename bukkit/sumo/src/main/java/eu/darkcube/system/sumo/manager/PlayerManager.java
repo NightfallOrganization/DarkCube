@@ -11,15 +11,18 @@ import eu.darkcube.system.sumo.Sumo;
 import eu.darkcube.system.sumo.executions.Ending;
 import eu.darkcube.system.sumo.other.GameStates;
 import eu.darkcube.system.sumo.other.LobbySystemLink;
+import eu.darkcube.system.sumo.other.Message;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
+import eu.darkcube.system.sumo.scoreboards.GameScoreboard;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
 import eu.darkcube.system.sumo.executions.Spectator;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
 
@@ -36,6 +39,7 @@ public class PlayerManager implements Listener {
         this.teamManager = teamManager;
         this.prefixManager = prefixManager;
         this.lobbySystemLink = lobbySystemLink;
+
     }
 
     @EventHandler
@@ -60,7 +64,14 @@ public class PlayerManager implements Listener {
             Location spawnLocation = new Location(Bukkit.getWorld("world"), 0.5, 101, 0.5);
             player.setGameMode(GameMode.SURVIVAL);
             player.teleport(spawnLocation);
-            Bukkit.broadcastMessage(ChatColor.GRAY + player.getName() + " hat das Spiel betreten");
+
+            lobbyScoreboard.createLobbyScoreboard(player);
+
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
+                user.sendMessage(Message.BC_PLAYER_JOIN, player.getName());
+            }
+
 
         } else if (GameStates.getState() == GameStates.PLAYING) {
             Spectator.setPlayerToSpectator(player);
@@ -74,8 +85,6 @@ public class PlayerManager implements Listener {
         } else if (GameStates.isState(GameStates.ENDING)) {
             ItemManager.setEndingItems(player);
         }
-
-        prefixManager.setPlayerPrefix(player);
     }
 
     @EventHandler
@@ -89,18 +98,19 @@ public class PlayerManager implements Listener {
         event.setQuitMessage(null);
 
         if ((GameStates.isState(GameStates.STARTING) || GameStates.isState(GameStates.PLAYING)) && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
-            Bukkit.broadcastMessage(ChatColor.GRAY + event.getPlayer().getName() + " hat das Spiel verlassen.");
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
+                user.sendMessage(Message.BC_PLAYER_LEAVE, player.getName());
+            }
         }
 
         ChatColor playerTeam = teamManager.getPlayerTeam(playerID);
-        teamManager.removePlayerTeam(playerID);
+        teamManager.removePlayerTeam(player);
 
         if (teamManager.isTeamEmpty(playerTeam) && GameStates.isState(GameStates.PLAYING) && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
             Ending ending = new Ending(Sumo.getInstance());
             ending.execute();
         }
-
-        prefixManager.removePlayerPrefix(player);
     }
 
     @EventHandler

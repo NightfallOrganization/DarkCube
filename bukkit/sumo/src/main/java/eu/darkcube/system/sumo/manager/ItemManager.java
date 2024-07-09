@@ -7,8 +7,13 @@
 
 package eu.darkcube.system.sumo.manager;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.sumo.items.game.ItemStick;
 import eu.darkcube.system.sumo.items.game.ItemWool;
+import eu.darkcube.system.sumo.other.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,18 +37,22 @@ public class ItemManager {
     }
 
     public static void setStartingItems(Player player) {
+        User user = UserAPI.instance().user(player.getUniqueId());
+        String itemBookName = Message.ITEM_LORE_TEAMS_BOOK.convertToString(user);
+        String itemVotingName = Message.ITEM_LORE_VOTING.convertToString(user);
+
 //        player.getInventory().setItem(0, createItem(Material.BREWING_STAND_ITEM, "§dFähigkeiten", "§7Wähle deine Macht!"));
 //        player.getInventory().setItem(1, createItem(Material.BOOK, "§9Teams", "§7Wähle dein Team!"));
 //        player.getInventory().setItem(4, createItem(Material.BLAZE_ROD, "§6Partikel §aAn §8╏ §7Ausschalten?", "§7Klicke um Partikel zu deaktivieren!"));
 //        player.getInventory().setItem(7, createItem(Material.REDSTONE_COMPARATOR, "§cEinstellungen", "§7Stelle alles nach belieben ein!"));
 //        player.getInventory().setItem(8, createItem(Material.PAPER, "§6Voting", "§7Stimme für Spielszenarien ab!"));
 
-        player.getInventory().setItem(3, createItem(Material.BOOK, "§9Teams", "§7Wähle dein Team!"));
-        player.getInventory().setItem(5, createItem(Material.PAPER, "§6Voting", "§7Stimme für Spielszenarien ab!"));
+        player.getInventory().setItem(3, createItem(Material.BOOK, "§9Teams", itemBookName));
+        player.getInventory().setItem(5, createItem(Material.PAPER, "§6Voting", itemVotingName));
     }
 
     public static void setPlayingItems(Player player) {
-        player.getInventory().setItem(1, ItemStick.createStick());
+        player.getInventory().setItem(1, ItemStick.createStick(player));
         player.getInventory().setItem(0, ItemWool.createWool(player));
     }
 

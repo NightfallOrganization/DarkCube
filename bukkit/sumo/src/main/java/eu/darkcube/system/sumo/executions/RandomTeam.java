@@ -49,13 +49,11 @@ public class RandomTeam {
             Player player = Bukkit.getPlayer(playerID);
             if (player != null) {
                 if (blackTeamPlayers.size() <= whiteTeamPlayers.size()) {
-                    teamManager.setPlayerTeam(playerID, TeamManager.TEAM_BLACK);
+                    teamManager.setPlayerTeam(player, TeamManager.TEAM_BLACK);
                     blackTeamPlayers.add(playerID);
-                    prefixManager.setPlayerPrefix(player); // Prefix nach der Teamzuweisung aktualisieren
                 } else {
-                    teamManager.setPlayerTeam(playerID, TeamManager.TEAM_WHITE);
+                    teamManager.setPlayerTeam(player, TeamManager.TEAM_WHITE);
                     whiteTeamPlayers.add(playerID);
-                    prefixManager.setPlayerPrefix(player); // Prefix nach der Teamzuweisung aktualisieren
                 }
             }
         }
@@ -71,7 +69,7 @@ public class RandomTeam {
 
     private void movePlayerToOtherTeam(List<UUID> fromTeam, List<UUID> toTeam, ChatColor toTeamColor) {
         UUID playerToMove = fromTeam.remove(random.nextInt(fromTeam.size()));
-        teamManager.setPlayerTeam(playerToMove, toTeamColor);
+        teamManager.setPlayerTeam(Bukkit.getPlayer(playerToMove), toTeamColor);
         toTeam.add(playerToMove);
     }
 }

@@ -7,7 +7,12 @@
 
 package eu.darkcube.system.sumo.executions;
 
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.sumo.manager.TeamManager;
+import eu.darkcube.system.sumo.other.Message;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -35,12 +40,17 @@ public class EquipPlayer {
 
     private void equipWithColoredArmor(Player player, ChatColor teamColor) {
         PlayerInventory inventory = player.getInventory();
+        User user = UserAPI.instance().user(player.getUniqueId());
+        String itemHelmName = Message.ITEM_HELM.convertToString(user);
+        String itemChestplateName = Message.ITEM_CHESTPLATE.convertToString(user);
+        String itemLeggingsName = Message.ITEM_LEGGINGS.convertToString(user);
+        String itemBootsName = Message.ITEM_BOOTS.convertToString(user);
 
         ChatColor nameColor = teamColor == TeamManager.TEAM_BLACK ? ChatColor.DARK_GRAY : teamColor;
-        ItemStack helmet = createColoredArmorItem(Material.LEATHER_HELMET, teamColor, nameColor + "Kopfbedeckung <3");
-        ItemStack chestplate = createColoredArmorItem(Material.LEATHER_CHESTPLATE, teamColor, nameColor + "Harnisch");
-        ItemStack leggings = createColoredArmorItem(Material.LEATHER_LEGGINGS, teamColor, nameColor + "Beinkleid");
-        ItemStack boots = createColoredArmorItem(Material.LEATHER_BOOTS, teamColor, nameColor + "Sporenträger");
+        ItemStack helmet = createColoredArmorItem(Material.LEATHER_HELMET, teamColor, nameColor + itemHelmName);
+        ItemStack chestplate = createColoredArmorItem(Material.LEATHER_CHESTPLATE, teamColor, nameColor + itemChestplateName);
+        ItemStack leggings = createColoredArmorItem(Material.LEATHER_LEGGINGS, teamColor, nameColor + itemLeggingsName);
+        ItemStack boots = createColoredArmorItem(Material.LEATHER_BOOTS, teamColor, nameColor + itemBootsName);
 
         inventory.setHelmet(helmet);
         inventory.setChestplate(chestplate);
@@ -58,6 +68,7 @@ public class EquipPlayer {
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
         meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
         if (teamColor == TeamManager.TEAM_BLACK) {
             meta.setColor(org.bukkit.Color.fromRGB(30, 30, 30));

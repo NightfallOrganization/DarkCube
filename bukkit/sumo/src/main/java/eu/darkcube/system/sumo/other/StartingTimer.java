@@ -18,6 +18,8 @@ import eu.darkcube.system.sumo.executions.Respawn;
 import eu.darkcube.system.sumo.manager.TeamManager;
 import eu.darkcube.system.sumo.prefix.PrefixManager;
 import eu.darkcube.system.sumo.scoreboards.LobbyScoreboard;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -31,7 +33,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class StartingTimer implements Listener {
     private int timer = 15;
     private BukkitTask task = null;
-    private final Sumo plugin; // Ersetze YourPlugin mit deinem Plugin-Klassennamen
+    private final Sumo sumo;
     private boolean running = false;
     private LobbyScoreboard lobbyScoreboard;
     private Respawn respawn;
@@ -40,15 +42,15 @@ public class StartingTimer implements Listener {
     private RandomTeam randomTeam;
     private PrefixManager prefixManager;
 
-    public StartingTimer(Sumo plugin, LobbyScoreboard lobbyScoreboard, Respawn respawn, EquipPlayer equipPlayer, TeamManager teamManager, RandomTeam randomTeam, PrefixManager prefixManager) {
-        this.plugin = plugin;
+    public StartingTimer(Sumo sumo, LobbyScoreboard lobbyScoreboard, Respawn respawn, EquipPlayer equipPlayer, TeamManager teamManager, RandomTeam randomTeam, PrefixManager prefixManager) {
+        this.sumo = sumo;
         this.teamManager = teamManager;
         this.lobbyScoreboard = lobbyScoreboard;
         this.equipPlayer = equipPlayer;
         this.respawn = respawn;
         this.randomTeam = randomTeam;
         this.prefixManager = prefixManager;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, sumo);
     }
 
     @EventHandler
@@ -72,7 +74,11 @@ public class StartingTimer implements Listener {
             task.cancel();
         }
         running = false;
-        Bukkit.broadcastMessage("§7Der §bTimer §7wurde gestoppt");
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
+            user.sendMessage(Message.BC_TIMER_STOPPED);
+        }
     }
 
     public void zeroTimer() {
@@ -96,7 +102,7 @@ public class StartingTimer implements Listener {
         }
 
         timer = 15;
-        task = new TimerRunnable().runTaskTimer(plugin, 20L, 20L);
+        task = new TimerRunnable().runTaskTimer(sumo, 20L, 20L);
         running = true;
     }
 
@@ -117,7 +123,11 @@ public class StartingTimer implements Listener {
 
             if (timer <= 3) {
                 playSoundToAllPlayers();
-                Bukkit.broadcastMessage("§7Spiel startet in §b" + timer);
+
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
+                    user.sendMessage(Message.BC_GAME_START, timer);
+                }
             }
 
             timer--;
@@ -129,13 +139,14 @@ public class StartingTimer implements Listener {
                 GameStates.setState(GameStates.PLAYING);
                 Set<UUID> playerIDs = Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
 
+                randomTeam.balanceTeams(playerIDs);
+
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    randomTeam.balanceTeams(playerIDs);
                     equipPlayer.equipPlayerIfInTeam(player);
                     respawn.teleportPlayerRandomly(player);
-                    prefixManager.setPlayerPrefix(player);
                 }
 
+                sumo.getLobbySystemLink().updateLobbyLink();
             }
         }
     }
