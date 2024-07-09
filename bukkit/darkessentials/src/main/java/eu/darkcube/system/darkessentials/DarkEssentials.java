@@ -17,6 +17,7 @@ import eu.darkcube.system.darkessentials.command.HealCommand;
 import eu.darkcube.system.darkessentials.command.MaxCommand;
 import eu.darkcube.system.darkessentials.command.NightCommand;
 import eu.darkcube.system.darkessentials.command.TpWorldCommand;
+import eu.darkcube.system.darkessentials.manager.BanManager;
 import eu.darkcube.system.darkessentials.util.LanguageHelper;
 
 public class DarkEssentials extends DarkCubePlugin {
@@ -40,6 +41,11 @@ public class DarkEssentials extends DarkCubePlugin {
         CommandAPI.instance().register(new TpWorldCommand());
         CommandAPI.instance().register(new HealCommand());
         CommandAPI.instance().register(new MaxCommand());
+
+        BanManager banManager = new BanManager();
+
+        instance.getServer().getPluginManager().registerEvents(banManager, this);
+
     }
 
 }
