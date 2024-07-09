@@ -25,6 +25,7 @@ import eu.darkcube.minigame.woolbattle.perk.perks.active.GrapplingHookPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.LineBuilderPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.MinePerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.MinigunPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.PodPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.ProtectiveShieldPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.RonjasToiletFlushPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.RopePerk;
@@ -46,7 +47,9 @@ import eu.darkcube.minigame.woolbattle.perk.perks.passive.ExtraWoolPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.FastArrowPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.FreezeArrowPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.HookArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.KnockbackArrowPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.LongJumpPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.PiercingArrowPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.ReflectorPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.RocketJumpPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.ScampPerk;
@@ -97,12 +100,12 @@ public class PerkRegistry {
         register(new SpiderPerk(woolbattle));
         register(new HookArrowPerk(woolbattle));
         register(new DrawArrowPerk(woolbattle));
-        //        register(new PiercingArrowPerk(woolbattle));
-        //        register(new KnockbackArrowPerk(woolbattle));
+//        register(new PiercingArrowPerk(woolbattle));
+//        register(new KnockbackArrowPerk(woolbattle));
         register(new FreezeArrowPerk(woolbattle));
         register(new BerserkerPerk(woolbattle));
         register(new StomperPerk(woolbattle));
-        // register(new PodPerk(woolbattle));
+        register(new PodPerk(woolbattle));
     }
 
     public void register(Perk perk) {
