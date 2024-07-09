@@ -90,7 +90,7 @@ public class Sumo extends DarkCubePlugin {
         var damageManager = new DamageManager(teamManager, this);
         Spectator.setMainRuler(mapManager);
         Spectator.setPrefixManager(prefixManager);
-        var chatManager = new ChatManager();
+        var chatManager = new ChatManager(prefixManager);
         var itemWool = new ItemWool(teamManager);
         var mapRuler = new MapRuler(mapManager);
         var teamGUI = new TeamGUI(teamManager, prefixManager, equipPlayer);
