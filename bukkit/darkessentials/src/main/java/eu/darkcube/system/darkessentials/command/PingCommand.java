@@ -12,6 +12,8 @@ import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
 import eu.darkcube.system.darkessentials.DarkCommand;
+import eu.darkcube.system.darkessentials.util.LanguageHelper;
+import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -41,7 +43,7 @@ public class PingCommand extends DarkCommand {
             try {
                 Object handle = sender.getClass().getMethod("getHandle").invoke(sender);
                 int ping = (int) handle.getClass().getField("ping").get(handle);
-                context.getSource().sendMessage(Component.text("§7Ping: §e" + ping));
+                context.getSource().sendMessage(Component.text(LanguageHelper.systemName() + "Ping: §e" + ping));
             } catch (Exception e) {
                 context.getSource().sendMessage(Component.text("§cPing error: Contact Administrators"));
             }
@@ -49,7 +51,7 @@ public class PingCommand extends DarkCommand {
             try {
                 Object handle = player.getClass().getMethod("getHandle").invoke(player);
                 int ping = (int) handle.getClass().getField("ping").get(handle);
-                sender.sendMessage("§7" + player.getName() + "'s ping: §e" + ping);
+                sender.sendMessage(LanguageHelper.systemName() + player.getName() + "'s ping: §e" + ping);
             } catch (Exception e) {
                 player.sendMessage("§cPing error: Contact Administrators");
             }

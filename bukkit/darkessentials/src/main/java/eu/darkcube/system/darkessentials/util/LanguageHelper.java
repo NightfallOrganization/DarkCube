@@ -37,4 +37,10 @@ public class LanguageHelper {
         }
         language.registerLookup(properties, s -> Message.KEY_PREFIX + s);
     }
+
+    public static String systemName() {
+        return "§7[§6Dark§eCube§7] ";
+    }
+
+
 }
