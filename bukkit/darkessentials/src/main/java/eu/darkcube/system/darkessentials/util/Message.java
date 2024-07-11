@@ -23,7 +23,17 @@ public enum Message implements BaseMessage {
     FEED,
     HEAL,
     MAX,
-    TELEPORT;
+    TELEPORT,
+    SPEED_WALK_SETTED_FROM,
+    SPEED_FLY_SETTED_FROM,
+    SPEED_WALK_SET,
+    SPEED_FLY_SET,
+    SPEED_WALK_SETTED,
+    SPEED_FLY_SETTED,
+    SPEED_VALUE_TOO_MUCH,
+    SPEED_RESET
+
+    ;
 
     public static final String PREFIX_ITEM = "ITEM_";
     public static final String PREFIX_LORE = "LORE_";

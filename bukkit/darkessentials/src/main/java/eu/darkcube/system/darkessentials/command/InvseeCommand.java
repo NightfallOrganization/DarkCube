@@ -29,11 +29,11 @@ public class InvseeCommand extends DarkCommand {
 
     public InvseeCommand() {
         //@formatter:off
-        super("invsee", builder -> {
+        super("invsee",builder -> {
             builder.then(Commands.argument("player", EntityArgument.player())
                             .executes(context -> executeCommand(context, EntityArgument.getPlayer(context, "player")))
-                    );
-            });
+            );
+        });
         //@formatter:on
     }
 
