@@ -41,6 +41,7 @@ import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskSchedule;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMap;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -133,7 +134,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                 var protocol = Document.newJsonDocument();
                 protocol.writeProperty(ADMIN_SETUP, true);
 
-                entry.writeProperty(DISPLAY_NAME, "Setup WoolBattle");
+                entry.writeProperty(DISPLAY_NAME, GsonComponentSerializer.gson().serialize(Component.text("Setup WoolBattle")));
                 entry.writeProperty(PLAYING_PLAYERS, 0);
                 entry.writeProperty(MAX_PLAYING_PLAYERS, 1);
                 entry.writeProperty(SPECTATING_PLAYERS, 0);

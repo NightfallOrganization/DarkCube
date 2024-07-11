@@ -50,7 +50,7 @@ public class CommonLobby extends CommonPhase implements Lobby {
         setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_CHESTPLATE, 2, 2000, 23);
         this.teamsInventoryTemplate.animation().calculateManifold(22, 1);
         var pagination = this.teamsInventoryTemplate.pagination();
-        pagination.pageSlots(new int[]{10, 11, 12, 13, 14, 15, 16});
+        pagination.pageSlots(new int[]{10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34});
         pagination.content().addStaticItem(Items.LOBBY_VOTING_EP_GLITCH);
         pagination.content().addStaticItem(Items.LOBBY_VOTING_EP_GLITCH);
         pagination.content().addStaticItem(user -> {
@@ -61,6 +61,13 @@ public class CommonLobby extends CommonPhase implements Lobby {
             }
             return Items.LOBBY_VOTING_MAPS;
         }).makeAsync();
+        for (var i = 0; i < 100; i++) {
+            pagination.content().addStaticItem(Items.values()[i % Items.values().length]);
+        }
+        pagination.previousButton().setItem(Items.PREV_PAGE);
+        pagination.previousButton().slots(new int[]{9, 18, 27});
+        pagination.nextButton().setItem(Items.NEXT_PAGE);
+        pagination.nextButton().slots(new int[]{17, 26, 35});
     }
 
     private void setDelayed(InventoryTemplate template, Items item, int priority, int delay, int slot) {
