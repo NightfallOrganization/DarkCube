@@ -39,7 +39,7 @@ public class FlyCommand extends DarkCommand {
         //@formatter:on
     }
 
-    private static int executeCommand(CommandContext<CommandSource> context, @NotNull Collection<Player> players) throws CommandSyntaxException {
+    private static int executeCommand(CommandContext<CommandSource> context, @NotNull Collection<Player> players) {
 
         for (Player player : players) {
             boolean isFlying = player.isFlying();

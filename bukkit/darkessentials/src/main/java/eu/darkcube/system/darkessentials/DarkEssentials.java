@@ -9,6 +9,7 @@ package eu.darkcube.system.darkessentials;
 
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
+import eu.darkcube.system.darkessentials.command.ChainCommand;
 import eu.darkcube.system.darkessentials.command.DayCommand;
 import eu.darkcube.system.darkessentials.command.FeedCommand;
 import eu.darkcube.system.darkessentials.command.FlyCommand;
@@ -20,6 +21,8 @@ import eu.darkcube.system.darkessentials.command.NightCommand;
 import eu.darkcube.system.darkessentials.command.PingCommand;
 import eu.darkcube.system.darkessentials.command.SpeedCommand;
 import eu.darkcube.system.darkessentials.command.TpWorldCommand;
+import eu.darkcube.system.darkessentials.command.UnchainCommand;
+import eu.darkcube.system.darkessentials.listener.command.ChainCommandListener;
 import eu.darkcube.system.darkessentials.manager.BanManager;
 import eu.darkcube.system.darkessentials.util.LanguageHelper;
 
@@ -47,9 +50,13 @@ public class DarkEssentials extends DarkCubePlugin {
         CommandAPI.instance().register(new InvseeCommand());
         CommandAPI.instance().register(new PingCommand());
         CommandAPI.instance().register(new SpeedCommand());
+        CommandAPI.instance().register(new ChainCommand());
+        CommandAPI.instance().register(new UnchainCommand());
 
-        BanManager banManager = new BanManager();
+        var banManager = new BanManager();
+        var chainCommandListener = new ChainCommandListener(this);
 
+        instance.getServer().getPluginManager().registerEvents(chainCommandListener,this);
         instance.getServer().getPluginManager().registerEvents(banManager, this);
 
     }
