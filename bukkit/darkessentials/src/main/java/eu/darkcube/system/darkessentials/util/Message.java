@@ -30,7 +30,6 @@ public enum Message implements BaseMessage {
     SPEED_FLY_SET,
     SPEED_WALK_SETTED,
     SPEED_FLY_SETTED,
-    SPEED_VALUE_TOO_MUCH,
     SPEED_RESET
 
     ;
