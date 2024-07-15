@@ -30,6 +30,7 @@ public class ChainCommandListener implements Listener {
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         User user = UserAPI.instance().user(player.getUniqueId());
+        if (!user.metadata().has(chainKey)) return;
         int chainValue = user.metadata().get(chainKey);
 
         if (chainValue == 1) {
@@ -55,6 +56,7 @@ public class ChainCommandListener implements Listener {
     public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         User user = UserAPI.instance().user(player.getUniqueId());
+        if (!user.metadata().has(chainKey)) return;
         int chainValue = user.metadata().get(chainKey);
         if (chainValue == 1) {
             event.setCancelled(true);
