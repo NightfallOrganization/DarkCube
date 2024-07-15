@@ -12,8 +12,6 @@ import eu.darkcube.system.darkessentials.util.Message;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.data.PersistentDataType;
-import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,6 +42,7 @@ public class ChainCommandListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         User user = UserAPI.instance().user(player.getUniqueId());
+        if (!user.metadata().has(chainKey)) return;
         int chainValue = user.metadata().get(chainKey);
         if (chainValue == 1) {
             if (event.getFrom().getX() != event.getTo().getX() || event.getFrom().getZ() != event.getTo().getZ()) {
