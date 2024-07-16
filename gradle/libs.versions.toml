@@ -20,7 +20,7 @@ brigadier = "1.0.18"
 gson = "2.10.1"
 adventure = "4.16.0"
 adventure-platform = "4.3.2"
-jctools-core = "4.0.3"
+jctools-core = "4.0.5"
 fastutil = "8.5.13"
 lombok-plugin = "8.6"
 
