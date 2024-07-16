@@ -16,5 +16,5 @@ tasks.build.dependsOn(tasks.shadowJar)
 dependencies {
     implementation project(':bukkit:statsapi')
     compileOnly libs.cloudnet
-    compileOnly "mysql:mysql-connector-java:5.1.47"
+    compileOnly "mysql:mysql-connector-java:5.1.49"
 }
