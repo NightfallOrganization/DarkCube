@@ -94,8 +94,8 @@ dependencies {
     implementation("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
     // libraries to be added
     minestomLibrary("org.slf4j:jul-to-slf4j:2.0.13")
-    minestomLibrary("org.apache.logging.log4j:log4j-core:2.22.1")
-    minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")
+    minestomLibrary("org.apache.logging.log4j:log4j-core:2.23.1")
+    minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1")
     minestomLibrary(libs.jline)
     minestomLibrary(libs.bundles.minestom) {
         exclude("org.jetbrains", "annotations")
