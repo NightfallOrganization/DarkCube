@@ -18,7 +18,7 @@ sourceSets {
 }
 
 dependencies {
-    "generatorImplementation"("com.google.code.gson:gson:2.10.1")
+    "generatorImplementation"("com.google.code.gson:gson:2.11.0")
     "generatorImplementation"("it.unimi.dsi:fastutil:8.5.12")
     compileOnly("it.unimi.dsi:fastutil:8.5.12")
     testRuntimeOnly("it.unimi.dsi:fastutil:8.5.12")
