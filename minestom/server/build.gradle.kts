@@ -91,7 +91,7 @@ dependencies {
     api(darkcubesystem.api.cloudnet)
     api(darkcubesystem.server.cloudnet) { exclude("org.jetbrains", "annotations") }
     implementation("org.ow2.asm:asm:9.5") // in cloudnet but not exposed
-    implementation("org.ow2.asm:asm-tree:9.5") // in cloudnet but not exposed
+    implementation("org.ow2.asm:asm-tree:9.7") // in cloudnet but not exposed
     // libraries to be added
     minestomLibrary("org.slf4j:jul-to-slf4j:2.0.13")
     minestomLibrary("org.apache.logging.log4j:log4j-core:2.22.1")
