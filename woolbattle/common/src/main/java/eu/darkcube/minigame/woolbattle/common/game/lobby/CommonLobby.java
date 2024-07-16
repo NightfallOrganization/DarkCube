@@ -22,6 +22,7 @@ import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserJoin
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.util.GameState;
@@ -44,10 +45,10 @@ public class CommonLobby extends CommonPhase implements Lobby {
         this.teamsInventoryTemplate.title(Messages.INVENTORY_TEAMS);
         this.teamsInventoryTemplate.setItem(1, 4, Items.LOBBY_TEAMS);
         this.teamsInventoryTemplate.setItem(-1, 2, Items.LOBBY_TEAMS);
-        setDelayed(teamsInventoryTemplate, Items.LOBBY_TEAMS, 1, 1000, 6);
-        setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_BOOTS, 2, 2000, 6);
-        setDelayed(teamsInventoryTemplate, Items.PERK_BOOSTER, 1, 1000, 23);
-        setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_CHESTPLATE, 2, 2000, 23);
+        // setDelayed(teamsInventoryTemplate, Items.LOBBY_TEAMS, 1, 1000, 6);
+        // setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_BOOTS, 2, 2000, 6);
+        // setDelayed(teamsInventoryTemplate, Items.PERK_BOOSTER, 1, 1000, 23);
+        // setDelayed(teamsInventoryTemplate, Items.ARMOR_LEATHER_CHESTPLATE, 2, 2000, 23);
         this.teamsInventoryTemplate.animation().calculateManifold(22, 1);
         var pagination = this.teamsInventoryTemplate.pagination();
         pagination.pageSlots(new int[]{10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34});
@@ -61,8 +62,17 @@ public class CommonLobby extends CommonPhase implements Lobby {
             }
             return Items.LOBBY_VOTING_MAPS;
         }).makeAsync();
-        for (var i = 0; i < 100; i++) {
-            pagination.content().addStaticItem(Items.values()[i % Items.values().length]);
+        for (var i = 0; i < 300; i++) {
+            var item = Items.values()[i % Items.values().length];
+            var fi = i;
+            pagination.content().addStaticItem(user -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return item.createItem(user).lore(Component.text(fi));
+            }).makeAsync();
         }
         pagination.previousButton().setItem(Items.PREV_PAGE);
         pagination.previousButton().slots(new int[]{9, 18, 27});
