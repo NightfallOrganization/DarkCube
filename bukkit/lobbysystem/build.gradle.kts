@@ -54,7 +54,7 @@ dependencies {
     compileOnly("io.github.juliarn:npc-lib-api:3.0.0-beta6")
     implementation("io.github.juliarn:npc-lib-labymod:3.0.0-beta6")
     implementation(libs.hologramlib)
-    implementation("me.clip:placeholderapi:2.11.3")
+    implementation("me.clip:placeholderapi:2.11.6")
     compileOnly(libs.annotations)
     compileOnly(libs.cloudnet.bridge)
     compileOnly(libs.luckperms)
