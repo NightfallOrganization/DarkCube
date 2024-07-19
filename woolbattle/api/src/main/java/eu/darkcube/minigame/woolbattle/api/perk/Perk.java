@@ -10,7 +10,6 @@ package eu.darkcube.minigame.woolbattle.api.perk;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.listener.Listener;
@@ -20,8 +19,6 @@ import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
 
 public class Perk {
-    private static final Logger logger = Logger.getLogger("Perk");
-
     private final Collection<PerkHook> hooks = new ArrayList<>();
 
     private final ActivationType activationType;

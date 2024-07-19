@@ -22,6 +22,7 @@ import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.permission.Permission;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class Start {
     public static void main(String[] args) {
@@ -30,6 +31,8 @@ public class Start {
         System.setProperty("minestom.chunk-view-distance", "32");
         System.setProperty("minestom.entity-view-distance", "32");
         System.setProperty("minestom.experiment.pose-updates", "true");
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
 
         LoggerFactory.getLogger("DarkCube").info("Starting Minestom Server...");
 

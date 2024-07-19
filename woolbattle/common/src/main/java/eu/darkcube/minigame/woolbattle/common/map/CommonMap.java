@@ -7,8 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.map;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
 import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
@@ -19,7 +18,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public class CommonMap implements Map {
-    private static final Logger LOGGER = Logger.getLogger("WoolBattle");
     private final @NotNull CommonMapManager mapManager;
     private final @NotNull String name;
     private final @NotNull MapSize size;
@@ -105,7 +103,7 @@ public class CommonMap implements Map {
             var icon = ItemBuilder.item(GsonUtil.gson().fromJson(document.getString("icon"), JsonElement.class));
             return new CommonMap(mapManager, name, size, deathHeight, icon, enabled);
         } catch (RuntimeException | Error t) {
-            LOGGER.log(Level.SEVERE, "Failed to load map " + document.getString("name"), t);
+            LOGGER.error("Failed to load map {}", document.getString("name"), t);
             throw t;
         }
     }

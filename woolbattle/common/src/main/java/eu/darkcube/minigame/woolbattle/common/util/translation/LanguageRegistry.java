@@ -9,8 +9,10 @@ package eu.darkcube.minigame.woolbattle.common.util.translation;
 
 import static eu.darkcube.minigame.woolbattle.common.util.translation.Messages.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
@@ -19,18 +21,34 @@ import eu.darkcube.system.util.Language;
 public class LanguageRegistry {
     public void register() {
         try {
-            var loader = getClass().getClassLoader();
-            Language.GERMAN.registerLookup(loader, "messages_de.properties", KEY_MODFIIER);
-            Language.ENGLISH.registerLookup(loader, "messages_en.properties", KEY_MODFIIER);
+            register(Language.GERMAN);
+            register(Language.ENGLISH);
 
             var entries = new ArrayList<String>();
             entries.addAll(Arrays.stream(Messages.values()).map(Messages::key).toList());
-            entries.addAll(Arrays.stream(Items.values()).flatMap(i -> Stream.of(ITEM_PREFIX + i.key(), ITEM_PREFIX + LORE_PREFIX + i.key())).toList());
+            entries.addAll(Arrays.stream(Items.values()).flatMap(this::names).toList());
 
-            Language.validateEntries(entries.toArray(String[]::new), KEY_MODFIIER);
+            Language.validateEntries(entries.toArray(String[]::new), KEY_MODIFIER);
         } catch (Throwable throwable) {
             throw new Error(throwable);
         }
+    }
+
+    private Stream<String> names(Items item) {
+        var name = ITEM_PREFIX + item.key();
+        var lore = ITEM_PREFIX + LORE_PREFIX + item.key();
+        switch (item) {
+            case NEXT_PAGE, NEXT_PAGE_UNUSABLE, PREV_PAGE, PREV_PAGE_UNUSABLE, GRAY_GLASS_PANE, BLACK_GLASS_PANE -> lore = null;
+        }
+        return Stream.of(name, lore).filter(Objects::nonNull);
+    }
+
+    private void register(Language language) throws IOException {
+        var loader = getClass().getClassLoader();
+        var tag = language.getLocale().toLanguageTag();
+        language.registerLookup(loader, "messages_" + tag + ".properties", KEY_MODIFIER);
+        language.registerLookup(loader, "items_" + tag + ".properties", ITEM_MODIFIER);
+        language.registerLookup(loader, "items_lore_" + tag + ".properties", LORE_MODIFIER);
     }
 
     public void unregister() {

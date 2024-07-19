@@ -51,7 +51,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     public MinestomWoolBattle() {
         super();
-        api = new MinestomWoolBattleApi(this);
+        this.api = new MinestomWoolBattleApi(this);
         WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, api);
         this.playerKey = Key.key(api, "minestom_player");
         setupModeImplementation = new MinestomSetupModeImplementation(api);
@@ -135,5 +135,10 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     public void removed(MinestomEntity entity) {
         entities.remove(entity.entity().unwrap());
         entityMeta(entity).clear();
+    }
+
+    @Override
+    public @NotNull String namespace() {
+        return this.api.namespace();
     }
 }

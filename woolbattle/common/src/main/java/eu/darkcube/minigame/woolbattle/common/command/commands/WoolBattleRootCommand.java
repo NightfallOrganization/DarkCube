@@ -13,9 +13,18 @@ import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.GameCo
 import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.LobbyCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.MigrateMapsCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.SetupCommand;
+import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.TeamsCommand;
 
 public class WoolBattleRootCommand extends WoolBattleCommand {
     public WoolBattleRootCommand(CommonWoolBattleApi woolbattle) {
-        super("woolbattle", b -> b.then(new MigrateMapsCommand(woolbattle).builder()).then(new SetupCommand(woolbattle).builder()).then(new GameCommand(woolbattle).builder()).then(new LobbyCommand(woolbattle).builder()));
+        // @formatter:off
+        super("woolbattle", b -> b
+                .then(new MigrateMapsCommand(woolbattle).builder())
+                .then(new SetupCommand(woolbattle).builder())
+                .then(new GameCommand(woolbattle).builder())
+                .then(new LobbyCommand(woolbattle).builder())
+                .then(new TeamsCommand(woolbattle).builder())
+        );
+        // @formatter:on
     }
 }

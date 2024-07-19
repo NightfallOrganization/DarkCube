@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
 
 import eu.cloudnetservice.common.concurrent.Task;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
@@ -52,6 +51,8 @@ import eu.darkcube.system.util.data.CustomPersistentDataProvider;
 import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NodePServerExecutor implements PServerExecutor {
     private static final Key K_ACCESS_LEVEL = Key.key("pserver", "access_level");
@@ -60,7 +61,7 @@ public class NodePServerExecutor implements PServerExecutor {
     private static final PersistentDataType<Type> T_TYPE = PersistentDataTypes.enumType(Type.class);
     private static final Key K_TASK = Key.key("pserver", "task");
     private static final PersistentDataType<String> T_TASK = PersistentDataTypes.STRING;
-    private static final Logger logger = Logger.getGlobal();
+    private static final Logger LOGGER = LoggerFactory.getLogger("PServer");
     private final UniqueId id;
     private final Set<UUID> owners = new CopyOnWriteArraySet<>();
     private final PersistentDataStorage storage;
@@ -136,7 +137,7 @@ public class NodePServerExecutor implements PServerExecutor {
                 if (taskName == null) taskName = NodePServerProvider.pserverTaskName;
                 @Nullable var task = serviceTaskProvider.serviceTask(taskName);
                 if (task == null) {
-                    logger.warning("Task not found for PServer creation: " + taskName);
+                    LOGGER.warn("Task not found for PServer creation: {}", taskName);
                     return false;
                 }
                 var serviceSnapshot = createService(task).join();
@@ -150,7 +151,7 @@ public class NodePServerExecutor implements PServerExecutor {
                 snapshot = serviceSnapshot;
                 serverName = snapshot.name();
                 sendUpdate();
-                logger.info("[PServer] Started PServer " + this.serverName + " (" + this.id + ")");
+                LOGGER.info("[PServer] Started PServer {} ({})", this.serverName, this.id);
                 snapshot.provider().startAsync().whenComplete((unused, throwable) -> {
                     if (throwable != null) {
                         throwable.printStackTrace();
@@ -183,7 +184,7 @@ public class NodePServerExecutor implements PServerExecutor {
         state = State.STOPPING;
         sendUpdate();
         new PacketStop(createSnapshotInternal()).sendAsync();
-        logger.info("[PServer] Stopping PServer " + serverName + " (" + id + ")");
+        LOGGER.info("[PServer] Stopping PServer {} ({})", serverName, id);
         stopFuture = snapshot.provider().stopAsync().thenCompose(unused -> {
             try {
                 lock.lock();
@@ -194,8 +195,8 @@ public class NodePServerExecutor implements PServerExecutor {
         }).thenRun(() -> {
             try {
                 lock.lock();
-                logger.info("[PServer] Stopped PServer " + serverName + " (" + id + ")");
-                if (state != State.STOPPING) logger.severe("[PServer] PServer was stopping but state wasn't stopping");
+                LOGGER.info("[PServer] Stopped PServer {} ({})", serverName, id);
+                if (state != State.STOPPING) LOGGER.error("[PServer] PServer was stopping but state wasn't stopping");
                 resetState();
                 NodePServerProvider.instance().releaseReference(this);
             } finally {
@@ -208,11 +209,11 @@ public class NodePServerExecutor implements PServerExecutor {
         state = State.STOPPING;
         sendUpdate();
         new PacketStop(createSnapshotInternal()).sendAsync();
-        logger.info("[PServer] Killing PServer " + serverName + " (" + id + ")");
+        LOGGER.info("[PServer] Killing PServer {} ({})", serverName, id);
         stopFuture = snapshot.provider().deleteAsync().thenRun(() -> {
             try {
                 lock.lock();
-                logger.info("[PServer] Killed PServer " + serverName + " (" + id + ")");
+                LOGGER.info("[PServer] Killed PServer {} ({})", serverName, id);
                 resetState();
                 NodePServerProvider.instance().releaseReference(this);
             } finally {

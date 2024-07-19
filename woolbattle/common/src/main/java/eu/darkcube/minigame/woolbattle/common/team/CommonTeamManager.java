@@ -7,17 +7,18 @@
 
 package eu.darkcube.minigame.woolbattle.common.team;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
-import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamManager;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
 public class CommonTeamManager implements TeamManager {
     private final @NotNull Game game;
@@ -47,7 +48,12 @@ public class CommonTeamManager implements TeamManager {
     }
 
     @Override
-    public @Nullable Team team(UUID uniqueId) {
+    public @Nullable CommonTeam team(UUID uniqueId) {
         return teams.get(uniqueId);
+    }
+
+    @Override
+    public @NotNull @Unmodifiable Collection<CommonTeam> teams() {
+        return teams.values();
     }
 }

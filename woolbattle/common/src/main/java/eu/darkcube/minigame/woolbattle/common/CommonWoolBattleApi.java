@@ -53,7 +53,7 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         this.teamRegistry = new CommonTeamRegistry(this);
         this.eventManager = EventNode.all("woolbattle");
         this.lobbyData = new CommonLobbyData(this);
-        this.commandArguments = new CommonWoolBattleArguments();
+        this.commandArguments = new CommonWoolBattleArguments(this);
         WoolBattleProvider.PROVIDER.register(ItemManager.class, new ItemManager(this));
     }
 

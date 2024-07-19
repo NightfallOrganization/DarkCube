@@ -27,8 +27,20 @@ import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 
 public class CommandTeam extends WBCommand {
     public CommandTeam(WoolBattleBukkit woolbattle) {
-
-        super("team", b -> b.then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle, new MapSizeValidator(woolbattle))).then(Commands.argument("team", TeamTypeArgument.teamTypeArgument(woolbattle, new MapSizeToString())).then(new CommandDisable().builder()).then(new CommandEnable().builder()).then(new CommandInfo().builder()).then(new CommandSetNameColor().builder()).then(new CommandSetSpawn(woolbattle).builder()).then(new CommandSetWoolColor().builder()).then(new CommandDelete().builder()))));
+        // @formatter:off
+        super("team", b ->
+                b.then(Commands.argument("mapSize", MapSizeArgument.mapSize(woolbattle, new MapSizeValidator(woolbattle)))
+                        .then(Commands.argument("team", TeamTypeArgument.teamTypeArgument(woolbattle, new MapSizeToString()))
+                                .then(new CommandDisable().builder())
+                                .then(new CommandEnable().builder())
+                                .then(new CommandInfo().builder())
+                                .then(new CommandSetNameColor().builder())
+                                .then(new CommandSetSpawn(woolbattle).builder())
+                                .then(new CommandSetWoolColor().builder())
+                                .then(new CommandDelete().builder()))
+                )
+        );
+        // @formatter:on
     }
 
     private static class MapSizeValidator implements Predicate<MapSize> {

@@ -7,11 +7,12 @@
 
 package eu.darkcube.minigame.woolbattle.common.team;
 
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import eu.cloudnetservice.driver.database.Database;
 import eu.cloudnetservice.driver.database.DatabaseProvider;
@@ -33,7 +34,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
 public class CommonTeamRegistry implements TeamRegistry {
-    private static final Logger LOGGER = Logger.getLogger("TeamRegistry");
     private final CommonWoolBattleApi woolbattle;
     private final DocProperty<ColoredWool> woolColor;
     private final DocProperty<Style> nameColor;
@@ -52,7 +52,7 @@ public class CommonTeamRegistry implements TeamRegistry {
         for (var entry : this.database.entries().entrySet()) {
             var mapSize = MapSize.fromString(entry.getKey());
             if (mapSize == null) {
-                LOGGER.warning("Failed to load " + entry.getKey() + " from Database: " + database.name());
+                LOGGER.warn("Failed to load {} from Database: {}", entry.getKey(), database.name());
                 continue;
             }
             for (var key : entry.getValue().keys()) {
@@ -62,7 +62,7 @@ public class CommonTeamRegistry implements TeamRegistry {
                 var teamType = key.equals(SPECTATOR_KEY) ? TeamType.SPECTATOR : TeamType.PLAYER;
                 var configuration = new CommonTeamConfiguration(key, mapSize, teamType, nameStyle, woolColor);
 
-                var map = teams.computeIfAbsent(mapSize, k -> new ConcurrentHashMap<>());
+                var map = teams.computeIfAbsent(mapSize, _ -> new ConcurrentHashMap<>());
                 map.put(key, configuration);
             }
             defaultSpectatorIfRequired(mapSize);
@@ -85,6 +85,11 @@ public class CommonTeamRegistry implements TeamRegistry {
     }
 
     @Override
+    public @NotNull @Unmodifiable Collection<CommonTeamConfiguration> teamConfigurations() {
+        return teams.values().stream().map(Map::values).flatMap(Collection::stream).toList();
+    }
+
+    @Override
     public synchronized @NotNull CommonTeamConfiguration createConfiguration(@NotNull MapSize mapSize, @NotNull String key) {
         var woolColor = woolbattle.woolProvider().defaultWool();
         var configuration = new CommonTeamConfiguration(key, mapSize, TeamType.PLAYER, Style.empty(), woolColor);
@@ -96,7 +101,7 @@ public class CommonTeamRegistry implements TeamRegistry {
     public synchronized void updateConfiguration(@NotNull TeamConfiguration configuration) {
         if (!SPECTATOR_KEY.equals(configuration.key())) defaultSpectatorIfRequired(configuration.mapSize());
         var commonConfiguration = (CommonTeamConfiguration) configuration.clone();
-        var map = teams.computeIfAbsent(configuration.mapSize(), k -> new ConcurrentHashMap<>());
+        var map = teams.computeIfAbsent(configuration.mapSize(), _ -> new ConcurrentHashMap<>());
         map.put(configuration.key(), commonConfiguration);
         // save to storage
         database.insert(configuration.mapSize().toString(), serialize(map));

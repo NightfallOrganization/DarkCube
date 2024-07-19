@@ -7,25 +7,84 @@
 
 package eu.darkcube.minigame.woolbattle.api.command.arguments;
 
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
+import eu.darkcube.minigame.woolbattle.api.map.MapSize;
+import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface WoolBattleArguments {
     @NotNull
-    ArgumentType<@NotNull ? extends Game> gameArgument0(@NotNull WoolBattleApi woolbattle);
+    ArgumentType<@NotNull ?> gameArgument0();
 
     @NotNull
-    Game game0(@NotNull CommandContext<?> ctx, @NotNull String name);
+    Game game0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
 
-    static @NotNull ArgumentType<@NotNull ? extends Game> gameArgument(@NotNull WoolBattleApi woolbattle) {
-        return instance().gameArgument0(woolbattle);
+    @NotNull
+    ArgumentType<@NotNull ?> teamConfigurationArgument0();
+
+    <T extends TeamConfiguration> @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument0(@NotNull ToStringFunction<@NotNull T> toStringFunction);
+
+    <T extends TeamConfiguration> @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument0(@NotNull Supplier<@NotNull T @NotNull []> supplier);
+
+    <T extends TeamConfiguration> @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument0(@NotNull Supplier<@NotNull T @NotNull []> supplier, @NotNull ToStringFunction<@NotNull T> toStringFunction);
+
+    @NotNull
+    TeamConfiguration teamConfiguration0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
+
+    @NotNull
+    ArgumentType<@NotNull ?> mapSizeArgument0();
+
+    @NotNull
+    ArgumentType<@NotNull ?> mapSizeArgument0(@NotNull Predicate<@NotNull MapSize> validator);
+
+    @NotNull
+    MapSize mapSize0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
+
+    static @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument() {
+        return instance().teamConfigurationArgument0();
     }
 
-    static @NotNull Game game(@NotNull CommandContext<?> ctx, @NotNull String name) {
+    static <T extends TeamConfiguration> @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument(@NotNull ToStringFunction<@NotNull T> toStringFunction) {
+        return instance().teamConfigurationArgument0(toStringFunction);
+    }
+
+    static <T extends TeamConfiguration> @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument(@NotNull Supplier<@NotNull T @NotNull []> supplier) {
+        return instance().teamConfigurationArgument0(supplier);
+    }
+
+    static <T extends TeamConfiguration> @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument(@NotNull Supplier<@NotNull T @NotNull []> supplier, @NotNull ToStringFunction<@NotNull T> toStringFunction) {
+        return instance().teamConfigurationArgument0(supplier, toStringFunction);
+    }
+
+    static @NotNull TeamConfiguration teamConfiguration(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return instance().teamConfiguration0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> gameArgument() {
+        return instance().gameArgument0();
+    }
+
+    static @NotNull Game game(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
         return instance().game0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> mapSizeArgument() {
+        return instance().mapSizeArgument0();
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> mapSizeArgument(@NotNull Predicate<MapSize> validator) {
+        return instance().mapSizeArgument0(validator);
+    }
+
+    static @NotNull MapSize mapSize(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return instance().mapSize0(ctx, name);
     }
 
     private static WoolBattleArguments instance() {

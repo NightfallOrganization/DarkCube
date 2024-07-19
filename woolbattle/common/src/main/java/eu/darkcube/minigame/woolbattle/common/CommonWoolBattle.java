@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common;
 
-import java.util.logging.Logger;
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
 import eu.darkcube.minigame.woolbattle.common.event.CommonEventHandler;
@@ -16,24 +16,29 @@ import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
-import eu.darkcube.minigame.woolbattle.common.util.item.DefaultItemTemplate;
+import eu.darkcube.minigame.woolbattle.common.util.item.DefaultInventorySettings;
+import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.TaskScheduleProviderImpl;
 import eu.darkcube.minigame.woolbattle.common.util.translation.LanguageRegistry;
 import eu.darkcube.minigame.woolbattle.common.world.SimpleWorldDataProvider;
 import eu.darkcube.minigame.woolbattle.common.world.WorldDataProvider;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Namespaced;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.server.inventory.item.ItemTemplate;
+import org.slf4j.Logger;
 
-public abstract class CommonWoolBattle {
+public abstract class CommonWoolBattle implements Namespaced {
 
-    private final @NotNull Logger logger = Logger.getLogger("WoolBattle");
     private final @NotNull CommonEventHandler eventHandler;
     private final @NotNull SetupMode setupMode;
     private final @NotNull WorldDataProvider worldDataProvider;
     private final @NotNull LanguageRegistry languageRegistry;
     private final @NotNull ItemTemplate defaultItemTemplate;
+    private final @NotNull ItemTemplate defaultPagedItemTemplate;
+    private final @NotNull ItemTemplate defaultSinglePagedItemTemplate;
 
     public CommonWoolBattle() {
         eventHandler = new CommonEventHandler(this);
@@ -42,7 +47,9 @@ public abstract class CommonWoolBattle {
         this.worldDataProvider = new SimpleWorldDataProvider();
         this.languageRegistry = new LanguageRegistry();
 
-        this.defaultItemTemplate = DefaultItemTemplate.create();
+        this.defaultItemTemplate = DefaultInventorySettings.create();
+        this.defaultPagedItemTemplate = DefaultInventorySettings.create();
+        this.defaultSinglePagedItemTemplate = DefaultInventorySettings.create();
     }
 
     public void start() {
@@ -51,7 +58,9 @@ public abstract class CommonWoolBattle {
         api.lobbySystemLink().enable();
         api.commands().registerDefaults(api);
         languageRegistry.register();
-        DefaultItemTemplate.setup(this.defaultItemTemplate);
+        DefaultInventorySettings.setup(this.defaultItemTemplate);
+        DefaultInventorySettings.setupPaged(this.defaultPagedItemTemplate);
+        DefaultInventorySettings.setup(this.defaultSinglePagedItemTemplate);
     }
 
     public void stop() {
@@ -61,7 +70,7 @@ public abstract class CommonWoolBattle {
     }
 
     public @NotNull Logger logger() {
-        return logger;
+        return LOGGER;
     }
 
     public @NotNull SetupMode setupMode() {
@@ -94,6 +103,25 @@ public abstract class CommonWoolBattle {
     public abstract @NotNull UserPermissions createPermissionsFor(@NotNull CommonWBUser user);
 
     public @NotNull ItemTemplate defaultInventoryTemplate() {
-        return defaultItemTemplate;
+        return this.defaultItemTemplate;
+    }
+
+    public @NotNull ItemTemplate defaultSinglePagedInventoryTemplate() {
+        return this.defaultSinglePagedItemTemplate;
+    }
+
+    public @NotNull ItemTemplate defaultPagedInventoryTemplate() {
+        return this.defaultPagedItemTemplate;
+    }
+
+    public void configureDefaultPagedInventory(@NotNull InventoryTemplate template) {
+        template.setItems(0, defaultSinglePagedInventoryTemplate());
+        template.animation().calculateManifold(22, 1);
+        var pagination = template.pagination();
+        pagination.pageSlots(DefaultInventorySettings.PAGE_SLOTS_5x9);
+        pagination.previousButton().setItem(Items.PREV_PAGE);
+        pagination.previousButton().slots(DefaultInventorySettings.SLOTS_PAGED_PREV_5x9);
+        pagination.nextButton().setItem(Items.NEXT_PAGE);
+        pagination.nextButton().slots(DefaultInventorySettings.SLOTS_PAGED_NEXT_5x9);
     }
 }

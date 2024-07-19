@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.api.user;
 
-import java.util.logging.Logger;
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
@@ -17,7 +17,6 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.Legacy
 import eu.darkcube.system.util.data.PersistentDataType;
 
 public final class HeightDisplay implements Cloneable {
-    private static final Logger logger = Logger.getLogger("HeightDisplay");
     public static final PersistentDataType<HeightDisplay> TYPE = new PersistentDataType<>() {
         @Override
         public HeightDisplay deserialize(JsonElement json) {
@@ -32,7 +31,7 @@ public final class HeightDisplay implements Cloneable {
             }
             if (color == null) color = TextColor.fromHexString(colorString);
             if (color == null) {
-                logger.severe("Failed to deserialize HeightDisplay color: " + colorString);
+                LOGGER.error("Failed to deserialize HeightDisplay color: {}", colorString);
                 color = HeightDisplay.getDefault().color();
             }
             return new HeightDisplay(enabled, maxDistance, color);

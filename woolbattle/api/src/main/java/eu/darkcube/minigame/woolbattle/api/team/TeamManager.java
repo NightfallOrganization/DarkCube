@@ -7,18 +7,30 @@
 
 package eu.darkcube.minigame.woolbattle.api.team;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
 @Api
 public interface TeamManager {
     @Api
-    @NotNull Game game();
+    @NotNull
+    Game game();
 
     @Api
-    @Nullable Team team(UUID uniqueId);
+    @Nullable
+    Team team(UUID uniqueId);
+
+    /**
+     * @return all teams, including spectator
+     */
+    @Api
+    @NotNull
+    @Unmodifiable
+    Collection<? extends Team> teams();
 }

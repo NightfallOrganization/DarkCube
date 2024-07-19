@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -76,14 +75,16 @@ import eu.darkcube.system.pserver.common.packets.wn.PacketState;
 import eu.darkcube.system.pserver.common.packets.wn.PacketStop;
 import eu.darkcube.system.pserver.common.packets.wn.PacketTaskName;
 import eu.darkcube.system.pserver.common.packets.wn.PacketType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PServerModule extends DriverModule {
 
     public static final String PLUGIN_NAME = new File(PServerModule.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+    private static final Logger LOGGER = LoggerFactory.getLogger("PServer");
     private static PServerModule instance;
     public Listener listener;
     public String sqlDatabase;
-    private Logger logger = Logger.getLogger("PServer");
     private PServerConfiguration configuration;
     private List<Pattern> compiledDeploymentExclusions = null;
 
@@ -118,7 +119,7 @@ public class PServerModule extends DriverModule {
     @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.STARTED)
     public void load(EventManager eventManager, CommandProvider commandProvider) {
         //        ClassLoaderFixRelocation.load(logger, eventManager, commandProvider);
-        logger.info("Enabling module PServer");
+        LOGGER.info("Enabling module PServer");
         NodeServiceInfoUtil.init();
         NodePServerProvider.init();
         NodeUniqueIdProvider.init();
