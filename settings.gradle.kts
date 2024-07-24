@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("eu.darkcube.darkcube.settings") version "1.2.7"
+    id("eu.darkcube.darkcube.settings") version "1.2.8"
 }
 
 rootProject.name = "DarkCube"
