@@ -7,23 +7,23 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners;
 
-import eu.darkcube.minigame.woolbattle.api.event.user.SetupUserGameEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserJoinGameEvent;
 import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListener;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
-import net.minestom.server.attribute.Attribute;
+import net.minestom.server.entity.attribute.Attribute;
 
-public class MinestomLobbySetupUserListener extends ConfiguredListener<SetupUserGameEvent> {
+public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGameEvent> {
     private final MinestomWoolBattle woolbattle;
 
-    public MinestomLobbySetupUserListener(MinestomWoolBattle woolbattle) {
-        super(SetupUserGameEvent.class);
+    public MinestomLobbyJoinGameListener(MinestomWoolBattle woolbattle) {
+        super(UserJoinGameEvent.class);
         this.woolbattle = woolbattle;
     }
 
     @Override
-    public void accept(SetupUserGameEvent event) {
+    public void accept(UserJoinGameEvent event) {
         var user = (CommonWBUser) event.user();
         var player = woolbattle.player(user);
         var inventory = player.getInventory();
@@ -34,6 +34,6 @@ public class MinestomLobbySetupUserListener extends ConfiguredListener<SetupUser
         inventory.setItemStack(8, Items.LOBBY_VOTING.getItem(user).build());
         player.setFoodSaturation(0);
 
-        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1024);
+        player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1024);
     }
 }

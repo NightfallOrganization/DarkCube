@@ -14,9 +14,11 @@ import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface WoolBattleArguments {
@@ -37,6 +39,18 @@ public interface WoolBattleArguments {
 
     @NotNull
     TeamConfiguration teamConfiguration0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
+
+    @NotNull
+    ArgumentType<@NotNull ?> woolColorArgument0();
+
+    @NotNull
+    ColoredWool woolColor0(@NotNull CommandContext<?> ctx, @NotNull String name);
+
+    @NotNull
+    ArgumentType<@NotNull ?> textColorArgument0();
+
+    @NotNull
+    TextColor textColor0(@NotNull CommandContext<?> ctx, @NotNull String name);
 
     @NotNull
     ArgumentType<@NotNull ?> mapSizeArgument0();
@@ -85,6 +99,22 @@ public interface WoolBattleArguments {
 
     static @NotNull MapSize mapSize(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
         return instance().mapSize0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> woolColorArgument() {
+        return instance().woolColorArgument0();
+    }
+
+    static @NotNull ColoredWool woolColor(@NotNull CommandContext<?> ctx, @NotNull String name) {
+        return instance().woolColor0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> textColorArgument() {
+        return instance().textColorArgument0();
+    }
+
+    static @NotNull TextColor textColor(@NotNull CommandContext<?> ctx, @NotNull String name) {
+        return instance().textColor0(ctx, name);
     }
 
     private static WoolBattleArguments instance() {

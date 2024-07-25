@@ -13,16 +13,13 @@ velocity = "3.1.1"
 jline = "3.26.3"
 shadow = "8.1.8"
 blossom = "2.1.0"
-minestom = "7f15222468"
+minestom = "5f0fbba498"
 minestom-extensions = "1.2.0"
 paperweight-userdev = "1.7.1"
-brigadier = "1.0.18"
-gson = "2.10.1"
-adventure = "4.16.0"
-adventure-platform = "4.3.2"
 jctools-core = "4.0.5"
 fastutil = "8.5.13"
 lombok-plugin = "8.6"
+kotlin = "2.0.0"
 
 paper-latest = "1.20.6-R0.1-SNAPSHOT"
 paper-legacy = "1.8.8-R0.1-SNAPSHOT"
@@ -31,6 +28,7 @@ paper-legacy = "1.8.8-R0.1-SNAPSHOT"
 paper-legacy = { group = "org.spigotmc", name = "spigot-api", version.ref = "paper-legacy" }
 paper-latest = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-latest" }
 
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 hologramlib = { group = "com.github.unldenis.hologram", name = "hologram-lib", version.ref = "hologramlib" }
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }

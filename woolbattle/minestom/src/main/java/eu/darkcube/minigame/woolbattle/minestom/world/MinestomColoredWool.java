@@ -10,6 +10,7 @@ package eu.darkcube.minigame.woolbattle.minestom.world;
 import eu.darkcube.minigame.woolbattle.api.world.Block;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.minestom.item.material.MinestomMaterial;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.material.Material;
 
@@ -22,5 +23,14 @@ public record MinestomColoredWool(@NotNull Material material) implements Colored
     @Override
     public ItemBuilder createSingleItem() {
         return ItemBuilder.item(material);
+    }
+
+    @Override
+    public String name() {
+        var name = ((MinestomMaterial) material).minestomType().registry().namespace().value();
+        if (name.endsWith("_wool")) {
+            return name.substring(0, name.length() - 5);
+        }
+        return name;
     }
 }

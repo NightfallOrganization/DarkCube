@@ -39,22 +39,23 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.item.ItemEntityMeta;
-import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
+import net.minestom.server.instance.anvil.AnvilLoader;
+import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.world.DimensionType;
-import net.minestom.server.world.biomes.BiomeManager;
+import net.minestom.server.world.biome.Biome;
 
 public class MinestomWorldHandler implements PlatformWorldHandler {
     private final @NotNull MinestomWoolBattleApi woolbattle;
     private final @NotNull InstanceManager instanceManager;
-    private final @NotNull BiomeManager biomeManager;
+    private final @NotNull DynamicRegistry<Biome> biomeRegistry;
 
-    public MinestomWorldHandler(@NotNull MinestomWoolBattleApi woolbattle, @NotNull InstanceManager instanceManager, @NotNull BiomeManager biomeManager) {
+    public MinestomWorldHandler(@NotNull MinestomWoolBattleApi woolbattle, @NotNull InstanceManager instanceManager, @NotNull DynamicRegistry<Biome> biomeRegistry) {
         this.woolbattle = woolbattle;
         this.instanceManager = instanceManager;
-        this.biomeManager = biomeManager;
+        this.biomeRegistry = biomeRegistry;
     }
 
     @Override
@@ -73,7 +74,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
         try {
             var worldHandler = woolbattle.worldHandler();
             var instance = new InstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
-            var biome = biomeManager.getByName("minecraft:plains");
+            var biome = biomeRegistry.get(Biome.PLAINS);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
             var path = extractWorld("setup", zip, null);
@@ -95,7 +96,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     public @NotNull CommonGameWorld loadLobbyWorld(@NotNull CommonGame game) {
         try {
             var instance = new InstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
-            var biome = biomeManager.getByName("minecraft:plains");
+            var biome = biomeRegistry.get(Biome.PLAINS);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
             var path = extractWorld(game.id() + "-lobby", zip, null);

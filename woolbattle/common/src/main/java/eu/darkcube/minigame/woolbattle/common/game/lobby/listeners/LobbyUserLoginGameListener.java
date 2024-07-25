@@ -7,22 +7,22 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.lobby.listeners;
 
-import eu.darkcube.minigame.woolbattle.api.event.game.UserJoinGameEvent;
+import eu.darkcube.minigame.woolbattle.api.event.game.UserLoginGameEvent;
 import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public class LobbyUserJoinGameListener extends ConfiguredListener<UserJoinGameEvent> {
+public class LobbyUserLoginGameListener extends ConfiguredListener<UserLoginGameEvent> {
     private final @NotNull CommonLobby lobby;
 
-    public LobbyUserJoinGameListener(@NotNull CommonLobby lobby) {
-        super(UserJoinGameEvent.class);
+    public LobbyUserLoginGameListener(@NotNull CommonLobby lobby) {
+        super(UserLoginGameEvent.class);
         this.lobby = lobby;
     }
 
     @Override
-    public void accept(UserJoinGameEvent event) {
-        event.result(UserJoinGameEvent.Result.USER_PLAYING);
+    public void accept(UserLoginGameEvent event) {
+        event.result(UserLoginGameEvent.Result.USER_PLAYING);
         event.spawnLocation(lobby.spawn());
     }
 }

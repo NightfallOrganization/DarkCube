@@ -44,10 +44,6 @@ public class LitLight implements Light {
     }
 
     @Override
-    public void invalidatePropagation() {
-    }
-
-    @Override
     public int getLevel(int x, int y, int z) {
         return 15;
     }

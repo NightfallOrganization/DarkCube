@@ -33,4 +33,8 @@ public interface TeamManager {
     @NotNull
     @Unmodifiable
     Collection<? extends Team> teams();
+
+    @Api
+    @NotNull
+    Team spectator();
 }

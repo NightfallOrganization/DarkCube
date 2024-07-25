@@ -8,15 +8,15 @@
 package eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners;
 
 import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListener;
-import eu.darkcube.minigame.woolbattle.minestom.event.MinestomInventoryClickEvent;
+import eu.darkcube.minigame.woolbattle.minestom.event.MinestomInventoryPreClickEvent;
 
-public class MinestomLobbyInventoryClickListener extends ConfiguredListener<MinestomInventoryClickEvent> {
+public class MinestomLobbyInventoryClickListener extends ConfiguredListener<MinestomInventoryPreClickEvent> {
     public MinestomLobbyInventoryClickListener() {
-        super(MinestomInventoryClickEvent.class);
+        super(MinestomInventoryPreClickEvent.class);
     }
 
     @Override
-    public void accept(MinestomInventoryClickEvent customEvent) {
+    public void accept(MinestomInventoryPreClickEvent customEvent) {
         var event = customEvent.event();
         event.setCancelled(true);
     }

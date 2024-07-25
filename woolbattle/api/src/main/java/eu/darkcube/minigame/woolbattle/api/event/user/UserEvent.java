@@ -11,7 +11,8 @@ import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface UserEvent {
-    @NotNull WBUser user();
+    @NotNull
+    WBUser user();
 
     class Event implements UserEvent {
         private final @NotNull WBUser user;

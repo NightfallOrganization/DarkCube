@@ -19,6 +19,7 @@ import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInteractListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInventoryListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomItemListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomJoinListener;
@@ -71,6 +72,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         MinestomItemListener.register(this, eventManager);
         MinestomInventoryListener.register(this, eventManager);
         MinestomAnimationListener.register(this, eventManager);
+        MinestomInteractListener.register(this, eventManager);
 
         MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
@@ -93,7 +95,13 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     @Override
     public void broadcastTeamUpdate(@NotNull CommonWBUser user, @Nullable CommonTeam oldTeam, @Nullable CommonTeam newTeam) {
-        logger().info("User " + user.playerName() + " switched to team " + (newTeam == null ? "null" : newTeam.key()) + " from  " + (oldTeam == null ? "null" : oldTeam.key()));
+        if (oldTeam != null && newTeam != null) {
+            logger().info("User {} switched to team {} from  {}", user.playerName(), newTeam.key(), oldTeam.key());
+        } else if (oldTeam != null) {
+            logger().info("User {} left team {}", user.playerName(), oldTeam.key());
+        } else if (newTeam != null) {
+            logger().info("User {} joined team {}", user.playerName(), newTeam.key());
+        }
     }
 
     @Override

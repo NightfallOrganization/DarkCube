@@ -13,10 +13,10 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import eu.darkcube.minigame.woolbattle.api.event.game.GameEvent;
-import eu.darkcube.minigame.woolbattle.api.event.game.UserJoinGameEvent;
+import eu.darkcube.minigame.woolbattle.api.event.game.UserLoginGameEvent;
 import eu.darkcube.minigame.woolbattle.api.event.game.UserQuitGameEvent;
-import eu.darkcube.minigame.woolbattle.api.event.user.SetupUserGameEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserJoinGameEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.WorldEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
@@ -196,7 +196,7 @@ public class CommonGame implements Game {
 
     public @NotNull JoinResult playerJoined(@NotNull CommonWBUser user) {
         users.add(user);
-        var event = new UserJoinGameEvent(user, this, UserJoinGameEvent.Result.CANNOT_JOIN, null);
+        var event = new UserLoginGameEvent(user, this, UserLoginGameEvent.Result.CANNOT_JOIN, null);
         woolbattle.eventManager().call(event);
         var result = event.result();
         var location = event.spawnLocation();
@@ -216,6 +216,7 @@ public class CommonGame implements Game {
         var event = new UserQuitGameEvent(user, this);
         woolbattle.eventManager().call(event);
         users.remove(user);
+        user.clearTeam();
         removeFromPlaying(user);
         removeFromSpectating(user);
         checkUnload();
@@ -223,7 +224,8 @@ public class CommonGame implements Game {
     }
 
     public void playerSetup(@NotNull CommonWBUser user) {
-        var event = new SetupUserGameEvent(user, this);
+        user.team(teamManager.spectator());
+        var event = new UserJoinGameEvent(user, this);
         woolbattle.eventManager().call(event);
     }
 

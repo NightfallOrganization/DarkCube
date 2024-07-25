@@ -85,7 +85,9 @@ public enum Messages implements Message {
     SET_LOBBY_SPAWN,
     SET_SETUP_LOBBY_SPAWN,
     TEAM_CONFIGURATION_NOT_FOUND,
-    INVALID_COLOR;
+    INVALID_NAME_COLOR,
+    INVALID_WOOL_COLOR,
+    TEAM_INFO;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final String ITEM_PREFIX = "ITEM_";
@@ -107,7 +109,7 @@ public enum Messages implements Message {
 
     @Override
     public String getPrefixModifier() {
-        return Message.super.getPrefixModifier();
+        return KEY_PREFIX;
     }
 
     @Override

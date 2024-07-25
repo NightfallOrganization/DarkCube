@@ -13,11 +13,11 @@ import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
-public class UserJoinGameEvent extends GameEvent.User.Event {
+public class UserLoginGameEvent extends GameEvent.User.Event {
     private @NotNull Result result;
     private @Nullable Location spawnLocation;
 
-    public UserJoinGameEvent(@NotNull WBUser user, @NotNull Game game, @NotNull Result result, @Nullable Location spawnLocation) {
+    public UserLoginGameEvent(@NotNull WBUser user, @NotNull Game game, @NotNull Result result, @Nullable Location spawnLocation) {
         super(user, game);
         this.result = result;
         this.spawnLocation = spawnLocation;

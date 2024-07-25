@@ -35,8 +35,31 @@ public interface CommonItem extends Item {
         return Messages.ITEM_PREFIX + key();
     }
 
+    default boolean storeIdOnItem() {
+        return true;
+    }
+
     @Override
     default @NotNull ItemBuilder createItem(@NotNull User user) {
         return ItemManager.instance().getItem(this, user);
+    }
+
+    default CommonItem withoutId() {
+        return new CommonItem() {
+            @Override
+            public ItemBuilder builder() {
+                return CommonItem.this.builder();
+            }
+
+            @Override
+            public String key() {
+                return CommonItem.this.key();
+            }
+
+            @Override
+            public boolean storeIdOnItem() {
+                return false;
+            }
+        };
     }
 }

@@ -31,14 +31,14 @@ public class MinestomJoinListener {
             var game = joinResult.game();
             woolbattle.player(user, player);
             if (game == null) {
-                woolbattle.logger().info("Player " + user.playerName() + " connecting to SetupMode");
+                woolbattle.logger().info("Player {} connecting to SetupMode", user.playerName());
                 // setup mode
                 woolbattle.setupModeImplementation().enterSetupMode(user, (instance, point) -> {
                     event.setSpawningInstance(instance);
                     player.setRespawnPoint(point);
                 });
             } else {
-                woolbattle.logger().info("Player " + user.playerName() + " connecting to game " + game.id());
+                woolbattle.logger().info("Player {} connecting to game {}", user.playerName(), game.id());
                 var result = game.playerJoined(user);
                 if (result.location() == null) { // no spawn location found, enter setup mode
                     game.playerQuit(user);

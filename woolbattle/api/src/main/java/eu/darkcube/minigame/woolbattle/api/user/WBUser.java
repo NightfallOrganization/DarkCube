@@ -131,6 +131,7 @@ public interface WBUser extends CommandSender {
     /**
      * @return this player's language
      */
+    @Override
     @Api
     default @NotNull Language language() {
         return user().language();

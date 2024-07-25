@@ -50,7 +50,9 @@ public class ItemManager {
 
     public ItemBuilder getItem(Item item, WBUser user, Object[] replacements, Object... loreReplacements) {
         var builder = item.builder();
-        setId(builder, itemId, item.itemId());
+        if (!(item instanceof CommonItem commonItem) || commonItem.storeIdOnItem()) {
+            setId(builder, itemId, item.itemId());
+        }
         var language = user.language();
         var name = Messages.getMessage(item.itemId(), language, replacements);
         builder.displayname(name);

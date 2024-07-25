@@ -12,6 +12,7 @@ import static eu.darkcube.system.util.data.PersistentDataTypes.BOOLEAN;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.event.user.UserAddWoolEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserChangeTeamEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetMaxWoolSizeEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetWoolBreakAmountEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserRemoveWoolEvent;
@@ -183,11 +184,26 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         return team;
     }
 
+    public void clearTeam() {
+        this.team0(null);
+    }
+
     @Override
     public void team(@NotNull Team team) {
-        if (!(team instanceof CommonTeam c)) throw new IllegalArgumentException("Team must be created with CommonTeamManager");
+        this.team0(team);
+    }
+
+    private void team0(@Nullable Team team) {
+        if (this.team == team) return;
+        if (team != null && !(team instanceof CommonTeam)) throw new IllegalArgumentException("Team must be created with CommonTeamManager");
+        var c = (CommonTeam) team;
         var oldTeam = this.team;
+        if (oldTeam != null) oldTeam.usersModifiable().remove(this);
         this.team = c;
+        if (c != null) {
+            c.usersModifiable().add(this);
+        }
+        woolbattle.eventManager().call(new UserChangeTeamEvent(this, oldTeam, team));
         woolbattle.woolbattle().broadcastTeamUpdate(this, oldTeam, c);
     }
 

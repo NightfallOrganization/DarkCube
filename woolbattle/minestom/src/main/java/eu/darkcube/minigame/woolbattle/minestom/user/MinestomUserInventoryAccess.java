@@ -7,8 +7,6 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.user;
 
-import java.util.ArrayList;
-
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
@@ -16,6 +14,9 @@ import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.material.Material;
+import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
@@ -36,7 +37,7 @@ public class MinestomUserInventoryAccess implements UserInventoryAccess {
         final var player = woolbattle.player(user);
         var team = user.team();
         if (team == null) return;
-        player.getAcquirable().sync(e -> {
+        player.acquirable().sync(e -> {
             var p = (Player) e;
             var inventory = p.getInventory();
             var wool = (MinestomColoredWool) team.wool();
@@ -80,20 +81,22 @@ public class MinestomUserInventoryAccess implements UserInventoryAccess {
     }
 
     private static void removeItems(@NotNull PlayerInventory inventory, @NotNull ItemStack itemToRemove, int size, boolean reverse) {
-        var slots = new ArrayList<Integer>(size);
-        if (reverse) {
-            for (var i = size - 1; i >= 0; i--) {
-                slots.add(i);
-            }
-        } else {
-            for (var i = 0; i < size; i++) {
-                slots.add(i);
-            }
-        }
-        var type = TransactionType.take(slots);
-        TransactionOption.ALL.fill(type, inventory, itemToRemove);
-        // var pair = TransactionType.TAKE.process(inventory, itemToRemove, (a, b) -> true, start, end, step);
-        // TransactionOption.ALL.fill(inventory, pair.left(), pair.right());
+        // var slots = new ArrayList<Integer>(size);
+        // if (reverse) {
+        //     for (var i = size - 1; i >= 0; i--) {
+        //         slots.add(i);
+        //     }
+        // } else {
+        //     for (var i = 0; i < size; i++) {
+        //         slots.add(i);
+        //     }
+        // }
+        // var type = TransactionType.take(slots);
+        // TransactionOption.ALL.fill(type, inventory, itemToRemove);
+        var start = reverse ? inventory.getInnerSize() : 0;
+        var end = reverse ? 0 : inventory.getInnerSize();
+        var pair = reverse ? TAKE.process(inventory, itemToRemove, (_, _) -> true, start, end, -1) : TransactionType.TAKE.process(inventory, itemToRemove, (_, _) -> true, start, end, 1);
+        TransactionOption.ALL.fill(inventory, pair.left(), pair.right());
     }
 
     // private static int last(PlayerInventory inventory, ItemStack item) {
@@ -106,4 +109,32 @@ public class MinestomUserInventoryAccess implements UserInventoryAccess {
     //     }
     //     return -1;
     // }
+    private static final TransactionType TAKE = (inventory, itemStack, slotPredicate, start, end, step) -> {
+        Int2ObjectMap<ItemStack> itemChangesMap = new Int2ObjectOpenHashMap<>();
+        for (var i = start; i >= end; i += step) {
+            final var inventoryItem = inventory.getItemStack(i);
+            if (inventoryItem.isAir()) continue;
+            if (itemStack.isSimilar(inventoryItem)) {
+                if (!slotPredicate.test(i, inventoryItem)) {
+                    // Cancelled transaction
+                    continue;
+                }
+
+                final var itemAmount = inventoryItem.amount();
+                final var itemStackAmount = itemStack.amount();
+                if (itemStackAmount < itemAmount) {
+                    itemChangesMap.put(i, inventoryItem.withAmount(itemAmount - itemStackAmount));
+                    itemStack = ItemStack.AIR;
+                    break;
+                }
+                itemChangesMap.put(i, ItemStack.AIR);
+                itemStack = itemStack.withAmount(itemStackAmount - itemAmount);
+                if (itemStack.amount() == 0) {
+                    itemStack = ItemStack.AIR;
+                    break;
+                }
+            }
+        }
+        return Pair.of(itemStack, itemChangesMap);
+    };
 }

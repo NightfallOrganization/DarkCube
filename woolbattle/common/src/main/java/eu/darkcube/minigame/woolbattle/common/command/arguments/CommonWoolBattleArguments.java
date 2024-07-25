@@ -14,11 +14,13 @@ import eu.darkcube.minigame.woolbattle.api.command.arguments.ToStringFunction;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class CommonWoolBattleArguments implements WoolBattleArguments {
@@ -61,6 +63,26 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
     @Override
     public @NotNull TeamConfiguration teamConfiguration0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
         return CommonTeamConfigurationArgument.getTeamConfiguration(ctx, name);
+    }
+
+    @Override
+    public @NotNull ArgumentType<@NotNull ?> woolColorArgument0() {
+        return WoolColorArgument.woolColor(woolbattle.woolProvider());
+    }
+
+    @Override
+    public @NotNull ColoredWool woolColor0(@NotNull CommandContext<?> ctx, @NotNull String name) {
+        return WoolColorArgument.getWoolColor(ctx, name);
+    }
+
+    @Override
+    public @NotNull ArgumentType<@NotNull ?> textColorArgument0() {
+        return TextColorArgument.color();
+    }
+
+    @Override
+    public @NotNull TextColor textColor0(@NotNull CommandContext<?> ctx, @NotNull String name) {
+        return TextColorArgument.getColor(ctx, name);
     }
 
     @Override
