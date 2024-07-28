@@ -9,8 +9,10 @@ package eu.darkcube.minigame.woolbattle.common;
 
 import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
+import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
 import eu.darkcube.minigame.woolbattle.common.event.CommonEventHandler;
+import eu.darkcube.minigame.woolbattle.common.perk.CommonActivationTypeItemProvider;
 import eu.darkcube.minigame.woolbattle.common.setup.SetupMode;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
@@ -44,6 +46,7 @@ public abstract class CommonWoolBattle implements Namespaced {
         eventHandler = new CommonEventHandler(this);
         setupMode = new SetupMode(this);
         WoolBattleProvider.PROVIDER.register(TaskScheduleProvider.class, new TaskScheduleProviderImpl());
+        WoolBattleProvider.PROVIDER.register(ActivationType.ItemProvider.class, new CommonActivationTypeItemProvider());
         this.worldDataProvider = new SimpleWorldDataProvider();
         this.languageRegistry = new LanguageRegistry();
 
@@ -114,8 +117,17 @@ public abstract class CommonWoolBattle implements Namespaced {
         return this.defaultPagedItemTemplate;
     }
 
-    public void configureDefaultPagedInventory(@NotNull InventoryTemplate template) {
+    public void configureDefaultSinglePagedInventory(@NotNull InventoryTemplate template) {
         template.setItems(0, defaultSinglePagedInventoryTemplate());
+        configurePaged(template);
+    }
+
+    public void configureDefaultPagedInventory(@NotNull InventoryTemplate template) {
+        template.setItems(0, defaultPagedInventoryTemplate());
+        configurePaged(template);
+    }
+
+    private void configurePaged(@NotNull InventoryTemplate template) {
         template.animation().calculateManifold(22, 1);
         var pagination = template.pagination();
         pagination.pageSlots(DefaultInventorySettings.PAGE_SLOTS_5x9);

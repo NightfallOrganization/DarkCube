@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.common.util.item;
 
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public enum Items implements CommonItem {
@@ -123,12 +124,12 @@ public enum Items implements CommonItem {
     }
 
     @Override
-    public String key() {
+    public @NotNull String key() {
         return key;
     }
 
     @Override
-    public ItemBuilder builder() {
+    public @NotNull ItemBuilder builder() {
         return builder.clone();
     }
 

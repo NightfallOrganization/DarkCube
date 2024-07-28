@@ -16,22 +16,40 @@ import eu.darkcube.system.userapi.User;
 
 public interface CommonItem extends Item {
     @Override
-    default ItemBuilder getItem(WBUser user) {
+    default @NotNull ItemBuilder getItem(@NotNull WBUser user) {
         return ItemManager.instance().getItem(this, user);
     }
 
     @Override
-    default ItemBuilder getItem(WBUser user, Object... replacements) {
+    default @NotNull ItemBuilder getItem(@NotNull WBUser user, Object @NotNull ... replacements) {
         return ItemManager.instance().getItem(this, user, replacements);
     }
 
     @Override
-    default ItemBuilder getItem(WBUser user, Object[] replacements, Object... loreReplacements) {
+    default @NotNull ItemBuilder getItem(@NotNull WBUser user, Object @NotNull [] replacements, Object @NotNull ... loreReplacements) {
         return ItemManager.instance().getItem(this, user, replacements, loreReplacements);
     }
 
     @Override
-    default String itemId() {
+    @NotNull
+    default ItemBuilder getItem(@NotNull User user, @NotNull Object @NotNull [] replacements, @NotNull Object @NotNull ... loreReplacements) {
+        return ItemManager.instance().getItem(this, user, replacements, loreReplacements);
+    }
+
+    @Override
+    @NotNull
+    default ItemBuilder getItem(@NotNull User user, @NotNull Object @NotNull ... replacements) {
+        return ItemManager.instance().getItem(this, user, replacements);
+    }
+
+    @Override
+    @NotNull
+    default ItemBuilder getItem(@NotNull User user) {
+        return ItemManager.instance().getItem(this, user);
+    }
+
+    @Override
+    default @NotNull String itemId() {
         return Messages.ITEM_PREFIX + key();
     }
 
@@ -47,12 +65,12 @@ public interface CommonItem extends Item {
     default CommonItem withoutId() {
         return new CommonItem() {
             @Override
-            public ItemBuilder builder() {
+            public @NotNull ItemBuilder builder() {
                 return CommonItem.this.builder();
             }
 
             @Override
-            public String key() {
+            public @NotNull String key() {
                 return CommonItem.this.key();
             }
 

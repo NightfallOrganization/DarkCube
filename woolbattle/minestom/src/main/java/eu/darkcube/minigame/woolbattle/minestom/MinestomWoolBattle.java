@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
+import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
+import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
@@ -38,6 +40,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.thread.Acquirable;
 import net.minestom.server.timer.TaskSchedule;
@@ -96,7 +99,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     @Override
     public void broadcastTeamUpdate(@NotNull CommonWBUser user, @Nullable CommonTeam oldTeam, @Nullable CommonTeam newTeam) {
         if (oldTeam != null && newTeam != null) {
-            logger().info("User {} switched to team {} from  {}", user.playerName(), newTeam.key(), oldTeam.key());
+            logger().info("User {} switched to team {} from {}", user.playerName(), newTeam.key(), oldTeam.key());
         } else if (oldTeam != null) {
             logger().info("User {} left team {}", user.playerName(), oldTeam.key());
         } else if (newTeam != null) {
@@ -117,6 +120,14 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     @Override
     public @NotNull MinestomUserPermissions createPermissionsFor(@NotNull CommonWBUser user) {
         return new MinestomUserPermissions(this, user);
+    }
+
+    public CommandSender wrapCommandSender(net.minestom.server.command.CommandSender sender) {
+        if (sender instanceof MinestomPlayer player) {
+            var user = player.user();
+            if (user != null) return user;
+        }
+        return new MinestomCommandSender(sender);
     }
 
     public @NotNull MinestomPlayer player(@NotNull CommonWBUser user) {

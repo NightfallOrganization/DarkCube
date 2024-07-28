@@ -13,6 +13,7 @@ import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.material.Material;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -58,6 +59,12 @@ public class MinestomUserInventoryAccess implements UserInventoryAccess {
                 inventory.addItemStack(wool.createSingleItem().amount(difference).build(), TransactionOption.ALL);
             }
         });
+    }
+
+    @Override
+    public void setItem(int slot, ItemBuilder item) {
+        final var player = woolbattle.player(user);
+        player.getInventory().setItemStack(slot, item.build());
     }
 
     private static void removeItems(PlayerInventory inventory, ItemStack itemToRemove, int count, WoolSubtractDirection direction) {

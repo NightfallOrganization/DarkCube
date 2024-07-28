@@ -26,14 +26,7 @@ public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGa
     public void accept(UserJoinGameEvent event) {
         var user = (CommonWBUser) event.user();
         var player = woolbattle.player(user);
-        var inventory = player.getInventory();
-        inventory.setItemStack(0, Items.LOBBY_PERKS.getItem(user).build());
-        inventory.setItemStack(1, Items.LOBBY_TEAMS.getItem(user).build());
-        inventory.setItemStack(4, (user.particles() ? Items.LOBBY_PARTICLES_ON : Items.LOBBY_PARTICLES_OFF).getItem(user).build());
-        inventory.setItemStack(7, Items.SETTINGS.getItem(user).build());
-        inventory.setItemStack(8, Items.LOBBY_VOTING.getItem(user).build());
         player.setFoodSaturation(0);
-
         player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1024);
     }
 }

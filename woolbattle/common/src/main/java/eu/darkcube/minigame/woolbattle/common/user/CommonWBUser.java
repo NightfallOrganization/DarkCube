@@ -15,6 +15,7 @@ import eu.darkcube.minigame.woolbattle.api.event.user.UserAddWoolEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserChangeTeamEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetMaxWoolSizeEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetWoolBreakAmountEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserParticlesUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserRemoveWoolEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolCountUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
@@ -266,6 +267,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @Override
     public void particles(boolean particles) {
         user.persistentData().set(keyParticles, BOOLEAN, particles);
+        woolbattle.eventManager().call(new UserParticlesUpdateEvent(this, particles));
     }
 
     @Override
@@ -291,5 +293,9 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @Override
     public @NotNull Audience audience() {
         return user;
+    }
+
+    public @NotNull UserInventoryAccess inventoryAccess() {
+        return inventoryAccess;
     }
 }

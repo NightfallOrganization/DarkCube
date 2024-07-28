@@ -32,22 +32,17 @@ public class LobbyItemListener implements ConfiguredListeners {
     private void handle(WBUser user, ItemBuilder item) {
         var itemId = ItemManager.instance().getItemId(item);
         if (itemId == null) return;
-        if (itemId.equals(Items.LOBBY_VOTING_MAPS.itemId())) {
-
-        } else if (itemId.equals(Items.LOBBY_VOTING_LIFES.itemId())) {
-
-        } else if (itemId.equals(Items.LOBBY_VOTING_EP_GLITCH.itemId())) {
-
+        if (itemId.equals(Items.LOBBY_PERKS.itemId())) {
+            lobby.perksInventoryTemplate().open(user.user());
+        } else if (itemId.equals(Items.LOBBY_VOTING.itemId())) {
+            lobby.votingInventoryTemplate().open(user.user());
         } else if (itemId.equals(Items.LOBBY_TEAMS.itemId())) {
             lobby.teamsInventoryTemplate().open(user.user());
         } else if (itemId.equals(Items.LOBBY_PARTICLES_OFF.itemId())) {
             user.particles(true);
-            System.out.println("Particles on");
         } else if (itemId.equals(Items.LOBBY_PARTICLES_ON.itemId())) {
             user.particles(false);
-            System.out.println("Particles off");
         }
-
     }
 
     private void handle(UserClickItemEvent event) {

@@ -17,6 +17,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.minestom.util.adventure.MinestomAdventureSupport;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
+import net.luckperms.api.LuckPermsProvider;
 import net.minestom.server.entity.Player;
 
 public class MinestomCommandSender implements CommandSender, ForwardingAudience.Single {
