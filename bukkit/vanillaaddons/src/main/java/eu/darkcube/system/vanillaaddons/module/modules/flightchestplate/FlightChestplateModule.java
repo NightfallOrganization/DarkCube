@@ -19,7 +19,6 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.attribute.Attribute;
-import eu.darkcube.system.server.item.attribute.AttributeModifier;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
@@ -41,6 +40,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.RecipeChoice.MaterialChoice;
 import org.bukkit.inventory.SmithingRecipe;
@@ -105,16 +105,16 @@ public class FlightChestplateModule implements Listener, Module {
         var modifiers = first.attributeModifiers(Attribute.of(GENERIC_ARMOR));
         for (var modifier : modifiers) {
             var bukkitModifier = ((BukkitAttributeModifier) modifier).<org.bukkit.attribute.AttributeModifier>bukkitType();
-            if (bukkitModifier.getName().equals("flight_chestplate") && (bukkitModifier.getAmount() < 0 || bukkitModifier.getOperation() != org.bukkit.attribute.AttributeModifier. Operation.ADD_NUMBER || bukkitModifier.getSlot() != EquipmentSlot.CHEST)) {
-                first.removeAttributeModifier(Attribute.of(GENERIC_ARMOR), modifier);
-                first.attributeModifier(Attribute.of(GENERIC_ARMOR), AttributeModifier.of(new org.bukkit.attribute.AttributeModifier(bukkitModifier.getUniqueId(), bukkitModifier.getName(), 0, org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST)));
+            if (bukkitModifier.getName().equals("flight_chestplate") && (bukkitModifier.getAmount() < 0 || bukkitModifier.getOperation() != org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER || bukkitModifier.getSlot() != EquipmentSlot.CHEST)) {
+                first.removeAttributeModifiers(Attribute.of(GENERIC_ARMOR));
+                first.attributeModifier(GENERIC_ARMOR, bukkitModifier.key(), EquipmentSlotGroup.CHEST, 0, org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER);
                 inv.setItem(1, first.build());
             }
         }
 
         var second = inv.getItem(2) == null ? null : ItemBuilder.item(inv.getItem(2));
         if (second == null) return;
-        if (second.material() != eu.darkcube.system.server.item.material.Material.of(Material.NETHER_STAR) )return;
+        if (second.material() != eu.darkcube.system.server.item.material.Material.of(Material.NETHER_STAR)) return;
         if (speed >= 20) return;
         first.persistentDataStorage().set(SPEED_KEY, PersistentDataTypes.INTEGER, speed + 1);
         List<Component> lore = new ArrayList<>(first.lore());
@@ -123,8 +123,6 @@ public class FlightChestplateModule implements Listener, Module {
         event.setResult(first.build());
     }
 
-
-
     @EventHandler
     public void handle(PlayerRecipeDiscoverEvent event) {
         if (event.getRecipe().equals(new NamespacedKey(addons, "flight_chestplate_upgrade"))) {
@@ -132,7 +130,7 @@ public class FlightChestplateModule implements Listener, Module {
         }
     }
 
-    @EventHandler (priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void handle(BlockDispenseArmorEvent event) {
         var target = event.getTargetEntity();
         if (!(target instanceof Player player)) return;
@@ -225,7 +223,9 @@ public class FlightChestplateModule implements Listener, Module {
         var currentSpeed = diff / MAX_SPEED * speed;
         var percent = Math.round(minSpeed / maxSpeed * 100 + currentSpeed / maxSpeed * 100);
         return Component.text("Geschwindigkeit: " + percent + "%").color(NamedTextColor.GRAY);
-    }public boolean canFly(ItemBuilder item) {
+    }
+
+    public boolean canFly(ItemBuilder item) {
         if (item == null) {
             return false;
         } else {

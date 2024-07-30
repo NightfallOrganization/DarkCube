@@ -24,7 +24,7 @@ jctools-core = "4.0.5"
 fastutil = "8.5.13"
 lombok-plugin = "8.6"
 
-paper-latest = "1.20.6-R0.1-SNAPSHOT"
+paper-latest = "1.21-R0.1-SNAPSHOT"
 paper-legacy = "1.8.8-R0.1-SNAPSHOT"
 
 [libraries]

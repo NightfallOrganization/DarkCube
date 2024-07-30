@@ -13,11 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.cloudnetservice.driver.event.EventListener;
-import eu.cloudnetservice.driver.event.EventManager;
-import eu.cloudnetservice.driver.event.InvocationOrder;
-import eu.cloudnetservice.driver.event.events.service.CloudServiceUpdateEvent;
-import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
@@ -27,6 +22,7 @@ import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.lobbysystem.util.server.ServerManager;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.GameState;
@@ -39,14 +35,14 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     public static final Key minigameServer = Key.key(Lobby.getInstance(), "minigameserver");
     private boolean done;
     private Item minigameItem;
-    private Listener listener = new Listener();
+    private ServerManager.UpdateListener updateListener = _ -> recalculate();
 
     public MinigameInventory(Component title, Item minigameItem, InventoryType type, User user) {
         super(type, title, user);
         this.minigameItem = minigameItem;
         this.done = true;
         this.complete();
-        InjectionLayer.boot().instance(EventManager.class).registerListener(this.listener);
+        Lobby.getInstance().serverManager().registerListener(updateListener);
     }
 
     protected abstract Set<String> getCloudTasks();
@@ -58,7 +54,7 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 
     @Override
     protected final void destroy() {
-        InjectionLayer.boot().instance(EventManager.class).unregisterListener(this.listener);
+        Lobby.getInstance().serverManager().unregisterListener(updateListener);
         this.destroy0();
         super.destroy();
     }
@@ -136,13 +132,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 
         public ItemStack item() {
             return item;
-        }
-    }
-
-    public class Listener {
-        @EventListener(order = InvocationOrder.MONITOR)
-        public void handle(CloudServiceUpdateEvent ignored) {
-            MinigameInventory.this.recalculate();
         }
     }
 }
