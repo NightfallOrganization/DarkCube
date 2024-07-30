@@ -1,5 +1,5 @@
 [versions]
-darkcubesystem = "1.0.9-SNAPSHOT"
+darkcubesystem = "1.0.11-SNAPSHOT"
 
 [libraries]
 api = { group = "eu.darkcube.system", name = "darkcubesystem-api", version.ref = "darkcubesystem" }

@@ -160,6 +160,10 @@ public class ServerManager {
         this.updateListeners.add(updateListener);
     }
 
+    public void unregisterListener(UpdateListener updateListener) {
+        this.updateListeners.remove(updateListener);
+    }
+
     public @Nullable ServerInformation byUniqueId(UUID uuid) {
         return mergedInformations.get(uuid);
     }
