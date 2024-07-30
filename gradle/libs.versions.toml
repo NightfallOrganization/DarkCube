@@ -3,6 +3,7 @@ metadata.format.version = "1.1"
 [versions]
 
 cloudnet = "4.0.0-RC10"
+gson = "2.11.0"
 bungee = "1.19-R0.1-SNAPSHOT"
 luckperms = "5.4"
 protocollib = "5.1.0"
@@ -28,6 +29,7 @@ paper-legacy = "1.8.8-R0.1-SNAPSHOT"
 paper-legacy = { group = "org.spigotmc", name = "spigot-api", version.ref = "paper-legacy" }
 paper-latest = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-latest" }
 
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 hologramlib = { group = "com.github.unldenis.hologram", name = "hologram-lib", version.ref = "hologramlib" }
