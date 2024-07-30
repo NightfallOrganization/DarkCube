@@ -141,7 +141,7 @@ public class ArrowPerk extends Perk {
             }
             if (!woolbattle.ingame().playerUtil().attack(shooter, user)) {
                 arrow.remove();
-                logger.warning("Inconsistent behaviour for ArrowPerk. This might mess up some logic for " + "other perks");
+                LOGGER.warn("Inconsistent behaviour for ArrowPerk. This might mess up some logic for other perks");
                 return;
             }
             userPlayer.damage(0);

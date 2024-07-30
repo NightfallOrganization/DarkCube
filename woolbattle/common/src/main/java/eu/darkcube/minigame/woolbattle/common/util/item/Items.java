@@ -114,7 +114,7 @@ public enum Items implements CommonItem {
     PERK_BERSERKER,
     GRAY_GLASS_PANE,
     BLACK_GLASS_PANE,
-    ;
+    HEIGHT_DISPLAY_COLOR_ENTRY;
 
     private final String key;
     private ItemBuilder builder;
@@ -133,7 +133,7 @@ public enum Items implements CommonItem {
         return builder.clone();
     }
 
-    static {
+    public static void loadItems() {
         for (var item : values()) {
             item.builder = ProviderReference.PROVIDER.builder(item);
         }

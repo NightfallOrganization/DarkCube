@@ -9,8 +9,10 @@ package eu.darkcube.minigame.woolbattle.common.user;
 
 import eu.darkcube.system.server.item.ItemBuilder;
 
-public interface UserInventoryAccess {
+public interface UserPlatformAccess {
     void woolCount(int count);
+
+    void xp(float xp);
 
     void setItem(int slot, ItemBuilder item);
 }

@@ -18,9 +18,12 @@ import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
 import org.bukkit.event.Listener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Perk {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger("Perk");
     private final Collection<Listener> listeners = new ArrayList<>();
     private final Collection<ConfiguredScheduler> schedulers = new ArrayList<>();
 

@@ -9,6 +9,8 @@ package eu.darkcube.minigame.woolbattle.minestom.game.lobby;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.LobbySidebarTeam;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyInventoryClickListener;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyJoinGameListener;
@@ -27,13 +29,8 @@ public class MinestomLobby extends CommonLobby {
     }
 
     @Override
-    public void enable() {
-        super.enable();
-    }
-
-    @Override
-    public void disable() {
-        super.disable();
+    protected void updateSidebar(@NotNull CommonWBUser user, LobbySidebarTeam team) {
+        this.scoreboard.update(user, team);
     }
 
     public @NotNull MinestomLobbyScoreboard scoreboard() {

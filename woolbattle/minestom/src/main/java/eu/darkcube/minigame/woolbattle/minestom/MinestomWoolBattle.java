@@ -29,8 +29,8 @@ import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomMoveListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomQuitListener;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
-import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
@@ -40,7 +40,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.thread.Acquirable;
 import net.minestom.server.timer.TaskSchedule;
@@ -56,9 +55,9 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     public MinestomWoolBattle() {
         super();
         this.api = new MinestomWoolBattleApi(this);
-        WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, api);
-        this.playerKey = Key.key(api, "minestom_player");
-        setupModeImplementation = new MinestomSetupModeImplementation(api);
+        WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, this.api);
+        this.playerKey = Key.key(this.api, "minestom_player");
+        this.setupModeImplementation = new MinestomSetupModeImplementation(this.api);
     }
 
     @Override
@@ -113,8 +112,8 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     }
 
     @Override
-    public @NotNull MinestomUserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user) {
-        return new MinestomUserInventoryAccess(this, user);
+    public @NotNull MinestomUserPlatformAccess createInventoryAccessFor(@NotNull CommonWBUser user) {
+        return new MinestomUserPlatformAccess(this, user);
     }
 
     @Override

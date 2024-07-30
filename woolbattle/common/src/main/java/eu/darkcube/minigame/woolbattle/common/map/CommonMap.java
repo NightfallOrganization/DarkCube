@@ -65,12 +65,12 @@ public class CommonMap implements Map {
 
     @Override
     public @NotNull ItemBuilder icon() {
-        return icon;
+        return icon.clone();
     }
 
     @Override
     public void icon(@NotNull ItemBuilder icon) {
-        this.icon = icon;
+        this.icon = icon.clone();
         save();
     }
 

@@ -8,16 +8,21 @@
 package eu.darkcube.minigame.woolbattle.common;
 
 import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
+import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
+import static eu.darkcube.system.server.inventory.Inventory.createChestTemplate;
 
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
+import eu.darkcube.minigame.woolbattle.api.util.translation.Message;
 import eu.darkcube.minigame.woolbattle.common.event.CommonEventHandler;
+import eu.darkcube.minigame.woolbattle.common.inventory.SettingsInventory;
 import eu.darkcube.minigame.woolbattle.common.perk.CommonActivationTypeItemProvider;
 import eu.darkcube.minigame.woolbattle.common.setup.SetupMode;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
-import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
+import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
+import eu.darkcube.minigame.woolbattle.common.util.item.CommonItem;
 import eu.darkcube.minigame.woolbattle.common.util.item.DefaultInventorySettings;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.TaskScheduleProviderImpl;
@@ -41,6 +46,10 @@ public abstract class CommonWoolBattle implements Namespaced {
     private final @NotNull ItemTemplate defaultItemTemplate;
     private final @NotNull ItemTemplate defaultPagedItemTemplate;
     private final @NotNull ItemTemplate defaultSinglePagedItemTemplate;
+    private final @NotNull InventoryTemplate settingsInventoryTemplate;
+    private final @NotNull InventoryTemplate settingsHeightDisplayInventoryTemplate;
+    private final @NotNull InventoryTemplate settingsHeightDisplayColorInventoryTemplate;
+    private final @NotNull InventoryTemplate settingsWoolDirectionInventoryTemplate;
 
     public CommonWoolBattle() {
         eventHandler = new CommonEventHandler(this);
@@ -53,9 +62,15 @@ public abstract class CommonWoolBattle implements Namespaced {
         this.defaultItemTemplate = DefaultInventorySettings.create();
         this.defaultPagedItemTemplate = DefaultInventorySettings.create();
         this.defaultSinglePagedItemTemplate = DefaultInventorySettings.create();
+
+        this.settingsInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.create(this));
+        this.settingsHeightDisplayInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createHeightDisplay(this));
+        this.settingsHeightDisplayColorInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createHeightDisplayColor(this));
+        this.settingsWoolDirectionInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createWoolDirection(this));
     }
 
     public void start() {
+        Items.loadItems();
         var api = api();
         api.teamRegistry().init();
         api.lobbySystemLink().enable();
@@ -101,7 +116,23 @@ public abstract class CommonWoolBattle implements Namespaced {
 
     public abstract @NotNull CommonWoolBattleApi api();
 
-    public abstract @NotNull UserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user);
+    public @NotNull InventoryTemplate settingsInventoryTemplate() {
+        return settingsInventoryTemplate;
+    }
+
+    public @NotNull InventoryTemplate settingsHeightDisplayInventoryTemplate() {
+        return settingsHeightDisplayInventoryTemplate;
+    }
+
+    public @NotNull InventoryTemplate settingsHeightDisplayColorInventoryTemplate() {
+        return settingsHeightDisplayColorInventoryTemplate;
+    }
+
+    public @NotNull InventoryTemplate settingsWoolDirectionInventoryTemplate() {
+        return settingsWoolDirectionInventoryTemplate;
+    }
+
+    public abstract @NotNull UserPlatformAccess createInventoryAccessFor(@NotNull CommonWBUser user);
 
     public abstract @NotNull UserPermissions createPermissionsFor(@NotNull CommonWBUser user);
 
@@ -125,6 +156,16 @@ public abstract class CommonWoolBattle implements Namespaced {
     public void configureDefaultPagedInventory(@NotNull InventoryTemplate template) {
         template.setItems(0, defaultPagedInventoryTemplate());
         configurePaged(template);
+    }
+
+    public InventoryTemplate createDefaultTemplate(String key, Message title, @Nullable CommonItem displayItem) {
+        var template = createChestTemplate(key(this, key), 5 * 9);
+        template.title(title);
+        configureDefaultSinglePagedInventory(template);
+        if (displayItem != null) {
+            template.setItem(10, 4, displayItem.withoutId());
+        }
+        return template;
     }
 
     private void configurePaged(@NotNull InventoryTemplate template) {

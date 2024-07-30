@@ -14,15 +14,21 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 public interface TaskScheduleProvider {
-    @NotNull TaskSchedule duration(@NotNull Duration duration);
+    @NotNull
+    TaskSchedule duration(@NotNull Duration duration);
 
-    @NotNull TaskSchedule tick(int tick);
+    @NotNull
+    TaskSchedule tick(int tick);
 
-    @NotNull TaskSchedule nextTick();
+    @NotNull
+    TaskSchedule nextTick();
 
-    @NotNull TaskSchedule immediate();
+    @NotNull
+    TaskSchedule immediate();
 
-    @NotNull TaskSchedule seconds(int seconds);
+    @NotNull
+    TaskSchedule seconds(int seconds);
 
-    @NotNull TaskSchedule stop();
+    @NotNull
+    TaskSchedule stop();
 }

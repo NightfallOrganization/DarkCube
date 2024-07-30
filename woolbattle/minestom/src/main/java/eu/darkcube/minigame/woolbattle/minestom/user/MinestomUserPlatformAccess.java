@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.minestom.user;
 
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
-import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
+import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -24,11 +24,11 @@ import net.minestom.server.inventory.TransactionOption;
 import net.minestom.server.inventory.TransactionType;
 import net.minestom.server.item.ItemStack;
 
-public class MinestomUserInventoryAccess implements UserInventoryAccess {
+public class MinestomUserPlatformAccess implements UserPlatformAccess {
     private final @NotNull MinestomWoolBattle woolbattle;
     private final @NotNull CommonWBUser user;
 
-    public MinestomUserInventoryAccess(@NotNull MinestomWoolBattle woolbattle, @NotNull CommonWBUser user) {
+    public MinestomUserPlatformAccess(@NotNull MinestomWoolBattle woolbattle, @NotNull CommonWBUser user) {
         this.woolbattle = woolbattle;
         this.user = user;
     }
@@ -59,6 +59,12 @@ public class MinestomUserInventoryAccess implements UserInventoryAccess {
                 inventory.addItemStack(wool.createSingleItem().amount(difference).build(), TransactionOption.ALL);
             }
         });
+    }
+
+    @Override
+    public void xp(float xp) {
+        final var player = woolbattle.player(user);
+        player.setExp(xp);
     }
 
     @Override

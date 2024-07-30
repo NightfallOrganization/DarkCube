@@ -7,9 +7,12 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.listener;
 
+import eu.darkcube.minigame.woolbattle.api.event.game.UserLoginGameEvent;
+import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
+import eu.darkcube.system.minestom.util.adventure.MinestomAdventureSupport;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.event.Event;
@@ -24,7 +27,7 @@ public class MinestomJoinListener {
             var joinResult = woolbattle.eventHandler().playerJoined(player.getUuid());
             if (joinResult == null) {
                 // denied
-                event.getPlayer().kick("Bad request");
+                player.kick("Bad request");
                 return;
             }
             var user = joinResult.user();
@@ -38,10 +41,15 @@ public class MinestomJoinListener {
                     player.setRespawnPoint(point);
                 });
             } else {
+                if (!game.mayJoin(user)) {
+                    woolbattle.logger().info("Denied login for {} to game {}", user.playerName(), game.id());
+                    player.kick(MinestomAdventureSupport.adventureSupport().convert(Messages.KICKED_FULL.getMessage(user)));
+                    return;
+                }
                 woolbattle.logger().info("Player {} connecting to game {}", user.playerName(), game.id());
-                var result = game.playerJoined(user);
-                if (result.location() == null) { // no spawn location found, enter setup mode
-                    game.playerQuit(user);
+                var result = game.playerLogin(user);
+                if (result.location() == null && result.result() == UserLoginGameEvent.Result.CANNOT_JOIN) {
+                    // no spawn location found, enter setup mode
                     woolbattle.setupModeImplementation().enterSetupMode(user, (instance, point) -> {
                         event.setSpawningInstance(instance);
                         player.setRespawnPoint(point);
@@ -67,7 +75,7 @@ public class MinestomJoinListener {
                     // user is in setup mode. We do not do anything here at this time
                     return;
                 }
-                game.playerSetup(user);
+                game.playerJoin(user);
             }
         });
     }

@@ -10,7 +10,7 @@ package eu.darkcube.minigame.woolbattle.common.game.lobby.listeners;
 import eu.darkcube.minigame.woolbattle.api.event.game.UserLoginGameEvent;
 import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
-import eu.darkcube.minigame.woolbattle.common.game.lobby.inventory.LobbyUserInventory;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class LobbyUserLoginGameListener extends ConfiguredListener<UserLoginGameEvent> {
@@ -25,6 +25,6 @@ public class LobbyUserLoginGameListener extends ConfiguredListener<UserLoginGame
     public void accept(UserLoginGameEvent event) {
         event.result(UserLoginGameEvent.Result.USER_PLAYING);
         event.spawnLocation(lobby.spawn());
-        LobbyUserInventory.create(event.user());
+        lobby.preJoin((CommonWBUser) event.user());
     }
 }

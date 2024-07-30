@@ -5,7 +5,7 @@ import java.util.function.Function;
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
-import eu.darkcube.minigame.woolbattle.common.user.UserInventoryAccess;
+import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 
@@ -14,11 +14,11 @@ public class LobbyUserInventory {
     private static final Function<WoolBattleApi, Key> KEY = woolbattle -> Key.key(woolbattle, "lobby_user_inventory");
 
     private final WBUser user;
-    private final UserInventoryAccess access;
+    private final UserPlatformAccess access;
 
     private LobbyUserInventory(WBUser user) {
         this.user = user;
-        this.access = ((CommonWBUser) user).inventoryAccess();
+        this.access = ((CommonWBUser) user).platformAccess();
     }
 
     public static LobbyUserInventory get(WBUser user) {

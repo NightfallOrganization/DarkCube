@@ -13,7 +13,6 @@ import static net.minestom.server.item.Material.*;
 import static net.minestom.server.item.enchant.Enchantment.*;
 
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
-import eu.darkcube.system.minestom.item.flag.MinestomItemFlag;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public class MinestomItemsProvider implements Items.Provider {
@@ -29,7 +28,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case LOBBY_VOTING_LIFES -> item(NAME_TAG);
             case LOBBY_VOTING_LIFES_ENTRY -> item(NAME_TAG);
             case GENERAL_VOTING_FOR -> item(GREEN_DYE);
-            case GENERAL_VOTING_AGAINST -> item(GREEN_DYE);
+            case GENERAL_VOTING_AGAINST -> item(RED_DYE);
             case SETTINGS -> item(COMPARATOR);
             case SETTINGS_WOOL_DIRECTION -> item(WHITE_WOOL);
             case SETTINGS_HEIGHT_DISPLAY -> item(WHITE_CARPET);
@@ -123,6 +122,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_BERSERKER -> item(DIAMOND_SWORD);
             case GRAY_GLASS_PANE -> item(GRAY_STAINED_GLASS_PANE);
             case BLACK_GLASS_PANE -> item(BLACK_STAINED_GLASS_PANE);
+            case HEIGHT_DISPLAY_COLOR_ENTRY -> item(PAPER);
         };
     }
 }

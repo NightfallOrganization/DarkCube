@@ -123,6 +123,7 @@ public class BukkitItemsProvider implements Items.Provider {
             case PERK_BERSERKER -> item(DIAMOND_SWORD);
             case GRAY_GLASS_PANE -> item(STAINED_GLASS_PANE).damage(7);
             case BLACK_GLASS_PANE -> item(STAINED_GLASS_PANE).damage(15);
+            case HEIGHT_DISPLAY_COLOR_ENTRY -> item(PAPER);
         };
     }
 }

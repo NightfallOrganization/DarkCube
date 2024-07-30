@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.util.translation;
 
+import java.util.MissingFormatArgumentException;
 import java.util.function.Function;
 
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
@@ -87,7 +88,8 @@ public enum Messages implements Message {
     TEAM_CONFIGURATION_NOT_FOUND,
     INVALID_NAME_COLOR,
     INVALID_WOOL_COLOR,
-    TEAM_INFO;
+    TEAM_INFO,
+    KICKED_FULL;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final String ITEM_PREFIX = "ITEM_";
@@ -103,7 +105,7 @@ public enum Messages implements Message {
         this.key = this.name();
     }
 
-    public static Component getMessage(String messageKey, Language language, Object... replacements) {
+    public static Component getMessage(String messageKey, Language language, Object... replacements) throws MissingFormatArgumentException {
         return language.getMessage(KEY_PREFIX + messageKey, replacements);
     }
 

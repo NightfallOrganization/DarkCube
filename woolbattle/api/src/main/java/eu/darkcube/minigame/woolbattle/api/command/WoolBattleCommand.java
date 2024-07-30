@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 @Api
@@ -20,6 +21,11 @@ public class WoolBattleCommand {
     private final @NotNull String[] aliases;
     private final @NotNull String[] names;
     private final @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder;
+
+    @ApiStatus.Experimental
+    public WoolBattleCommand(@NotNull String name, @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder, @NotNull String @NotNull ... aliases) {
+        this(name, aliases, builder);
+    }
 
     @Api
     public WoolBattleCommand(@NotNull String name, @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder) {
