@@ -27,7 +27,7 @@ public class CommonEventHandler {
         this.woolbattle = woolbattle;
     }
 
-    public @Nullable JoinResult playerJoined(UUID uniqueId) {
+    public @Nullable CommonEventHandler.ConfigurationResult playerConfiguration(UUID uniqueId) {
         var lobbySystemLink = woolbattle.api().lobbySystemLink();
         var connectionRequests = lobbySystemLink.connectionRequests();
         for (var entry : connectionRequests.asMap().entrySet()) {
@@ -38,7 +38,7 @@ public class CommonEventHandler {
             var game = request.game();
             var rawUser = UserAPI.instance().user(uniqueId);
             var user = new CommonWBUser(woolbattle.api(), rawUser, game);
-            return new JoinResult(user, game);
+            return new ConfigurationResult(user, game);
         }
         return null;
     }
@@ -61,6 +61,6 @@ public class CommonEventHandler {
     public record PlaceResult(boolean cancel) {
     }
 
-    public record JoinResult(@NotNull CommonWBUser user, @Nullable CommonGame game) {
+    public record ConfigurationResult(@NotNull CommonWBUser user, @Nullable CommonGame game) {
     }
 }

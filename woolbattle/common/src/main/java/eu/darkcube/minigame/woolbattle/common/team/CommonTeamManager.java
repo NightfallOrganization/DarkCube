@@ -35,11 +35,11 @@ public class CommonTeamManager implements TeamManager {
             do {
                 id = UUID.randomUUID();
             } while (teams.containsKey(id));
-            var nameStyle = configuration.nameStyle();
+            var nameColor = configuration.nameColor();
             var woolColor = configuration.woolColor();
             var teamType = configuration.type();
             var key = configuration.key();
-            var team = new CommonTeam(game, id, key, teamType, nameStyle, woolColor);
+            var team = new CommonTeam(game, id, key, teamType, nameColor, woolColor);
             teams.put(id, team);
             if (team.spectator()) {
                 spectator = team;

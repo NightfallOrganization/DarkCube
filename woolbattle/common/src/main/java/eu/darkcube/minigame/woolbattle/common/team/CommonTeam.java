@@ -22,6 +22,7 @@ import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
@@ -30,17 +31,17 @@ public class CommonTeam implements Team {
     private final @NotNull UUID uniqueId;
     private final @NotNull String key;
     private final @NotNull TeamType teamType;
-    private final @NotNull Style nameStyle;
+    private final @NotNull TextColor nameColor;
     private final @NotNull ColoredWool woolColor;
     private final @NotNull Collection<WBUser> users = new CopyOnWriteArraySet<>();
     private volatile int lifes;
 
-    public CommonTeam(@NotNull Game game, @NotNull UUID uniqueId, @NotNull String key, @NotNull TeamType teamType, @NotNull Style nameStyle, @NotNull ColoredWool woolColor) {
+    public CommonTeam(@NotNull Game game, @NotNull UUID uniqueId, @NotNull String key, @NotNull TeamType teamType, @NotNull TextColor nameColor, @NotNull ColoredWool woolColor) {
         this.game = game;
         this.uniqueId = uniqueId;
         this.key = key;
         this.teamType = teamType;
-        this.nameStyle = nameStyle;
+        this.nameColor = nameColor;
         this.woolColor = woolColor;
     }
 
@@ -56,12 +57,12 @@ public class CommonTeam implements Team {
 
     @Override
     public @NotNull Component getName(@NotNull CommandExecutor executor) {
-        return Messages.getMessage(Messages.TEAM_PREFIX + key.toUpperCase(Locale.ROOT), executor.language()).style(nameStyle());
+        return Messages.getMessage(Messages.TEAM_PREFIX + key.toUpperCase(Locale.ROOT), executor.language()).style(Style.style(nameColor()));
     }
 
     @Override
-    public @NotNull Style nameStyle() {
-        return nameStyle;
+    public @NotNull TextColor nameColor() {
+        return nameColor;
     }
 
     @Override

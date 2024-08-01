@@ -77,13 +77,25 @@ public class MinestomLobbyScoreboard {
         }
     }
 
-    public void cleanupPlayer(@NotNull MinestomPlayer player, @NotNull WBUser user) {
-        var team = user.team();
-        if (team != null) {
-            var removePacket = removePlayerPacket(team, player);
-            for (var u : this.game.users()) {
-                var p = this.woolbattle.player(u);
-                p.sendPacket(removePacket);
+    public void cleanupPlayer(@NotNull MinestomPlayer player, @NotNull Team oldTeam) {
+        var removePacket = removePlayerPacket(oldTeam, player);
+        for (var u : this.game.users()) {
+            var p = this.woolbattle.player(u);
+            p.sendPacket(removePacket);
+        }
+        var user = player.user();
+        System.out.println(user);
+        if (user != null) {
+            var sidebar = user.metadata().<Sidebar>remove(sidebarKey);
+            System.out.println(sidebar);
+            if (sidebar != null) {
+                System.out.println("Remove " + sidebar.getViewers().contains(player));
+                // Minestom doesn't send this packet
+                player.sendPacket(sidebar.getDisplayScoreboardPacket((byte) 1));
+                sidebar.removeViewer(player);
+            }
+            for (var team : this.game.teamManager().teams()) {
+                player.sendPacket(deletePacket(team));
             }
         }
     }
@@ -103,12 +115,17 @@ public class MinestomLobbyScoreboard {
         return new TeamsPacket(team.uniqueId().toString(), action);
     }
 
+    private TeamsPacket deletePacket(Team team) {
+        var action = new TeamsPacket.RemoveTeamAction();
+        return new TeamsPacket(team.uniqueId().toString(), action);
+    }
+
     private TeamsPacket createPacket(Team team) {
-        var displayName = adventureSupport().convert(Component.text(team.uniqueId().toString(), team.nameStyle()));
+        var displayName = adventureSupport().convert(Component.text(team.uniqueId().toString(), team.nameColor()));
         var nameTagVisibility = TeamsPacket.NameTagVisibility.ALWAYS;
         var collisionRule = TeamsPacket.CollisionRule.NEVER;
-        var customColor = team.nameStyle().color();
-        var teamColor = NamedTextColor.nearestTo(adventureSupport().convert(customColor == null ? eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor.WHITE : customColor));
+        var customColor = team.nameColor();
+        var teamColor = NamedTextColor.nearestTo(adventureSupport().convert(customColor));
         var teamPrefix = adventureSupport().convert(Component.empty());
         var teamSuffix = adventureSupport().convert(Component.empty());
         var entities = team.users().stream().map(WBUser::playerName).toList();

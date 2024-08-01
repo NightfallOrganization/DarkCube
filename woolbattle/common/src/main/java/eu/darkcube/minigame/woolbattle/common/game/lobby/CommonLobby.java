@@ -7,8 +7,6 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
-import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
-
 import java.util.stream.IntStream;
 
 import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
@@ -36,7 +34,6 @@ import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.util.GameState;
-import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public abstract class CommonLobby extends CommonPhase implements Lobby {
     protected int minPlayerCount;
@@ -59,11 +56,9 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
 
     public CommonLobby(@NotNull CommonGame game) {
         super(game, GameState.LOBBY);
-        this.minPlayerCount = game.woolbattle().persistentDataStorage().get(key(game.woolbattle(), "min_player_count"), PersistentDataTypes.INTEGER, () -> 2);
-        this.deathLine = game.woolbattle().persistentDataStorage().get(key(game.woolbattle(), "lobby_death_line"), PersistentDataTypes.INTEGER, () -> 50);
 
         this.voteRegistry = new CommonVoteRegistry();
-        this.mapPoll = voteRegistry.<Map>pollBuilder().addPossibilities(game.woolbattle().mapManager().maps(game.mapSize())).addToRegistry();
+        this.mapPoll = voteRegistry.<Map>pollBuilder().addPossibilities(game.woolbattle().mapManager().maps(game.mapSize()).stream().filter(Map::enabled).toList()).addToRegistry();
         this.mapPoll.onVote((user, vote) -> user.sendMessage(Messages.VOTED_FOR_MAP, vote.name()));
         this.mapPoll.onUpdate(_ -> {
             var winner = this.mapPoll.sortedWinners().getFirst();
@@ -179,7 +174,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     protected void updateTimer(@NotNull CommonWBUser user) {
         var millis = this.timer.timer().toMillis();
         var maxMillis = this.timer.maxTimer().toMillis();
-        var xp = (double) millis / (double) maxMillis;
+        var xp = Math.min((double) millis / (double) maxMillis, 0.999999);
         user.platformAccess().xp((float) xp);
         updateSidebar(user, LobbySidebarTeam.TIME);
     }

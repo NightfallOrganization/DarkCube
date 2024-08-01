@@ -178,7 +178,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     public @NotNull Component teamPlayerName() {
         var team = team();
         if (team == null) return Component.text(playerName());
-        return Component.text(playerName()).style(team.nameStyle());
+        return Component.text(playerName(), team.nameColor());
     }
 
     @Override

@@ -18,6 +18,9 @@ public class CommonLobbyTimer {
     private @Nullable Duration override = null;
     private Duration timer = maxTimer;
 
+    private Duration timerRequest;
+    private Duration overrideRequest;
+
     public CommonLobbyTimer(CommonLobby lobby) {
         this.lobby = lobby;
     }
@@ -27,17 +30,27 @@ public class CommonLobbyTimer {
         task = lobby.game().scheduler().submit(() -> {
             var onlineCount = lobby.game().users().size();
             if (onlineCount >= lobby.minPlayerCount()) {
-                if (override != null) {
-                    setOverride(override.minus(1, tick));
+                if (overrideRequest != null) {
+                    newOverride(overrideRequest);
+                    overrideRequest = null;
+                    timerRequest = null;
+                } else if (timerRequest != null) {
+                    newTimer(timerRequest);
+                    timerRequest = null;
+                } else if (override != null) {
+                    newOverride(override.minus(1, tick));
                 } else {
                     if (onlineCount == lobby.maxPlayerCount() && timer.compareTo(quickStart) > 0) {
-                        setTimer(quickStart);
+                        newTimer(quickStart);
                     } else {
-                        setTimer(timer.minus(1, tick));
+                        newTimer(timer.minus(1, tick));
                     }
                 }
             } else {
-                reset();
+                override = null;
+                overrideRequest = null;
+                timerRequest = null;
+                newTimer(maxTimer);
             }
             return TaskSchedule.nextTick();
         });
@@ -47,22 +60,32 @@ public class CommonLobbyTimer {
         task.cancel();
     }
 
-    public void setOverride(@Nullable Duration override) {
-        if (override != null && override.isNegative()) override = Duration.ZERO;
-        this.override = override;
-        if (override != null) setTimer(override);
+    public void timer(@NotNull Duration timer) {
+        this.timerRequest = timer;
     }
 
-    public void setTimer(@NotNull Duration timer) {
-        if (timer.isNegative()) timer = Duration.ZERO;
-        this.timer = timer;
-        lobby.game().woolbattle().eventManager().call(new LobbyTimerUpdateEvent(lobby.game(), timer));
+    public void overrideTimer(@NotNull Duration timer) {
+        this.overrideRequest = timer;
+    }
+
+    private void newOverride(@Nullable Duration override) {
+        this.override = override != null && override.isNegative() ? Duration.ZERO : override;
+        if (this.override != null) newTimer(this.override);
+    }
+
+    private void newTimer(@NotNull Duration timer) {
+        this.timer = timer.isNegative() ? Duration.ZERO : timer;
+        lobby.game().woolbattle().eventManager().call(new LobbyTimerUpdateEvent(lobby.game(), this.timer));
         lobby.updateTimer();
+        if (this.timer.isZero()) {
+            lobby.game().enableNextPhase();
+        }
     }
 
     public void reset() {
         override = null;
-        setTimer(maxTimer);
+        overrideRequest = null;
+        timerRequest = maxTimer;
     }
 
     public Duration timer() {

@@ -185,6 +185,7 @@ public class CommonGame implements Game {
         if (!users.isEmpty()) {
             return;
         }
+        System.out.println("Check unload");
         // no users in game, unload it
         woolbattle.games().unload(this);
     }
@@ -218,13 +219,17 @@ public class CommonGame implements Game {
         return new LoginResult(location, result);
     }
 
+    public void quietRemove(CommonWBUser user) {
+        users.remove(user);
+    }
+
     public void playerQuit(@NotNull CommonWBUser user) {
-        var event = new UserQuitGameEvent(user, this);
-        woolbattle.eventManager().call(event);
+        woolbattle.eventManager().call(new UserQuitGameEvent(user, this));
         users.remove(user);
         user.clearTeam();
         removeFromPlaying(user);
         removeFromSpectating(user);
+        woolbattle.eventManager().call(new UserQuitGameEvent.Post(user, this));
         checkUnload();
         woolbattle.lobbySystemLink().update();
     }

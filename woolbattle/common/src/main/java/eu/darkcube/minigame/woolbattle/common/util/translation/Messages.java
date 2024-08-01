@@ -89,7 +89,10 @@ public enum Messages implements Message {
     INVALID_NAME_COLOR,
     INVALID_WOOL_COLOR,
     TEAM_INFO,
-    KICKED_FULL;
+    KICKED_FULL,
+    INVALID_MAP,
+    MAP_ICON_SET,
+    AIR_IN_HAND;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final String ITEM_PREFIX = "ITEM_";

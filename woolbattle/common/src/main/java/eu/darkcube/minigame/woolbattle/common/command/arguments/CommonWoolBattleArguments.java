@@ -12,11 +12,12 @@ import java.util.function.Supplier;
 
 import eu.darkcube.minigame.woolbattle.api.command.arguments.ToStringFunction;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
+import eu.darkcube.minigame.woolbattle.api.game.Game;
+import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
-import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -31,12 +32,12 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
     }
 
     @Override
-    public @NotNull CommonGameArgument gameArgument0() {
+    public @NotNull ArgumentType<?> gameArgument0() {
         return CommonGameArgument.gameArgument(woolbattle);
     }
 
     @Override
-    public @NotNull CommonGame game0(@NotNull CommandContext<?> ctx, @NotNull String name) {
+    public @NotNull Game game0(@NotNull CommandContext<?> ctx, @NotNull String name) {
         return CommonGameArgument.game(ctx, name);
     }
 
@@ -87,16 +88,26 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull MapSize> mapSizeArgument0() {
-        return CommonMapSizeArgument.mapSize();
+        return CommonMapSizeArgument.mapSize(woolbattle);
     }
 
     @Override
     public @NotNull ArgumentType<@NotNull MapSize> mapSizeArgument0(@NotNull Predicate<@NotNull MapSize> validator) {
-        return CommonMapSizeArgument.mapSize(validator);
+        return CommonMapSizeArgument.mapSize(woolbattle, validator);
     }
 
     @Override
     public @NotNull MapSize mapSize0(@NotNull CommandContext<?> ctx, @NotNull String name) {
         return CommonMapSizeArgument.getMapSize(ctx, name);
+    }
+
+    @Override
+    public @NotNull ArgumentType<@NotNull ?> mapArgument0() {
+        return CommonMapArgument.map(woolbattle);
+    }
+
+    @Override
+    public @NotNull Map map0(@NotNull CommandContext<?> ctx, @NotNull String name) {
+        return CommonMapArgument.getMap(ctx, name);
     }
 }

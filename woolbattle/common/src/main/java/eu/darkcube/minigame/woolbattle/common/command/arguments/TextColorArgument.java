@@ -16,7 +16,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 
-public class TextColorArgument implements ArgumentType<TextColor> {
+class TextColorArgument implements ArgumentType<TextColor> {
     private static final DynamicCommandExceptionType INVALID_COLOR = Messages.INVALID_NAME_COLOR.newDynamicCommandExceptionType();
 
     public static TextColorArgument color() {

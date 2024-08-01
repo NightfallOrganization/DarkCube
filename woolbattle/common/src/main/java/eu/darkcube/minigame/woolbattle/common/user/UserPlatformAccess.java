@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.user;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public interface UserPlatformAccess {
@@ -15,4 +16,7 @@ public interface UserPlatformAccess {
     void xp(float xp);
 
     void setItem(int slot, ItemBuilder item);
+
+    @NotNull
+    ItemBuilder itemInHand();
 }

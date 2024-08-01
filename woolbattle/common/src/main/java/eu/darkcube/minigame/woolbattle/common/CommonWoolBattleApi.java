@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.common;
 
+import static eu.darkcube.system.util.data.PluginPersistentDataProvider.pluginPersistentDataProvider;
+
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
@@ -28,7 +30,6 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.PersistentDataStorage;
-import eu.darkcube.system.util.data.PluginPersistentDataProvider;
 
 public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
@@ -49,7 +50,7 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         this.mapManager = new CommonMapManager(this);
         this.lobbySystemLink = new CommonLobbySystemLink(this);
         this.scheduler = new CommonSchedulerManager();
-        this.persistentDataStorage = PluginPersistentDataProvider.pluginPersistentDataProvider().persistentData(Key.key(this, "woolbattle"));
+        this.persistentDataStorage = pluginPersistentDataProvider().persistentData(Key.key(this, "woolbattle"));
         this.teamRegistry = new CommonTeamRegistry(this);
         this.eventManager = EventNode.all("woolbattle");
         this.lobbyData = new CommonLobbyData(this);

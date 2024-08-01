@@ -31,7 +31,7 @@ public class MinestomLobbyUserChangeTeamListener extends ConfiguredListener<User
             lobby.scoreboard().switchTeam(player, oldTeam, newTeam);
         } else if (oldTeam != null) {
             // Player quit
-            lobby.scoreboard().cleanupPlayer(player, user);
+            lobby.scoreboard().cleanupPlayer(player, oldTeam);
         } else {
             // Can't happen
             throw new IllegalStateException("Player switched team from null to null");

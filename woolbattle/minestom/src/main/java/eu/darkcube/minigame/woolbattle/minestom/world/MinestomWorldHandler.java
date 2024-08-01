@@ -37,7 +37,6 @@ import eu.darkcube.system.server.item.material.Material;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
 import net.minestom.server.entity.metadata.item.ItemEntityMeta;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
@@ -131,7 +130,10 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     public void unloadWorld(@NotNull CommonWorld world) {
         var minestomWorld = (MinestomWorld) world;
         var instance = minestomWorld.instance();
-        List.copyOf(instance.getPlayers()).forEach(Player::remove);
+        List.copyOf(instance.getPlayers()).forEach(p -> {
+            System.out.println("Forcefully disconnecting " + p.getUsername());
+            p.remove();
+        });
         instanceManager.unregisterInstance(instance);
         logUnloadWorld(minestomWorld);
         var worldDirectory = minestomWorld.worldDirectory();

@@ -23,7 +23,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilde
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
-public class CommonTeamConfigurationArgument<T extends TeamConfiguration> implements ArgumentType<CommonTeamConfigurationArgument.Spec> {
+class CommonTeamConfigurationArgument<T extends TeamConfiguration> implements ArgumentType<CommonTeamConfigurationArgument.Spec<T>> {
     private static final DynamicCommandExceptionType TEAM_CONFIGURATION_NOT_FOUND = Messages.TEAM_CONFIGURATION_NOT_FOUND.newDynamicCommandExceptionType();
     private final Supplier<Collection<T>> values;
     private final ToStringFunction<T> toStringFunction;

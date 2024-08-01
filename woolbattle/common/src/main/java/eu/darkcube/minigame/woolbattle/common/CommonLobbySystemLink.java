@@ -63,7 +63,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
 
     public CommonLobbySystemLink(CommonWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
-        this.connectionRequests = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofSeconds(10)).removalListener((UUID key, ConnectionRequest value, RemovalCause cause) -> {
+        this.connectionRequests = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofSeconds(10)).removalListener((UUID _, ConnectionRequest value, RemovalCause cause) -> {
             if (cause.wasEvicted()) { // Connection timed out
                 if (value != null) {
                     var game = value.game;

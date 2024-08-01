@@ -73,6 +73,12 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
         player.getInventory().setItemStack(slot, item.build());
     }
 
+    @Override
+    public @NotNull ItemBuilder itemInHand() {
+        final var player = woolbattle.player(user);
+        return ItemBuilder.item(player.getItemInMainHand());
+    }
+
     private static void removeItems(PlayerInventory inventory, ItemStack itemToRemove, int count, WoolSubtractDirection direction) {
         // var toDelete = count;
         // var deleted = 0;

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
+import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
@@ -22,6 +23,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface WoolBattleArguments {
+
     @NotNull
     ArgumentType<@NotNull ?> gameArgument0();
 
@@ -60,6 +62,12 @@ public interface WoolBattleArguments {
 
     @NotNull
     MapSize mapSize0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
+
+    @NotNull
+    ArgumentType<@NotNull ?> mapArgument0();
+
+    @NotNull
+    Map map0(@NotNull CommandContext<?> ctx, @NotNull String name);
 
     static @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument() {
         return instance().teamConfigurationArgument0();
@@ -115,6 +123,14 @@ public interface WoolBattleArguments {
 
     static @NotNull TextColor textColor(@NotNull CommandContext<?> ctx, @NotNull String name) {
         return instance().textColor0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> mapArgument() {
+        return instance().mapArgument0();
+    }
+
+    static @NotNull Map map(@NotNull CommandContext<?> ctx, @NotNull String name) {
+        return instance().map0(ctx, name);
     }
 
     private static WoolBattleArguments instance() {

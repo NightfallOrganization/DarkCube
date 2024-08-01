@@ -15,14 +15,16 @@ import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
 public interface Team {
-    @NotNull Game game();
+    @NotNull
+    Game game();
 
-    @NotNull TeamType type();
+    @NotNull
+    TeamType type();
 
     default boolean spectator() {
         return type() == TeamType.SPECTATOR;
@@ -38,17 +40,22 @@ public interface Team {
      * @param executor the executor which language to use
      * @return a translated name
      */
-    @NotNull Component getName(@NotNull CommandExecutor executor);
+    @NotNull
+    Component getName(@NotNull CommandExecutor executor);
 
-    @NotNull Style nameStyle();
+    @NotNull
+    TextColor nameColor();
 
-    @Unmodifiable @NotNull Collection<WBUser> users();
+    @Unmodifiable
+    @NotNull
+    Collection<WBUser> users();
 
     int lifes();
 
     void lifes(int lifes);
 
-    @NotNull ColoredWool wool();
+    @NotNull
+    ColoredWool wool();
 
     /**
      * Adds lifes to this team.
@@ -66,5 +73,6 @@ public interface Team {
      */
     int removeLifes(int count);
 
-    @NotNull UUID uniqueId();
+    @NotNull
+    UUID uniqueId();
 }

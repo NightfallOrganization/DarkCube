@@ -38,7 +38,24 @@ public class MinestomColoredWoolProvider implements ColoredWoolProvider {
     @Override
     public @NotNull MinestomColoredWool deserializeFromString(@NotNull String serialized) {
         var minestomMaterial = fromNamespaceId(serialized);
-        if (minestomMaterial == null) return defaultWool();
+        if (minestomMaterial == null) {
+            // Try fallback color names
+            var wool = switch (serialized) {
+                case "red" -> RED_WOOL;
+                case "blue", "aqua" -> BLUE_WOOL;
+                case "green", "lime" -> GREEN_WOOL;
+                case "white" -> WHITE_WOOL;
+                case "purple" -> PURPLE_WOOL;
+                case "yellow" -> YELLOW_WOOL;
+                case "brown" -> BROWN_WOOL;
+                case "black" -> BLACK_WOOL;
+                default -> null;
+            };
+            if (wool != null) {
+                return new MinestomColoredWool(Material.of(wool));
+            }
+            return defaultWool();
+        }
         var material = Material.of(minestomMaterial);
         return new MinestomColoredWool(material);
     }

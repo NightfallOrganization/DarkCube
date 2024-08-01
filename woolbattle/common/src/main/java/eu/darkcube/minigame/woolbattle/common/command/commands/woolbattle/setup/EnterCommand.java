@@ -10,6 +10,7 @@ package eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.setup
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommand;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 
 public class EnterCommand extends WoolBattleCommand {
     public EnterCommand(CommonWoolBattleApi woolbattleApi) {
@@ -23,6 +24,7 @@ public class EnterCommand extends WoolBattleCommand {
             var user = (CommonWBUser) source.sender();
 
             var woolbattle = woolbattleApi.woolbattle();
+            source.sendMessage(Messages.ENTERED_SETUP_MODE);
             woolbattle.setupMode().enter(user);
             return 0;
         }));
