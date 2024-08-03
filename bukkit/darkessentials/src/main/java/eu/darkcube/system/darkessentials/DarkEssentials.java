@@ -15,6 +15,8 @@ import eu.darkcube.system.darkessentials.command.FeedCommand;
 import eu.darkcube.system.darkessentials.command.FlyCommand;
 import eu.darkcube.system.darkessentials.command.GameModeCommand;
 import eu.darkcube.system.darkessentials.command.HealCommand;
+import eu.darkcube.system.darkessentials.command.ImportKurzCommand;
+import eu.darkcube.system.darkessentials.command.ImportWorldCommand;
 import eu.darkcube.system.darkessentials.command.InvseeCommand;
 import eu.darkcube.system.darkessentials.command.MaxCommand;
 import eu.darkcube.system.darkessentials.command.NightCommand;
@@ -52,6 +54,7 @@ public class DarkEssentials extends DarkCubePlugin {
         CommandAPI.instance().register(new SpeedCommand());
         CommandAPI.instance().register(new ChainCommand());
         CommandAPI.instance().register(new UnchainCommand());
+        CommandAPI.instance().register(new ImportKurzCommand());
 
         var banManager = new BanManager();
         var chainCommandListener = new ChainCommandListener(this);
