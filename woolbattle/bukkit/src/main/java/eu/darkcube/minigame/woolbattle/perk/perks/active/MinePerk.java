@@ -77,7 +77,7 @@ public class MinePerk extends Perk {
 
             event.setCancelled(true);
             woolbattle.ingame().destroy(block);
-            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
+            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 5);
 
             new Scheduler(woolbattle, () -> {
                 var playerLoc = p.getLocation().toVector();

@@ -138,7 +138,9 @@ public class ListenerExplode extends Listener<EntityExplodeEvent> {
                 velocity.setY(1 + (velocity.getY() * strengthY / 5));
                 velocity.setZ(velocity.getZ() * strengthZ);
                 p.setVelocity(velocity);
-                woolbattle.ingame().playerUtil().attack(attacker, user);
+                if (!tnt.hasMetadata("peaceful")) {
+                    woolbattle.ingame().playerUtil().attack(attacker, user);
+                }
             }
         } else if (event.getDamager().getType() == EntityType.SNOWBALL) {
             var bomb = (Snowball) event.getDamager();

@@ -104,12 +104,10 @@ public class GhostPerk extends Perk {
                 public void run() {
                     if (!isGhost(user)) {
                         this.cancel();
-                        p.removePotionEffect(PotionEffectType.BLINDNESS);
                         p.removePotionEffect(PotionEffectType.SPEED);
                         return;
                     }
                     p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10, 0, false, false), true);
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 15, 10, false, false), true);
                 }
 
             }.runTaskTimer(1);
