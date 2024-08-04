@@ -59,7 +59,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 
-				int islandGenHeight = getIslandThiccness(chunkX * 16 + x, chunkZ * 16 + z);
+				int islandGenHeight = getIslandThickess(chunkX * 16 + x, chunkZ * 16 + z);
 				SkylandBiome skylandBiome = SkylandBiome.getBiome(chunkX * 16 + x, chunkZ * 16 + z);
 
 
@@ -192,12 +192,23 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	 */
 	public boolean isIsland(int x, int z){
 		boolean isVoidIslands = true;
-		if (getIslandThiccness(x, z) < 35 || !isVoidIslands) {
+		if (getIslandThickess(x, z) < 35 || !isVoidIslands) {
 			return true;
 		}
 
 		return false;
 	}
+	public int getIslandIntensity(int x, int z){
+		return getIslandThickess(x, z) -35;
+	}
+
+	public int getIslandThickess(int x, int z){
+		int islandGenHeight =
+				(int) ((islandThiccnessNoise.noise(x/2, z/2, 0.5D, 0.5D, true)
+						+ 1) * 150D);
+		return islandGenHeight;
+	}
+
 
 	public int getRawTopY(int x, int z, SkylandBiome biomes) {
 
@@ -223,7 +234,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 		}
 		int out = sum / ((iterpolRad*2+1) * (iterpolRad*2+1));
 
-		int islandGenHeight = getIslandThiccness(x, z);
+		int islandGenHeight = getIslandThickess(x, z);
 
 		if (islandGenHeight >= 29){
 			out = (int) (out - 0.67*(islandGenHeight-35) - 0.67*6);
@@ -233,9 +244,6 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	}
 
 
-	public int getIslandIntensity(int x, int z){
-		return getIslandThiccness(x, z) -35;
-	}
 
 	/**
 	 * This method uses the given x and z value to generate the island's thiccness (or existance) at this point.
@@ -244,12 +252,7 @@ public class CustomChunkGenerator extends ChunkGenerator {
 	 * @param z
 	 * @return
 	 */
-	public int getIslandThiccness(int x, int z){
-		int islandGenHeight =
-				(int) ((islandThiccnessNoise.noise(x/2, z/2, 0.5D, 0.5D, true)
-						+ 1) * 50D);
-		return islandGenHeight;
-	}
+
 
 	@Override
 	public void generateSurface(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX,
