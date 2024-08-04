@@ -7,7 +7,19 @@
 
 package eu.darkcube.minigame.woolbattle.game;
 
-import eu.cloudnetservice.common.log.Logger;
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.world.EventDamageBlock;
 import eu.darkcube.minigame.woolbattle.event.world.EventDestroyBlock;
@@ -52,13 +64,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.material.Wool;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
 
@@ -192,9 +197,7 @@ public class Ingame extends GamePhase {
         var map = woolbattle.gameData().map(); // TODO this should never be null
         if (map == null) {
             var data = woolbattle.gameData();
-            Logger
-                    .getGlobal()
-                    .log(Level.SEVERE, "Map was null when starting (" + data.mapSize() + ", " + data.votedMap() + "," + data.forceMap() + ")", new Exception());
+            LOGGER.error("Map was null when starting ({}, {},{})", data.mapSize(), data.votedMap(), data.forceMap(), new Exception());
             System.exit(-1);
         }
         var future = woolbattle.mapLoader().loadMap(map);

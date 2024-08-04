@@ -54,12 +54,17 @@ public class FullbrightChunk extends DynamicChunk {
         return new LightData(skyMask, blockMask, emptySkyMask, emptyBlockMask, skyLights, blockLights);
     }
 
+    @Override
+    protected LightData createLightData(boolean requiredFullChunk) {
+        return lightData;
+    }
+
     // private UpdateLightPacket createLightPacket() {
     //     return new UpdateLightPacket(chunkX, chunkZ, createLightData());
     // }
     //
-    @Override
-    protected LightData createLightData() {
-        return lightData;
-    }
+    // @Override
+    // protected LightData createLightData() {
+    //     return lightData;
+    // }
 }

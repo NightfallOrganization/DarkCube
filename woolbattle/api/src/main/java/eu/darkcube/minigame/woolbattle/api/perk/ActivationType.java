@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.api.perk;
 
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 /**
  * This is the class for all perk types. May need renaming in the future, {@code
@@ -61,6 +62,7 @@ public enum ActivationType {
     }
 
     public interface ItemProvider {
+        @Nullable
         Item getItem(String activationType);
     }
 }

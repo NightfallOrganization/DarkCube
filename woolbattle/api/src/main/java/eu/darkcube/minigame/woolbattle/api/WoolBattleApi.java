@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
+import java.time.temporal.TemporalUnit;
+
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
@@ -85,6 +87,10 @@ public interface WoolBattleApi extends Namespaced {
     @Api
     @NotNull
     LobbyData lobbyData();
+
+    @Api
+    @NotNull
+    TemporalUnit tickUnit();
 
     /**
      * Get a user by the UserAPI {@link User}. May be null in case no {@link WBUser} was found

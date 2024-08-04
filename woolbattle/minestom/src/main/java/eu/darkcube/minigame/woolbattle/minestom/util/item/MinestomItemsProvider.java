@@ -7,10 +7,10 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.util.item;
 
+import static eu.darkcube.system.minestom.item.flag.MinestomItemFlag.HIDE_UNBREAKABLE;
 import static eu.darkcube.system.server.item.ItemBuilder.item;
-import static net.minestom.server.item.Enchantment.*;
-import static net.minestom.server.item.ItemHideFlag.HIDE_UNBREAKABLE;
 import static net.minestom.server.item.Material.*;
+import static net.minestom.server.item.enchant.Enchantment.*;
 
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.system.server.item.ItemBuilder;
@@ -28,7 +28,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case LOBBY_VOTING_LIFES -> item(NAME_TAG);
             case LOBBY_VOTING_LIFES_ENTRY -> item(NAME_TAG);
             case GENERAL_VOTING_FOR -> item(GREEN_DYE);
-            case GENERAL_VOTING_AGAINST -> item(GREEN_DYE);
+            case GENERAL_VOTING_AGAINST -> item(RED_DYE);
             case SETTINGS -> item(COMPARATOR);
             case SETTINGS_WOOL_DIRECTION -> item(WHITE_WOOL);
             case SETTINGS_HEIGHT_DISPLAY -> item(WHITE_CARPET);
@@ -94,7 +94,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_STOMPER -> item(DIAMOND_BOOTS);
             case PERK_HOOK_ARROW -> item(REDSTONE_TORCH);
             case PERK_HOOK_ARROW_COOLDOWN -> item(REDSTONE_TORCH);
-            case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5).flag(HIDE_UNBREAKABLE).unbreakable(true);
+            case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5)/*.flag(HIDE_UNBREAKABLE)TODO*/.unbreakable(true);
             case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).unbreakable(true).flag(HIDE_UNBREAKABLE);
             case DEFAULT_PEARL -> item(ENDER_PEARL).glow(true);
             case DEFAULT_PEARL_COOLDOWN -> item(FIREWORK_STAR);
@@ -122,6 +122,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_BERSERKER -> item(DIAMOND_SWORD);
             case GRAY_GLASS_PANE -> item(GRAY_STAINED_GLASS_PANE);
             case BLACK_GLASS_PANE -> item(BLACK_STAINED_GLASS_PANE);
+            case HEIGHT_DISPLAY_COLOR_ENTRY -> item(PAPER);
         };
     }
 }

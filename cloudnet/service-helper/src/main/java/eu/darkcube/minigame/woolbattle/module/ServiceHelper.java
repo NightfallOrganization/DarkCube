@@ -4,7 +4,12 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.module;
+
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import dev.derklaro.aerogel.Singleton;
 import eu.cloudnetservice.driver.document.DocumentFactory;
@@ -15,12 +20,8 @@ import eu.cloudnetservice.driver.module.driver.DriverModule;
 import eu.cloudnetservice.driver.registry.ServiceRegistry;
 import eu.cloudnetservice.driver.template.TemplateStorage;
 
-import java.nio.file.Path;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
-
-@Singleton public class ServiceHelper extends DriverModule {
+@Singleton
+public class ServiceHelper extends DriverModule {
 
     private ServiceHelperConfig config;
 
@@ -31,7 +32,8 @@ import java.util.logging.Logger;
         eventManager.registerListener(serviceListener);
     }
 
-    @ModuleTask(lifecycle = ModuleLifeCycle.RELOADING) public void reload(ServiceRegistry serviceRegistry) {
+    @ModuleTask(lifecycle = ModuleLifeCycle.RELOADING)
+    public void reload(ServiceRegistry serviceRegistry) {
         unregisterStorages(serviceRegistry);
         reloadConfiguration();
         registerStorages(serviceRegistry);

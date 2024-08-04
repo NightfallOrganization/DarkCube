@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.common.map;
 
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
+
 import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
@@ -63,12 +65,12 @@ public class CommonMap implements Map {
 
     @Override
     public @NotNull ItemBuilder icon() {
-        return icon;
+        return icon.clone();
     }
 
     @Override
     public void icon(@NotNull ItemBuilder icon) {
-        this.icon = icon;
+        this.icon = icon.clone();
         save();
     }
 
@@ -93,12 +95,17 @@ public class CommonMap implements Map {
     }
 
     public static CommonMap fromDocument(@NotNull CommonMapManager mapManager, @NotNull Document document) {
-        var name = document.getString("name");
-        var enabled = document.getBoolean("enabled");
-        var deathHeight = document.getInt("deathHeight");
-        var size = document.readObject("mapSize", MapSize.class);
-        var icon = ItemBuilder.item(GsonUtil.gson().fromJson(document.getString("icon"), JsonElement.class));
-        return new CommonMap(mapManager, name, size, deathHeight, icon, enabled);
+        try {
+            var name = document.getString("name");
+            var enabled = document.getBoolean("enabled");
+            var deathHeight = document.getInt("deathHeight");
+            var size = document.readObject("mapSize", MapSize.class);
+            var icon = ItemBuilder.item(GsonUtil.gson().fromJson(document.getString("icon"), JsonElement.class));
+            return new CommonMap(mapManager, name, size, deathHeight, icon, enabled);
+        } catch (RuntimeException | Error t) {
+            LOGGER.error("Failed to load map {}", document.getString("name"), t);
+            throw t;
+        }
     }
 
     private void save() {

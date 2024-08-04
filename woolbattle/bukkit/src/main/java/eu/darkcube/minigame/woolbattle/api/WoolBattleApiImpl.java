@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.api;
 
+import java.time.temporal.TemporalUnit;
+
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
@@ -94,6 +96,11 @@ public class WoolBattleApiImpl implements WoolBattleApi {
 
     @Override
     public @NotNull LobbyData lobbyData() {
+        return null;
+    }
+
+    @Override
+    public @NotNull TemporalUnit tickUnit() {
         return null;
     }
 

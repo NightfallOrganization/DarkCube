@@ -9,25 +9,31 @@ package eu.darkcube.minigame.woolbattle.minestom.game.lobby;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.LobbySidebarTeam;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyInventoryClickListener;
-import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbySetupUserListener;
+import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyJoinGameListener;
+import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyUserChangeTeamListener;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class MinestomLobby extends CommonLobby {
-    public MinestomLobby(@NotNull CommonGame game, MinestomWoolBattle woolbattle) {
+    private final @NotNull MinestomLobbyScoreboard scoreboard;
+
+    public MinestomLobby(@NotNull CommonGame game, @NotNull MinestomWoolBattle woolbattle) {
         super(game);
         this.listeners.addListener(new MinestomLobbyInventoryClickListener().create());
-        this.listeners.addListener(new MinestomLobbySetupUserListener(woolbattle).create());
+        this.listeners.addListener(new MinestomLobbyJoinGameListener(woolbattle).create());
+        this.listeners.addListener(new MinestomLobbyUserChangeTeamListener(woolbattle, this).create());
+        this.scoreboard = new MinestomLobbyScoreboard(woolbattle, game);
     }
 
     @Override
-    public void enable() {
-        super.enable();
+    protected void updateSidebar(@NotNull CommonWBUser user, LobbySidebarTeam team) {
+        this.scoreboard.update(user, team);
     }
 
-    @Override
-    public void disable() {
-        super.disable();
+    public @NotNull MinestomLobbyScoreboard scoreboard() {
+        return scoreboard;
     }
 }

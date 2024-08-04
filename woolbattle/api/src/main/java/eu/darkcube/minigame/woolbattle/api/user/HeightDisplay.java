@@ -7,17 +7,17 @@
 
 package eu.darkcube.minigame.woolbattle.api.user;
 
-import java.util.logging.Logger;
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataType;
 
 public final class HeightDisplay implements Cloneable {
-    private static final Logger logger = Logger.getLogger("HeightDisplay");
     public static final PersistentDataType<HeightDisplay> TYPE = new PersistentDataType<>() {
         @Override
         public HeightDisplay deserialize(JsonElement json) {
@@ -32,7 +32,7 @@ public final class HeightDisplay implements Cloneable {
             }
             if (color == null) color = TextColor.fromHexString(colorString);
             if (color == null) {
-                logger.severe("Failed to deserialize HeightDisplay color: " + colorString);
+                LOGGER.error("Failed to deserialize HeightDisplay color: {}", colorString);
                 color = HeightDisplay.getDefault().color();
             }
             return new HeightDisplay(enabled, maxDistance, color);
@@ -54,9 +54,9 @@ public final class HeightDisplay implements Cloneable {
     };
     private boolean enabled;
     private int maxDistance;
-    private TextColor color;
+    private @NotNull TextColor color;
 
-    public HeightDisplay(boolean enabled, int maxDistance, TextColor color) {
+    public HeightDisplay(boolean enabled, int maxDistance, @NotNull TextColor color) {
         this.enabled = enabled;
         this.maxDistance = maxDistance;
         this.color = color;
@@ -87,11 +87,12 @@ public final class HeightDisplay implements Cloneable {
         this.enabled = enabled;
     }
 
+    @NotNull
     public TextColor color() {
         return color;
     }
 
-    public void color(TextColor color) {
+    public void color(@NotNull TextColor color) {
         this.color = color;
     }
 }

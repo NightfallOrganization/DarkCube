@@ -11,14 +11,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
+import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
+import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInteractListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInventoryListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomItemListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomJoinListener;
@@ -26,8 +29,8 @@ import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomMoveListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomQuitListener;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
-import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserInventoryAccess;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
@@ -51,10 +54,10 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     public MinestomWoolBattle() {
         super();
-        api = new MinestomWoolBattleApi(this);
-        WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, api);
-        this.playerKey = Key.key(api, "minestom_player");
-        setupModeImplementation = new MinestomSetupModeImplementation(api);
+        this.api = new MinestomWoolBattleApi(this);
+        WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, this.api);
+        this.playerKey = Key.key(this.api, "minestom_player");
+        this.setupModeImplementation = new MinestomSetupModeImplementation(this.api);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         MinestomItemListener.register(this, eventManager);
         MinestomInventoryListener.register(this, eventManager);
         MinestomAnimationListener.register(this, eventManager);
+        MinestomInteractListener.register(this, eventManager);
 
         MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
@@ -93,7 +97,13 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     @Override
     public void broadcastTeamUpdate(@NotNull CommonWBUser user, @Nullable CommonTeam oldTeam, @Nullable CommonTeam newTeam) {
-        logger().info("User " + user.playerName() + " switched to team " + (newTeam == null ? "null" : newTeam.key()) + " from  " + (oldTeam == null ? "null" : oldTeam.key()));
+        if (oldTeam != null && newTeam != null) {
+            logger().info("User {} switched to team {} from {}", user.playerName(), newTeam.key(), oldTeam.key());
+        } else if (oldTeam != null) {
+            logger().info("User {} left team {}", user.playerName(), oldTeam.key());
+        } else if (newTeam != null) {
+            logger().info("User {} joined team {}", user.playerName(), newTeam.key());
+        }
     }
 
     @Override
@@ -102,13 +112,21 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     }
 
     @Override
-    public @NotNull MinestomUserInventoryAccess createInventoryAccessFor(@NotNull CommonWBUser user) {
-        return new MinestomUserInventoryAccess(this, user);
+    public @NotNull MinestomUserPlatformAccess createInventoryAccessFor(@NotNull CommonWBUser user) {
+        return new MinestomUserPlatformAccess(this, user);
     }
 
     @Override
     public @NotNull MinestomUserPermissions createPermissionsFor(@NotNull CommonWBUser user) {
         return new MinestomUserPermissions(this, user);
+    }
+
+    public CommandSender wrapCommandSender(net.minestom.server.command.CommandSender sender) {
+        if (sender instanceof MinestomPlayer player) {
+            var user = player.user();
+            if (user != null) return user;
+        }
+        return new MinestomCommandSender(sender);
     }
 
     public @NotNull MinestomPlayer player(@NotNull CommonWBUser user) {
@@ -135,5 +153,10 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     public void removed(MinestomEntity entity) {
         entities.remove(entity.entity().unwrap());
         entityMeta(entity).clear();
+    }
+
+    @Override
+    public @NotNull String namespace() {
+        return this.api.namespace();
     }
 }

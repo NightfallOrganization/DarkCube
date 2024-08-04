@@ -3,6 +3,7 @@
   "name": "WoolBattle",
   "version": "1.0",
   "dependencies": [
-    "DarkCubeSystem"
+    "DarkCubeSystem",
+    "LuckPerms"
   ]
 }

@@ -28,7 +28,7 @@ public class GameCommand extends WoolBattleCommand {
                 source.sendMessage(text(" - Game (" + game.id() + "), Size: " + game.mapSize()));
             }
             return 0;
-        })).then(argument("game", WoolBattleArguments.gameArgument(woolbattle)).executes(ctx -> {
+        })).then(argument("game", WoolBattleArguments.gameArgument()).executes(ctx -> {
             var source = ctx.getSource();
             var game = WoolBattleArguments.game(ctx, "game");
             source.sendMessage(text("Game: " + game.id()));

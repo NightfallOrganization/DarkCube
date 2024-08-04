@@ -9,7 +9,6 @@ package eu.darkcube.minigame.woolbattle.perk;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.Cooldown.Unit;
@@ -19,11 +18,12 @@ import eu.darkcube.minigame.woolbattle.util.Arrays;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
 import org.bukkit.event.Listener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Perk {
 
-    public static final Logger logger = Logger.getLogger("Perk");
-
+    public static final Logger LOGGER = LoggerFactory.getLogger("Perk");
     private final Collection<Listener> listeners = new ArrayList<>();
     private final Collection<ConfiguredScheduler> schedulers = new ArrayList<>();
 

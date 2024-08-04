@@ -12,10 +12,13 @@ import static eu.darkcube.system.util.data.PersistentDataTypes.BOOLEAN;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.event.user.UserAddWoolEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserChangeTeamEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetMaxWoolSizeEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetWoolBreakAmountEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserParticlesUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserRemoveWoolEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolCountUpdateEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolSubtractDirectionUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.api.user.PerksStorage;
@@ -48,7 +51,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     private final @NotNull User user;
     private final @Nullable CommonGame game;
     private final @NotNull CommonUserPerks perks;
-    private final @NotNull UserInventoryAccess inventoryAccess;
+    private final @NotNull UserPlatformAccess platformAccess;
     private final @NotNull UserPermissions permissions;
     private final @NotNull MetaDataStorage metadata = new BasicMetaDataStorage();
     private volatile @Nullable Location location;
@@ -64,7 +67,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         this.keyHeightDisplay = Key.key(woolbattle, "height_display");
         this.keyWoolSubtractDirection = Key.key(woolbattle, "wool_subtract_direction");
         this.keyPerks = Key.key(woolbattle, "perks");
-        this.inventoryAccess = woolbattle.woolbattle().createInventoryAccessFor(this);
+        this.platformAccess = woolbattle.woolbattle().createInventoryAccessFor(this);
         this.permissions = woolbattle.woolbattle().createPermissionsFor(this);
     }
 
@@ -109,7 +112,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         this.woolCount = woolCount;
         var event = new UserWoolCountUpdateEvent(this, woolCount);
         woolbattle.eventManager().call(event);
-        inventoryAccess.woolCount(woolCount);
+        platformAccess.woolCount(woolCount);
     }
 
     @Override
@@ -151,7 +154,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         var removeCount = Math.min(woolCount(), event.amount());
         woolCount(woolCount() - removeCount);
         if (updateInventory) {
-            inventoryAccess.woolCount(count);
+            platformAccess.woolCount(count);
         }
         return removeCount;
     }
@@ -183,11 +186,26 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         return team;
     }
 
+    public void clearTeam() {
+        this.team0(null);
+    }
+
     @Override
     public void team(@NotNull Team team) {
-        if (!(team instanceof CommonTeam c)) throw new IllegalArgumentException("Team must be created with CommonTeamManager");
+        this.team0(team);
+    }
+
+    private void team0(@Nullable Team team) {
+        if (this.team == team) return;
+        if (team != null && !(team instanceof CommonTeam)) throw new IllegalArgumentException("Team must be created with CommonTeamManager");
+        var c = (CommonTeam) team;
         var oldTeam = this.team;
+        if (oldTeam != null) oldTeam.usersModifiable().remove(this);
         this.team = c;
+        if (c != null) {
+            c.usersModifiable().add(this);
+        }
+        woolbattle.eventManager().call(new UserChangeTeamEvent(this, oldTeam, team));
         woolbattle.woolbattle().broadcastTeamUpdate(this, oldTeam, c);
     }
 
@@ -224,7 +242,9 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
 
     @Override
     public void woolSubtractDirection(@NotNull WoolSubtractDirection woolSubtractDirection) {
+        if (woolSubtractDirection() == woolSubtractDirection) return;
         user.persistentData().set(keyWoolSubtractDirection, WoolSubtractDirection.TYPE, woolSubtractDirection);
+        woolbattle.eventManager().call(new UserWoolSubtractDirectionUpdateEvent(this, woolSubtractDirection));
     }
 
     @Override
@@ -250,6 +270,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @Override
     public void particles(boolean particles) {
         user.persistentData().set(keyParticles, BOOLEAN, particles);
+        woolbattle.eventManager().call(new UserParticlesUpdateEvent(this, particles));
     }
 
     @Override
@@ -275,5 +296,9 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @Override
     public @NotNull Audience audience() {
         return user;
+    }
+
+    public @NotNull UserPlatformAccess platformAccess() {
+        return platformAccess;
     }
 }

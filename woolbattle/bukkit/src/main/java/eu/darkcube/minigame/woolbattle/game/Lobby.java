@@ -178,7 +178,24 @@ public class Lobby extends GamePhase {
         ScoreboardHelper.initTeam(sb, woolbattle.teamManager().getSpectator());
         for (Team team : woolbattle.teamManager().getTeams()) ScoreboardHelper.initTeam(sb, team);
 
-        for (WBUser u : WBUser.onlineUsers()) sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
+        for (WBUser u : WBUser.onlineUsers()) {
+            var team = u.getTeam();
+            if (team == null) {
+                Bukkit.broadcastMessage("§cA Bug just happened.");
+                Bukkit.broadcastMessage("§cThis is a detection system to find a bug we are trying to fix.");
+                Bukkit.broadcastMessage("§cIf you see this, please report this to a server administrator,");
+                Bukkit.broadcastMessage("§cit would be a great help! (discord #bug-reports)");
+                Bukkit.broadcastMessage("§7Additional Info for Admins:");
+                Bukkit.broadcastMessage("§7User " + u.getPlayerName() + "'s team was null configuring " + user.getPlayerName());
+                Bukkit.broadcastMessage("§7Players: " + WBUser.onlineUsers().stream().map(WBUser::getPlayerName).toList());
+                Bukkit.broadcastMessage("§aTrying to work around the bug, let's hope you can play without problems :)");
+                Bukkit.broadcastMessage("§7No guarantees though .-.");
+                Bukkit.broadcastMessage("§cIf possible, do not quit the game. This could allow us to investigate" +
+                        " the bug in person, while the game is running. Thank you!");
+                u.setTeam(woolbattle.teamManager().getSpectator());
+            }
+            sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
+        }
 
         setupLobbyObjective(sb, user);
 

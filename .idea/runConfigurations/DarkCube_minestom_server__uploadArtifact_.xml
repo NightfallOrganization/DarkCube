@@ -13,7 +13,7 @@
           <option value="uploadArtifact" />
           <option value="--user=development" />
           <option value="--host=darkcube.eu" />
-          <option value="--remoteDir=/home/development/CloudNet4/local/templates/woolbattle/default/" />
+          <option value="--remoteDir=/home/development/CloudNet/local/templates/wb-minestom/default/" />
           <option value="--fingerprint=AAAAC3NzaC1lZDI1NTE5AAAAIAw8qQ7NjnD01YvjivyF68/p+zw0z4YYQgZPLgqOgzRw" />
         </list>
       </option>

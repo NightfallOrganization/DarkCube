@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.minestom;
 
+import java.time.temporal.TemporalUnit;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
@@ -22,13 +23,14 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.utils.time.TimeUnit;
 
 public class MinestomWoolBattleApi extends CommonWoolBattleApi {
     private final MinestomWoolBattle woolbattle;
     private final MinestomColoredWoolProvider woolProvider = new MinestomColoredWoolProvider();
     private final MinestomMaterialProvider materialProvider = new MinestomMaterialProvider(woolProvider);
     private final MinestomEntityImplementations entityImplementations = new MinestomEntityImplementations();
-    private final MinestomWorldHandler worldHandler = new MinestomWorldHandler(this, MinecraftServer.getInstanceManager(), MinecraftServer.getBiomeManager());
+    private final MinestomWorldHandler worldHandler = new MinestomWorldHandler(this, MinecraftServer.getInstanceManager(), MinecraftServer.getBiomeRegistry());
     private final MinestomGamePhaseCreator gamePhaseCreator;
     private final MinestomWoolBattleCommands commands = new MinestomWoolBattleCommands(this, MinecraftServer.getCommandManager());
     private final CompletableFuture<Void> fullyLoadedFuture = new CompletableFuture<>(); // TODO complete this
@@ -79,6 +81,11 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
         var player = (MinestomPlayer) MinecraftServer.getConnectionManager().getOnlinePlayerByUuid(user.uniqueId());
         if (player == null) return null;
         return player.user();
+    }
+
+    @Override
+    public @NotNull TemporalUnit tickUnit() {
+        return TimeUnit.SERVER_TICK;
     }
 
     @Override

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,8 +32,8 @@ public class CommonUserPerks implements UserPerks {
     private final CommonGame game;
     private final CommonWBUser user;
     private final Map<Integer, UserPerk> perks = new HashMap<>();
-    private final Map<ActivationType, Collection<UserPerk>> byType = new HashMap<>();
-    private final Map<PerkName, Collection<UserPerk>> byName = new HashMap<>();
+    private final Map<ActivationType, List<UserPerk>> byType = new HashMap<>();
+    private final Map<PerkName, List<UserPerk>> byName = new HashMap<>();
 
     public CommonUserPerks(CommonWBUser user) {
         this.user = user;
@@ -60,10 +61,10 @@ public class CommonUserPerks implements UserPerks {
             }
         }
         for (var entry : new ArrayList<>(byType.entrySet())) {
-            byType.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
+            byType.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
         }
         for (var entry : new ArrayList<>(byName.entrySet())) {
-            byName.put(entry.getKey(), Collections.unmodifiableCollection(entry.getValue()));
+            byName.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
         }
     }
 
@@ -91,12 +92,12 @@ public class CommonUserPerks implements UserPerks {
     }
 
     @Override
-    public Collection<UserPerk> perks(ActivationType type) {
+    public List<UserPerk> perks(ActivationType type) {
         return byType.getOrDefault(type, Collections.emptyList());
     }
 
     @Override
-    public Collection<UserPerk> perks(PerkName perkName) {
+    public List<UserPerk> perks(PerkName perkName) {
         return byName.getOrDefault(perkName, Collections.emptyList());
     }
 

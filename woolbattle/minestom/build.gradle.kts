@@ -17,6 +17,7 @@ dependencies {
     implementation(darkcubesystem.minestom)
     implementation(projects.woolbattle.provider)
     implementation(projects.woolbattle.common)
+    implementation(libs.luckperms)
     woolbattleShadow(libs.jctools.core)
     woolbattleShadow(libs.fastutil)
     woolbattleShadow(projects.woolbattle.provider) { isTransitive = false }

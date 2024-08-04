@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.common.util.item;
 
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
 public enum Items implements CommonItem {
@@ -113,7 +114,7 @@ public enum Items implements CommonItem {
     PERK_BERSERKER,
     GRAY_GLASS_PANE,
     BLACK_GLASS_PANE,
-    ;
+    HEIGHT_DISPLAY_COLOR_ENTRY;
 
     private final String key;
     private ItemBuilder builder;
@@ -123,16 +124,16 @@ public enum Items implements CommonItem {
     }
 
     @Override
-    public String key() {
+    public @NotNull String key() {
         return key;
     }
 
     @Override
-    public ItemBuilder builder() {
+    public @NotNull ItemBuilder builder() {
         return builder.clone();
     }
 
-    static {
+    public static void loadItems() {
         for (var item : values()) {
             item.builder = ProviderReference.PROVIDER.builder(item);
         }

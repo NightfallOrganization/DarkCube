@@ -212,15 +212,15 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
             world = woolbattle.woolbattle().worlds().get(player.getInstance());
             player.get(Pointer.pointer(CommandSource.class, Key.key("asd")));
             commandPrefix = "/";
-            customSender = Objects.requireNonNullElseGet(player.user(), () -> new MinestomCommandSender(sender));
+            customSender = Objects.requireNonNullElseGet(player.user(), () -> woolbattle.woolbattle().wrapCommandSender(sender));
             var displayNameComponent = player.getDisplayName();
             if (world instanceof GameWorld gameWorld) game = gameWorld.game();
             if (displayNameComponent != null) displayName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
         } else if (sender instanceof ConsoleSender) {
             name = "console";
-            customSender = new MinestomCommandSender(sender);
+            customSender = woolbattle.woolbattle().wrapCommandSender(sender);
         } else {
-            customSender = new MinestomCommandSender(sender);
+            customSender = woolbattle.woolbattle().wrapCommandSender(sender);
         }
         return new CommandSource(woolbattle, game, customSender, pos, rotation, world, name, displayName, extra, commandPrefix);
     }
@@ -229,8 +229,8 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
     protected void register0(WoolBattleCommand command, String name, LiteralCommandNode<CommandSource> node) {
         var wrapper = new Command(name);
         var argument = new MinestomArgumentWrapper("args");
-        wrapper.setCondition((sender, commandString) -> {
-            var wbSender = new MinestomCommandSender(sender);
+        wrapper.setCondition((sender, _) -> {
+            var wbSender = woolbattle.woolbattle().wrapCommandSender(sender);
             return wbSender.hasPermission(command.permission());
         });
         wrapper.setDefaultExecutor(executor);

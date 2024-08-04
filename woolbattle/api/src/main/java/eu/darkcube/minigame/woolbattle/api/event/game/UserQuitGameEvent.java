@@ -15,4 +15,10 @@ public class UserQuitGameEvent extends GameEvent.User.Event {
     public UserQuitGameEvent(@NotNull WBUser user, @NotNull Game game) {
         super(user, game);
     }
+
+    public static class Post extends UserQuitGameEvent {
+        public Post(@NotNull WBUser user, @NotNull Game game) {
+            super(user, game);
+        }
+    }
 }

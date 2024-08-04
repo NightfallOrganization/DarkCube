@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.user;
 
-import java.util.logging.Logger;
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
@@ -20,7 +20,6 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 public class WBUserModifier implements UserModifier {
 
     static Key USER;
-    private final Logger logger = Logger.getLogger("WBUserModifier");
     private final Key DATA_VERSION;
     private final WoolBattleBukkit woolbattle;
 
@@ -62,7 +61,7 @@ public class WBUserModifier implements UserModifier {
     }
 
     private void migrateFrom1To2(DefaultWBUser user) {
-        logger.info("[WoolBattle] Migrating user " + user.user().name() + " from version 1 to 2");
+        LOGGER.info("[WoolBattle] Migrating user {} from version 1 to 2", user.user().name());
         var perks = user.perksStorage();
         perks.perk(ActivationType.DOUBLE_JUMP, 0, DoubleJumpPerk.DOUBLE_JUMP);
         perks.perkInvSlot(ActivationType.DOUBLE_JUMP, 0, -1);

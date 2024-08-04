@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.util.translation;
 
+import java.util.MissingFormatArgumentException;
 import java.util.function.Function;
 
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
@@ -82,13 +83,21 @@ public enum Messages implements Message {
     WOOL_DIRECTION_SETTINGS_TITLE,
     GAME_NOT_FOUND,
     NOT_IN_A_WORLD,
-    SET_LOBBY_SPAWN;
+    SET_LOBBY_SPAWN,
+    SET_SETUP_LOBBY_SPAWN,
+    TEAM_CONFIGURATION_NOT_FOUND,
+    INVALID_NAME_COLOR,
+    INVALID_WOOL_COLOR,
+    TEAM_INFO,
+    KICKED_FULL;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
-    public static final Function<String, String> KEY_MODFIIER = s -> KEY_PREFIX + s;
     public static final String ITEM_PREFIX = "ITEM_";
     public static final String LORE_PREFIX = "LORE_";
     public static final String TEAM_PREFIX = "TEAM_";
+    public static final Function<String, String> KEY_MODIFIER = s -> KEY_PREFIX + s;
+    public static final Function<String, String> ITEM_MODIFIER = s -> KEY_MODIFIER.apply(ITEM_PREFIX + s);
+    public static final Function<String, String> LORE_MODIFIER = s -> ITEM_MODIFIER.apply(LORE_PREFIX + s);
 
     private final String key;
 
@@ -96,13 +105,13 @@ public enum Messages implements Message {
         this.key = this.name();
     }
 
-    public static Component getMessage(String messageKey, Language language, Object... replacements) {
+    public static Component getMessage(String messageKey, Language language, Object... replacements) throws MissingFormatArgumentException {
         return language.getMessage(KEY_PREFIX + messageKey, replacements);
     }
 
     @Override
     public String getPrefixModifier() {
-        return Message.super.getPrefixModifier();
+        return KEY_PREFIX;
     }
 
     @Override

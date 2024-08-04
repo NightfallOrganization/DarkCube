@@ -32,10 +32,12 @@ public class DataManager {
     private final Key keySpawn;
     private final Key keyBorder;
     private final Key keyWoolBattleNPCLocation;
+    private final Key keyWoolBattleModernNPCLocation;
     private final Key keySumoNPCLocation;
     private final Key keyDailyRewardNPCLocation;
     private final Key keyFisherNPCLocation;
     private final Key keyWoolBattleSpawn;
+    private final Key keyWoolBattleModernSpawn;
     private final Key keySumoSpawn;
     private final Key keyFisherSpawn;
     private final Key keyWinter;
@@ -43,6 +45,7 @@ public class DataManager {
     private final Key keyJumpAndRunSpawn;
     private final Key keyJumpAndRunPlate;
     private final Key keyWoolBattleTasks;
+    private final Key keyWoolBattleModernTasks;
     private final Key keySumoTasks;
 
     public DataManager(Lobby lobby) {
@@ -50,10 +53,12 @@ public class DataManager {
         this.keySpawn = Key.key(lobby, "spawn");
         this.keyBorder = Key.key(lobby, "border");
         this.keyWoolBattleNPCLocation = Key.key(lobby, "woolbattle_npc_location");
+        this.keyWoolBattleModernNPCLocation = Key.key(lobby, "woolbattle_modern_npc_location");
         this.keySumoNPCLocation = Key.key(lobby, "sumo_npc_location");
         this.keyDailyRewardNPCLocation = Key.key(lobby, "daily_reward_npc_location");
         this.keyFisherNPCLocation = Key.key(lobby, "fisher_npc_location");
         this.keyWoolBattleSpawn = Key.key(lobby, "woolbattle_spawn");
+        this.keyWoolBattleModernSpawn = Key.key(lobby, "woolbattle_modern_spawn");
         this.keySumoSpawn = Key.key(lobby, "sumo_spawn");
         this.keyFisherSpawn = Key.key(lobby, "fisher_spawn");
         this.keyWinter = Key.key(lobby, "winter");
@@ -61,12 +66,14 @@ public class DataManager {
         this.keyJumpAndRunSpawn = Key.key(lobby, "jump_and_run_spawn");
         this.keyJumpAndRunPlate = Key.key(lobby, "jump_and_run_plate");
         this.keyWoolBattleTasks = Key.key(lobby, "woolbattle_tasks");
+        this.keyWoolBattleModernTasks = Key.key(lobby, "woolbattle_modern_tasks");
         this.keySumoTasks = Key.key(lobby, "sumo_tasks");
 
         // Getting all these values also sets default values
         getSpawn();
         getBorder();
         getWoolBattleNPCLocation();
+        getWoolBattleModernNPCLocation();
         getSumoNPCLocation();
         getDailyRewardNPCLocation();
         getFisherNPCLocation();
@@ -128,6 +135,14 @@ public class DataManager {
         lobby.persistentDataStorage().set(keyWoolBattleTasks, TYPE_TASKS, tasks);
     }
 
+    public @Unmodifiable Set<String> getWoolBattleModernTasks() {
+        return lobby.persistentDataStorage().get(keyWoolBattleModernTasks, TYPE_TASKS, HashSet::new);
+    }
+
+    public void setWoolBattleModernTasks(Set<String> tasks) {
+        lobby.persistentDataStorage().set(keyWoolBattleModernTasks, TYPE_TASKS, tasks);
+    }
+
     public @Unmodifiable Set<String> getSumoTasks() {
         return lobby.persistentDataStorage().get(keySumoTasks, TYPE_TASKS, HashSet::new);
     }
@@ -160,6 +175,14 @@ public class DataManager {
         lobby.persistentDataStorage().set(keyWoolBattleSpawn, Locations.TYPE, loc);
     }
 
+    public Location getWoolBattleModernSpawn() {
+        return lobby.persistentDataStorage().get(keyWoolBattleModernSpawn, Locations.TYPE, () -> Locations.DEFAULT);
+    }
+
+    public void setWoolBattleModernSpawn(Location loc) {
+        lobby.persistentDataStorage().set(keyWoolBattleModernSpawn, Locations.TYPE, loc);
+    }
+
     public Location getJumpAndRunSpawn() {
         return lobby.persistentDataStorage().get(keyJumpAndRunSpawn, Locations.TYPE, () -> Locations.DEFAULT);
     }
@@ -180,8 +203,16 @@ public class DataManager {
         return lobby.persistentDataStorage().get(keyWoolBattleNPCLocation, Locations.TYPE, () -> Locations.DEFAULT);
     }
 
+    public Location getWoolBattleModernNPCLocation() {
+        return lobby.persistentDataStorage().get(keyWoolBattleModernNPCLocation, Locations.TYPE, () -> Locations.DEFAULT);
+    }
+
     public void setWoolBattleNPCLocation(Location loc) {
         lobby.persistentDataStorage().set(keyWoolBattleNPCLocation, Locations.TYPE, loc);
+    }
+
+    public void setWoolBattleModernNPCLocation(Location loc) {
+        lobby.persistentDataStorage().set(keyWoolBattleModernNPCLocation, Locations.TYPE, loc);
     }
 
     public Location getSumoNPCLocation() {

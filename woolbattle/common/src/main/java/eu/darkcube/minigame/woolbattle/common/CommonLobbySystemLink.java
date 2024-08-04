@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common;
 
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 import static eu.darkcube.system.cloudnet.DarkCubeServiceProperty.*;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.space;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
@@ -17,7 +18,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -41,6 +41,7 @@ import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskSchedule;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMap;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -53,7 +54,6 @@ public class CommonLobbySystemLink implements LobbySystemLink {
     private static final DocProperty<MapSize> MAP_SIZE = DocProperty.property("mapSize", MapSize.class).withDefault(null);
     private static final DocProperty<String> MAP_NAME = DocProperty.property("mapName", String.class).withDefault(null);
     private static final DocProperty<Boolean> ADMIN_SETUP = DocProperty.property("adminSetup", Boolean.class).withDefault(false);
-    private static final Logger LOGGER = Logger.getLogger("CommonLobbySystemLink");
     private final CommonWoolBattleApi woolbattle;
     private final Cache<UUID, ConnectionRequest> connectionRequests;
     private final RequestListener requestListener;
@@ -71,7 +71,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                         game.checkUnload();
                     }
                 } else {
-                    LOGGER.severe("ConnectionRequest was null when it shouldn't be possible");
+                    LOGGER.error("ConnectionRequest was null when it shouldn't be possible");
                 }
             }
         }).build();
@@ -133,7 +133,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                 var protocol = Document.newJsonDocument();
                 protocol.writeProperty(ADMIN_SETUP, true);
 
-                entry.writeProperty(DISPLAY_NAME, "Setup WoolBattle");
+                entry.writeProperty(DISPLAY_NAME, GsonComponentSerializer.gson().serialize(Component.text("Setup WoolBattle")));
                 entry.writeProperty(PLAYING_PLAYERS, 0);
                 entry.writeProperty(MAX_PLAYING_PLAYERS, 1);
                 entry.writeProperty(SPECTATING_PLAYERS, 0);

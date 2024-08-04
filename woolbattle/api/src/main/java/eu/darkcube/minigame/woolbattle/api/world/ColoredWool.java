@@ -13,4 +13,6 @@ public interface ColoredWool {
     void apply(Block block);
 
     ItemBuilder createSingleItem();
+
+    String name();
 }

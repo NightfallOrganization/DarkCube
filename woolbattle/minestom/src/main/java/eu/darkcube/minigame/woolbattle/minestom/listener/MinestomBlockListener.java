@@ -43,7 +43,7 @@ public class MinestomBlockListener {
             var placingBlock = event.getBlock();
             var minestomMaterial = placingBlock.registry().material();
             if (minestomMaterial == null) {
-                woolbattle.logger().severe("No corresponding material for block " + placingBlock);
+                woolbattle.logger().error("No corresponding material for block {}", placingBlock);
                 return;
             }
             var material = Material.of(minestomMaterial);

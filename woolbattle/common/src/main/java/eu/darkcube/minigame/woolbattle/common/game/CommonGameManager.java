@@ -41,7 +41,7 @@ public class CommonGameManager implements GameManager {
             if (old != null) continue;
             game.init();
             woolbattle.eventManager().addChild(game.eventManager());
-            woolbattle.woolbattle().logger().info("Created game " + game.id());
+            woolbattle.woolbattle().logger().info("Created game {}", game.id());
             woolbattle.lobbySystemLink().update();
             return game;
         }
@@ -56,15 +56,15 @@ public class CommonGameManager implements GameManager {
         var removed = games.remove(game.id());
         if (removed != game) {
             if (removed == null) {
-                woolbattle.woolbattle().logger().severe("Game was trying to unload but not registered: " + game);
+                woolbattle.woolbattle().logger().error("Game was trying to unload but not registered: {}", game);
             } else {
-                woolbattle.woolbattle().logger().severe("Multiple games with same id: " + game + " and " + removed);
+                woolbattle.woolbattle().logger().error("Multiple games with same id: {} and {}", game, removed);
             }
             return;
         }
         woolbattle.eventManager().removeChild(game.eventManager());
         game.unload0();
-        woolbattle.woolbattle().logger().info("Unloaded game " + game.id());
+        woolbattle.woolbattle().logger().info("Unloaded game {}", game.id());
         woolbattle.lobbySystemLink().update();
     }
 }

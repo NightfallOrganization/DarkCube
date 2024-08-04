@@ -13,10 +13,10 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import eu.darkcube.minigame.woolbattle.api.event.game.GameEvent;
-import eu.darkcube.minigame.woolbattle.api.event.game.UserJoinGameEvent;
+import eu.darkcube.minigame.woolbattle.api.event.game.UserLoginGameEvent;
 import eu.darkcube.minigame.woolbattle.api.event.game.UserQuitGameEvent;
-import eu.darkcube.minigame.woolbattle.api.event.user.SetupUserGameEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserJoinGameEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.WorldEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
@@ -59,7 +59,7 @@ public class CommonGame implements Game {
     CommonGame(@NotNull CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull Map map) {
         this.woolbattle = woolbattle;
         this.id = id;
-        this.eventManager = EventNode.type("game-" + id, EventFilter.ALL, (event, unused) -> {
+        this.eventManager = EventNode.type("game-" + id, EventFilter.ALL, (event, _) -> {
             if (event instanceof GameEvent gameEvent) {
                 var game = gameEvent.game();
                 return game == this;
@@ -194,9 +194,15 @@ public class CommonGame implements Game {
         phase = null;
     }
 
-    public @NotNull JoinResult playerJoined(@NotNull CommonWBUser user) {
-        users.add(user);
-        var event = new UserJoinGameEvent(user, this, UserJoinGameEvent.Result.CANNOT_JOIN, null);
+    public boolean mayJoin(@NotNull CommonWBUser user) {
+        if (phase instanceof CommonLobby lobby) {
+            return users.size() < lobby.maxPlayerCount();
+        }
+        return true;
+    }
+
+    public @NotNull LoginResult playerLogin(@NotNull CommonWBUser user) {
+        var event = new UserLoginGameEvent(user, this, UserLoginGameEvent.Result.CANNOT_JOIN, null);
         woolbattle.eventManager().call(event);
         var result = event.result();
         var location = event.spawnLocation();
@@ -204,26 +210,29 @@ public class CommonGame implements Game {
             case USER_PLAYING -> addToPlaying(user);
             case USER_SPECTATING -> addToSpectating(user);
             case CANNOT_JOIN -> {
-                return new JoinResult(null);
+                return new LoginResult(null, result);
             }
             default -> throw new IllegalStateException("Unexpected value: " + result);
         }
         woolbattle.lobbySystemLink().update();
-        return new JoinResult(location);
+        return new LoginResult(location, result);
     }
 
     public void playerQuit(@NotNull CommonWBUser user) {
         var event = new UserQuitGameEvent(user, this);
         woolbattle.eventManager().call(event);
         users.remove(user);
+        user.clearTeam();
         removeFromPlaying(user);
         removeFromSpectating(user);
         checkUnload();
         woolbattle.lobbySystemLink().update();
     }
 
-    public void playerSetup(@NotNull CommonWBUser user) {
-        var event = new SetupUserGameEvent(user, this);
+    public void playerJoin(@NotNull CommonWBUser user) {
+        users.add(user);
+        user.team(teamManager.spectator());
+        var event = new UserJoinGameEvent(user, this);
         woolbattle.eventManager().call(event);
     }
 
@@ -246,6 +255,6 @@ public class CommonGame implements Game {
     /**
      * @param location null to deny, else the spawn location
      */
-    public record JoinResult(@Nullable Location location) {
+    public record LoginResult(@Nullable Location location, @NotNull UserLoginGameEvent.Result result) {
     }
 }

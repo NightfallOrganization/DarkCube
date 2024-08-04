@@ -11,6 +11,8 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import net.luckperms.api.LuckPermsProvider;
+import net.minestom.server.entity.Player;
 
 public class MinestomUserPermissions implements UserPermissions {
     private final @NotNull MinestomWoolBattle woolbattle;
@@ -24,6 +26,6 @@ public class MinestomUserPermissions implements UserPermissions {
     @Override
     public boolean hasPermission(String permission) {
         var player = woolbattle.player(user);
-        return player.hasPermission(permission);
+        return LuckPermsProvider.get().getPlayerAdapter(Player.class).getPermissionData(player).checkPermission(permission).asBoolean();
     }
 }

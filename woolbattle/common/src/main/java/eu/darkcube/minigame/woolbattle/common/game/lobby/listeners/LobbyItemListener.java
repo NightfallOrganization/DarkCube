@@ -8,42 +8,57 @@
 package eu.darkcube.minigame.woolbattle.common.game.lobby.listeners;
 
 import eu.darkcube.minigame.woolbattle.api.event.item.UserClickItemEvent;
-import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListener;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserInteractEvent;
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListeners;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
 import eu.darkcube.minigame.woolbattle.common.util.item.ItemManager;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
+import eu.darkcube.system.event.EventNode;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.server.item.ItemBuilder;
 
-public class LobbyItemListener extends ConfiguredListener<UserClickItemEvent> {
+public class LobbyItemListener implements ConfiguredListeners {
     private final CommonLobby lobby;
+    private final EventNode<Object> node;
 
     public LobbyItemListener(CommonLobby lobby) {
-        super(UserClickItemEvent.class);
         this.lobby = lobby;
+        this.node = EventNode.all("lobby-items");
+        this.node.addListener(UserClickItemEvent.class, this::handle);
+        this.node.addListener(UserInteractEvent.class, this::handle);
+    }
+
+    private void handle(WBUser user, ItemBuilder item) {
+        var itemId = ItemManager.instance().getItemId(item);
+        if (itemId == null) return;
+        if (itemId.equals(Items.LOBBY_PERKS.itemId())) {
+            lobby.perksInventoryTemplate().open(user.user());
+        } else if (itemId.equals(Items.LOBBY_VOTING.itemId())) {
+            lobby.votingInventoryTemplate().open(user.user());
+        } else if (itemId.equals(Items.LOBBY_TEAMS.itemId())) {
+            lobby.teamsInventoryTemplate().open(user.user());
+        } else if (itemId.equals(Items.LOBBY_PARTICLES_OFF.itemId())) {
+            user.particles(true);
+        } else if (itemId.equals(Items.LOBBY_PARTICLES_ON.itemId())) {
+            user.particles(false);
+        } else if (itemId.equals(Items.SETTINGS.itemId())) {
+            lobby.game().woolbattle().woolbattle().settingsInventoryTemplate().open(user.user());
+        }
+    }
+
+    private void handle(UserClickItemEvent event) {
+        handle(event.user(), event.item());
+    }
+
+    private void handle(UserInteractEvent event) {
+        if (event.action() == UserInteractEvent.Action.RIGHT_CLICK_AIR || event.action() == UserInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            handle(event.user(), event.item());
+        }
     }
 
     @Override
-    public void accept(UserClickItemEvent event) {
-        var itemId = ItemManager.instance().getItemId(event.item());
-        if (itemId == null) return;
-        var user = event.user();
-        if (itemId.equals(Items.LOBBY_VOTING_MAPS.itemId())) {
-
-        } else if (itemId.equals(Items.LOBBY_VOTING_LIFES.itemId())) {
-
-        } else if (itemId.equals(Items.LOBBY_VOTING_EP_GLITCH.itemId())) {
-
-        } else if (itemId.equals(Items.LOBBY_TEAMS.itemId())) {
-            try {
-                lobby.teamsInventoryTemplate().open(user.user());
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        } else if (itemId.equals(Items.LOBBY_PARTICLES_OFF.itemId())) {
-            user.particles(true);
-            System.out.println("Particles on");
-        } else if (itemId.equals(Items.LOBBY_PARTICLES_ON.itemId())) {
-            user.particles(false);
-            System.out.println("Particles off");
-        }
+    public @NotNull EventNode<?> node() {
+        return node;
     }
 }
