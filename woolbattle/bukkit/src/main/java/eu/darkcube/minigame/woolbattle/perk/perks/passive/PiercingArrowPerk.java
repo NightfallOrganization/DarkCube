@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -31,7 +32,8 @@ public class PiercingArrowPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(BowShootArrowEvent event) {
+        @EventHandler
+        public void handle(BowShootArrowEvent event) {
             if (event.user().perks().count(PIERCING_ARROW) != 0) {
                 ArrowPerk.claimArrow(woolbattle, event.arrow(), event.user(), 2, 3);
             }

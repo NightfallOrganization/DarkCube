@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.common.team;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 public class CommonTeamManager implements TeamManager {
     private final @NotNull Game game;
     private final @NotNull Map<UUID, CommonTeam> teams;
+    private final @NotNull List<CommonTeam> playingTeams;
     private final @NotNull Team spectator;
 
     public CommonTeamManager(@NotNull CommonGame game, @NotNull MapSize mapSize) {
@@ -47,6 +49,7 @@ public class CommonTeamManager implements TeamManager {
         }
         if (spectator == null) throw new IllegalArgumentException("No spectator team configured for " + mapSize);
         this.teams = Map.copyOf(teams);
+        this.playingTeams = this.teams.values().stream().filter(CommonTeam::canPlay).toList();
         this.spectator = spectator;
     }
 
@@ -63,6 +66,11 @@ public class CommonTeamManager implements TeamManager {
     @Override
     public @NotNull @Unmodifiable Collection<CommonTeam> teams() {
         return teams.values();
+    }
+
+    @Override
+    public @NotNull @Unmodifiable List<CommonTeam> playingTeams() {
+        return playingTeams;
     }
 
     @Override

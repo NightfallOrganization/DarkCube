@@ -23,11 +23,13 @@ import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonGameWorld;
 import eu.darkcube.minigame.woolbattle.common.util.GsonUtil;
+import eu.darkcube.minigame.woolbattle.common.util.schematic.Schematic;
 import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomGameWorldImpl;
+import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomIngameWorldImpl;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomWorldImpl;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -50,6 +52,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     private final @NotNull MinestomWoolBattleApi woolbattle;
     private final @NotNull InstanceManager instanceManager;
     private final @NotNull DynamicRegistry<Biome> biomeRegistry;
+    private final @NotNull Path worldsDirectory = Path.of("worlds");
 
     public MinestomWorldHandler(@NotNull MinestomWoolBattleApi woolbattle, @NotNull InstanceManager instanceManager, @NotNull DynamicRegistry<Biome> biomeRegistry) {
         this.woolbattle = woolbattle;
@@ -76,7 +79,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             var biome = biomeRegistry.get(Biome.PLAINS);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
-            var path = extractWorld("setup", zip, null);
+            var path = extractWorld(null, "setup", zip, null);
             instance.setChunkLoader(new AnvilLoader(path));
             instance.setChunkSupplier(FullbrightChunk::new);
             instance.setTimeRate(0);
@@ -98,13 +101,37 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             var biome = biomeRegistry.get(Biome.PLAINS);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
-            var path = extractWorld(game.id() + "-lobby", zip, null);
+            var path = extractWorld(game, "lobby", zip, null);
             instance.setChunkLoader(new AnvilLoader(path));
             instance.setChunkSupplier(FullbrightChunk::new);
             instance.setTimeRate(0);
             instance.setTime(6000);
             instanceManager.registerInstance(instance);
             var world = new MinestomGameWorldImpl(game, instance, path);
+            woolbattle.woolbattle().worlds().put(instance, world);
+            logLoadWorld(world);
+            return world;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public @NotNull CommonIngameWorld loadIngameWorld(@NotNull CommonGame game, @Nullable Schematic schematic) {
+        try {
+            var instance = new InstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
+            var biome = biomeRegistry.get(Biome.PLAINS);
+            if (biome == null) throw new IllegalStateException("Biome plains not registered");
+            var path = createDirectory(game, "ingame");
+            instance.setChunkLoader(new AnvilLoader(path));
+            if (schematic != null) {
+                instance.setGenerator(new VoidSchematicGenerator(schematic));
+            }
+            instance.setChunkSupplier(FullbrightChunk::new);
+            instance.setTimeRate(0);
+            instance.setTime(6000);
+            instanceManager.registerInstance(instance);
+            var world = new MinestomIngameWorldImpl(game, instance, path);
             woolbattle.woolbattle().worlds().put(instance, world);
             logLoadWorld(world);
             return world;
@@ -122,16 +149,11 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     }
 
     @Override
-    public @NotNull CommonIngameWorld loadIngameWorld(@NotNull CommonGame game) {
-        return null;
-    }
-
-    @Override
     public void unloadWorld(@NotNull CommonWorld world) {
         var minestomWorld = (MinestomWorld) world;
         var instance = minestomWorld.instance();
         List.copyOf(instance.getPlayers()).forEach(p -> {
-            System.out.println("Forcefully disconnecting " + p.getUsername());
+            woolbattle.woolbattle().logger().warn("Forcefully disconnecting {}", p.getUsername());
             p.remove();
         });
         instanceManager.unregisterInstance(instance);
@@ -160,10 +182,13 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
         entity.setInstance(instance, new Pos(x, y, z));
     }
 
-    private @NotNull Path extractWorld(@NotNull String base, @NotNull ZipInputStream zip, @Nullable Consumer<@NotNull JsonObject> dataConsumer) throws IOException {
-        var worldsDirectory = Path.of("worlds");
+    private @NotNull Path createDirectory(@Nullable CommonGame game, @NotNull String suffix) throws IOException {
         Files.createDirectories(worldsDirectory);
-        var directory = Files.createTempDirectory(worldsDirectory, base);
+        return Files.createTempDirectory(worldsDirectory, game == null ? suffix : game.id() + "-" + suffix);
+    }
+
+    private @NotNull Path extractWorld(@Nullable CommonGame game, @NotNull String suffix, @NotNull ZipInputStream zip, @Nullable Consumer<@NotNull JsonObject> dataConsumer) throws IOException {
+        var directory = createDirectory(game, suffix);
         while (true) {
             var entry = zip.getNextEntry();
             if (entry == null) {

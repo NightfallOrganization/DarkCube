@@ -18,6 +18,7 @@ import eu.cloudnetservice.driver.database.Database;
 import eu.cloudnetservice.driver.database.DatabaseProvider;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
+import eu.darkcube.minigame.woolbattle.api.map.MapIngameData;
 import eu.darkcube.minigame.woolbattle.api.map.MapManager;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
@@ -28,17 +29,20 @@ import eu.darkcube.system.server.item.ItemBuilder;
 
 public class CommonMapManager implements MapManager {
     private static final ConcurrentMap<String, CommonMap> EMPTY = new ConcurrentHashMap<>(0);
-    private final Database database;
+    private final Database mapsDatabase;
+    private final Database mapDataDatabase;
     private final CommonWoolBattleApi woolbattle;
     private final ConcurrentMap<MapSize, ConcurrentMap<String, CommonMap>> maps = new ConcurrentHashMap<>();
 
     public CommonMapManager(CommonWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
-        database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_maps_" + woolbattle.databaseNameSuffixMaps());
-        for (var entry : database.entries().entrySet()) {
+        var databaseProvider = InjectionLayer.boot().instance(DatabaseProvider.class);
+        mapsDatabase = databaseProvider.database("woolbattle_maps_" + woolbattle.databaseNameSuffixMaps());
+        mapDataDatabase = databaseProvider.database("woolbattle_map_data");
+        for (var entry : mapsDatabase.entries().entrySet()) {
             var document = entry.getValue();
             var map = CommonMap.fromDocument(this, document);
-            maps.computeIfAbsent(map.size(), v -> new ConcurrentHashMap<>()).put(map.name(), map);
+            maps.computeIfAbsent(map.size(), _ -> new ConcurrentHashMap<>()).put(map.name(), map);
         }
     }
 
@@ -50,11 +54,11 @@ public class CommonMapManager implements MapManager {
     @Override
     public @NotNull CommonMap createMap(@NotNull String name, @NotNull MapSize mapSize) {
         var mapRef = new AtomicReference<CommonMap>();
-        maps.compute(mapSize, (k, v) -> {
+        maps.compute(mapSize, (_, v) -> {
             if (v == null) v = new ConcurrentHashMap<>();
             mapRef.set(v.computeIfAbsent(name, n -> {
                 var map = new CommonMap(this, n, mapSize, ItemBuilder.item(woolbattle.materialProvider().grassBlock()));
-                database.insert(databaseKey(map), map.toDocument());
+                mapsDatabase.insert(databaseKey(map), map.toDocument());
                 return map;
             }));
             return v;
@@ -63,7 +67,7 @@ public class CommonMapManager implements MapManager {
     }
 
     void save(CommonMap map) {
-        database.insert(databaseKey(map), map.toDocument());
+        mapsDatabase.insert(databaseKey(map), map.toDocument());
     }
 
     @Override
@@ -80,12 +84,29 @@ public class CommonMapManager implements MapManager {
 
     @Override
     public void deleteMap(@NotNull Map map) {
-        maps.compute(map.size(), (k, v) -> {
+        maps.compute(map.size(), (_, v) -> {
             if (v == null) return null;
             v.remove(map.name());
             if (v.isEmpty()) return null;
             return v;
         });
+    }
+
+    @Override
+    public @NotNull CommonMapIngameData loadIngameData(@NotNull Map map) {
+        if (!(map instanceof CommonMap m)) throw new IllegalArgumentException("Invalid Map");
+        var ingameData = new CommonMapIngameData(m);
+        var document = mapDataDatabase.get(databaseKey(m));
+        if (document != null) {
+            ingameData.readFromDocument(document);
+        }
+        return ingameData;
+    }
+
+    @Override
+    public void saveIngameData(@NotNull MapIngameData ingameData) {
+        if (!(ingameData instanceof CommonMapIngameData data)) throw new IllegalArgumentException("Invalid MapIngameData");
+        mapDataDatabase.insert(databaseKey(data.map()), data.toDocument());
     }
 
     private String databaseKey(CommonMap map) {

@@ -46,19 +46,27 @@ public class CommonUserPerks implements UserPerks {
         byType.clear();
         byName.clear();
         var p = user.perksStorage();
+        var modifiedStorage = false;
         for (var type : ActivationType.values()) {
             var perks = p.perks(type);
             for (var i = 0; i < perks.length; i++) {
                 var perk = game.perkRegistry().perks().get(perks[i]);
                 if (perk == null) {
                     var listPerks = Arrays.asList(perks);
-                    perk = java.util.Arrays.stream(game.perkRegistry().perks(type)).filter(pe -> !listPerks.contains(pe.perkName())).findAny().orElseThrow(Error::new);
+                    var perkOptional = Arrays.stream(game.perkRegistry().perks(type)).filter(pe -> !listPerks.contains(pe.perkName())).findAny();
+                    if (perkOptional.isEmpty()) break;
+
+                    perk = perkOptional.get();
+
                     p.perk(type, i, perk.perkName());
-                    user.perksStorage(p);
-                    System.out.println("Fixing perk: " + perks[i] + " -> " + perk.perkName());
+                    modifiedStorage = true;
+                    game.woolbattle().woolbattle().logger().warn("Fixing perk for {}: {} -> {}", user.playerName(), perks[i], perk.perkName());
                 }
                 perk(perk, i);
             }
+        }
+        if (modifiedStorage) {
+            user.perksStorage(p);
         }
         for (var entry : new ArrayList<>(byType.entrySet())) {
             byType.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));

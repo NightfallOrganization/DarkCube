@@ -25,6 +25,7 @@ import eu.darkcube.minigame.woolbattle.api.user.PerksStorage;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.perk.user.CommonUserPerks;
@@ -69,6 +70,7 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         this.keyPerks = Key.key(woolbattle, "perks");
         this.platformAccess = woolbattle.woolbattle().createInventoryAccessFor(this);
         this.permissions = woolbattle.woolbattle().createPermissionsFor(this);
+        this.perks.reloadFromStorage();
     }
 
     @Override
@@ -223,6 +225,21 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @ApiStatus.Internal
     public void location(@Nullable Location location) {
         this.location = location;
+    }
+
+    public void teleport(@NotNull Location location) {
+        location(location);
+        platformAccess.teleport(location);
+    }
+
+    public void teleport(@NotNull Position.Directed position) {
+        if (position instanceof Location location) {
+            teleport(location);
+        } else {
+            var l = location;
+            if (l == null) throw new IllegalStateException("Can't perform teleport: location is null");
+            teleport(new Location(l.world(), position));
+        }
     }
 
     @Override

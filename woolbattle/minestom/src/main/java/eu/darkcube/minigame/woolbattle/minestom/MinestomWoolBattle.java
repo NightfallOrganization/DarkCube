@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
+import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
+import eu.darkcube.minigame.woolbattle.api.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
@@ -27,6 +29,8 @@ import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomItemListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomJoinListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomMoveListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomQuitListener;
+import eu.darkcube.minigame.woolbattle.minestom.perk.MinestomPerkItemImplementation;
+import eu.darkcube.minigame.woolbattle.minestom.perk.MinestomUserPerkImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
@@ -56,6 +60,8 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         super();
         this.api = new MinestomWoolBattleApi(this);
         WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, this.api);
+        WoolBattleProvider.PROVIDER.register(DefaultUserPerk.Implementation.class, new MinestomUserPerkImplementation());
+        WoolBattleProvider.PROVIDER.register(PerkItem.Implementation.class, new MinestomPerkItemImplementation());
         this.playerKey = Key.key(this.api, "minestom_player");
         this.setupModeImplementation = new MinestomSetupModeImplementation(this.api);
     }
@@ -147,7 +153,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     }
 
     public MinestomEntity entity(Acquirable<Entity> entity) {
-        return entities.computeIfAbsent(entity.unwrap(), k -> new MinestomEntity(k.getAcquirable(), this));
+        return entities.computeIfAbsent(entity.unwrap(), k -> new MinestomEntity(k.acquirable(), this));
     }
 
     public void removed(MinestomEntity entity) {

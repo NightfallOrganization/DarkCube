@@ -59,9 +59,11 @@ public class ChunkUnloader {
                 }
             }
             if (playerChunk != chunk) {
+                instance.saveChunkToStorage(chunk);
                 instance.unloadChunk(chunk);
             } else {
                 if (playerChunk.getViewers().isEmpty()) {
+                    instance.saveChunkToStorage(playerChunk);
                     instance.unloadChunk(playerChunk);
                     var player = event.getPlayer();
                     MinecraftServer.getSchedulerManager().scheduleNextProcess(() -> lastChunk.remove(player));

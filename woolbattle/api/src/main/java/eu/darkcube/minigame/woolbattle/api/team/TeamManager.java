@@ -36,5 +36,10 @@ public interface TeamManager {
 
     @Api
     @NotNull
+    @Unmodifiable
+    Collection<? extends Team> playingTeams();
+
+    @Api
+    @NotNull
     Team spectator();
 }

@@ -50,6 +50,8 @@ public class BukkitItemsProvider implements Items.Provider {
             case PERK_WOOL_BOMB -> item(TNT);
             case PERK_WOOL_BOMB_COOLDOWN -> item(TNT);
             case PERK_EXTRA_WOOL -> item(CHEST);
+            case PERK_PIERCING_ARROW -> item(GOLD_AXE).unbreakable(true).flag(HIDE_UNBREAKABLE);
+            case PERK_KNOCKBACK_ARROW -> item(ENCHANTED_BOOK);
             case PERK_LONGJUMP -> item(RABBIT_FOOT);
             case PERK_ROCKETJUMP -> item(DIAMOND_BOOTS);
             case PERK_ARROW_RAIN -> item(DISPENSER);
@@ -70,6 +72,8 @@ public class BukkitItemsProvider implements Items.Provider {
             case PERK_MINE_COOLDOWN -> item(STONE_PLATE);
             case PERK_MINIGUN -> item(DIAMOND_BARDING);
             case PERK_MINIGUN_COOLDOWN -> item(DIAMOND_BARDING);
+            case PERK_POD -> item(FLOWER_POT_ITEM);
+            case PERK_POD_COOLDOWN -> item(FIREWORK_CHARGE);
             case PERK_GRABBER -> item(STICK);
             case PERK_GRABBER_GRABBED -> item(BLAZE_ROD);
             case PERK_GRABBER_COOLDOWN -> item(STICK);

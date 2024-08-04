@@ -8,16 +8,21 @@
 package eu.darkcube.minigame.woolbattle.minestom.user;
 
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
+import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.util.PosUtil;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.material.Material;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
@@ -77,6 +82,25 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
     public @NotNull ItemBuilder itemInHand() {
         final var player = woolbattle.player(user);
         return ItemBuilder.item(player.getItemInMainHand());
+    }
+
+    @Override
+    public void playInventorySound() {
+        final var player = woolbattle.player(user);
+        player.playSound(Sound.sound(Key.key("minecraft:block.note_block.hat"), Sound.Source.AMBIENT, 100, 1));
+    }
+
+    @Override
+    public void teleport(@NotNull Location location) {
+        final var player = woolbattle.player(user);
+        var instance = ((MinestomWorld) location.world()).instance();
+        player.acquirable().sync(_ -> {
+            if (player.getInstance() != instance) {
+                player.setInstance(instance, PosUtil.toPos(location)).join();
+            } else {
+                player.teleport(PosUtil.toPos(location)).join();
+            }
+        });
     }
 
     private static void removeItems(PlayerInventory inventory, ItemStack itemToRemove, int count, WoolSubtractDirection direction) {

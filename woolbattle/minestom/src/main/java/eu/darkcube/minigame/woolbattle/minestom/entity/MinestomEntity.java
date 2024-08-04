@@ -20,11 +20,11 @@ import net.minestom.server.thread.Acquirable;
 
 @SuppressWarnings("UnstableApiUsage")
 public class MinestomEntity implements Entity {
-    private final Acquirable<net.minestom.server.entity.Entity> entity;
+    private final Acquirable<? extends net.minestom.server.entity.Entity> entity;
     private final MinestomWoolBattle woolbattle;
 
     @ApiStatus.Experimental
-    public MinestomEntity(Acquirable<net.minestom.server.entity.Entity> entity, MinestomWoolBattle woolbattle) {
+    public MinestomEntity(Acquirable<? extends net.minestom.server.entity.Entity> entity, MinestomWoolBattle woolbattle) {
         this.entity = entity;
         this.woolbattle = woolbattle;
     }
@@ -56,7 +56,7 @@ public class MinestomEntity implements Entity {
         woolbattle.removed(this);
     }
 
-    public Acquirable<net.minestom.server.entity.Entity> entity() {
+    public Acquirable<? extends net.minestom.server.entity.Entity> entity() {
         return entity;
     }
 }

@@ -8,9 +8,10 @@
 package eu.darkcube.minigame.woolbattle.common.user;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.user.PerksStorage;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
@@ -30,8 +32,8 @@ public class CommonPerksStorage implements PerksStorage {
             var d = json.getAsJsonObject();
             var docPerks = d.getAsJsonObject("perks");
             var docPerkSlots = d.getAsJsonObject("perkSlots");
-            var perks = new HashMap<ActivationType, PerkName[]>();
-            var perkSlots = new HashMap<ActivationType, int[]>();
+            var perks = new EnumMap<ActivationType, PerkName[]>(ActivationType.class);
+            var perkSlots = new EnumMap<ActivationType, int[]>(ActivationType.class);
             for (var documentKey : docPerks.keySet()) {
                 var type = ActivationType.valueOf(documentKey);
                 var array = PERK_NAME_ARRAY.deserialize(docPerks.get(documentKey));
@@ -51,7 +53,11 @@ public class CommonPerksStorage implements PerksStorage {
             var docPerks = new JsonObject();
             var docPerkSlots = new JsonObject();
             for (var type : ActivationType.values()) {
-                docPerks.add(type.name(), PERK_NAME_ARRAY.serialize(data.perks(type)));
+                var p = data.perks(type);
+                var n = new ArrayList<PerkName>();
+                for (var perkName : p) if (perkName != null) n.add(perkName);
+                p = n.toArray(PerkName[]::new);
+                docPerks.add(type.name(), PERK_NAME_ARRAY.serialize(p));
                 docPerkSlots.add(type.name(), PersistentDataTypes.INT_ARRAY.serialize(data.perkInvSlots(type)));
             }
             d.add("perks", docPerks);
@@ -68,8 +74,8 @@ public class CommonPerksStorage implements PerksStorage {
     private final Map<ActivationType, int[]> perkSlots;
 
     public CommonPerksStorage() {
-        var perks = new HashMap<ActivationType, PerkName[]>();
-        var perkSlots = new HashMap<ActivationType, int[]>();
+        var perks = new EnumMap<ActivationType, PerkName[]>(ActivationType.class);
+        var perkSlots = new EnumMap<ActivationType, int[]>(ActivationType.class);
         for (var type : ActivationType.values()) {
             perks.put(type, new PerkName[type.maxCount()]);
             perkSlots.put(type, new int[type.maxCount()]);
@@ -79,7 +85,7 @@ public class CommonPerksStorage implements PerksStorage {
         reset();
     }
 
-    public CommonPerksStorage(Map<ActivationType, PerkName[]> perks, Map<ActivationType, int[]> perkSlots) {
+    private CommonPerksStorage(Map<ActivationType, PerkName[]> perks, Map<ActivationType, int[]> perkSlots) {
         this();
         perks(perks);
         for (var entry : perkSlots.entrySet()) {
@@ -88,47 +94,47 @@ public class CommonPerksStorage implements PerksStorage {
     }
 
     @Override
-    public CommonPerksStorage clone() {
+    public @NotNull CommonPerksStorage clone() {
         return new CommonPerksStorage(perks, perkSlots);
     }
 
     @Override
-    public PerkName[] perks(ActivationType type) {
+    public PerkName @NotNull [] perks(@NotNull ActivationType type) {
         return perks.get(type).clone();
     }
 
     @Override
-    public PerkName perk(ActivationType type, int perkSlot) {
+    public @NotNull PerkName perk(@NotNull ActivationType type, int perkSlot) {
         return perks.get(type)[perkSlot];
     }
 
     @Override
-    public void perk(ActivationType type, int perkSlot, PerkName perk) {
+    public void perk(@NotNull ActivationType type, int perkSlot, @NotNull PerkName perk) {
         perks.get(type)[perkSlot] = perk;
     }
 
     @Override
-    public int[] perkInvSlots(ActivationType type) {
+    public int @NotNull [] perkInvSlots(@NotNull ActivationType type) {
         return perkSlots.get(type).clone();
     }
 
     @Override
-    public int perkInvSlot(ActivationType type, int perkSlot) {
+    public int perkInvSlot(@NotNull ActivationType type, int perkSlot) {
         return perkSlots.get(type)[perkSlot];
     }
 
     @Override
-    public void perkInvSlot(ActivationType type, int perkSlot, int slot) {
+    public void perkInvSlot(@NotNull ActivationType type, int perkSlot, int slot) {
         perkSlots.get(type)[perkSlot] = slot;
     }
 
     @Override
-    public Map<ActivationType, PerkName[]> perks() {
+    public @NotNull Map<ActivationType, PerkName[]> perks() {
         return perks;
     }
 
     @Override
-    public void perks(Map<ActivationType, PerkName[]> perks) {
+    public void perks(@NotNull Map<ActivationType, PerkName[]> perks) {
         for (var entry : perks.entrySet()) {
             System.arraycopy(entry.getValue(), 0, this.perks.get(entry.getKey()), 0, Math.min(entry.getValue().length, this.perks.get(entry.getKey()).length));
         }

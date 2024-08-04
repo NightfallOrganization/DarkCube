@@ -92,7 +92,8 @@ public enum Messages implements Message {
     KICKED_FULL,
     INVALID_MAP,
     MAP_ICON_SET,
-    AIR_IN_HAND;
+    AIR_IN_HAND,
+    ;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final String ITEM_PREFIX = "ITEM_";

@@ -11,6 +11,8 @@ import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
 import static eu.darkcube.system.server.inventory.Inventory.createChestTemplate;
 
+import java.nio.file.Path;
+
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
 import eu.darkcube.minigame.woolbattle.api.util.translation.Message;
@@ -34,7 +36,10 @@ import eu.darkcube.system.libs.net.kyori.adventure.key.Namespaced;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
+import eu.darkcube.system.server.inventory.TemplateInventory;
 import eu.darkcube.system.server.inventory.item.ItemTemplate;
+import eu.darkcube.system.server.inventory.listener.TemplateInventoryListener;
+import eu.darkcube.system.userapi.User;
 import org.slf4j.Logger;
 
 public abstract class CommonWoolBattle implements Namespaced {
@@ -43,6 +48,7 @@ public abstract class CommonWoolBattle implements Namespaced {
     private final @NotNull SetupMode setupMode;
     private final @NotNull WorldDataProvider worldDataProvider;
     private final @NotNull LanguageRegistry languageRegistry;
+    private final @NotNull Path mapsDirectory = Path.of("maps");
     private final @NotNull ItemTemplate defaultItemTemplate;
     private final @NotNull ItemTemplate defaultPagedItemTemplate;
     private final @NotNull ItemTemplate defaultSinglePagedItemTemplate;
@@ -148,6 +154,10 @@ public abstract class CommonWoolBattle implements Namespaced {
         return this.defaultPagedItemTemplate;
     }
 
+    public @NotNull Path mapsDirectory() {
+        return mapsDirectory;
+    }
+
     public void configureDefaultSinglePagedInventory(@NotNull InventoryTemplate template) {
         template.setItems(0, defaultSinglePagedInventoryTemplate());
         configurePaged(template);
@@ -170,6 +180,29 @@ public abstract class CommonWoolBattle implements Namespaced {
 
     private void configurePaged(@NotNull InventoryTemplate template) {
         template.animation().calculateManifold(22, 1);
+        template.addListener(TemplateInventoryListener.ofStateful(() -> new TemplateInventoryListener() {
+            private boolean finished = false;
+            private User user;
+
+            @Override
+            public void onOpen(@NotNull TemplateInventory inventory, @NotNull User user) {
+                this.user = user;
+            }
+
+            @Override
+            public void onOpenAnimationFinished(@NotNull TemplateInventory inventory) {
+                finished = true;
+            }
+
+            @Override
+            public void onUpdate(@NotNull TemplateInventory inventory) {
+                if (!finished) {
+                    var wbUser = api().user(user);
+                    if (wbUser == null) return;
+                    wbUser.platformAccess().playInventorySound();
+                }
+            }
+        }));
         var pagination = template.pagination();
         pagination.pageSlots(DefaultInventorySettings.PAGE_SLOTS_5x9);
         pagination.previousButton().setItem(Items.PREV_PAGE);

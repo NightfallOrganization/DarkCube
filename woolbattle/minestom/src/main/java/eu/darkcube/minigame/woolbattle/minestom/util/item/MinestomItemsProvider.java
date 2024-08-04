@@ -49,6 +49,8 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_WOOL_BOMB -> item(TNT);
             case PERK_WOOL_BOMB_COOLDOWN -> item(TNT);
             case PERK_EXTRA_WOOL -> item(CHEST);
+            case PERK_PIERCING_ARROW -> item(GOLDEN_AXE).unbreakable(true).flag(HIDE_UNBREAKABLE);
+            case PERK_KNOCKBACK_ARROW -> item(ENCHANTED_BOOK).glow(false);
             case PERK_LONGJUMP -> item(RABBIT_FOOT);
             case PERK_ROCKETJUMP -> item(DIAMOND_BOOTS);
             case PERK_ARROW_RAIN -> item(DISPENSER);
@@ -69,6 +71,8 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_MINE_COOLDOWN -> item(STONE_PRESSURE_PLATE);
             case PERK_MINIGUN -> item(DIAMOND_HORSE_ARMOR);
             case PERK_MINIGUN_COOLDOWN -> item(DIAMOND_HORSE_ARMOR);
+            case PERK_POD -> item(FLOWER_POT);
+            case PERK_POD_COOLDOWN -> item(FIREWORK_STAR);
             case PERK_GRABBER -> item(STICK);
             case PERK_GRABBER_GRABBED -> item(BLAZE_ROD);
             case PERK_GRABBER_COOLDOWN -> item(STICK);

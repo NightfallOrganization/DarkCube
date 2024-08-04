@@ -84,12 +84,9 @@ public class MinestomLobbyScoreboard {
             p.sendPacket(removePacket);
         }
         var user = player.user();
-        System.out.println(user);
         if (user != null) {
             var sidebar = user.metadata().<Sidebar>remove(sidebarKey);
-            System.out.println(sidebar);
             if (sidebar != null) {
-                System.out.println("Remove " + sidebar.getViewers().contains(player));
                 // Minestom doesn't send this packet
                 player.sendPacket(sidebar.getDisplayScoreboardPacket((byte) 1));
                 sidebar.removeViewer(player);

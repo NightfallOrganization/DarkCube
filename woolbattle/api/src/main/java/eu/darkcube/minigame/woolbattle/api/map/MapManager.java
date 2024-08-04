@@ -36,4 +36,11 @@ public interface MapManager {
 
     @Api
     void deleteMap(@NotNull Map map);
+
+    @Api
+    @NotNull
+    MapIngameData loadIngameData(@NotNull Map map);
+
+    @Api
+    void saveIngameData(@NotNull MapIngameData ingameData);
 }

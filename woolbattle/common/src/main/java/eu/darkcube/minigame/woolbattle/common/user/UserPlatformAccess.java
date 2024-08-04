@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.user;
 
+import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
@@ -19,4 +20,8 @@ public interface UserPlatformAccess {
 
     @NotNull
     ItemBuilder itemInHand();
+
+    void playInventorySound();
+
+    void teleport(@NotNull Location location);
 }

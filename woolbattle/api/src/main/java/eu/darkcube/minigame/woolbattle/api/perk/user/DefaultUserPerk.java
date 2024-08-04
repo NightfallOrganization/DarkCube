@@ -105,7 +105,8 @@ public class DefaultUserPerk implements UserPerk {
     public void cooldown(int cooldown) {
         this.cooldown = Math.min(cooldown, perk.cooldown().cooldown());
         if (game.phase() instanceof Ingame) {
-            if (owner.team().canPlay()) {
+            var team = owner.team();
+            if (team != null && team.canPlay()) {
                 currentPerkItem().setItem();
             }
         }

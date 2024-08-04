@@ -3,6 +3,7 @@ package eu.darkcube.minigame.woolbattle.common.game.lobby.inventory;
 import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -12,6 +13,7 @@ import java.util.function.Function;
 
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
+import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.vote.Poll;
 import eu.darkcube.minigame.woolbattle.api.vote.Vote;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
@@ -47,6 +49,14 @@ public class LobbyInventories {
     public InventoryTemplate createTeamsTemplate() {
         var template = woolbattle.createDefaultTemplate("lobby_select_team", Messages.INVENTORY_TEAMS, Items.LOBBY_TEAMS);
         var pagination = template.pagination();
+        pagination.specialPageSlots(22);
+        pagination.specialPageSlots(21, 23);
+        pagination.specialPageSlots(21, 22, 23);
+        pagination.specialPageSlots(20, 21, 23, 24);
+        pagination.specialPageSlots(20, 21, 22, 23, 24);
+        pagination.specialPageSlots(19, 20, 21, 23, 24, 25);
+        pagination.specialPageSlots(19, 20, 21, 22, 23, 24, 25);
+        pagination.specialPageSlots(20, 21, 23, 24, 29, 30, 32, 33);
         for (var team : game.teamManager().teams().stream().sorted(Comparator.comparing(CommonTeam::key)).toList()) {
             if (team.spectator()) continue;
             pagination.content().addStaticItem(user -> {
@@ -74,7 +84,11 @@ public class LobbyInventories {
                 if (team == null) return;
                 var wbUser = game.woolbattle().user(user);
                 if (wbUser == null) return;
-                wbUser.team(team);
+                if (team.users().size() >= game.mapSize().teamSize()) {
+                    wbUser.sendMessage(Messages.TEAM_IS_FULL);
+                } else {
+                    wbUser.team(team);
+                }
             }
         });
         return template;
@@ -109,16 +123,15 @@ public class LobbyInventories {
         var perksTypeNumber = Key.key(woolbattle, "perks_type_number");
         for (var activationType : ActivationType.values()) {
             var perks = game.perkRegistry().perks(activationType);
-            for (var i = 0; i < perks.length; i++) {
-                if (perks.length > activationType.maxCount()) {
+            if (perks.length > activationType.maxCount()) {
+                for (var i = 0; i < activationType.maxCount(); i++) {
                     var finalI = i;
                     content.addStaticItem(user -> {
-                        var builder = activationType.displayItem().getItem(user, finalI);
+                        var builder = activationType.displayItem().getItem(user, finalI + 1);
                         ItemManager.instance().setId(builder, perksType, String.valueOf(activationType.ordinal()));
                         ItemManager.instance().setId(builder, perksTypeNumber, String.valueOf(finalI));
                         return builder;
                     });
-                    i++;
                 }
             }
         }
@@ -149,18 +162,36 @@ public class LobbyInventories {
                 if (wbUser.perks().count(perk.perkName()) > 0) {
                     builder.lore(Messages.SELECTED.getMessage(user));
                 }
-                if (wbUser.perks().perks(type).get(number).perk().perkName().equals(perk.perkName())) {
+                var userPerks = wbUser.perks().perks(type);
+                if (userPerks.size() >= number + 1 && userPerks.get(number).perk().perkName().equals(perk.perkName())) {
                     builder.glow(true);
                 }
                 return builder;
             });
         }
+        template.addListener(new TemplateInventoryListener() {
+            @Override
+            public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
+                var perkNameString = ItemManager.instance().getId(item, keyPerk);
+                if (perkNameString == null) return;
+                var perkName = new PerkName(perkNameString);
+                var wbUser = woolbattle.api().user(user);
+                if (wbUser == null) return;
+                var perksStorage = wbUser.perksStorage();
+                var currentPerks = Arrays.asList(perksStorage.perks(type));
+                if (currentPerks.contains(perkName)) return;
+                perksStorage.perk(type, number, perkName);
+                wbUser.perksStorage(perksStorage);
+                wbUser.perks().reloadFromStorage();
+                inventory.pagedController().publishUpdateAll();
+            }
+        });
         return template;
     }
 
     public InventoryTemplate createVotingEpGlitchInventoryTemplate() {
         var template = woolbattle.createDefaultTemplate("lobby_voting_ep_glitch", Messages.INVENTORY_VOTING_EP_GLITCH, Items.LOBBY_VOTING_EP_GLITCH);
-        template.pagination().pageSlots(new int[]{21, 23});
+        template.pagination().pageSlots(21, 23);
         template.pagination().content().addStaticItem(Items.GENERAL_VOTING_FOR.modify((user, item) -> {
             var vote = vote(lobby.epGlitchPoll(), user);
             if (vote != null && vote.vote()) item.glow(true);

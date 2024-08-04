@@ -19,9 +19,11 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class MinestomLobby extends CommonLobby {
     private final @NotNull MinestomLobbyScoreboard scoreboard;
+    private final @NotNull MinestomWoolBattle woolbattle;
 
     public MinestomLobby(@NotNull CommonGame game, @NotNull MinestomWoolBattle woolbattle) {
         super(game);
+        this.woolbattle = woolbattle;
         this.listeners.addListener(new MinestomLobbyInventoryClickListener().create());
         this.listeners.addListener(new MinestomLobbyJoinGameListener(woolbattle).create());
         this.listeners.addListener(new MinestomLobbyUserChangeTeamListener(woolbattle, this).create());

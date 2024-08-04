@@ -13,8 +13,10 @@ import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngame;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.inventory.LobbyInventories;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.inventory.LobbyUserInventory;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyBreakBlockListener;
@@ -32,6 +34,7 @@ import eu.darkcube.minigame.woolbattle.common.vote.CommonPoll;
 import eu.darkcube.minigame.woolbattle.common.vote.CommonVoteRegistry;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.util.GameState;
 
@@ -39,6 +42,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     protected int minPlayerCount;
     protected int maxPlayerCount;
     protected int deathLine;
+    protected boolean enoughTeams;
     protected CommonWorld world;
     protected Location spawn;
     protected CommonVoteRegistry voteRegistry;
@@ -81,6 +85,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.perkTemplates = createPerkTemplates(lobbyInventories);
         this.timer = new CommonLobbyTimer(this);
         this.maxPlayerCount = game.mapSize().teams() * game.mapSize().teamSize();
+        this.enoughTeams = game.teamManager().playingTeams().size() >= 2;
 
         this.listeners.addListener(new LobbyBreakBlockListener().create());
         this.listeners.addListener(new LobbyPlaceBlockListener().create());
@@ -106,25 +111,55 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     }
 
     @Override
-    public void enable() {
+    public void init(@Nullable CommonPhase oldPhase) {
+        super.init(oldPhase);
+        if (!enoughTeams) {
+            woolbattle.logger().error("Not enough teams for {}", game.mapSize());
+        }
+    }
+
+    @Override
+    public void enable(@Nullable CommonPhase oldPhase) {
         setupWorld();
         spawn = new Location(world, game.lobbyData().spawn());
         deathLine = game.lobbyData().deathLine();
         minPlayerCount = game.lobbyData().minPlayerCount();
-        super.enable();
-        timer.start();
+        super.enable(oldPhase);
+        if (enoughTeams) timer.start();
     }
 
     @Override
-    public void disable() {
-        super.disable();
-        timer.stop();
+    public void disable(@Nullable CommonPhase newPhase) {
+        super.disable(newPhase);
+        var ingame = (CommonIngame) newPhase;
+        if (enoughTeams) timer.stop();
         for (var user : game.users()) {
             quit(user);
         }
+        if (ingame != null) {
+            transitionPlayers(ingame);
+        }
+    }
+
+    @Override
+    public void unload(@Nullable CommonPhase newPhase) {
+        super.unload(newPhase);
         game.woolbattle().worldHandler().unloadWorld(world);
         world = null;
         spawn = null;
+    }
+
+    protected void transitionPlayers(@NotNull CommonIngame ingame) {
+        for (var user : game.users()) {
+            var team = user.team();
+            if (team == null) throw new IllegalStateException("User team can't be null when game starts");
+            var spawn = ingame.mapIngameData().spawn(team.key());
+            if (spawn == null) {
+                woolbattle.logger().warn("No spawn configured for team {} on {}", team.key(), game.mapSize());
+                spawn = new Position.Directed.Simple(0.5, 100, 0.5, 0, 0);
+            }
+            user.teleport(new Location(ingame.world(), spawn));
+        }
     }
 
     private void setupWorld() {

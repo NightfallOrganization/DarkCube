@@ -25,7 +25,7 @@ public class CommonIngameWorld extends CommonGameWorld {
 
     public CommonIngameWorld(@NotNull CommonGame game) {
         super(game);
-        this.blockDamageKey = Key.key(game.woolbattle(), "blockDamage");
+        this.blockDamageKey = Key.key(game.woolbattle(), "block_damage");
     }
 
     public Set<CommonBlock> placedBlocks() {

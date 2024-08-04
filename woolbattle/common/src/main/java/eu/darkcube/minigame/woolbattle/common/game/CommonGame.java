@@ -30,6 +30,7 @@ import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngameData;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobbyData;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMap;
+import eu.darkcube.minigame.woolbattle.common.perk.CommonPerks;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeamManager;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.CommonSchedulerManager;
@@ -85,8 +86,9 @@ public class CommonGame implements Game {
     }
 
     void init() {
+        CommonPerks.register(this);
         this.phase = woolbattle.gamePhaseCreator().createLobby(this);
-        this.phase.enable();
+        this.phase.enable(null);
     }
 
     @Override
@@ -120,15 +122,19 @@ public class CommonGame implements Game {
     }
 
     public void enableNextPhase() {
-        phase.disable();
-        if (phase instanceof CommonLobby) {
-            phase = woolbattle.gamePhaseCreator().createIngame(this);
-        } else if (phase instanceof CommonIngame) {
-            phase = woolbattle.gamePhaseCreator().createEndgame(this);
+        var oldPhase = phase;
+        CommonPhase newPhase;
+        if (oldPhase instanceof CommonLobby) {
+            newPhase = woolbattle.gamePhaseCreator().createIngame(this);
+        } else if (oldPhase instanceof CommonIngame) {
+            newPhase = woolbattle.gamePhaseCreator().createEndgame(this);
         } else {
-            throw new IllegalStateException("Invalid phase: " + phase);
+            throw new IllegalStateException("Invalid phase: " + oldPhase);
         }
-        phase.enable();
+        newPhase.init(oldPhase);
+        oldPhase.disable(newPhase);
+        newPhase.enable(oldPhase);
+        oldPhase.unload(newPhase);
     }
 
     @Override
@@ -185,13 +191,12 @@ public class CommonGame implements Game {
         if (!users.isEmpty()) {
             return;
         }
-        System.out.println("Check unload");
         // no users in game, unload it
         woolbattle.games().unload(this);
     }
 
     void unload0() {
-        phase.disable();
+        phase.disable(null);
         phase = null;
     }
 

@@ -16,7 +16,7 @@ import net.minestom.server.thread.Acquirable;
 @SuppressWarnings("UnstableApiUsage")
 public class MinestomProjectile extends MinestomEntity implements Projectile {
     @ApiStatus.Experimental
-    public MinestomProjectile(Acquirable<Entity> entity, MinestomWoolBattle woolbattle) {
+    public MinestomProjectile(Acquirable<? extends Entity> entity, MinestomWoolBattle woolbattle) {
         super(entity, woolbattle);
     }
 }

@@ -29,7 +29,7 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
     private final MinestomWoolBattle woolbattle;
     private final MinestomColoredWoolProvider woolProvider = new MinestomColoredWoolProvider();
     private final MinestomMaterialProvider materialProvider = new MinestomMaterialProvider(woolProvider);
-    private final MinestomEntityImplementations entityImplementations = new MinestomEntityImplementations();
+    private final MinestomEntityImplementations entityImplementations;
     private final MinestomWorldHandler worldHandler = new MinestomWorldHandler(this, MinecraftServer.getInstanceManager(), MinecraftServer.getBiomeRegistry());
     private final MinestomGamePhaseCreator gamePhaseCreator;
     private final MinestomWoolBattleCommands commands = new MinestomWoolBattleCommands(this, MinecraftServer.getCommandManager());
@@ -39,6 +39,7 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
         super("minestom");
         this.woolbattle = woolbattle;
         this.gamePhaseCreator = new MinestomGamePhaseCreator(woolbattle);
+        this.entityImplementations = new MinestomEntityImplementations(woolbattle);
     }
 
     @Override

@@ -26,10 +26,13 @@ public class CommonLobbyTimer {
     }
 
     public void start() {
-        this.tick = lobby.game().woolbattle().tickUnit();
-        task = lobby.game().scheduler().submit(() -> {
+        this.tick = this.lobby.game().woolbattle().tickUnit();
+
+        this.task = this.lobby.game().scheduler().submit(() -> {
             var onlineCount = lobby.game().users().size();
-            if (onlineCount >= lobby.minPlayerCount()) {
+            var enoughPlayers = onlineCount >= lobby.minPlayerCount();
+
+            if (enoughPlayers) {
                 if (overrideRequest != null) {
                     newOverride(overrideRequest);
                     overrideRequest = null;
