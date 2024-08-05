@@ -17,12 +17,25 @@ public class MinestomIngame extends CommonIngame {
     }
 
     @Override
+    public void init(@Nullable CommonPhase oldPhase) {
+        for (var user : game.users()) {
+            var player = woolbattle.player(user);
+            player.acquirable().sync(p -> {
+                p.setGameMode(GameMode.SPECTATOR);
+                p.setFlyingSpeed(0);
+            });
+        }
+        super.init(oldPhase);
+    }
+
+    @Override
     public void enable(@Nullable CommonPhase oldPhase) {
         super.enable(oldPhase);
         for (var user : game.users()) {
             var player = woolbattle.player(user);
             player.acquirable().sync(p -> {
                 p.setGameMode(GameMode.CREATIVE);
+                p.setFlyingSpeed(0.05F);
             });
         }
     }
