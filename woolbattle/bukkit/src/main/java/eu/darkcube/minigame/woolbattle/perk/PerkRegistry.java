@@ -25,6 +25,7 @@ import eu.darkcube.minigame.woolbattle.perk.perks.active.GrapplingHookPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.LineBuilderPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.MinePerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.MinigunPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.PandasToiletFlushPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.PodPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.ProtectiveShieldPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.active.RonjasToiletFlushPerk;
@@ -106,6 +107,7 @@ public class PerkRegistry {
         register(new BerserkerPerk(woolbattle));
         register(new StomperPerk(woolbattle));
         register(new PodPerk(woolbattle));
+        register(new PandasToiletFlushPerk(woolbattle));
     }
 
     public void register(Perk perk) {
