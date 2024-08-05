@@ -97,6 +97,7 @@ public class GhostPerk extends Perk {
             p.setMaxHealth(20);
 
             Bukkit.getPluginManager().callEvent(new EventGhostStateChange(user, true));
+            p.setFoodLevel(5);
 
             new Scheduler(woolbattle) {
 
@@ -105,9 +106,11 @@ public class GhostPerk extends Perk {
                     if (!isGhost(user)) {
                         this.cancel();
                         p.removePotionEffect(PotionEffectType.SPEED);
+                        p.setFoodLevel(20);
                         return;
                     }
                     p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10, 0, false, false), true);
+                    p.setFoodLevel(5);
                 }
 
             }.runTaskTimer(1);

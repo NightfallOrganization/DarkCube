@@ -20,6 +20,7 @@ import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -77,7 +78,7 @@ public class MinePerk extends Perk {
 
             event.setCancelled(true);
             woolbattle.ingame().destroy(block);
-            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 5);
+            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 7);
 
             new Scheduler(woolbattle, () -> {
                 var playerLoc = p.getLocation().toVector();
@@ -101,7 +102,11 @@ public class MinePerk extends Perk {
             if (!perk.perk().perkName().equals(MinePerk.MINE)) return;
 
             event.setCancelled(true);
+            var rel = block.getRelative(BlockFace.DOWN);
+            if (rel.getType().isSolid()) return;
+
             woolbattle.ingame().destroy(block);
+
             block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
 
             var blockLoc = block.getLocation().add(0.5, 0, 0.5);

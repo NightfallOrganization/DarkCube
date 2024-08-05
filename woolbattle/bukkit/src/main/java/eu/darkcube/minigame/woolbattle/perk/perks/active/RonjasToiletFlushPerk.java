@@ -63,7 +63,7 @@ public class RonjasToiletFlushPerk extends Perk {
                 if (egg.getTicksLived() <= 3) {
                     WBUser.onlineUsers().stream().filter(u -> !u.getTeam().isSpectator()).map(WBUser::getBukkitEntity).filter(bukkitEntity -> bukkitEntity.getLocation().distance(egg.getLocation()) < RANGE).forEach(t -> {
                         Vector v = egg.getVelocity().multiply(1.3);
-                        v.setY(egg.getVelocity().getY()).normalize().multiply(3).setY(v.getY() + 1.2);
+                        v.setY(egg.getVelocity().getY()).normalize().multiply(1.9).setY(v.getY() + 1.2);
                         t.setVelocity(v);
                     });
                 } else {
