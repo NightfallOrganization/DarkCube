@@ -24,7 +24,7 @@ public class GrandpasClockPerk extends Perk {
     public static final PerkName GRANDPAS_CLOCK = new PerkName("GRANDPAS_CLOCK");
 
     public GrandpasClockPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, GRANDPAS_CLOCK, 16, 18, Item.PERK_GRANDPAS_CLOCK, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_GRANDPAS_CLOCK_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, GRANDPAS_CLOCK, 14, 18, Item.PERK_GRANDPAS_CLOCK, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_GRANDPAS_CLOCK_COOLDOWN, woolbattle));
         addListener(new ListenerGrandpasClock(this, woolbattle));
     }
 
