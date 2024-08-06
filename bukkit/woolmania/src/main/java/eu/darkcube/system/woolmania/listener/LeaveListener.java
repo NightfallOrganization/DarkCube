@@ -19,7 +19,7 @@ public class LeaveListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        WoolMania.woolManiaPlayerMap.remove(player);
+        WoolMania.getInstance().woolManiaPlayerMap.remove(player);
     }
 
 }

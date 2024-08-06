@@ -19,7 +19,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        WoolMania.woolManiaPlayerMap.put(player, new WoolManiaPlayer(player));
+        WoolMania.getInstance().woolManiaPlayerMap.put(player, new WoolManiaPlayer(player));
         // WoolManiaPlayer woolManiaPlayer = WoolMania.woolManiaPlayerMap.get(player);
     }
 

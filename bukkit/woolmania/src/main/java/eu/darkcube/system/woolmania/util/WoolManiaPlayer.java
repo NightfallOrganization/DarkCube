@@ -27,6 +27,7 @@ public class WoolManiaPlayer {
         money = new PersistentDataValue<>(new NamespacedKey(woolMania, "money"), Integer.class, player.getPersistentDataContainer(), 0);
     }
 
+    //<editor-fold desc="Getter">
     public Integer getLevel() {
         return level.getOrDefault();
     }
@@ -34,5 +35,5 @@ public class WoolManiaPlayer {
     public Integer getMoney() {
         return money.getOrDefault();
     }
-
+    //</editor-fold>
 }
