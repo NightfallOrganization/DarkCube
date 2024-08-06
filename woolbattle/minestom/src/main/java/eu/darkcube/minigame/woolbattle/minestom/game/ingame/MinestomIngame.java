@@ -1,9 +1,12 @@
 package eu.darkcube.minigame.woolbattle.minestom.game.ingame;
 
+import java.util.concurrent.TimeUnit;
+
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngame;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.world.VoidSchematicGenerator;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.entity.GameMode;
@@ -38,5 +41,6 @@ public class MinestomIngame extends CommonIngame {
                 p.setFlyingSpeed(0.05F);
             });
         }
+        System.out.println(TimeUnit.NANOSECONDS.toMillis(VoidSchematicGenerator.time.get()));
     }
 }

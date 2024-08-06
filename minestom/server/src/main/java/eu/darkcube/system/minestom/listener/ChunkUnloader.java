@@ -8,6 +8,7 @@
 package eu.darkcube.system.minestom.listener;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.MinecraftServer;
@@ -17,6 +18,8 @@ import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.Chunk;
+import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.InstanceContainer;
 
 public class ChunkUnloader {
 
@@ -32,7 +35,7 @@ public class ChunkUnloader {
         var chunk = lastChunk.remove(player);
         if (chunk == null) return;
         if (chunk.getViewers().isEmpty()) {
-            chunk.getInstance().unloadChunk(chunk);
+            saveAndUnload(chunk.getInstance(), chunk);
         }
     }
 
@@ -53,24 +56,46 @@ public class ChunkUnloader {
         var playerChunk = event.getPlayer().getChunk();
         var chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
         if (chunk != null) {
-            for (var player : instance.getPlayers()) {
-                if (player != event.getPlayer() && chunk.getViewers().contains(player)) {
-                    return;
+            if (!chunk.getViewers().isEmpty()) {
+                for (var player : instance.getPlayers()) {
+                    if (player != event.getPlayer() && chunk.getViewers().contains(player)) {
+                        return;
+                    }
                 }
             }
             if (playerChunk != chunk) {
-                instance.saveChunkToStorage(chunk);
-                instance.unloadChunk(chunk);
+                saveAndUnload(instance, chunk);
             } else {
                 if (playerChunk.getViewers().isEmpty()) {
-                    instance.saveChunkToStorage(playerChunk);
-                    instance.unloadChunk(playerChunk);
+                    saveAndUnload(instance, playerChunk);
                     var player = event.getPlayer();
                     MinecraftServer.getSchedulerManager().scheduleNextProcess(() -> lastChunk.remove(player));
                 } else {
                     lastChunk.put(event.getPlayer(), playerChunk);
                 }
             }
+        }
+    }
+
+    private static boolean shouldUnload(Chunk chunk) {
+        var viewers = chunk.getViewers();
+        return viewers.isEmpty();
+    }
+
+    private static void saveAndUnload(Instance instance, Chunk chunk) {
+        if (!(instance instanceof InstanceContainer container)) return;
+        var loader = container.getChunkLoader();
+        if (loader.supportsParallelSaving()) {
+            var pool = ForkJoinPool.commonPool();
+            pool.execute(() -> loader.saveChunk(chunk).thenRun(() -> {
+                synchronized (chunk) {
+                    if (shouldUnload(chunk)) {
+                        instance.unloadChunk(chunk);
+                    }
+                }
+            }));
+        } else {
+            throw new IllegalStateException("Loader not parallel");
         }
     }
 }

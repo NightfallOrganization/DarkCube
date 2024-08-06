@@ -7,12 +7,16 @@
 
 package eu.darkcube.system.minestom;
 
+import java.nio.file.Path;
+
 import eu.darkcube.system.minestom.command.GameModeCommand;
 import eu.darkcube.system.minestom.command.LoadedChunksCommand;
 import eu.darkcube.system.minestom.command.StopCommand;
 import eu.darkcube.system.minestom.console.ServerConsole;
 import eu.darkcube.system.minestom.listener.ChunkUnloader;
 import eu.darkcube.system.server.cloudnet.CloudNetIntegration;
+import me.lucko.luckperms.minestom.CommandRegistry;
+import me.lucko.luckperms.minestom.LuckPermsMinestom;
 import net.hollowcube.minestom.extensions.ExtensionBootstrap;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.entity.EntityDespawnEvent;
@@ -41,6 +45,7 @@ public class Start {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+        var luckperms = LuckPermsMinestom.builder(Path.of("LuckPerms")).commandRegistry(CommandRegistry.minestom()).logger(LoggerFactory.getLogger("LuckPerms")).configurationAdapter(plugin -> new YamlConfigurationAdapter(plugin, plugin.resolveConfig("luckperms/config.yml"))).enable();
 
         // BungeeCordProxy.enable();
 

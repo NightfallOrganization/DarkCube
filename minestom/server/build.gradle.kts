@@ -93,6 +93,8 @@ dependencies {
     // libraries to be added
     minestomLibrary("org.slf4j:jul-to-slf4j:2.0.13")
     minestomLibrary(libs.kotlin.stdlib)
+    minestomLibrary("me.lucko.luckperms:minestom:5.4-SNAPSHOT")
+    minestomLibrary("ninja.leaping.configurate:configurate-yaml:3.7.1")
     minestomLibrary("org.apache.logging.log4j:log4j-core:2.23.1")
     minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1")
     minestomLibrary(libs.jline)
