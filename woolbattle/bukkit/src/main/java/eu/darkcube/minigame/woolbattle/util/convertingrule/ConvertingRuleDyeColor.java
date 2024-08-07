@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -12,13 +12,13 @@ import org.bukkit.DyeColor;
 
 public class ConvertingRuleDyeColor extends ConvertingRule<DyeColor> {
 
-	@Override
-	public Class<DyeColor> getConvertingClass() {
-		return DyeColor.class;
-	}
+    @Override
+    public Class<DyeColor> getConvertingClass() {
+        return DyeColor.class;
+    }
 
-	@Override
-	public String convert(DyeColor object) {
-		return object.name().toLowerCase();
-	}
+    @Override
+    public String convert(DyeColor object) {
+        return object.name().toLowerCase();
+    }
 }

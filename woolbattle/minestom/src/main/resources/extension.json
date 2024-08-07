@@ -1,0 +1,9 @@
+{
+  "entrypoint": "eu.darkcube.minigame.woolbattle.WoolBattleMinestomExtension",
+  "name": "WoolBattle",
+  "version": "1.0",
+  "dependencies": [
+    "DarkCubeSystem",
+    "LuckPerms"
+  ]
+}

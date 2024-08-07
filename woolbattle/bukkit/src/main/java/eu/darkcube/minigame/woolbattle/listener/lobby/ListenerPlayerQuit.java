@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener.lobby;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -23,7 +24,9 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         this.woolBattle = woolBattle;
     }
 
-    @Override @EventHandler public void handle(PlayerQuitEvent e) {
+    @Override
+    @EventHandler
+    public void handle(PlayerQuitEvent e) {
         WBUser user = WBUser.getUser(e.getPlayer());
         Lobby lobby = woolBattle.lobby();
         lobby.VOTES_MAP.remove(user);
@@ -37,5 +40,6 @@ public class ListenerPlayerQuit extends Listener<PlayerQuitEvent> {
         WBUser.onlineUsers().forEach(ScoreboardHelper::setOnline);
         e.setQuitMessage(null);
         woolBattle.lobby().checkUnload(Bukkit.getOnlinePlayers().size() - 1);
+        user.setTeam(null);
     }
 }

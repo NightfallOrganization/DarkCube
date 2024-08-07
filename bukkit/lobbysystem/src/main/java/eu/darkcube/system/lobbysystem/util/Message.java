@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -41,7 +41,9 @@ public enum Message implements BaseMessage {
     SERVER_NOT_FOUND,
     STATE_LOBBY,
     STATE_INGAME,
-    GAMESERVER_STATE;
+    ROUNDS_COMPLETED,
+    GAMESERVER_STATE,
+    NO_FISHES_IN_INVENTORY;
 
     public static final String PREFIX_ITEM = "ITEM_";
     public static final String PREFIX_LORE = "LORE_";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,19 +7,19 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import java.util.UUID;
+
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.MinigameInventory;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.UUID;
 
 public class ListenerMinigameServer extends BaseListener {
     private final Lobby lobby;
@@ -40,6 +40,6 @@ public class ListenerMinigameServer extends BaseListener {
         p.closeInventory();
         ServerInformation information = lobby.serverManager().byUniqueId(uuid);
         if (information != null) information.connectPlayer(p.getUniqueId());
-        else UserAPI.instance().user(p.getUniqueId()).sendMessage(Message.SERVER_NOT_FOUND.getMessage(p));
+        else UserAPI.instance().user(p.getUniqueId()).sendMessage(Message.SERVER_NOT_FOUND);
     }
 }

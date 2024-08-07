@@ -1,11 +1,15 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
 package eu.darkcube.minigame.woolbattle.api;
+
+import java.time.Duration;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -20,28 +24,22 @@ import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.network.buffer.DataBuf;
 import eu.cloudnetservice.modules.bridge.BridgeServiceHelper;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
-import eu.darkcube.minigame.woolbattle.GameData;
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.DarkCubeBukkit;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.pserver.common.PServerProvider;
+import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
 import eu.darkcube.system.util.GameState;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
-
-import java.time.Duration;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class LobbySystemLinkImpl implements LobbySystemLink {
 
@@ -56,12 +54,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     public LobbySystemLinkImpl(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
         this.updateTask = new UpdateTask(woolbattle);
-        this.connectionRequests = Caffeine
-                .newBuilder()
-                .scheduler(com.github.benmanes.caffeine.cache.Scheduler.systemScheduler())
-                .expireAfterWrite(Duration.ofSeconds(10))
-                .removalListener(newRemovalListener())
-                .build();
+        this.connectionRequests = Caffeine.newBuilder().scheduler(com.github.benmanes.caffeine.cache.Scheduler.systemScheduler()).expireAfterWrite(Duration.ofSeconds(10)).removalListener(newRemovalListener()).build();
     }
 
     private RemovalListener<UUID, ConnectionRequest> newRemovalListener() {
@@ -74,7 +67,8 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         };
     }
 
-    @Override public boolean enabled() {
+    @Override
+    public boolean enabled() {
         return enabled;
     }
 
@@ -83,13 +77,13 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         fullyLoaded = false;
         InjectionLayer.boot().instance(EventManager.class).registerListener(requestListener);
         new Scheduler(woolbattle, this::setFullyLoaded).runTask();
-        DarkCubeBukkit.autoConfigure(false);
+        DarkCubeServerCloudNet.autoConfigure(false);
         if (pserver) {
             var executor = PServerProvider.instance().currentPServer();
-            var doc = executor.storage().get(new Key("LobbySystem", "pserver.gameserver.service"), PersistentDataTypes.DOCUMENT);
+            var doc = executor.storage().get(Key.key("lobbysystem", "pserver.gameserver.service"), PersistentDataTypes.JSON_OBJECT);
             if (doc != null) {
-                var protocol = doc.readDocument("protocol");
-                var data = protocol.getString("data");
+                var protocol = doc.get("protocol").getAsJsonObject();
+                var data = protocol.get("data").getAsString();
                 woolbattle.lobby().loadGame(MapSize.fromString(data));
                 new Scheduler(woolbattle, this::sendIsLoaded).runTaskLater(5);
             }
@@ -98,14 +92,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     }
 
     private void sendIsLoaded() {
-        ChannelMessage
-                .builder()
-                .channel("darkcube_lobbysystem")
-                .message("pserver_loaded")
-                .targetServices()
-                .buffer(DataBuf.empty())
-                .build()
-                .send();
+        ChannelMessage.builder().channel("darkcube_lobbysystem").message("pserver_loaded").targetServices().buffer(DataBuf.empty()).build().send();
     }
 
     public void disable() {
@@ -124,25 +111,26 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         return pserver;
     }
 
-    @Override public void update() {
+    @Override
+    public void update() {
         if (!fullyLoaded) return;
         if (!enabled) return;
-        GameState gameState = gameState();
-        DarkCubeBukkit.gameState(gameState);
-        DarkCubeBukkit.playingPlayers().set(playingPlayers());
-        DarkCubeBukkit.maxPlayingPlayers().set(woolbattle.maxPlayers());
-        ServiceInfoHolder serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
-        BridgeServiceHelper serviceHelper = InjectionLayer.ext().instance(BridgeServiceHelper.class);
+        var gameState = gameState();
+        DarkCubeServerCloudNet.gameState(gameState);
+        DarkCubeServerCloudNet.playingPlayers().set(playingPlayers());
+        DarkCubeServerCloudNet.maxPlayingPlayers().set(woolbattle.maxPlayers());
+        var serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
+        var serviceHelper = InjectionLayer.ext().instance(BridgeServiceHelper.class);
         serviceHelper.maxPlayers().set(1000);
-        DarkCubeBukkit.displayName("LobbyV2");
-        DarkCubeBukkit.extra(root -> {
-            Document.Mutable doc = Document.newJsonDocument();
-            GameData gameData = woolbattle.gameData();
+        DarkCubeServerCloudNet.displayName("LobbyV2");
+        DarkCubeServerCloudNet.extra(root -> {
+            var doc = Document.newJsonDocument();
+            var gameData = woolbattle.gameData();
             @Nullable MapSize gameDataSize = gameData.mapSize();
             if (gameState == GameState.LOBBY) {
                 if (gameDataSize == null) {
-                    Set<MapSize> knownByMaps = woolbattle.mapManager().getMaps().stream().map(Map::size).collect(Collectors.toSet());
-                    for (MapSize mapSize : knownByMaps) {
+                    var knownByMaps = woolbattle.mapManager().getMaps().stream().map(Map::size).collect(Collectors.toSet());
+                    for (var mapSize : knownByMaps) {
                         write(doc, mapSize);
                     }
                 } else {
@@ -152,6 +140,11 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
                     } else {
                         write(doc, map);
                     }
+                }
+            } else if (gameState == GameState.INGAME) {
+                var map = woolbattle.gameData().map();
+                if (map != null) {
+                    write(doc, map);
                 }
             }
 
@@ -165,7 +158,7 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     }
 
     private void write(@NotNull Document.Mutable doc, @NotNull MapSize mapSize) {
-        Map map = woolbattle.mapManager().defaultRandomPersistentMap(mapSize);
+        var map = woolbattle.mapManager().defaultRandomPersistentMap(mapSize);
         if (map == null) return;
         write(doc, map);
     }
@@ -174,34 +167,37 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
         doc.append(map.size().toString(), createEntry(map));
     }
 
-    @NotNull private Document createEntry(@NotNull Map map) {
-        MapSize mapSize = map.size();
-        Document.Mutable protocol = Document.newJsonDocument();
+    @NotNull
+    private Document createEntry(@NotNull Map map) {
+        var mapSize = map.size();
+        var protocol = Document.newJsonDocument();
         protocol.append("mapSize", mapSize);
 
-        int onlinePlayers = 0;
-        GameData gameData = woolbattle.gameData();
+        var onlinePlayers = 0;
+        var spectatingPlayers = 0;
+        var gameData = woolbattle.gameData();
         if (gameData != null && gameData.mapSize() != null && gameData.mapSize().equals(mapSize)) {
             if (!woolbattle.lobby().enabled()) {
                 onlinePlayers = (int) WBUser.onlineUsers().stream().filter(u -> u.getTeam().canPlay()).count();
+                spectatingPlayers = (int) WBUser.onlineUsers().stream().filter(u -> !u.getTeam().canPlay()).count();
             } else {
                 onlinePlayers = Bukkit.getOnlinePlayers().size();
             }
         }
 
-        Document.Mutable entry = Document.newJsonDocument();
+        var entry = Document.newJsonDocument();
+        entry.append("gameState", gameState());
         entry.append("displayName", GsonComponentSerializer.gson().serialize(displayName(map)));
-        entry.append("onlinePlayers", onlinePlayers);
-        entry.append("maxPlayers", mapSize.teams() * mapSize.teamSize());
+        entry.append("playingPlayers", onlinePlayers);
+        entry.append("maxPlayingPlayers", mapSize.teams() * mapSize.teamSize());
+        entry.append("spectatingPlayers", spectatingPlayers);
         entry.append("document", protocol);
         return entry;
     }
 
-    @NotNull private Component displayName(@NotNull Map map) {
-        return Component
-                .text(map.getName(), NamedTextColor.LIGHT_PURPLE)
-                .append(Component.space())
-                .append(Component.text("(" + map.size() + ")", NamedTextColor.GRAY));
+    @NotNull
+    private Component displayName(@NotNull Map map) {
+        return Component.text(map.getName(), NamedTextColor.LIGHT_PURPLE).append(Component.space()).append(Component.text("(" + map.size() + ")", NamedTextColor.GRAY));
     }
 
     private int playingPlayers() {
@@ -228,19 +224,13 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
     private class RequestListener {
 
         private void responseV2(ChannelMessageSender target, UUID requestId, int status, @Nullable String message) {
-            DataBuf.Mutable buffer = DataBuf.empty().writeUniqueId(requestId).writeInt(status);
+            var buffer = DataBuf.empty().writeUniqueId(requestId).writeInt(status);
             if (message != null) buffer.writeString(message);
-            ChannelMessage
-                    .builder()
-                    .target(target.toTarget())
-                    .channel("darkcube_lobbysystem_v2")
-                    .message("connection_request_status")
-                    .buffer(buffer)
-                    .build()
-                    .send();
+            ChannelMessage.builder().target(target.toTarget()).channel("darkcube_lobbysystem_v2").message("connection_request_status").buffer(buffer).build().send();
         }
 
-        @EventListener public void handle(ChannelMessageReceiveEvent event) {
+        @EventListener
+        public void handle(ChannelMessageReceiveEvent event) {
             if (event.channel().equals("darkcube_lobbysystem_v2")) handleV2(event);
             else if (event.channel().equals("darkcube_lobbysystem")) handle_(event);
         }
@@ -275,6 +265,10 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
                 responseV2(sender, requestId, 1, null);
                 schedule(() -> {
                     if (!woolbattle.lobby().enabled()) {
+                        if (woolbattle.ingame().enabled()) {
+                            responseV2(sender, requestId, 2, null);
+                            return;
+                        }
                         responseV2(sender, requestId, 0, "out_of_date");
                         return;
                     }
@@ -300,7 +294,8 @@ public class LobbySystemLinkImpl implements LobbySystemLink {
             super(woolbattle);
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             update();
         }
     }

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "hostRules": [
+    {
+      "matchHost": "https://nexus.darkcube.eu/repository/darkcube-group/",
+      "username": "powerless",
+      "hostType": "maven",
+      "encrypted": {
+        "password": "wcFMA/xDdHCJBTolAQ//chtbzypbElRKxzEtwNSKuuXlq3Tdnys5GZt8cpUcvR/J+W+SxSLij9YtjV4yFC1fiIh67E8ACxRWGN6I3c9NxyhhOrXhE2/O0vReBXTo7dh5ZALXPv+KyWa/Mknj1AWiEZYpszJ1pKHgg6kYqBY/SYI2463vpTMjg1LAxMPjBoeGuffdJFtG7XOFu1+YPOCwJCn/C7uOcCkGaAR3yJnxVnSIs7uIUo/bXvYy6RPoRA70XtD1bNlKnKeFmk5lsW0jlMsGlYifBL0MokyXkYwA9eOolu/B0C3DoyEuXzJKeXcdwMz5r0vjVdVBpRdDWNB7qnxGYBXYR2kZyCjCHrhdDlSumdV+uoA9mnr0C+F5liFjHMmupx+Dfw1xvYBeqzxSLo7Ge3PoENLlGyX2xfdqTETb+UmNbS05za4SRsxGrS7JW4LNnNunUMQV/n70wFY2aNcBvWtNo6DImd1qWlOGzFfajBgxkzkKxUvJe9HUhszCgVBIVf4hQPIvB83s/5oSwJb0cWj4GwBi9K9WWEcnR5OKrFqGAgpzTQMWkHs12Zo0IxeDBEERDGDW/OoniOAZWVpTh7ZkFK0F1yNJtjWX5y/LufycI0Cg/JwFoRZIeg08WEZbFsOuc59gFvXg1qSpst3DV/tTgjufg3V8v7AXmqYfCNjRpp8iQLft57xNAcjSbAHJM418O14IRx9TFl8MWRwyi9zHNTeo8UNDat0tHKEgFSsiE3DsllEZ6IzCoJ6zEFJ9DZiBq5+fziXWRkrOjj+jYw2ZFoWvwV9qlhA/7R0hCyUlDxsD96ozuys4QMIrD+VwKMZ/BxOkrNMhhQ"
+      }
+    },
+    {
+      "matchHost": "https://repo1.maven.org/maven2/",
+      "enabled": false
+    },
+    {
+      "matchHost": "docker.io",
+      "enabled": false
+    },
+    {
+      "matchHost": "api.github.com",
+      "enabled": false
+    },
+    {
+      "matchHost": "github.com",
+      "enabled": false
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "registryUrls": [
+        "https://nexus.darkcube.eu/repository/darkcube-group/"
+      ]
+    },
+    {
+      "matchPackagePatterns": [
+        "^eu.cloudnetservice.cloudnet"
+      ],
+      "allowedVersions": "!/-SNAPSHOT$/"
+    }
+  ]
+}

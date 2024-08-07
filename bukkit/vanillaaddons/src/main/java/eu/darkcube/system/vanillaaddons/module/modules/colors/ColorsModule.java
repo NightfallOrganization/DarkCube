@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.colors;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import net.kyori.adventure.text.Component;
@@ -21,47 +22,41 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 
 public class ColorsModule implements Module, Listener {
-	private final VanillaAddons addons;
+    private final VanillaAddons addons;
 
-	public ColorsModule(VanillaAddons addons) {
-		this.addons = addons;
-	}
+    public ColorsModule(VanillaAddons addons) {
+        this.addons = addons;
+    }
 
-	@EventHandler(priority = EventPriority.LOW)
-	public void handle(PrepareAnvilEvent event) {
-		if (event.getResult() != null) {
-			ItemBuilder item = ItemBuilder.item(event.getResult());
-			if (item.displayname() == null)
-				return;
-			String name = LegacyComponentSerializer.legacySection().serialize(item.displayname());
-			name = ChatColor.translateAlternateColorCodes('&', name);
-			item.displayname(LegacyComponentSerializer.legacySection().deserialize(name));
-			event.setResult(item.build());
-		}
-	}
+    @EventHandler(priority = EventPriority.LOW)
+    public void handle(PrepareAnvilEvent event) {
+        if (event.getResult() != null) {
+            var item = ItemBuilder.item(event.getResult());
+            if (item.displayname() == Component.empty()) return;
+            var name = LegacyComponentSerializer.legacySection().serialize(item.displayname());
+            name = ChatColor.translateAlternateColorCodes('&', name);
+            item.displaynameRaw(LegacyComponentSerializer.legacySection().deserialize(name));
+            event.setResult(item.build());
+        }
+    }
 
-	@EventHandler
-	public void onSignChange(SignChangeEvent e) {
-		for (int i = 0; i < e.lines().size(); ++i) {
-			Component cline = e.line(i);
-			if (cline == null)
-				continue;
-			String line =
-					net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand()
-							.serialize(cline);
-			e.line(i,
-					net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand()
-							.deserialize(line));
-		}
-	}
+    @EventHandler
+    public void onSignChange(SignChangeEvent e) {
+        for (var i = 0; i < e.lines().size(); ++i) {
+            var cline = e.line(i);
+            if (cline == null) continue;
+            var line = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().serialize(cline);
+            e.line(i, net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand().deserialize(line));
+        }
+    }
 
-	@Override
-	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(this, addons);
-	}
+    @Override
+    public void onEnable() {
+        Bukkit.getPluginManager().registerEvents(this, addons);
+    }
 
-	@Override
-	public void onDisable() {
-		HandlerList.unregisterAll(this);
-	}
+    @Override
+    public void onDisable() {
+        HandlerList.unregisterAll(this);
+    }
 }

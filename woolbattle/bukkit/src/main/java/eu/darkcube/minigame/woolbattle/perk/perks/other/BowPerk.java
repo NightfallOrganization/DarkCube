@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
@@ -23,8 +26,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.util.Vector;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 public class BowPerk extends Perk {
     public static final PerkName BOW = new PerkName("BOW");
 
@@ -42,7 +43,8 @@ public class BowPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activate(UserPerk perk) {
+        @Override
+        protected boolean activate(UserPerk perk) {
             Arrow arrow = perk.owner().getBukkitEntity().launchProjectile(Arrow.class, force);
             ArrowPerk.claimArrow(woolbattle, arrow, perk.owner(), 2, 1);
             arrow.setVelocity(arrow.getVelocity());
@@ -52,11 +54,13 @@ public class BowPerk extends Perk {
             return true;
         }
 
-        @Override protected boolean mayActivate() {
+        @Override
+        protected boolean mayActivate() {
             return false;
         }
 
-        @EventHandler public void handle(EntityShootBowEvent event) {
+        @EventHandler
+        public void handle(EntityShootBowEvent event) {
             if (event.getBow() == null || !event.getBow().hasItemMeta()) return;
             if (!(event.getEntity() instanceof Player)) return;
             WBUser user = WBUser.getUser((Player) event.getEntity());

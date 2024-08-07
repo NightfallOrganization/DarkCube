@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,7 +7,15 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+
+import eu.darkcube.system.bukkit.util.BukkitAdventureSupport;
 import eu.darkcube.system.labymod.emotes.Emotes;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.event.PlayerNPCInteractEvent;
@@ -16,8 +24,8 @@ import eu.darkcube.system.lobbysystem.npc.NPCManagement;
 import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.AdventureSupport;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -26,9 +34,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.math.BigInteger;
-import java.util.*;
 
 public class ListenerDailyReward extends BaseListener {
 
@@ -46,7 +51,8 @@ public class ListenerDailyReward extends BaseListener {
         return minCubes + new Random().nextInt(maxCubes - minCubes + 1);
     }
 
-    @EventHandler public void handle(InventoryClickEvent e) {
+    @EventHandler
+    public void handle(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
         LobbyUser user = UserWrapper.fromUser(UserAPI.instance().user(p.getUniqueId()));
         if (user.getOpenInventory().getType() != InventoryDailyReward.type_daily_reward) {
@@ -61,7 +67,7 @@ public class ListenerDailyReward extends BaseListener {
         }
         int id = ItemBuilder.item(item).persistentDataStorage().get(InventoryDailyReward.reward, PersistentDataTypes.INTEGER);
 
-        Set<Integer> used = user.getRewardSlotsUsed();
+        var used = new HashSet<>(user.getRewardSlotsUsed());
         // used.clear();
         if (used.contains(id)) {
             p.playSound(p.getLocation(), Sound.VILLAGER_NO, 1, 1);
@@ -79,11 +85,12 @@ public class ListenerDailyReward extends BaseListener {
         item.setItemMeta(meta);
         user.setLastDailyReward(System.currentTimeMillis());
         e.setCurrentItem(item);
-        AdventureSupport.audienceProvider().player(p).sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
+        BukkitAdventureSupport.adventureSupport().audienceProvider().player(p).sendMessage(Message.REWARD_COINS.getMessage(user.user(), Integer.toString(cubes)));
         p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
     }
 
-    @EventHandler public void handle(PlayerNPCInteractEvent e) {
+    @EventHandler
+    public void handle(PlayerNPCInteractEvent e) {
         if (e.hand() != PlayerNPCInteractEvent.Hand.MAIN_HAND) {
             return;
         }

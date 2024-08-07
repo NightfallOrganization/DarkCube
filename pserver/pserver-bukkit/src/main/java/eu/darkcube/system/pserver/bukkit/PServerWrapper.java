@@ -1,24 +1,33 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.pserver.bukkit;
 
 import eu.cloudnetservice.driver.ComponentInfo;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.wrapper.holder.ServiceInfoHolder;
-import eu.darkcube.system.Plugin;
-import eu.darkcube.system.commandapi.CommandAPI;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.bukkit.Plugin;
+import eu.darkcube.system.bukkit.commandapi.deprecated.CommandAPI;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.bukkit.command.CommandPServer;
 import eu.darkcube.system.pserver.bukkit.command.PServerCommand;
-import eu.darkcube.system.pserver.bukkit.packethandler.*;
+import eu.darkcube.system.pserver.bukkit.packethandler.HandlerAddOwner;
+import eu.darkcube.system.pserver.bukkit.packethandler.HandlerRemoveOwner;
+import eu.darkcube.system.pserver.bukkit.packethandler.HandlerStart;
+import eu.darkcube.system.pserver.bukkit.packethandler.HandlerStop;
+import eu.darkcube.system.pserver.bukkit.packethandler.HandlerUpdate;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packets.nw.*;
+import eu.darkcube.system.pserver.common.packets.nw.PacketAddOwner;
+import eu.darkcube.system.pserver.common.packets.nw.PacketRemoveOwner;
+import eu.darkcube.system.pserver.common.packets.nw.PacketStart;
+import eu.darkcube.system.pserver.common.packets.nw.PacketStop;
+import eu.darkcube.system.pserver.common.packets.nw.PacketUpdate;
 import eu.darkcube.system.pserver.common.packets.wn.PacketGetUniqueId;
 import eu.darkcube.system.pserver.common.packets.wn.PacketOnlinePlayersSet;
 import eu.darkcube.system.pserver.common.packets.wn.PacketSetRunning;
@@ -48,12 +57,13 @@ public class PServerWrapper extends Plugin {
         return instance;
     }
 
-    @Override public void onLoad() {
+    @Override
+    public void onLoad() {
 
         WrapperServiceInfoUtil.init();
         WrapperPServerProvider.init();
 
-        PacketAPI pm = PacketAPI.getInstance();
+        var pm = PacketAPI.instance();
         pm.registerHandler(PacketStart.class, new HandlerStart());
         pm.registerHandler(PacketStop.class, new HandlerStop());
         pm.registerHandler(PacketUpdate.class, new HandlerUpdate());
@@ -63,15 +73,15 @@ public class PServerWrapper extends Plugin {
         UniqueId id;
         tr:
         try {
-            ComponentInfo componentInfo = InjectionLayer.boot().instance(ComponentInfo.class);
-            ServiceInfoHolder serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
-            EventManager eventManager = InjectionLayer.boot().instance(EventManager.class);
+            var componentInfo = InjectionLayer.boot().instance(ComponentInfo.class);
+            var serviceInfoHolder = InjectionLayer.boot().instance(ServiceInfoHolder.class);
+            var eventManager = InjectionLayer.boot().instance(EventManager.class);
             id = new PacketGetUniqueId(componentInfo.componentName()).sendQuery(PacketGetUniqueId.Response.class).id();
             if (id == null) {
                 System.out.println("[PSERVER] LOADING PSERVER API...");
                 break tr;
             }
-            ConfigurationListener ll = new ConfigurationListener(id);
+            var ll = new ConfigurationListener(id);
             eventManager.registerListener(ll);
             serviceInfoHolder.publishServiceInfoUpdate();
             System.out.println("[PSERVER] LOADING PSERVER...");
@@ -83,10 +93,8 @@ public class PServerWrapper extends Plugin {
         }
     }
 
-    @Override public void onDisable() {
-    }
-
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         CommandAPI.enable(this, new CommandPServer());
         if (PServerProvider.instance().isPServer()) {
             if (PServerProvider.instance().isPServer()) {
@@ -94,7 +102,8 @@ public class PServerWrapper extends Plugin {
                 Bukkit.getPluginManager().registerEvents(new BukkitListener(), this);
             }
             new BukkitRunnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     System.out.println("[PServer] Set status as RUNNING");
                     new PacketSetRunning(PServerProvider.instance().currentPServer().id()).sendAsync();
                 }
@@ -102,7 +111,8 @@ public class PServerWrapper extends Plugin {
         }
     }
 
-    @Override public String getCommandPrefix() {
+    @Override
+    public String getCommandPrefix() {
         return "PServer";
     }
 }

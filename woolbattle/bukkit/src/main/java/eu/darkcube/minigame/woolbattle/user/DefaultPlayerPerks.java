@@ -1,10 +1,22 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.user;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -18,8 +30,6 @@ import eu.darkcube.minigame.woolbattle.perk.perks.other.ShearsPerk;
 import eu.darkcube.minigame.woolbattle.perk.perks.passive.RocketJumpPerk;
 import eu.darkcube.minigame.woolbattle.util.Slot.Hotbar;
 import eu.darkcube.minigame.woolbattle.util.Slot.Inventory;
-
-import java.util.*;
 
 public class DefaultPlayerPerks implements PlayerPerks {
 
@@ -46,45 +56,55 @@ public class DefaultPlayerPerks implements PlayerPerks {
         }
     }
 
-    @Override public PlayerPerks clone() {
+    @Override
+    public PlayerPerks clone() {
         return new DefaultPlayerPerks(perks, perkSlots);
     }
 
-    @Override public PerkName[] perks(ActivationType type) {
+    @Override
+    public PerkName[] perks(ActivationType type) {
         return Arrays.copyOf(perks.get(type), perks.get(type).length);
     }
 
-    @Override public PerkName perk(ActivationType type, int perkSlot) {
+    @Override
+    public PerkName perk(ActivationType type, int perkSlot) {
         return perks(type)[perkSlot];
     }
 
-    @Override public void perk(ActivationType type, int perkSlot, PerkName perk) {
+    @Override
+    public void perk(ActivationType type, int perkSlot, PerkName perk) {
         perks.get(type)[perkSlot] = perk;
     }
 
-    @Override public int[] perkInvSlots(ActivationType type) {
+    @Override
+    public int[] perkInvSlots(ActivationType type) {
         return Arrays.copyOf(perkSlots.get(type), perkSlots.get(type).length);
     }
 
-    @Override public int perkInvSlot(ActivationType type, int perkSlot) {
+    @Override
+    public int perkInvSlot(ActivationType type, int perkSlot) {
         return perkInvSlots(type)[perkSlot];
     }
 
-    @Override public void perkInvSlot(ActivationType type, int perkSlot, int slot) {
+    @Override
+    public void perkInvSlot(ActivationType type, int perkSlot, int slot) {
         perkSlots.get(type)[perkSlot] = slot;
     }
 
-    @Override public Map<ActivationType, PerkName[]> perks() {
+    @Override
+    public Map<ActivationType, PerkName[]> perks() {
         return perks;
     }
 
-    @Override public void perks(Map<ActivationType, PerkName[]> perks) {
+    @Override
+    public void perks(Map<ActivationType, PerkName[]> perks) {
         for (ActivationType type : perks.keySet()) {
             System.arraycopy(perks.get(type), 0, this.perks.get(type), 0, Math.min(perks.get(type).length, this.perks.get(type).length));
         }
     }
 
-    @Override public void reset() {
+    @Override
+    public void reset() {
         List<ActivationType> list = Arrays.asList(ActivationType.values());
         list.sort(null);
         Set<Integer> slotsUsed = new HashSet<>();

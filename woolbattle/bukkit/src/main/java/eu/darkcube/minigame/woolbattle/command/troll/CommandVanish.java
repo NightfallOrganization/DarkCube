@@ -1,22 +1,23 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.command.troll;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.command.CommandArgument;
 import eu.darkcube.minigame.woolbattle.listener.Listener;
-import eu.darkcube.system.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.deprecated.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.HashSet;
-import java.util.Set;
 
 // TODO: Currently unused
 public class CommandVanish extends Command {
@@ -27,13 +28,15 @@ public class CommandVanish extends Command {
         super(woolbattle, "vanish", new Command[0], "Vanish", CommandArgument.PLAYER_OPTIONAL);
         this.woolbattle = woolbattle;
         WoolBattleBukkit.registerListeners(new Listener<PlayerQuitEvent>() {
-            @Override public void handle(PlayerQuitEvent e) {
+            @Override
+            public void handle(PlayerQuitEvent e) {
                 vanished.remove(e.getPlayer());
             }
         });
     }
 
-    @Override public boolean execute(CommandSender sender, String[] args) {
+    @Override
+    public boolean execute(CommandSender sender, String[] args) {
         Player vanishing = null;
         if (args.length == 1) {
             vanishing = Bukkit.getPlayer(args[0]);

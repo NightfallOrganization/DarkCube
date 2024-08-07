@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -15,17 +18,14 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MinePerk extends Perk {
     public static final PerkName MINE = new PerkName("MINE");
@@ -43,32 +43,34 @@ public class MinePerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(BlockPlaceEvent event) {
+        @EventHandler
+        public void handle(BlockPlaceEvent event) {
             if (event.getItemInHand() == null) return;
-            ItemStack item = event.getItemInHand();
-            WBUser user = WBUser.getUser(event.getPlayer());
-            AtomicReference<UserPerk> perkRef = new AtomicReference<>(null);
+            var item = event.getItemInHand();
+            var user = WBUser.getUser(event.getPlayer());
+            var perkRef = new AtomicReference<UserPerk>(null);
             if (!checkUsable(user, item, perk(), perkRef::set, woolbattle)) {
                 if (perkRef.get() != null) event.setCancelled(true);
                 return;
             }
-            UserPerk userPerk = perkRef.get();
+            var userPerk = perkRef.get();
             userPerk.currentPerkItem().setItem();
             new Scheduler(woolbattle, userPerk.currentPerkItem()::setItem).runTask();
             event.setCancelled(true);
             activated(userPerk);
-            woolbattle.ingame().place(event.getBlock(), t -> t == Material.STONE_PLATE, b -> {
-                new Scheduler(woolbattle, () -> b.setType(Material.STONE_PLATE)).runTask();
+            new Scheduler(woolbattle, () -> woolbattle.ingame().place(event.getBlock(), b -> {
+                b.setType(Material.STONE_PLATE);
                 woolbattle.ingame().setMetaData(b, "perk", userPerk);
-            });
+            })).runTask();
         }
 
-        @EventHandler public void handle(PlayerInteractEvent event) {
-            Player p = event.getPlayer();
-            WBUser user = WBUser.getUser(p);
+        @EventHandler
+        public void handle(PlayerInteractEvent event) {
+            var p = event.getPlayer();
+            var user = WBUser.getUser(p);
             if (!user.getTeam().canPlay()) return;
             if (event.getAction() != Action.PHYSICAL) return;
-            Block block = event.getClickedBlock();
+            var block = event.getClickedBlock();
             if (block == null) return;
             UserPerk perk = woolbattle.ingame().getMetaData(block, "perk", null);
             if (perk == null) return;
@@ -76,13 +78,13 @@ public class MinePerk extends Perk {
 
             event.setCancelled(true);
             woolbattle.ingame().destroy(block);
-            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
+            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 7);
 
             new Scheduler(woolbattle, () -> {
-                Vector playerLoc = p.getLocation().toVector();
-                Vector blockLoc = block.getLocation().add(0.5, 0, 0.5).toVector();
+                var playerLoc = p.getLocation().toVector();
+                var blockLoc = block.getLocation().add(0.5, 0, 0.5).toVector();
 
-                Vector velocity = playerLoc.subtract(blockLoc).normalize();
+                var velocity = playerLoc.subtract(blockLoc).normalize();
                 velocity.multiply(Math.pow(playerLoc.distance(blockLoc), 0.4) / 6);
                 if (woolbattle.ingame().playerUtil().attack(perk.owner(), user)) {
                     p.damage(0);
@@ -92,7 +94,43 @@ public class MinePerk extends Perk {
             }).runTaskLater(2);
         }
 
-        @Override protected boolean mayActivate() {
+        @EventHandler
+        public void handle(BlockPhysicsEvent event) {
+            var block = event.getBlock();
+            UserPerk perk = woolbattle.ingame().getMetaData(block, "perk", null);
+            if (perk == null) return;
+            if (!perk.perk().perkName().equals(MinePerk.MINE)) return;
+
+            event.setCancelled(true);
+            var rel = block.getRelative(BlockFace.DOWN);
+            if (rel.getType().isSolid()) return;
+
+            woolbattle.ingame().destroy(block);
+
+            block.getWorld().createExplosion(block.getLocation().add(0.5, 0.5, 0.5), 3);
+
+            var blockLoc = block.getLocation().add(0.5, 0, 0.5);
+            for (var p : Bukkit.getOnlinePlayers()) {
+                if (p.getLocation().distanceSquared(blockLoc) > 9) {
+                    continue;
+                }
+                var user = WBUser.getUser(p);
+
+                var playerLoc = p.getLocation().toVector();
+                var blockVec = block.getLocation().add(0.5, 0, 0.5).toVector();
+
+                var velocity = playerLoc.subtract(blockVec).normalize();
+                velocity.multiply(Math.pow(playerLoc.distance(blockVec), 0.4) / 6);
+                if (woolbattle.ingame().playerUtil().attack(perk.owner(), user)) {
+                    p.damage(0);
+                }
+                velocity.setY(1.3);
+                p.setVelocity(velocity);
+            }
+        }
+
+        @Override
+        protected boolean mayActivate() {
             return false;
         }
     }

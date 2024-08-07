@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
@@ -24,7 +25,8 @@ public class FastArrowPerk extends Perk {
     }
 
     private static class FastArrowListener implements Listener {
-        @EventHandler public void handle(BowShootArrowEvent event) {
+        @EventHandler
+        public void handle(BowShootArrowEvent event) {
             for (UserPerk ignored : event.user().perks().perks(FAST_ARROW)) {
                 event.arrow().setVelocity(event.arrow().getVelocity().multiply(1.6));
             }

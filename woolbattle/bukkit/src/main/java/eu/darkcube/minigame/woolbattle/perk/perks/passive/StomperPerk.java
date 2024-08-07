@@ -1,10 +1,14 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -17,7 +21,7 @@ import eu.darkcube.minigame.woolbattle.util.ParticleEffect;
 import eu.darkcube.minigame.woolbattle.util.ParticleEffect.OrdinaryColor;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler.ConfiguredScheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -25,9 +29,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 public class StomperPerk extends Perk {
     public static final PerkName STOMPER = new PerkName("STOMPER");
@@ -38,9 +39,9 @@ public class StomperPerk extends Perk {
 
     public StomperPerk(WoolBattleBukkit woolbattle) {
         super(ActivationType.PASSIVE, STOMPER, new Cooldown(Unit.ACTIVATIONS, 0), 10, Item.PERK_STOMPER, DefaultUserPerk::new);
-        wasOnGround = new Key(woolbattle, "perk_stomper_was_on_ground");
-        active = new Key(woolbattle, "perk_stomper_active");
-        startPos = new Key(woolbattle, "perk_stomper_start_pos");
+        wasOnGround = Key.key(woolbattle, "perk_stomper_was_on_ground");
+        active = Key.key(woolbattle, "perk_stomper_active");
+        startPos = Key.key(woolbattle, "perk_stomper_start_pos");
         addListener(new StomperListener());
         addScheduler(new StomperScheduler(woolbattle));
     }
@@ -63,7 +64,8 @@ public class StomperPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             radius += speedBlocksPerTick;
             if (radius > maxRadius) {
                 cancel();
@@ -80,7 +82,7 @@ public class StomperPerk extends Perk {
                 double y = Math.sin(theta + radius) * 0.3 + 0.3;
                 center.add(x, y, z);
                 ParticleEffect.REDSTONE.display(new OrdinaryColor(230, 230, 230), center, 50);
-                //				ParticleEffect.REDSTONE.display(0, 0, 0, 1, 1, center, 50);
+                // ParticleEffect.REDSTONE.display(0, 0, 0, 1, 1, center, 50);
                 center.subtract(x, y, z);
             }
             for (WBUser target : WBUser.onlineUsers()) {
@@ -115,21 +117,17 @@ public class StomperPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             for (WBUser user : WBUser.onlineUsers()) {
                 if (user.perks().count(STOMPER) == 0) continue;
-                if (user.getBukkitEntity().isOnGround()) user.user().getMetaDataStorage().set(wasOnGround, true);
+                if (user.getBukkitEntity().isOnGround()) user.user().metadata().set(wasOnGround, true);
                 if (!user.getTeam().canPlay()) continue;
-                if (!user.user().getMetaDataStorage().has(active)) continue;
-                if (!user.getBukkitEntity().isOnGround() && user
-                        .getBukkitEntity()
-                        .getLocation()
-                        .subtract(0, 0.5, 0)
-                        .getBlock()
-                        .getType() == Material.AIR) continue;
+                if (!user.user().metadata().has(active)) continue;
+                if (!user.getBukkitEntity().isOnGround() && user.getBukkitEntity().getLocation().subtract(0, 0.5, 0).getBlock().getType() == Material.AIR) continue;
                 int removed;
-                user.user().getMetaDataStorage().remove(active);
-                double starty = user.user().getMetaDataStorage().remove(startPos);
+                user.user().metadata().remove(active);
+                double starty = user.user().metadata().remove(startPos);
                 double diff = starty - user.getBukkitEntity().getLocation().getY();
                 if (diff < 2) continue;
                 if ((removed = user.removeWool(cost())) != cost()) {
@@ -141,31 +139,31 @@ public class StomperPerk extends Perk {
             }
         }
 
-        @Override public void start() {
+        @Override
+        public void start() {
             runTaskTimer(1);
         }
 
-        @Override public void stop() {
+        @Override
+        public void stop() {
             cancel();
         }
     }
 
     public class StomperListener implements Listener {
 
-        @EventHandler(priority = EventPriority.HIGHEST) public void handle(PlayerMoveEvent event) {
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void handle(PlayerMoveEvent event) {
             WBUser user = WBUser.getUser(event.getPlayer());
             if (!user.getTeam().canPlay()) return;
             if (user.perks().count(perkName()) == 0) return;
-            if (!user.user().getMetaDataStorage().has(active)) {
-                boolean og = user.user().getMetaDataStorage().has(wasOnGround) && user
-                        .user()
-                        .getMetaDataStorage()
-                        .<Boolean>remove(wasOnGround);
+            if (!user.user().metadata().has(active)) {
+                boolean og = user.user().metadata().has(wasOnGround) && user.user().metadata().<Boolean>remove(wasOnGround);
                 if (!og && event.getFrom().subtract(0, 0.95, 0).getBlock().getType() == Material.AIR) return;
             }
             if (event.getFrom().getY() - event.getTo().getY() < 0) {
-                user.user().getMetaDataStorage().set(active, true);
-                user.user().getMetaDataStorage().set(startPos, event.getTo().getY());
+                user.user().metadata().set(active, true);
+                user.user().metadata().set(startPos, event.getTo().getY());
             }
         }
     }

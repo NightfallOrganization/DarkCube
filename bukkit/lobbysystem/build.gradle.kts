@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
 plugins {
+    java
+    id("eu.darkcube.darkcube")
     alias(libs.plugins.shadow)
 }
 
@@ -34,27 +36,28 @@ tasks {
             include(project(":common:labymod-emotes"))
         }
     }
-    jar.configure { archiveClassifier = "pure" }
+    jar.configure {
+        destinationDirectory = layout.buildDirectory.dir("tmp").map { d -> d.dir("jar") }
+    }
     assemble.configure { dependsOn(shadowJar) }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT")
-    compileOnly(project(":darkcubesystem"))
-    compileOnly(project(":darkcubesystem:bukkit"))
+    compileOnly(darkcubesystem.bukkit)
     compileOnly(project(":pserver:pserver-bukkit"))
     compileOnly(project(":pserver:pserver-api"))
-    api(project(":common:labymod-emotes"))
+    implementation(project(":common:labymod-emotes"))
 //    runtimeOnly("com.github.juliarn", "npc-lib-bukkit", "3.0.0-SNAPSHOT", classifier = "shadow")
-    implementation("io.github.juliarn:npc-lib-bukkit:3.0.0-SNAPSHOT")
-    compileOnly("io.github.juliarn:npc-lib-common:3.0.0-SNAPSHOT")
-    compileOnly("io.github.juliarn:npc-lib-api:3.0.0-SNAPSHOT")
-    implementation("io.github.juliarn:npc-lib-labymod:3.0.0-SNAPSHOT")
+    implementation("io.github.juliarn:npc-lib-bukkit:3.0.0-beta6")
+    compileOnly("io.github.juliarn:npc-lib-common:3.0.0-beta6")
+    compileOnly("io.github.juliarn:npc-lib-api:3.0.0-beta6")
+    implementation("io.github.juliarn:npc-lib-labymod:3.0.0-beta6")
     implementation(libs.hologramlib)
-    implementation("me.clip:placeholderapi:2.11.3")
+    implementation("me.clip:placeholderapi:2.11.6")
     compileOnly(libs.annotations)
-    compileOnly(libs.cloudnetBridge)
+    compileOnly(libs.cloudnet.bridge)
     compileOnly(libs.luckperms)
-    compileOnly(libs.cloudnetInjectApi)
-    annotationProcessor(libs.cloudnetInjectProcessor)
+    compileOnly(libs.cloudnet.inject.api)
+    annotationProcessor(libs.cloudnet.inject.processor)
 }

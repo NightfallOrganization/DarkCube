@@ -1,0 +1,99 @@
+name: OneBlock
+author: EliteDarkness
+version: '${version}'
+main: building.oneblock.OneBlock
+api-version: '1.20'
+
+commands:
+  gm:
+    description: Wechselt den Gamemode
+    permission: oneblock.gm.use
+  tpworld:
+    description: Teleportiert zu Welten
+    permission: oneblock.tpworld.use
+  god:
+    description: Setzt die Unverwundbarkeit
+    permission: oneblock.god.use
+  fly:
+    description: Setzt den Flugmodus
+    permission: oneblock.fly.use
+  killmobs:
+    description: Entfernt alle Monster
+    permission: oneblock.killmobs.use
+  startworld:
+    description: Startet eine OneBlock Welt
+    permission: oneblock.startworld.use
+  loadworld:
+    description: Startet eine OneBlock Welt
+    permission: oneblock.loadworld.use
+  heal:
+    description: Heile einen Spieler
+    permission: oneblock.heal.use
+  feed:
+    description: Füttere einen Spieler
+    permission: oneblock.feed.use
+  max:
+    description: Maximiere einen Spieler
+    permission: oneblock.max.use
+  day:
+    description: Setze Tag
+    permission: oneblock.day.use
+  night:
+    description: Setze Nacht
+    permission: oneblock.night.use
+  spawn:
+    description: Teleportiert den Spieler zum Spawn
+    permission: oneblock.spawn.use
+  menu:
+    description: Öffnet das Oneblock Menu
+    permission: oneblock.menu.use
+  cor:
+    description: Alle Cor Commands
+    permission: oneblock.cor.use
+  myslots:
+    description: Zeigt alle Slots der Welten an
+    permission: oneblock.myslots.use
+  deleteworld:
+    description: Löscht eine OneBlock Welt
+    permission: oneblock.deleteworld.use
+  setblocksmined:
+    description: Setzt die abgebauten Blöcke einer OneBlock Welt
+    permission: oneblock.setblocksmined.use
+
+Permissions:
+  oneblock.gm.use:
+    default: op
+  oneblock.tpworld.use:
+    default: op
+  oneblock.god.use:
+    default: op
+  oneblock.fly.use:
+    default: op
+  oneblock.killmobs.use:
+    default: op
+  oneblock.startworld.use:
+    default: op
+  oneblock.loadworld.use:
+    default: op
+  oneblock.heal.use:
+    default: op
+  oneblock.feed.use:
+    default: op
+  oneblock.max.use:
+    default: op
+  oneblock.day.use:
+    default: op
+  oneblock.night.use:
+    default: op
+  oneblock.spawn.use:
+    default: op
+  oneblock.menu.use:
+    default: op
+  oneblock.cor.use:
+    default: op
+  oneblock.myslots.use:
+    default: op
+  oneblock.deleteworld.use:
+    default: op
+  oneblock.setblocksmined.use:
+    default: op

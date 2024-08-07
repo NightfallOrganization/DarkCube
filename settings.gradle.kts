@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -10,36 +10,50 @@ pluginManagement {
     includeBuild("build-extensions")
     repositories {
         gradlePluginPortal()
-        maven {
-            url = uri("https://repo.papermc.io/repository/maven-public/")
+        maven("https://nexus.darkcube.eu/repository/darkcube-group/") {
+            name = "DarkCube"
+            credentials(PasswordCredentials::class)
+        }
+    }
+}
+dependencyResolutionManagement {
+    versionCatalogs {
+        register("darkcubesystem") {
+            from(files("gradle/darkcubesystem.versions.toml"))
         }
     }
 }
 
+plugins {
+    id("eu.darkcube.darkcube.settings") version "1.2.9"
+}
+
 rootProject.name = "DarkCube"
+
 include("bukkit")
 include("bukkit:autovoidworld")
 include("bukkit:bauserver")
 //include "bukkit:bedwars"
 include("bukkit:changepermissionmessage")
-includeSubProjects("darkcubesystem", "api", "module", "velocity", "common")
-includeSubProjects("darkcubesystem:libs", "brigadier", "gson", "annotations")
-includeSubProjects("darkcubesystem:libs:adventure", "adventure-api", "adventure-key", "adventure-nbt", "adventure-platform-api", "adventure-platform-bukkit", "adventure-platform-facet", "adventure-platform-viaversion", "adventure-text-serializer-bungeecord", "adventure-text-serializer-gson", "adventure-text-serializer-gson-legacy-impl", "adventure-text-serializer-legacy", "adventure-text-serializer-plain", "examination-api", "examination-string")
-includeSubProjects("darkcubesystem:bukkit", "1.8.8", "1.20.1")
 
-includeSubProjects("woolbattle", "bukkit", "api", "minestom")
+includeSubProjects("minestom", "server")
 
-//includeSubProjects("darkcubesystem", "1.8.8", "1.19.3", "core", "module")
+includeSubProjects("woolbattle", "provider", "api", "common", "bukkit", "minestom")
+
 include("bukkit:darkessentials")
 //include "bukkit:holograms"
 include("bukkit:jumpleague")
 //include "bukkit:knockout"
-include("bukkit:citybuild")
+//include("bukkit:aetheria")
+include("bukkit:oneblock")
+include("bukkit:woolbattleteamfight")
+include("bukkit:jumpleaguemodules")
 include("bukkit:lobbysystem")
 include("bukkit:luckperms-prefixplugin")
 include("bukkit:miners")
 include("bukkit:skyland")
 include("bukkit:vanillaaddons")
+include("bukkit:sumo")
 //include "bukkit:smash"
 include("bukkit:statsapi")
 //include("bungee")

@@ -1,36 +1,11 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
 package eu.darkcube.minigame.woolbattle.command.woolbattle;
-
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.cloudnetservice.driver.service.ServiceTemplate;
-import eu.cloudnetservice.driver.template.TemplateStorageProvider;
-import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.command.WBCommandExecutor;
-import eu.darkcube.minigame.woolbattle.command.argument.CloudTemplateArgument;
-import eu.darkcube.minigame.woolbattle.map.CloudNetMapIngameData;
-import eu.darkcube.minigame.woolbattle.map.DefaultMap;
-import eu.darkcube.minigame.woolbattle.map.MapSize;
-import eu.darkcube.minigame.woolbattle.team.TeamType;
-import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
-import eu.darkcube.minigame.woolbattle.util.UnloadedLocation;
-import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPlugin;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.Commands;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.libs.com.google.gson.Gson;
-import eu.darkcube.system.libs.com.google.gson.JsonObject;
-import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import org.bukkit.*;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +15,45 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class CommandImport extends WBCommandExecutor {
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.service.ServiceTemplate;
+import eu.cloudnetservice.driver.template.TemplateStorageProvider;
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.minigame.woolbattle.command.WBCommand;
+import eu.darkcube.minigame.woolbattle.command.argument.CloudTemplateArgument;
+import eu.darkcube.minigame.woolbattle.map.CloudNetMapIngameData;
+import eu.darkcube.minigame.woolbattle.map.DefaultMap;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
+import eu.darkcube.minigame.woolbattle.team.TeamType;
+import eu.darkcube.minigame.woolbattle.util.MaterialAndId;
+import eu.darkcube.minigame.woolbattle.util.UnloadedLocation;
+import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
+import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPlugin;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.Commands;
+import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.server.item.ItemBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+
+public class CommandImport extends WBCommand {
     public CommandImport(WoolBattleBukkit woolbattle) {
         super("import", b -> b.then(Commands.argument("template", CloudTemplateArgument.template()).executes(ctx -> {
             ServiceTemplate template = CloudTemplateArgument.template(ctx, "template");

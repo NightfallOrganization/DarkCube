@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -37,7 +37,7 @@ public class JaRListener extends BaseListener {
         }
         if (to.distance(jar.getCurrentBlock().getLocation().add(1, 1.5, 1)) < 1.5) {
             if (jar.node.prev != null && jar.node.prev.color != jar.node.color) {
-                jar.user.playSound(Sound.NOTE_PLING, 1, 1);
+                jar.user.playSound(Sound.NOTE_PLING, 50, 1);
                 jar.user.user().cubes(jar.user.user().cubes().add(jar.node.add));
             }
             if (jar.getNextBlock() == null) {

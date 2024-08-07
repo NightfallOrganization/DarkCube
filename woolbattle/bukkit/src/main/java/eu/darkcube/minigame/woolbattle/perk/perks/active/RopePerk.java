@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -22,7 +23,7 @@ public class RopePerk extends Perk {
     public static final PerkName ROPE = new PerkName("ROPE");
 
     public RopePerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, ROPE, 12, 12, Item.PERK_ROPE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ROPE_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, ROPE, 13, 12, Item.PERK_ROPE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ROPE_COOLDOWN, woolbattle));
         addListener(new ListenerRope(this, woolbattle));
     }
 
@@ -32,7 +33,8 @@ public class RopePerk extends Perk {
             super(perk, woolbattle);
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             Player p = perk.owner().getBukkitEntity();
             Vector vec = p.getLocation().getDirection().setY(0).normalize();
             double ax = Math.abs(vec.getX());

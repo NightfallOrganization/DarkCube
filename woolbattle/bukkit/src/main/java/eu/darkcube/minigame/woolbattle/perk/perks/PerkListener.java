@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks;
+
+import java.util.function.Consumer;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -12,11 +15,9 @@ import eu.darkcube.minigame.woolbattle.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.function.Consumer;
 
 public abstract class PerkListener implements Listener {
 
@@ -31,7 +32,7 @@ public abstract class PerkListener implements Listener {
      * @return if the given perk is usable
      */
     public static boolean checkUsable(UserPerk perk, WoolBattleBukkit woolbattle) {
-        WBUser user = perk.owner();
+        var user = perk.owner();
         if (user.woolCount() < perk.perk().cost() || perk.cooldown() > 0) {
             woolbattle.ingame().playSoundNotEnoughWool(user);
             new Scheduler(woolbattle, perk.currentPerkItem()::setItem).runTask();
@@ -51,12 +52,12 @@ public abstract class PerkListener implements Listener {
      * @return if the checks are successful
      */
     public static boolean checkUsable(WBUser user, ItemStack usedItem, Perk perk, Consumer<UserPerk> itemMatchRunnable, WoolBattleBukkit woolbattle) {
-        ItemBuilder builder = ItemBuilder.item(usedItem);
+        var builder = ItemBuilder.item(usedItem);
         if (!builder.persistentDataStorage().has(PerkItem.KEY_PERK_ID)) {
             return false;
         }
         @SuppressWarnings("DataFlowIssue") int perkId = builder.persistentDataStorage().get(PerkItem.KEY_PERK_ID, PerkItem.TYPE_PERK_ID);
-        UserPerk userPerk = user.perks().perk(perkId);
+        var userPerk = user.perks().perk(perkId);
         if (!userPerk.perk().equals(perk)) {
             return false;
         }

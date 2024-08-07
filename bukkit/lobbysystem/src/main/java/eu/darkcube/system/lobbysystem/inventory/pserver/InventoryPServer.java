@@ -1,18 +1,24 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory.pserver;
+
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.UUID;
 
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.event.EventManager;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.inventory.pserver.gameserver.InventoryGameServerSelection;
@@ -33,22 +39,17 @@ import eu.darkcube.system.pserver.common.PServerExecutor.State;
 import eu.darkcube.system.pserver.common.PServerExecutor.Type;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
-
 public class InventoryPServer extends LobbyAsyncPagedInventory {
 
     public static final String ITEMID = "lobbysystem.pserver.publiclist";
 
-    public static final Key META_KEY_PSERVER = new Key(Lobby.getInstance(), "lobbysystem.pserver.id");
+    public static final Key META_KEY_PSERVER = Key.key(Lobby.getInstance(), "lobbysystem.pserver.id");
 
     private static final InventoryType type_pserver = InventoryType.of("pserver");
 
@@ -61,7 +62,8 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
         this.listener.register();
     }
 
-    @Override protected void inventoryClick(IInventoryClickEvent event) {
+    @Override
+    protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
         if (event.item() == null) return;
         var itemid = Item.getItemId(event.item());
@@ -83,7 +85,8 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
         });
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         SortedMap<Long, ItemStack> sitems = new TreeMap<>();
 
         for (PServerExecutor ps : PServerProvider.instance().pservers().join()) {
@@ -127,7 +130,8 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         this.fallbackItems.put(IInventory.slot(1, 3), Item.LIME_GLASS_PANE.getItem(this.user.user()));
         this.fallbackItems.put(IInventory.slot(1, 4), Item.INVENTORY_PSERVER_PUBLIC.getItem(this.user.user()));
         this.fallbackItems.put(IInventory.slot(1, 5), Item.LIME_GLASS_PANE.getItem(this.user.user()));
@@ -135,7 +139,8 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
         super.insertFallbackItems();
     }
 
-    @Override protected void destroy() {
+    @Override
+    protected void destroy() {
         super.destroy();
         this.listener.unregister();
     }
@@ -150,15 +155,18 @@ public class InventoryPServer extends LobbyAsyncPagedInventory {
             InjectionLayer.boot().instance(EventManager.class).unregisterListener(this);
         }
 
-        @EventListener public void handle(PServerUpdateEvent event) {
+        @EventListener
+        public void handle(PServerUpdateEvent event) {
             InventoryPServer.this.recalculate();
         }
 
-        @EventListener public void handle(PServerStartEvent event) {
+        @EventListener
+        public void handle(PServerStartEvent event) {
             recalculate();
         }
 
-        @EventListener public void handle(PServerStopEvent event) {
+        @EventListener
+        public void handle(PServerStopEvent event) {
             recalculate();
         }
 

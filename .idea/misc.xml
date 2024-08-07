@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
     <list size="13">
@@ -19,6 +20,8 @@
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onEnable" />
     <pattern value="org.bukkit.plugin.java.JavaPlugin" hierarchically="true" method="onDisable" />
     <pattern value="org.bukkit.event.Event" hierarchically="true" method="getHandlerList" />
+    <pattern value="net.minestom.server.extensions.Extension" hierarchically="true" />
+    <pattern value="eu.darkcube.system.module.ModuleImplementation" hierarchically="true" />
     <writeAnnotations>
       <writeAnnotation name="dev.derklaro.aerogel.Inject" />
       <writeAnnotation name="eu.cloudnetservice.driver.registry.injection.Service" />
@@ -33,46 +36,55 @@
     <option name="myDefaultNotNull" value="eu.darkcube.system.libs.org.jetbrains.annotations.NotNull" />
     <option name="myNullables">
       <value>
-        <list size="15">
+        <list size="18">
           <item index="0" class="java.lang.String" itemvalue="android.support.annotation.Nullable" />
           <item index="1" class="java.lang.String" itemvalue="androidx.annotation.Nullable" />
           <item index="2" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNullable" />
           <item index="3" class="java.lang.String" itemvalue="com.android.annotations.Nullable" />
           <item index="4" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
           <item index="5" class="java.lang.String" itemvalue="eu.darkcube.system.libs.org.jetbrains.annotations.Nullable" />
-          <item index="6" class="java.lang.String" itemvalue="javax.annotation.CheckForNull" />
-          <item index="7" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
-          <item index="8" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableDecl" />
-          <item index="9" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableType" />
-          <item index="10" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.Nullable" />
-          <item index="11" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.Nullable" />
-          <item index="12" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
-          <item index="13" class="java.lang.String" itemvalue="org.jspecify.nullness.Nullable" />
-          <item index="14" class="java.lang.String" itemvalue="jakarta.annotation.Nullable" />
+          <item index="6" class="java.lang.String" itemvalue="io.reactivex.annotations.Nullable" />
+          <item index="7" class="java.lang.String" itemvalue="io.reactivex.rxjava3.annotations.Nullable" />
+          <item index="8" class="java.lang.String" itemvalue="jakarta.annotation.Nullable" />
+          <item index="9" class="java.lang.String" itemvalue="javax.annotation.CheckForNull" />
+          <item index="10" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
+          <item index="11" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableDecl" />
+          <item index="12" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableType" />
+          <item index="13" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.Nullable" />
+          <item index="14" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.Nullable" />
+          <item index="15" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
+          <item index="16" class="java.lang.String" itemvalue="org.jspecify.annotations.Nullable" />
+          <item index="17" class="java.lang.String" itemvalue="org.jspecify.nullness.Nullable" />
         </list>
       </value>
     </option>
     <option name="myNotNulls">
       <value>
-        <list size="15">
+        <list size="18">
           <item index="0" class="java.lang.String" itemvalue="android.support.annotation.NonNull" />
           <item index="1" class="java.lang.String" itemvalue="androidx.annotation.NonNull" />
           <item index="2" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNonNull" />
           <item index="3" class="java.lang.String" itemvalue="com.android.annotations.NonNull" />
           <item index="4" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
           <item index="5" class="java.lang.String" itemvalue="eu.darkcube.system.libs.org.jetbrains.annotations.NotNull" />
-          <item index="6" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
-          <item index="7" class="java.lang.String" itemvalue="lombok.NonNull" />
-          <item index="8" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullDecl" />
-          <item index="9" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullType" />
-          <item index="10" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.NonNull" />
-          <item index="11" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.NonNull" />
-          <item index="12" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
-          <item index="13" class="java.lang.String" itemvalue="org.jspecify.nullness.NonNull" />
-          <item index="14" class="java.lang.String" itemvalue="jakarta.annotation.Nonnull" />
+          <item index="6" class="java.lang.String" itemvalue="io.reactivex.annotations.NonNull" />
+          <item index="7" class="java.lang.String" itemvalue="io.reactivex.rxjava3.annotations.NonNull" />
+          <item index="8" class="java.lang.String" itemvalue="jakarta.annotation.Nonnull" />
+          <item index="9" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
+          <item index="10" class="java.lang.String" itemvalue="lombok.NonNull" />
+          <item index="11" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullDecl" />
+          <item index="12" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullType" />
+          <item index="13" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.NonNull" />
+          <item index="14" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.NonNull" />
+          <item index="15" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
+          <item index="16" class="java.lang.String" itemvalue="org.jspecify.annotations.NonNull" />
+          <item index="17" class="java.lang.String" itemvalue="org.jspecify.nullness.NonNull" />
         </list>
       </value>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK" />
+  <component name="PWA">
+    <option name="wasEnabledAtLeastOnce" value="true" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="temurin-22" project-jdk-type="JavaSDK" />
 </project>

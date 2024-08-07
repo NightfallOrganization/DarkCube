@@ -1,0 +1,12 @@
+[versions]
+darkcubesystem = "1.0.14-SNAPSHOT"
+
+[libraries]
+api = { group = "eu.darkcube.system", name = "darkcubesystem-api", version.ref = "darkcubesystem" }
+api-cloudnet = { group = "eu.darkcube.system", name = "darkcubesystem-api-cloudnet", version.ref = "darkcubesystem" }
+bukkit = { group = "eu.darkcube.system", name = "darkcubesystem-bukkit", version.ref = "darkcubesystem" }
+libs = { group = "eu.darkcube.system", name = "darkcubesystem-libs", version.ref = "darkcubesystem" }
+minestom = { group = "eu.darkcube.system", name = "darkcubesystem-minestom", version.ref = "darkcubesystem" }
+proxy = { group = "eu.darkcube.system", name = "darkcubesystem-proxy", version.ref = "darkcubesystem" }
+server = { group = "eu.darkcube.system", name = "darkcubesystem-server", version.ref = "darkcubesystem" }
+server-cloudnet = { group = "eu.darkcube.system", name = "darkcubesystem-server-cloudnet", version.ref = "darkcubesystem" }

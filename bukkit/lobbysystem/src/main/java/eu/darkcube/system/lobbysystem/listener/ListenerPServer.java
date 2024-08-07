@@ -1,11 +1,14 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
 package eu.darkcube.system.lobbysystem.listener;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import dev.derklaro.aerogel.Inject;
 import dev.derklaro.aerogel.Singleton;
@@ -14,6 +17,7 @@ import eu.cloudnetservice.driver.channel.ChannelMessageSender;
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.event.events.channel.ChannelMessageReceiveEvent;
 import eu.cloudnetservice.driver.network.buffer.DataBuf;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.util.Message;
 import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
@@ -22,23 +26,21 @@ import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.UniqueId;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.data.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+@Singleton
+public class ListenerPServer implements Listener {
 
-@Singleton public class ListenerPServer implements Listener {
+    private final Key key = Key.key(Lobby.getInstance(), "connecting.pserver");
+    private final Key keyCallback = Key.key(Lobby.getInstance(), "connecting.pserver.callback");
+    private final Key keyStarted = Key.key(Lobby.getInstance(), "connecting.pserver.started");
 
-    private final Key key = new Key(Lobby.getInstance(), "connecting.pserver");
-    private final Key keyCallback = new Key(Lobby.getInstance(), "connecting.pserver.callback");
-    private final Key keyStarted = new Key(Lobby.getInstance(), "connecting.pserver.started");
-
-    @Inject public ListenerPServer() {
+    @Inject
+    public ListenerPServer() {
         Bukkit.getPluginManager().registerEvents(this, Lobby.getInstance());
     }
 
@@ -58,7 +60,8 @@ import java.util.function.Consumer;
     public void remove(User user) {
         var callback = user.metadata().<Consumer<Boolean>>remove(keyCallback);
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (callback != null) callback.accept(false);
             }
         }.runTask(Lobby.getInstance());
@@ -71,7 +74,8 @@ import java.util.function.Consumer;
         var callback = user.metadata().<Consumer<Boolean>>remove(keyCallback);
         remove(user);
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (callback != null) callback.accept(true);
                 user.sendActionBar(Message.CONNECTING_TO_PSERVER_FAILED);
             }
@@ -82,14 +86,7 @@ import java.util.function.Consumer;
         executor.type().thenAccept(type -> {
             if (type == PServerExecutor.Type.GAMEMODE) {
                 user.metadata().set(key, executor);
-                ChannelMessage
-                        .builder()
-                        .channel("darkcube_lobbysystem")
-                        .message("send_is_loaded")
-                        .buffer(DataBuf.empty().writeString(executor.id().toString()))
-                        .targetServices()
-                        .build()
-                        .send();
+                ChannelMessage.builder().channel("darkcube_lobbysystem").message("send_is_loaded").buffer(DataBuf.empty().writeString(executor.id().toString())).targetServices().build().send();
             } else {
                 executor.connectPlayer(user.uniqueId()).thenAccept(suc -> {
                     if (!suc) {
@@ -121,7 +118,8 @@ import java.util.function.Consumer;
 
     private void pserverLoaded(ChannelMessageSender sender) {
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (var player : Bukkit.getOnlinePlayers()) {
                     var user = UserAPI.instance().user(player.getUniqueId());
                     if (!user.metadata().has(key)) continue;
@@ -137,7 +135,8 @@ import java.util.function.Consumer;
         }.runTask(Lobby.getInstance());
     }
 
-    @EventListener public void handle(PServerStopEvent event) {
+    @EventListener
+    public void handle(PServerStopEvent event) {
         for (var player : Bukkit.getOnlinePlayers()) {
             var user = UserAPI.instance().user(player.getUniqueId());
             var id = user.metadata().<UniqueId>get(keyStarted);
@@ -148,12 +147,14 @@ import java.util.function.Consumer;
         }
     }
 
-    @EventHandler public void handle(PlayerQuitEvent event) {
+    @EventHandler
+    public void handle(PlayerQuitEvent event) {
         var user = UserAPI.instance().user(event.getPlayer().getUniqueId());
         remove(user);
     }
 
-    @EventListener public void handle(ChannelMessageReceiveEvent event) {
+    @EventListener
+    public void handle(ChannelMessageReceiveEvent event) {
         if (!event.channel().equals("darkcube_lobbysystem")) return;
         if (event.message().equals("pserver_loaded")) pserverLoaded(event.sender());
     }

@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="DarkCube-Minestom" pattern="[minestom-ce]:*..*||[minestom-ce.code-generators]:*..*||[minestom-ce.code-generators.main]:*..*||[minestom-ce.demo]:*..*||[minestom-ce.demo.main]:*..*||[minestom-ce.main]:*..*||[minestom-ce.test]:*..*||[minestom-ce.testing]:*..*||[minestom-ce.testing.main]:*..*" />
+</component>

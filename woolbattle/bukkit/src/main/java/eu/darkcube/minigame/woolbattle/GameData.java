@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -75,11 +75,11 @@ public class GameData {
     }
 
     private void updateMap(@Nullable Map newMap, Consumer<@Nullable Map> setter, boolean force) {
-        Map oldMap = map();
         if (woolbattle.lobby().enabled()) {
             setter.accept(newMap);
             WBUser.onlineUsers().forEach(u -> ScoreboardHelper.setMap(woolbattle, u));
         } else if (woolbattle.ingame().enabled()) {
+            Map oldMap = map();
             if (oldMap == null) throw new Error("Old Map is null");
             if (newMap == oldMap) return;
             Map map = map(newMap, force);

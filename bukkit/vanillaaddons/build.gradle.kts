@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,6 +7,7 @@
 plugins {
     `java-library`
     alias(libs.plugins.shadow)
+    id("eu.darkcube.darkcube")
 }
 
 tasks {
@@ -15,10 +16,7 @@ tasks {
         relocate("net.wesjd.anvilgui", "eu.darkcube.system.vanillaaddons.libs.net.wesjd.anvilgui")
     }
     jar.configure {
-        archiveClassifier = "pure"
-    }
-    compileJava {
-        options.release = 17
+        destinationDirectory = temporaryDir
     }
     assemble.configure {
         dependsOn(shadowJar)
@@ -26,15 +24,10 @@ tasks {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
-    compileOnly(project(":darkcubesystem"))
-    implementation("net.wesjd:anvilgui:1.7.0-SNAPSHOT")
+    compileOnly(libs.paper.latest)
+    compileOnly(darkcubesystem.bukkit)
+    implementation("net.wesjd:anvilgui:1.9.4-SNAPSHOT")
 }
-
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(17)
-}
-
 repositories {
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
 }

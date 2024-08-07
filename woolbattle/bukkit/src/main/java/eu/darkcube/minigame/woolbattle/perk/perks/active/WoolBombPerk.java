@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -38,7 +39,8 @@ public class WoolBombPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activate(UserPerk perk) {
+        @Override
+        protected boolean activate(UserPerk perk) {
             Player p = perk.owner().getBukkitEntity();
             Snowball bomb = p.launchProjectile(Snowball.class);
             bomb.setMetadata("source", new FixedMetadataValue(woolbattle, perk.owner()));
@@ -46,7 +48,8 @@ public class WoolBombPerk extends Perk {
             return true;
         }
 
-        @EventHandler public void handle(ProjectileHitEvent e) {
+        @EventHandler
+        public void handle(ProjectileHitEvent e) {
             if (e.getEntityType() == EntityType.SNOWBALL) {
                 Snowball bomb = (Snowball) e.getEntity();
                 if (!bomb.hasMetadata("source")) {

@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.event.perk.other.BowShootArrowEvent;
@@ -26,12 +27,13 @@ public class ArrowRainPerk extends Perk {
     public static final PerkName ARROW_RAIN = new PerkName("ARROW_RAIN");
 
     public ArrowRainPerk() {
-        super(ActivationType.PASSIVE, ARROW_RAIN, new Cooldown(Unit.ACTIVATIONS, 6), false, 0, CostType.PER_ACTIVATION, Item.PERK_ARROW_RAIN, (user, perk, id, perkSlot, woolbattle) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ARROW_RAIN_COOLDOWN, woolbattle));
+        super(ActivationType.PASSIVE, ARROW_RAIN, new Cooldown(Unit.ACTIVATIONS, 6), false, 0, Item.PERK_ARROW_RAIN, (user, perk, id, perkSlot, woolbattle) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ARROW_RAIN_COOLDOWN, woolbattle));
         addListener(new ArrowRainListener());
     }
 
     private static class ArrowRainListener implements Listener {
-        @EventHandler(priority = EventPriority.HIGHEST) public void handle(BowShootArrowEvent event) {
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void handle(BowShootArrowEvent event) {
             int arrows = 0;
             for (UserPerk perk : event.user().perks().perks(ARROW_RAIN)) {
                 if (perk.cooldown() > 0) {

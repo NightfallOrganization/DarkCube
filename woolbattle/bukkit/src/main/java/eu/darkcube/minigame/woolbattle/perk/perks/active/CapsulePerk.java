@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -33,7 +34,8 @@ public class CapsulePerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             Player p = perk.owner().getBukkitEntity();
             Location loc = p.getLocation();
             this.setBlock(perk.owner(), loc.subtract(0, 1, 0));

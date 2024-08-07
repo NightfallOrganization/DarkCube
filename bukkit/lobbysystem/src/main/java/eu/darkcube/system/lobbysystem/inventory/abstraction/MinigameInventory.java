@@ -1,31 +1,11 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
-import eu.cloudnetservice.driver.event.EventListener;
-import eu.cloudnetservice.driver.event.EventManager;
-import eu.cloudnetservice.driver.event.events.service.CloudServiceUpdateEvent;
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
-import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.util.Item;
-import eu.darkcube.system.lobbysystem.util.Message;
-import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.GameState;
-import eu.darkcube.system.util.data.Key;
-import eu.darkcube.system.util.data.PersistentDataTypes;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+package eu.darkcube.system.lobbysystem.inventory.abstraction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,28 +13,48 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.lobbysystem.Lobby;
+import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.lobbysystem.util.Message;
+import eu.darkcube.system.lobbysystem.util.server.ServerInformation;
+import eu.darkcube.system.lobbysystem.util.server.ServerManager;
+import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.GameState;
+import eu.darkcube.system.util.data.PersistentDataTypes;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
 public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
-    public static final Key minigameServer = new Key(Lobby.getInstance(), "minigameserver");
+    public static final Key minigameServer = Key.key(Lobby.getInstance(), "minigameserver");
     private boolean done;
     private Item minigameItem;
-    private Listener listener = new Listener();
+    private ServerManager.UpdateListener updateListener = _ -> recalculate();
 
     public MinigameInventory(Component title, Item minigameItem, InventoryType type, User user) {
         super(type, title, user);
         this.minigameItem = minigameItem;
         this.done = true;
         this.complete();
-        InjectionLayer.boot().instance(EventManager.class).registerListener(this.listener);
+        Lobby.getInstance().serverManager().registerListener(updateListener);
     }
 
     protected abstract Set<String> getCloudTasks();
 
-    @Override protected boolean done() {
+    @Override
+    protected boolean done() {
         return super.done() && this.done;
     }
 
-    @Override protected final void destroy() {
-        InjectionLayer.boot().instance(EventManager.class).unregisterListener(this.listener);
+    @Override
+    protected final void destroy() {
+        Lobby.getInstance().serverManager().unregisterListener(updateListener);
         this.destroy0();
         super.destroy();
     }
@@ -62,16 +62,11 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
     protected void destroy0() {
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         Lobby lobby = Lobby.getInstance();
 
-        List<ServerInformation> informations = lobby
-                .serverManager()
-                .informations()
-                .stream()
-                .filter(ServerInformation.filterByTask(getCloudTasks()))
-                .filter(ServerInformation.ONLINE_FILTER)
-                .collect(Collectors.toList());
+        List<ServerInformation> informations = lobby.serverManager().informations().stream().filter(ServerInformation.filterByTask(getCloudTasks())).filter(ServerInformation.ONLINE_FILTER).collect(Collectors.toList());
 
         List<ItemSortingInfo> itemSortingInfos = new ArrayList<>();
         for (ServerInformation information : informations) {
@@ -95,6 +90,9 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
             } else if (state == GameState.INGAME) {
                 builder.damage(DyeColor.ORANGE.getWoolData());
                 builder.lore(Message.GAMESERVER_STATE.getMessage(user.user(), Message.STATE_INGAME));
+            } else if (state == GameState.STOPPING) {
+                builder.damage(DyeColor.BLACK.getWoolData());
+                builder.lore(Message.GAMESERVER_STATE.getMessage(user.user(), Message.STATE_STOPPING));
             } else {
                 throw new IllegalStateException();
             }
@@ -112,7 +110,8 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
         }
     }
 
-    @Override protected void insertFallbackItems() {
+    @Override
+    protected void insertFallbackItems() {
         this.fallbackItems.put(IInventory.slot(1, 5), this.minigameItem.getItem(this.user.user()));
         super.insertFallbackItems();
     }
@@ -133,12 +132,6 @@ public abstract class MinigameInventory extends LobbyAsyncPagedInventory {
 
         public ItemStack item() {
             return item;
-        }
-    }
-
-    public class Listener {
-        @EventListener public void handle(CloudServiceUpdateEvent ignored) {
-            MinigameInventory.this.recalculate();
         }
     }
 }

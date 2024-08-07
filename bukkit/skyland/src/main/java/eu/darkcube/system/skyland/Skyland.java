@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 package eu.darkcube.system.skyland;
 
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.CommandAPI;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.libs.com.google.gson.Gson;
 import eu.darkcube.system.skyland.equipment.crafting.RecipeBook;
 import eu.darkcube.system.skyland.listener.SkylandListener;
@@ -57,7 +57,7 @@ public class Skyland extends DarkCubePlugin {
 
         }
 
-        CommandAPI.getInstance().unregisterByPrefix("skyland");
+        CommandAPI.instance().unregisterByPrefix("skyland");
         SkylandGeneratorCommand.deleteCustomWorlds(this);
 
     }
@@ -90,12 +90,12 @@ public class Skyland extends DarkCubePlugin {
 
         instance.getCommand("test").setExecutor(new Feed());
 
-        CommandAPI.getInstance().register(new SkylandGeneratorCommand(this));
+        CommandAPI.instance().register(new SkylandGeneratorCommand(this));
 
 
         new BukkitRunnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
                 for (CustomMob cm : mobs) {
                     cm.aiTick();
                 }
@@ -103,8 +103,8 @@ public class Skyland extends DarkCubePlugin {
         }.runTaskTimer(this, 20, 1);
 
         new BukkitRunnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
                 for (CustomMob cm : mobs) {
                     cm.updateName();
                 }
@@ -156,8 +156,7 @@ public class Skyland extends DarkCubePlugin {
         }
 
         if (mob.getPersistentDataContainer().has(CustomMob.getCustomMobTypeKey())) {
-            int id = mob.getPersistentDataContainer()
-                    .get(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER);
+            int id = mob.getPersistentDataContainer().get(CustomMob.getCustomMobTypeKey(), PersistentDataType.INTEGER);
             if (id == 0) {
                 return new FollowingMob(mob);
             }

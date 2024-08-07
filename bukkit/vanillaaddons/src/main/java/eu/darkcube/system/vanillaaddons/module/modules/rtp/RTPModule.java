@@ -1,29 +1,25 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 package eu.darkcube.system.vanillaaddons.module.modules.rtp;
 
-import eu.darkcube.system.commandapi.v3.CommandAPI;
-import eu.darkcube.system.commandapi.v3.CommandExecutor;
+import eu.darkcube.system.bukkit.commandapi.Command;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public class RTPModule extends CommandExecutor implements Module {
+public class RTPModule extends Command implements Module {
 
     public RTPModule() {
         super("vanillaaddons", "randomtp", new String[]{"rtp"}, b -> b.executes(ctx -> {

@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.user;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -42,26 +43,30 @@ public class DefaultUserPerk implements UserPerk {
 
     /**
      * @return the perk slot for the perk type
-     * <br>Example: for {@link eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType#ACTIVE}
-     * slot 1
+     *         <br>Example: for {@link eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType#ACTIVE}
+     *         slot 1
      */
     public int perkSlot() {
         return perkSlot;
     }
 
-    @Override public int id() {
+    @Override
+    public int id() {
         return id;
     }
 
-    @Override public Perk perk() {
+    @Override
+    public Perk perk() {
         return perk;
     }
 
-    @Override public PerkItem currentPerkItem() {
+    @Override
+    public PerkItem currentPerkItem() {
         return new PerkItem(this::currentItem, this);
     }
 
-    @Override public void slot(int slot) {
+    @Override
+    public void slot(int slot) {
         int oldValue = this.slot;
         slotSilent(slot);
         if (woolbattle.ingame().enabled()) {
@@ -74,29 +79,34 @@ public class DefaultUserPerk implements UserPerk {
         }
     }
 
-    @Override public int slot() {
+    @Override
+    public int slot() {
         return slot;
     }
 
-    @Override public int cooldown() {
+    @Override
+    public int cooldown() {
         return this.cooldown;
     }
 
-    @Override public void cooldown(int cooldown) {
+    @Override
+    public void cooldown(int cooldown) {
         this.cooldown = Math.min(cooldown, perk.cooldown().cooldown());
         if (woolbattle.ingame().enabled()) {
             if (owner.getTeam().canPlay()) currentPerkItem().setItem();
         }
     }
 
-    @Override public void slotSilent(int slot) {
+    @Override
+    public void slotSilent(int slot) {
         this.slot = slot;
         PlayerPerks pp = owner().perksStorage();
         pp.perkInvSlot(perk().activationType(), perkSlot(), slot);
         owner().perksStorage(pp);
     }
 
-    @Override public WBUser owner() {
+    @Override
+    public WBUser owner() {
         return owner;
     }
 }

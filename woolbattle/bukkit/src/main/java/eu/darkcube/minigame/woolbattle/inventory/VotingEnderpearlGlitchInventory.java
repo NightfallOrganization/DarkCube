@@ -1,10 +1,15 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.inventory;
+
+import static eu.darkcube.system.server.item.ItemBuilder.item;
+
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.translation.Message;
@@ -12,32 +17,24 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.Vote;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-
-import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
-
 public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
-    public static final InventoryType TYPE =
-            InventoryType.of("woolbattle-voting-enderpearl-glitch");
+    public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-enderpearl-glitch");
 
     public VotingEnderpearlGlitchInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_EP_GLITCH.getMessage(user), user);
     }
 
-    @Override
-    protected void inventoryClick(IInventoryClickEvent event) {
+    @Override protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
+        if (event.item() == null) return;
         String itemId = ItemManager.getItemId(event.item());
-        if (itemId == null)
-            return;
+        if (itemId == null) return;
         Boolean vote = null;
         if (itemId.equals(Item.GENERAL_VOTING_FOR.getItemId())) {
             vote = true;
@@ -54,14 +51,12 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
         if (vote != null) {
             woolbattle.lobby().VOTES_EP_GLITCH.put(user, new Vote<>(System.currentTimeMillis(), vote));
             woolbattle.lobby().recalculateEpGlitch();
-            user.user().sendMessage(
-                    vote ? Message.VOTED_FOR_EP_GLITCH : Message.VOTED_AGAINST_EP_GLITCH);
+            user.user().sendMessage(vote ? Message.VOTED_FOR_EP_GLITCH : Message.VOTED_AGAINST_EP_GLITCH);
             recalculate();
         }
     }
 
-    @Override
-    protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override protected void fillItems(Map<Integer, ItemStack> items) {
         ItemBuilder b1 = item(Item.GENERAL_VOTING_FOR.getItem(user));
         ItemBuilder b2 = item(Item.GENERAL_VOTING_AGAINST.getItem(user));
         Vote<Boolean> vote = woolbattle.lobby().VOTES_EP_GLITCH.get(user);
@@ -78,8 +73,7 @@ public class VotingEnderpearlGlitchInventory extends WoolBattlePagedInventory {
         updateSlots.offer(IInventory.slot(3, 6));
     }
 
-    @Override
-    protected void insertFallbackItems() {
+    @Override protected void insertFallbackItems() {
         fallbackItems.put(IInventory.slot(1, 5), Item.LOBBY_VOTING_EP_GLITCH.getItem(user));
         super.insertFallbackItems();
     }

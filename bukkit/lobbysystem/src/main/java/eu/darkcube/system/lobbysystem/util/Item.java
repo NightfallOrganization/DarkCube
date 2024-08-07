@@ -1,19 +1,23 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.util;
 
-import eu.cloudnetservice.driver.document.StandardSerialisationStyle;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.item.meta.FireworkBuilderMeta;
+import static org.bukkit.Material.*;
+
+import java.util.ArrayList;
+
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
+import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.server.item.meta.FireworkBuilderMeta;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -21,10 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-
-import static org.bukkit.Material.*;
 
 public enum Item {
 
@@ -46,14 +46,11 @@ public enum Item {
     INVENTORY_COMPASS_SPAWN(ItemBuilder.item(NETHER_STAR)),
     INVENTORY_COMPASS_SMASH(ItemBuilder.item(FIREBALL)),
     INVENTORY_COMPASS_WOOLBATTLE(ItemBuilder.item(BOW)),
+    INVENTORY_COMPASS_SUMO(ItemBuilder.item(STICK).glow(true)),
+    INVENTORY_COMPASS_FISHER(ItemBuilder.item(FISHING_ROD)),
     INVENTORY_COMPASS_MINERS(ItemBuilder.item(DIAMOND_PICKAXE).flag(ItemFlag.HIDE_ATTRIBUTES)),
 
-    GADGET_HOOK_ARROW(ItemBuilder
-            .item(BOW)
-            .unbreakable(true)
-            .flag(ItemFlag.HIDE_UNBREAKABLE)
-            .enchant(Enchantment.ARROW_INFINITE, 1)
-            .flag(ItemFlag.HIDE_ENCHANTS)),
+    GADGET_HOOK_ARROW(ItemBuilder.item(BOW).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE).enchant(Enchantment.ARROW_INFINITE, 1).flag(ItemFlag.HIDE_ENCHANTS)),
     GADGET_HOOK_ARROW_ARROW(ItemBuilder.item(ARROW)),
 
     GADGET_GRAPPLING_HOOK(ItemBuilder.item(FISHING_ROD).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE)),
@@ -84,15 +81,9 @@ public enum Item {
     CANCEL(ItemBuilder.item(INK_SACK).damage(1)),
     START_PSERVER(ItemBuilder.item(INK_SACK).damage(2)),
     STOP_PSERVER(ItemBuilder.item(INK_SACK).damage(1)),
-    PSERVER_PUBLIC(ItemBuilder
-            .item(FIREWORK_CHARGE)
-            .meta(new FireworkBuilderMeta(FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build()))
-            .flag(ItemFlag.HIDE_POTION_EFFECTS)),
+    PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE).meta(new FireworkBuilderMeta(FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())).flag(ItemFlag.HIDE_POTION_EFFECTS)),
 
-    PSERVER_PRIVATE(ItemBuilder
-            .item(FIREWORK_CHARGE)
-            .meta(new FireworkBuilderMeta(FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build()))
-            .flag(ItemFlag.HIDE_POTION_EFFECTS)),
+    PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE).meta(new FireworkBuilderMeta(FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build())).flag(ItemFlag.HIDE_POTION_EFFECTS)),
 
     ARROW_NEXT(ItemBuilder.item(ARROW)),
 
@@ -104,7 +95,7 @@ public enum Item {
     JUMPANDRUN_STOP(ItemBuilder.item(INK_SACK).damage(1)),
     ;
 
-    private static final Key itemId = new Key(Lobby.getInstance(), "itemId");
+    private static final Key itemId = Key.key(Lobby.getInstance(), "item_id");
     private final ItemBuilder builder;
     private final String key = this.name();
 

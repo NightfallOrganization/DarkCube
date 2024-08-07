@@ -1,19 +1,37 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.pserver.cloudnet;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import eu.cloudnetservice.common.concurrent.Task;
-import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
 import eu.cloudnetservice.driver.registry.ServiceRegistry;
-import eu.cloudnetservice.driver.service.*;
+import eu.cloudnetservice.driver.service.ServiceConfiguration;
+import eu.cloudnetservice.driver.service.ServiceCreateResult;
+import eu.cloudnetservice.driver.service.ServiceDeployment;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.driver.service.ServiceTask;
+import eu.cloudnetservice.driver.service.ServiceTemplate;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import eu.cloudnetservice.node.cluster.NodeServerProvider;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -24,30 +42,29 @@ import eu.darkcube.system.pserver.common.PServerExecutor;
 import eu.darkcube.system.pserver.common.PServerProvider;
 import eu.darkcube.system.pserver.common.PServerSnapshot;
 import eu.darkcube.system.pserver.common.UniqueId;
-import eu.darkcube.system.pserver.common.packets.nw.*;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.pserver.common.packets.nw.PacketAddOwner;
+import eu.darkcube.system.pserver.common.packets.nw.PacketRemoveOwner;
+import eu.darkcube.system.pserver.common.packets.nw.PacketStart;
+import eu.darkcube.system.pserver.common.packets.nw.PacketStop;
+import eu.darkcube.system.pserver.common.packets.nw.PacketUpdate;
+import eu.darkcube.system.util.data.CustomPersistentDataProvider;
+import eu.darkcube.system.util.data.PersistentDataStorage;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NodePServerExecutor implements PServerExecutor {
-    private static final Key K_ACCESS_LEVEL = new Key("PServer", "accessLevel");
+    private static final Key K_ACCESS_LEVEL = Key.key("pserver", "access_level");
     private static final PersistentDataType<AccessLevel> T_ACCESS_LEVEL = PersistentDataTypes.enumType(AccessLevel.class);
-    private static final Key K_TYPE = new Key("PServer", "type");
+    private static final Key K_TYPE = Key.key("pserver", "type");
     private static final PersistentDataType<Type> T_TYPE = PersistentDataTypes.enumType(Type.class);
-    private static final Key K_TASK = new Key("PServer", "task");
+    private static final Key K_TASK = Key.key("pserver", "task");
     private static final PersistentDataType<String> T_TASK = PersistentDataTypes.STRING;
-    private static final Logger logger = Logger.getGlobal();
+    private static final Logger LOGGER = LoggerFactory.getLogger("PServer");
     private final UniqueId id;
     private final Set<UUID> owners = new CopyOnWriteArraySet<>();
-    private final PServerStorage storage;
+    private final PersistentDataStorage storage;
     private final Deque<ConnectionRequest> requestConnection = new ConcurrentLinkedDeque<>();
     private final ServiceTaskProvider serviceTaskProvider = InjectionLayer.boot().instance(ServiceTaskProvider.class);
     private final NodeServerProvider nodeServerProvider = InjectionLayer.boot().instance(NodeServerProvider.class);
@@ -62,22 +79,22 @@ public class NodePServerExecutor implements PServerExecutor {
 
     public NodePServerExecutor(NodePServerProvider provider, UniqueId id) {
         this.id = id;
-        this.storage = new PServerStorage(provider, this);
+        this.storage = createStorage(id);
 
         owners.addAll(DatabaseProvider.get("pserver").cast(PServerDatabase.class).getOwners(id));
 
-        Document.Mutable doc = storage.storeToJsonDocument().mutableCopy();
-        if (doc.contains("private")) {
-            var privateServer = doc.getBoolean("private");
+        var doc = storage.storeToJsonObject();
+        if (doc.has("private")) {
+            var privateServer = doc.get("private").getAsBoolean();
             doc.remove("private");
-            var task = doc.getString("task");
+            var task = doc.get("task").getAsString();
             if (task != null && !storage.has(K_TYPE)) {
                 doc.remove("task");
             } else {
                 task = null;
             }
             doc.remove("startedBy");
-            storage.loadFromJsonDocument(doc);
+            storage.loadFromJsonObject(doc);
             storage.set(K_ACCESS_LEVEL, T_ACCESS_LEVEL, privateServer ? AccessLevel.PRIVATE : AccessLevel.PUBLIC);
             if (task != null) {
                 storage.set(K_TASK, T_TASK, task);
@@ -91,9 +108,14 @@ public class NodePServerExecutor implements PServerExecutor {
 
     public NodePServerExecutor(@NotNull NodePServerProvider provider, @NotNull UniqueId id, @NotNull Type type, @NotNull String taskName) {
         this.id = id;
-        this.storage = new PServerStorage(provider, this);
+        this.storage = createStorage(id);
         this.storage.set(K_TYPE, T_TYPE, type);
         this.storage.set(K_TASK, T_TASK, taskName);
+    }
+
+    private PersistentDataStorage createStorage(UniqueId id) {
+        // noinspection PatternValidation
+        return CustomPersistentDataProvider.dataProvider().persistentData("pserver_data", Key.key("", id.toString()));
     }
 
     /**
@@ -103,18 +125,19 @@ public class NodePServerExecutor implements PServerExecutor {
         new PacketUpdate(createSnapshotInternal()).sendAsync();
     }
 
-    @Override public @NotNull CompletableFuture<Boolean> start() {
+    @Override
+    public @NotNull CompletableFuture<Boolean> start() {
         return Task.supply(() -> {
             try {
                 lock.lock();
 
                 if (state != State.OFFLINE) return false;
 
-                var taskName = taskName().getNow(null);
+                var taskName = taskName().join();
                 if (taskName == null) taskName = NodePServerProvider.pserverTaskName;
                 @Nullable var task = serviceTaskProvider.serviceTask(taskName);
                 if (task == null) {
-                    logger.warning("Task not found for PServer creation: " + taskName);
+                    LOGGER.warn("Task not found for PServer creation: {}", taskName);
                     return false;
                 }
                 var serviceSnapshot = createService(task).join();
@@ -128,7 +151,7 @@ public class NodePServerExecutor implements PServerExecutor {
                 snapshot = serviceSnapshot;
                 serverName = snapshot.name();
                 sendUpdate();
-                logger.info("[PServer] Started PServer " + this.serverName + " (" + this.id + ")");
+                LOGGER.info("[PServer] Started PServer {} ({})", this.serverName, this.id);
                 snapshot.provider().startAsync().whenComplete((unused, throwable) -> {
                     if (throwable != null) {
                         throwable.printStackTrace();
@@ -161,7 +184,7 @@ public class NodePServerExecutor implements PServerExecutor {
         state = State.STOPPING;
         sendUpdate();
         new PacketStop(createSnapshotInternal()).sendAsync();
-        logger.info("[PServer] Stopping PServer " + serverName + " (" + id + ")");
+        LOGGER.info("[PServer] Stopping PServer {} ({})", serverName, id);
         stopFuture = snapshot.provider().stopAsync().thenCompose(unused -> {
             try {
                 lock.lock();
@@ -172,8 +195,8 @@ public class NodePServerExecutor implements PServerExecutor {
         }).thenRun(() -> {
             try {
                 lock.lock();
-                logger.info("[PServer] Stopped PServer " + serverName + " (" + id + ")");
-                if (state != State.STOPPING) logger.severe("[PServer] PServer was stopping but state wasn't stopping");
+                LOGGER.info("[PServer] Stopped PServer {} ({})", serverName, id);
+                if (state != State.STOPPING) LOGGER.error("[PServer] PServer was stopping but state wasn't stopping");
                 resetState();
                 NodePServerProvider.instance().releaseReference(this);
             } finally {
@@ -186,11 +209,11 @@ public class NodePServerExecutor implements PServerExecutor {
         state = State.STOPPING;
         sendUpdate();
         new PacketStop(createSnapshotInternal()).sendAsync();
-        logger.info("[PServer] Killing PServer " + serverName + " (" + id + ")");
+        LOGGER.info("[PServer] Killing PServer {} ({})", serverName, id);
         stopFuture = snapshot.provider().deleteAsync().thenRun(() -> {
             try {
                 lock.lock();
-                logger.info("[PServer] Killed PServer " + serverName + " (" + id + ")");
+                LOGGER.info("[PServer] Killed PServer {} ({})", serverName, id);
                 resetState();
                 NodePServerProvider.instance().releaseReference(this);
             } finally {
@@ -199,7 +222,8 @@ public class NodePServerExecutor implements PServerExecutor {
         });
     }
 
-    @Override public @NotNull CompletableFuture<Void> stop() {
+    @Override
+    public @NotNull CompletableFuture<Void> stop() {
         return Task.supply(() -> {
             try {
                 lock.lock();
@@ -217,11 +241,13 @@ public class NodePServerExecutor implements PServerExecutor {
         }).thenCompose(future -> future);
     }
 
-    @Override public @NotNull CompletableFuture<Boolean> accessLevel(@NotNull AccessLevel level) {
+    @Override
+    public @NotNull CompletableFuture<Boolean> accessLevel(@NotNull AccessLevel level) {
         return storage().setAsync(K_ACCESS_LEVEL, T_ACCESS_LEVEL, level).thenApply(p -> true);
     }
 
-    @Override public @NotNull CompletableFuture<Boolean> addOwner(UUID uuid) {
+    @Override
+    public @NotNull CompletableFuture<Boolean> addOwner(UUID uuid) {
         if (owners.add(uuid)) {
             DatabaseProvider.get("pserver").cast(PServerDatabase.class).update(id, uuid);
             new PacketAddOwner(id, uuid).sendAsync();
@@ -230,7 +256,8 @@ public class NodePServerExecutor implements PServerExecutor {
         return CompletableFuture.completedFuture(true);
     }
 
-    @Override public @NotNull CompletableFuture<Boolean> removeOwner(UUID uuid) {
+    @Override
+    public @NotNull CompletableFuture<Boolean> removeOwner(UUID uuid) {
         if (owners.remove(uuid)) {
             DatabaseProvider.get("pserver").cast(PServerDatabase.class).delete(id, uuid);
             new PacketRemoveOwner(id, uuid).sendAsync();
@@ -242,7 +269,8 @@ public class NodePServerExecutor implements PServerExecutor {
         return CompletableFuture.completedFuture(true);
     }
 
-    @Override public @NotNull CompletableFuture<PServerSnapshot> createSnapshot() {
+    @Override
+    public @NotNull CompletableFuture<PServerSnapshot> createSnapshot() {
         return CompletableFuture.completedFuture(createSnapshotInternal());
     }
 
@@ -250,7 +278,8 @@ public class NodePServerExecutor implements PServerExecutor {
         return new PServerSnapshot(id, state, onlinePlayers, startedAt, serverName, owners.toArray(new UUID[0]));
     }
 
-    @Override public @NotNull CompletableFuture<Boolean> connectPlayer(UUID player) {
+    @Override
+    public @NotNull CompletableFuture<Boolean> connectPlayer(UUID player) {
         State state = this.state;
         if (state == State.STARTING || state == State.RUNNING) {
             CompletableFuture<Boolean> fut = new CompletableFuture<>();
@@ -261,47 +290,60 @@ public class NodePServerExecutor implements PServerExecutor {
         return CompletableFuture.completedFuture(false);
     }
 
-    @Override public @NotNull UniqueId id() {
+    @Override
+    public @NotNull UniqueId id() {
         return id;
     }
 
-    @Override public @NotNull CompletableFuture<State> state() {
+    @Override
+    public @NotNull CompletableFuture<State> state() {
         return CompletableFuture.completedFuture(state);
     }
 
-    @Override public @NotNull CompletableFuture<Type> type() {
+    @Override
+    public @NotNull CompletableFuture<Type> type() {
         return storage.getAsync(K_TYPE, T_TYPE);
     }
 
-    @Override public @NotNull CompletableFuture<AccessLevel> accessLevel() {
+    @Override
+    public @NotNull CompletableFuture<AccessLevel> accessLevel() {
         return storage.getAsync(K_ACCESS_LEVEL, T_ACCESS_LEVEL, () -> AccessLevel.PUBLIC);
     }
 
-    @Override public @NotNull PServerStorage storage() {
+    @Override
+    public @NotNull PersistentDataStorage storage() {
         return storage;
     }
 
-    @Override public @NotNull CompletableFuture<Long> startedAt() {
+    @Override
+    public @NotNull CompletableFuture<Long> startedAt() {
         return CompletableFuture.completedFuture(startedAt);
     }
 
-    @Override public @NotNull CompletableFuture<Long> ontime() {
+    @Override
+    public @NotNull CompletableFuture<Long> ontime() {
         return startedAt().thenApply(s -> System.currentTimeMillis() - s);
     }
 
-    @Override public @NotNull CompletableFuture<Integer> onlinePlayers() {
+    @Override
+    public @NotNull CompletableFuture<Integer> onlinePlayers() {
         return CompletableFuture.completedFuture(onlinePlayers);
     }
 
-    @Override public @NotNull CompletableFuture<String> serverName() {
+    @Override
+    public @NotNull CompletableFuture<String> serverName() {
         return CompletableFuture.completedFuture(serverName);
     }
 
-    @Override public @NotNull CompletableFuture<@UnmodifiableView @NotNull Collection<@NotNull UUID>> owners() {
+    @Override
+    public @NotNull CompletableFuture<@UnmodifiableView @NotNull Collection<@NotNull UUID>> owners() {
         return CompletableFuture.completedFuture(Collections.unmodifiableCollection(new HashSet<>(owners)));
     }
 
-    @Deprecated @ApiStatus.Internal @Override public @NotNull CompletableFuture<@Nullable String> taskName() {
+    @Deprecated
+    @ApiStatus.Internal
+    @Override
+    public @NotNull CompletableFuture<@Nullable String> taskName() {
         return storage.getAsync(K_TASK, T_TASK);
     }
 
@@ -360,12 +402,7 @@ public class NodePServerExecutor implements PServerExecutor {
     }
 
     private CompletableFuture<ServiceConfiguration> createConfiguration(ServiceTask task) {
-        var builder = ServiceConfiguration
-                .builder(task)
-                .taskName(NodePServerProvider.pserverTaskName)
-                .staticService(false)
-                .modifyTemplates(templates -> templates.add(NodePServerProvider.instance().globalTemplate()))
-                .modifyGroups(g -> g.add("pserver-global"));
+        var builder = ServiceConfiguration.builder(task).taskName(NodePServerProvider.pserverTaskName).staticService(false).modifyTemplates(templates -> templates.add(NodePServerProvider.instance().globalTemplate())).modifyGroups(g -> g.add("pserver-global"));
         return type().thenApply(type -> {
             if (type == Type.WORLD) {
                 builder.modifyGroups(g -> g.add("pserver-world"));
@@ -373,11 +410,7 @@ public class NodePServerExecutor implements PServerExecutor {
                 var template = PServerProvider.template(id);
                 NodePServerProvider.instance().storage().create(template);
                 builder.modifyTemplates(t -> t.add(template));
-                var deployment = ServiceDeployment
-                        .builder()
-                        .template(template)
-                        .excludes(PServerModule.getInstance().compiledDeploymentExclusions())
-                        .build();
+                var deployment = ServiceDeployment.builder().template(template).excludes(PServerModule.getInstance().compiledDeploymentExclusions()).build();
                 builder.deployments(Collections.singleton(deployment));
             }
             builder.node(nodeServerProvider.localNode().info().uniqueId());

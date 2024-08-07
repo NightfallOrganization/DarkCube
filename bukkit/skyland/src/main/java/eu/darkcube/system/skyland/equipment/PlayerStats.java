@@ -1,33 +1,42 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.skyland.equipment;
 
-import eu.cloudnetservice.driver.document.Document;
-import eu.darkcube.system.util.data.PersistentDataType;
-import eu.darkcube.system.util.data.PersistentDataTypes;
+package eu.darkcube.system.skyland.equipment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.darkcube.system.libs.com.google.gson.JsonElement;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
+import eu.darkcube.system.util.data.PersistentDataType;
+import eu.darkcube.system.util.data.PersistentDataTypes;
+
 public class PlayerStats {
 
     public static final PersistentDataType<PlayerStats> TYPE = new PersistentDataType<PlayerStats>() {
 
-        @Override public PlayerStats deserialize(Document doc, String key) {
-            return doc.readObject(key, PlayerStats.class);
+        @Override
+        public PlayerStats deserialize(JsonElement json) {
+            var o = json.getAsJsonObject();
+            return new PlayerStats(PlayerStatsType.valueOf(o.get("type").getAsString()), o.get("menge").getAsInt());
         }
 
-        @Override public void serialize(Document.Mutable doc, String key, PlayerStats data) {
-            doc.append(key, data);
+        @Override
+        public JsonElement serialize(PlayerStats data) {
+            var o = new JsonObject();
+            o.addProperty("type", data.type.name());
+            o.addProperty("menge", data.menge);
+            return o;
         }
 
-        @Override public PlayerStats clone(PlayerStats object) {
+        @Override
+        public PlayerStats clone(PlayerStats object) {
             return new PlayerStats(object.getType(), object.getMenge());
         }
     };
@@ -115,7 +124,8 @@ public class PlayerStats {
         this.menge = menge;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
 
         return type + "``" + menge;
     }

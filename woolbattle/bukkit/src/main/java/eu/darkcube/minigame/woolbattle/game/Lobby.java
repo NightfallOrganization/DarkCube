@@ -1,10 +1,17 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.game;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import eu.darkcube.minigame.woolbattle.Config;
 import eu.darkcube.minigame.woolbattle.GameData;
@@ -13,8 +20,19 @@ import eu.darkcube.minigame.woolbattle.game.lobby.LobbyDeathLineTask;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyOverrideTimer;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyTimer;
 import eu.darkcube.minigame.woolbattle.game.lobby.LobbyTimerTask;
-import eu.darkcube.minigame.woolbattle.listener.lobby.*;
-import eu.darkcube.minigame.woolbattle.listener.lobby.item.*;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerBlockBreak;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerBlockPlace;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerEntityDamage;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerInteract;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerDropItem;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerJoin;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerLogin;
+import eu.darkcube.minigame.woolbattle.listener.lobby.ListenerPlayerQuit;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemParticles;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemPerks;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemSettings;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemTeams;
+import eu.darkcube.minigame.woolbattle.listener.lobby.item.ListenerItemVoting;
 import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -29,8 +47,10 @@ import eu.darkcube.minigame.woolbattle.util.observable.ObservableInteger;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Objective;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.Scoreboard;
 import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardHelper;
-import eu.darkcube.system.DarkCubeBukkit;
+import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.server.cloudnet.DarkCubeServerCloudNet;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -40,12 +60,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Lobby extends GamePhase {
 
@@ -61,7 +75,7 @@ public class Lobby extends GamePhase {
 
     public Lobby(WoolBattleBukkit woolbattle) {
         this.woolbattle = woolbattle;
-        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(woolbattle), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle), new ListenerInteractMenuBack());
+        addListener(new ListenerPlayerDropItem(), new ListenerEntityDamage(), new ListenerBlockBreak(), new ListenerBlockPlace(), new ListenerPlayerJoin(this), new ListenerPlayerQuit(woolbattle), new ListenerPlayerLogin(woolbattle), new ListenerInteract(), new ListenerItemParticles(), new ListenerItemSettings(woolbattle), new ListenerItemVoting(woolbattle), new ListenerItemTeams(woolbattle), new ListenerItemPerks(woolbattle));
 
         this.VOTES_MAP = new HashMap<>();
         this.VOTES_EP_GLITCH = new HashMap<>();
@@ -75,7 +89,8 @@ public class Lobby extends GamePhase {
         addScheduler(new LobbyDeathLineTask(this, woolbattle), new LobbyTimerTask(this, overrideTimer, woolbattle));
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         unloadGame();
         woolbattle.lobbySystemLink().update();
         woolbattle.gameData(new GameData(woolbattle));
@@ -98,7 +113,8 @@ public class Lobby extends GamePhase {
         this.maxPlayerCount = -1;
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
     }
 
     public void unloadGame() {
@@ -115,7 +131,7 @@ public class Lobby extends GamePhase {
         woolbattle.gameData().mapSize(null);
         woolbattle.gameData().votedMap(null);
         woolbattle.gameData().forceMap(null);
-        DarkCubeBukkit.extra(doc -> doc.append("configured", false));
+        DarkCubeServerCloudNet.extra(doc -> doc.append("configured", false));
         System.out.println("Unloaded Game");
         if (publishUpdate) woolbattle.lobbySystemLink().update();
     }
@@ -134,7 +150,7 @@ public class Lobby extends GamePhase {
         recalculateMap();
         recalculateEpGlitch();
         WBUser.onlineUsers().forEach(this::setupScoreboard);
-        DarkCubeBukkit.extra(doc -> doc.append("configured", true));
+        DarkCubeServerCloudNet.extra(doc -> doc.append("configured", true));
         woolbattle.lobbySystemLink().update();
         System.out.println("Loaded game " + mapSize);
     }
@@ -162,7 +178,24 @@ public class Lobby extends GamePhase {
         ScoreboardHelper.initTeam(sb, woolbattle.teamManager().getSpectator());
         for (Team team : woolbattle.teamManager().getTeams()) ScoreboardHelper.initTeam(sb, team);
 
-        for (WBUser u : WBUser.onlineUsers()) sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
+        for (WBUser u : WBUser.onlineUsers()) {
+            var team = u.getTeam();
+            if (team == null) {
+                Bukkit.broadcastMessage("§cA Bug just happened.");
+                Bukkit.broadcastMessage("§cThis is a detection system to find a bug we are trying to fix.");
+                Bukkit.broadcastMessage("§cIf you see this, please report this to a server administrator,");
+                Bukkit.broadcastMessage("§cit would be a great help! (discord #bug-reports)");
+                Bukkit.broadcastMessage("§7Additional Info for Admins:");
+                Bukkit.broadcastMessage("§7User " + u.getPlayerName() + "'s team was null configuring " + user.getPlayerName());
+                Bukkit.broadcastMessage("§7Players: " + WBUser.onlineUsers().stream().map(WBUser::getPlayerName).toList());
+                Bukkit.broadcastMessage("§aTrying to work around the bug, let's hope you can play without problems :)");
+                Bukkit.broadcastMessage("§7No guarantees though .-.");
+                Bukkit.broadcastMessage("§cIf possible, do not quit the game. This could allow us to investigate" +
+                        " the bug in person, while the game is running. Thank you!");
+                u.setTeam(woolbattle.teamManager().getSpectator());
+            }
+            sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
+        }
 
         setupLobbyObjective(sb, user);
 
@@ -237,18 +270,7 @@ public class Lobby extends GamePhase {
     }
 
     public void recalculateMap() {
-        eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP
-                .values()
-                .stream()
-                .filter(m -> m.vote.isEnabled())
-                .collect(Collectors.toList()), woolbattle
-                .mapManager()
-                .getMaps(woolbattle.gameData().mapSize())
-                .stream()
-                .filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled)
-                .collect(Collectors.toSet()), woolbattle.gameData().map());
-
-        if (map != null && !map.isEnabled()) map = null;
+        @NotNull eu.darkcube.minigame.woolbattle.map.Map map = Vote.calculateWinner(this.VOTES_MAP.values(), woolbattle.mapManager().getMaps(woolbattle.gameData().mapSize()).stream().filter(eu.darkcube.minigame.woolbattle.map.Map::isEnabled).collect(Collectors.toSet()), woolbattle.gameData().map());
 
         woolbattle.gameData().votedMap(map);
     }
@@ -271,15 +293,13 @@ public class Lobby extends GamePhase {
     }
 
     public Location getSpawn() {
-        if (this.spawn == null) this.spawn = woolbattle
-                .persistentDataStorage()
-                .get(Config.SPAWN, PersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
+        if (this.spawn == null) this.spawn = woolbattle.persistentDataStorage().get(Config.SPAWN, BukkitPersistentDataTypes.LOCATION, () -> new Location(Bukkit.getWorlds().get(0), 0.5, 100, 0.5));
         return this.spawn.clone();
     }
 
     public void setSpawn(Location spawn) {
         this.spawn = spawn;
-        woolbattle.persistentDataStorage().set(Config.SPAWN, PersistentDataTypes.LOCATION, spawn);
+        woolbattle.persistentDataStorage().set(Config.SPAWN, BukkitPersistentDataTypes.LOCATION, spawn);
     }
 
     public int minPlayerCount() {

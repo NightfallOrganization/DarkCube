@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-
 plugins {
-    id("java-library")
+    `java-library`
+    id("eu.darkcube.darkcube")
 }
 
 dependencies {
-    compileOnly(libs.cloudnet)
-    compileOnly(libs.cloudnetBridge)
-    compileOnly(rootProject.project("darkcubesystem"))
+    compileOnly(libs.cloudnet.node)
+    compileOnly(libs.cloudnet.bridge)
+    compileOnly(darkcubesystem.api.cloudnet)
 }

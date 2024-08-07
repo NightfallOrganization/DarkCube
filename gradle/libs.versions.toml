@@ -2,42 +2,66 @@ metadata.format.version = "1.1"
 
 [versions]
 
-cloudnet = "4.0.0-RC9"
+cloudnet = "4.0.0-RC10"
+gson = "2.11.0"
 bungee = "1.19-R0.1-SNAPSHOT"
 luckperms = "5.4"
-protocollib = "4.8.0"
-viaversion = "4.8.1-darkcube"
-annotations = "24.0.1"
+protocollib = "5.1.0"
+viaversion = "5.0.2-20240626.120045-1"
+annotations = "24.1.0"
 hologramlib = "2.6.0-SNAPSHOT"
 velocity = "3.1.1"
-minestom = "1.0-20230831.112407-1"
-shadow = "8.1.1"
-blossom = "1.3.1"
-paperweight-userdev = "1.5.5"
+jline = "3.26.3"
+shadow = "8.1.8"
+blossom = "2.1.0"
+minestom = "5f0fbba498"
+minestom-extensions = "1.2.0"
+paperweight-userdev = "1.7.1"
+jctools-core = "4.0.5"
+fastutil = "8.5.14"
+lombok-plugin = "8.6"
+kotlin = "2.0.0"
+
+paper-latest = "1.21-R0.1-SNAPSHOT"
+paper-legacy = "1.8.8-R0.1-SNAPSHOT"
 
 [libraries]
+paper-legacy = { group = "org.spigotmc", name = "spigot-api", version.ref = "paper-legacy" }
+paper-latest = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-latest" }
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 hologramlib = { group = "com.github.unldenis.hologram", name = "hologram-lib", version.ref = "hologramlib" }
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
-viaversion = { group = "com.viaversion", name = "viaversion-api", version.ref = "viaversion" }
-viaversion-common = { group = "com.viaversion", name = "viaversion-common", version.ref = "viaversion" }
-viaversion-velocity = { group = "com.viaversion", name = "viaversion-velocity", version.ref = "viaversion" }
-viaversion-bukkit = { group = "com.viaversion", name = "viaversion-bukkit", version.ref = "viaversion" }
+viaversion = { group = "eu.darkcube.com.viaversion", name = "viaversion-api", version.ref = "viaversion" }
+viaversion-common = { group = "eu.darkcube.com.viaversion", name = "viaversion-common", version.ref = "viaversion" }
+viaversion-velocity = { group = "eu.darkcube.com.viaversion", name = "viaversion-velocity", version.ref = "viaversion" }
+viaversion-bukkit = { group = "eu.darkcube.com.viaversion", name = "viaversion-bukkit", version.ref = "viaversion" }
 protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
-minestom = { group = "net.minestom", name = "Minestom", version.ref = "minestom" }
+minestom = { group = "eu.darkcube", name = "minestom", version.ref = "minestom" }
+minestom-extensions = { group = "dev.hollowcube", name = "minestom-ce-extensions", version.ref = "minestom-extensions" }
+jline = { group = "org.jline", name = "jline", version.ref = "jline" }
+jctools-core = { group = "org.jctools", name = "jctools-core", version.ref = "jctools-core" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 
-cloudnetDriver = { group = "eu.cloudnetservice.cloudnet", name = "driver", version.ref = "cloudnet" }
-cloudnetBridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
-cloudnet = { group = "eu.cloudnetservice.cloudnet", name = "node", version.ref = "cloudnet" }
-cloudnetWrapper = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "cloudnet" }
-cloudnetInjectApi = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-api", version.ref = "cloudnet" }
-cloudnetInjectProcessor = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-processor", version.ref = "cloudnet" }
+cloudnet-driver = { group = "eu.cloudnetservice.cloudnet", name = "driver", version.ref = "cloudnet" }
+cloudnet-bridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
+cloudnet-node = { group = "eu.cloudnetservice.cloudnet", name = "node", version.ref = "cloudnet" }
+cloudnet-wrapper = { group = "eu.cloudnetservice.cloudnet", name = "wrapper-jvm", version.ref = "cloudnet" }
+cloudnet-inject-api = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-api", version.ref = "cloudnet" }
+cloudnet-inject-processor = { group = "eu.cloudnetservice.cloudnet", name = "platform-inject-processor", version.ref = "cloudnet" }
 
 [bundles]
+minestom = [
+    "minestom",
+    "minestom-extensions"
+]
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }
+lombok = { id = "io.freefair.lombok", version.ref = "lombok-plugin" }

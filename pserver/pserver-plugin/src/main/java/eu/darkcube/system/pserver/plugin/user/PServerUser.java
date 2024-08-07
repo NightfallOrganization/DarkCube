@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,16 +7,16 @@
 
 package eu.darkcube.system.pserver.plugin.user;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
-import eu.darkcube.system.util.Language;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.UUID;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import eu.darkcube.system.commandapi.CommandExecutor;
+import eu.darkcube.system.util.Language;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class PServerUser implements User {
 
@@ -28,7 +28,8 @@ public class PServerUser implements User {
         this.setExtra(UserCache.cache().getEntry(user.uniqueId()).extra);
     }
 
-    @Override public boolean isOnline() {
+    @Override
+    public boolean isOnline() {
         Player p = getOnlinePlayer();
         return p != null && p.isOnline();
     }
@@ -37,31 +38,38 @@ public class PServerUser implements User {
         return user;
     }
 
-    @Override public Language getLanguage() {
+    @Override
+    public Language getLanguage() {
         return user().language();
     }
 
-    @Override public ICommandExecutor getCommandExecutor() {
+    @Override
+    public CommandExecutor getCommandExecutor() {
         return user;
     }
 
-    @Override public Player getOnlinePlayer() {
+    @Override
+    public Player getOnlinePlayer() {
         return Bukkit.getPlayer(user.uniqueId());
     }
 
-    @Override public UUID getUUID() {
+    @Override
+    public UUID getUUID() {
         return user.uniqueId();
     }
 
-    @Override public JsonObject getExtra() {
+    @Override
+    public JsonObject getExtra() {
         return extra;
     }
 
-    @Override public void setExtra(JsonObject extra) {
+    @Override
+    public void setExtra(JsonObject extra) {
         this.extra = extra == null ? new JsonObject() : extra;
     }
 
-    @Override public void saveExtra() {
+    @Override
+    public void saveExtra() {
         // Saving extra to UserCache
         UserCache.Entry entry = UserCache.cache().getEntry(user.uniqueId());
         for (Entry<String, JsonElement> e : new ArrayList<>(entry.extra.entrySet())) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -12,14 +12,14 @@ import eu.darkcube.minigame.woolbattle.util.Arrays.ConvertingRule;
 
 public class ConvertingRuleMap extends ConvertingRule<Map> {
 
-	@Override
-	public Class<Map> getConvertingClass() {
-		return Map.class;
-	}
+    @Override
+    public Class<Map> getConvertingClass() {
+        return Map.class;
+    }
 
-	@Override
-	public String convert(Map object) {
-		return object.getName();
-	}
+    @Override
+    public String convert(Map object) {
+        return object.getName();
+    }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,24 +7,22 @@
 
 package eu.darkcube.system.lobbysystem.listener;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.inventory.InventoryConfirm;
 import eu.darkcube.system.lobbysystem.inventory.InventorySettings;
+import eu.darkcube.system.lobbysystem.inventory.InventorySumo;
 import eu.darkcube.system.lobbysystem.inventory.InventoryWoolBattle;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServer;
 import eu.darkcube.system.lobbysystem.inventory.pserver.InventoryPServerOwn;
-import eu.darkcube.system.lobbysystem.user.LobbyUser;
 import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class ListenerInventoryClick extends BaseListener {
 
@@ -73,6 +71,12 @@ public class ListenerInventoryClick extends BaseListener {
             close = true;
         } else if (itemid.equals(Item.INVENTORY_COMPASS_JUMPANDRUN.getItemId())) {
             user.teleport(Lobby.getInstance().getDataManager().getJumpAndRunSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_COMPASS_SUMO.getItemId()) && !(user.getOpenInventory() instanceof InventorySumo)) {
+            user.teleport(Lobby.getInstance().getDataManager().getSumoSpawn());
+            close = true;
+        } else if (itemid.equals(Item.INVENTORY_COMPASS_FISHER.getItemId())) {
+            user.teleport(Lobby.getInstance().getDataManager().getFisherSpawn());
             close = true;
         } else if (itemid.equals(Item.INVENTORY_SETTINGS_ANIMATIONS_ON.getItemId())) {
             user.setAnimations(false);

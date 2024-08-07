@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,7 +7,8 @@
 
 plugins {
     alias(libs.plugins.shadow)
-    `java-library`
+    java
+    id("eu.darkcube.darkcube")
 }
 
 tasks {
@@ -15,7 +16,7 @@ tasks {
         archiveClassifier = ""
     }
     jar.configure {
-        archiveClassifier = "pure"
+        destinationDirectory = temporaryDir
     }
     assemble.configure {
         dependsOn(shadowJar)
@@ -26,12 +27,14 @@ tasks {
 }
 
 dependencies {
-    compileOnly(project(":darkcubesystem:bukkit"))
+    compileOnly(darkcubesystem.bukkit)
     compileOnly(project(":bukkit:statsapi"))
     compileOnly(project(":pserver:pserver-api"))
     compileOnly("io.papermc.paper:paper:1.8.8-R0.1-SNAPSHOT")
-    compileOnlyApi(parent!!.project("api"))
-    runtimeOnly(parent!!.project("api"))
-    compileOnlyApi(libs.cloudnetBridge)
-    compileOnlyApi(libs.cloudnetWrapper)
+    compileOnly(projects.woolbattle.common)
+    runtimeOnly(projects.woolbattle.api) {
+        isTransitive = false
+    }
+    compileOnly(libs.cloudnet.bridge)
+    compileOnly(libs.cloudnet.wrapper)
 }

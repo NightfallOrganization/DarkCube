@@ -1,10 +1,19 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.pserver.cloudnet;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.document.DocumentFactory;
@@ -13,37 +22,69 @@ import eu.cloudnetservice.driver.module.ModuleLifeCycle;
 import eu.cloudnetservice.driver.module.ModuleTask;
 import eu.cloudnetservice.driver.module.driver.DriverModule;
 import eu.cloudnetservice.node.command.CommandProvider;
-import eu.darkcube.system.packetapi.HandlerGroup;
-import eu.darkcube.system.packetapi.PacketAPI;
+import eu.darkcube.system.cloudnet.packetapi.HandlerGroup;
+import eu.darkcube.system.cloudnet.packetapi.PacketAPI;
 import eu.darkcube.system.pserver.cloudnet.command.CommandPServers;
 import eu.darkcube.system.pserver.cloudnet.database.DatabaseProvider;
 import eu.darkcube.system.pserver.cloudnet.database.PServerDatabase;
-import eu.darkcube.system.pserver.cloudnet.packethandler.*;
-import eu.darkcube.system.pserver.cloudnet.packethandler.storage.*;
-import eu.darkcube.system.pserver.common.packets.wn.*;
-import eu.darkcube.system.pserver.common.packets.wn.storage.*;
-
-import java.io.File;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerAccessLevel;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerAccessLevelSet;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerAddOwner;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerConnectPlayer;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerCreate;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerCreateSnapshot;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerExists;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerGetUniqueId;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerOnlinePlayers;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerOnlinePlayersSet;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerOntime;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerOwners;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerPServers;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerPServersByOwner;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerRegisteredPServers;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerRemoveOwner;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerServerName;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerSetRunning;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerStart;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerStartedAt;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerState;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerStop;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerTaskName;
+import eu.darkcube.system.pserver.cloudnet.packethandler.HandlerType;
+import eu.darkcube.system.pserver.common.packets.wn.PacketAccessLevel;
+import eu.darkcube.system.pserver.common.packets.wn.PacketAccessLevelSet;
+import eu.darkcube.system.pserver.common.packets.wn.PacketAddOwner;
+import eu.darkcube.system.pserver.common.packets.wn.PacketConnectPlayer;
+import eu.darkcube.system.pserver.common.packets.wn.PacketCreate;
+import eu.darkcube.system.pserver.common.packets.wn.PacketCreateSnapshot;
+import eu.darkcube.system.pserver.common.packets.wn.PacketExists;
+import eu.darkcube.system.pserver.common.packets.wn.PacketGetUniqueId;
+import eu.darkcube.system.pserver.common.packets.wn.PacketOnlinePlayers;
+import eu.darkcube.system.pserver.common.packets.wn.PacketOnlinePlayersSet;
+import eu.darkcube.system.pserver.common.packets.wn.PacketOntime;
+import eu.darkcube.system.pserver.common.packets.wn.PacketOwners;
+import eu.darkcube.system.pserver.common.packets.wn.PacketPServers;
+import eu.darkcube.system.pserver.common.packets.wn.PacketPServersByOwner;
+import eu.darkcube.system.pserver.common.packets.wn.PacketRegisteredPServers;
+import eu.darkcube.system.pserver.common.packets.wn.PacketRemoveOwner;
+import eu.darkcube.system.pserver.common.packets.wn.PacketServerName;
+import eu.darkcube.system.pserver.common.packets.wn.PacketSetRunning;
+import eu.darkcube.system.pserver.common.packets.wn.PacketStart;
+import eu.darkcube.system.pserver.common.packets.wn.PacketStartedAt;
+import eu.darkcube.system.pserver.common.packets.wn.PacketState;
+import eu.darkcube.system.pserver.common.packets.wn.PacketStop;
+import eu.darkcube.system.pserver.common.packets.wn.PacketTaskName;
+import eu.darkcube.system.pserver.common.packets.wn.PacketType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PServerModule extends DriverModule {
 
-    public static final String PLUGIN_NAME = new File(PServerModule.class
-            .getProtectionDomain()
-            .getCodeSource()
-            .getLocation()
-            .getPath()).getName();
+    public static final String PLUGIN_NAME = new File(PServerModule.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+    private static final Logger LOGGER = LoggerFactory.getLogger("PServer");
     private static PServerModule instance;
     public Listener listener;
     public String sqlDatabase;
-    private Logger logger = Logger.getLogger("PServer");
     private PServerConfiguration configuration;
     private List<Pattern> compiledDeploymentExclusions = null;
 
@@ -55,17 +96,18 @@ public class PServerModule extends DriverModule {
         return PServerModule.instance;
     }
 
-    @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.LOADED) public void loadConfig() {
+    @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.LOADED)
+    public void loadConfig() {
         configuration = this.readConfig(PServerConfiguration.class, () -> new PServerConfiguration("h2", defaultExclusions()), DocumentFactory.json());
         this.sqlDatabase = configuration.database();
     }
 
     private Set<String> defaultExclusions() {
         try {
-            InputStream in = getClass().getClassLoader().getResourceAsStream("default_deployment_exclusions.txt");
+            var in = getClass().getClassLoader().getResourceAsStream("default_deployment_exclusions.txt");
             if (in == null) return Collections.emptySet();
-            String data = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            String[] lines = data.split("\\n");
+            var data = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            var lines = data.split("\\n");
             in.close();
             return Set.of(lines);
         } catch (Throwable t) {
@@ -76,14 +118,14 @@ public class PServerModule extends DriverModule {
 
     @ModuleTask(order = Byte.MAX_VALUE, lifecycle = ModuleLifeCycle.STARTED)
     public void load(EventManager eventManager, CommandProvider commandProvider) {
-//        ClassLoaderFixRelocation.load(logger, eventManager, commandProvider);
-        logger.info("Enabling module PServer");
+        //        ClassLoaderFixRelocation.load(logger, eventManager, commandProvider);
+        LOGGER.info("Enabling module PServer");
         NodeServiceInfoUtil.init();
         NodePServerProvider.init();
         NodeUniqueIdProvider.init();
         DatabaseProvider.register("pserver", new PServerDatabase());
 
-        HandlerGroup handlerGroup = new HandlerGroup();
+        var handlerGroup = new HandlerGroup();
         handlerGroup.registerHandler(PacketType.class, new HandlerType());
         handlerGroup.registerHandler(PacketTaskName.class, new HandlerTaskName());
         handlerGroup.registerHandler(PacketStop.class, new HandlerStop());
@@ -108,26 +150,16 @@ public class PServerModule extends DriverModule {
         handlerGroup.registerHandler(PacketAccessLevelSet.class, new HandlerAccessLevelSet());
         handlerGroup.registerHandler(PacketAccessLevel.class, new HandlerAccessLevel());
 
-        handlerGroup.registerHandler(PacketClearCache.class, new HandlerClearCache());
-        handlerGroup.registerHandler(PacketClear.class, new HandlerClear());
-        handlerGroup.registerHandler(PacketGet.class, new HandlerGet());
-        handlerGroup.registerHandler(PacketGetDef.class, new HandlerGetDef());
-        handlerGroup.registerHandler(PacketHas.class, new HandlerHas());
-        handlerGroup.registerHandler(PacketKeys.class, new HandlerKeys());
-        handlerGroup.registerHandler(PacketLoadFromDocument.class, new HandlerLoadFromDocument());
-        handlerGroup.registerHandler(PacketRemove.class, new HandlerRemove());
-        handlerGroup.registerHandler(PacketSet.class, new HandlerSet());
-        handlerGroup.registerHandler(PacketSetIfNotPresent.class, new HandlerSetIfNotPresent());
-        handlerGroup.registerHandler(PacketStoreToDocument.class, new HandlerStoreToDocument());
         handlerGroup.registerHandler(PacketRegisteredPServers.class, new HandlerRegisteredPServers());
 
-        PacketAPI.getInstance().registerGroup(handlerGroup);
+        PacketAPI.instance().registerGroup(handlerGroup);
 
         eventManager.registerListener((PServerModule.getInstance().listener = new Listener()));
         commandProvider.register(CommandPServers.class);
     }
 
-    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED) public void stop() {
+    @ModuleTask(lifecycle = ModuleLifeCycle.STOPPED)
+    public void stop() {
         NodePServerProvider.instance().cleanup();
     }
 
@@ -143,7 +175,7 @@ public class PServerModule extends DriverModule {
     }
 
     public boolean addDeploymentExclusion(String exclusion) {
-        boolean changed = configuration.deploymentExclusions().add(exclusion);
+        var changed = configuration.deploymentExclusions().add(exclusion);
         if (changed) {
             saveConfig();
             invalidateCompiledDeploymentExclusions();
@@ -152,7 +184,7 @@ public class PServerModule extends DriverModule {
     }
 
     public boolean removeDeploymentExclusion(String exclusion) {
-        boolean changed = configuration.deploymentExclusions().remove(exclusion);
+        var changed = configuration.deploymentExclusions().remove(exclusion);
         if (changed) {
             saveConfig();
             invalidateCompiledDeploymentExclusions();

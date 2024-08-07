@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -25,7 +26,7 @@ public class TntArrowPerk extends Perk {
     public static final PerkName TNT_ARROW = new PerkName("TNT_ARROW");
 
     public TntArrowPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.PASSIVE, TNT_ARROW, new Cooldown(Unit.ACTIVATIONS, 7), false, 16, CostType.PER_SHOT, Item.PERK_TNT_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_TNT_ARROW_COOLDOWN, wb));
+        super(ActivationType.PASSIVE, TNT_ARROW, new Cooldown(Unit.ACTIVATIONS, 7), false, 16, Item.PERK_TNT_ARROW, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_TNT_ARROW_COOLDOWN, wb));
         addListener(new TntArrowListener(woolbattle));
     }
 
@@ -36,7 +37,8 @@ public class TntArrowPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(BowShootArrowEvent event) {
+        @EventHandler
+        public void handle(BowShootArrowEvent event) {
             Arrow arrow = event.arrow();
             for (UserPerk perk : event.user().perks().perks(TNT_ARROW)) {
                 if (perk.cooldown() > 0) {
@@ -45,7 +47,8 @@ public class TntArrowPerk extends Perk {
                 }
                 perk.cooldown(perk.perk().cooldown().cooldown());
                 new Scheduler(woolbattle) {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (arrow.isDead() || !arrow.isValid()) {
                             this.cancel();
                             if (event.user().removeWool(perk.perk().cost()) != perk.perk().cost()) {
@@ -57,6 +60,7 @@ public class TntArrowPerk extends Perk {
 
                             tnt.setMetadata("boost", new FixedMetadataValue(woolbattle, 2));
                             tnt.setMetadata("source", new FixedMetadataValue(woolbattle, event.user()));
+                            tnt.setMetadata("peaceful", new FixedMetadataValue(woolbattle, true));
                             tnt.setIsIncendiary(false);
                             tnt.setFuseTicks(2);
                         }

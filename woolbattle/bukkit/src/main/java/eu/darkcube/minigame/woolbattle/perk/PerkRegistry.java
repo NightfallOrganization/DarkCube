@@ -4,17 +4,59 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.minigame.woolbattle.perk;
 
-import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
-import eu.darkcube.minigame.woolbattle.perk.perks.active.*;
-import eu.darkcube.minigame.woolbattle.perk.perks.other.*;
-import eu.darkcube.minigame.woolbattle.perk.perks.passive.*;
+package eu.darkcube.minigame.woolbattle.perk;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.minigame.woolbattle.perk.Perk.ActivationType;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.ArrowBombPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.BlinkPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.BoosterPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.CapsulePerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.FreezerPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.GhostPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.GrabberPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.GrandpasClockPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.GrapplingHookPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.LineBuilderPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.MinePerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.MinigunPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.PandasToiletFlushPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.PodPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.ProtectiveShieldPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.RonjasToiletFlushPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.RopePerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.SafetyPlatformPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.SlimePlatformPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.SwitcherPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.WallGeneratorPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.active.WoolBombPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.ArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.BowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.DoubleJumpPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.EnderPearlPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.other.ShearsPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.ArrowRainPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.BerserkerPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.DrawArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.ElevatorPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.ExtraWoolPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.FastArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.FreezeArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.HookArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.KnockbackArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.LongJumpPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.PiercingArrowPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.ReflectorPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.RocketJumpPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.ScampPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.SpiderPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.StomperPerk;
+import eu.darkcube.minigame.woolbattle.perk.perks.passive.TntArrowPerk;
 
 public class PerkRegistry {
 
@@ -59,10 +101,13 @@ public class PerkRegistry {
         register(new SpiderPerk(woolbattle));
         register(new HookArrowPerk(woolbattle));
         register(new DrawArrowPerk(woolbattle));
-
+        register(new PiercingArrowPerk(woolbattle));
+        register(new KnockbackArrowPerk(woolbattle));
         register(new FreezeArrowPerk(woolbattle));
         register(new BerserkerPerk(woolbattle));
         register(new StomperPerk(woolbattle));
+        register(new PodPerk(woolbattle));
+        register(new PandasToiletFlushPerk(woolbattle));
     }
 
     public void register(Perk perk) {
@@ -71,9 +116,7 @@ public class PerkRegistry {
     }
 
     public Perk[] perks(ActivationType activationType) {
-        return cache1
-                .computeIfAbsent(activationType, n -> perks.values().stream().filter(p -> p.activationType() == n).toArray(Perk[]::new))
-                .clone();
+        return cache1.computeIfAbsent(activationType, n -> perks.values().stream().filter(p -> p.activationType() == n).toArray(Perk[]::new)).clone();
     }
 
     public Map<PerkName, Perk> perks() {

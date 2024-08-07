@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
+
+import java.util.Random;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
@@ -15,7 +18,7 @@ import eu.darkcube.minigame.woolbattle.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.scheduler.Scheduler;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
@@ -26,42 +29,43 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Random;
-
 public class MinigunPerk extends Perk {
     public static final PerkName MINIGUN = new PerkName("MINIGUN");
 
     public MinigunPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, MINIGUN, 10, 1, CostType.PER_SHOT, Item.PERK_MINIGUN, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_MINIGUN_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, MINIGUN, 10, 1, Item.PERK_MINIGUN, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_MINIGUN_COOLDOWN, woolbattle));
         addListener(new ListenerMinigun(this, woolbattle));
     }
 
     public static class ListenerMinigun extends BasicPerkListener {
 
-        private final Key DATA_SCHEDULER = new Key(woolbattle, "minigunScheduler");
+        private final Key DATA_SCHEDULER = Key.key(woolbattle, "minigun_scheduler");
 
         public ListenerMinigun(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             WBUser user = perk.owner();
-            if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
+            if (user.user().metadata().has(DATA_SCHEDULER)) {
                 return false;
             }
-            user.user().getMetaDataStorage().set(DATA_SCHEDULER, new Scheduler(woolbattle) {
+            user.user().metadata().set(DATA_SCHEDULER, new Scheduler(woolbattle) {
                 private int count = 0;
 
                 {
                     runTaskTimer(3);
                 }
 
-                @Override public void cancel() {
+                @Override
+                public void cancel() {
                     perk.cooldown(perk.perk().cooldown().cooldown());
                     super.cancel();
                 }
 
-                @Override public void run() {
+                @Override
+                public void run() {
                     Player p = user.getBukkitEntity();
                     ItemStack item = p.getItemInHand();
 
@@ -82,7 +86,8 @@ public class MinigunPerk extends Perk {
             return false;
         }
 
-        @EventHandler public void handle(EntityDamageByEntityEvent event) {
+        @EventHandler
+        public void handle(EntityDamageByEntityEvent event) {
             if (event.getEntity() instanceof Player) {
                 WBUser target = WBUser.getUser((Player) event.getEntity());
                 if (event.getDamager() instanceof Snowball) {
@@ -101,28 +106,22 @@ public class MinigunPerk extends Perk {
                             }
                             target.getBukkitEntity().damage(0);
 
-                            target
-                                    .getBukkitEntity()
-                                    .setVelocity(ball
-                                            .getVelocity()
-                                            .setY(0)
-                                            .normalize()
-                                            .multiply(.47 + new Random().nextDouble() / 70 + 1.1)
-                                            .setY(.400023));
+                            target.getBukkitEntity().setVelocity(ball.getVelocity().setY(0).normalize().multiply(.47 + new Random().nextDouble() / 70 + 1.1).setY(.400023));
                         }
                     }
                 }
             }
         }
 
-        @EventHandler public void handle(PlayerItemHeldEvent event) {
+        @EventHandler
+        public void handle(PlayerItemHeldEvent event) {
             WBUser user = WBUser.getUser(event.getPlayer());
             stop(user);
         }
 
         private void stop(WBUser user) {
-            if (user.user().getMetaDataStorage().has(DATA_SCHEDULER)) {
-                user.user().getMetaDataStorage().<Scheduler>remove(DATA_SCHEDULER).cancel();
+            if (user.user().metadata().has(DATA_SCHEDULER)) {
+                user.user().metadata().<Scheduler>remove(DATA_SCHEDULER).cancel();
             }
         }
     }

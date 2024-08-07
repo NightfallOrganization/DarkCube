@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.gadget.listener;
 
+import eu.darkcube.system.bukkit.util.ReflectionUtils;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.listener.BaseListener;
@@ -15,7 +16,6 @@ import eu.darkcube.system.lobbysystem.user.UserWrapper;
 import eu.darkcube.system.lobbysystem.util.Border;
 import eu.darkcube.system.lobbysystem.util.Item;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.ReflectionUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;

@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.game;
+
+import java.util.List;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.listener.endgame.ListenerBlockBreak;
@@ -19,8 +22,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class Endgame extends GamePhase {
 
     private final WoolBattleBukkit woolbattle;
@@ -30,9 +31,10 @@ public class Endgame extends GamePhase {
         this.addListener(new ListenerPlayerJoin(woolbattle), new ListenerPlayerQuit(), new ListenerBlockBreak(), new ListenerEntityDamage());
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         woolbattle.lobbySystemLink().update();
-        //		main.getSchedulers().clear();
+        // main.getSchedulers().clear();
 
         Team winner = woolbattle.ingame().winner;
         WBUser.onlineUsers().forEach(u -> {
@@ -49,12 +51,7 @@ public class Endgame extends GamePhase {
             }
         }
 
-        List<WBUser> users = WBUser
-                .onlineUsers()
-                .stream()
-                .filter(u -> u.getKills() != 0)
-                .sorted((o1, o2) -> Double.compare(o2.getKD(), o1.getKD()))
-                .toList();
+        List<WBUser> users = WBUser.onlineUsers().stream().filter(u -> u.getKills() != 0).sorted((o1, o2) -> Double.compare(o2.getKD(), o1.getKD())).toList();
 
         int players = users.size();
         if (players >= 1) {
@@ -65,9 +62,7 @@ public class Endgame extends GamePhase {
                     woolbattle.sendMessage(Message.STATS_PLACE_3, "3", val(users.get(2).getKD()), users.get(2).getTeamPlayerName());
                     if (players >= 4) {
                         for (int i = 3; i < 4; i++) {
-                            woolbattle.sendMessage(Message.STATS_PLACE_TH, Integer.toString(i + 1), val(users.get(i).getKD()), users
-                                    .get(i)
-                                    .getTeamPlayerName());
+                            woolbattle.sendMessage(Message.STATS_PLACE_TH, Integer.toString(i + 1), val(users.get(i).getKD()), users.get(i).getTeamPlayerName());
                         }
                     }
                 }
@@ -77,7 +72,8 @@ public class Endgame extends GamePhase {
         new Scheduler(woolbattle) {
             private int countdownTicks = 400;
 
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (Player all : Bukkit.getOnlinePlayers()) {
                     if (this.countdownTicks % 20 == 0) all.setLevel(this.countdownTicks / 20);
                     all.setExp(this.countdownTicks / 400F);
@@ -95,7 +91,8 @@ public class Endgame extends GamePhase {
         }.runTaskTimer(1);
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
     }
 
     private String val(double d) {

@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.inventory;
+
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.team.Team;
@@ -12,11 +15,11 @@ import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
@@ -25,11 +28,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-
 public class TeamsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-teams");
-    private final Key TEAM = new Key(woolbattle, "team_id");
+    private final Key TEAM = Key.key(woolbattle, "team_id");
     private final TeamsListener listener = new TeamsListener();
 
     public TeamsInventory(WoolBattleBukkit woolbattle, WBUser user) {
@@ -46,11 +47,9 @@ public class TeamsInventory extends WoolBattlePagedInventory {
     @Override
     protected void inventoryClick(IInventoryClickEvent event) {
         event.setCancelled(true);
-        if (event.item() == null)
-            return;
+        if (event.item() == null) return;
         String teamId = ItemManager.getId(event.item(), TEAM);
-        if (teamId == null)
-            return;
+        if (teamId == null) return;
         Team team = woolbattle.teamManager().getTeam(teamId);
         if (team.equals(user.getTeam())) {
             user.user().sendMessage(Message.ALREADY_IN_TEAM);

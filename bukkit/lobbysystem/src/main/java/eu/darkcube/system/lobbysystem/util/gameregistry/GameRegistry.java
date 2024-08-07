@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,15 +7,23 @@
 
 package eu.darkcube.system.lobbysystem.util.gameregistry;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import eu.cloudnetservice.driver.database.Database;
 import eu.cloudnetservice.driver.database.DatabaseProvider;
 import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 import eu.darkcube.system.lobbysystem.Lobby;
-
-import java.util.*;
 
 public class GameRegistry {
     private static final Database database = InjectionLayer.boot().instance(DatabaseProvider.class).database("lobbysystem_game_registry");
@@ -23,6 +31,7 @@ public class GameRegistry {
     private final Map<String, Collection<RegistryEntry>> entries = new HashMap<>();
 
     public GameRegistry(Lobby lobby) {
+        var gson = new Gson();
         for (var entry : database.entries().entrySet()) {
             var taskName = entry.getKey();
             List<RegistryEntry> l = new ArrayList<>();
@@ -31,7 +40,8 @@ public class GameRegistry {
             for (Document document : documents) {
                 var data = document.getString("data");
                 var protocol = document.readDocument("protocol");
-                var registryEntry = new RegistryEntry(taskName, data, protocol);
+                var protocolObject = gson.fromJson(protocol.serializeToString(), JsonObject.class);
+                var registryEntry = new RegistryEntry(taskName, data, protocolObject);
                 l.add(registryEntry);
             }
             if (!l.isEmpty()) {
@@ -79,7 +89,7 @@ public class GameRegistry {
         throw new IllegalArgumentException("Data not found: " + data);
     }
 
-    public void addEntry(String taskName, String data, Document protocol) {
+    public void addEntry(String taskName, String data, JsonObject protocol) {
         var entry = new RegistryEntry(taskName, data, protocol);
         synchronized (entries) {
             var l = entries.computeIfAbsent(taskName, s -> new ArrayList<>());

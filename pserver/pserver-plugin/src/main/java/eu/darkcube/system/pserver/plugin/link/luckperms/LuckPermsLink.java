@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -12,21 +12,21 @@ import net.luckperms.api.LuckPermsProvider;
 
 public class LuckPermsLink extends Link {
 
-	private CustomContextCalculator contextCalculator;
+    private CustomContextCalculator contextCalculator;
 
-	public LuckPermsLink() throws Throwable {
-		super();
-	}
+    public LuckPermsLink() throws Throwable {
+        super();
+    }
 
-	@Override
-	protected void link() throws Throwable {
-		contextCalculator = new CustomContextCalculator();
-		LuckPermsProvider.get().getContextManager().registerCalculator(contextCalculator);
-	}
+    @Override
+    protected void link() throws Throwable {
+        contextCalculator = new CustomContextCalculator();
+        LuckPermsProvider.get().getContextManager().registerCalculator(contextCalculator);
+    }
 
-	@Override
-	protected void unlink() {
-		LuckPermsProvider.get().getContextManager().unregisterCalculator(contextCalculator);
-		contextCalculator = null;
-	}
+    @Override
+    protected void unlink() {
+        LuckPermsProvider.get().getContextManager().unregisterCalculator(contextCalculator);
+        contextCalculator = null;
+    }
 }

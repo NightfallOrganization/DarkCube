@@ -1,24 +1,11 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.minigame.woolbattle.command.argument;
 
-import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
-import eu.darkcube.minigame.woolbattle.map.Map;
-import eu.darkcube.minigame.woolbattle.map.MapSize;
-import eu.darkcube.system.commandapi.v3.CommandSource;
-import eu.darkcube.system.commandapi.v3.ISuggestionProvider;
-import eu.darkcube.system.commandapi.v3.Messages;
-import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
-import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
-import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
-import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
-import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
+package eu.darkcube.minigame.woolbattle.command.argument;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +13,20 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
+import eu.darkcube.minigame.woolbattle.map.Map;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
+import eu.darkcube.system.commandapi.ISuggestionProvider;
+import eu.darkcube.system.commandapi.util.Messages;
+import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
+import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
+import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
     private static final DynamicCommandExceptionType INVALID_ENUM = Messages.INVALID_ENUM.newDynamicCommandExceptionType();
@@ -56,13 +57,13 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
     }
 
     @Override public MapSpec parse(StringReader reader) throws CommandSyntaxException {
-        StringReader clone = new StringReader(reader);
+        var clone = new StringReader(reader);
         return new MapSpec(reader.readString(), clone);
     }
 
     @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         List<String> suggestions = new ArrayList<>();
-        for (Map map : maps()) {
+        for (var map : maps()) {
             suggestions.addAll(Arrays.asList(toStringFunction.toString(context, map)));
         }
         return ISuggestionProvider.suggest(suggestions, builder);
@@ -99,9 +100,9 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
         static FromStringFunction of(Supplier<Map[]> maps, ToStringFunction f) {
             return new FromStringFunction() {
                 @Override public <S> Map fromString(CommandContext<S> context, String string) {
-                    Map[] a = maps.get();
-                    for (Map map : a) {
-                        String[] sa = f.toString(context, map);
+                    var a = maps.get();
+                    for (var map : a) {
+                        var sa = f.toString(context, map);
                         if (Arrays.asList(sa).contains(string)) {
                             return map;
                         }
@@ -124,7 +125,7 @@ public class MapArgument implements ArgumentType<MapArgument.MapSpec> {
         }
 
         public <S> Map parse(CommandContext<S> context) throws CommandSyntaxException {
-            Map type = fromStringFunction.fromString(context, mapName);
+            var type = fromStringFunction.fromString(context, mapName);
             if (type == null) throw INVALID_ENUM.createWithContext(reader, mapName);
             return type;
         }

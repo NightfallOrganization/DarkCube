@@ -1,10 +1,14 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.listener.lobby;
+
+import java.util.Map;
+import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.api.LobbySystemLinkImpl;
@@ -18,9 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-
-import java.util.Map;
-import java.util.UUID;
 
 public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
     private final WoolBattleBukkit woolbattle;
@@ -50,11 +51,7 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
     }
 
     private boolean handleRequest(Player player) {
-        for (Map.Entry<UUID, LobbySystemLinkImpl.ConnectionRequest> entry : woolbattle
-                .lobbySystemLink()
-                .connectionRequests()
-                .asMap()
-                .entrySet()) {
+        for (Map.Entry<UUID, LobbySystemLinkImpl.ConnectionRequest> entry : woolbattle.lobbySystemLink().connectionRequests().asMap().entrySet()) {
             if (entry.getValue().player().equals(player.getUniqueId())) {
                 woolbattle.lobbySystemLink().connectionRequests().invalidate(entry.getKey());
                 return true;
@@ -63,7 +60,9 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
         return false;
     }
 
-    @Override @EventHandler(priority = EventPriority.HIGHEST) public void handle(PlayerLoginEvent e) {
+    @Override
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handle(PlayerLoginEvent e) {
         Player p = e.getPlayer();
 
         if (!handleRequest(p)) {
@@ -107,20 +106,22 @@ public class ListenerPlayerLogin extends Listener<PlayerLoginEvent> {
         if (full) {
             e.setResult(Result.KICK_FULL);
         }
-        //		if (Main.getInstance().getMaxPlayers() <= Main.getInstance().getUserWrapper().getUsers().size()) {
-        //			e.disallow(Result.KICK_FULL, e.getKickMessage());
-        //		}
+        // if (Main.getInstance().getMaxPlayers() <= Main.getInstance().getUserWrapper().getUsers().size()) {
+        //     e.disallow(Result.KICK_FULL, e.getKickMessage());
+        // }
     }
 
     public static class PermissionInfo implements Comparable<PermissionInfo> {
         public boolean hasPermission = false;
         public int priority = 0;
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return "PermissionInfo [hasPermission=" + hasPermission + ", priority=" + priority + "]";
         }
 
-        @Override public int compareTo(@NotNull PermissionInfo o) {
+        @Override
+        public int compareTo(@NotNull PermissionInfo o) {
             return hasPermission ? Integer.compare(priority, o.priority) : -1;
         }
     }

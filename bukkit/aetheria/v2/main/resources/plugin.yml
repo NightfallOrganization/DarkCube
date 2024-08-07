@@ -1,0 +1,82 @@
+main: eu.darkcube.system.aetheria.Aetheria
+name: Aetheria
+author: EliteDarkness
+version: 2.0
+api-version: 1.13
+depend: [ System ]
+softdepend:
+  - Multiverse-Core
+commands:
+  gm:
+    description: Wechselt den Gamemode
+    permission: aetheria.gm.use
+  world:
+    description: Teleportiert zu Welten
+    permission: aetheria.world.use
+  god:
+    description: Setzt die Unverwundbarkeit
+    permission: aetheria.god.use
+  fly:
+    description: Setzt den Flugmodus
+    permission: aetheria.fly.use
+  stats:
+    description: Zeigt die Statistiken an
+    permission: aetheria.stats.use
+  setdamage:
+    description: Setzt den Damage
+    permission: aetheria.setdamage.use
+  sethealth:
+    description: Setzt die Health
+    permission: aetheria.sethealth.use
+  mobspawn:
+    description: Spawn ein Monster
+    permission: aetheria.mobspawn.use
+  killmobs:
+    description: Entfernt alle Monster
+    permission: aetheria.killmobs.use
+  setxp:
+    description: Setzt die XP
+    permission: aetheria.setxp.use
+  setregeneration:
+    description: Setzt die Regeneration
+    permission: aetheria.setregeneration.use
+  setlevel:
+    description: Setzt die Level
+    permission: aetheria.setlevel.use
+  datamode:
+    description: Wechselt den DataMode
+    permission: aetheria.datamode.use
+  setcore:
+    description: Setzt die Core
+    permission: aetheria.setcore.use
+
+
+Permissions:
+  aetheria.gm.use:
+    default: op
+  aetheria.world.use:
+    default: op
+  aetheria.god.use:
+    default: op
+  aetheria.fly.use:
+    default: op
+  aetheria.stats.use:
+    default: op
+  aetheria.setdamage.use:
+    default: op
+  aetheria.sethealth.use:
+    default: op
+  aetheria.mobspawn.use:
+    default: op
+  aetheria.killmobs.use:
+    default: op
+  aetheria.setxp.use:
+    default: op
+  aetheria.setregeneration.use:
+    default: op
+  aetheria.setlevel.use:
+    default: op
+  aetheria.datamode.use:
+    default: op
+  aetheria.setcore.use:
+    default: op

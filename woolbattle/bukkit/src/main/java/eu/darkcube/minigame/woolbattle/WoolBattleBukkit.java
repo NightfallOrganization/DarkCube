@@ -1,10 +1,16 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 import eu.darkcube.minigame.woolbattle.api.LobbySystemLinkImpl;
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApiImpl;
@@ -12,7 +18,11 @@ import eu.darkcube.minigame.woolbattle.game.Endgame;
 import eu.darkcube.minigame.woolbattle.game.Ingame;
 import eu.darkcube.minigame.woolbattle.game.Lobby;
 import eu.darkcube.minigame.woolbattle.listener.RegisterNotifyListener;
-import eu.darkcube.minigame.woolbattle.map.*;
+import eu.darkcube.minigame.woolbattle.map.CloudNetMapLoader;
+import eu.darkcube.minigame.woolbattle.map.DefaultMapManager;
+import eu.darkcube.minigame.woolbattle.map.MapLoader;
+import eu.darkcube.minigame.woolbattle.map.MapManager;
+import eu.darkcube.minigame.woolbattle.map.MapSize;
 import eu.darkcube.minigame.woolbattle.perk.PerkRegistry;
 import eu.darkcube.minigame.woolbattle.team.DefaultTeamManager;
 import eu.darkcube.minigame.woolbattle.team.TeamManager;
@@ -24,19 +34,15 @@ import eu.darkcube.minigame.woolbattle.util.SchedulerTicker;
 import eu.darkcube.minigame.woolbattle.util.convertingrule.ConvertingRuleHelper;
 import eu.darkcube.minigame.woolbattle.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.voidworldplugin.VoidWorldPluginLoader;
-import eu.darkcube.system.DarkCubePlugin;
-import eu.darkcube.system.commandapi.v3.ICommandExecutor;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
+import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Function;
 
 public class WoolBattleBukkit extends DarkCubePlugin {
 
@@ -67,7 +73,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         WoolBattleBukkit.instance = this;
     }
 
-    @Deprecated public static WoolBattleBukkit instance() {
+    @Deprecated
+    public static WoolBattleBukkit instance() {
         return WoolBattleBukkit.instance;
     }
 
@@ -89,7 +96,8 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         }
     }
 
-    @Override public void onLoad() {
+    @Override
+    public void onLoad() {
         this.lobbySystemLink = new LobbySystemLinkImpl(this);
         LanguageHelper.load();
 
@@ -120,12 +128,13 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         VoidWorldPluginLoader.load();
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         mapLoader = new CloudNetMapLoader(this);
         mapManager = new DefaultMapManager();
 
         this.userModifier = new WBUserModifier(this);
-        UserAPI.getInstance().addModifier(userModifier);
+        UserAPI.instance().addModifier(userModifier);
 
         this.tickTask = new SchedulerTicker(this).runTaskTimer(this, 0, 1);
 
@@ -138,11 +147,12 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         lobbySystemLink.enable();
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         lobbySystemLink.disable();
         commands.disableAll();
         listeners.unregisterAll();
-        UserAPI.getInstance().removeModifier(userModifier);
+        UserAPI.instance().removeModifier(userModifier);
         this.tickTask.cancel();
     }
 
@@ -198,11 +208,11 @@ public class WoolBattleBukkit extends DarkCubePlugin {
         this.sendMessage(msg, (u) -> replacements);
     }
 
-    public final void sendMessage(Message msg, Function<ICommandExecutor, Object[]> function) {
+    public final void sendMessage(Message msg, Function<CommandExecutor, Object[]> function) {
         for (WBUser user : WBUser.onlineUsers()) {
             user.user().sendMessage(msg, function.apply(user.user()));
         }
-        ICommandExecutor e = ICommandExecutor.create(Bukkit.getConsoleSender());
+        CommandExecutor e = BukkitCommandExecutor.create(Bukkit.getConsoleSender());
         e.sendMessage(msg, function.apply(e));
     }
 

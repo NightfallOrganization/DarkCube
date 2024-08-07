@@ -1,10 +1,17 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.inventory;
+
+import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
+import static eu.darkcube.system.server.item.ItemBuilder.item;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.map.Map;
@@ -14,23 +21,17 @@ import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.Item;
 import eu.darkcube.minigame.woolbattle.util.ItemManager;
 import eu.darkcube.minigame.woolbattle.util.Vote;
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.IInventoryClickEvent;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
-import eu.darkcube.system.util.data.Key;
+import eu.darkcube.system.server.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static eu.darkcube.system.inventoryapi.item.ItemBuilder.item;
-import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 
 public class VotingMapsInventory extends WoolBattlePagedInventory {
     public static final InventoryType TYPE = InventoryType.of("woolbattle-voting-maps");
-    private final Key MAP = new Key(woolbattle, "voting-map");
+    private final Key MAP = Key.key(woolbattle, "voting-map");
 
     public VotingMapsInventory(WoolBattleBukkit woolbattle, WBUser user) {
         super(woolbattle, TYPE, Message.INVENTORY_VOTING_MAPS.getMessage(user), user);
@@ -74,9 +75,7 @@ public class VotingMapsInventory extends WoolBattlePagedInventory {
             Map map = maps.get(i);
             ItemBuilder bu = item(map.getIcon());
             ItemManager.setId(bu, MAP, map.getName());
-            if (vote != null)
-                if (map.equals(vote.vote))
-                    bu.glow(true);
+            if (vote != null) if (map.equals(vote.vote)) bu.glow(true);
             bu.displayname(text(map.getName()).color(NamedTextColor.GREEN));
             items.put(i, bu.build());
         }

@@ -1,6 +1,0 @@
-apply plugin: 'java-library'
-
-dependencies {
-    compileOnlyApi project(':darkcubesystem')
-    compileOnlyApi libs.cloudnetDriver
-}

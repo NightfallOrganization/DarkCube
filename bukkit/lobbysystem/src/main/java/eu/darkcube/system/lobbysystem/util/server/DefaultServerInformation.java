@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,16 +7,16 @@
 
 package eu.darkcube.system.lobbysystem.util.server;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
-import eu.darkcube.system.DarkCubeServiceProperty;
+import eu.darkcube.system.cloudnet.DarkCubeServiceProperty;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.util.GameState;
-
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class DefaultServerInformation implements ServerInformation {
 
@@ -37,8 +37,9 @@ public class DefaultServerInformation implements ServerInformation {
         return lobby;
     }
 
-    @Override public @Nullable Component displayName() {
-        String displayName = displayNameString();
+    @Override
+    public @Nullable Component displayName() {
+        var displayName = displayNameString();
         if (displayName == null) return null;
         return LegacyComponentSerializer.legacySection().deserialize(displayName);
     }
@@ -51,40 +52,48 @@ public class DefaultServerInformation implements ServerInformation {
         return snapshot.readProperty(DarkCubeServiceProperty.AUTOCONFIGURED);
     }
 
-    @Override public String taskName() {
+    @Override
+    public String taskName() {
         return snapshot.serviceId().taskName();
     }
 
-    @Override public boolean online() {
-        GameState gameState = gameState();
+    @Override
+    public boolean online() {
+        var gameState = gameState();
         if (gameState == null) return false;
-        boolean autoconfigured = autoconfigured();
+        var autoconfigured = autoconfigured();
         if (gameState != GameState.INGAME && autoconfigured) return false;
-        Component displayName = displayName();
+        var displayName = displayName();
         return displayName != null;
     }
 
-    @Override public UUID uniqueId() {
+    @Override
+    public UUID uniqueId() {
         return uniqueId;
     }
 
-    @Override public int onlinePlayers() {
+    @Override
+    public int onlinePlayers() {
         return snapshot.readProperty(DarkCubeServiceProperty.PLAYING_PLAYERS);
     }
 
-    @Override public int maxPlayers() {
+    @Override
+    public int maxPlayers() {
         return snapshot.readProperty(DarkCubeServiceProperty.MAX_PLAYING_PLAYERS);
     }
 
-    @Override public int spectators() {
+    @Override
+    public int spectators() {
         return snapshot.readProperty(DarkCubeServiceProperty.SPECTATING_PLAYERS);
     }
 
-    @Override public @Nullable GameState gameState() {
+    @Override
+    public @Nullable GameState gameState() {
         return snapshot.readProperty(DarkCubeServiceProperty.GAME_STATE);
     }
 
-    @Override public CompletableFuture<State> connectPlayer(UUID uuid) {
+    @Override
+    public CompletableFuture<State> connectPlayer(UUID uuid) {
         lobby.playerManager().playerExecutor(uuid).connect(snapshot.name());
         return CompletableFuture.completedFuture(new State(true, null));
     }

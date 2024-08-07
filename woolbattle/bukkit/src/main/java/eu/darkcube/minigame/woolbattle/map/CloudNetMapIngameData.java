@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.map;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.util.GsonSerializer;
 import eu.darkcube.minigame.woolbattle.util.UnloadedLocation;
 import org.bukkit.Location;
 import org.bukkit.World;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CloudNetMapIngameData implements MapIngameData {
     private final Map<String, UnloadedLocation> spawns = new HashMap<>();
@@ -29,7 +30,8 @@ public class CloudNetMapIngameData implements MapIngameData {
         this.worldName = worldName;
     }
 
-    @Override public World world() {
+    @Override
+    public World world() {
         return world;
     }
 
@@ -37,26 +39,31 @@ public class CloudNetMapIngameData implements MapIngameData {
         this.world = world;
     }
 
-    @Override public void spawn(String name, Location loc) {
+    @Override
+    public void spawn(String name, Location loc) {
         if (loc == null) spawns.remove(name);
         else spawn(name, new UnloadedLocation(loc));
     }
 
-    @Override public void spawn(String name, UnloadedLocation loc) {
+    @Override
+    public void spawn(String name, UnloadedLocation loc) {
         spawns.put(name, loc);
     }
 
-    @Override public UnloadedLocation unloadedSpawn(String name) {
+    @Override
+    public UnloadedLocation unloadedSpawn(String name) {
         return spawns.get(name);
     }
 
-    @Override public Location spawn(String name) {
+    @Override
+    public Location spawn(String name) {
         UnloadedLocation loc = spawns.get(name);
         if (loc == null) return null;
         return loc.loaded();
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "CloudNetMapIngameData{" + "spawns=" + spawns + ", worldName='" + worldName + '\'' + '}';
     }
 }

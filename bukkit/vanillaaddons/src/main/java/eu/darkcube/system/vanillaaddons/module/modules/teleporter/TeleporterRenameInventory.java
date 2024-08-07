@@ -1,16 +1,19 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import java.util.List;
+
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.TextComponent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.inventory.AbstractInventory;
@@ -20,8 +23,6 @@ import net.wesjd.anvilgui.AnvilGUI.ResponseAction;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.List;
 
 public class TeleporterRenameInventory extends AbstractInventory<AnvilGUI, Teleporter> {
     public static final InventoryType TYPE = InventoryType.of("teleporterRename");

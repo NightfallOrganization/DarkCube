@@ -1,16 +1,21 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.user;
+
+import java.util.Collection;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import eu.darkcube.minigame.woolbattle.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.util.TimeUnit;
 import eu.darkcube.minigame.woolbattle.util.WoolSubtractDirection;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
@@ -19,10 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.Nullable;
 
 public interface WBUser {
 
@@ -84,8 +86,8 @@ public interface WBUser {
 
     /**
      * @return the in-game perks. This will <b>ONLY</b> affect the in-game perks but storage will
-     * not be updated and the perks will not persist over games. Use {@link #perksStorage()} and
-     * {@link #perksStorage(PlayerPerks)} for that functionality
+     *         not be updated and the perks will not persist over games. Use {@link #perksStorage()} and
+     *         {@link #perksStorage(PlayerPerks)} for that functionality
      */
     UserPerks perks();
 
@@ -123,8 +125,7 @@ public interface WBUser {
      * Gives the player wool
      *
      * @param count how much wool to add
-     * @return the actual amount of wool added, may be less than requested if the player's inventory
-     * is full
+     * @return the actual amount of wool added, may be less than requested if the player's inventory is full
      */
     int addWool(int count);
 
@@ -135,7 +136,7 @@ public interface WBUser {
      * @param dropIfFull whether we should drop the wool in the world if the player's inventory is
      *                   full
      * @return the amount of wool processed. This is all the wool that is put into the world,
-     * inventory AND world, if dropping is requested
+     *         inventory AND world, if dropping is requested
      */
     int addWool(int count, boolean dropIfFull);
 
@@ -144,7 +145,7 @@ public interface WBUser {
      *
      * @param count how much wool to remove
      * @return the amount of wool removed. This may be less if the player has no more wool or if
-     * somehow the removal was blocked.
+     *         somehow the removal was blocked.
      */
     int removeWool(int count);
 
@@ -155,8 +156,8 @@ public interface WBUser {
      * @param updateInventory whether the inventory should be affected by this command. This is used
      *                        for dropping items where we want to update the wool count silently,
      *                        cuz the inventory is already up-to-date
-     * @return the amount of wool removed. This may be less if the player has no more wool or if
-     * somehow the removal was blocked.
+     * @return the amount of wool removed. This may be less if the player has no
+     *         more wool or if somehow the removal was blocked.
      */
     int removeWool(int count, boolean updateInventory);
 
@@ -202,6 +203,7 @@ public interface WBUser {
     /**
      * @return the bukkit {@link Player} object
      */
+    @Nullable
     CraftPlayer getBukkitEntity();
 
     /**

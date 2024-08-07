@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.active;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -24,7 +25,7 @@ public class WallGeneratorPerk extends Perk {
     public static final PerkName WALL_GENERATOR = new PerkName("WALL_GENERATOR");
 
     public WallGeneratorPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, WALL_GENERATOR, 9, 1, CostType.PER_BLOCK, Item.PERK_WALL_GENERATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_WALL_GENERATOR_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, WALL_GENERATOR, 9, 1, Item.PERK_WALL_GENERATOR, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_WALL_GENERATOR_COOLDOWN, woolbattle));
         addListener(new ListenerWallGenerator(this, woolbattle));
     }
 
@@ -37,7 +38,8 @@ public class WallGeneratorPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @Override protected boolean activateRight(UserPerk perk) {
+        @Override
+        protected boolean activateRight(UserPerk perk) {
             new WallBlockPlacerScheduler(perk).runTaskTimer(1);
             return true;
         }
@@ -66,7 +68,8 @@ public class WallGeneratorPerk extends Perk {
                 normal = calculateNormal();
             }
 
-            @Override public void run() {
+            @Override
+            public void run() {
                 WBUser user = perk.owner();
                 Player p = user.getBukkitEntity();
                 if (p.isSneaking()) {

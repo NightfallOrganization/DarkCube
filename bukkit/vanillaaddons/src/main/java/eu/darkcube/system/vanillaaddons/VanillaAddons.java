@@ -1,25 +1,26 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 package eu.darkcube.system.vanillaaddons;
 
-import eu.darkcube.system.DarkCubePlugin;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.userapi.UserModifier;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.vanillaaddons.AUser.Modifier;
 import eu.darkcube.system.vanillaaddons.inventory.InventoryRegistry;
-import eu.darkcube.system.vanillaaddons.listener.ArmorListener;
 import eu.darkcube.system.vanillaaddons.listener.InventoryListener;
+import eu.darkcube.system.vanillaaddons.module.Module;
 import eu.darkcube.system.vanillaaddons.module.ModuleManager;
 import eu.darkcube.system.vanillaaddons.module.modules.RandoShit;
 import eu.darkcube.system.vanillaaddons.module.modules.actionbar.ActionbarModule;
 import eu.darkcube.system.vanillaaddons.module.modules.anvilmechanics.AnvilMechanicsModule;
 import eu.darkcube.system.vanillaaddons.module.modules.colors.ColorsModule;
 import eu.darkcube.system.vanillaaddons.module.modules.deathchests.DeathChestsModule;
+import eu.darkcube.system.vanillaaddons.module.modules.flightchestplate.FlightChestplateModule;
 import eu.darkcube.system.vanillaaddons.module.modules.messaging.MessagingModule;
 import eu.darkcube.system.vanillaaddons.module.modules.onlinetime.OnlinetimeModule;
 import eu.darkcube.system.vanillaaddons.module.modules.recipes.RecipesModule;
@@ -27,6 +28,12 @@ import eu.darkcube.system.vanillaaddons.module.modules.rtp.RTPModule;
 import eu.darkcube.system.vanillaaddons.module.modules.teleporter.TeleporterModule;
 import eu.darkcube.system.vanillaaddons.module.modules.worldmechanics.WorldMechanicsModule;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.IOException;
@@ -56,7 +63,7 @@ public class VanillaAddons extends DarkCubePlugin {
             throw new RuntimeException(e);
         }
         moduleManager.addModule(new RecipesModule(this));
-        //		moduleManager.addModule(new FlightChestplateModule(this));
+        moduleManager.addModule(new FlightChestplateModule(this));
         moduleManager.addModule(new TeleporterModule(this));
         moduleManager.addModule(new WorldMechanicsModule(this));
         moduleManager.addModule(new AnvilMechanicsModule(this));
@@ -71,15 +78,14 @@ public class VanillaAddons extends DarkCubePlugin {
 
     @Override public void onDisable() {
         moduleManager.disableAll();
-        UserAPI.getInstance().removeModifier(userModifier);
+        UserAPI.instance().removeModifier(userModifier);
     }
 
     @Override public void onEnable() {
         inventoryRegistry = new InventoryRegistry();
-        UserAPI.getInstance().addModifier(userModifier = new Modifier(this));
+        UserAPI.instance().addModifier(userModifier = new Modifier(this));
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new InventoryListener(), this);
-        pm.registerEvents(new ArmorListener(), this);
         moduleManager.enableAll();
 
     }

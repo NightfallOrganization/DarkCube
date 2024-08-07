@@ -1,11 +1,16 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
 
 package eu.darkcube.minigame.woolbattle.game.ingame;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.user.EventUserAttackUser;
@@ -32,7 +37,12 @@ import eu.darkcube.minigame.woolbattle.util.scoreboard.ScoreboardTeam;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -40,11 +50,6 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.DisplaySlot;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class PlayerUtil {
 
@@ -76,26 +81,25 @@ public class PlayerUtil {
         p.setSaturation(0);
         user.resetTicksAfterLastHit();
         if (user.getTeam() == null) user.setTeam(woolbattle.teamManager().getSpectator());
-        if (!user.getTeam().isSpectator()) {
-            user.perks().reloadFromStorage();
-            loadScoreboard(user);
-            user.getBukkitEntity().closeInventory();
-            setPlayerItems(user);
-            Location loc = user.getTeam().getSpawn();
-            if (loc == null) loc = woolbattle.lobby().getSpawn();
-            user.getBukkitEntity().teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        //        if (!user.getTeam().isSpectator()) {
+        user.perks().reloadFromStorage();
+        loadScoreboard(user);
+        user.getBukkitEntity().closeInventory();
+        setPlayerItems(user);
+        Location loc = user.getTeam().getSpawn();
+        if (loc == null) loc = woolbattle.lobby().getSpawn();
+        user.getBukkitEntity().teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
-            for (WBUser t : WBUser.onlineUsers()) {
-                if (user == t) continue;
-                if (t.getTeam().isSpectator()) continue;
-                if (user.getBukkitEntity().canSee(t.getBukkitEntity())) continue;
-                user.getBukkitEntity().showPlayer(t.getBukkitEntity());
-            }
-        }
+        //        }
     }
 
     public void loadScoreboard(WBUser user) {
         loadScoreboardObjective(user);
+        var sb = new Scoreboard(user);
+        ScoreboardHelper.initTeam(sb, woolbattle.teamManager().getSpectator());
+        for (Team team : woolbattle.teamManager().getTeams()) {
+            ScoreboardHelper.initTeam(sb, team);
+        }
     }
 
     public void loadScoreboardObjective(WBUser user) {
@@ -106,10 +110,7 @@ public class PlayerUtil {
         for (Team team : woolbattle.teamManager().getTeams()) {
             ScoreboardTeam t = sb.getTeam(team.getType().getLivesScoreboardTag());
             t.addPlayer(team.getType().getInvisibleTag());
-            t.setSuffix(Component
-                    .text(Characters.SHIFT_SHIFT_LEFT.toString())
-                    .color(NamedTextColor.GOLD)
-                    .append(team.getName(user.user())));
+            t.setSuffix(Component.text(Characters.SHIFT_SHIFT_LEFT.toString()).color(NamedTextColor.GOLD).append(team.getName(user.user())));
             obj.setScore(team.getType().getInvisibleTag(), i++);
             reloadScoreboardLifes(sb, team);
         }
@@ -120,7 +121,7 @@ public class PlayerUtil {
         if (!ingame.lastTeam.containsKey(target)) {
             return false;
         }
-        woolbattle.teamManager().setTeam(target, ingame.lastTeam.remove(target));
+        target.setTeam(ingame.lastTeam.remove(target));
         return true;
     }
 
@@ -195,6 +196,7 @@ public class PlayerUtil {
         }
         p.getHandle().updateInventory(p.getHandle().activeContainer);
         p.getHandle().collidesWithEntities = true;
+        fixAllVisibilities(user);
     }
 
     public int getKillstreak(WBUser user) {
@@ -269,7 +271,7 @@ public class PlayerUtil {
 
         Team userTeam = user.getTeam();
         if (userTeam.getLifes() == 0 || leaving) {
-            woolbattle.teamManager().setTeam(user, woolbattle.teamManager().getSpectator());
+            user.setTeam(woolbattle.teamManager().getSpectator());
         }
 
         if (userTeam.getUsers().isEmpty()) {
@@ -297,22 +299,38 @@ public class PlayerUtil {
         user.setSpawnProtectionTicks(ingame.spawnprotectionTicks());
     }
 
+    private void fixVisibilities(WBUser user, WBUser target) {
+        var us = user.getTeam().isSpectator();
+        var ts = target.getTeam().isSpectator();
+        if ((us && ts) || (!us && ts)) user.getBukkitEntity().hidePlayer(target.getBukkitEntity());
+        if (us) {
+            user.getBukkitEntity().showPlayer(target.getBukkitEntity());
+        } else {
+            if (!ts) {
+                user.getBukkitEntity().showPlayer(target.getBukkitEntity());
+            }
+        }
+    }
+
+    private void fixAllVisibilities(WBUser user) {
+        WBUser.onlineUsers().forEach(target -> {
+            fixVisibilities(user, target);
+            fixVisibilities(target, user);
+        });
+    }
+
     public void fixSpectator(WBUser user) {
-        if (user.getTeam() != null) ingame.lastTeam.put(user, user.getTeam());
+        //        if (user.getTeam() != null ) ingame.lastTeam.put(user, user.getTeam());
         Player p = user.getBukkitEntity();
         Scoreboard sb = new Scoreboard(user);
         WBUser.onlineUsers().forEach(u -> {
             Scoreboard s = new Scoreboard(u);
             s.getTeam(user.getTeam().getType().getScoreboardTag()).addPlayer(user.getPlayerName());
-            if (!u.getTeam().isSpectator()) {
-                u.getBukkitEntity().hidePlayer(p);
-            } else {
-                p.showPlayer(u.getBukkitEntity());
-            }
             if (u != user) {
                 sb.getTeam(u.getTeam().getType().getScoreboardTag()).addPlayer(u.getPlayerName());
             }
         });
+        fixAllVisibilities(user);
         loadScoreboardObjective(user);
         p.spigot().setCollidesWithEntities(false);
         p.setAllowFlight(true);
@@ -339,10 +357,6 @@ public class PlayerUtil {
         if (llifes.length() > 3) {
             llifes = llifes.substring(0, 3);
         }
-        sb
-                .getTeam(team.getType().getLivesScoreboardTag())
-                .setPrefix(LegacyComponentSerializer
-                        .legacySection()
-                        .deserialize(ChatColor.translateAlternateColorCodes('&', "&6" + Characters.SHIFT_SHIFT_RIGHT + " &4" + Characters.HEART + "&r" + llifes + "&4" + Characters.HEART + " ")));
+        sb.getTeam(team.getType().getLivesScoreboardTag()).setPrefix(LegacyComponentSerializer.legacySection().deserialize(ChatColor.translateAlternateColorCodes('&', "&6" + Characters.SHIFT_SHIFT_RIGHT + " &4" + Characters.HEART + "&r" + llifes + "&4" + Characters.HEART + " ")));
     }
 }

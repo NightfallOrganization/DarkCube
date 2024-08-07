@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.util.scoreboard;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Team;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * TODO: Update this to be more efficient in creating new instances. Maybe not load all objectives and teams on instance creation and instead only when required

@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2023. [DarkCube]
+ * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.perk.perks.other;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
@@ -44,7 +45,8 @@ public class DoubleJumpPerk extends Perk {
             this.woolbattle = woolbattle;
         }
 
-        @EventHandler public void handle(PlayerToggleFlightEvent e) {
+        @EventHandler
+        public void handle(PlayerToggleFlightEvent e) {
             Player p = e.getPlayer();
             WBUser user = WBUser.getUser(p);
             if (p.getGameMode() != GameMode.SURVIVAL || user.isTrollMode() || !user.getTeam().canPlay()) {
@@ -74,19 +76,23 @@ public class DoubleJumpPerk extends Perk {
             }
         }
 
-        @EventHandler public void handle(EventUserWoolCountUpdate event) {
+        @EventHandler
+        public void handle(EventUserWoolCountUpdate event) {
             workRefresh(event.user());
         }
 
-        @EventHandler public void handle(EventGhostStateChange event) {
+        @EventHandler
+        public void handle(EventGhostStateChange event) {
             workRefresh(event.user());
         }
 
-        @EventHandler public void handle(PlayerGameModeChangeEvent e) {
+        @EventHandler
+        public void handle(PlayerGameModeChangeEvent e) {
             new Scheduler(woolbattle, () -> workRefresh(WBUser.getUser(e.getPlayer()))).runTask();
         }
 
-        @EventHandler public void handle(SpiderStateChangeEvent event) {
+        @EventHandler
+        public void handle(SpiderStateChangeEvent event) {
             new Scheduler(woolbattle, () -> workRefresh(event.user())).runTask();
         }
 
@@ -99,6 +105,9 @@ public class DoubleJumpPerk extends Perk {
                 case RefreshResult.DENIED:
                 case RefreshResult.INSUFFICIENT_WOOL:
                     user.getBukkitEntity().setAllowFlight(false);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + res.state);
             }
         }
 
@@ -132,7 +141,10 @@ public class DoubleJumpPerk extends Perk {
         }
 
         private static class RefreshResult {
-            private static final int INSUFFICIENT_WOOL = 0, EVENT_CANCELLED = 1, ALLOWED = 2, DENIED = 3;
+            private static final int INSUFFICIENT_WOOL = 0;
+            private static final int EVENT_CANCELLED = 1;
+            private static final int ALLOWED = 2;
+            private static final int DENIED = 3;
             private final int state;
             private final UserPerk perk;
 
@@ -149,7 +161,8 @@ public class DoubleJumpPerk extends Perk {
             super(owner, perk, id, perkSlot, woolbattle);
         }
 
-        @Override public void cooldown(int cooldown) {
+        @Override
+        public void cooldown(int cooldown) {
             float max = perk().cooldown().cooldown();
             owner().getBukkitEntity().setFoodLevel(7 + (Math.round((max - (float) cooldown) / max * 13)));
             if (cooldown <= 0 && cooldown() > 0) {

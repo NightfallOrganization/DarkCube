@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.inventory;
 
-import eu.darkcube.system.inventoryapi.item.ItemBuilder;
-import eu.darkcube.system.inventoryapi.v1.IInventory;
-import eu.darkcube.system.inventoryapi.v1.InventoryType;
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.inventory.abstraction.LobbyAsyncPagedInventory;
 import eu.darkcube.system.lobbysystem.util.Item;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +26,7 @@ public class InventoryCompass extends LobbyAsyncPagedInventory {
         // super(InventoryCompass.type_compass,
         // Bukkit.createInventory(null, 6 * 9,
         // ChatColor.stripColor(Item.INVENTORY_COMPASS.getDisplayName(user))));
-        super(InventoryCompass.type_compass, Item.INVENTORY_COMPASS.getDisplayName(user), 5 * 9, box(2, 2, 4, 8), user);
+        super(InventoryCompass.type_compass, Item.INVENTORY_COMPASS.getDisplayName(user), 6 * 9, box(2, 2, 4, 8), user);
     }
 
     @Override protected void insertFallbackItems() {
@@ -62,16 +63,18 @@ public class InventoryCompass extends LobbyAsyncPagedInventory {
         this.fallbackItems.put(IInventory.slot(3, 1), p);
         this.fallbackItems.put(IInventory.slot(4, 1), m);
         this.fallbackItems.put(IInventory.slot(5, 1), p);
-        this.fallbackItems.put(IInventory.slot(5, 2), m);
-        this.fallbackItems.put(IInventory.slot(5, 3), p);
-        this.fallbackItems.put(IInventory.slot(5, 4), m);
-        this.fallbackItems.put(IInventory.slot(5, 5), p);
-        this.fallbackItems.put(IInventory.slot(5, 6), m);
-        this.fallbackItems.put(IInventory.slot(5, 7), p);
-        this.fallbackItems.put(IInventory.slot(5, 8), m);
+        this.fallbackItems.put(IInventory.slot(6, 1), m);
+        this.fallbackItems.put(IInventory.slot(6, 2), p);
+        this.fallbackItems.put(IInventory.slot(6, 3), m);
+        this.fallbackItems.put(IInventory.slot(6, 4), p);
+        this.fallbackItems.put(IInventory.slot(6, 5), m);
+        this.fallbackItems.put(IInventory.slot(6, 6), p);
+        this.fallbackItems.put(IInventory.slot(6, 7), m);
+        this.fallbackItems.put(IInventory.slot(6, 8), p);
+        this.fallbackItems.put(IInventory.slot(6, 9), m);
         this.fallbackItems.put(IInventory.slot(5, 9), p);
         this.fallbackItems.put(IInventory.slot(4, 9), m);
-        this.fallbackItems.put(IInventory.slot(3, 9), m);
+        this.fallbackItems.put(IInventory.slot(3, 9), p);
         this.fallbackItems.put(IInventory.slot(2, 9), m);
 
         this.fallbackItems.put(IInventory.slot(2, 2), d);
@@ -82,6 +85,13 @@ public class InventoryCompass extends LobbyAsyncPagedInventory {
         this.fallbackItems.put(IInventory.slot(2, 7), l);
         this.fallbackItems.put(IInventory.slot(2, 8), d);
         this.fallbackItems.put(IInventory.slot(3, 2), l);
+        this.fallbackItems.put(IInventory.slot(5, 2), l);
+        this.fallbackItems.put(IInventory.slot(5, 3), d);
+        this.fallbackItems.put(IInventory.slot(5, 4), l);
+        this.fallbackItems.put(IInventory.slot(5, 5), d);
+        this.fallbackItems.put(IInventory.slot(5, 6), l);
+        this.fallbackItems.put(IInventory.slot(5, 7), d);
+        this.fallbackItems.put(IInventory.slot(5, 8), l);
         this.fallbackItems.put(IInventory.slot(3, 3), l);
         this.fallbackItems.put(IInventory.slot(3, 4), l);
         this.fallbackItems.put(IInventory.slot(3, 5), l);
@@ -98,7 +108,9 @@ public class InventoryCompass extends LobbyAsyncPagedInventory {
 
         this.fallbackItems.put(IInventory.slot(3, 5), Item.INVENTORY_COMPASS_SPAWN.getItem(this.user.user()));
         this.fallbackItems.put(IInventory.slot(3, 3), Item.INVENTORY_COMPASS_WOOLBATTLE.getItem(this.user.user()));
-        this.fallbackItems.put(IInventory.slot(3, 7), Item.INVENTORY_COMPASS_JUMPANDRUN.getItem(user.user()));
+        this.fallbackItems.put(IInventory.slot(3, 7), Item.INVENTORY_COMPASS_SUMO.getItem(user.user()));
+        this.fallbackItems.put(IInventory.slot(4, 6), Item.INVENTORY_COMPASS_JUMPANDRUN.getItem(user.user()));
+        this.fallbackItems.put(IInventory.slot(4, 4), Item.INVENTORY_COMPASS_FISHER.getItem(user.user()));
     }
 
 }

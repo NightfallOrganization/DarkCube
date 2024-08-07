@@ -1,21 +1,28 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.lobbysystem.user;
 
-import eu.darkcube.system.inventoryapi.v1.IInventory;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import eu.darkcube.system.bukkit.inventoryapi.v1.IInventory;
+import eu.darkcube.system.bukkit.util.data.BukkitPersistentDataTypes;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.lobbysystem.inventory.InventoryPlayer;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaR;
 import eu.darkcube.system.lobbysystem.util.ParticleEffect;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.Key;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Bukkit;
@@ -27,20 +34,16 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
 public class LobbyUser {
     private static final PersistentDataType<Set<Integer>> INTEGERS = PersistentDataTypes.set(PersistentDataTypes.INTEGER);
     private static final PersistentDataType<Gadget> TYPE_GADGET = PersistentDataTypes.enumType(Gadget.class);
-    private static final Key ANIMATIONS = new Key(Lobby.getInstance(), "animations");
-    private static final Key SOUNDS = new Key(Lobby.getInstance(), "sounds");
-    private static final Key LAST_DAILY_REWARD = new Key(Lobby.getInstance(), "lastDailyReward");
-    private static final Key REWARD_SLOTS_USED = new Key(Lobby.getInstance(), "rewardSlotsUsed");
-    private static final Key GADGET = new Key(Lobby.getInstance(), "gadget");
-    private static final Key POSITION = new Key(Lobby.getInstance(), "position");
-    private static final Key SELECTED_SLOT = new Key(Lobby.getInstance(), "selectedSlot");
+    private static final Key ANIMATIONS = Key.key(Lobby.getInstance(), "animations");
+    private static final Key SOUNDS = Key.key(Lobby.getInstance(), "sounds");
+    private static final Key LAST_DAILY_REWARD = Key.key(Lobby.getInstance(), "last_daily_reward");
+    private static final Key REWARD_SLOTS_USED = Key.key(Lobby.getInstance(), "reward_slots_used");
+    private static final Key GADGET = Key.key(Lobby.getInstance(), "gadget");
+    private static final Key POSITION = Key.key(Lobby.getInstance(), "position");
+    private static final Key SELECTED_SLOT = Key.key(Lobby.getInstance(), "selected_slot");
     private final User user;
     private boolean buildMode = false;
     private volatile IInventory openInventory;
@@ -60,10 +63,7 @@ public class LobbyUser {
         long time2 = System.currentTimeMillis();
         this.openInventory = new InventoryPlayer();
         if (System.currentTimeMillis() - time1 > 1000) {
-            Lobby
-                    .getInstance()
-                    .getLogger()
-                    .info("Loading LobbyUser took very long: " + (System.currentTimeMillis() - time1) + " | " + (System.currentTimeMillis() - time2));
+            Lobby.getInstance().getLogger().info("Loading LobbyUser took very long: " + (System.currentTimeMillis() - time1) + " | " + (System.currentTimeMillis() - time2));
         }
     }
 
@@ -141,7 +141,7 @@ public class LobbyUser {
         user.persistentData().set(SELECTED_SLOT, PersistentDataTypes.INTEGER, slot);
     }
 
-    public Set<Integer> getRewardSlotsUsed() {
+    public @Unmodifiable Set<Integer> getRewardSlotsUsed() {
         return user.persistentData().get(REWARD_SLOTS_USED, INTEGERS);
     }
 
@@ -166,11 +166,11 @@ public class LobbyUser {
     }
 
     public Location getLastPosition() {
-        return user.persistentData().get(POSITION, PersistentDataTypes.LOCATION, () -> Lobby.getInstance().getDataManager().getSpawn());
+        return user.persistentData().get(POSITION, BukkitPersistentDataTypes.LOCATION, () -> Lobby.getInstance().getDataManager().getSpawn());
     }
 
     public void setLastPosition(Location position) {
-        user.persistentData().set(POSITION, PersistentDataTypes.LOCATION, position);
+        user.persistentData().set(POSITION, BukkitPersistentDataTypes.LOCATION, position);
     }
 
     public boolean isSounds() {
@@ -236,7 +236,8 @@ public class LobbyUser {
                 double t = 0;
                 double x, y, z;
 
-                @Override public void run() {
+                @Override
+                public void run() {
                     for (int i = 0; i < 4; i++) {
                         this.t = this.t + Math.PI / 16;
                         this.x = this.r * Math.cos(this.t);

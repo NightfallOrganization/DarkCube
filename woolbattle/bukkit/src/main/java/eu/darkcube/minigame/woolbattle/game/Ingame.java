@@ -1,34 +1,69 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.minigame.woolbattle.game;
+
+import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.event.world.EventDamageBlock;
 import eu.darkcube.minigame.woolbattle.event.world.EventDestroyBlock;
-import eu.darkcube.minigame.woolbattle.game.ingame.*;
-import eu.darkcube.minigame.woolbattle.listener.ingame.*;
+import eu.darkcube.minigame.woolbattle.game.ingame.PlayerUtil;
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerHeightDisplay;
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerParticles;
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerPerkCooldown;
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerResetWool;
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerSpawnProtection;
+import eu.darkcube.minigame.woolbattle.game.ingame.SchedulerTick;
+import eu.darkcube.minigame.woolbattle.game.ingame.TeamSplitter;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerBlockBreak;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerBlockCanBuild;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerBlockPlace;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerChangeBlock;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerDeathMove;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerEntityDamage;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerEntityDamageByEntity;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerEntitySpawn;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerExplode;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerInteract;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerInventoryClick;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerInventoryDrag;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerItemDrop;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerItemPickup;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerPlayerJoin;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerPlayerLogin;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerPlayerMove;
+import eu.darkcube.minigame.woolbattle.listener.ingame.ListenerPlayerQuit;
 import eu.darkcube.minigame.woolbattle.perk.Perk;
 import eu.darkcube.minigame.woolbattle.team.Team;
 import eu.darkcube.minigame.woolbattle.translation.Message;
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.minigame.woolbattle.util.StatsLink;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
-import eu.darkcube.system.util.data.Key;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.material.Wool;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Ingame extends GamePhase {
 
@@ -62,21 +97,21 @@ public class Ingame extends GamePhase {
 
     public <T> T getMetaData(Block block, String key, T defaultValue) {
         if (block.hasMetadata("WoolBattleMetaStorage")) {
-            BasicMetaDataStorage storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0).value();
-            return storage.getOr(new Key(woolbattle, key), defaultValue);
+            var storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").getFirst().value();
+            return storage.getOr(Key.key(woolbattle, key), defaultValue);
         }
         return defaultValue;
     }
 
     public void setMetaData(Block block, String key, Object value) {
         BasicMetaDataStorage storage;
-        boolean has = block.hasMetadata("WoolBattleMetaStorage");
+        var has = block.hasMetadata("WoolBattleMetaStorage");
         if (has) {
-            storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").get(0).value();
+            storage = (BasicMetaDataStorage) block.getMetadata("WoolBattleMetaStorage").getFirst().value();
         } else {
             storage = new BasicMetaDataStorage();
         }
-        Key k = new Key(woolbattle, key);
+        var k = Key.key(woolbattle, key);
         if (value == null) {
             if (storage.has(k)) {
                 storage.remove(k);
@@ -108,7 +143,7 @@ public class Ingame extends GamePhase {
     }
 
     public void setBlockDamage(Block block, int damage) {
-        EventDamageBlock damageBlock = new EventDamageBlock(block, getBlockDamage(block), damage);
+        var damageBlock = new EventDamageBlock(block, getBlockDamage(block), damage);
         if (damageBlock.isCancelled()) {
             return;
         }
@@ -126,37 +161,48 @@ public class Ingame extends GamePhase {
 
     public boolean destroy(Block block, boolean force) {
         if (!force && !placedBlocks.contains(block)) return false;
-        EventDestroyBlock destroyBlock = new EventDestroyBlock(block);
+        var destroyBlock = new EventDestroyBlock(block);
         if (force || !destroyBlock.isCancelled()) {
-            Ingame ingame = woolbattle.ingame();
+            var ingame = woolbattle.ingame();
             if (ingame.placedBlocks.contains(block)) {
                 ingame.placedBlocks.remove(block);
             } else if (block.getType() == Material.WOOL) {
                 ingame.breakedWool.put(block, ((Wool) block.getState().getData()).getColor());
             }
 
-            if (block.hasMetadata("WoolBattleMetaStorage")) {
-                block.removeMetadata("WoolBattleMetaStorage", woolbattle);
-            }
+            removeMetaStorage(block);
             block.setType(Material.AIR);
             return true;
         }
         return false;
     }
 
+    public void removeMetaStorage(Block block) {
+        if (block.hasMetadata("WoolBattleMetaStorage")) {
+            block.removeMetadata("WoolBattleMetaStorage", woolbattle);
+        }
+    }
+
     public Team getLastTeam(WBUser user) {
         return this.lastTeam.containsKey(user) ? this.lastTeam.get(user) : user.getTeam();
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         killstreak.clear();
         this.startingIngame = true;
 
         woolbattle.lobbySystemLink().update();
-        
-        CompletableFuture<Void> future = woolbattle.mapLoader().loadMap(woolbattle.gameData().map());
+
+        var map = woolbattle.gameData().map(); // TODO this should never be null
+        if (map == null) {
+            var data = woolbattle.gameData();
+            LOGGER.error("Map was null when starting ({}, {},{})", data.mapSize(), data.votedMap(), data.forceMap(), new Exception());
+            System.exit(-1);
+        }
+        var future = woolbattle.mapLoader().loadMap(map);
         woolbattle.sendMessage(Message.STARTING_GAME);
-        for (WBUser user : WBUser.onlineUsers()) {
+        for (var user : WBUser.onlineUsers()) {
             user.getBukkitEntity().setGameMode(GameMode.SPECTATOR);
             user.removeWool(user.woolCount());
             user.setKills(0);
@@ -180,10 +226,10 @@ public class Ingame extends GamePhase {
     private void postMapLoaded() {
         teamSplitter.splitPlayers();
 
-        int lifes = calculateLifes();
-        for (Team team : woolbattle.teamManager().getTeams()) team.setLifes(lifes);
+        var lifes = calculateLifes();
+        for (var team : woolbattle.teamManager().getTeams()) team.setLifes(lifes);
 
-        if (this.placedBlocks != null) for (Block b : new ArrayList<>(this.placedBlocks)) destroy(b);
+        if (this.placedBlocks != null) for (var b : new ArrayList<>(this.placedBlocks)) destroy(b);
 
         this.globalSpawnProtection = true;
 
@@ -193,9 +239,9 @@ public class Ingame extends GamePhase {
     }
 
     private int calculateLifes() {
-        int lifes = -1;
+        var lifes = -1;
         if (!woolbattle.lobby().VOTES_LIFES.isEmpty()) {
-            Collection<Integer> list = woolbattle.lobby().VOTES_LIFES.values();
+            var list = woolbattle.lobby().VOTES_LIFES.values();
             double d = 0;
             for (int i : list) {
                 d += i;
@@ -204,8 +250,8 @@ public class Ingame extends GamePhase {
             lifes = (int) Math.round(d);
         }
         if (lifes == -1) {
-            int xtra = 0;
-            int playersize = Bukkit.getOnlinePlayers().size();
+            var xtra = 0;
+            var playersize = Bukkit.getOnlinePlayers().size();
             if (playersize >= 3) {
                 playersize = 3;
                 xtra = new Random().nextInt(4);
@@ -217,12 +263,13 @@ public class Ingame extends GamePhase {
         return lifes;
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
 
         woolbattle.perkRegistry().perks().values().forEach(Perk::stopLogic);
 
         if (this.placedBlocks != null) {
-            for (Block b : new ArrayList<>(this.placedBlocks)) {
+            for (var b : new ArrayList<>(this.placedBlocks)) {
                 destroy(b);
             }
         }
@@ -242,9 +289,9 @@ public class Ingame extends GamePhase {
         return place(block, b -> {
             block.setType(Material.WOOL);
             if (useColor) {
-                BlockState state = block.getState();
+                var state = block.getState();
                 state.setType(Material.WOOL);
-                Wool wool = (Wool) state.getData();
+                var wool = (Wool) state.getData();
                 wool.setColor(user.getTeam().getType().getWoolColor());
                 state.setData(wool);
                 state.update(true);
@@ -270,8 +317,8 @@ public class Ingame extends GamePhase {
         if (this.startingIngame) return;
         List<Team> teams = woolbattle.teamManager().getTeams().stream().filter(t -> !t.getUsers().isEmpty()).collect(Collectors.toList());
         if (teams.size() == 1) {
-            this.winner = teams.get(0);
-            for (WBUser i : this.winner.getUsers()) {
+            this.winner = teams.getFirst();
+            for (var i : this.winner.getUsers()) {
                 StatsLink.addWin(i);
             }
             this.disable();

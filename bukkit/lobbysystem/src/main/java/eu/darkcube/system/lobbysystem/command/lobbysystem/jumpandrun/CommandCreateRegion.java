@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. [DarkCube]
+ * Copyright (c) 2022-2024. [DarkCube]
  * All rights reserved.
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
@@ -7,12 +7,12 @@
 
 package eu.darkcube.system.lobbysystem.command.lobbysystem.jumpandrun;
 
-import eu.darkcube.system.commandapi.v3.CommandSource;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.lobbysystem.Lobby;
-import eu.darkcube.system.lobbysystem.command.LobbyCommandExecutor;
+import eu.darkcube.system.lobbysystem.command.LobbyCommand;
 import eu.darkcube.system.lobbysystem.jumpandrun.JaRRegion;
 import eu.darkcube.system.lobbysystem.listener.BaseListener;
 import org.bukkit.block.Block;
@@ -21,7 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class CommandCreateRegion extends LobbyCommandExecutor {
+public class CommandCreateRegion extends LobbyCommand {
 
 	public CommandCreateRegion() {
 		super("createRegion", b -> b.executes(ctx -> {
