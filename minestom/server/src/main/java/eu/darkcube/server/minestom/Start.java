@@ -5,26 +5,29 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.minestom;
+package eu.darkcube.server.minestom;
 
 import java.nio.file.Path;
 
+import eu.darkcube.server.minestom.console.ServerConsole;
+import eu.darkcube.server.minestom.listener.ChunkUnloader;
 import eu.darkcube.system.minestom.command.GameModeCommand;
 import eu.darkcube.system.minestom.command.LoadedChunksCommand;
+import eu.darkcube.system.minestom.command.PermissionProvider;
 import eu.darkcube.system.minestom.command.StopCommand;
-import eu.darkcube.system.minestom.console.ServerConsole;
-import eu.darkcube.system.minestom.listener.ChunkUnloader;
 import eu.darkcube.system.server.cloudnet.CloudNetIntegration;
+import eu.darkcube.system.server.version.ServerVersion;
 import me.lucko.luckperms.minestom.CommandRegistry;
 import me.lucko.luckperms.minestom.LuckPermsMinestom;
 import net.hollowcube.minestom.extensions.ExtensionBootstrap;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.entity.EntityDespawnEvent;
+import net.minestom.server.event.instance.InstanceRegisterEvent;
+import net.minestom.server.event.instance.InstanceUnregisterEvent;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.permission.Permission;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -32,8 +35,8 @@ public class Start {
     public static void main(String[] args) {
         System.setProperty("org.jline.terminal.dumb", "true");
         // System.setProperty("minestom.extension.enabled", "true");
-        System.setProperty("minestom.chunk-view-distance", "16");
-        System.setProperty("minestom.entity-view-distance", "32");
+        System.setProperty("minestom.chunk-view-distance", "4");
+        System.setProperty("minestom.entity-view-distance", "4");
         System.setProperty("minestom.experiment.pose-updates", "true");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
@@ -45,14 +48,13 @@ public class Start {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-        var luckperms = LuckPermsMinestom.builder(Path.of("LuckPerms")).commandRegistry(CommandRegistry.minestom()).logger(LoggerFactory.getLogger("LuckPerms")).configurationAdapter(plugin -> new YamlConfigurationAdapter(plugin, plugin.resolveConfig("luckperms/config.yml"))).enable();
 
         // BungeeCordProxy.enable();
 
         var server = ExtensionBootstrap.init();
 
-        // Console must have every permission
-        MinecraftServer.getCommandManager().getConsoleSender().addPermission(new Permission("*"));
+        ServerVersion.version().provider().register(PermissionProvider.class, new MinestomPermissionProvider());
+        var luckperms = LuckPermsMinestom.builder(Path.of("LuckPerms")).commandRegistry(CommandRegistry.minestom()).logger(LoggerFactory.getLogger("LuckPerms")).configurationAdapter(plugin -> new YamlConfigurationAdapter(plugin, plugin.resolveConfig("luckperms/config.yml"))).enable();
 
         MinecraftServer.setBrandName("DarkCube");
 
@@ -64,6 +66,8 @@ public class Start {
         MinecraftServer.getGlobalEventHandler().addListener(EntityDespawnEvent.class, ChunkUnloader::entityDespawn);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, ChunkUnloader::playerDisconnect);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, ChunkUnloader::playerSpawn);
+        MinecraftServer.getGlobalEventHandler().addListener(InstanceRegisterEvent.class, ChunkUnloader::instanceRegister);
+        MinecraftServer.getGlobalEventHandler().addListener(InstanceUnregisterEvent.class, ChunkUnloader::instanceUnregister);
         MinecraftServer.getGlobalEventHandler().addListener(PlayerMoveEvent.class, event -> {
             var instance = event.getInstance();
             var chunk = instance.getChunkAt(event.getNewPosition());

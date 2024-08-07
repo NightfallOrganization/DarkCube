@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.minestom.console;
+package eu.darkcube.server.minestom.console;
 
 import java.io.IOException;
 import java.util.List;

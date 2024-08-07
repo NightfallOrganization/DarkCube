@@ -133,6 +133,7 @@ public class CommonGame implements Game {
         }
         newPhase.init(oldPhase);
         oldPhase.disable(newPhase);
+        phase = newPhase;
         newPhase.enable(oldPhase);
         oldPhase.unload(newPhase);
     }
@@ -197,6 +198,7 @@ public class CommonGame implements Game {
 
     void unload0() {
         phase.disable(null);
+        phase.unload(null);
         phase = null;
     }
 

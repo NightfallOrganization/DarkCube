@@ -15,6 +15,7 @@ val woolbattleShadow by configurations.register("woolbattleShadow")
 
 dependencies {
     implementation(darkcubesystem.minestom)
+    implementation(projects.minestom.server)
     implementation(projects.woolbattle.provider)
     implementation(projects.woolbattle.common)
     implementation(libs.luckperms)

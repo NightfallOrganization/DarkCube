@@ -42,6 +42,13 @@ public class CommonIngame extends CommonPhase {
         splitter.splitPlayers();
     }
 
+    @Override
+    public void unload(@Nullable CommonPhase newPhase) {
+        super.unload(newPhase);
+        woolbattleApi.worldHandler().unloadWorld(world);
+        world = null;
+    }
+
     private void loadWorld() {
         var schematicPath = woolbattle.mapsDirectory().resolve(game.mapSize().toString()).resolve(game.map().name() + ".litematic");
         if (Files.exists(schematicPath)) {

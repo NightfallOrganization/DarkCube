@@ -1,4 +1,4 @@
-package eu.darkcube.system.minestom;
+package eu.darkcube.server.minestom;
 
 import java.nio.file.Path;
 

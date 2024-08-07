@@ -77,7 +77,7 @@ tasks {
     }
     jar {
         manifest {
-            attributes["Main-Class"] = "eu.darkcube.system.minestom.Start"
+            attributes["Main-Class"] = "eu.darkcube.server.minestom.Start"
             attributes["Class-Path"] = minestomLibrary.files.joinToString(separator = " ") { "libraries/" + it.name }
         }
     }
@@ -95,6 +95,8 @@ dependencies {
     minestomLibrary(libs.kotlin.stdlib)
     minestomLibrary("me.lucko.luckperms:minestom:5.4-SNAPSHOT")
     minestomLibrary("ninja.leaping.configurate:configurate-yaml:3.7.1")
+    minestomLibrary("com.zaxxer:HikariCP:5.1.0")
+    minestomLibrary("org.mariadb.jdbc:mariadb-java-client:3.4.1")
     minestomLibrary("org.apache.logging.log4j:log4j-core:2.23.1")
     minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1")
     minestomLibrary(libs.jline)

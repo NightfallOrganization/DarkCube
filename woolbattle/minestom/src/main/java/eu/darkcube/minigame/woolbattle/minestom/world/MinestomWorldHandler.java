@@ -31,6 +31,7 @@ import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomGameWorldImpl;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomIngameWorldImpl;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomWorldImpl;
+import eu.darkcube.server.minestom.instance.DoNotSave;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -75,7 +76,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     public @NotNull CommonWorld loadSetupWorld() {
         try {
             var worldHandler = woolbattle.worldHandler();
-            var instance = new InstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
+            var instance = new NoSaveInstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
             var biome = biomeRegistry.get(Biome.PLAINS);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
@@ -97,7 +98,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     @Override
     public @NotNull CommonGameWorld loadLobbyWorld(@NotNull CommonGame game) {
         try {
-            var instance = new InstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
+            var instance = new NoSaveInstanceContainer(UUID.randomUUID(), DimensionType.OVERWORLD);
             var biome = biomeRegistry.get(Biome.PLAINS);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
@@ -222,5 +223,11 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
 
     private Instance instance(CommonWorld world) {
         return ((MinestomWorld) world).instance();
+    }
+
+    private static class NoSaveInstanceContainer extends InstanceContainer implements DoNotSave {
+        public NoSaveInstanceContainer(@NotNull UUID uniqueId, @NotNull DynamicRegistry.Key<DimensionType> dimensionType) {
+            super(uniqueId, dimensionType);
+        }
     }
 }
