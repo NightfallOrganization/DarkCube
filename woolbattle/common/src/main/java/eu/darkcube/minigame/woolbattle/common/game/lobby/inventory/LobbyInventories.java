@@ -85,7 +85,7 @@ public class LobbyInventories {
                 var wbUser = game.woolbattle().user(user);
                 if (wbUser == null) return;
                 if (team.users().size() >= game.mapSize().teamSize()) {
-                    wbUser.sendMessage(Messages.TEAM_IS_FULL);
+                    wbUser.sendMessage(Messages.TEAM_IS_FULL, team.getName(user));
                 } else {
                     wbUser.team(team);
                 }

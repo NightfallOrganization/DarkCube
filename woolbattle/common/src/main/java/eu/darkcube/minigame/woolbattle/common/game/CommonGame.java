@@ -88,6 +88,7 @@ public class CommonGame implements Game {
     void init() {
         CommonPerks.register(this);
         this.phase = woolbattle.gamePhaseCreator().createLobby(this);
+        this.phase.init(null);
         this.phase.enable(null);
     }
 

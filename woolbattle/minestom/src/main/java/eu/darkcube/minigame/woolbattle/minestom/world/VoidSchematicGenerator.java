@@ -1,7 +1,5 @@
 package eu.darkcube.minigame.woolbattle.minestom.world;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import eu.darkcube.minigame.woolbattle.common.util.math.AABBi;
 import eu.darkcube.minigame.woolbattle.common.util.schematic.Schematic;
 import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicRegion;
@@ -14,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 public class VoidSchematicGenerator implements Generator {
     private static final Logger LOGGER = LoggerFactory.getLogger("SchematicGenerator");
-    public static final AtomicLong time = new AtomicLong();
     private final ParsedSchematic schematic;
 
     public VoidSchematicGenerator(Schematic schematic) {
@@ -42,7 +39,6 @@ public class VoidSchematicGenerator implements Generator {
             placeRegion(unit, region, unitAABB);
         }
         var took = System.nanoTime() - start;
-        time.addAndGet(took);
     }
 
     private void placeRegion(GenerationUnit unit, SchematicRegion region, AABBi unitAABB) {
