@@ -33,7 +33,7 @@ import eu.darkcube.system.util.data.PersistentDataStorage;
 
 public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
-    private final @NotNull String databaseNameSuffixMaps;
+    private final @NotNull String platformName;
     private final @NotNull CommonGameManager gameManager;
     private final @NotNull CommonMapManager mapManager;
     private final @NotNull CommonLobbySystemLink lobbySystemLink;
@@ -44,8 +44,8 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
     private final @NotNull EventNode<Object> eventManager;
     private final @NotNull CommonWoolBattleArguments commandArguments;
 
-    public CommonWoolBattleApi(@NotNull String databaseNameSuffixMaps) {
-        this.databaseNameSuffixMaps = databaseNameSuffixMaps;
+    public CommonWoolBattleApi(@NotNull String platformName) {
+        this.platformName = platformName;
         this.gameManager = new CommonGameManager(this);
         this.mapManager = new CommonMapManager(this);
         this.lobbySystemLink = new CommonLobbySystemLink(this);
@@ -60,7 +60,7 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
     @Override
     public @NotNull String namespace() {
-        return "woolbattle";
+        return "woolbattle_" + this.platformName;
     }
 
     @Override
@@ -103,8 +103,8 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         return teamRegistry;
     }
 
-    public @NotNull String databaseNameSuffixMaps() {
-        return databaseNameSuffixMaps;
+    public @NotNull String platformName() {
+        return platformName;
     }
 
     @Override

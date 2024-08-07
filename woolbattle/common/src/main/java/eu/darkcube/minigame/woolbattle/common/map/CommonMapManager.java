@@ -37,7 +37,7 @@ public class CommonMapManager implements MapManager {
     public CommonMapManager(CommonWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
         var databaseProvider = InjectionLayer.boot().instance(DatabaseProvider.class);
-        mapsDatabase = databaseProvider.database("woolbattle_maps_" + woolbattle.databaseNameSuffixMaps());
+        mapsDatabase = databaseProvider.database("woolbattle_maps_" + woolbattle.platformName());
         mapDataDatabase = databaseProvider.database("woolbattle_map_data");
         for (var entry : mapsDatabase.entries().entrySet()) {
             var document = entry.getValue();
