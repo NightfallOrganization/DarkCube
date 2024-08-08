@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.util;
+package eu.darkcube.system.woolmania.util.area;
 
 import static eu.darkcube.system.woolmania.enums.Hallpools.HALLPOOL1;
 import static eu.darkcube.system.woolmania.enums.Locations.HALL1;

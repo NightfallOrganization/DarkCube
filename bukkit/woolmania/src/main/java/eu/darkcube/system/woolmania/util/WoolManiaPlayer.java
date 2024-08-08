@@ -37,6 +37,16 @@ public class WoolManiaPlayer {
     }
     //</editor-fold>
 
+    //<editor-fold desc="Setter">
+    public void setLevel(Integer integer) {
+        level.set(integer);
+    }
+
+    public void setMoney(Integer integer) {
+        money.set(integer);
+    }
+    //</editor-fold>
+
     //<editor-fold desc="Adder">
     public void addLevel(Integer integer) {
         int currentLevel = level.getOrDefault();

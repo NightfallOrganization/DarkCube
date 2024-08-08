@@ -8,16 +8,11 @@
 package eu.darkcube.system.woolmania.commands.zenum;
 
 import java.util.Collection;
-import java.util.List;
 
 import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
 import eu.darkcube.system.bukkit.commandapi.argument.EntityArgument;
-import eu.darkcube.system.bukkit.commandapi.argument.Vec2Argument;
-import eu.darkcube.system.bukkit.commandapi.argument.Vec3Argument;
-import eu.darkcube.system.bukkit.commandapi.argument.WorldArgument;
-import eu.darkcube.system.libs.com.mojang.brigadier.arguments.FloatArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.IntegerArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -26,16 +21,15 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.commands.WoolManiaCommand;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SetZenumCommand extends WoolManiaCommand {
+public class AddZenumCommand extends WoolManiaCommand {
 
-    public SetZenumCommand() {
+    public AddZenumCommand() {
         // @formatter:off
-        super("set",builder -> {
+        super("add",builder -> {
             builder.then(Commands.argument("player", EntityArgument.players())
                     .then(Commands.argument("amount", IntegerArgumentType.integer())
                             .executes(context -> executeCommand(context, EntityArgument.getPlayers(context, "player"), IntegerArgumentType.getInteger(context, "amount")))
@@ -51,12 +45,12 @@ public class SetZenumCommand extends WoolManiaCommand {
             User user = UserAPI.instance().user(player.getUniqueId());
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
             if (sender.equals(player)) {
-                WoolMania.getStaticPlayer(player).setMoney(amount);
-                user.sendMessage(Message.ZENUM_SET_YOURSELF, amount);
+                WoolMania.getStaticPlayer(player).addMoney(amount);
+                user.sendMessage(Message.ZENUM_ADD_YOURSELF, amount);
             } else {
-                WoolMania.getStaticPlayer(player).setMoney(amount);
-                context.getSource().sendMessage(Message.ZENUM_SET_OTHER, player.getName(), amount);
-                user.sendMessage(Message.ZENUM_SETTED, amount, context.getSource().getName());
+                WoolMania.getStaticPlayer(player).addMoney(amount);
+                context.getSource().sendMessage(Message.ZENUM_ADD_OTHER, player.getName(), amount);
+                user.sendMessage(Message.ZENUM_ADDED, amount, context.getSource().getName());
             }
         }
         return 0;

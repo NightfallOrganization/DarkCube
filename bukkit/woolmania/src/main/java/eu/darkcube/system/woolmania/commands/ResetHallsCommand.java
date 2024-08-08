@@ -9,11 +9,11 @@ package eu.darkcube.system.woolmania.commands;
 
 import static eu.darkcube.system.woolmania.enums.Names.SYSTEM;
 
+import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.woolmania.enums.Names;
 import eu.darkcube.system.woolmania.util.message.Message;
-import eu.darkcube.system.woolmania.util.RegenerateWoolAreas;
+import eu.darkcube.system.woolmania.util.area.RegenerateWoolAreas;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -25,7 +25,13 @@ public class ResetHallsCommand extends WoolManiaCommand {
             RegenerateWoolAreas.regenerateWoolAreas();
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
-                onlinePlayer.sendMessage(" \n" + "§7--------- " + SYSTEM.getName() + " ---------\n" + " \n" + Message.HALLS_RESET, context.getSource().asPlayer().getName() + " \n" + "§7---------------------------");
+
+                BaseMessage message = Message.HALLS_RESET;
+                message = message.prepend("\n§7--------- " + SYSTEM.getName() + " §7---------\n\n");
+                message = message.append("\n\n§7-]-------------------------[-\n");
+
+                user.sendMessage(message, context.getSource().getName());
+
             }
 
             return 0;

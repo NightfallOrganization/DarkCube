@@ -5,13 +5,14 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.manager;
+package eu.darkcube.system.woolmania.listener;
 
 import com.github.juliarn.npclib.api.Npc;
 import com.github.juliarn.npclib.api.event.AttackNpcEvent;
 import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.World;

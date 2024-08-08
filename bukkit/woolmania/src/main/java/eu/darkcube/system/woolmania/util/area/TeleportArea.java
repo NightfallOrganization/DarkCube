@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.util;
+package eu.darkcube.system.woolmania.util.area;
 
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
@@ -44,7 +44,7 @@ public class TeleportArea {
                     && playerLocation.getBlockY() >= minY && playerLocation.getBlockY() <= maxY
                     && playerLocation.getBlockZ() >= minZ && playerLocation.getBlockZ() <= maxZ) {
                 player.teleport(location);
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, (float) 1.0, (float) 1.0);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, (float) 1.0, (float) 2.0);
             }
         }
     }

@@ -20,9 +20,14 @@ tasks {
     shadowJar {
         archiveClassifier = null
 
+        relocate("com.github.juliarn.npclib.relocate.com.packetevents", "com.github.retrooper")
+        relocate("com.github.juliarn.npclib.relocate.io.packetevents", "io.github.retrooper")
         relocate("com.github.juliarn.npclib", "eu.darkcube.system.woolmania.libs.npclib")
 
+        exclude("assets/")
         exclude("**/gson/**")
+        exclude("**/packetevents/**")
+        exclude("**/packetevents/**")
         exclude("io/github/retrooper/**")
         exclude("com/github/retrooper/**")
         exclude("io/leangen/geantyref/**")

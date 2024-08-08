@@ -1,8 +1,5 @@
 package eu.darkcube.system.woolmania.manager;
 
-import static eu.darkcube.system.woolmania.npc.NPCCreator.NAME_ZINA;
-import static eu.darkcube.system.woolmania.npc.NPCCreator.NAME_ZINUS;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -10,8 +7,6 @@ import java.util.UUID;
 import com.github.juliarn.npclib.api.Npc;
 import com.github.juliarn.npclib.api.NpcActionController;
 import com.github.juliarn.npclib.api.Platform;
-import com.github.juliarn.npclib.api.event.AttackNpcEvent;
-import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import com.github.juliarn.npclib.api.event.ShowNpcEvent;
 import com.github.juliarn.npclib.api.profile.Profile;
 import com.github.juliarn.npclib.api.profile.ProfileProperty;
@@ -20,12 +15,8 @@ import com.github.juliarn.npclib.bukkit.BukkitPlatform;
 import com.github.juliarn.npclib.bukkit.BukkitWorldAccessor;
 import com.github.juliarn.npclib.bukkit.protocol.BukkitProtocolAdapter;
 import com.github.juliarn.npclib.bukkit.util.BukkitPlatformUtil;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.npc.NPC;
-import eu.darkcube.system.woolmania.npc.NPCCreator;
-import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -40,7 +31,7 @@ public class NPCManager {
             builder.flag(NpcActionController.SPAWN_DISTANCE, 50);
             builder.flag(NpcActionController.IMITATE_DISTANCE, 35);
             builder.flag(NpcActionController.TAB_REMOVAL_TICKS, 40);
-        }).worldAccessor(BukkitWorldAccessor.worldAccessor()).packetFactory(BukkitProtocolAdapter.packetEvents()).build();
+        }).worldAccessor(BukkitWorldAccessor.worldAccessor()).packetFactory(BukkitProtocolAdapter.protocolLib()).build();
 
         platform.eventManager().registerEventHandler(ShowNpcEvent.Post.class, event -> {
             Player player = event.player();

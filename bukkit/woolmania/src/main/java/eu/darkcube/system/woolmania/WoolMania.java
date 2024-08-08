@@ -16,19 +16,21 @@ import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
 import eu.darkcube.system.woolmania.listener.BlockBreakListener;
 import eu.darkcube.system.woolmania.listener.JoinListener;
 import eu.darkcube.system.woolmania.listener.LeaveListener;
-import eu.darkcube.system.woolmania.manager.NPCListeners;
+import eu.darkcube.system.woolmania.listener.NPCListeners;
 import eu.darkcube.system.woolmania.manager.NPCManager;
-import eu.darkcube.system.woolmania.manager.NPCRemover;
+import eu.darkcube.system.woolmania.npc.NPCRemover;
 import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.util.Ruler;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.WoolRegenerationTimer;
 import eu.darkcube.system.woolmania.util.message.LanguageHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class WoolMania extends DarkCubePlugin {
     private static WoolMania instance;
+    private NPCManager npcManager;
     private NPCCreator npcCreator;
     public Map<Player, WoolManiaPlayer> woolManiaPlayerMap = new HashMap<>();
 
@@ -39,10 +41,14 @@ public class WoolMania extends DarkCubePlugin {
 
     @Override
     public void onEnable() {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            woolManiaPlayerMap.put(onlinePlayer, new WoolManiaPlayer(onlinePlayer));
+        }
+
         LanguageHelper.initialize();
         WorldManager.loadWorlds();
         WoolRegenerationTimer.startFirstTimer();
-        var npcManager = new NPCManager(this);
+        npcManager = new NPCManager(this);
         npcCreator = new NPCCreator(npcManager);
         NPCListeners.register(npcManager, npcCreator);
 

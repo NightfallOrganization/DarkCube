@@ -7,20 +7,16 @@
 
 package eu.darkcube.system.woolmania.util;
 
-import static eu.darkcube.system.woolmania.enums.Hallpools.HALLPOOL1;
-import static eu.darkcube.system.woolmania.enums.Locations.HALL1;
 import static eu.darkcube.system.woolmania.enums.Names.SYSTEM;
-import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.util.area.RegenerateWoolAreas;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class WoolRegenerationTimer extends BukkitRunnable {
@@ -45,7 +41,7 @@ public class WoolRegenerationTimer extends BukkitRunnable {
     }
 
     private void playSoundToAllPlayers(Player player) {
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, (float) 1.0, (float) 1.0);
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, (float) 1.0, (float) 2.0);
     }
 
     private class LastMinuteWarningTask extends BukkitRunnable {

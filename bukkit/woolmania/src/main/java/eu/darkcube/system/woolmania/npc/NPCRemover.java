@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.manager;
+package eu.darkcube.system.woolmania.npc;
 
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 
