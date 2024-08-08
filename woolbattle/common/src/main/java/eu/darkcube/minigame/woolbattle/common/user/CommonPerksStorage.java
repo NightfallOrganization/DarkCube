@@ -28,7 +28,7 @@ public class CommonPerksStorage implements PerksStorage {
     private static final PersistentDataType<PerkName[]> PERK_NAME_ARRAY = PersistentDataTypes.array(PerkName.TYPE, PerkName.class);
     public static final PersistentDataType<PerksStorage> TYPE = new PersistentDataType<>() {
         @Override
-        public CommonPerksStorage deserialize(JsonElement json) {
+        public @NotNull CommonPerksStorage deserialize(JsonElement json) {
             var d = json.getAsJsonObject();
             var docPerks = d.getAsJsonObject("perks");
             var docPerkSlots = d.getAsJsonObject("perkSlots");
@@ -48,7 +48,7 @@ public class CommonPerksStorage implements PerksStorage {
         }
 
         @Override
-        public JsonElement serialize(PerksStorage data) {
+        public @NotNull JsonElement serialize(@NotNull PerksStorage data) {
             var d = new JsonObject();
             var docPerks = new JsonObject();
             var docPerkSlots = new JsonObject();
@@ -66,7 +66,7 @@ public class CommonPerksStorage implements PerksStorage {
         }
 
         @Override
-        public PerksStorage clone(PerksStorage object) {
+        public @NotNull PerksStorage clone(PerksStorage object) {
             return object.clone();
         }
     };
@@ -146,6 +146,5 @@ public class CommonPerksStorage implements PerksStorage {
         Collections.sort(list);
         var slotsUsed = new HashSet<Integer>();
         var slotsQueryFrom = new ArrayDeque<Integer>();
-
     }
 }

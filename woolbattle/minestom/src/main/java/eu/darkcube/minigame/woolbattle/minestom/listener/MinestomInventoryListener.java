@@ -31,6 +31,7 @@ public class MinestomInventoryListener {
                 // case Click.Info.Right right -> right.slot();
                 default -> -1;
             };
+            System.out.println(event.getSlot());
             if (slot == -1) {
                 woolbattle.logger().info("Ignoring clicktype slot {}", clickType);
                 return;

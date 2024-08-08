@@ -70,7 +70,9 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
         this.keyPerks = Key.key(woolbattle, "perks");
         this.platformAccess = woolbattle.woolbattle().createInventoryAccessFor(this);
         this.permissions = woolbattle.woolbattle().createPermissionsFor(this);
-        this.perks.reloadFromStorage();
+        if (this.game != null) { // We might be in setup mode
+            this.perks.reloadFromStorage();
+        }
     }
 
     @Override

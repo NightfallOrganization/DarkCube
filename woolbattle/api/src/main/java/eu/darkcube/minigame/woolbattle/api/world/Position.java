@@ -97,7 +97,7 @@ public interface Position extends Cloneable {
             }
 
             private static double nice(double c) {
-                return ((int) (c * 2)) / 2D;
+                return ((int) (c * 2 + 0.5D)) / 2D;
             }
 
             private static float getNicePitch(float y) {
