@@ -20,7 +20,7 @@ paperweight-userdev = "1.7.2"
 jctools-core = "4.0.5"
 fastutil = "8.5.14"
 lombok-plugin = "8.7.1"
-kotlin = "2.0.0"
+kotlin = "2.0.10"
 
 paper-latest = "1.21-R0.1-SNAPSHOT"
 paper-legacy = "1.8.8-R0.1-SNAPSHOT"
