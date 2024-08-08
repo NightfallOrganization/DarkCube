@@ -11,6 +11,7 @@ import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -43,6 +44,7 @@ public class TeleportArea {
                     && playerLocation.getBlockY() >= minY && playerLocation.getBlockY() <= maxY
                     && playerLocation.getBlockZ() >= minZ && playerLocation.getBlockZ() <= maxZ) {
                 player.teleport(location);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BANJO, (float) 1.0, (float) 1.0);
             }
         }
     }

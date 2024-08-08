@@ -9,7 +9,7 @@ package eu.darkcube.system.woolmania.enums;
 
 public enum Names {
 
-    SYSTEM("§7[§bWool§3Mania§7] ");
+    SYSTEM("§7[§bWool§3Mania§7]");
 
     private final String name;
 

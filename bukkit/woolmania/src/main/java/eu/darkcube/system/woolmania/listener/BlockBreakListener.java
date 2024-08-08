@@ -29,7 +29,6 @@ public class BlockBreakListener implements Listener {
         Location location = block.getLocation();
 
         if (!isWithinBoundLocations(location, new Location(HALLS, HALLPOOL1.getX1(), HALLPOOL1.getY1(), HALLPOOL1.getZ1()), new Location(HALLS, HALLPOOL1.getX2(), HALLPOOL1.getY2(), HALLPOOL1.getZ2()))) {
-            event.setCancelled(true);
             return;
         }
 

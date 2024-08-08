@@ -53,13 +53,14 @@ public class Ruler implements Listener {
         Location location = event.getBlock().getLocation();
         Block block = event.getBlock();
 
-        if (player.getWorld().equals(HALLS) && player.getGameMode() != GameMode.CREATIVE) {
-            if (!block.getType().toString().endsWith("_WOOL")) {
-                event.setCancelled(true);
-            } else if (!isWithinBoundLocations(location, new Location(HALLS, HALLPOOL1.getX1(),HALLPOOL1.getY1(),HALLPOOL1.getZ1()), new Location(HALLS,HALLPOOL1.getX2(),HALLPOOL1.getY2(),HALLPOOL1.getZ2()))) {
-                event.setCancelled(true);
-            }
+        if (player.getGameMode() == GameMode.CREATIVE) return;
+
+        if (!block.getType().toString().endsWith("_WOOL") && player.getWorld().equals(HALLS)) {
+            event.setCancelled(true);
+        } else if (!isWithinBoundLocations(location, new Location(HALLS, HALLPOOL1.getX1(), HALLPOOL1.getY1(), HALLPOOL1.getZ1()), new Location(HALLS, HALLPOOL1.getX2(), HALLPOOL1.getY2(), HALLPOOL1.getZ2()))) {
+            event.setCancelled(true);
         }
+
     }
 
     @EventHandler
