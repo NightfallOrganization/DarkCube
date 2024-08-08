@@ -25,20 +25,20 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-public class RonjasToiletFlushPerk extends Perk {
-    public static final PerkName RONJAS_TOILET_FLUSH = new PerkName("RONJAS_TOILET_FLUSH");
+public class PandasToiletFlushPerk extends Perk {
+    public static final PerkName PANDAS_TOILET_FLUSH = new PerkName("PANDAS_TOILET_FLUSH");
 
-    public RonjasToiletFlushPerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, RONJAS_TOILET_FLUSH, 13, 12, Item.PERK_RONJAS_TOILET_FLUSH, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_RONJAS_TOILET_FLUSH_COOLDOWN, woolbattle));
-        addListener(new ListenerRonjasToiletFlush(this, woolbattle));
+    public PandasToiletFlushPerk(WoolBattleBukkit woolbattle) {
+        super(ActivationType.ACTIVE, PANDAS_TOILET_FLUSH, 13, 12, Item.PERK_PANDAS_TOILET_FLUSH, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_PANDAS_TOILET_FLUSH_COOLDOWN, woolbattle));
+        addListener(new ListenerPandasToiletFlush(this, woolbattle));
     }
 
-    public static class ListenerRonjasToiletFlush extends BasicPerkListener {
+    public static class ListenerPandasToiletFlush extends BasicPerkListener {
 
         private static final double RANGE = 4;
         private final WoolBattleBukkit woolbattle;
 
-        public ListenerRonjasToiletFlush(Perk perk, WoolBattleBukkit woolbattle) {
+        public ListenerPandasToiletFlush(Perk perk, WoolBattleBukkit woolbattle) {
             super(perk, woolbattle);
             this.woolbattle = woolbattle;
         }
@@ -63,7 +63,7 @@ public class RonjasToiletFlushPerk extends Perk {
                 if (egg.getTicksLived() <= 3) {
                     WBUser.onlineUsers().stream().filter(u -> !u.getTeam().isSpectator()).map(WBUser::getBukkitEntity).filter(bukkitEntity -> bukkitEntity.getLocation().distance(egg.getLocation()) < RANGE).forEach(t -> {
                         Vector v = egg.getVelocity().multiply(1.3);
-                        v.setY(egg.getVelocity().getY()).normalize().multiply(1.9).setY(v.getY() + 1.2);
+                        v.setY(egg.getVelocity().getY()).normalize().multiply(3).setY(v.getY() + 1.2);
                         t.setVelocity(v);
                     });
                 } else {
@@ -101,7 +101,7 @@ public class RonjasToiletFlushPerk extends Perk {
             if (!egg.hasMetadata("perk")) {
                 return false;
             }
-            return egg.getMetadata("perk").get(0).asString().equals(RonjasToiletFlushPerk.RONJAS_TOILET_FLUSH.getName());
+            return egg.getMetadata("perk").get(0).asString().equals(PandasToiletFlushPerk.PANDAS_TOILET_FLUSH.getName());
         }
     }
 }

@@ -54,8 +54,10 @@ public enum Item {
     PERK_ROCKETJUMP(item(DIAMOND_BOOTS)),
     PERK_ARROW_RAIN(item(DISPENSER)),
     PERK_ARROW_RAIN_COOLDOWN(item(DISPENSER)),
-    PERK_RONJAS_TOILET_SPLASH(item(POTION)),
-    PERK_RONJAS_TOILET_SPLASH_COOLDOWN(item(GLASS_BOTTLE)),
+    PERK_RONJAS_TOILET_FLUSH(item(POTION)),
+    PERK_RONJAS_TOILET_FLUSH_COOLDOWN(item(GLASS_BOTTLE)),
+    PERK_PANDAS_TOILET_FLUSH(item(POTION)),
+    PERK_PANDAS_TOILET_FLUSH_COOLDOWN(item(GLASS_BOTTLE)),
     PERK_BLINK_COOLDOWN(item(ENDER_PEARL)),
     PERK_BLINK(item(EYE_OF_ENDER)),
     PERK_SAFETY_PLATFORM(item(BLAZE_ROD)),
@@ -77,7 +79,8 @@ public enum Item {
     PERK_BOOSTER_COOLDOWN(item(FEATHER)),
     PERK_FAST_ARROW(item(SUGAR)),
     PERK_PIERCING_ARROW(item(GOLD_AXE).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE)),
-	PERK_KNOCKBACK_ARROW(item(ENCHANTED_BOOK)),PERK_TNT_ARROW(item(TNT)),
+    PERK_KNOCKBACK_ARROW(item(ENCHANTED_BOOK)),
+    PERK_TNT_ARROW(item(TNT)),
     PERK_TNT_ARROW_COOLDOWN(item(TNT)),
     PERK_ARROW_BOMB(item(FIREWORK_CHARGE)),
     PERK_ARROW_BOMB_COOLDOWN(item(FIREWORK_CHARGE)),
@@ -96,17 +99,8 @@ public enum Item {
     PERK_STOMPER(item(DIAMOND_BOOTS)),
     PERK_HOOK_ARROW(item(REDSTONE_TORCH_ON)),
     PERK_HOOK_ARROW_COOLDOWN(item(REDSTONE_TORCH_ON)),
-    DEFAULT_BOW(item(BOW)
-            .enchant(Enchantment.ARROW_INFINITE, 1)
-            .enchant(Enchantment.ARROW_KNOCKBACK, 2)
-            .enchant(Enchantment.KNOCKBACK, 5)
-            .flag(ItemFlag.HIDE_UNBREAKABLE)
-            .unbreakable(true)),
-    DEFAULT_SHEARS(item(SHEARS)
-            .enchant(Enchantment.KNOCKBACK, 5)
-            .enchant(Enchantment.DIG_SPEED, 5)
-            .unbreakable(true)
-            .flag(ItemFlag.HIDE_UNBREAKABLE)),
+    DEFAULT_BOW(item(BOW).enchant(Enchantment.ARROW_INFINITE, 1).enchant(Enchantment.ARROW_KNOCKBACK, 2).enchant(Enchantment.KNOCKBACK, 5).flag(ItemFlag.HIDE_UNBREAKABLE).unbreakable(true)),
+    DEFAULT_SHEARS(item(SHEARS).enchant(Enchantment.KNOCKBACK, 5).enchant(Enchantment.DIG_SPEED, 5).unbreakable(true).flag(ItemFlag.HIDE_UNBREAKABLE)),
     DEFAULT_PEARL(item(ENDER_PEARL).glow(true)),
     DEFAULT_ARROW(item(ARROW)),
     DEFAULT_PEARL_COOLDOWN(item(FIREWORK_CHARGE)),
@@ -130,8 +124,7 @@ public enum Item {
     PERK_DRAW_ARROW_COOLDOWN(item(TORCH)),
     PERK_FREEZE_ARROW(item(ARROW)),
     PERK_FREEZE_ARROW_COOLDOWN(item(ARROW)),
-    PERK_BERSERKER(item(DIAMOND_SWORD)),
-    ;
+    PERK_BERSERKER(item(DIAMOND_SWORD));
 
     private final ItemBuilder builder;
 

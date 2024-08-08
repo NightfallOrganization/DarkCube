@@ -23,7 +23,7 @@ public class RopePerk extends Perk {
     public static final PerkName ROPE = new PerkName("ROPE");
 
     public RopePerk(WoolBattleBukkit woolbattle) {
-        super(ActivationType.ACTIVE, ROPE, 12, 12, Item.PERK_ROPE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ROPE_COOLDOWN, woolbattle));
+        super(ActivationType.ACTIVE, ROPE, 13, 12, Item.PERK_ROPE, (user, perk, id, perkSlot, wb) -> new CooldownUserPerk(user, id, perkSlot, perk, Item.PERK_ROPE_COOLDOWN, woolbattle));
         addListener(new ListenerRope(this, woolbattle));
     }
 

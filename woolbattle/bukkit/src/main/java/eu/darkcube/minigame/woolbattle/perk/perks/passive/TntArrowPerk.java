@@ -60,6 +60,7 @@ public class TntArrowPerk extends Perk {
 
                             tnt.setMetadata("boost", new FixedMetadataValue(woolbattle, 2));
                             tnt.setMetadata("source", new FixedMetadataValue(woolbattle, event.user()));
+                            tnt.setMetadata("peaceful", new FixedMetadataValue(woolbattle, true));
                             tnt.setIsIncendiary(false);
                             tnt.setFuseTicks(2);
                         }
