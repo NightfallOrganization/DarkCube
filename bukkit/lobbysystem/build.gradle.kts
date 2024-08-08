@@ -51,7 +51,7 @@ dependencies {
 //    runtimeOnly("com.github.juliarn", "npc-lib-bukkit", "3.0.0-SNAPSHOT", classifier = "shadow")
     implementation("io.github.juliarn:npc-lib-bukkit:3.0.0-beta6")
     compileOnly("io.github.juliarn:npc-lib-common:3.0.0-beta6")
-    compileOnly("io.github.juliarn:npc-lib-api:3.0.0-beta6")
+    compileOnly("io.github.juliarn:npc-lib-api:3.0.0-SNAPSHOT")
     implementation("io.github.juliarn:npc-lib-labymod:3.0.0-beta6")
     implementation(libs.hologramlib)
     implementation("me.clip:placeholderapi:2.11.6")
