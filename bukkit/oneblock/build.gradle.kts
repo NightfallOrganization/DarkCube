@@ -58,6 +58,6 @@ dependencies {
     compileOnly(parent!!.project("luckperms-prefixplugin"))
     compileOnly("io.github.juliarn", "npc-lib-api", "3.0.0-beta6")
     compileOnly("io.github.juliarn", "npc-lib-common", "3.0.0-beta6")
-    implementation("io.github.juliarn", "npc-lib-bukkit", "3.0.0-beta6")
+    implementation("io.github.juliarn", "npc-lib-bukkit", "3.0.0-SNAPSHOT")
     implementation(project(":common:glyph-width-loader"))
 }
