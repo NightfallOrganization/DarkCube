@@ -91,7 +91,7 @@ dependencies {
     api(darkcubesystem.api.cloudnet)
     api(darkcubesystem.server.cloudnet) { exclude("org.jetbrains", "annotations") }
     // libraries to be added
-    minestomLibrary("org.slf4j:jul-to-slf4j:2.0.13")
+    minestomLibrary("org.slf4j:jul-to-slf4j:2.0.14")
     minestomLibrary(libs.kotlin.stdlib)
     minestomLibrary("me.lucko.luckperms:minestom:5.4-SNAPSHOT")
     minestomLibrary("ninja.leaping.configurate:configurate-yaml:3.7.1")
