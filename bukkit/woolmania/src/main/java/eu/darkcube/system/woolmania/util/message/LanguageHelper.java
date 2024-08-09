@@ -17,11 +17,18 @@ public class LanguageHelper {
 
     public static void initialize() {
         try {
-            loadLanguage(Language.GERMAN, "messages_de.properties");
-            loadLanguage(Language.ENGLISH, "messages_en.properties");
+            loadLanguage(Language.GERMAN);
+            loadLanguage(Language.ENGLISH);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static void loadLanguage(Language language) throws IOException {
+        ClassLoader loader = LanguageHelper.class.getClassLoader();
+        String tag = language.getLocale().toLanguageTag();
+        loadLanguage(language, "messages_" + tag + ".properties");
+        language.registerLookup(loader, "items_" + tag + ".properties", Message.ITEM_MODIFIER);
     }
 
     private static void loadLanguage(Language language, String path) throws IOException {
@@ -35,13 +42,13 @@ public class LanguageHelper {
             if (key.equals("ZINA_GET_MONEY") || key.equals("ZINA_NO_WOOL")) {
                 translation = "§7[§bZina§7] " + translation;
                 properties.setProperty(key, translation);
-            } else if (key.equals("HALLS_RESET") || key.equals("TIMER_IS_OVER")|| key.equals("TIMER_IS_OVER_SECOUND")){
+            } else if (key.equals("HALLS_RESET") || key.equals("TIMER_IS_OVER") || key.equals("TIMER_IS_OVER_SECOUND")) {
                 properties.setProperty(key, translation);
             } else {
                 translation = "§7[§bWool§3Mania§7] " + translation;
                 properties.setProperty(key, translation);
             }
         }
-        language.registerLookup(properties, s -> Message.KEY_PREFIX + s);
+        language.registerLookup(properties, Message.KEY_MODIFIER);
     }
 }

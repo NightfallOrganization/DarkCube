@@ -16,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 public class WoolManiaPlayer {
     PersistentDataValue<Integer> level;
     PersistentDataValue<Integer> money;
+    PersistentDataValue<Integer> xp;
     Plugin woolMania = WoolMania.getInstance();
 
     public WoolManiaPlayer(Player player){
@@ -25,6 +26,7 @@ public class WoolManiaPlayer {
     public void initializePersistentData(Player player){
         level = new PersistentDataValue<>(new NamespacedKey(woolMania, "level"), Integer.class, player.getPersistentDataContainer(), 1);
         money = new PersistentDataValue<>(new NamespacedKey(woolMania, "money"), Integer.class, player.getPersistentDataContainer(), 0);
+        xp = new PersistentDataValue<>(new NamespacedKey(woolMania, "xp"), Integer.class, player.getPersistentDataContainer(), 0);
     }
 
     //<editor-fold desc="Getter">
@@ -35,6 +37,10 @@ public class WoolManiaPlayer {
     public Integer getMoney() {
         return money.getOrDefault();
     }
+
+    public Integer getXP() {
+        return xp.getOrDefault();
+    }
     //</editor-fold>
 
     //<editor-fold desc="Setter">
@@ -44,6 +50,9 @@ public class WoolManiaPlayer {
 
     public void setMoney(Integer integer) {
         money.set(integer);
+    }
+    public void setXP(Integer integer) {
+        xp.set(integer);
     }
     //</editor-fold>
 
@@ -57,6 +66,11 @@ public class WoolManiaPlayer {
         int currentMoney = money.getOrDefault();
         money.set(currentMoney + integer);
     }
+
+    public void addXP(Integer integer) {
+        int currentXP = xp.getOrDefault();
+        xp.set(currentXP + integer);
+    }
     //</editor-fold>
 
     //<editor-fold desc="Remover">
@@ -68,6 +82,11 @@ public class WoolManiaPlayer {
     public void removeMoney(Integer integer) {
         int currentMoney = money.getOrDefault();
         money.set(currentMoney - integer);
+    }
+
+    public void removeXP(Integer integer) {
+        int currentXP = xp.getOrDefault();
+        xp.set(currentXP - integer);
     }
     //</editor-fold>
 

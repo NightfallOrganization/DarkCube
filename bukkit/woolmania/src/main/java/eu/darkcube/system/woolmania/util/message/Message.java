@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.woolmania.util.message;
 
+import java.util.function.Function;
+
 import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.util.Language;
@@ -36,12 +38,17 @@ public enum Message implements BaseMessage {
     ZENUM_SEND_OTHER,
     ZENUM_SENDED,
     ZENUM_NOT_ENOUGH,
+    LEVEL_RESET,
+    LEVEL_RESET_OWN,
+    LEVEL_RESETTED
 
     ;
 
     public static final String PREFIX_ITEM = "ITEM_";
     public static final String PREFIX_LORE = "LORE_";
     public static final String KEY_PREFIX = "WOOLMANIA_";
+    public static final Function<String, String> KEY_MODIFIER = s -> KEY_PREFIX + s;
+    public static final Function<String, String> ITEM_MODIFIER = s -> KEY_MODIFIER.apply(PREFIX_ITEM + s);
 
     private final String key;
 

@@ -11,9 +11,6 @@ import static eu.darkcube.system.server.item.ItemBuilder.item;
 import static eu.darkcube.system.util.Language.lastStyle;
 import static org.bukkit.Material.*;
 
-import java.util.Arrays;
-import java.util.MissingFormatArgumentException;
-
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.TextComponent;
@@ -24,11 +21,14 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.item.ItemFactory;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.util.message.Message;
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
 public enum Items implements ItemFactory {
     INVENTORY_SHOP_STEAK(item(COOKED_BEEF)),
@@ -50,12 +50,16 @@ public enum Items implements ItemFactory {
         return key;
     }
 
-    public String itemId() {
+    public String itemID() {
         return Message.PREFIX_ITEM + key();
     }
 
     public @NotNull ItemBuilder builder() {
         return builder.clone();
+    }
+
+    public ItemBuilder createItem(Player player) {
+        return createItem(UserAPI.instance().user(player.getUniqueId()));
     }
 
     @Override
@@ -69,15 +73,15 @@ public enum Items implements ItemFactory {
 
     public @NotNull ItemBuilder getItem(@NotNull User user, boolean storeItemId) {
         ItemBuilder builder = this.builder();
-        if(storeItemId) {
-            builder.persistentDataStorage().set(ITEM_ID, PersistentDataTypes.STRING, itemId());
+        if (storeItemId) {
+            builder.persistentDataStorage().set(ITEM_ID, PersistentDataTypes.STRING, itemID());
         }
         Language language = user.language();
-        Component name = Message.getMessage(this.itemId(), language);
+        Component name = Message.getMessage(this.itemID(), language);
         builder.displayname(name);
-        String loreKey = Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + key();
-        if (language.containsMessage(loreKey)) {
-            Component lore = Message.getMessage(loreKey, language);
+
+        if (language.containsMessage(Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + key())) {
+            Component lore = Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + key(), language);
 
             String serialized = LegacyComponentSerializer.legacySection().serialize(lore);
             String[] loreStringLines = serialized.split("\n");

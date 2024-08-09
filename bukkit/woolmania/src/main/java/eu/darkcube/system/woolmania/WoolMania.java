@@ -12,6 +12,9 @@ import java.util.Map;
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.woolmania.commands.ResetHallsCommand;
+import eu.darkcube.system.woolmania.commands.ResetLevelCommand;
+import eu.darkcube.system.woolmania.commands.StatsCommand;
+import eu.darkcube.system.woolmania.handler.LevelXPHandler;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
 import eu.darkcube.system.woolmania.inventory.ShopInventory;
 import eu.darkcube.system.woolmania.listener.BlockBreakListener;
@@ -34,6 +37,7 @@ public class WoolMania extends DarkCubePlugin {
     private NPCManager npcManager;
     private NPCCreator npcCreator;
     private ShopInventory shopInventory;
+    private LevelXPHandler levelXPHandler;
     public Map<Player, WoolManiaPlayer> woolManiaPlayerMap = new HashMap<>();
 
     public WoolMania() {
@@ -53,6 +57,7 @@ public class WoolMania extends DarkCubePlugin {
         npcManager = new NPCManager(this);
         npcCreator = new NPCCreator(npcManager);
         shopInventory = new ShopInventory();
+        levelXPHandler = new LevelXPHandler();
         NPCListeners.register(npcManager, npcCreator);
 
         npcCreator.createNPC();
@@ -69,6 +74,8 @@ public class WoolMania extends DarkCubePlugin {
 
         CommandAPI.instance().register(new ResetHallsCommand());
         CommandAPI.instance().register(new ZenumCommand());
+        CommandAPI.instance().register(new StatsCommand());
+        CommandAPI.instance().register(new ResetLevelCommand());
     }
 
     @Override
@@ -88,8 +95,13 @@ public class WoolMania extends DarkCubePlugin {
     public static WoolManiaPlayer getStaticPlayer(Player player) {
         return WoolMania.getInstance().woolManiaPlayerMap.get(player);
     }
+
     public ShopInventory getShopInventory() {
         return shopInventory;
+    }
+
+    public LevelXPHandler getLevelXPHandler() {
+        return levelXPHandler;
     }
     //</editor-fold>
 

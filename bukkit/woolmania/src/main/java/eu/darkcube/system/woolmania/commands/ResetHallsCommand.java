@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 public class ResetHallsCommand extends WoolManiaCommand {
 
     public ResetHallsCommand() {
-        super("resethalls", new String[0], builder -> builder.executes(context -> {
+        super("resethalls",builder -> builder.executes(context -> {
 
             RegenerateWoolAreas.regenerateWoolAreas();
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
