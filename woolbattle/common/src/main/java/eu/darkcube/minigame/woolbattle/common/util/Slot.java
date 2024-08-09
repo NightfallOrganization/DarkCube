@@ -58,6 +58,7 @@ public final class Slot {
         int SLOT_7 = id();
         int SLOT_8 = id();
         int SLOT_9 = id();
+        int OFFHAND = id();
 
         int[] SLOTS = {SLOT_1, SLOT_2, SLOT_3, SLOT_4, SLOT_5, SLOT_6, SLOT_7, SLOT_8, SLOT_9};
     }

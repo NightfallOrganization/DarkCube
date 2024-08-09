@@ -9,7 +9,15 @@ public class MinestomSlotMappings implements Slot.Mappings {
 
     public MinestomSlotMappings() {
         var mappings = new IntArrayList();
+        register(mappings, Slot.Hotbar.SLOT_1, 0, 9);
         register(mappings, Slot.Inventory.SLOT_1, 9, 27);
+        register(mappings, Slot.Armor.HEAD, 41);
+        register(mappings, Slot.Armor.CHEST, 42);
+        register(mappings, Slot.Armor.PANTS, 43);
+        register(mappings, Slot.Armor.BOOTS, 44);
+        register(mappings, Slot.Hotbar.OFFHAND, 45);
+        register(mappings, Slot.CraftingField.PRODUCT, 36);
+        register(mappings, Slot.CraftingField.SLOT_1, 37, 4);
         this.mappings = mappings.toIntArray();
     }
 

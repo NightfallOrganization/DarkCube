@@ -11,6 +11,7 @@ import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.api.perk.PerkRegistry;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface PerksStorage extends Cloneable {
@@ -76,5 +77,5 @@ public interface PerksStorage extends Cloneable {
 
     void perks(@NotNull Map<@NotNull ActivationType, @NotNull PerkName @NotNull []> perks);
 
-    void reset();
+    void reset(@NotNull PerkRegistry perkRegistry);
 }

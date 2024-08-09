@@ -14,10 +14,20 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.api.perk.PerkRegistry;
 import eu.darkcube.minigame.woolbattle.api.user.PerksStorage;
+import eu.darkcube.minigame.woolbattle.common.perk.perks.active.CapsulePerk;
+import eu.darkcube.minigame.woolbattle.common.perk.perks.active.SwitcherPerk;
+import eu.darkcube.minigame.woolbattle.common.perk.perks.other.ArrowPerk;
+import eu.darkcube.minigame.woolbattle.common.perk.perks.other.BowPerk;
+import eu.darkcube.minigame.woolbattle.common.perk.perks.other.ShearsPerk;
+import eu.darkcube.minigame.woolbattle.common.perk.perks.passive.RocketJumpPerk;
+import eu.darkcube.minigame.woolbattle.common.util.Slot.Hotbar;
+import eu.darkcube.minigame.woolbattle.common.util.Slot.Inventory;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -82,7 +92,6 @@ public class CommonPerksStorage implements PerksStorage {
         }
         this.perks = Collections.unmodifiableMap(perks);
         this.perkSlots = Collections.unmodifiableMap(perkSlots);
-        reset();
     }
 
     private CommonPerksStorage(Map<ActivationType, PerkName[]> perks, Map<ActivationType, int[]> perkSlots) {
@@ -141,10 +150,60 @@ public class CommonPerksStorage implements PerksStorage {
     }
 
     @Override
-    public void reset() {
+    public void reset(@NotNull PerkRegistry perkRegistry) {
         var list = Arrays.asList(ActivationType.values());
         Collections.sort(list);
         var slotsUsed = new HashSet<Integer>();
         var slotsQueryFrom = new ArrayDeque<Integer>();
+        slotsQueryFrom.offer(Hotbar.SLOT_1);
+        slotsQueryFrom.offer(Hotbar.SLOT_2);
+        slotsQueryFrom.offer(Hotbar.SLOT_3);
+        slotsQueryFrom.offer(Hotbar.SLOT_4);
+        slotsQueryFrom.offer(Hotbar.SLOT_5);
+        slotsQueryFrom.offer(Hotbar.SLOT_9);
+        // arrow
+        slotsQueryFrom.offer(Inventory.SLOT_9);
+        // for illegal perks as fallback. Should never be used
+        slotsQueryFrom.addAll(IntStream.of(Hotbar.SLOTS).boxed().toList());
+        slotsQueryFrom.addAll(IntStream.of(Inventory.SLOTS).boxed().toList());
+
+        var perksUsed = new ArrayList<PerkName>();
+        for (var type : list) {
+            for (var i = 0; i < perkSlots.get(type).length; i++) {
+                int slot;
+                do {
+                    slot = slotsQueryFrom.removeFirst();
+                } while (slotsUsed.contains(slot));
+                slotsUsed.add(slot);
+                perkSlots.get(type)[i] = slot;
+                PerkName preferred = null;
+                // region Test
+                if (type == ActivationType.PRIMARY_WEAPON && i == 0) {
+                    preferred = BowPerk.BOW;
+                } else if (type == ActivationType.SECONDARY_WEAPON && i == 0) {
+                    preferred = ShearsPerk.SHEARS;
+                } else if (type == ActivationType.ARROW && i == 0) {
+                    preferred = ArrowPerk.ARROW;
+                } else if (type == ActivationType.ACTIVE && i == 0) {
+                    preferred = CapsulePerk.CAPSULE;
+                } else if (type == ActivationType.ACTIVE && i == 1) {
+                    perks.get(type)[i] = SwitcherPerk.SWITCHER;
+                } else if (type == ActivationType.PASSIVE && i == 0) {
+                    perks.get(type)[i] = RocketJumpPerk.ROCKET_JUMP;
+                } else { // Fallback
+                    PerkName name = null;
+                    for (var perk : perkRegistry.perks(type)) {
+                        name = perk.perkName();
+                        if (perksUsed.contains(name)) continue;
+                        break;
+                    }
+
+                    if (name == null) throw new NullPointerException();
+                    perksUsed.add(name);
+                    perks.get(type)[i] = name;
+                }
+                // endregion
+            }
+        }
     }
 }

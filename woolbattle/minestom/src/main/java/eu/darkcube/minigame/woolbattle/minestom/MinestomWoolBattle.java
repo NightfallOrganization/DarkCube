@@ -18,6 +18,7 @@ import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.common.util.Slot;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
@@ -35,6 +36,7 @@ import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplement
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPlatformAccess;
+import eu.darkcube.minigame.woolbattle.minestom.util.MinestomSlotMappings;
 import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
@@ -60,6 +62,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         super();
         this.api = new MinestomWoolBattleApi(this);
         WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, this.api);
+        WoolBattleProvider.PROVIDER.register(Slot.Mappings.class, new MinestomSlotMappings());
         WoolBattleProvider.PROVIDER.register(DefaultUserPerk.Implementation.class, new MinestomUserPerkImplementation());
         WoolBattleProvider.PROVIDER.register(PerkItem.Implementation.class, new MinestomPerkItemImplementation());
         this.playerKey = Key.key(this.api, "minestom_player");
