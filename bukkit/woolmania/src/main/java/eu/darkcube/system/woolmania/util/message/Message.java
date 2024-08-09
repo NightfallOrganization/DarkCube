@@ -8,6 +8,8 @@
 package eu.darkcube.system.woolmania.util.message;
 
 import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.util.Language;
 
 public enum Message implements BaseMessage {
 
@@ -47,12 +49,17 @@ public enum Message implements BaseMessage {
         key = name();
     }
 
-    @Override public String getPrefixModifier() {
+    @Override
+    public String getPrefixModifier() {
         return KEY_PREFIX;
     }
 
-    @Override public String key() {
+    @Override
+    public String key() {
         return key;
     }
 
+    public static Component getMessage(String messageKey, Language language, Object... replacements) {
+        return language.getMessage(KEY_PREFIX + messageKey, replacements);
+    }
 }

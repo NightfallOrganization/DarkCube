@@ -12,6 +12,8 @@ import com.github.juliarn.npclib.api.event.AttackNpcEvent;
 import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.inventory.ShopInventory;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.util.message.Message;
@@ -57,8 +59,8 @@ public class NPCListeners {
     }
 
     private static void zinusExecute(Player player, User user) {
-        if (player.hasPermission("woolmania.level.2")) {
-            user.sendMessage(Message.LEVEL_TO_LOW);
+        if (player.hasPermission("woolmania.level.3")) {
+            WoolMania.getInstance().getShopInventory().openInventory(player);
         } else {
             user.sendMessage(Message.LEVEL_TO_LOW);
         }

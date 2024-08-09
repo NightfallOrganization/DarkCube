@@ -9,6 +9,7 @@ package eu.darkcube.system.woolmania.util;
 
 import static eu.darkcube.system.woolmania.enums.Names.SYSTEM;
 
+import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
@@ -79,9 +80,15 @@ public class WoolRegenerationTimer extends BukkitRunnable {
                     onlinePlayer.sendMessage("§7--------- " + SYSTEM.getName() + " ---------");
                     onlinePlayer.sendMessage(" ");
                     user.sendMessage(Message.TIMER_IS_OVER);
-                    user.sendMessage(Message.TIMER_IS_OVER_SECOUND);
                     onlinePlayer.sendMessage(" ");
                     onlinePlayer.sendMessage("§7----------------------------");
+
+
+                    // BaseMessage message = Message.HALLS_RESET;
+                    // message = message.prepend("\n§7--------- " + SYSTEM.getName() + " §7---------\n\n");
+                    // message = message.append("\n\n§7-]-------------------------[-\n");
+                    //
+                    // user.sendMessage(message, context.getSource().getName());
                 }
             }
         }

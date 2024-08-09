@@ -13,6 +13,7 @@ import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.woolmania.commands.ResetHallsCommand;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
+import eu.darkcube.system.woolmania.inventory.ShopInventory;
 import eu.darkcube.system.woolmania.listener.BlockBreakListener;
 import eu.darkcube.system.woolmania.listener.JoinListener;
 import eu.darkcube.system.woolmania.listener.LeaveListener;
@@ -32,6 +33,7 @@ public class WoolMania extends DarkCubePlugin {
     private static WoolMania instance;
     private NPCManager npcManager;
     private NPCCreator npcCreator;
+    private ShopInventory shopInventory;
     public Map<Player, WoolManiaPlayer> woolManiaPlayerMap = new HashMap<>();
 
     public WoolMania() {
@@ -50,6 +52,7 @@ public class WoolMania extends DarkCubePlugin {
         WoolRegenerationTimer.startFirstTimer();
         npcManager = new NPCManager(this);
         npcCreator = new NPCCreator(npcManager);
+        shopInventory = new ShopInventory();
         NPCListeners.register(npcManager, npcCreator);
 
         npcCreator.createNPC();
@@ -73,6 +76,7 @@ public class WoolMania extends DarkCubePlugin {
         NPCRemover.destoryNPCs(npcCreator);
     }
 
+    //<editor-fold desc="Getter">
     public static WoolMania getInstance() {
         return instance;
     }
@@ -84,5 +88,10 @@ public class WoolMania extends DarkCubePlugin {
     public static WoolManiaPlayer getStaticPlayer(Player player) {
         return WoolMania.getInstance().woolManiaPlayerMap.get(player);
     }
+    public ShopInventory getShopInventory() {
+        return shopInventory;
+    }
+    //</editor-fold>
+
 
 }
