@@ -69,6 +69,9 @@ public interface WoolBattleArguments {
     @NotNull
     Map map0(@NotNull CommandContext<?> ctx, @NotNull String name);
 
+    @NotNull
+    ArgumentType<@NotNull ?> entityArgument0(boolean player, boolean single);
+
     static @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument() {
         return instance().teamConfigurationArgument0();
     }
@@ -131,6 +134,22 @@ public interface WoolBattleArguments {
 
     static @NotNull Map map(@NotNull CommandContext<?> ctx, @NotNull String name) {
         return instance().map0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> entityArgument() {
+        return instance().entityArgument0(false, true);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> entitiesArgument() {
+        return instance().entityArgument0(false, false);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> playerArgument() {
+        return instance().entityArgument0(true, true);
+    }
+
+    static @NotNull ArgumentType<@NotNull ?> playersArgument() {
+        return instance().entityArgument0(true, false);
     }
 
     private static WoolBattleArguments instance() {

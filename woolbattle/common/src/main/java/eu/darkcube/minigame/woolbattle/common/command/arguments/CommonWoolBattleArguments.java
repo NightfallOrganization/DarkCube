@@ -110,4 +110,9 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
     public @NotNull Map map0(@NotNull CommandContext<?> ctx, @NotNull String name) {
         return CommonMapArgument.getMap(ctx, name);
     }
+
+    @Override
+    public @NotNull ArgumentType<@NotNull ?> entityArgument0(boolean player, boolean single) {
+        return null; // TODO
+    }
 }

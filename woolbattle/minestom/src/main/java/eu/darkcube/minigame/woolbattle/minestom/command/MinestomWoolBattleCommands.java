@@ -76,14 +76,14 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
             dispatcher.execute(parse);
         } catch (CommandSyntaxException ex) {
             var failedCursor = ex.getCursor();
+
+            source.sendMessage(text(ex.getMessage(), NamedTextColor.RED));
             if (failedCursor == 0) {
                 return; // Happens when someone tries to execute a command that requires a condition which is not met
             }
             if (failedCursor == -1) {
                 return; // When there is no context to the exception. Use #createWithContext to work around this
             }
-
-            source.sendMessage(text(ex.getMessage(), NamedTextColor.RED));
 
             if (failedCursor == commandLine.length()) {
                 var commandLineNext = commandLine + " ";
