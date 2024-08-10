@@ -31,7 +31,7 @@ public class JoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         WoolMania.getInstance().woolManiaPlayerMap.put(player, new WoolManiaPlayer(player));
-
+        WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
         setupScoreboardForNPCs(player);
 
         // WoolManiaPlayer woolManiaPlayer = WoolMania.woolManiaPlayerMap.get(player);

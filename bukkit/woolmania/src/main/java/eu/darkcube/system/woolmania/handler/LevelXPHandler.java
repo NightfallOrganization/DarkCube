@@ -7,6 +7,10 @@
 
 package eu.darkcube.system.woolmania.handler;
 
+import static eu.darkcube.system.woolmania.util.message.Message.LEVEL_UP;
+
+import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Sound;
@@ -16,23 +20,26 @@ public class LevelXPHandler {
 
     public void manageLevelXP(Player player) {
         WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-        int xp = woolManiaPlayer.getXP();
+        User user = UserAPI.instance().user(player.getUniqueId());
+        int playerXP = woolManiaPlayer.getXP();
         int currentLevel = woolManiaPlayer.getLevel();
         int xpRequired = calculateXPRequiredForNextLevel(currentLevel);
-        woolManiaPlayer.addXP(1);
+        int privateBooster = WoolMania.getStaticPlayer(player).getPrivateBooster();
 
-        if (xp >= xpRequired) {
-            woolManiaPlayer.addLevel(1);
-            woolManiaPlayer.setXP(0);
-
-            player.sendMessage("§7Du hast Level §b" + (currentLevel + 1) + " §7erreicht!");
-            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 50f, 1f);
+        if (playerXP + privateBooster > xpRequired) {
+            int extantXP = playerXP - xpRequired;
+            woolManiaPlayer.addLevel(1, player);
+            woolManiaPlayer.setXP(extantXP + privateBooster);
+            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 100f, 1f);
+            user.sendMessage(LEVEL_UP,(currentLevel + 1));
+        } else {
+            woolManiaPlayer.addXP(privateBooster);
         }
     }
 
     public static int calculateXPRequiredForNextLevel(int currentLevel) {
-        int baseXP = 20;
-        int maxXP = 43000;
+        int baseXP = 50;
+        int maxXP = 50000;
         int totalLevels = 99;
 
         int xpPerLevelIncrement = (maxXP - baseXP) / totalLevels;

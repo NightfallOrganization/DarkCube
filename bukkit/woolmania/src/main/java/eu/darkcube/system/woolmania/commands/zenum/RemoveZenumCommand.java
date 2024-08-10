@@ -45,10 +45,10 @@ public class RemoveZenumCommand extends WoolManiaCommand {
             User user = UserAPI.instance().user(player.getUniqueId());
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
             if (sender.equals(player)) {
-                WoolMania.getStaticPlayer(player).removeMoney(amount);
+                WoolMania.getStaticPlayer(player).removeMoney(amount, player);
                 user.sendMessage(Message.ZENUM_ADD_YOURSELF, amount);
             } else {
-                WoolMania.getStaticPlayer(player).removeMoney(amount);
+                WoolMania.getStaticPlayer(player).removeMoney(amount, player);
                 context.getSource().sendMessage(Message.ZENUM_ADD_OTHER, player.getName(), amount);
                 user.sendMessage(Message.ZENUM_ADDED, amount, context.getSource().getName());
             }

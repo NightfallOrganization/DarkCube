@@ -47,7 +47,7 @@ public class ResetLevelCommand extends WoolManiaCommand {
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
             User user = UserAPI.instance().user(player.getUniqueId());
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-            woolManiaPlayer.setLevel(1);
+            woolManiaPlayer.setLevel(1, player);
             woolManiaPlayer.setXP(0);
 
             if (sender.equals(player)) {

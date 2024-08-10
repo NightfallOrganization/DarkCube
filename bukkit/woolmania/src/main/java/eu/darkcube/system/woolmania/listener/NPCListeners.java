@@ -17,6 +17,7 @@ import eu.darkcube.system.woolmania.inventory.ShopInventory;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.util.message.Message;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -67,16 +68,22 @@ public class NPCListeners {
     }
 
     private static void zinaExecute(Player player, User user) {
+        int woolCount = 0;
         if (player.hasPermission("woolmania.level.2")) {
             boolean hasWool = false;
+
             for (ItemStack item : player.getInventory().getContents()) {
-                if (item != null && item.getType() != null && item.getType().toString().endsWith("_WOOL")) {
+                if (item != null && item.getType().toString().endsWith("_WOOL")) {
+                    woolCount += item.getAmount();
+                    player.getInventory().remove(item);
                     hasWool = true;
-                    break;
                 }
             }
+
             if (hasWool) {
-                user.sendMessage(Message.ZINA_GET_MONEY, "?");
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 50f, 2f);
+                user.sendMessage(Message.ZINA_GET_MONEY, woolCount);
+                WoolMania.getStaticPlayer(player).addMoney(woolCount, player);
             } else {
                 user.sendMessage(Message.ZINA_NO_WOOL);
             }

@@ -43,12 +43,12 @@ public class StatsCommand extends WoolManiaCommand {
 
         for (Player player : players) {
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
-            // User user = UserAPI.instance().user(player.getUniqueId());
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
             int level = woolManiaPlayer.getLevel();
             int xp = woolManiaPlayer.getXP();
             int xpRequired = LevelXPHandler.calculateXPRequiredForNextLevel(level);
             int money = woolManiaPlayer.getMoney();
+            int farmedBlocks = woolManiaPlayer.getFarmedBlocks();
 
             sender.sendMessage("");
             sender.sendMessage("§b" + player.getName() + " §7Stats:");
@@ -56,6 +56,7 @@ public class StatsCommand extends WoolManiaCommand {
             sender.sendMessage("§7Level: §b" + level);
             sender.sendMessage("§7XP: §b" + xp + "§7/§b" + xpRequired);
             sender.sendMessage("§7Zenum: §b" + money);
+            sender.sendMessage("§7Farmed: §b" + farmedBlocks);
             sender.sendMessage("");
 
         }

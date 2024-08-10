@@ -5,9 +5,10 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.commands.zenum;
+package eu.darkcube.system.woolmania.commands;
 
 import java.util.Collection;
+import java.util.List;
 
 import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
@@ -20,51 +21,41 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.commands.WoolManiaCommand;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SendZenumCommand extends WoolManiaCommand {
+public class SetBoosterCommand extends WoolManiaCommand {
 
-    public SendZenumCommand() {
-        // @formatter:off
-        super("send",builder -> {
+    public SetBoosterCommand() {
+        //@formatter:off
+        super("setbooster",builder -> {
             builder.then(Commands.argument("player", EntityArgument.players())
-                    .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                    .then(Commands.argument("amount", IntegerArgumentType.integer())
                             .executes(context -> executeCommand(context, EntityArgument.getPlayers(context, "player"), IntegerArgumentType.getInteger(context, "amount")))
                     )
             );
         });
-        // @formatter:on
+        //@formatter:on
     }
 
     private static int executeCommand(CommandContext<CommandSource> context, @NotNull Collection<Player> players, int amount) throws CommandSyntaxException {
 
         for (Player player : players) {
-            User user = UserAPI.instance().user(player.getUniqueId());
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
-            Player contextPlayer = context.getSource().asPlayer();
-            int money = WoolMania.getStaticPlayer(contextPlayer).getMoney();
+            User user = UserAPI.instance().user(player.getUniqueId());
+            WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
+            int privateBooster = woolManiaPlayer.getPrivateBooster();
+            woolManiaPlayer.setPrivateBooster(amount, player);
 
             if (sender.equals(player)) {
-                if (amount <= money) {
-                    WoolMania.getStaticPlayer(contextPlayer).removeMoney(amount, player);
-                    WoolMania.getStaticPlayer(player).addMoney(amount, player);
-                    user.sendMessage(Message.ZENUM_SEND_YOURSELF, amount);
-                } else {
-                    context.getSource().sendMessage(Message.ZENUM_NOT_ENOUGH);
-                }
+                context.getSource().sendMessage(Message.BOOSTER_SET_OWN, amount);
             } else {
-                if (amount <= money) {
-                    WoolMania.getStaticPlayer(contextPlayer).removeMoney(amount, player);
-                    WoolMania.getStaticPlayer(player).addMoney(amount, player);
-                    context.getSource().sendMessage(Message.ZENUM_SEND_OTHER, player.getName(), amount);
-                    user.sendMessage(Message.ZENUM_SENDED, amount, context.getSource().getName());
-                } else {
-                    context.getSource().sendMessage(Message.ZENUM_NOT_ENOUGH);
-                }
+                context.getSource().sendMessage(Message.BOOSTER_SET, player.getName(), amount);
+                user.sendMessage(Message.BOOSTER_SETTED, sender.getName(), amount);
             }
+
         }
         return 0;
     }

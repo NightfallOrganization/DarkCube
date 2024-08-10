@@ -12,6 +12,7 @@ import static eu.darkcube.system.woolmania.enums.Locations.isWithinBoundLocation
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -37,6 +38,7 @@ public class BlockBreakListener implements Listener {
             event.setDropItems(false);
             ItemStack woolItem = new ItemStack(block.getType());
             WoolMania.getInstance().getLevelXPHandler().manageLevelXP(player);
+            WoolMania.getStaticPlayer(player).addFarmedBlocks(1, player);
 
             if (player.getInventory().addItem(woolItem).isEmpty()) {
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 2.0f);

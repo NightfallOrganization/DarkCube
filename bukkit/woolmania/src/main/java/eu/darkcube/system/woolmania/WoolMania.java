@@ -13,6 +13,7 @@ import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.woolmania.commands.ResetHallsCommand;
 import eu.darkcube.system.woolmania.commands.ResetLevelCommand;
+import eu.darkcube.system.woolmania.commands.SetBoosterCommand;
 import eu.darkcube.system.woolmania.commands.StatsCommand;
 import eu.darkcube.system.woolmania.handler.LevelXPHandler;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
@@ -25,6 +26,7 @@ import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.npc.NPCRemover;
 import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
+import eu.darkcube.system.woolmania.util.GameScoreboard;
 import eu.darkcube.system.woolmania.util.Ruler;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.WoolRegenerationTimer;
@@ -38,6 +40,7 @@ public class WoolMania extends DarkCubePlugin {
     private NPCCreator npcCreator;
     private ShopInventory shopInventory;
     private LevelXPHandler levelXPHandler;
+    private GameScoreboard gameScoreboard;
     public Map<Player, WoolManiaPlayer> woolManiaPlayerMap = new HashMap<>();
 
     public WoolMania() {
@@ -58,6 +61,7 @@ public class WoolMania extends DarkCubePlugin {
         npcCreator = new NPCCreator(npcManager);
         shopInventory = new ShopInventory();
         levelXPHandler = new LevelXPHandler();
+        gameScoreboard = new GameScoreboard();
         NPCListeners.register(npcManager, npcCreator);
 
         npcCreator.createNPC();
@@ -76,6 +80,7 @@ public class WoolMania extends DarkCubePlugin {
         CommandAPI.instance().register(new ZenumCommand());
         CommandAPI.instance().register(new StatsCommand());
         CommandAPI.instance().register(new ResetLevelCommand());
+        CommandAPI.instance().register(new SetBoosterCommand());
     }
 
     @Override
@@ -102,6 +107,10 @@ public class WoolMania extends DarkCubePlugin {
 
     public LevelXPHandler getLevelXPHandler() {
         return levelXPHandler;
+    }
+
+    public GameScoreboard getGameScoreboard() {
+        return gameScoreboard;
     }
     //</editor-fold>
 

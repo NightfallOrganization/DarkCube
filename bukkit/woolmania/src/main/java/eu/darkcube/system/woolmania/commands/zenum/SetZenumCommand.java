@@ -51,10 +51,10 @@ public class SetZenumCommand extends WoolManiaCommand {
             User user = UserAPI.instance().user(player.getUniqueId());
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
             if (sender.equals(player)) {
-                WoolMania.getStaticPlayer(player).setMoney(amount);
+                WoolMania.getStaticPlayer(player).setMoney(amount, player);
                 user.sendMessage(Message.ZENUM_SET_YOURSELF, amount);
             } else {
-                WoolMania.getStaticPlayer(player).setMoney(amount);
+                WoolMania.getStaticPlayer(player).setMoney(amount, player);
                 context.getSource().sendMessage(Message.ZENUM_SET_OTHER, player.getName(), amount);
                 user.sendMessage(Message.ZENUM_SETTED, amount, context.getSource().getName());
             }

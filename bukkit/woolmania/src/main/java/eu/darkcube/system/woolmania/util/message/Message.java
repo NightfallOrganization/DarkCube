@@ -20,6 +20,7 @@ public enum Message implements BaseMessage {
     TIMER_IS_OVER_SECOUND,
     ZINA_GET_MONEY,
     LEVEL_TO_LOW,
+    LEVEL_UP,
     ZINA_NO_WOOL,
     ONE_MINUTE_LEFT,
     SECOUND_LEFT,
@@ -40,7 +41,15 @@ public enum Message implements BaseMessage {
     ZENUM_NOT_ENOUGH,
     LEVEL_RESET,
     LEVEL_RESET_OWN,
-    LEVEL_RESETTED
+    LEVEL_RESETTED,
+    SCOREBOARD_LEVEL,
+    SCOREBOARD_ZENUM,
+    SCOREBOARD_WORLD,
+    SCOREBOARD_FARMED,
+    SCOREBOARD_BOOSTER,
+    BOOSTER_SET_OWN,
+    BOOSTER_SET,
+    BOOSTER_SETTED,
 
     ;
 
