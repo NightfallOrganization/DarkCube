@@ -10,8 +10,6 @@ plugins {
     id("eu.darkcube.darkcube")
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
 sourceSets {
     create("generator") {
     }
