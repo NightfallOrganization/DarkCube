@@ -58,7 +58,7 @@ public class WoolRegenerationTimer extends BukkitRunnable {
                 }
             }
 
-            if (timer <= 4 && timer != 0) {
+            if (timer <= 4 && timer != 1) {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
                     playSoundToAllPlayers(onlinePlayer);

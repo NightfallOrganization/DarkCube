@@ -14,6 +14,7 @@ import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.server.inventory.DarkCubeInventoryTemplates;
 import eu.darkcube.system.server.inventory.DarkCubeItemTemplates;
 import eu.darkcube.system.server.inventory.Inventory;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
