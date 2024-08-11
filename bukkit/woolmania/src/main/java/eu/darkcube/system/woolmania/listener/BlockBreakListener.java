@@ -10,6 +10,8 @@ package eu.darkcube.system.woolmania.listener;
 import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
 
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.items.CustomItem;
+import eu.darkcube.system.woolmania.enums.Tiers;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -41,6 +43,7 @@ public class BlockBreakListener implements Listener {
             } else {
                 block.getWorld().dropItemNaturally(block.getLocation(), woolItem);
             }
+            new CustomItem(woolItem, Tiers.TIER1);
         }
     }
 

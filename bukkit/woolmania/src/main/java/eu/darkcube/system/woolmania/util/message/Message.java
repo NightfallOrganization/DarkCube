@@ -50,6 +50,10 @@ public enum Message implements BaseMessage {
     BOOSTER_SET_OWN,
     BOOSTER_SET,
     BOOSTER_SETTED,
+    BOOSTER_SET_OWN_NONE,
+    BOOSTER_SET_NONE,
+    BOOSTER_SETTED_NONE,
+
 
     ;
 

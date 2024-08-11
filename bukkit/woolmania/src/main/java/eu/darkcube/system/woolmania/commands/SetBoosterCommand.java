@@ -7,8 +7,9 @@
 
 package eu.darkcube.system.woolmania.commands;
 
+import static eu.darkcube.system.woolmania.util.message.Message.*;
+
 import java.util.Collection;
-import java.util.List;
 
 import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
@@ -46,18 +47,24 @@ public class SetBoosterCommand extends WoolManiaCommand {
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
             User user = UserAPI.instance().user(player.getUniqueId());
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-            int privateBooster = woolManiaPlayer.getPrivateBooster();
             woolManiaPlayer.setPrivateBooster(amount, player);
 
-            if (sender.equals(player)) {
-                context.getSource().sendMessage(Message.BOOSTER_SET_OWN, amount);
+            if (amount >= 2) {
+                amountCheck(sender, player, amount, user, context, BOOSTER_SET_OWN, BOOSTER_SET, BOOSTER_SETTED);
             } else {
-                context.getSource().sendMessage(Message.BOOSTER_SET, player.getName(), amount);
-                user.sendMessage(Message.BOOSTER_SETTED, sender.getName(), amount);
+                amountCheck(sender, player, amount, user, context, BOOSTER_SET_OWN_NONE, BOOSTER_SET_NONE, BOOSTER_SETTED_NONE);
             }
-
         }
         return 0;
+    }
+
+    private static void amountCheck(CommandSender sender, Player player, int amount, User user, CommandContext<CommandSource> context, Message messageOWN, Message messageSET, Message messageSETTED) {
+        if (sender.equals(player)) {
+            context.getSource().sendMessage(messageOWN, amount);
+        } else {
+            context.getSource().sendMessage(messageSET, player.getName(), amount);
+            user.sendMessage(messageSETTED, sender.getName(), amount);
+        }
     }
 
 }

@@ -25,15 +25,16 @@ public class LevelXPHandler {
         int currentLevel = woolManiaPlayer.getLevel();
         int xpRequired = calculateXPRequiredForNextLevel(currentLevel);
         int privateBooster = WoolMania.getStaticPlayer(player).getPrivateBooster();
+        int privateBoosterValue = (privateBooster <= 0) ? 1 : privateBooster;
 
-        if (playerXP + privateBooster > xpRequired) {
+        if (playerXP + privateBoosterValue > xpRequired) {
             int extantXP = playerXP - xpRequired;
             woolManiaPlayer.addLevel(1, player);
-            woolManiaPlayer.setXP(extantXP + privateBooster);
+            woolManiaPlayer.setXP(extantXP + privateBoosterValue);
             player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 100f, 1f);
             user.sendMessage(LEVEL_UP,(currentLevel + 1));
         } else {
-            woolManiaPlayer.addXP(privateBooster);
+            woolManiaPlayer.addXP(privateBoosterValue);
         }
     }
 

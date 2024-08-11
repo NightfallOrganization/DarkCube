@@ -47,7 +47,6 @@ public class JoinListener implements Listener {
 
         Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
             WoolMania.getInstance().getGameScoreboard().updateWorld(player);
-            player.sendMessage("§7Player aktualisiert");
         }, 10L);
     }
 

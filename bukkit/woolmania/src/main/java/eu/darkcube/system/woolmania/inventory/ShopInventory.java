@@ -43,31 +43,7 @@ public class ShopInventory {
             meta.setJukeboxPlayable(jukebox);
             // meta.setHideTooltip(true);
         });
-        inventoryTemplate.addListener(TemplateInventoryListener.ofStateful(() -> new TemplateInventoryListener() {
-            private boolean finished = false;
-            private User user;
 
-            @Override
-            public void onOpen(@NotNull TemplateInventory inventory, @NotNull User user) {
-                this.user = user;
-            }
-
-            @Override
-            public void onOpenAnimationFinished(@NotNull TemplateInventory inventory) {
-                finished = true;
-            }
-
-            @Override
-            public void onUpdate(@NotNull TemplateInventory inventory) {
-                System.out.println("Update " + finished + " " + user);
-                if (!finished) {
-                    Player player = Bukkit.getPlayer(user.uniqueId());
-                    if (player != null) {
-                        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 100, 1);
-                    }
-                }
-            }
-        }));
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_3);
         inventoryTemplate.setItem(1, 11, Items.INVENTORY_SHOP_STEAK);
         inventoryTemplate.setItem(1, 13, Items.INVENTORY_SHOP_SHEARS);

@@ -115,7 +115,6 @@ public class GameScoreboard implements Listener {
 
         if (HALL1.isWithinBounds(location)) {
             team.setSuffix("§7» §b" + HALL1.getName());
-            player.sendMessage("§7Ist drinnen");
         } else {
             team.setSuffix("§7» §bUnknown");
         }
