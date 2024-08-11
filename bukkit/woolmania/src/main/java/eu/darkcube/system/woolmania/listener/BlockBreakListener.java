@@ -7,14 +7,10 @@
 
 package eu.darkcube.system.woolmania.listener;
 
-import static eu.darkcube.system.woolmania.enums.Hallpools.HALLPOOL1;
-import static eu.darkcube.system.woolmania.enums.Locations.isWithinBoundLocations;
-import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
+import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -30,7 +26,7 @@ public class BlockBreakListener implements Listener {
         Player player = event.getPlayer();
         Location location = block.getLocation();
 
-        if (!isWithinBoundLocations(location, new Location(HALLS, HALLPOOL1.getX1(), HALLPOOL1.getY1(), HALLPOOL1.getZ1()), new Location(HALLS, HALLPOOL1.getX2(), HALLPOOL1.getY2(), HALLPOOL1.getZ2()))) {
+        if (!HALLPOOL1.isWithinBounds(location)) {
             return;
         }
 

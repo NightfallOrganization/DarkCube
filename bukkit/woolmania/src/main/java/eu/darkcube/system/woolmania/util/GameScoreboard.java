@@ -7,9 +7,11 @@
 
 package eu.darkcube.system.woolmania.util;
 
+import static eu.darkcube.system.woolmania.enums.Areas.HALL1;
 import eu.darkcube.system.woolmania.WoolMania;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -26,10 +28,13 @@ public class GameScoreboard implements Listener {
     private static final String ENTRY_FARMED = "§4";
     private static final String ENTRY_BOOSTER = "§5";
 
-    public void createGameScoreboard( Player player) {
+    public void createGameScoreboard(Player player) {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard scoreboard = manager.getNewScoreboard();
-        player.setScoreboard(scoreboard);
+        Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard == manager.getMainScoreboard()) {
+            scoreboard = manager.getNewScoreboard();
+            player.setScoreboard(scoreboard);
+        }
 
         var objective = scoreboard.registerNewObjective("game", "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -106,7 +111,14 @@ public class GameScoreboard implements Listener {
 
     public void updateWorld(Player player) {
         var team = player.getScoreboard().getTeam("world_team");
-        team.setSuffix("§7» §bNONE");
+        Location location = player.getLocation();
+
+        if (HALL1.isWithinBounds(location)) {
+            team.setSuffix("§7» §b" + HALL1.getName());
+            player.sendMessage("§7Ist drinnen");
+        } else {
+            team.setSuffix("§7» §bUnknown");
+        }
     }
 
     public void updateFarmed(Player player) {
@@ -121,23 +133,26 @@ public class GameScoreboard implements Listener {
         if (privateBooster <= 1) {
             team.setSuffix("§7» §bNone");
         } else {
-            team.setSuffix("§7» §b" + privateBooster +".0x");
+            team.setSuffix("§7» §b" + privateBooster + ".0x");
         }
     }
 
-    // public void updateWhiteLives(Player player) {
-    //     var team = player.getScoreboard().getTeam("white_team");
-    //     var lives = sumo.getLifeManager().getTeamLives(TeamManager.TEAM_WHITE);
-    //     team.setSuffix(Message.LIVES_SUFFIX_WHITE.convertToString(player, lives));
-    // }
+    public void deleteGameScoreboard(Player player) {
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = scoreboard.getObjective("game");
+        if (objective != null) {
+            objective.unregister();
+        }
+        deleteTeam(scoreboard, "level_team");
+        deleteTeam(scoreboard, "money_team");
+        deleteTeam(scoreboard, "booster_team");
+        deleteTeam(scoreboard, "world_team");
+        deleteTeam(scoreboard, "farmed_team");
+    }
 
-    // public void deleteGameScoreboard() {
-    //     ScoreboardManager manager = Bukkit.getScoreboardManager();
-    //     Scoreboard scoreboard = manager.getMainScoreboard();
-    //     Objective objective = scoreboard.getObjective("game");
-    //     if (objective != null) {
-    //         objective.unregister();
-    //     }
-    // }
-
+    private void deleteTeam(Scoreboard scoreboard, String teamName) {
+        Team team = scoreboard.getTeam(teamName);
+        if (team == null) return;
+        team.unregister();
+    }
 }

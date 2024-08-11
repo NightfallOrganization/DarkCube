@@ -7,8 +7,8 @@
 
 package eu.darkcube.system.woolmania.util.area;
 
-import static eu.darkcube.system.woolmania.enums.Hallpools.HALLPOOL1;
-import static eu.darkcube.system.woolmania.enums.Locations.HALL1;
+import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
+import static eu.darkcube.system.woolmania.enums.TeleportLocations.HALL1;
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
 import org.bukkit.Material;

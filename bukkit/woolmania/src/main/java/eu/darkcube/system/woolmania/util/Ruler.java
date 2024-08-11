@@ -7,13 +7,12 @@
 
 package eu.darkcube.system.woolmania.util;
 
-import static eu.darkcube.system.woolmania.enums.Hallpools.HALLPOOL1;
-import static eu.darkcube.system.woolmania.enums.Locations.isWithinBoundLocations;
+import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
+import static eu.darkcube.system.woolmania.enums.TeleportLocations.isWithinBoundLocations;
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 
-import eu.darkcube.system.woolmania.enums.Hallpools;
-import eu.darkcube.system.woolmania.enums.Locations;
+import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,9 +35,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -128,7 +125,7 @@ public class Ruler implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Location spawnLocation = Locations.SPAWN.getLocation(MAINWORLD);
+        Location spawnLocation = TeleportLocations.SPAWN.getLocation(MAINWORLD);
         event.setRespawnLocation(spawnLocation);
     }
 

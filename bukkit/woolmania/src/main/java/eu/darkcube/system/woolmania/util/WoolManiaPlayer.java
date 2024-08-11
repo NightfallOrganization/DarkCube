@@ -33,32 +33,6 @@ public class WoolManiaPlayer {
         privateBooster = new PersistentDataValue<>(new NamespacedKey(woolMania, "privateBooster"), Integer.class, player.getPersistentDataContainer(), 1);
     }
 
-    //<editor-fold desc="Updater">
-    public void delayedUpdateLevel(Player player) {
-        Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
-            WoolMania.getInstance().getGameScoreboard().updateLevel(player);
-        }, 1L);
-    }
-
-    public void delayedUpdateMoney(Player player) {
-        Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
-            WoolMania.getInstance().getGameScoreboard().updateMoney(player);
-        }, 1L);
-    }
-
-    public void delayedUpdateFarmedBlocks(Player player) {
-        Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
-            WoolMania.getInstance().getGameScoreboard().updateFarmed(player);
-        }, 1L);
-    }
-
-    public void delayedUpdatePrivateBooster(Player player) {
-        Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
-            WoolMania.getInstance().getGameScoreboard().updateBooster(player);
-        }, 1L);
-    }
-    //</editor-fold>
-
     //<editor-fold desc="Getter">
     public Integer getLevel() {
         return level.getOrDefault();
@@ -83,13 +57,13 @@ public class WoolManiaPlayer {
 
     //<editor-fold desc="Setter">
     public void setLevel(Integer integer, Player player) {
-        delayedUpdateLevel(player);
         level.set(integer);
+        WoolMania.getInstance().getGameScoreboard().updateLevel(player);
     }
 
     public void setMoney(Integer integer, Player player) {
-        delayedUpdateMoney(player);
         money.set(integer);
+        WoolMania.getInstance().getGameScoreboard().updateMoney(player);
     }
 
     public void setXP(Integer integer) {
@@ -97,27 +71,27 @@ public class WoolManiaPlayer {
     }
 
     public void setFarmedBlocks(Integer integer, Player player) {
-        delayedUpdateFarmedBlocks(player);
         farmedBlocks.set(integer);
+        WoolMania.getInstance().getGameScoreboard().updateFarmed(player);
     }
 
     public void setPrivateBooster(Integer integer, Player player) {
-        delayedUpdatePrivateBooster(player);
         privateBooster.set(integer);
+        WoolMania.getInstance().getGameScoreboard().updateBooster(player);
     }
     //</editor-fold>
 
     //<editor-fold desc="Adder">
     public void addLevel(Integer integer, Player player) {
-        delayedUpdateLevel(player);
         int currentLevel = level.getOrDefault();
         level.set(currentLevel + integer);
+        WoolMania.getInstance().getGameScoreboard().updateLevel(player);
     }
 
     public void addMoney(Integer integer, Player player) {
-        delayedUpdateMoney(player);
         int currentMoney = money.getOrDefault();
         money.set(currentMoney + integer);
+        WoolMania.getInstance().getGameScoreboard().updateMoney(player);
     }
 
     public void addXP(Integer integer) {
@@ -126,29 +100,29 @@ public class WoolManiaPlayer {
     }
 
     public void addFarmedBlocks(Integer integer, Player player) {
-        delayedUpdateFarmedBlocks(player);
         int currentFarmedBlocks = farmedBlocks.getOrDefault();
         farmedBlocks.set(currentFarmedBlocks + integer);
+        WoolMania.getInstance().getGameScoreboard().updateFarmed(player);
     }
 
     public void addPrivateBooster(Integer integer, Player player) {
-        delayedUpdatePrivateBooster(player);
         int currentPrivateBooster = privateBooster.getOrDefault();
         privateBooster.set(currentPrivateBooster + integer);
+        WoolMania.getInstance().getGameScoreboard().updateBooster(player);
     }
     //</editor-fold>
 
     //<editor-fold desc="Remover">
     public void removeLevel(Integer integer, Player player) {
-        delayedUpdateLevel(player);
         int currentLevel = level.getOrDefault();
         level.set(currentLevel - integer);
+        WoolMania.getInstance().getGameScoreboard().updateLevel(player);
     }
 
     public void removeMoney(Integer integer, Player player) {
-        delayedUpdateMoney(player);
         int currentMoney = money.getOrDefault();
         money.set(currentMoney - integer);
+        WoolMania.getInstance().getGameScoreboard().updateMoney(player);
     }
 
     public void removeXP(Integer integer, Player player) {
@@ -157,15 +131,15 @@ public class WoolManiaPlayer {
     }
 
     public void removeFarmedBlocks(Integer integer, Player player) {
-        delayedUpdateFarmedBlocks(player);
         int currentFarmedBlocks = farmedBlocks.getOrDefault();
         farmedBlocks.set(currentFarmedBlocks - integer);
+        WoolMania.getInstance().getGameScoreboard().updateFarmed(player);
     }
 
     public void removePrivateBooster(Integer integer, Player player) {
-        delayedUpdatePrivateBooster(player);
         int currentPrivateBooster = privateBooster.getOrDefault();
         privateBooster.set(currentPrivateBooster - integer);
+        WoolMania.getInstance().getGameScoreboard().updateBooster(player);
     }
     //</editor-fold>
 

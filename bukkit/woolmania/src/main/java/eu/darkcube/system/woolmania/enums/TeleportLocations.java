@@ -13,7 +13,7 @@ import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public enum Locations {
+public enum TeleportLocations {
     SPAWN(MAINWORLD, 631.5, 121, 467, -90, 0),
     HALL1(HALLS, 0.5, 111, 0.5, -90, 0)
 
@@ -27,7 +27,7 @@ public enum Locations {
     private final double y;
     private final double z;
 
-    Locations(World world, double x, double y, double z, float yaw, float pitch) {
+    TeleportLocations(World world, double x, double y, double z, float yaw, float pitch) {
         this.world = world;
         this.coordinates = new double[] {x, y, z};
         this.yaw = yaw;
@@ -66,6 +66,7 @@ public enum Locations {
     }
 
     public static boolean isWithinBoundLocations(Location location, Location corner1, Location corner2) {
+
         double x1 = Math.min(corner1.getX(), corner2.getX());
         double y1 = Math.min(corner1.getY(), corner2.getY());
         double z1 = Math.min(corner1.getZ(), corner2.getZ());

@@ -33,8 +33,6 @@ public class JoinListener implements Listener {
         WoolMania.getInstance().woolManiaPlayerMap.put(player, new WoolManiaPlayer(player));
         WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
         setupScoreboardForNPCs(player);
-
-        // WoolManiaPlayer woolManiaPlayer = WoolMania.woolManiaPlayerMap.get(player);
     }
 
     private void setupScoreboardForNPCs(Player player) {
@@ -47,6 +45,10 @@ public class JoinListener implements Listener {
         setupPrefix(scoreboard, "npc-1", NAME_ZINUS, empty(), text(" (", GRAY).append(text("SHOP", DARK_AQUA)).append(text(")", GRAY)), AQUA);
         setupPrefix(scoreboard, "npc-2", NAME_ZINA, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
 
+        Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
+            WoolMania.getInstance().getGameScoreboard().updateWorld(player);
+            player.sendMessage("§7Player aktualisiert");
+        }, 10L);
     }
 
     private void setupPrefix(Scoreboard scoreboard, String npcId, String npcName, Component prefix, Component suffix, NamedTextColor color) {

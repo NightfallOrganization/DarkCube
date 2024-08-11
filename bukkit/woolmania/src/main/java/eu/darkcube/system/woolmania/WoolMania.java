@@ -50,20 +50,15 @@ public class WoolMania extends DarkCubePlugin {
 
     @Override
     public void onEnable() {
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            woolManiaPlayerMap.put(onlinePlayer, new WoolManiaPlayer(onlinePlayer));
-        }
-
-        LanguageHelper.initialize();
         WorldManager.loadWorlds();
+        gameScoreboard = new GameScoreboard();
+        LanguageHelper.initialize();
         WoolRegenerationTimer.startFirstTimer();
         npcManager = new NPCManager(this);
         npcCreator = new NPCCreator(npcManager);
         shopInventory = new ShopInventory();
         levelXPHandler = new LevelXPHandler();
-        gameScoreboard = new GameScoreboard();
         NPCListeners.register(npcManager, npcCreator);
-
         npcCreator.createNPC();
 
         var joinListener = new JoinListener();
@@ -81,11 +76,19 @@ public class WoolMania extends DarkCubePlugin {
         CommandAPI.instance().register(new StatsCommand());
         CommandAPI.instance().register(new ResetLevelCommand());
         CommandAPI.instance().register(new SetBoosterCommand());
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            woolManiaPlayerMap.put(onlinePlayer, new WoolManiaPlayer(onlinePlayer));
+            gameScoreboard.createGameScoreboard(onlinePlayer);
+        }
     }
 
     @Override
     public void onDisable() {
         NPCRemover.destoryNPCs(npcCreator);
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            WoolMania.getInstance().getGameScoreboard().deleteGameScoreboard(onlinePlayer);
+        }
     }
 
     //<editor-fold desc="Getter">
