@@ -13,9 +13,11 @@ import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.inventory.DarkCubeInventoryTemplates;
 import eu.darkcube.system.server.inventory.DarkCubeItemTemplates;
 import eu.darkcube.system.server.inventory.Inventory;
+import eu.darkcube.system.server.inventory.InventoryMask;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.server.inventory.paged.PagedInventoryContent;
 import eu.darkcube.system.server.inventory.paged.PagedTemplateSettings;
+import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Items;
 import org.bukkit.entity.Player;
@@ -23,12 +25,20 @@ import org.bukkit.inventory.ItemStack;
 
 public class ShopInventorySound {
 
-    public void openInventory(Player player) {
-        InventoryTemplate inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "shop"), 27);
+    private static final String MASK = """
+            .........
+            .........
+            .#######.
+            .#######.
+            .........
+            """;
+
+    public void openInventory(User user) {
+        InventoryTemplate inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "shop_sound"), 45);
         inventoryTemplate.title(ZINUS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
 
-        var disc = Items.INVENTORY_SHOP_MUSIC_DISK.createItem(player).<ItemStack>build();
+        var disc = Items.INVENTORY_SHOP_SOUNDS.createItem(user).<ItemStack>build();
         disc.editMeta(meta -> {
             var jukebox = meta.getJukeboxPlayable();
             jukebox.setShowInTooltip(false);
@@ -36,70 +46,15 @@ public class ShopInventorySound {
             // meta.setHideTooltip(true);
         });
 
-        inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_3);
-        DarkCubeInventoryTemplates.Paged.configure3x9(inventoryTemplate, disc);
-
+        inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_5);
+        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, disc);
         PagedTemplateSettings pagination = inventoryTemplate.pagination();
+        pagination.pageSlots(InventoryMask.slots(MASK, '#'));
         PagedInventoryContent content = pagination.content();
 
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_STEAK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
-        content.addStaticItem(Items.INVENTORY_SHOP_MUSIC_DISK);
+        content.addStaticItem(Items.INVENTORY_SHOP_SOUNDS);
 
-        inventoryTemplate.open(player);
+        inventoryTemplate.open(user);
     }
 
 }

@@ -40,6 +40,7 @@ tasks {
 dependencies {
     compileOnly(libs.paper.latest)
     compileOnly(darkcubesystem.bukkit)
+    compileOnly(darkcubesystem.kyori.wrapper)
     compileOnly("io.github.juliarn", "npc-lib-api", "3.0.0-beta7")
     compileOnly("io.github.juliarn", "npc-lib-common", "3.0.0-beta7")
     implementation("io.github.juliarn", "npc-lib-bukkit", "3.0.0-beta7")

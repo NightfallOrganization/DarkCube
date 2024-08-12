@@ -7,11 +7,10 @@
 
 package eu.darkcube.system.woolmania.util;
 
-import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
-import static eu.darkcube.system.woolmania.enums.TeleportLocations.isWithinBoundLocations;
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
-import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 
+import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Hall;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -47,14 +46,22 @@ public class Ruler implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        WoolManiaPlayer p = WoolMania.getStaticPlayer(player);
         Location location = event.getBlock().getLocation();
         Block block = event.getBlock();
+        Hall hall = p.getHall();
 
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
+        if (hall == null) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (!block.getType().toString().endsWith("_WOOL") && player.getWorld().equals(HALLS)) {
             event.setCancelled(true);
-        } else if (!isWithinBoundLocations(location, new Location(HALLS, HALLPOOL1.getX1(), HALLPOOL1.getY1(), HALLPOOL1.getZ1()), new Location(HALLS, HALLPOOL1.getX2(), HALLPOOL1.getY2(), HALLPOOL1.getZ2()))) {
+
+        } else if (!hall.getPool().isWithinBounds(location)) {
             event.setCancelled(true);
         }
 
@@ -125,7 +132,7 @@ public class Ruler implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Location spawnLocation = TeleportLocations.SPAWN.getLocation(MAINWORLD);
+        Location spawnLocation = TeleportLocations.SPAWN.getLocation();
         event.setRespawnLocation(spawnLocation);
     }
 

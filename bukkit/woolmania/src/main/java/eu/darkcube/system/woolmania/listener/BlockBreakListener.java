@@ -7,14 +7,15 @@
 
 package eu.darkcube.system.woolmania.listener;
 
-import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
-
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Hall;
 import eu.darkcube.system.woolmania.items.CustomItem;
-import eu.darkcube.system.woolmania.enums.Tiers;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Light;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,24 +27,39 @@ public class BlockBreakListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Player player = event.getPlayer();
+        WoolManiaPlayer p = WoolMania.getStaticPlayer(player);
         Location location = block.getLocation();
+        Hall hall = p.getHall();
 
-        if (!HALLPOOL1.isWithinBounds(location)) {
+        if (hall == null || !hall.getPool().isWithinBounds(location)) {
             return;
         }
 
         if (block.getType().toString().endsWith("_WOOL")) {
             event.setDropItems(false);
-            ItemStack woolItem = new ItemStack(block.getType());
             WoolMania.getInstance().getLevelXPHandler().manageLevelXP(player);
             WoolMania.getStaticPlayer(player).addFarmedBlocks(1, player);
+            ItemStack woolItem = new ItemStack(block.getType());
+            CustomItem customItem = new CustomItem(woolItem);
 
-            if (player.getInventory().addItem(woolItem).isEmpty()) {
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 2.0f);
-            } else {
-                block.getWorld().dropItemNaturally(block.getLocation(), woolItem);
-            }
-            new CustomItem(woolItem, Tiers.TIER1);
+            dropBlocks(player, block, customItem, hall, "§7« §fWool §7»");
+
+            Light l = (Light) Material.LIGHT.createBlockData();
+            l.setLevel(12);
+            block.setBlockData(l);
+        }
+    }
+
+    public void dropBlocks(Player player, Block block, CustomItem customItem, Hall hall, String name) {
+        customItem.setDisplayName(name);
+        customItem.setTier(hall.getTier());
+        customItem.setDurability(-2);
+        customItem.updateItemLore();
+
+        if (player.getInventory().addItem(customItem.getItemStack()).isEmpty()) {
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 2.0f);
+        } else {
+            block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
         }
     }
 

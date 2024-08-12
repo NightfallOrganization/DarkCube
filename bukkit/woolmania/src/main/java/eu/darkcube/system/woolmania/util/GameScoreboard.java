@@ -7,11 +7,11 @@
 
 package eu.darkcube.system.woolmania.util;
 
-import static eu.darkcube.system.woolmania.enums.Areas.HALL1;
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Hall;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -38,12 +38,14 @@ public class GameScoreboard implements Listener {
 
         var objective = scoreboard.registerNewObjective("game", "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.numberFormat(NumberFormat.blank());
         objective.setDisplayName(ChatColor.GRAY + "« " + ChatColor.DARK_AQUA + "Dark" + ChatColor.AQUA + "Cube" + ChatColor.GRAY + "." + ChatColor.DARK_AQUA + "eu" + ChatColor.GRAY + " »");
 
         Score space1 = objective.getScore(" ");
         space1.setScore(15);
 
         Score levelnameTeam = objective.getScore("§7Dein Level:");
+        // levelnameTeam.customName(Message.BOOSTER_SET_NONE.getBukkit(player));
         levelnameTeam.setScore(14);
 
         Team levelTeam = scoreboard.registerNewTeam("level_team");
@@ -73,7 +75,7 @@ public class GameScoreboard implements Listener {
         Score space4 = objective.getScore("    ");
         space4.setScore(6);
 
-        Score farmednameTeam = objective.getScore("§7Abgebaute Blöcke:");
+        Score farmednameTeam = objective.getScore("§7Abgebaute Blöcke: ");
         farmednameTeam.setScore(5);
 
         Team farmedTeam = scoreboard.registerNewTeam("farmed_team");
@@ -111,10 +113,11 @@ public class GameScoreboard implements Listener {
 
     public void updateWorld(Player player) {
         var team = player.getScoreboard().getTeam("world_team");
-        Location location = player.getLocation();
+        WoolManiaPlayer p = WoolMania.getStaticPlayer(player);
+        Hall hall = p.getHall();
 
-        if (HALL1.isWithinBounds(location)) {
-            team.setSuffix("§7» §b" + HALL1.getName());
+        if (hall != null) {
+            team.suffix(hall.getName().getBukkit(player, hall.getTier().getId()));
         } else {
             team.setSuffix("§7» §bUnknown");
         }

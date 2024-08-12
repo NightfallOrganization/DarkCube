@@ -7,11 +7,12 @@
 
 package eu.darkcube.system.woolmania.util;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.woolmania.WoolMania;
-import org.bukkit.Bukkit;
+import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class WoolManiaPlayer {
     PersistentDataValue<Integer> level;
@@ -19,18 +20,47 @@ public class WoolManiaPlayer {
     PersistentDataValue<Integer> xp;
     PersistentDataValue<Integer> farmedBlocks;
     PersistentDataValue<Integer> privateBooster;
-    Plugin woolMania = WoolMania.getInstance();
+    Player player;
+    WoolMania woolMania = WoolMania.getInstance();
+    @Nullable
+    Hall hall;
 
-    public WoolManiaPlayer(Player player){
+    public WoolManiaPlayer(Player player) {
+        this.player = player;
         initializePersistentData(player);
     }
 
-    public void initializePersistentData(Player player){
+    private void initializePersistentData(Player player) {
         level = new PersistentDataValue<>(new NamespacedKey(woolMania, "level"), Integer.class, player.getPersistentDataContainer(), 1);
         money = new PersistentDataValue<>(new NamespacedKey(woolMania, "money"), Integer.class, player.getPersistentDataContainer(), 0);
         xp = new PersistentDataValue<>(new NamespacedKey(woolMania, "xp"), Integer.class, player.getPersistentDataContainer(), 0);
         farmedBlocks = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmedBlocks"), Integer.class, player.getPersistentDataContainer(), 0);
         privateBooster = new PersistentDataValue<>(new NamespacedKey(woolMania, "privateBooster"), Integer.class, player.getPersistentDataContainer(), 1);
+    }
+
+    private void updateHall(@Nullable Hall hall) {
+        this.hall = hall;
+
+    }
+
+    public void teleportTo(Hall hall) {
+        updateHall(hall);
+        player.teleportAsync(hall.getSpawn().getLocation());
+    }
+
+    public void teleportSyncTo(Hall hall) {
+        updateHall(hall);
+        player.teleport(hall.getSpawn().getLocation());
+    }
+
+    public void teleportToSpawn() {
+        updateHall(hall);
+        player.teleportAsync(TeleportLocations.SPAWN.getLocation());
+    }
+
+    public void teleportSyncToSpawn() {
+        updateHall(hall);
+        player.teleport(TeleportLocations.SPAWN.getLocation());
     }
 
     //<editor-fold desc="Getter">
@@ -53,6 +83,11 @@ public class WoolManiaPlayer {
     public Integer getPrivateBooster() {
         return privateBooster.getOrDefault();
     }
+
+    @Nullable
+    public Hall getHall() {
+        return hall;
+    }
     //</editor-fold>
 
     //<editor-fold desc="Setter">
@@ -64,6 +99,12 @@ public class WoolManiaPlayer {
     public void setMoney(Integer integer, Player player) {
         money.set(integer);
         WoolMania.getInstance().getGameScoreboard().updateMoney(player);
+    }
+
+    public void setHall(Hall hall) {
+        if (this.hall != null) throw new IllegalStateException();
+        updateHall(hall);
+        woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void setXP(Integer integer) {

@@ -61,7 +61,7 @@ public enum TeleportLocations {
         return this.pitch;
     }
 
-    public Location getLocation(World world) {
+    public Location getLocation() {
         return new Location(world, getPositonX(), getPositonY(), getPositonZ(), getPositionYaw(), getPositionPitch());
     }
 

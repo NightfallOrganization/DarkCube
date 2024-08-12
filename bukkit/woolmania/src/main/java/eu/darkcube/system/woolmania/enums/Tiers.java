@@ -8,33 +8,41 @@
 package eu.darkcube.system.woolmania.enums;
 
 public enum Tiers {
-    TIER1(1, "Tier I"),
-    TIER2(2, "Tier II"),
-    TIER3(3, "Tier III"),
-    TIER4(4, "Tier IV"),
-    TIER5(5, "Tier V"),
-    TIER6(6, "Tier VI"),
-    TIER7(7, "Tier VII"),
-    TIER8(8, "Tier VIII"),
-    TIER9(9, "Tier IX"),
-    TIER10(10, "Tier X"),
-    TIER11(11, "Tier XI"),
-    TIER12(12, "Tier XII"),
-    TIER13(13, "Tier XIII"),
-    TIER14(14, "Tier XIV"),
-    TIER15(15, "Tier XV"),
+    // DEFAULT_TIER(1, "Default Tier"),
+    TIER1(1, "Tier I", 150),
+    TIER2(2, "Tier II", 500),
+    TIER3(3, "Tier III", 850),
+    TIER4(4, "Tier IV", 1200),
+    TIER5(5, "Tier V", 1550),
+    TIER6(6, "Tier VI", 1900),
+    TIER7(7, "Tier VII", 2250),
+    TIER8(8, "Tier VIII", 2600),
+    TIER9(9, "Tier IX", 2950),
+    TIER10(10, "Tier X", 3300),
+    TIER11(11, "Tier XI", 3650),
+    TIER12(12, "Tier XII", 4000),
+    TIER13(13, "Tier XIII", 4350),
+    TIER14(14, "Tier XIV", 4700),
+    TIER15(15, "Tier XV", 5050),
 
     ;
 
-    long id;
+    int id;
     String name;
+    int durability;
 
-    private Tiers(long id, String name){
+    private Tiers(int id, String name, int durability) {
+        this.id = id;
+        this.name = name;
+        this.durability = durability;
+    }
+
+    private Tiers(int id, String name){
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -42,11 +50,15 @@ public enum Tiers {
         return name;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getDurability() {
+        return durability;
     }
 }

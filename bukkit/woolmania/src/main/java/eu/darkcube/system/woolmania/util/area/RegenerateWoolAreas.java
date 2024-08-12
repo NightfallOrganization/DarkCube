@@ -7,20 +7,33 @@
 
 package eu.darkcube.system.woolmania.util.area;
 
-import static eu.darkcube.system.woolmania.enums.Areas.HALLPOOL1;
-import static eu.darkcube.system.woolmania.enums.TeleportLocations.HALL1;
-import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
-
-import org.bukkit.Material;
+import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class RegenerateWoolAreas {
 
-    public static void regenerateWoolAreas() {
-        TeleportArea teleportArea = new TeleportArea(HALLS, HALLPOOL1.getX1(),HALLPOOL1.getY1(),HALLPOOL1.getZ1(),HALLPOOL1.getX2(),HALLPOOL1.getY2(),HALLPOOL1.getZ2());
-        WoolRegenerationArea woolRegenerationArea = new WoolRegenerationArea(HALLS,HALLPOOL1.getX1(),HALLPOOL1.getY1(),HALLPOOL1.getZ1(),HALLPOOL1.getX2(),HALLPOOL1.getY2(),HALLPOOL1.getZ2());
+    public static void regenerateWoolAreas(Hall hall) {
 
-        teleportArea.teleportPlayersTo(HALL1.getLocation(HALLS));
-        woolRegenerationArea.replaceAirWithWool(Material.WHITE_WOOL);
+        WoolRegenerationArea woolRegenerationArea = new WoolRegenerationArea(hall);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            WoolManiaPlayer p = WoolMania.getStaticPlayer(player);
+            if (p.getHall() != hall) continue;
+            if (hall.getPool().isWithinBounds(player.getLocation())) {
+                p.teleportSyncTo(hall);
+            }
+        }
+
+        woolRegenerationArea.replaceAirAndLightWithWool(hall.getWool());
+    }
+
+    public static void regenerateWoolAreas() {
+        for (Hall hall : Hall.values()) {
+            regenerateWoolAreas(hall);
+        }
     }
 
 }

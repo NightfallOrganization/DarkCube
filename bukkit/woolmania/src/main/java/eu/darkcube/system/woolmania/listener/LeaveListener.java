@@ -9,6 +9,9 @@ package eu.darkcube.system.woolmania.listener;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +22,7 @@ public class LeaveListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        event.quitMessage(null);
         WoolMania.getInstance().woolManiaPlayerMap.remove(player);
     }
 

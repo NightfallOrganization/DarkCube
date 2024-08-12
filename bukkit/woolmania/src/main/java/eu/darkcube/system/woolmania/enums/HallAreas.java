@@ -9,18 +9,12 @@ package eu.darkcube.system.woolmania.enums;
 
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
-import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.woolmania.manager.WorldManager;
-import org.bukkit.Location;
+import eu.darkcube.system.woolmania.util.area.Area;
 import org.bukkit.World;
 
-public enum Areas {
+public enum HallAreas implements Area {
 
-    HALLPOOL1(HALLS, 25, 110, 19, 99, 68, -19),
-
-    //-- Trennung
-
-    HALL1(HALLS, -12, 178, 48, 142, 51, -61, "Halls");
+    HALL1(HALLS, -12, 178, 48, 142, 51, -61);
 
     private final World world;
     private final double[] coordinate1;
@@ -31,13 +25,8 @@ public enum Areas {
     private final int x2;
     private final int y2;
     private final int z2;
-    private final @Nullable String name;
 
-    Areas(World world, int x1, int y1, int z1, int x2, int y2, int z2) {
-        this(world, x1, y1, z1, x2, y2, z2, null);
-    }
-
-    Areas(World world, int x1, int y1, int z1, int x2, int y2, int z2, @Nullable String name) {
+    HallAreas(World world, int x1, int y1, int z1, int x2, int y2, int z2) {
         this.world = world;
         this.x1 = x1;
         this.y1 = y1;
@@ -45,29 +34,13 @@ public enum Areas {
         this.x2 = x2;
         this.y2 = y2;
         this.z2 = z2;
-        this.name = name;
 
         this.coordinate1 = new double[]{x1, y1, z1};
         this.coordinate2 = new double[]{x2, y2, z2};
     }
 
-    public @Nullable String getName() {
-        return name;
-    }
-
-    public boolean isWithinBounds(Location location) {
-        if (location.getWorld() != world) {
-            return false;
-        }
-        return TeleportLocations.isWithinBoundLocations(location, getFirstLocation(world), getSecondLocation(world));
-    }
-
-    public Location getFirstLocation(World world) {
-        return new Location(world, getX1(), getY1(), getZ1());
-    }
-
-    public Location getSecondLocation(World world) {
-        return new Location(world, getX2(), getY2(), getZ2());
+    public World getWorld() {
+        return world;
     }
 
     public double[] getCoordinate1() {

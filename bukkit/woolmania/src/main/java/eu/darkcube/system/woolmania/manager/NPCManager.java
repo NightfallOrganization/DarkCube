@@ -29,7 +29,7 @@ public class NPCManager {
     public NPCManager(WoolMania woolMania) {
         platform = BukkitPlatform.bukkitNpcPlatformBuilder().extension(woolMania).actionController(builder -> {
             builder.flag(NpcActionController.SPAWN_DISTANCE, 50);
-            builder.flag(NpcActionController.IMITATE_DISTANCE, 35);
+            builder.flag(NpcActionController.IMITATE_DISTANCE, 50);
             builder.flag(NpcActionController.TAB_REMOVAL_TICKS, 40);
         }).worldAccessor(BukkitWorldAccessor.worldAccessor()).packetFactory(BukkitProtocolAdapter.protocolLib()).build();
 

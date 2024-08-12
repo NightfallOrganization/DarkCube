@@ -9,29 +9,33 @@ package eu.darkcube.system.woolmania;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.woolmania.commands.ResetHallsCommand;
 import eu.darkcube.system.woolmania.commands.ResetLevelCommand;
 import eu.darkcube.system.woolmania.commands.SetBoosterCommand;
 import eu.darkcube.system.woolmania.commands.StatsCommand;
-import eu.darkcube.system.woolmania.handler.LevelXPHandler;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
+import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.handler.LevelXPHandler;
 import eu.darkcube.system.woolmania.inventory.ShopInventory;
+import eu.darkcube.system.woolmania.inventory.ShopInventorySound;
 import eu.darkcube.system.woolmania.listener.BlockBreakListener;
 import eu.darkcube.system.woolmania.listener.JoinListener;
 import eu.darkcube.system.woolmania.listener.LeaveListener;
 import eu.darkcube.system.woolmania.listener.NPCListeners;
 import eu.darkcube.system.woolmania.manager.NPCManager;
-import eu.darkcube.system.woolmania.npc.NPCRemover;
 import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
+import eu.darkcube.system.woolmania.npc.NPCRemover;
 import eu.darkcube.system.woolmania.util.GameScoreboard;
 import eu.darkcube.system.woolmania.util.Ruler;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.WoolRegenerationTimer;
 import eu.darkcube.system.woolmania.util.message.LanguageHelper;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class WoolMania extends DarkCubePlugin {
@@ -39,6 +43,7 @@ public class WoolMania extends DarkCubePlugin {
     private NPCManager npcManager;
     private NPCCreator npcCreator;
     private ShopInventory shopInventory;
+    private ShopInventorySound shopInventorySound;
     private LevelXPHandler levelXPHandler;
     private GameScoreboard gameScoreboard;
     public Map<Player, WoolManiaPlayer> woolManiaPlayerMap = new HashMap<>();
@@ -57,6 +62,7 @@ public class WoolMania extends DarkCubePlugin {
         npcManager = new NPCManager(this);
         npcCreator = new NPCCreator(npcManager);
         shopInventory = new ShopInventory();
+        shopInventorySound = new ShopInventorySound();
         levelXPHandler = new LevelXPHandler();
         NPCListeners.register(npcManager, npcCreator);
         npcCreator.createNPC();
@@ -78,8 +84,16 @@ public class WoolMania extends DarkCubePlugin {
         CommandAPI.instance().register(new SetBoosterCommand());
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            woolManiaPlayerMap.put(onlinePlayer, new WoolManiaPlayer(onlinePlayer));
+            WoolManiaPlayer player = new WoolManiaPlayer(onlinePlayer);
+            woolManiaPlayerMap.put(onlinePlayer, player);
             gameScoreboard.createGameScoreboard(onlinePlayer);
+            Location location = onlinePlayer.getLocation();
+            for (var hall : Hall.values()) {
+                if (hall.getHallArea().isWithinBounds(location)) {
+                    player.setHall(hall);
+                    break;
+                }
+            }
         }
     }
 
@@ -108,6 +122,10 @@ public class WoolMania extends DarkCubePlugin {
         return shopInventory;
     }
 
+    public ShopInventorySound getShopInventorySound() {
+        return shopInventorySound;
+    }
+
     public LevelXPHandler getLevelXPHandler() {
         return levelXPHandler;
     }
@@ -116,6 +134,5 @@ public class WoolMania extends DarkCubePlugin {
         return gameScoreboard;
     }
     //</editor-fold>
-
 
 }

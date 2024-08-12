@@ -13,7 +13,9 @@ import com.github.juliarn.npclib.api.event.InteractNpcEvent;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Tiers;
 import eu.darkcube.system.woolmania.inventory.ShopInventory;
+import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.util.message.Message;
@@ -68,13 +70,19 @@ public class NPCListeners {
     }
 
     private static void zinaExecute(Player player, User user) {
-        int woolCount = 0;
+
         if (player.hasPermission("woolmania.level.2")) {
             boolean hasWool = false;
+            int woolValue = 0;
 
             for (ItemStack item : player.getInventory().getContents()) {
                 if (item != null && item.getType().toString().endsWith("_WOOL")) {
-                    woolCount += item.getAmount();
+
+                    CustomItem customItem = new CustomItem(item);
+                    int tierLevel = customItem.getID();
+                    int itemAmount = item.getAmount();
+                    woolValue += tierLevel * itemAmount;
+
                     player.getInventory().remove(item);
                     hasWool = true;
                 }
@@ -82,8 +90,8 @@ public class NPCListeners {
 
             if (hasWool) {
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 50f, 2f);
-                user.sendMessage(Message.ZINA_GET_MONEY, woolCount);
-                WoolMania.getStaticPlayer(player).addMoney(woolCount, player);
+                user.sendMessage(Message.ZINA_GET_MONEY, woolValue);
+                WoolMania.getStaticPlayer(player).addMoney(woolValue, player);
             } else {
                 user.sendMessage(Message.ZINA_NO_WOOL);
             }
@@ -91,6 +99,5 @@ public class NPCListeners {
             user.sendMessage(Message.LEVEL_TO_LOW);
         }
     }
-
 
 }

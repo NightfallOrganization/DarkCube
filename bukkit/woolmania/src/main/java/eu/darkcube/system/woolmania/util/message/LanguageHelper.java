@@ -28,6 +28,7 @@ public class LanguageHelper {
         ClassLoader loader = LanguageHelper.class.getClassLoader();
         String tag = language.getLocale().toLanguageTag();
         loadLanguage(language, "messages_" + tag + ".properties");
+        language.registerLookup(loader, "messages_pure_" + tag + ".properties", Message.KEY_MODIFIER);
         language.registerLookup(loader, "items_" + tag + ".properties", Message.ITEM_MODIFIER);
     }
 

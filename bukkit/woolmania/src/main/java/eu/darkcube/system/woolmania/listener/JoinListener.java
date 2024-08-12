@@ -9,15 +9,17 @@ package eu.darkcube.system.woolmania.listener;
 
 import static eu.darkcube.system.woolmania.npc.NPCCreator.NAME_ZINA;
 import static eu.darkcube.system.woolmania.npc.NPCCreator.NAME_ZINUS;
-import static net.kyori.adventure.text.Component.*;
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.npc.NPCCreator;
+import eu.darkcube.system.woolmania.enums.Hall;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,9 +32,27 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        WoolMania.getInstance().woolManiaPlayerMap.put(player, new WoolManiaPlayer(player));
+        WoolManiaPlayer p = new WoolManiaPlayer(player);
+        event.joinMessage(null);
+        WoolMania.getInstance().woolManiaPlayerMap.put(player, p);
         WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
         setupScoreboardForNPCs(player);
+
+        Location location = player.getLocation();
+        for (var hall : Hall.values()) {
+            if (hall.getHallArea().isWithinBounds(location)) {
+                if (hall.getPool().isWithinBounds(location)) {
+                    p.teleportSyncTo(hall);
+                } else {
+                    p.setHall(hall);
+                }
+                break;
+            }
+        }
+
+        if (p.getHall() == null) {
+            p.teleportSyncToSpawn();
+        }
     }
 
     private void setupScoreboardForNPCs(Player player) {

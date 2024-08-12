@@ -10,11 +10,15 @@ package eu.darkcube.system.woolmania.util.message;
 import java.util.function.Function;
 
 import eu.darkcube.system.BaseMessage;
+import eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
+import org.bukkit.entity.Player;
 
 public enum Message implements BaseMessage {
 
+    HALL,
     HALLS_RESET,
     TIMER_IS_OVER,
     TIMER_IS_OVER_SECOUND,
@@ -54,7 +58,6 @@ public enum Message implements BaseMessage {
     BOOSTER_SET_NONE,
     BOOSTER_SETTED_NONE,
 
-
     ;
 
     public static final String PREFIX_ITEM = "ITEM_";
@@ -77,6 +80,10 @@ public enum Message implements BaseMessage {
     @Override
     public String key() {
         return key;
+    }
+
+    public net.kyori.adventure.text.Component getBukkit(Player player, Object... replacements) {
+        return KyoriAdventureSupport.adventureSupport().convert(getMessage(UserAPI.instance().user(player.getUniqueId()), replacements));
     }
 
     public static Component getMessage(String messageKey, Language language, Object... replacements) {

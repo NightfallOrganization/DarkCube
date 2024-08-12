@@ -23,21 +23,20 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
+import eu.darkcube.system.util.data.DataKey;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 public enum Items implements ItemFactory {
     INVENTORY_SHOP_STEAK(item(COOKED_BEEF)),
     INVENTORY_SHOP_SHEARS(item(SHEARS)),
-    INVENTORY_SHOP_MUSIC_DISK(item(MUSIC_DISC_PIGSTEP)),
+    INVENTORY_SHOP_SOUNDS(item(MUSIC_DISC_PIGSTEP)),
 
     ;
 
-    public static final Key ITEM_ID = Key.key(WoolMania.getInstance(), "item_id");
+    public static final DataKey<String> ITEM_ID = DataKey.of(Key.key(WoolMania.getInstance(), "item_id"), PersistentDataTypes.STRING);
     private final String key;
     private final ItemBuilder builder;
 
@@ -74,7 +73,7 @@ public enum Items implements ItemFactory {
     public @NotNull ItemBuilder getItem(@NotNull User user, boolean storeItemId) {
         ItemBuilder builder = this.builder();
         if (storeItemId) {
-            builder.persistentDataStorage().set(ITEM_ID, PersistentDataTypes.STRING, itemID());
+            builder.persistentDataStorage().set(ITEM_ID, itemID());
         }
         Language language = user.language();
         Component name = Message.getMessage(this.itemID(), language);
@@ -102,6 +101,6 @@ public enum Items implements ItemFactory {
 
     @Nullable
     public static String getItemID(ItemBuilder item) {
-        return item.persistentDataStorage().get(ITEM_ID, PersistentDataTypes.STRING);
+        return item.persistentDataStorage().get(ITEM_ID);
     }
 }
