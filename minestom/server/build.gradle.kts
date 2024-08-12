@@ -91,7 +91,7 @@ dependencies {
     api(darkcubesystem.api.cloudnet)
     api(darkcubesystem.server.cloudnet) { exclude("org.jetbrains", "annotations") }
     // libraries to be added
-    minestomLibrary("org.slf4j:jul-to-slf4j:2.0.14")
+    minestomLibrary("org.slf4j:jul-to-slf4j:2.0.16")
     minestomLibrary(libs.kotlin.stdlib)
     minestomLibrary("org.apache.logging.log4j:log4j-core:2.23.1")
     minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1")
