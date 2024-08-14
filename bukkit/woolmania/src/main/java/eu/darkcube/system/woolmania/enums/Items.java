@@ -34,15 +34,31 @@ public enum Items implements ItemFactory {
     INVENTORY_SHOP_SHEARS(item(SHEARS)),
     INVENTORY_SHOP_SOUNDS(item(MUSIC_DISC_PIGSTEP)),
 
+
+    //Shop-Sound-Items
+    INVENTORY_SOUNDS_STANDARD(item(MUSIC_DISC_WARD)),
+    INVENTORY_SOUNDS_WOOLBATTLE(item(MUSIC_DISC_MALL),15000),
+
     ;
 
     public static final DataKey<String> ITEM_ID = DataKey.of(Key.key(WoolMania.getInstance(), "item_id"), PersistentDataTypes.STRING);
     private final String key;
     private final ItemBuilder builder;
+    private Integer cost;
+
+    Items(ItemBuilder builder, Integer cost) {
+        this.builder = builder;
+        this.cost = cost;
+        key = this.name();
+    }
 
     Items(ItemBuilder builder) {
         this.builder = builder;
         key = this.name();
+    }
+
+    public Integer getCost() {
+        return cost;
     }
 
     public @NotNull String key() {
@@ -70,13 +86,21 @@ public enum Items implements ItemFactory {
         return getItem(user, true);
     }
 
+    public @NotNull ItemBuilder getItem(@NotNull User user, Object... displayNameReplacements) {
+        return getItem(user, displayNameReplacements, true);
+    }
+
     public @NotNull ItemBuilder getItem(@NotNull User user, boolean storeItemId) {
+        return getItem(user, new Object[0], storeItemId);
+    }
+
+    public @NotNull ItemBuilder getItem(@NotNull User user, Object[] displayNameReplacements, boolean storeItemId) {
         ItemBuilder builder = this.builder();
         if (storeItemId) {
             builder.persistentDataStorage().set(ITEM_ID, itemID());
         }
         Language language = user.language();
-        Component name = Message.getMessage(this.itemID(), language);
+        Component name = Message.getMessage(this.itemID(), language, displayNameReplacements);
         builder.displayname(name);
 
         if (language.containsMessage(Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + key())) {

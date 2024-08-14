@@ -8,6 +8,7 @@
 package eu.darkcube.system.woolmania.util;
 
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
+import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Hall;
@@ -53,6 +54,11 @@ public class Ruler implements Listener {
 
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
+        if (player.getWorld().equals(MAINWORLD)) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (hall == null) {
             event.setCancelled(true);
             return;
@@ -69,7 +75,7 @@ public class Ruler implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getPlayer().getWorld().equals(HALLS) && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE) {
             event.setCancelled(true);
         }
     }

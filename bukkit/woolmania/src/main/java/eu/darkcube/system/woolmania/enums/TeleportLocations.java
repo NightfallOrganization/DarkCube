@@ -14,7 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 public enum TeleportLocations {
-    SPAWN(MAINWORLD, 631.5, 121, 467, -90, 0),
+    SPAWN(MAINWORLD, 15.5, 199, -3.5, 45, 0),
     HALL1(HALLS, 0.5, 111, 0.5, -90, 0)
 
     ;

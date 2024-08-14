@@ -57,6 +57,8 @@ public enum Message implements BaseMessage {
     BOOSTER_SET_OWN_NONE,
     BOOSTER_SET_NONE,
     BOOSTER_SETTED_NONE,
+    ITEM_BUY_COST,
+    ITEM_BUY_BOUGHT,
 
     ;
 

@@ -13,7 +13,6 @@ import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.entity.Player;
@@ -57,7 +56,7 @@ public class BlockBreakListener implements Listener {
         customItem.updateItemLore();
 
         if (player.getInventory().addItem(customItem.getItemStack()).isEmpty()) {
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 2.0f);
+            WoolMania.getStaticPlayer(player).getSound().playSound(player);
         } else {
             block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
         }

@@ -25,6 +25,7 @@ import eu.darkcube.system.woolmania.listener.BlockBreakListener;
 import eu.darkcube.system.woolmania.listener.JoinListener;
 import eu.darkcube.system.woolmania.listener.LeaveListener;
 import eu.darkcube.system.woolmania.listener.NPCListeners;
+import eu.darkcube.system.woolmania.listener.PlayerMoveListener;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
@@ -70,8 +71,10 @@ public class WoolMania extends DarkCubePlugin {
         var joinListener = new JoinListener();
         var leaveListener = new LeaveListener();
         var blockBreakListener = new BlockBreakListener();
+        var playerMoveListener = new PlayerMoveListener();
         var ruler = new Ruler();
 
+        instance.getServer().getPluginManager().registerEvents(playerMoveListener, this);
         instance.getServer().getPluginManager().registerEvents(blockBreakListener, this);
         instance.getServer().getPluginManager().registerEvents(joinListener, this);
         instance.getServer().getPluginManager().registerEvents(leaveListener, this);

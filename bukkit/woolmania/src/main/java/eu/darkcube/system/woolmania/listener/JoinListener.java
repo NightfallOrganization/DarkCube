@@ -32,9 +32,9 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        WoolManiaPlayer p = new WoolManiaPlayer(player);
+        WoolManiaPlayer woolmaniaPlayer = new WoolManiaPlayer(player);
         event.joinMessage(null);
-        WoolMania.getInstance().woolManiaPlayerMap.put(player, p);
+        WoolMania.getInstance().woolManiaPlayerMap.put(player, woolmaniaPlayer);
         WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
         setupScoreboardForNPCs(player);
 
@@ -42,16 +42,16 @@ public class JoinListener implements Listener {
         for (var hall : Hall.values()) {
             if (hall.getHallArea().isWithinBounds(location)) {
                 if (hall.getPool().isWithinBounds(location)) {
-                    p.teleportSyncTo(hall);
+                    woolmaniaPlayer.teleportSyncTo(hall);
                 } else {
-                    p.setHall(hall);
+                    woolmaniaPlayer.setHall(hall);
                 }
                 break;
             }
         }
 
-        if (p.getHall() == null) {
-            p.teleportSyncToSpawn();
+        if (woolmaniaPlayer.getHall() == null) {
+            woolmaniaPlayer.teleportSyncToSpawn();
         }
     }
 

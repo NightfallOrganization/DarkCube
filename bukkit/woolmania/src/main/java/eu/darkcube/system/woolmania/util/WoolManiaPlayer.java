@@ -7,9 +7,12 @@
 
 package eu.darkcube.system.woolmania.util;
 
+import java.util.List;
+
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.enums.Sounds;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -20,6 +23,9 @@ public class WoolManiaPlayer {
     PersistentDataValue<Integer> xp;
     PersistentDataValue<Integer> farmedBlocks;
     PersistentDataValue<Integer> privateBooster;
+    PersistentDataValue<Sounds> farmingSound;
+    List<Sounds> lockedSoundsDefault = Sounds.unlockedSounds();
+    PersistentDataValue<List<Sounds>> lockedSounds;
     Player player;
     WoolMania woolMania = WoolMania.getInstance();
     @Nullable
@@ -36,13 +42,15 @@ public class WoolManiaPlayer {
         xp = new PersistentDataValue<>(new NamespacedKey(woolMania, "xp"), Integer.class, player.getPersistentDataContainer(), 0);
         farmedBlocks = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmedBlocks"), Integer.class, player.getPersistentDataContainer(), 0);
         privateBooster = new PersistentDataValue<>(new NamespacedKey(woolMania, "privateBooster"), Integer.class, player.getPersistentDataContainer(), 1);
+        farmingSound = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmingSound"), Sounds.class, player.getPersistentDataContainer(), Sounds.FARMING_SOUND_STANDARD);
+        lockedSounds = new PersistentDataValue<>(new NamespacedKey(woolMania, "lockedSounds"), List.class, player.getPersistentDataContainer(), lockedSoundsDefault);
     }
 
     private void updateHall(@Nullable Hall hall) {
         this.hall = hall;
-
     }
 
+    //<editor-fold desc="Teleport">
     public void teleportTo(Hall hall) {
         updateHall(hall);
         player.teleportAsync(hall.getSpawn().getLocation());
@@ -62,6 +70,7 @@ public class WoolManiaPlayer {
         updateHall(hall);
         player.teleport(TeleportLocations.SPAWN.getLocation());
     }
+    //</editor-fold>
 
     //<editor-fold desc="Getter">
     public Integer getLevel() {
@@ -87,6 +96,10 @@ public class WoolManiaPlayer {
     @Nullable
     public Hall getHall() {
         return hall;
+    }
+
+    public boolean isLockedSound(Sounds sound) {
+        return lockedSounds.getOrDefault().contains(sound);
     }
     //</editor-fold>
 
@@ -120,6 +133,11 @@ public class WoolManiaPlayer {
         privateBooster.set(integer);
         WoolMania.getInstance().getGameScoreboard().updateBooster(player);
     }
+
+    public void setFarmingSound(Sounds sound) {
+        farmingSound.set(sound);
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="Adder">
@@ -181,6 +199,10 @@ public class WoolManiaPlayer {
         int currentPrivateBooster = privateBooster.getOrDefault();
         privateBooster.set(currentPrivateBooster - integer);
         WoolMania.getInstance().getGameScoreboard().updateBooster(player);
+    }
+
+    public void unlockSound(Sounds sound) {
+        lockedSounds.getOrDefault().remove(sound);
     }
     //</editor-fold>
 
