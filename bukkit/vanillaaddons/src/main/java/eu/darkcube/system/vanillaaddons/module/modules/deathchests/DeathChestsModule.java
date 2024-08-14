@@ -16,7 +16,8 @@ import java.util.UUID;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.server.item.component.ItemComponent;
+import eu.darkcube.system.server.item.component.components.HeadProfile;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import org.bukkit.Bukkit;
@@ -49,7 +50,8 @@ public class DeathChestsModule implements Module, Listener {
         this.addons = addons;
     }
 
-    @EventHandler public void onDeath(PlayerDeathEvent e) {
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
         if (isPlayerKill(e.getPlayer())) {
             e.setKeepInventory(true);
             e.setKeepLevel(true);
@@ -85,15 +87,13 @@ public class DeathChestsModule implements Module, Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST) public void onDamage(EntityDamageEvent e) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player p)) return;
         if (e.getCause().equals(DamageCause.VOID)) return;
         if (e.getFinalDamage() < p.getHealth() + p.getAbsorptionAmount()) return;
         PlayerInventory inv = p.getInventory();
-        if (inv.getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || inv
-                .getItemInOffHand()
-                .getType()
-                .equals(Material.TOTEM_OF_UNDYING)) return;
+        if (inv.getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || inv.getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) return;
 
         int slot = containsTotem(inv);
         if (slot == -1) return;
@@ -102,7 +102,8 @@ public class DeathChestsModule implements Module, Listener {
         inv.setItem(slot, null);
 
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 inv.setItemInOffHand(old);
             }
         }.runTaskLater(addons, 1);
@@ -131,10 +132,7 @@ public class DeathChestsModule implements Module, Listener {
     }
 
     private ItemStack getPlayerHead(String name, UUID uuid) {
-        var item = ItemBuilder
-                .item(Material.PLAYER_HEAD)
-                .meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(name, uuid)))
-                .displayname(Component.text(name, NamedTextColor.YELLOW));
+        var item = ItemBuilder.item(Material.PLAYER_HEAD).set(ItemComponent.PROFILE, new HeadProfile(name, uuid, List.of())).displayname(Component.text(name, NamedTextColor.YELLOW));
         return item.build();
     }
 
@@ -165,11 +163,13 @@ public class DeathChestsModule implements Module, Listener {
         return false;
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, addons);
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         HandlerList.unregisterAll(this);
     }
 }

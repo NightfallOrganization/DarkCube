@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.vanillaaddons.module.modules.anvilmechanics;
 
+import static eu.darkcube.system.server.item.component.ItemComponent.STORED_ENCHANTMENTS;
 import static eu.darkcube.system.server.item.material.Material.of;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import eu.darkcube.system.bukkit.item.material.BukkitMaterial;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.EnchantmentStorageBuilderMeta;
+import eu.darkcube.system.server.item.component.components.EnchantmentList;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
 import eu.darkcube.system.vanillaaddons.module.Module;
 import org.bukkit.Bukkit;
@@ -77,7 +78,7 @@ public class AnvilMechanicsModule implements Module, Listener {
         var repair = false;
 
         if (second != null) {
-            var enchantedBook = second.material() == of(Material.ENCHANTED_BOOK) && !second.meta(EnchantmentStorageBuilderMeta.class).enchantments().isEmpty();
+            var enchantedBook = second.material() == of(Material.ENCHANTED_BOOK) && !second.get(STORED_ENCHANTMENTS, EnchantmentList.EMPTY).enchantments().isEmpty();
             if (((BukkitMaterial) result.material()).bukkitType().getMaxDurability() != 0 && first.canBeRepairedBy(second)) {
                 var k = Math.min(result.damage(), ((BukkitMaterial) result.material()).bukkitType().getMaxDurability() / 4);
                 if (k <= 0) {
@@ -208,7 +209,7 @@ public class AnvilMechanicsModule implements Module, Listener {
             else cost = 1;
 
             if (result.material() == of(Material.ENCHANTED_BOOK)) {
-                result.meta(EnchantmentStorageBuilderMeta.class).enchantments(resultEnchantments);
+                result.set(STORED_ENCHANTMENTS, EnchantmentList.EMPTY.withEnchantments(resultEnchantments).withTooltip(result.get(STORED_ENCHANTMENTS, EnchantmentList.EMPTY).showInTooltip()));
             } else result.enchantments(resultEnchantments);
         }
         return new Data(first, second, result, cost, repairItemCountCost);
@@ -219,7 +220,7 @@ public class AnvilMechanicsModule implements Module, Listener {
     }
 
     private Map<eu.darkcube.system.server.item.enchant.Enchantment, Integer> enchantments(ItemBuilder item) {
-        return new HashMap<>(item.material() == of(Material.ENCHANTED_BOOK) ? item.meta(EnchantmentStorageBuilderMeta.class).enchantments() : item.enchantments());
+        return new HashMap<>(item.material() == of(Material.ENCHANTED_BOOK) ? item.get(STORED_ENCHANTMENTS, EnchantmentList.EMPTY).getEnchantments() : item.enchantments());
     }
 
     private int calculateIncreasedRepairCost(int cost) {

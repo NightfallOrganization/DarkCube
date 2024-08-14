@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.lobbysystem.util;
 
+import static eu.darkcube.system.server.item.component.ItemComponent.FIREWORK_EXPLOSION;
 import static org.bukkit.Material.*;
 
 import java.util.ArrayList;
@@ -16,11 +17,10 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.lobbysystem.Lobby;
 import eu.darkcube.system.lobbysystem.gadget.Gadget;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.FireworkBuilderMeta;
+import eu.darkcube.system.server.item.component.components.FireworkExplosion;
 import eu.darkcube.system.userapi.User;
+import eu.darkcube.system.util.Color;
 import eu.darkcube.system.util.data.PersistentDataTypes;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -81,9 +81,9 @@ public enum Item {
     CANCEL(ItemBuilder.item(INK_SACK).damage(1)),
     START_PSERVER(ItemBuilder.item(INK_SACK).damage(2)),
     STOP_PSERVER(ItemBuilder.item(INK_SACK).damage(1)),
-    PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE).meta(new FireworkBuilderMeta(FireworkEffect.builder().withColor(Color.fromRGB(255, 255, 255)).build())).flag(ItemFlag.HIDE_POTION_EFFECTS)),
+    PSERVER_PUBLIC(ItemBuilder.item(FIREWORK_CHARGE).set(FIREWORK_EXPLOSION, FireworkExplosion.builder().withColor(new Color(255, 255, 255)).build()).flag(ItemFlag.HIDE_POTION_EFFECTS)),
 
-    PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE).meta(new FireworkBuilderMeta(FireworkEffect.builder().withColor(Color.fromRGB(255, 0, 0)).build())).flag(ItemFlag.HIDE_POTION_EFFECTS)),
+    PSERVER_PRIVATE(ItemBuilder.item(FIREWORK_CHARGE).set(FIREWORK_EXPLOSION, FireworkExplosion.builder().withColor(new Color(255, 0, 0)).build()).flag(ItemFlag.HIDE_POTION_EFFECTS)),
 
     ARROW_NEXT(ItemBuilder.item(ARROW)),
 

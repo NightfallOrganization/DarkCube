@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.inventory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,7 +19,8 @@ import eu.darkcube.system.bukkit.inventoryapi.v1.IInventoryClickEvent;
 import eu.darkcube.system.bukkit.inventoryapi.v1.InventoryType;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.server.item.component.ItemComponent;
+import eu.darkcube.system.server.item.component.components.HeadProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -63,7 +65,7 @@ public class CompassTeleportInventory extends WoolBattlePagedInventory {
             if (user.getTeam().isSpectator()) {
                 continue;
             }
-            ItemBuilder b = ItemBuilder.item(Material.SKULL_ITEM).meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(user.getPlayerName()))).damage(3).displayname(user.getTeamPlayerName());
+            ItemBuilder b = ItemBuilder.item(Material.SKULL_ITEM).set(ItemComponent.PROFILE, new HeadProfile(user.getPlayerName(), null, List.of())).damage(3).displayname(user.getTeamPlayerName());
             ItemManager.setId(b, USER, user.getUniqueId().toString());
             items.put(i++, b.build());
         }
