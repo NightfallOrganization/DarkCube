@@ -12,11 +12,12 @@ import static org.bukkit.Material.*;
 
 import eu.darkcube.minigame.woolbattle.user.WBUser;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.SpawnEggBuilderMeta;
+import eu.darkcube.system.server.item.component.LegacyItemComponent;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+@SuppressWarnings("deprecation")
 public enum Item {
 
     LOBBY_TEAMS(item(BOOK)),
@@ -118,8 +119,8 @@ public enum Item {
     NEXT_PAGE_UNUSABLE(item(STAINED_GLASS_PANE).damage(14)),
     PREV_PAGE_UNUSABLE(item(STAINED_GLASS_PANE).damage(14)),
     PERK_SCAMP(item(GOLD_INGOT)),
-    PERK_SPIDER(item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52)),
-    PERK_SPIDER_COOLDOWN(item(MONSTER_EGG).meta(new SpawnEggBuilderMeta("{id:\"Spider\"}")).damage(52)),
+    PERK_SPIDER(item(MONSTER_EGG).set(LegacyItemComponent.SPAWNER_ENTITY_DATA, "{id:\"Spider\"}").damage(52)),
+    PERK_SPIDER_COOLDOWN(item(MONSTER_EGG).set(LegacyItemComponent.SPAWNER_ENTITY_DATA, "{id:\"Spider\"}").damage(52)),
     PERK_DRAW_ARROW(item(TORCH)),
     PERK_DRAW_ARROW_COOLDOWN(item(TORCH)),
     PERK_FREEZE_ARROW(item(ARROW)),
