@@ -7,6 +7,9 @@
 
 package eu.darkcube.system.vanillaaddons.module.modules.teleporter;
 
+import static eu.darkcube.system.server.item.component.ItemComponent.PROFILE;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -19,7 +22,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.server.item.component.components.HeadProfile;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.vanillaaddons.AUser;
 import eu.darkcube.system.vanillaaddons.VanillaAddons;
@@ -54,7 +57,8 @@ public class TeleporterTrustedListInventory extends AbstractInventory<AddonsAsyn
                     AUser.user(event.user()).openInventory(TeleporterTrustedListAddInventory.TYPE, data());
                 } else if (type == 1) {
                     if (event.bukkitEvent().getClick() != ClickType.RIGHT) return;
-                    UUID target = item.meta(SkullBuilderMeta.class).owningPlayer().uniqueId();
+                    var profile = item.get(PROFILE);
+                    UUID target = profile == null ? null : profile.uuid();
                     data().trustedList().remove(target);
                     TeleporterListener.saveTeleporters(VanillaAddons.instance(), data().block().block().getWorld());
                     recalculate();
@@ -67,7 +71,7 @@ public class TeleporterTrustedListInventory extends AbstractInventory<AddonsAsyn
                 for (UUID uuid : data().trustedList()) {
                     OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);// 374
                     String name = op.hasPlayedBefore() ? op.getName() == null ? "Unbekannter Spieler" : op.getName() : "Unbekannter Spieler";
-                    items.put(id++, ItemBuilder.item(Material.PLAYER_HEAD).meta(new SkullBuilderMeta().owningPlayer(new SkullBuilderMeta.UserProfile(name, uuid))).displayname(Component.text(name).color(TextColor.color(255, 0, 0))).lore(Component.text("Rechtsklick um Spieler Zugriff zu entfernen").color(TextColor.color(120, 120, 120)), Component.text(uuid.toString()).color(TextColor.color(80, 80, 80))).persistentDataStorage().iset(KEY_TYPE, PersistentDataTypes.INTEGER, 1).builder().build());
+                    items.put(id++, ItemBuilder.item(Material.PLAYER_HEAD).set(PROFILE, new HeadProfile(name, uuid, List.of())).displayname(Component.text(name).color(TextColor.color(255, 0, 0))).lore(Component.text("Rechtsklick um Spieler Zugriff zu entfernen").color(TextColor.color(120, 120, 120)), Component.text(uuid.toString()).color(TextColor.color(80, 80, 80))).persistentDataStorage().iset(KEY_TYPE, PersistentDataTypes.INTEGER, 1).builder().build());
                 }
             }
 

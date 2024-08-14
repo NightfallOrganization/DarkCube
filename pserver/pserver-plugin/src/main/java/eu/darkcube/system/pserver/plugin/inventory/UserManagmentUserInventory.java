@@ -8,6 +8,7 @@
 package eu.darkcube.system.pserver.plugin.inventory;
 
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,7 +21,8 @@ import eu.darkcube.system.pserver.plugin.Message;
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserManager;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.server.item.component.ItemComponent;
+import eu.darkcube.system.server.item.component.components.HeadProfile;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,22 +36,18 @@ public class UserManagmentUserInventory extends DefaultPServerSyncPagedInventory
         super(user, TYPE, Message.USER_MANAGMENT_USER_INVENTORY_TITLE.getMessage(user.getCommandExecutor(), targetName));
         this.targetUUID = targetUUID;
         this.target = UserManager.getInstance().getUser(this.targetUUID);
-        this.staticItems.put(IInventory.slot0(5, 1), ItemBuilder
-                .item(Material.SKULL_ITEM)
-                .damage(3)
-                .displayname(Component.text(targetName, NamedTextColor.GRAY))
-                .meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(targetName, targetUUID)))
-                .lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessage(user.getCommandExecutor(), targetName, targetUUID))
-                .build());
+        this.staticItems.put(IInventory.slot0(5, 1), ItemBuilder.item(Material.SKULL_ITEM).damage(3).displayname(Component.text(targetName, NamedTextColor.GRAY)).set(ItemComponent.PROFILE, new HeadProfile(targetName, targetUUID, List.of())).lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessage(user.getCommandExecutor(), targetName, targetUUID)).build());
         tryFillInv();
     }
 
-    @Override protected void addConditions(Deque<Condition> conditions) {
+    @Override
+    protected void addConditions(Deque<Condition> conditions) {
         super.addConditions(conditions);
         conditions.add(() -> target != null);
     }
 
-    @Override protected void fillItems(Map<Integer, ItemStack> items) {
+    @Override
+    protected void fillItems(Map<Integer, ItemStack> items) {
         items.put(3, Item.USER_MANAGMENT_PERMISSIONS.getItem(user));
     }
 }

@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.pserver.plugin.inventory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,7 +21,8 @@ import eu.darkcube.system.pserver.plugin.listener.UserManagmentInventoryListener
 import eu.darkcube.system.pserver.plugin.user.User;
 import eu.darkcube.system.pserver.plugin.user.UserCache;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.meta.SkullBuilderMeta;
+import eu.darkcube.system.server.item.component.ItemComponent;
+import eu.darkcube.system.server.item.component.components.HeadProfile;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -51,7 +53,7 @@ public class UserManagmentInventory extends DefaultPServerSyncPagedInventory {
                 continue;
             }
             ItemBuilder builder = ItemBuilder.item(Material.SKULL_ITEM).damage(3);
-            builder.meta(new SkullBuilderMeta(new SkullBuilderMeta.UserProfile(entry.name, entry.uuid)));
+            builder.set(ItemComponent.PROFILE, new HeadProfile(entry.name, entry.uuid, List.of()));
             builder.displayname(Component.text(entry.name).color(NamedTextColor.GRAY));
             builder.persistentDataStorage().iset(KEY, PersistentDataTypes.STRING, KEY_VALUE).iset(USER_UUID_KEY, PersistentDataTypes.STRING, entry.uuid.toString()).iset(USER_NAME_KEY, PersistentDataTypes.STRING, entry.name);
             builder.lore(Message.ITEM_LORE_USER_MANAGMENT_INVENTORY_USER.getMessage(user.getCommandExecutor(), entry.name, entry.uuid));
