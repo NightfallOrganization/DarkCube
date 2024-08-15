@@ -4,7 +4,11 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.vanillaaddons.module.modules.rtp;
+
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.system.bukkit.commandapi.Command;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
@@ -15,9 +19,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 public class RTPModule extends Command implements Module {
 
@@ -51,11 +52,13 @@ public class RTPModule extends Command implements Module {
         });
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         CommandAPI.instance().register(this);
     }
 
-    @Override public void onDisable() {
+    @Override
+    public void onDisable() {
         CommandAPI.instance().unregister(this);
     }
 }

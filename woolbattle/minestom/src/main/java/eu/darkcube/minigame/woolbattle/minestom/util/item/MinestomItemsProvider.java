@@ -7,7 +7,6 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.util.item;
 
-import static eu.darkcube.system.minestom.item.flag.MinestomItemFlag.HIDE_UNBREAKABLE;
 import static eu.darkcube.system.server.item.ItemBuilder.item;
 import static net.minestom.server.item.Material.*;
 import static net.minestom.server.item.enchant.Enchantment.*;
@@ -89,7 +88,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_FREEZER_COOLDOWN -> item(ICE);
             case PERK_PROTECTIVE_SHIELD -> item(EMERALD);
             case PERK_PROTECTIVE_SHIELD_COOLDOWN -> item(EMERALD);
-            case PERK_GRAPPLING_HOOK -> item(FISHING_ROD).unbreakable(true).flag(HIDE_UNBREAKABLE);
+            case PERK_GRAPPLING_HOOK -> item(FISHING_ROD).hiddenUnbreakable();
             case PERK_GRAPPLING_HOOK_COOLDOWN -> item(STICK);
             case PERK_ELEVATOR -> item(PISTON);
             case PERK_ELEVATOR_COOLDOWN -> item(PISTON);
@@ -99,14 +98,14 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_HOOK_ARROW -> item(REDSTONE_TORCH);
             case PERK_HOOK_ARROW_COOLDOWN -> item(REDSTONE_TORCH);
             case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5)/*.flag(HIDE_UNBREAKABLE)TODO*/.unbreakable(true);
-            case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).unbreakable(true).flag(HIDE_UNBREAKABLE);
+            case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).hiddenUnbreakable();
             case DEFAULT_PEARL -> item(ENDER_PEARL).glow(true);
             case DEFAULT_PEARL_COOLDOWN -> item(FIREWORK_STAR);
             case DEFAULT_ARROW -> item(ARROW);
-            case ARMOR_LEATHER_BOOTS -> item(LEATHER_BOOTS).unbreakable(true).flag(HIDE_UNBREAKABLE);
-            case ARMOR_LEATHER_LEGGINGS -> item(LEATHER_LEGGINGS).unbreakable(true).flag(HIDE_UNBREAKABLE);
-            case ARMOR_LEATHER_CHESTPLATE -> item(LEATHER_CHESTPLATE).unbreakable(true).flag(HIDE_UNBREAKABLE);
-            case ARMOR_LEATHER_HELMET -> item(LEATHER_HELMET).unbreakable(true).flag(HIDE_UNBREAKABLE);
+            case ARMOR_LEATHER_BOOTS -> item(LEATHER_BOOTS).hiddenUnbreakable();
+            case ARMOR_LEATHER_LEGGINGS -> item(LEATHER_LEGGINGS).hiddenUnbreakable();
+            case ARMOR_LEATHER_CHESTPLATE -> item(LEATHER_CHESTPLATE).hiddenUnbreakable();
+            case ARMOR_LEATHER_HELMET -> item(LEATHER_HELMET).hiddenUnbreakable();
             case TELEPORT_COMPASS -> item(COMPASS).glow(true);
             case LOBBY_PARTICLES_ON -> item(BLAZE_ROD);
             case LOBBY_PARTICLES_OFF -> item(BLAZE_ROD);

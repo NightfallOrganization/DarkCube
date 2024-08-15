@@ -54,8 +54,12 @@ public class LobbyUser {
     public LobbyUser(User user) {
         this.user = user;
         long time1 = System.currentTimeMillis();
-        this.user.persistentData().setIfNotPresent(ANIMATIONS, PersistentDataTypes.BOOLEAN, true);
-        this.user.persistentData().setIfNotPresent(SOUNDS, PersistentDataTypes.BOOLEAN, true);
+        if (this.user.persistentData().has(ANIMATIONS)) {
+            user.settings().animations(!Boolean.FALSE.equals(this.user.persistentData().remove(ANIMATIONS, PersistentDataTypes.BOOLEAN)));
+        }
+        if (this.user.persistentData().has(SOUNDS)) {
+            user.settings().animations(!Boolean.FALSE.equals(this.user.persistentData().remove(SOUNDS, PersistentDataTypes.BOOLEAN)));
+        }
         this.user.persistentData().setIfNotPresent(LAST_DAILY_REWARD, PersistentDataTypes.LONG, 0L);
         this.user.persistentData().setIfNotPresent(REWARD_SLOTS_USED, INTEGERS, new HashSet<>());
         this.user.persistentData().setIfNotPresent(GADGET, TYPE_GADGET, Gadget.GRAPPLING_HOOK);
@@ -175,11 +179,11 @@ public class LobbyUser {
 
     public boolean isSounds() {
         if (disableSounds()) return false;
-        return user.persistentData().get(SOUNDS, PersistentDataTypes.BOOLEAN);
+        return user.settings().sounds();
     }
 
     public void setSounds(boolean sounds) {
-        user.persistentData().set(SOUNDS, PersistentDataTypes.BOOLEAN, sounds);
+        user.settings().sounds(sounds);
     }
 
     public boolean disableSounds() {
@@ -192,11 +196,11 @@ public class LobbyUser {
 
     public boolean isAnimations() {
         if (disableAnimations()) return false;
-        return user.persistentData().get(ANIMATIONS, PersistentDataTypes.BOOLEAN);
+        return user.settings().animations();
     }
 
     public void setAnimations(boolean animations) {
-        user.persistentData().set(ANIMATIONS, PersistentDataTypes.BOOLEAN, animations);
+        user.settings().animations(animations);
     }
 
     public long getLastDailyReward() {
