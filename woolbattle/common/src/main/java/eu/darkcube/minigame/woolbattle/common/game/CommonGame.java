@@ -36,6 +36,7 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.CommonSchedulerManager;
 import eu.darkcube.system.event.EventFilter;
 import eu.darkcube.system.event.EventNode;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
@@ -57,7 +58,8 @@ public class CommonGame implements Game {
     private volatile CommonPhase phase;
     private volatile @NotNull CommonMap map;
 
-    CommonGame(@NotNull CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull Map map) {
+    @ApiStatus.Internal
+    public CommonGame(@NotNull CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull Map map) {
         this.woolbattle = woolbattle;
         this.id = id;
         this.eventManager = EventNode.type("game-" + id, EventFilter.ALL, (event, _) -> {

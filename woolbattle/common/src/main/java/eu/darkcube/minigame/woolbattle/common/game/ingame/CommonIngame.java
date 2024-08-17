@@ -10,22 +10,34 @@ package eu.darkcube.minigame.woolbattle.common.game.ingame;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.inventory.IngameUserInventory;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserChatListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserJoinGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserLoginGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserQuitGameListener;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMapIngameData;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicReader;
 import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.GameState;
 
-public class CommonIngame extends CommonPhase {
+public class CommonIngame extends CommonPhase implements Ingame {
 
     private CommonIngameWorld world;
     private CommonMapIngameData mapIngameData;
 
     public CommonIngame(@NotNull CommonGame game) {
         super(game, GameState.INGAME);
+
+        this.listeners.addListener(new IngameUserChatListener(woolbattle).create());
+        this.listeners.addListener(new IngameUserJoinGameListener(this).create());
+        this.listeners.addListener(new IngameUserLoginGameListener(this).create());
+        this.listeners.addChild(new IngameUserQuitGameListener(this).node());
     }
 
     @Override
@@ -33,6 +45,9 @@ public class CommonIngame extends CommonPhase {
         super.init(oldPhase);
         loadWorld();
         mapIngameData = woolbattleApi.mapManager().loadIngameData(game.map());
+        for (var user : game.users()) {
+            preJoin(user);
+        }
     }
 
     @Override
@@ -40,6 +55,10 @@ public class CommonIngame extends CommonPhase {
         super.enable(oldPhase);
         var splitter = new TeamSplitter(game);
         splitter.splitPlayers();
+
+        for (var user : game.users()) {
+            join(user);
+        }
     }
 
     @Override
@@ -47,6 +66,19 @@ public class CommonIngame extends CommonPhase {
         super.unload(newPhase);
         woolbattleApi.worldHandler().unloadWorld(world);
         world = null;
+    }
+
+    public void preJoin(@NotNull CommonWBUser user) {
+        IngameUserInventory.create(user);
+    }
+
+    public void join(@NotNull CommonWBUser user) {
+        var inventory = IngameUserInventory.get(user);
+        inventory.setAllItems();
+    }
+
+    public void quit(@NotNull CommonWBUser user) {
+        IngameUserInventory.destroy(user);
     }
 
     private void loadWorld() {

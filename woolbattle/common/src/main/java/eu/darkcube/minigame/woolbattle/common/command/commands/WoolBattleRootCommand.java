@@ -16,6 +16,7 @@ import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.Migrat
 import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.MigrateMapsCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.SetupCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.TeamsCommand;
+import eu.darkcube.minigame.woolbattle.common.command.commands.woolbattle.UnsafeCommand;
 
 public class WoolBattleRootCommand extends WoolBattleCommand {
     public WoolBattleRootCommand(CommonWoolBattleApi woolbattle) {
@@ -28,6 +29,7 @@ public class WoolBattleRootCommand extends WoolBattleCommand {
                 .then(new TeamsCommand(woolbattle).builder())
                 .then(new MapsCommand(woolbattle).builder())
                 .then(new MigrateMapDataCommand(woolbattle).builder())
+                .then(new UnsafeCommand(woolbattle).builder())
         );
         // @formatter:on
     }

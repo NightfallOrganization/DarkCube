@@ -206,4 +206,13 @@ public interface WBUser extends CommandSender {
 
     @Api
     void particles(boolean particles);
+
+    /**
+     * Checks whether the user can see another user. This state should be aware of game state and team.
+     *
+     * @param other the other user
+     * @return if this user can see the other user
+     */
+    @Api
+    boolean canSee(WBUser other);
 }

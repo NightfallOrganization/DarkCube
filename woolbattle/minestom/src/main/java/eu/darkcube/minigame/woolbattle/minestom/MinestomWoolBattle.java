@@ -24,6 +24,7 @@ import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
 import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomChatListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInteractListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInventoryListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomItemListener;
@@ -64,7 +65,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, this.api);
         WoolBattleProvider.PROVIDER.register(Slot.Mappings.class, new MinestomSlotMappings());
         WoolBattleProvider.PROVIDER.register(DefaultUserPerk.Implementation.class, new MinestomUserPerkImplementation());
-        WoolBattleProvider.PROVIDER.register(PerkItem.Implementation.class, new MinestomPerkItemImplementation());
+        WoolBattleProvider.PROVIDER.register(PerkItem.Implementation.class, new MinestomPerkItemImplementation(this));
         this.playerKey = Key.key(this.api, "minestom_player");
         this.setupModeImplementation = new MinestomSetupModeImplementation(this.api);
     }
@@ -84,6 +85,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         MinestomInventoryListener.register(this, eventManager);
         MinestomAnimationListener.register(this, eventManager);
         MinestomInteractListener.register(this, eventManager);
+        MinestomChatListener.register(this, eventManager);
 
         MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
@@ -118,6 +120,11 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     @Override
     public @NotNull MinestomWoolBattleApi api() {
         return api;
+    }
+
+    @Override
+    public @NotNull CommandSender consoleSender() {
+        return wrapCommandSender(MinecraftServer.getCommandManager().getConsoleSender());
     }
 
     @Override

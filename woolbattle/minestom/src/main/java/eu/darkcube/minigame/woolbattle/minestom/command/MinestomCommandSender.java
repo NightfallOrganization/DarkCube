@@ -30,7 +30,7 @@ public class MinestomCommandSender implements CommandSender, ForwardingAudience.
     }
 
     @Override
-    public boolean hasPermission(String permission) {
+    public boolean hasPermission(@NotNull String permission) {
         return sender.hasPermission(permission);
     }
 

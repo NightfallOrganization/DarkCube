@@ -48,7 +48,7 @@ public interface Team {
 
     @Unmodifiable
     @NotNull
-    Collection<WBUser> users();
+    Collection<? extends WBUser> users();
 
     int lifes();
 

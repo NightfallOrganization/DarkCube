@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.game.lobby.inventory;
 
 import java.util.function.Function;
@@ -8,6 +15,7 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.server.item.ItemBuilder;
 
 public class LobbyUserInventory {
 
@@ -32,7 +40,8 @@ public class LobbyUserInventory {
     }
 
     public static void destroy(WBUser user) {
-        user.metadata().remove(KEY.apply(user.woolbattle()));
+        var inventory = user.metadata().<LobbyUserInventory>remove(KEY.apply(user.woolbattle()));
+        inventory.clearAllItems();
     }
 
     public void setAllItems() {
@@ -41,6 +50,14 @@ public class LobbyUserInventory {
         setParticlesItem();
         setSettingsItem();
         setVotingItem();
+    }
+
+    public void clearAllItems() {
+        access.setItem(0, ItemBuilder.item());
+        access.setItem(1, ItemBuilder.item());
+        access.setItem(4, ItemBuilder.item());
+        access.setItem(7, ItemBuilder.item());
+        access.setItem(8, ItemBuilder.item());
     }
 
     public void setPerksItem() {

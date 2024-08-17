@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.listener.Listener;
+import eu.darkcube.minigame.woolbattle.api.perk.user.CooldownUserPerk;
 import eu.darkcube.minigame.woolbattle.api.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
@@ -32,7 +33,7 @@ public class Perk {
     private int cost;
 
     public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost, Item item) {
-        this(activationType, perkName, cooldownSeconds, cost, item, (user, perk, id, perkSlot, game) -> new DefaultUserPerk(user, id, perkSlot, perk, game));
+        this(activationType, perkName, cooldownSeconds, cost, item, DefaultUserPerk::new);
     }
 
     public Perk(ActivationType activationType, PerkName perkName, int cooldownSeconds, int cost, Item defaultItem, UserPerkCreator perkCreator) {
@@ -47,10 +48,16 @@ public class Perk {
         this.activationType = activationType;
         this.perkName = perkName;
         this.defaultCooldown = defaultCooldown;
+        this.cooldown = defaultCooldown;
         this.defaultCost = defaultCost;
+        this.cost = defaultCost;
         this.defaultItem = defaultItem;
         this.perkCreator = perkCreator;
         this.autoCountdownCooldown = autoCountdownCooldown;
+    }
+
+    protected static UserPerkCreator cooldown(Item item) {
+        return (user, perk, id, perkSlot, game) -> new CooldownUserPerk(user, perk, id, perkSlot, game, item);
     }
 
     protected void addHooks(PerkHook... hooks) {
@@ -131,7 +138,7 @@ public class Perk {
 
     public record Cooldown(Unit unit, int cooldown) {
         public interface Unit {
-            Unit TICKS = cooldown -> cooldown / 20 + 1;
+            Unit TICKS = cooldown -> (cooldown + 19) / 20;
             Unit ACTIVATIONS = cooldown -> cooldown;
 
             int itemCount(int cooldown);

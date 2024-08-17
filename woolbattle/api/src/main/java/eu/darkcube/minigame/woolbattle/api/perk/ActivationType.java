@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.api.perk;
 
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
-import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 /**
  * This is the class for all perk types. May need renaming in the future, {@code
@@ -24,21 +24,21 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
  */
 public enum ActivationType {
     // Order is important here, as the inventory will be filled in that order for new players
-    PRIMARY_WEAPON("primaryWeapon", 1),
-    SECONDARY_WEAPON("secondaryWeapon", 1),
+    PRIMARY_WEAPON("primary_weapon", 1),
+    SECONDARY_WEAPON("secondary_weapon", 1),
 
     ACTIVE("active", 2),
     MISC("misc", 1),
     PASSIVE("passive", 1),
 
-    DOUBLE_JUMP("doubleJump", 1),
+    DOUBLE_JUMP("double_jump", 1),
 
     ARROW("arrow", 1);
-    private final String type;
+    private final @NotNull String type;
     private final int maxCount;
-    private final Item displayItem;
+    private final @NotNull Item displayItem;
 
-    ActivationType(String type, int maxCount) {
+    ActivationType(@NotNull String type, int maxCount) {
         this.type = type;
         this.maxCount = maxCount;
         this.displayItem = WoolBattleProvider.PROVIDER.service(ItemProvider.class).getItem(type);
@@ -49,6 +49,7 @@ public enum ActivationType {
         return type;
     }
 
+    @NotNull
     public String type() {
         return type;
     }
@@ -57,12 +58,13 @@ public enum ActivationType {
         return maxCount;
     }
 
+    @NotNull
     public Item displayItem() {
         return displayItem;
     }
 
     public interface ItemProvider {
-        @Nullable
+        @NotNull
         Item getItem(String activationType);
     }
 }

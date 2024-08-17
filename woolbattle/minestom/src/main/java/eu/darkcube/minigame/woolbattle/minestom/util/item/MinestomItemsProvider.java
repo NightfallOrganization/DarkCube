@@ -8,11 +8,18 @@
 package eu.darkcube.minigame.woolbattle.minestom.util.item;
 
 import static eu.darkcube.system.server.item.ItemBuilder.item;
+import static eu.darkcube.system.server.item.component.ItemComponent.ATTRIBUTE_MODIFIERS;
+import static eu.darkcube.system.server.item.component.ItemComponent.DYED_COLOR;
 import static net.minestom.server.item.Material.*;
 import static net.minestom.server.item.enchant.Enchantment.*;
 
+import java.util.List;
+
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.server.item.component.components.AttributeList;
+import eu.darkcube.system.server.item.component.components.DyedItemColor;
+import eu.darkcube.system.util.Color;
 
 public class MinestomItemsProvider implements Items.Provider {
     @SuppressWarnings("DuplicateBranchesInSwitch")
@@ -48,7 +55,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_WOOL_BOMB -> item(TNT);
             case PERK_WOOL_BOMB_COOLDOWN -> item(TNT);
             case PERK_EXTRA_WOOL -> item(CHEST);
-            case PERK_PIERCING_ARROW -> item(GOLDEN_AXE).unbreakable(true).flag(HIDE_UNBREAKABLE);
+            case PERK_PIERCING_ARROW -> item(GOLDEN_AXE).hiddenUnbreakable();
             case PERK_KNOCKBACK_ARROW -> item(ENCHANTED_BOOK).glow(false);
             case PERK_LONGJUMP -> item(RABBIT_FOOT);
             case PERK_ROCKETJUMP -> item(DIAMOND_BOOTS);
@@ -66,39 +73,27 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_GRANDPAS_CLOCK_COOLDOWN -> item(CLOCK);
             case PERK_GHOST -> item(GHAST_TEAR);
             case PERK_GHOST_COOLDOWN -> item(GUNPOWDER);
-            case PERK_MINE -> item(STONE_PRESSURE_PLATE);
-            case PERK_MINE_COOLDOWN -> item(STONE_PRESSURE_PLATE);
-            case PERK_MINIGUN -> item(DIAMOND_HORSE_ARMOR);
-            case PERK_MINIGUN_COOLDOWN -> item(DIAMOND_HORSE_ARMOR);
+            case PERK_MINE, PERK_MINE_COOLDOWN -> item(STONE_PRESSURE_PLATE);
+            case PERK_MINIGUN, PERK_MINIGUN_COOLDOWN -> item(DIAMOND_HORSE_ARMOR);
             case PERK_POD -> item(FLOWER_POT);
             case PERK_POD_COOLDOWN -> item(FIREWORK_STAR);
-            case PERK_GRABBER -> item(STICK);
+            case PERK_GRABBER, PERK_GRABBER_COOLDOWN -> item(STICK);
             case PERK_GRABBER_GRABBED -> item(BLAZE_ROD);
-            case PERK_GRABBER_COOLDOWN -> item(STICK);
-            case PERK_BOOSTER -> item(FEATHER);
-            case PERK_BOOSTER_COOLDOWN -> item(FEATHER);
+            case PERK_BOOSTER, PERK_BOOSTER_COOLDOWN -> item(FEATHER);
             case PERK_FAST_ARROW -> item(SUGAR);
-            case PERK_TNT_ARROW -> item(TNT);
-            case PERK_TNT_ARROW_COOLDOWN -> item(TNT);
-            case PERK_ARROW_BOMB -> item(FIREWORK_STAR);
-            case PERK_ARROW_BOMB_COOLDOWN -> item(FIREWORK_STAR);
-            case PERK_REFLECTOR -> item(CACTUS);
-            case PERK_REFLECTOR_COOLDOWN -> item(CACTUS);
-            case PERK_FREEZER -> item(ICE);
-            case PERK_FREEZER_COOLDOWN -> item(ICE);
-            case PERK_PROTECTIVE_SHIELD -> item(EMERALD);
-            case PERK_PROTECTIVE_SHIELD_COOLDOWN -> item(EMERALD);
+            case PERK_TNT_ARROW, PERK_TNT_ARROW_COOLDOWN -> item(TNT);
+            case PERK_ARROW_BOMB, PERK_ARROW_BOMB_COOLDOWN -> item(FIREWORK_STAR);
+            case PERK_REFLECTOR, PERK_REFLECTOR_COOLDOWN -> item(CACTUS);
+            case PERK_FREEZER, PERK_FREEZER_COOLDOWN -> item(ICE);
+            case PERK_PROTECTIVE_SHIELD, PERK_PROTECTIVE_SHIELD_COOLDOWN -> item(EMERALD);
             case PERK_GRAPPLING_HOOK -> item(FISHING_ROD).hiddenUnbreakable();
             case PERK_GRAPPLING_HOOK_COOLDOWN -> item(STICK);
-            case PERK_ELEVATOR -> item(PISTON);
-            case PERK_ELEVATOR_COOLDOWN -> item(PISTON);
-            case PERK_ROPE -> item(VINE);
-            case PERK_ROPE_COOLDOWN -> item(VINE);
+            case PERK_ELEVATOR, PERK_ELEVATOR_COOLDOWN -> item(PISTON);
+            case PERK_ROPE, PERK_ROPE_COOLDOWN -> item(VINE);
             case PERK_STOMPER -> item(DIAMOND_BOOTS);
-            case PERK_HOOK_ARROW -> item(REDSTONE_TORCH);
-            case PERK_HOOK_ARROW_COOLDOWN -> item(REDSTONE_TORCH);
-            case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5)/*.flag(HIDE_UNBREAKABLE)TODO*/.unbreakable(true);
-            case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).hiddenUnbreakable();
+            case PERK_HOOK_ARROW, PERK_HOOK_ARROW_COOLDOWN -> item(REDSTONE_TORCH);
+            case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5)/*.flag(HIDE_UNBREAKABLE)TODO*/.hiddenUnbreakable();
+            case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).hiddenUnbreakable().set(ATTRIBUTE_MODIFIERS, new AttributeList(List.of(), false));
             case DEFAULT_PEARL -> item(ENDER_PEARL).glow(true);
             case DEFAULT_PEARL_COOLDOWN -> item(FIREWORK_STAR);
             case DEFAULT_ARROW -> item(ARROW);
@@ -111,21 +106,17 @@ public class MinestomItemsProvider implements Items.Provider {
             case LOBBY_PARTICLES_OFF -> item(BLAZE_ROD);
             case HEIGHT_DISPLAY_ON -> item(LIME_TERRACOTTA);
             case HEIGHT_DISPLAY_OFF -> item(RED_TERRACOTTA);
-            case NEXT_PAGE -> item(LIME_STAINED_GLASS_PANE);
-            case PREV_PAGE -> item(LIME_STAINED_GLASS_PANE);
-            case NEXT_PAGE_UNUSABLE -> item(RED_STAINED_GLASS_PANE);
-            case PREV_PAGE_UNUSABLE -> item(RED_STAINED_GLASS_PANE);
+            case NEXT_PAGE, PREV_PAGE -> item(LIME_STAINED_GLASS_PANE);
+            case NEXT_PAGE_UNUSABLE, PREV_PAGE_UNUSABLE -> item(RED_STAINED_GLASS_PANE);
             case PERK_SCAMP -> item(GOLD_INGOT);
-            case PERK_SPIDER -> item(SPIDER_SPAWN_EGG);
-            case PERK_SPIDER_COOLDOWN -> item(SPIDER_SPAWN_EGG);
-            case PERK_DRAW_ARROW -> item(TORCH);
-            case PERK_DRAW_ARROW_COOLDOWN -> item(TORCH);
-            case PERK_FREEZE_ARROW -> item(ARROW);
-            case PERK_FREEZE_ARROW_COOLDOWN -> item(ARROW);
+            case PERK_SPIDER, PERK_SPIDER_COOLDOWN -> item(SPIDER_SPAWN_EGG);
+            case PERK_DRAW_ARROW, PERK_DRAW_ARROW_COOLDOWN -> item(TORCH);
+            case PERK_FREEZE_ARROW, PERK_FREEZE_ARROW_COOLDOWN -> item(ARROW);
             case PERK_BERSERKER -> item(DIAMOND_SWORD);
             case GRAY_GLASS_PANE -> item(GRAY_STAINED_GLASS_PANE);
             case BLACK_GLASS_PANE -> item(BLACK_STAINED_GLASS_PANE);
             case HEIGHT_DISPLAY_COLOR_ENTRY -> item(PAPER);
+            case PERK_DOUBLE_JUMP, PERK_DOUBLE_JUMP_COOLDOWN -> item(LEATHER_BOOTS).set(DYED_COLOR, new DyedItemColor(new Color(124, 31, 171), false)).set(ATTRIBUTE_MODIFIERS, AttributeList.EMPTY.withTooltip(false));
         };
     }
 }

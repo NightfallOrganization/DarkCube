@@ -13,6 +13,7 @@ import java.util.function.Function;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.translation.Message;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.Language;
 
 public enum Messages implements Message {
@@ -93,15 +94,16 @@ public enum Messages implements Message {
     INVALID_MAP,
     MAP_ICON_SET,
     AIR_IN_HAND,
-    ;
+    INGAME_SIDEBAR_TEAM_LINE,
+    AT_TEAM;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final String ITEM_PREFIX = "ITEM_";
     public static final String LORE_PREFIX = "LORE_";
     public static final String TEAM_PREFIX = "TEAM_";
     public static final Function<String, String> KEY_MODIFIER = s -> KEY_PREFIX + s;
-    public static final Function<String, String> ITEM_MODIFIER = s -> KEY_MODIFIER.apply(ITEM_PREFIX + s);
-    public static final Function<String, String> LORE_MODIFIER = s -> ITEM_MODIFIER.apply(LORE_PREFIX + s);
+    public static final Function<String, String> ITEM_MODIFIER = KEY_MODIFIER.compose(s -> ITEM_PREFIX + s);
+    public static final Function<String, String> LORE_MODIFIER = ITEM_MODIFIER.compose(s -> LORE_PREFIX + s);
 
     private final String key;
 
@@ -114,12 +116,12 @@ public enum Messages implements Message {
     }
 
     @Override
-    public String getPrefixModifier() {
+    public @NotNull String getPrefixModifier() {
         return KEY_PREFIX;
     }
 
     @Override
-    public String key() {
+    public @NotNull String key() {
         return key;
     }
 

@@ -26,6 +26,17 @@ public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGa
     public void accept(UserJoinGameEvent event) {
         var user = (CommonWBUser) event.user();
         var player = woolbattle.player(user);
+        var packet = player.getAddPlayerToList();
+        for (var wbUser : event.game().users()) {
+            var u = (CommonWBUser) wbUser;
+            var p = woolbattle.player(u);
+            p.sendPacketDirect(packet);
+
+            if (u != user) {
+                player.sendPacketDirect(p.getAddPlayerToList());
+            }
+        }
+
         player.setGameMode(GameMode.SURVIVAL);
         player.setFoodSaturation(0);
         player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1024);

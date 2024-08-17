@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.command.arguments;
 
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +53,7 @@ class CommonMapArgument implements ArgumentType<CommonMap> {
         var parser = new Parser(reader);
         try {
             parser.parse();
-        } catch (CommandSyntaxException ignored) {
+        } catch (CommandSyntaxException _) {
         }
         return parser.suggest(builder);
     }

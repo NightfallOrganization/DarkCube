@@ -28,10 +28,6 @@ public class DefaultUserPerk implements UserPerk {
     private int cooldown;
 
     public DefaultUserPerk(final WBUser owner, final Perk perk, final int id, final int perkSlot, Game game) {
-        this(owner, id, perkSlot, perk, game);
-    }
-
-    public DefaultUserPerk(final WBUser owner, final int id, final int perkSlot, final Perk perk, Game game) {
         this.id = id;
         this.perkSlot = perkSlot;
         this.perk = perk;

@@ -13,6 +13,7 @@ import static eu.darkcube.system.server.inventory.Inventory.createChestTemplate;
 
 import java.nio.file.Path;
 
+import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
 import eu.darkcube.minigame.woolbattle.api.util.translation.Message;
@@ -24,6 +25,7 @@ import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
 import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
+import eu.darkcube.minigame.woolbattle.common.util.ChatHandler;
 import eu.darkcube.minigame.woolbattle.common.util.item.CommonItem;
 import eu.darkcube.minigame.woolbattle.common.util.item.DefaultInventorySettings;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
@@ -56,6 +58,7 @@ public abstract class CommonWoolBattle implements Namespaced {
     private final @NotNull InventoryTemplate settingsHeightDisplayInventoryTemplate;
     private final @NotNull InventoryTemplate settingsHeightDisplayColorInventoryTemplate;
     private final @NotNull InventoryTemplate settingsWoolDirectionInventoryTemplate;
+    private final @NotNull ChatHandler chatHandler;
 
     public CommonWoolBattle() {
         eventHandler = new CommonEventHandler(this);
@@ -73,6 +76,7 @@ public abstract class CommonWoolBattle implements Namespaced {
         this.settingsHeightDisplayInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createHeightDisplay(this));
         this.settingsHeightDisplayColorInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createHeightDisplayColor(this));
         this.settingsWoolDirectionInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createWoolDirection(this));
+        this.chatHandler = new ChatHandler();
     }
 
     public void start() {
@@ -91,6 +95,10 @@ public abstract class CommonWoolBattle implements Namespaced {
         var api = api();
         api.lobbySystemLink().disable();
         languageRegistry.unregister();
+    }
+
+    public @NotNull ChatHandler chatHandler() {
+        return chatHandler;
     }
 
     public @NotNull Logger logger() {
@@ -121,6 +129,8 @@ public abstract class CommonWoolBattle implements Namespaced {
     public abstract void broadcastTeamUpdate(@NotNull CommonWBUser user, @Nullable CommonTeam oldTeam, @Nullable CommonTeam newTeam);
 
     public abstract @NotNull CommonWoolBattleApi api();
+
+    public abstract @NotNull CommandSender consoleSender();
 
     public @NotNull InventoryTemplate settingsInventoryTemplate() {
         return settingsInventoryTemplate;

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners;
 
 import eu.darkcube.minigame.woolbattle.api.event.user.UserChangeTeamEvent;
@@ -23,16 +30,10 @@ public class MinestomLobbyUserChangeTeamListener extends ConfiguredListener<User
         var player = this.woolbattle.player(user);
         var oldTeam = event.oldTeam();
         var newTeam = event.newTeam();
-        if (oldTeam == null && newTeam != null) {
-            // Player just joined
-            lobby.scoreboard().setupPlayer(player, user);
-        } else if (oldTeam != null && newTeam != null) {
+        if (oldTeam != null && newTeam != null) {
             // Player switched team
             lobby.scoreboard().switchTeam(player, oldTeam, newTeam);
-        } else if (oldTeam != null) {
-            // Player quit
-            lobby.scoreboard().cleanupPlayer(player, oldTeam);
-        } else {
+        } else if (oldTeam == null && newTeam == null) {
             // Can't happen
             throw new IllegalStateException("Player switched team from null to null");
         }

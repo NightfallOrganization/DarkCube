@@ -264,7 +264,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
             var connectionRequest = new ConnectionRequest(playerUniqueId, game);
             connectionRequests.put(requestId, connectionRequest);
             responseV2(sender, requestId, 1, null);
-            LOGGER.info("Connecting " + playerUniqueId + " to game " + game.id() + " with requestId " + requestId);
+            LOGGER.info("Connecting {} to game {} with requestId {}", playerUniqueId, game.id(), requestId);
             game.scheduler().schedule(() -> {
                 var phase = game.phase();
                 if (phase instanceof Ingame) {

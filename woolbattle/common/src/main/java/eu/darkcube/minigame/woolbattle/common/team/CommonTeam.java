@@ -16,8 +16,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamType;
-import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -33,7 +33,7 @@ public class CommonTeam implements Team {
     private final @NotNull TeamType teamType;
     private final @NotNull TextColor nameColor;
     private final @NotNull ColoredWool woolColor;
-    private final @NotNull Collection<WBUser> users = new CopyOnWriteArraySet<>();
+    private final @NotNull Collection<CommonWBUser> users = new CopyOnWriteArraySet<>();
     private volatile int lifes;
 
     public CommonTeam(@NotNull Game game, @NotNull UUID uniqueId, @NotNull String key, @NotNull TeamType teamType, @NotNull TextColor nameColor, @NotNull ColoredWool woolColor) {
@@ -66,7 +66,7 @@ public class CommonTeam implements Team {
     }
 
     @Override
-    public @Unmodifiable @NotNull Collection<WBUser> users() {
+    public @Unmodifiable @NotNull Collection<CommonWBUser> users() {
         return Set.copyOf(users);
     }
 
@@ -108,7 +108,12 @@ public class CommonTeam implements Team {
         return key;
     }
 
-    public @NotNull Collection<WBUser> usersModifiable() {
+    public @NotNull Collection<CommonWBUser> usersModifiable() {
         return users;
+    }
+
+    @Override
+    public String toString() {
+        return "CommonTeam{" + "key='" + key + '\'' + ", lifes=" + lifes + ", game=" + game.id() + '}';
     }
 }

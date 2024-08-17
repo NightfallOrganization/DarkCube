@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
-import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamManager;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -26,12 +25,12 @@ public class CommonTeamManager implements TeamManager {
     private final @NotNull Game game;
     private final @NotNull Map<UUID, CommonTeam> teams;
     private final @NotNull List<CommonTeam> playingTeams;
-    private final @NotNull Team spectator;
+    private final @NotNull CommonTeam spectator;
 
     public CommonTeamManager(@NotNull CommonGame game, @NotNull MapSize mapSize) {
         this.game = game;
         var teams = new HashMap<UUID, CommonTeam>();
-        Team spectator = null;
+        CommonTeam spectator = null;
         for (var configuration : game.woolbattle().teamRegistry().teamConfigurations(mapSize)) {
             UUID id;
             do {
@@ -74,7 +73,7 @@ public class CommonTeamManager implements TeamManager {
     }
 
     @Override
-    public @NotNull Team spectator() {
+    public @NotNull CommonTeam spectator() {
         return spectator;
     }
 }

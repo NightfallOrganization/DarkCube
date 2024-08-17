@@ -5,11 +5,10 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.common.user;
+package eu.darkcube.minigame.woolbattle.common.perk.user;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -31,12 +30,13 @@ import eu.darkcube.minigame.woolbattle.common.util.Slot.Inventory;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.data.PersistentDataType;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public class CommonPerksStorage implements PerksStorage {
     private static final PersistentDataType<PerkName[]> PERK_NAME_ARRAY = PersistentDataTypes.array(PerkName.TYPE, PerkName.class);
-    public static final PersistentDataType<PerksStorage> TYPE = new PersistentDataType<>() {
+    public static final PersistentDataType<CommonPerksStorage> TYPE = new PersistentDataType<>() {
         @Override
         public @NotNull CommonPerksStorage deserialize(JsonElement json) {
             var d = json.getAsJsonObject();
@@ -58,7 +58,7 @@ public class CommonPerksStorage implements PerksStorage {
         }
 
         @Override
-        public @NotNull JsonElement serialize(@NotNull PerksStorage data) {
+        public @NotNull JsonElement serialize(@NotNull CommonPerksStorage data) {
             var d = new JsonObject();
             var docPerks = new JsonObject();
             var docPerkSlots = new JsonObject();
@@ -76,14 +76,19 @@ public class CommonPerksStorage implements PerksStorage {
         }
 
         @Override
-        public @NotNull PerksStorage clone(PerksStorage object) {
+        public @NotNull CommonPerksStorage clone(CommonPerksStorage object) {
             return object.clone();
         }
     };
     private final Map<ActivationType, PerkName[]> perks;
     private final Map<ActivationType, int[]> perkSlots;
 
-    public CommonPerksStorage() {
+    public CommonPerksStorage(PerkRegistry registry) {
+        this();
+        reset(registry);
+    }
+
+    private CommonPerksStorage() {
         var perks = new EnumMap<ActivationType, PerkName[]>(ActivationType.class);
         var perkSlots = new EnumMap<ActivationType, int[]>(ActivationType.class);
         for (var type : ActivationType.values()) {
@@ -149,61 +154,122 @@ public class CommonPerksStorage implements PerksStorage {
         }
     }
 
+    /**
+     * Verifies the integrity of all perks and slots in this storage.
+     * This also fixes any issues found with duplicate perks, slots, and any other issues found.
+     *
+     * @return false if any issues were found
+     */
+    public boolean verifyIntegrity(@NotNull PerkRegistry perkRegistry) {
+        var types = ActivationType.values();
+        var slotsQueryFrom = new ArrayDeque<>(IntStream.of(POSSIBLE_SLOTS).boxed().toList());
+
+        var changed = false;
+        var slotsUsed = new HashSet<Integer>();
+        var perksUsed = new HashSet<PerkName>();
+        for (var type : types) {
+            var perkSlotArray = perkSlots.get(type);
+            var perkArray = perks.get(type);
+            for (var i = 0; i < perkSlotArray.length; i++) {
+                var slot = perkSlotArray[i];
+
+                var badSlot = false;
+                while (!slotsUsed.add(slot)) {
+                    badSlot = true;
+                    slot = slotsQueryFrom.removeFirst();
+                }
+                if (badSlot) {
+                    changed = true;
+                    perkSlotArray[i] = slot;
+                }
+
+                var name = perkArray[i];
+                if (name != null && !perkRegistry.contains(name)) name = null;
+                var badName = name == null || perksUsed.contains(name);
+                if (!badName) {
+                    perksUsed.add(name);
+                    // Slot and name are fine, continue
+                    continue;
+                }
+
+                name = preferredPerk(type, i);
+                if (perksUsed.contains(name)) name = null;
+                if (name != null && !perkRegistry.contains(name)) name = null;
+
+                if (name == null) {
+                    for (var perk : perkRegistry.perks(type)) {
+                        var n = perk.perkName();
+                        if (perksUsed.contains(n)) continue;
+                        name = n;
+                        break;
+                    }
+                }
+                if (name == null) throw new NullPointerException();
+                perksUsed.add(name);
+                perkArray[i] = name;
+                changed = true;
+            }
+        }
+        return !changed;
+    }
+
     @Override
     public void reset(@NotNull PerkRegistry perkRegistry) {
-        var list = Arrays.asList(ActivationType.values());
-        Collections.sort(list);
-        var slotsUsed = new HashSet<Integer>();
-        var slotsQueryFrom = new ArrayDeque<Integer>();
-        slotsQueryFrom.offer(Hotbar.SLOT_1);
-        slotsQueryFrom.offer(Hotbar.SLOT_2);
-        slotsQueryFrom.offer(Hotbar.SLOT_3);
-        slotsQueryFrom.offer(Hotbar.SLOT_4);
-        slotsQueryFrom.offer(Hotbar.SLOT_5);
-        slotsQueryFrom.offer(Hotbar.SLOT_9);
-        // arrow
-        slotsQueryFrom.offer(Inventory.SLOT_9);
-        // for illegal perks as fallback. Should never be used
-        slotsQueryFrom.addAll(IntStream.of(Hotbar.SLOTS).boxed().toList());
-        slotsQueryFrom.addAll(IntStream.of(Inventory.SLOTS).boxed().toList());
+        var types = ActivationType.values();
+        var slotsQueryFrom = new ArrayDeque<>(IntStream.of(POSSIBLE_SLOTS).boxed().toList());
 
         var perksUsed = new ArrayList<PerkName>();
-        for (var type : list) {
+        for (var type : types) {
             for (var i = 0; i < perkSlots.get(type).length; i++) {
-                int slot;
-                do {
-                    slot = slotsQueryFrom.removeFirst();
-                } while (slotsUsed.contains(slot));
-                slotsUsed.add(slot);
+                int slot = slotsQueryFrom.removeFirst();
+
                 perkSlots.get(type)[i] = slot;
-                PerkName preferred = null;
-                // region Test
-                if (type == ActivationType.PRIMARY_WEAPON && i == 0) {
-                    preferred = BowPerk.BOW;
-                } else if (type == ActivationType.SECONDARY_WEAPON && i == 0) {
-                    preferred = ShearsPerk.SHEARS;
-                } else if (type == ActivationType.ARROW && i == 0) {
-                    preferred = ArrowPerk.ARROW;
-                } else if (type == ActivationType.ACTIVE && i == 0) {
-                    preferred = CapsulePerk.CAPSULE;
-                } else if (type == ActivationType.ACTIVE && i == 1) {
-                    perks.get(type)[i] = SwitcherPerk.SWITCHER;
-                } else if (type == ActivationType.PASSIVE && i == 0) {
-                    perks.get(type)[i] = RocketJumpPerk.ROCKET_JUMP;
-                } else { // Fallback
-                    PerkName name = null;
+                var preferred = preferredPerk(type, i);
+
+                PerkName name = null;
+                if (preferred != null && !perksUsed.contains(preferred)) name = preferred;
+                if (name != null && !perkRegistry.contains(name)) name = null;
+
+                if (name == null) {
                     for (var perk : perkRegistry.perks(type)) {
                         name = perk.perkName();
                         if (perksUsed.contains(name)) continue;
                         break;
                     }
-
-                    if (name == null) throw new NullPointerException();
-                    perksUsed.add(name);
-                    perks.get(type)[i] = name;
                 }
-                // endregion
+                if (name == null) throw new NullPointerException();
+                perksUsed.add(name);
+                perks.get(type)[i] = name;
             }
         }
+    }
+
+    private static final int[] POSSIBLE_SLOTS = IntStream.concat(IntStream.of(Hotbar.SLOT_1, // Bow
+                    Hotbar.SLOT_2, // Shears
+                    Hotbar.SLOT_3, // Active Perk 1
+                    Hotbar.SLOT_4, // Active Perk 2
+                    Hotbar.SLOT_5, // Enderpearl
+                    Hotbar.SLOT_9, // Passive Perk
+                    Inventory.SLOT_9, // Arrow
+                    Inventory.SLOT_1 // Double jump
+            ), IntStream.concat(IntStream.of(Hotbar.SLOTS), IntStream.of(Inventory.SLOTS)) // Any illegal perks
+    ).distinct().toArray();
+
+    private static @Nullable PerkName preferredPerk(ActivationType type, int i) {
+        PerkName preferred = null;
+        if (type == ActivationType.PRIMARY_WEAPON && i == 0) {
+            preferred = BowPerk.BOW;
+        } else if (type == ActivationType.SECONDARY_WEAPON && i == 0) {
+            preferred = ShearsPerk.SHEARS;
+        } else if (type == ActivationType.ARROW && i == 0) {
+            preferred = ArrowPerk.ARROW;
+        } else if (type == ActivationType.ACTIVE && i == 0) {
+            preferred = CapsulePerk.CAPSULE;
+        } else if (type == ActivationType.ACTIVE && i == 1) {
+            preferred = SwitcherPerk.SWITCHER;
+        } else if (type == ActivationType.PASSIVE && i == 0) {
+            preferred = RocketJumpPerk.ROCKET_JUMP;
+        }
+        return preferred;
     }
 }

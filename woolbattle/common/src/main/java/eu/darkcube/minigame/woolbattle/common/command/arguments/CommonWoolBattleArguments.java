@@ -113,6 +113,6 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull ?> entityArgument0(boolean player, boolean single) {
-        return null; // TODO
+        return new CommonEntityArgument(woolbattle, player, single);
     }
 }

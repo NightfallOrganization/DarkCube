@@ -13,11 +13,16 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
 public interface Entity {
-    @NotNull Location location();
+    @NotNull
+    Location location();
 
     void velocity(@NotNull Vector velocity);
 
-    @NotNull MetaDataStorage metadata();
+    @NotNull
+    MetaDataStorage metadata();
+
+    @NotNull
+    EntityType type();
 
     void remove();
 }

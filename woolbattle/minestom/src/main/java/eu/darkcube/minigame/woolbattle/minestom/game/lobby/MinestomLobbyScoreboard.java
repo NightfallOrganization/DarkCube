@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.game.lobby;
 
 import static eu.darkcube.system.minestom.util.adventure.MinestomAdventureSupport.adventureSupport;
@@ -118,10 +125,10 @@ public class MinestomLobbyScoreboard {
     }
 
     private TeamsPacket createPacket(Team team) {
-        var displayName = adventureSupport().convert(Component.text(team.uniqueId().toString(), team.nameColor()));
+        var customColor = team.nameColor();
+        var displayName = adventureSupport().convert(Component.text(team.uniqueId().toString(), customColor));
         var nameTagVisibility = TeamsPacket.NameTagVisibility.ALWAYS;
         var collisionRule = TeamsPacket.CollisionRule.NEVER;
-        var customColor = team.nameColor();
         var teamColor = NamedTextColor.nearestTo(adventureSupport().convert(customColor));
         var teamPrefix = adventureSupport().convert(Component.empty());
         var teamSuffix = adventureSupport().convert(Component.empty());

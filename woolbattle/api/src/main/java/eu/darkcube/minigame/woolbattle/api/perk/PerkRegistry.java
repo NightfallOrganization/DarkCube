@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+
 public class PerkRegistry {
     private final Map<PerkName, Perk> perks = new HashMap<>();
     private final Map<ActivationType, Perk[]> cache = new HashMap<>();
@@ -23,11 +26,20 @@ public class PerkRegistry {
         cache.remove(perk.activationType());
     }
 
+    public boolean contains(@NotNull PerkName perk) {
+        return perks.containsKey(perk);
+    }
+
     public Perk[] perks(ActivationType type) {
         return cache.computeIfAbsent(type, n -> perks.values().stream().filter(p -> p.activationType() == n).toArray(Perk[]::new)).clone();
     }
 
     public Map<PerkName, Perk> perks() {
         return Collections.unmodifiableMap(perks);
+    }
+
+    @Nullable
+    public Perk perk(@NotNull PerkName name) {
+        return perks.get(name);
     }
 }

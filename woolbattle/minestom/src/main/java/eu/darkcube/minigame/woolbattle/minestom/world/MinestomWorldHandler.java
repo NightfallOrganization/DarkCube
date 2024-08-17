@@ -28,6 +28,8 @@ import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomQuitListener;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomGameWorldImpl;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomIngameWorldImpl;
 import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomWorldImpl;
@@ -154,7 +156,9 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
         var minestomWorld = (MinestomWorld) world;
         var instance = minestomWorld.instance();
         List.copyOf(instance.getPlayers()).forEach(p -> {
-            woolbattle.woolbattle().logger().warn("Forcefully disconnecting {}", p.getUsername());
+            if (!MinestomQuitListener.WORKING.get().contains((MinestomPlayer) p)) { // Ignore message if player is already disconnecting
+                woolbattle.woolbattle().logger().warn("Forcefully disconnecting {}", p.getUsername());
+            }
             p.remove();
         });
         instanceManager.unregisterInstance(instance);

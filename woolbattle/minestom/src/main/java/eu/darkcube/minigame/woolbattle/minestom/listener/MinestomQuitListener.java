@@ -19,7 +19,7 @@ import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 
 public class MinestomQuitListener {
-    private static final ThreadLocal<List<MinestomPlayer>> WORKING = ThreadLocal.withInitial(ArrayList::new);
+    public static final ThreadLocal<List<MinestomPlayer>> WORKING = ThreadLocal.withInitial(ArrayList::new);
 
     public static void register(MinestomWoolBattle woolbattle, EventNode<Event> node) {
         node.addListener(PlayerDisconnectEvent.class, event -> {

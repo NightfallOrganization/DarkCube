@@ -23,6 +23,7 @@ import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyBreakBlo
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyInventoryListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyPlaceBlockListener;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserChatListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserDropItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserLoginGameListener;
@@ -93,6 +94,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.listeners.addListener(new LobbyUserParticlesUpdateListener().create());
         this.listeners.addListener(new LobbyUserLoginGameListener(this).create());
         this.listeners.addListener(new LobbyUserDropItemListener().create());
+        this.listeners.addListener(new LobbyUserChatListener(woolbattle).create());
         this.listeners.addChild(new LobbyUserQuitGameListener(this).node());
         this.listeners.addChild(new LobbyItemListener(this).node());
         this.listeners.addChild(new LobbyInventoryListener(this).node());
@@ -131,18 +133,18 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     @Override
     public void disable(@Nullable CommonPhase newPhase) {
         super.disable(newPhase);
-        var ingame = (CommonIngame) newPhase;
         if (enoughTeams) timer.stop();
         for (var user : game.users()) {
             quit(user);
-        }
-        if (ingame != null) {
-            transitionPlayers(ingame);
         }
     }
 
     @Override
     public void unload(@Nullable CommonPhase newPhase) {
+        var ingame = (CommonIngame) newPhase;
+        if (ingame != null) {
+            transitionPlayers(ingame);
+        }
         super.unload(newPhase);
         game.woolbattle().worldHandler().unloadWorld(world);
         world = null;
