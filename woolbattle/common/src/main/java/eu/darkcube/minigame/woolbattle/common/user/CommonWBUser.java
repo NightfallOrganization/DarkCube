@@ -14,6 +14,8 @@ import static eu.darkcube.system.util.data.PersistentDataTypes.BOOLEAN;
 import java.util.Objects;
 import java.util.UUID;
 
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
+import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserAddWoolEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserChangeTeamEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetMaxWoolSizeEvent;
@@ -28,6 +30,7 @@ import eu.darkcube.minigame.woolbattle.api.user.HeightDisplay;
 import eu.darkcube.minigame.woolbattle.api.user.PerksStorage;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
+import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
@@ -95,6 +98,26 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @Override
     public @NotNull MetaDataStorage metadata() {
         return metadata;
+    }
+
+    @Override
+    public @NotNull EntityType<? extends Entity> type() {
+        return EntityType.PLAYER;
+    }
+
+    @Override
+    public boolean isAlive() {
+        return platformAccess.isAlive();
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Component getName() {
+        return teamPlayerName();
     }
 
     @Override
@@ -229,6 +252,11 @@ public class CommonWBUser implements WBUser, ForwardingAudience.Single {
     @Override
     public @Nullable Location location() {
         return location;
+    }
+
+    @Override
+    public void velocity(@NotNull Vector velocity) {
+        platformAccess.velocity(velocity);
     }
 
     @ApiStatus.Internal

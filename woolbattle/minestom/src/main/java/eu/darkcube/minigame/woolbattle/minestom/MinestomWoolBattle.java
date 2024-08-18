@@ -162,7 +162,8 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         return new CommonEntityMetaDataStorage(entityMetas, String.valueOf(entity.entity().unwrap().getEntityId()));
     }
 
-    public MinestomEntity entity(Acquirable<Entity> entity) {
+    public eu.darkcube.minigame.woolbattle.api.entity.Entity entity(Acquirable<Entity> entity) {
+        if (entity.unwrap() instanceof MinestomPlayer player) return player.user();
         return entities.computeIfAbsent(entity.unwrap(), k -> new MinestomEntity(k.acquirable(), this));
     }
 

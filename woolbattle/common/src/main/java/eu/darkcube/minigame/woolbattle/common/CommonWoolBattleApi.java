@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.common;
 
 import static eu.darkcube.system.util.data.PluginPersistentDataProvider.pluginPersistentDataProvider;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
@@ -117,6 +118,12 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
     @Override
     public abstract @Nullable CommonWBUser user(User user);
+
+    @Override
+    public abstract @Nullable CommonWBUser user(UUID uniqueId);
+
+    @Override
+    public abstract @Nullable CommonWBUser user(String playerName);
 
     public abstract @NotNull CommonWoolBattle woolbattle();
 

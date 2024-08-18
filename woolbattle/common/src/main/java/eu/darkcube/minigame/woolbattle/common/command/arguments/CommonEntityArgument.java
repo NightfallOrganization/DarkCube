@@ -7,110 +7,101 @@
 
 package eu.darkcube.minigame.woolbattle.common.command.arguments;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import static eu.darkcube.minigame.woolbattle.common.command.arguments.entity.TranslatableWrapper.translatable;
 
-import eu.darkcube.minigame.woolbattle.api.entity.Entity;
-import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
-import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
-import eu.darkcube.minigame.woolbattle.api.util.MinMaxBounds;
-import eu.darkcube.minigame.woolbattle.api.world.Position;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
-import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.common.command.arguments.entity.EntitySelector;
+import eu.darkcube.minigame.woolbattle.common.command.arguments.entity.EntitySelectorParser;
 import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-public class CommonEntityArgument implements ArgumentType<CommonEntityArgument.EntitySelector> {
-
+public class CommonEntityArgument implements ArgumentType<EntitySelector> {
+    public static final SimpleCommandExceptionType ERROR_NOT_SINGLE_ENTITY = new SimpleCommandExceptionType(translatable("argument.entity.toomany"));
+    public static final SimpleCommandExceptionType ERROR_NOT_SINGLE_PLAYER = new SimpleCommandExceptionType(translatable("argument.player.toomany"));
+    public static final SimpleCommandExceptionType ERROR_ONLY_PLAYERS_ALLOWED = new SimpleCommandExceptionType(translatable("argument.player.entities"));
+    public static final SimpleCommandExceptionType NO_ENTITIES_FOUND = new SimpleCommandExceptionType(translatable("argument.entity.notfound.entity"));
+    public static final SimpleCommandExceptionType NO_PLAYERS_FOUND = new SimpleCommandExceptionType(translatable("argument.entity.notfound.player"));
+    public static final SimpleCommandExceptionType ERROR_SELECTORS_NOT_ALLOWED = new SimpleCommandExceptionType(translatable("argument.entity.selector.not_allowed"));
     private final CommonWoolBattleApi woolbattle;
-    private final boolean player;
+    private final boolean playerOnly;
     private final boolean single;
 
-    public CommonEntityArgument(CommonWoolBattleApi woolbattle, boolean player, boolean single) {
+    public CommonEntityArgument(CommonWoolBattleApi woolbattle, boolean playerOnly, boolean single) {
         this.woolbattle = woolbattle;
-        this.player = player;
+        this.playerOnly = playerOnly;
         this.single = single;
     }
 
     @Override
     public EntitySelector parse(StringReader reader) throws CommandSyntaxException {
-        return new Parser(reader).parse();
+        return this.parse(reader, true);
+    }
+
+    public <S> EntitySelector parse(StringReader stringreader, S s0) throws CommandSyntaxException {
+        return this.parse(stringreader, EntitySelectorParser.allowSelectors(s0));
+    }
+
+    private EntitySelector parse(StringReader reader, boolean allowAtSelectors) throws CommandSyntaxException {
+        // CraftBukkit start
+        return this.parse(reader, allowAtSelectors, false);
+    }
+
+    public EntitySelector parse(StringReader stringreader, boolean flag, boolean overridePermissions) throws CommandSyntaxException {
+        // CraftBukkit end
+        boolean flag1 = false;
+        EntitySelectorParser argumentparserselector = new EntitySelectorParser(stringreader, flag);
+        EntitySelector entityselector = argumentparserselector.parse(overridePermissions); // CraftBukkit
+
+        if (entityselector.getMaxResults() > 1 && this.single) {
+            if (this.playerOnly) {
+                stringreader.setCursor(0);
+                throw ERROR_NOT_SINGLE_PLAYER.createWithContext(stringreader);
+            } else {
+                stringreader.setCursor(0);
+                throw ERROR_NOT_SINGLE_ENTITY.createWithContext(stringreader);
+            }
+        } else if (entityselector.includesEntities() && this.playerOnly && !entityselector.isSelfSelector()) {
+            stringreader.setCursor(0);
+            throw ERROR_ONLY_PLAYERS_ALLOWED.createWithContext(stringreader);
+        } else {
+            return entityselector;
+        }
     }
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        var reader = new StringReader(builder.getInput());
-        reader.setCursor(builder.getStart());
-        var parser = new Parser(reader);
-        try {
-            parser.parse();
-        } catch (CommandSyntaxException _) {
+        if (context.getSource() instanceof ISuggestionProvider suggestionProvider) {
+            var reader = new StringReader(builder.getInput());
+            reader.setCursor(builder.getStart());
+            var parser = new EntitySelectorParser(reader, true);
+
+            try {
+                parser.parse();
+            } catch (CommandSyntaxException ignored) {
+            }
+
+            return parser.fillSuggestions(builder, sbuilder -> {
+                var collection = suggestionProvider.getPlayerNames();
+                var iterable = this.playerOnly ? collection : concat(collection, suggestionProvider.getTargetedEntity());
+                ISuggestionProvider.suggest(iterable, sbuilder);
+            });
         }
-        return parser.suggest(builder);
+        return Suggestions.empty();
     }
 
-    private class Parser {
-        private final StringReader reader;
-        private int cursorStart;
-        private Function<SuggestionsBuilder, CompletableFuture<Suggestions>> suggestionsHandler;
-
-        public Parser(StringReader reader) {
-            this.reader = reader;
-        }
-
-        private EntitySelector parse() throws CommandSyntaxException {
-
-        }
-
-        public EntitySelector build() {
-            
-        }
-
-        private CompletableFuture<Suggestions> suggestNameOrSelector(SuggestionsBuilder builder) {
-            return ISuggestionProvider.suggest(woolbattle.games().games().stream().flatMap(g -> g.users().stream()).map(CommonWBUser::playerName), builder);
-        }
-
-        private CompletableFuture<Suggestions> suggest(SuggestionsBuilder builder) {
-            return suggestionsHandler.apply(builder.createOffset(reader.getCursor()));
-        }
-    }
-
-    private static class EntitySelector {
-        private final int limit;
-        private final boolean includeNonPlayers;
-        private final boolean currentWordOnly;
-        private final Predicate<Entity> filter;
-        private final MinMaxBounds.FloatBound distance;
-        private final Function<Position, Position> positionGetter;
-        private final BoundingBox boundingBox;
-        private final BiConsumer<Position, List<? extends Entity>> sorter;
-        private final boolean self;
-        private final String username;
-        private final UUID uuid;
-        private final EntityType type;
-
-        public EntitySelector(int limit, boolean includeNonPlayers, boolean currentWordOnly, Predicate<Entity> filter, MinMaxBounds.FloatBound distance, Function<Position, Position> positionGetter, BoundingBox boundingBox, BiConsumer<Position, List<? extends Entity>> sorter, boolean self, String username, UUID uuid, EntityType type) {
-            this.limit = limit;
-            this.includeNonPlayers = includeNonPlayers;
-            this.currentWordOnly = currentWordOnly;
-            this.filter = filter;
-            this.distance = distance;
-            this.positionGetter = positionGetter;
-            this.boundingBox = boundingBox;
-            this.sorter = sorter;
-            this.self = self;
-            this.username = username;
-            this.uuid = uuid;
-            this.type = type;
-        }
+    private <T> Collection<T> concat(Collection<T> c1, Collection<T> c2) {
+        var l = new ArrayList<>(c1);
+        l.addAll(c2);
+        return l;
     }
 }

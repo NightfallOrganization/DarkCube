@@ -19,20 +19,28 @@ public interface Position extends Cloneable {
 
     double z();
 
+    @NotNull
     Position clone();
+
+    default double distanceTo(@NotNull Position pos) {
+        return Math.sqrt(distanceToSqr(pos));
+    }
+
+    default double distanceToSqr(@NotNull Position pos) {
+        var dx = x() - pos.x();
+        var dy = y() - pos.y();
+        var dz = z() - pos.z();
+        return dx * dx + dy * dy + dz * dz;
+    }
 
     record Simple(double x, double y, double z) implements Position {
         @Override
-        public Position.Simple clone() {
+        public Position.@NotNull Simple clone() {
             return new Position.Simple(x, y, z);
         }
     }
 
-    interface Directed extends Position {
-        float yaw();
-
-        float pitch();
-
+    interface Directed extends Position, Rotation {
         @Override
         @NotNull
         Directed clone();
@@ -50,7 +58,7 @@ public interface Position extends Cloneable {
 
         PersistentDataType<Directed> TYPE = new PersistentDataType<>() {
             @Override
-            public Directed deserialize(JsonElement json) {
+            public @NotNull Directed deserialize(JsonElement json) {
                 var d = json.getAsJsonObject();
                 var x = d.get("x").getAsDouble();
                 var y = d.get("y").getAsDouble();
@@ -61,7 +69,7 @@ public interface Position extends Cloneable {
             }
 
             @Override
-            public JsonElement serialize(Directed data) {
+            public @NotNull JsonElement serialize(Directed data) {
                 var d = new JsonObject();
                 d.addProperty("x", data.x());
                 d.addProperty("y", data.y());
@@ -72,7 +80,7 @@ public interface Position extends Cloneable {
             }
 
             @Override
-            public Directed clone(Directed object) {
+            public @NotNull Directed clone(Directed object) {
                 return object.clone();
             }
         };
@@ -80,6 +88,10 @@ public interface Position extends Cloneable {
         record Simple(double x, double y, double z, float yaw, float pitch) implements Directed {
             private static final float F360 = 360f;
             private static final float F180 = 180f;
+
+            public Simple(double x, double y, double z, @NotNull Rotation rotation) {
+                this(x, y, z, rotation.yaw(), rotation.pitch());
+            }
 
             @Override
             public @NotNull Directed.Simple clone() {

@@ -57,6 +57,9 @@ public interface Team {
     @NotNull
     ColoredWool wool();
 
+    @NotNull
+    String key();
+
     /**
      * Adds lifes to this team.
      *

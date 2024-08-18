@@ -13,7 +13,10 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.network.packet.server.CachedPacket;
@@ -21,8 +24,6 @@ import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.network.packet.server.play.PlayerInfoRemovePacket;
 import net.minestom.server.network.packet.server.play.PlayerInfoUpdatePacket;
 import net.minestom.server.network.player.PlayerConnection;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class MinestomPlayer extends Player {
     private static final VarHandle LATENCY;
@@ -111,6 +112,23 @@ public class MinestomPlayer extends Player {
         } catch (Throwable t) {
             throw new Error(t);
         }
+    }
+
+    private Entity spectating;
+
+    @Override
+    public void spectate(@NotNull Entity entity) {
+        this.spectating = entity;
+        super.spectate(entity);
+    }
+
+    @Nullable
+    public Entity spectating() {
+        return spectating;
+    }
+
+    public Entity camera() {
+        return spectating == null ? this : spectating;
     }
 
     public @Nullable CommonWBUser user() {

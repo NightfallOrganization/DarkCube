@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.minestom.user;
 
 import eu.darkcube.minigame.woolbattle.api.user.WoolSubtractDirection;
+import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
@@ -23,6 +24,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
@@ -40,9 +42,9 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
 
     @Override
     public void woolCount(int count) {
-        final var player = woolbattle.player(user);
         var team = user.team();
         if (team == null) return;
+        final var player = woolbattle.player(user);
         player.acquirable().sync(e -> {
             var p = (Player) e;
             var inventory = p.getInventory();
@@ -69,19 +71,26 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
     @Override
     public void xp(float xp) {
         final var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
         player.setExp(xp);
+        lock.unlock();
     }
 
     @Override
     public void setItem(int slot, ItemBuilder item) {
         final var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
         player.getInventory().setItemStack(slot, item.build());
+        lock.unlock();
     }
 
     @Override
     public @NotNull ItemBuilder itemInHand() {
         final var player = woolbattle.player(user);
-        return ItemBuilder.item(player.getItemInMainHand());
+        var lock = player.acquirable().lock();
+        var item = player.getItemInMainHand();
+        lock.unlock();
+        return ItemBuilder.item(item);
     }
 
     @Override
@@ -94,13 +103,39 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
     public void teleport(@NotNull Location location) {
         final var player = woolbattle.player(user);
         var instance = ((MinestomWorld) location.world()).instance();
-        player.acquirable().sync(_ -> {
-            if (player.getInstance() != instance) {
-                player.setInstance(instance, PosUtil.toPos(location)).join();
-            } else {
-                player.teleport(PosUtil.toPos(location)).join();
-            }
-        });
+        var lock = player.acquirable().lock();
+        if (player.getInstance() != instance) {
+            player.setInstance(instance, PosUtil.toPos(location)).join();
+        } else {
+            player.teleport(PosUtil.toPos(location)).join();
+        }
+        lock.unlock();
+    }
+
+    @Override
+    public int xpLevel() {
+        var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
+        var level = player.getLevel();
+        lock.unlock();
+        return level;
+    }
+
+    @Override
+    public void velocity(@NotNull Vector velocity) {
+        var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
+        player.setVelocity(new Vec(velocity.x(), velocity.y(), velocity.z()));
+        lock.unlock();
+    }
+
+    @Override
+    public boolean isAlive() {
+        var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
+        var alive = player.isActive() && !player.isDead();
+        lock.unlock();
+        return alive;
     }
 
     private static void removeItems(PlayerInventory inventory, ItemStack itemToRemove, int count, WoolSubtractDirection direction) {

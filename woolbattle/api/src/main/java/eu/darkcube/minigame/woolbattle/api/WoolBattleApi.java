@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.api;
 
 import java.time.temporal.TemporalUnit;
+import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
@@ -101,4 +102,12 @@ public interface WoolBattleApi extends Namespaced {
     @Api
     @Nullable
     WBUser user(User user);
+
+    @Api
+    @Nullable
+    WBUser user(String playerName);
+
+    @Api
+    @Nullable
+    WBUser user(UUID uniqueId);
 }

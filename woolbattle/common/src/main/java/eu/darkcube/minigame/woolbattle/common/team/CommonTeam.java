@@ -104,7 +104,8 @@ public class CommonTeam implements Team {
         return uniqueId;
     }
 
-    public String key() {
+    @Override
+    public @NotNull String key() {
         return key;
     }
 

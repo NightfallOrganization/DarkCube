@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.minestom;
 
 import java.time.temporal.TemporalUnit;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
@@ -79,7 +80,19 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
 
     @Override
     public @Nullable CommonWBUser user(User user) {
-        var player = (MinestomPlayer) MinecraftServer.getConnectionManager().getOnlinePlayerByUuid(user.uniqueId());
+        return user(user.uniqueId());
+    }
+
+    @Override
+    public @Nullable CommonWBUser user(UUID uniqueId) {
+        var player = (MinestomPlayer) MinecraftServer.getConnectionManager().getOnlinePlayerByUuid(uniqueId);
+        if (player == null) return null;
+        return player.user();
+    }
+
+    @Override
+    public @Nullable CommonWBUser user(String playerName) {
+        var player = (MinestomPlayer) MinecraftServer.getConnectionManager().getOnlinePlayerByUsername(playerName);
         if (player == null) return null;
         return player.user();
     }

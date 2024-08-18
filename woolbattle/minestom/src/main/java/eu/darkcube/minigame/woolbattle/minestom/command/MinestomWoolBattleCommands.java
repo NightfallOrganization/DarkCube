@@ -20,14 +20,15 @@ import java.util.concurrent.ExecutionException;
 
 import eu.darkcube.minigame.woolbattle.api.command.CommandSource;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommand;
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
+import eu.darkcube.minigame.woolbattle.api.world.Rotation;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
-import eu.darkcube.system.commandapi.util.Vector2f;
-import eu.darkcube.system.commandapi.util.Vector3d;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
@@ -196,23 +197,25 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
 
     private CommandSource sourceFor(CommandSender sender) {
         @Nullable Game game = null;
-        @UnknownNullability Vector3d pos = null;
-        @UnknownNullability Vector2f rotation = null;
+        @UnknownNullability Position pos = null;
+        @UnknownNullability Rotation rotation = null;
         @UnknownNullability World world = null;
         @NotNull String name = "unknown";
         @UnknownNullability String displayName = null;
         @NotNull String commandPrefix = "";
+        @Nullable Entity entity = null;
         @NotNull Map<String, Object> extra = new HashMap<>();
         @NotNull eu.darkcube.minigame.woolbattle.api.command.CommandSender customSender;
         if (sender instanceof MinestomPlayer player) {
             name = player.getUsername();
             var playerPos = player.getPosition();
-            pos = new Vector3d(playerPos.x(), playerPos.y(), playerPos.z());
-            rotation = new Vector2f(playerPos.yaw(), playerPos.pitch());
+            pos = new Position.Simple(playerPos.x(), playerPos.y(), playerPos.z());
+            rotation = new Rotation.Simple(playerPos.yaw(), playerPos.pitch());
             world = woolbattle.woolbattle().worlds().get(player.getInstance());
             player.get(Pointer.pointer(CommandSource.class, Key.key("asd")));
             commandPrefix = "/";
             customSender = Objects.requireNonNullElseGet(player.user(), () -> woolbattle.woolbattle().wrapCommandSender(sender));
+            entity = player.user();
             var displayNameComponent = player.getDisplayName();
             if (world instanceof GameWorld gameWorld) game = gameWorld.game();
             if (displayNameComponent != null) displayName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
@@ -222,7 +225,7 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
         } else {
             customSender = woolbattle.woolbattle().wrapCommandSender(sender);
         }
-        return new CommandSource(woolbattle, game, customSender, pos, rotation, world, name, displayName, extra, commandPrefix);
+        return new CommandSource(woolbattle, game, customSender, pos, rotation, world, entity, name, displayName, extra, commandPrefix);
     }
 
     @Override
