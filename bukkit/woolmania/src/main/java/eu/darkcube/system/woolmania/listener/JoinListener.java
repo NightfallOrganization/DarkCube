@@ -14,7 +14,7 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Hall;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,12 +36,14 @@ public class JoinListener implements Listener {
         event.joinMessage(null);
         WoolMania.getInstance().woolManiaPlayerMap.put(player, woolmaniaPlayer);
         WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
-        setupScoreboardForNPCs(player);
+        // setupScoreboardForNPCs(player);
 
         Location location = player.getLocation();
+        boolean isInBlockLocation = player.getLocation().getBlock().getType().isSolid();
+
         for (var hall : Hall.values()) {
             if (hall.getHallArea().isWithinBounds(location)) {
-                if (hall.getPool().isWithinBounds(location)) {
+                if (hall.getPool().isWithinBounds(location) && isInBlockLocation) {
                     woolmaniaPlayer.teleportSyncTo(hall);
                 } else {
                     woolmaniaPlayer.setHall(hall);

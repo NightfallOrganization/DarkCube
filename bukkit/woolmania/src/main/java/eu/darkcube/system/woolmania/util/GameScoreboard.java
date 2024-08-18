@@ -7,8 +7,10 @@
 
 package eu.darkcube.system.woolmania.util;
 
+import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
+
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Hall;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -113,11 +115,13 @@ public class GameScoreboard implements Listener {
 
     public void updateWorld(Player player) {
         var team = player.getScoreboard().getTeam("world_team");
-        WoolManiaPlayer p = WoolMania.getStaticPlayer(player);
-        Hall hall = p.getHall();
+        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
+        Hall hall = woolManiaPlayer.getHall();
 
         if (hall != null) {
-            team.suffix(hall.getName().getBukkit(player, hall.getTier().getId()));
+            team.suffix(hall.getName().getBukkit(player, hall.ordinal() + 1));
+        } else if (player.getWorld().equals(SPAWN.getWorld())) {
+            team.setSuffix("§7» §bSpawn");
         } else {
             team.setSuffix("§7» §bUnknown");
         }

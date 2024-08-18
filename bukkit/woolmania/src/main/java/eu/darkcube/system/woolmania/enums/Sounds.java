@@ -14,10 +14,15 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public enum Sounds {
-    BUY(Sound.ENTITY_PLAYER_LEVELUP, 1f, 2f),
+    BUY(Sound.ENTITY_PLAYER_LEVELUP, 50f, 2f),
+    SOUND_SET(Sound.BLOCK_END_PORTAL_FRAME_FILL, 50f, 2f),
+    NO(Sound.ENTITY_VILLAGER_NO, 50f, 1f),
+    TELEPORT(Sound.BLOCK_END_PORTAL_FRAME_FILL, 50f, 2f),
 
-    FARMING_SOUND_STANDARD(Sound.ENTITY_ITEM_PICKUP, 1f, 2f, false),
-    FARMING_SOUND_WOOLBATTLE(Sound.ENTITY_ITEM_PICKUP, 1f, 1f, false)
+    THROW(Sound.ENTITY_EGG_THROW, 1f, 1f),
+
+    FARMING_SOUND_STANDARD(Sound.ENTITY_ITEM_PICKUP, 50f, 2f, false),
+    FARMING_SOUND_WOOLBATTLE(Sound.ENTITY_ITEM_PICKUP, 50f, 1f, true)
 
     ;
 
@@ -47,7 +52,7 @@ public enum Sounds {
                 unlockedSounds.add(sound);
             }
         }
-        return unlockedSounds;
+        return List.copyOf(unlockedSounds);
     }
 
     public Sound getSound() {

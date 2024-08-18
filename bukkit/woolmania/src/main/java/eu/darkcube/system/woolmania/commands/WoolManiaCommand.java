@@ -24,7 +24,7 @@ public class WoolManiaCommand extends Command {
     }
 
     public WoolManiaCommand(String name, String permission, String[] aliases, Consumer<LiteralArgumentBuilder<CommandSource>> argumentBuilder) {
-        super("darkessentials", name, permission, aliases, argumentBuilder);
+        super("woolmania", name, permission, aliases, argumentBuilder);
     }
 
 }

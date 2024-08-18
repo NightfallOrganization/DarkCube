@@ -10,12 +10,12 @@ package eu.darkcube.system.woolmania.listener;
 import com.github.juliarn.npclib.api.Npc;
 import com.github.juliarn.npclib.api.event.AttackNpcEvent;
 import com.github.juliarn.npclib.api.event.InteractNpcEvent;
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.Tiers;
-import eu.darkcube.system.woolmania.inventory.ShopInventory;
 import eu.darkcube.system.woolmania.items.CustomItem;
+import eu.darkcube.system.woolmania.items.WoolItem;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.util.message.Message;
@@ -24,32 +24,43 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class NPCListeners {
     public static void register(NPCManager manager, NPCCreator creator) {
         manager.getPlatform().eventManager().registerEventHandler(InteractNpcEvent.class, event -> {
-            if (event.hand() != InteractNpcEvent.Hand.MAIN_HAND) {
-                return;
-            }
-            Player player = event.player();
-            User user = UserAPI.instance().user(player.getUniqueId());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (event.hand() != InteractNpcEvent.Hand.MAIN_HAND) {
+                        return;
+                    }
+                    Player player = event.player();
+                    User user = UserAPI.instance().user(player.getUniqueId());
 
-            Npc<World, Player, ItemStack, Plugin> npc = event.npc();
-            try {
-                clickNpc(creator, player, user, npc);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+                    Npc<World, Player, ItemStack, Plugin> npc = event.npc();
+                    try {
+                        clickNpc(creator, player, user, npc);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }.runTask(WoolMania.getInstance());
         });
         manager.getPlatform().eventManager().registerEventHandler(AttackNpcEvent.class, event -> {
-            Player player = event.player();
-            User user = UserAPI.instance().user(player.getUniqueId());
-            Npc<World, Player, ItemStack, Plugin> npc = event.npc();
-            try {
-                clickNpc(creator, player, user, npc);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Player player = event.player();
+                    User user = UserAPI.instance().user(player.getUniqueId());
+                    Npc<World, Player, ItemStack, Plugin> npc = event.npc();
+                    try {
+                        clickNpc(creator, player, user, npc);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }.runTask(WoolMania.getInstance());
         });
     }
 
@@ -76,15 +87,18 @@ public class NPCListeners {
             int woolValue = 0;
 
             for (ItemStack item : player.getInventory().getContents()) {
-                if (item != null && item.getType().toString().endsWith("_WOOL")) {
 
-                    CustomItem customItem = new CustomItem(item);
-                    int tierLevel = customItem.getID();
-                    int itemAmount = item.getAmount();
-                    woolValue += tierLevel * itemAmount;
+                if (item != null) {
+                    CustomItem customItem = new CustomItem(ItemBuilder.item(item));
+                    if (WoolItem.ITEM_ID.equals(customItem.getItemID())) {
 
-                    player.getInventory().remove(item);
-                    hasWool = true;
+                        int tierLevel = customItem.getTierID();
+                        int itemAmount = item.getAmount();
+                        woolValue += tierLevel * itemAmount;
+
+                        player.getInventory().remove(item);
+                        hasWool = true;
+                    }
                 }
             }
 

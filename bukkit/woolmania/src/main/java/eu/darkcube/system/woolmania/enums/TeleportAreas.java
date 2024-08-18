@@ -13,7 +13,11 @@ import eu.darkcube.system.woolmania.util.area.Area;
 import org.bukkit.World;
 
 public enum TeleportAreas implements Area {
-    HALL1(HALLS, -5, 111, 6, -5, 155, -6);
+    HALL1(HALLS, -79, 207, 110,      183, 29, -105),
+    HALL2(HALLS, -79, 207, 1110,      183, 29, 895),
+    HALL3(HALLS, -79, 207, 2110,      183, 29, 1895),
+
+    ;
 
     private final World world;
     private final double[] coordinate1;

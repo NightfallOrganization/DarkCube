@@ -44,7 +44,8 @@ public class TestInventory {
         });
 
 
-
+        // ItemBuilder.item(Material.DIAMOND).set(ItemComponent.FOOD, new Food(10, 10, false, 1, null, List.of(new Food.EffectChance(new CustomPotionEffect(Key.key("strength"), new CustomPotionEffect.Settings(0, 30 * 20, false, true, true)), 0.5F))));
+        // player.getInventory().addItem(customItem.<ItemStack>build());
 
 
 

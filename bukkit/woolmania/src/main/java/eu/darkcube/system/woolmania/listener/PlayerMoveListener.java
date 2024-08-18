@@ -10,6 +10,7 @@ package eu.darkcube.system.woolmania.listener;
 import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +21,7 @@ public class PlayerMoveListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (player.getWorld().equals(MAINWORLD) && player.getLocation().getY() < 110) {
+        if (player.getWorld().equals(MAINWORLD) && player.getLocation().getY() < 110 && player.getGameMode() != GameMode.CREATIVE) {
             player.teleport(TeleportLocations.SPAWN.getLocation());
         }
     }

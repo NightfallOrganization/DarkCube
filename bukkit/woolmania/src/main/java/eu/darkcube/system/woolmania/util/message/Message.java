@@ -59,14 +59,24 @@ public enum Message implements BaseMessage {
     BOOSTER_SETTED_NONE,
     ITEM_BUY_COST,
     ITEM_BUY_BOUGHT,
+    ITEM_BUY_SELECTED,
+    SOUND_BUYED,
+    SOUND_SELECTED,
+    FOOD_BUYED,
+    NO_MONEY,
+    SOUND_RESETTED,
+    SOUND_RESET_OWN,
+    SOUND_RESET,
+    NOT_IN_HALL,
+    NOT_OFFHAND,
 
     ;
 
-    public static final String PREFIX_ITEM = "ITEM_";
+    public static final String PREFIX_INVENTORY_ITEM = "INVENTORY_ITEM_";
     public static final String PREFIX_LORE = "LORE_";
     public static final String KEY_PREFIX = "WOOLMANIA_";
     public static final Function<String, String> KEY_MODIFIER = s -> KEY_PREFIX + s;
-    public static final Function<String, String> ITEM_MODIFIER = s -> KEY_MODIFIER.apply(PREFIX_ITEM + s);
+    public static final Function<String, String> INVENTORY_ITEM_MODIFIER = s -> KEY_MODIFIER.apply(PREFIX_INVENTORY_ITEM + s);
 
     private final String key;
 

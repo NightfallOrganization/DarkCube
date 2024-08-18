@@ -34,10 +34,10 @@ public class ZenumCommand extends WoolManiaCommand {
 
                 .executes(context -> firstExecuteCommand(context, List.of(context.getSource().asPlayer())))
 
-                .then(new SetZenumCommand().builder())
-                .then(new AddZenumCommand().builder())
-                .then(new RemoveZenumCommand().builder())
-                .then(new SendZenumCommand().builder())
+                .then(new SetZenumCommand().builder().requires(source->source.getSource().hasPermission("woolmania.zenum.set")))
+                .then(new AddZenumCommand().builder().requires(source->source.getSource().hasPermission("woolmania.zenum.add")))
+                .then(new RemoveZenumCommand().builder().requires(source->source.getSource().hasPermission("woolmania.zenum.remove")))
+                .then(new SendZenumCommand().builder().requires(source->source.getSource().hasPermission("woolmania.zenum.send")))
         );
         // @formatter:on
     }

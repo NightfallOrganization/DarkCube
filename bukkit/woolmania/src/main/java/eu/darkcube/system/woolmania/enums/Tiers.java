@@ -24,22 +24,24 @@ public enum Tiers {
     TIER13(13, "Tier XIII", 4350),
     TIER14(14, "Tier XIV", 4700),
     TIER15(15, "Tier XV", 5050),
+    TIER16(15, "Tier XVI", 5400),
 
     ;
 
-    int id;
-    String name;
-    int durability;
+    private final int id;
+    private final String name;
+    private final int durability;
 
-    private Tiers(int id, String name, int durability) {
+    Tiers(int id, String name, int durability) {
         this.id = id;
         this.name = name;
         this.durability = durability;
     }
 
-    private Tiers(int id, String name){
+    Tiers(int id, String name){
         this.id = id;
         this.name = name;
+        this.durability = 0;
     }
 
     public int getId() {
@@ -50,13 +52,10 @@ public enum Tiers {
         return name;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    // NICHT TUN
+    // public void setName(ItemBuilder builder) {
+    //     builder.displayname(Component.text(name));
+    // }
 
     public int getDurability() {
         return durability;

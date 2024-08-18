@@ -11,8 +11,8 @@ import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.Hall;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
+import eu.darkcube.system.woolmania.enums.hall.Hall;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,15 +62,17 @@ public class Ruler implements Listener {
         if (hall == null) {
             event.setCancelled(true);
             return;
-        }
-
-        if (!block.getType().toString().endsWith("_WOOL") && player.getWorld().equals(HALLS)) {
-            event.setCancelled(true);
-
-        } else if (!hall.getPool().isWithinBounds(location)) {
+        } else if (!player.getWorld().equals(HALLS)) {
             event.setCancelled(true);
         }
 
+        var registry = WoolMania.getInstance().getWoolRegistry();
+
+        if (registry.contains(block.getType()) && hall.getPool().isWithinBounds(location)) {
+            // Allow
+        } else {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

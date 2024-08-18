@@ -5,9 +5,9 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.inventory;
+package eu.darkcube.system.woolmania.inventory.shop;
 
-import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
+import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
@@ -21,44 +21,41 @@ import eu.darkcube.system.server.inventory.listener.TemplateInventoryListener;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.Items;
-import org.bukkit.Bukkit;
+import eu.darkcube.system.woolmania.enums.InventoryItems;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class ShopInventory implements TemplateInventoryListener {
-    public void openInventory(Player player) {
-        InventoryTemplate inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "shop"), 27);
+    private final InventoryTemplate inventoryTemplate;
+
+    public ShopInventory() {
+        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "shop"), 27);
         inventoryTemplate.title(ZINUS.getName());
-
         inventoryTemplate.animation().calculateManifold(4, 1);
-
-        var disc = Items.INVENTORY_SHOP_SOUNDS.createItem(player).<ItemStack>build();
-        disc.editMeta(meta -> {
-            var jukebox = meta.getJukeboxPlayable();
-            jukebox.setShowInTooltip(false);
-            meta.setJukeboxPlayable(jukebox);
-            // meta.setHideTooltip(true);
-        });
-
         DarkCubeInventoryTemplates.Paged.configure3x9(inventoryTemplate);
 
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_3);
-        inventoryTemplate.setItem(1, 11, Items.INVENTORY_SHOP_STEAK);
-        inventoryTemplate.setItem(1, 13, Items.INVENTORY_SHOP_SHEARS);
-        inventoryTemplate.setItem(1, 15, disc);
+        inventoryTemplate.setItem(1, 11, INVENTORY_SHOP_FOOD);
+        inventoryTemplate.setItem(1, 13, INVENTORY_SHOP_GADGETS);
+        inventoryTemplate.setItem(1, 15, INVENTORY_SHOP_SOUNDS);
 
         inventoryTemplate.addListener(this);
+    }
+
+    public void openInventory(Player player) {
         inventoryTemplate.open(player);
     }
 
     @Override
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
-        String itemId = Items.getItemID(item);
+        String itemId = InventoryItems.getItemID(item);
         if (itemId == null) return;
 
-        if (itemId.equals(Items.INVENTORY_SHOP_SOUNDS.itemID())) {
+        if (itemId.equals(INVENTORY_SHOP_SOUNDS.itemID())) {
             WoolMania.getInstance().getShopInventorySound().openInventory(user);
+        } else if (itemId.equals(INVENTORY_SHOP_FOOD.itemID())) {
+            WoolMania.getInstance().getShopInventoryFood().openInventory(user);
+        } else if (itemId.equals(INVENTORY_SHOP_GADGETS.itemID())) {
+            WoolMania.getInstance().getShopInventoryGadgets().openInventory(user);
         }
     }
 }

@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.woolmania.util.area;
 
-import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Hall;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;

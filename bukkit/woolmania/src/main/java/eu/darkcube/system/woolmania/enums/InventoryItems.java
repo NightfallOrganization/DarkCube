@@ -27,17 +27,37 @@ import eu.darkcube.system.util.data.DataKey;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.util.message.Message;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-public enum Items implements ItemFactory {
-    INVENTORY_SHOP_STEAK(item(COOKED_BEEF)),
-    INVENTORY_SHOP_SHEARS(item(SHEARS)),
-    INVENTORY_SHOP_SOUNDS(item(MUSIC_DISC_PIGSTEP)),
+public enum InventoryItems implements ItemFactory {
+    //Shop-Inventar
+    INVENTORY_SHOP_FOOD(item(COOKED_BEEF)),
+    INVENTORY_SHOP_GADGETS(item(FISHING_ROD)),
+    INVENTORY_SHOP_SOUNDS(item(MUSIC_DISC_PIGSTEP).hideJukeboxPlayableTooltip()),
 
+    //Shop-Food
+    INVENTORY_SHOP_FOOD_CARROT(item(ItemBuilder.item(Material.CARROT)), 1000),
+    INVENTORY_SHOP_FOOD_MELON(item(ItemBuilder.item(MELON)), 5000),
+    INVENTORY_SHOP_FOOD_STEAK(item(ItemBuilder.item(COOKED_BEEF)), 10000),
+    INVENTORY_SHOP_FOOD_DIAMOND(item(ItemBuilder.item(Material.DIAMOND)), 20000),
 
-    //Shop-Sound-Items
-    INVENTORY_SOUNDS_STANDARD(item(MUSIC_DISC_WARD)),
-    INVENTORY_SOUNDS_WOOLBATTLE(item(MUSIC_DISC_MALL),15000),
+    //Shop-Gadgets
+    INVENTORY_SHOP_GADGETS_GRENADE(item(SNOWBALL), 5000),
+
+    //Shop-Sound
+    INVENTORY_SHOP_SOUNDS_STANDARD(item(MUSIC_DISC_WARD).hideJukeboxPlayableTooltip(), 0),
+    INVENTORY_SHOP_SOUNDS_WOOLBATTLE(item(MUSIC_DISC_MALL).hideJukeboxPlayableTooltip(),15000),
+
+    //Teleport-Inventar
+    INVENTORY_TELEPORT_SPAWN(item(NETHER_STAR)),
+    INVENTORY_TELEPORT_HALLS(item(BARREL)),
+    INVENTORY_TELEPORT_NONE(item(FIREWORK_STAR)),
+
+    //Teleport-Halls
+    INVENTORY_TELEPORT_HALLS_HALL_1(item(WHITE_SHULKER_BOX)),
+    INVENTORY_TELEPORT_HALLS_HALL_2(item(ORANGE_SHULKER_BOX)),
+    INVENTORY_TELEPORT_HALLS_HALL_3(item(MAGENTA_SHULKER_BOX)),
 
     ;
 
@@ -46,13 +66,13 @@ public enum Items implements ItemFactory {
     private final ItemBuilder builder;
     private Integer cost;
 
-    Items(ItemBuilder builder, Integer cost) {
+    InventoryItems(ItemBuilder builder, Integer cost) {
         this.builder = builder;
         this.cost = cost;
         key = this.name();
     }
 
-    Items(ItemBuilder builder) {
+    InventoryItems(ItemBuilder builder) {
         this.builder = builder;
         key = this.name();
     }
@@ -66,7 +86,7 @@ public enum Items implements ItemFactory {
     }
 
     public String itemID() {
-        return Message.PREFIX_ITEM + key();
+        return Message.PREFIX_INVENTORY_ITEM + key();
     }
 
     public @NotNull ItemBuilder builder() {
@@ -103,8 +123,8 @@ public enum Items implements ItemFactory {
         Component name = Message.getMessage(this.itemID(), language, displayNameReplacements);
         builder.displayname(name);
 
-        if (language.containsMessage(Message.KEY_PREFIX + Message.PREFIX_ITEM + Message.PREFIX_LORE + key())) {
-            Component lore = Message.getMessage(Message.PREFIX_ITEM + Message.PREFIX_LORE + key(), language);
+        if (language.containsMessage(Message.KEY_PREFIX + Message.PREFIX_INVENTORY_ITEM + Message.PREFIX_LORE + key())) {
+            Component lore = Message.getMessage(Message.PREFIX_INVENTORY_ITEM + Message.PREFIX_LORE + key(), language);
 
             String serialized = LegacyComponentSerializer.legacySection().serialize(lore);
             String[] loreStringLines = serialized.split("\n");

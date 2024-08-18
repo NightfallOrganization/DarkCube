@@ -5,16 +5,20 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.enums;
+package eu.darkcube.system.woolmania.enums.hall;
 
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 
 import eu.darkcube.system.woolmania.util.area.Area;
 import org.bukkit.World;
 
-public enum HallAreas implements Area {
+public enum PoolAreas implements Area {
 
-    HALL1(HALLS, -12, 178, 48, 142, 51, -61);
+    HALL1(HALLS, 25, 110, 19,       99, 68, -19),
+    HALL2(HALLS, 25, 110, 1019,     99, 68, 981),
+    HALL3(HALLS, 25, 110, 2019,     99, 68, 1981),
+
+    ;
 
     private final World world;
     private final double[] coordinate1;
@@ -26,7 +30,7 @@ public enum HallAreas implements Area {
     private final int y2;
     private final int z2;
 
-    HallAreas(World world, int x1, int y1, int z1, int x2, int y2, int z2) {
+    PoolAreas(World world, int x1, int y1, int z1, int x2, int y2, int z2) {
         this.world = world;
         this.x1 = x1;
         this.y1 = y1;

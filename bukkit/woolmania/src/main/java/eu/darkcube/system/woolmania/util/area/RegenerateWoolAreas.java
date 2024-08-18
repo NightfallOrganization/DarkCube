@@ -8,7 +8,7 @@
 package eu.darkcube.system.woolmania.util.area;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Hall;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

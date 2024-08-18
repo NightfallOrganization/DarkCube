@@ -29,7 +29,8 @@ public class LanguageHelper {
         String tag = language.getLocale().toLanguageTag();
         loadLanguage(language, "messages_" + tag + ".properties");
         language.registerLookup(loader, "messages_pure_" + tag + ".properties", Message.KEY_MODIFIER);
-        language.registerLookup(loader, "items_" + tag + ".properties", Message.ITEM_MODIFIER);
+        language.registerLookup(loader, "inventory_items_" + tag + ".properties", Message.INVENTORY_ITEM_MODIFIER);
+        language.registerLookup(loader, "custom_items_" + tag + ".properties", CustomItemNames.CUSTOM_ITEM_MODIFIER);
     }
 
     private static void loadLanguage(Language language, String path) throws IOException {
