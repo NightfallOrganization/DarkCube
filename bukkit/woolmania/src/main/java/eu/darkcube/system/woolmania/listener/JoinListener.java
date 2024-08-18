@@ -36,7 +36,7 @@ public class JoinListener implements Listener {
         event.joinMessage(null);
         WoolMania.getInstance().woolManiaPlayerMap.put(player, woolmaniaPlayer);
         WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
-        // setupScoreboardForNPCs(player);
+        setupScoreboardForNPCs(player);
 
         Location location = player.getLocation();
         boolean isInBlockLocation = player.getLocation().getBlock().getType().isSolid();

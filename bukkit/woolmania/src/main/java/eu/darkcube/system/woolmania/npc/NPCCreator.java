@@ -21,12 +21,12 @@ public class NPCCreator {
     public void createNPC() {
         createZinusNPC(new Location(HALLS, 13.5, 111, -20.5, 0, 0));
         createZinaNPC(new Location(HALLS, 13.5, 111, 21.5, -180, 0));
-
-        createZinusNPC(new Location(HALLS, 13.5, 111, 979.5, 0, 0));
-        createZinaNPC(new Location(HALLS, 13.5, 111, 1021.5, -180, 0));
-
-        createZinusNPC(new Location(HALLS, 13.5, 111, 1979.5, 0, 0));
-        createZinaNPC(new Location(HALLS, 13.5, 111, 2021.5, -180, 0));
+        //
+        // createZinusNPC(new Location(HALLS, 13.5, 111, 979.5, 0, 0));
+        // createZinaNPC(new Location(HALLS, 13.5, 111, 1021.5, -180, 0));
+        //
+        // createZinusNPC(new Location(HALLS, 13.5, 111, 1979.5, 0, 0));
+        // createZinaNPC(new Location(HALLS, 13.5, 111, 2021.5, -180, 0));
     }
 
     private void createZinusNPC(Location location) {
