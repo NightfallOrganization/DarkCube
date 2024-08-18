@@ -23,6 +23,7 @@ import net.minestom.server.thread.Acquired;
 public interface DefaultMinestomEntity extends Entity {
     Acquired<? extends net.minestom.server.entity.Entity> lock();
 
+    @NotNull
     MinestomWoolBattle woolbattle();
 
     @Override

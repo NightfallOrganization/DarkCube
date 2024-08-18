@@ -29,6 +29,8 @@ import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.system.commandapi.util.Messages;
+import eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
@@ -37,6 +39,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.ClickEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.HoverEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
@@ -64,10 +67,24 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
         }
         var parse = dispatcher.parse(commandLine, source);
         var suggestions = getTabCompletionsSync(parse);
-        for (var s : suggestions.getList()) {
-            Component tooltip = s.getTooltip() != null ? Component.text(s.getTooltip().getString()) : null;
-            suggestion.addEntry(new SuggestionEntry(s.getText(), tooltip));
+        var minStart = Integer.MAX_VALUE;
+        for (var entry : suggestions.getList()) {
+            var entryStart = entry.getRange().getStart() + 1;
+            if (minStart > entryStart) {
+                minStart = entryStart;
+            }
+            Component tooltip;
+            {
+                var tooltipMessage = entry.getTooltip();
+                if (tooltipMessage instanceof Messages.MessageWrapper(var message, var components)) {
+                    tooltip = KyoriAdventureSupport.adventureSupport().convert(message.getMessage(source.sender(), components));
+                } else {
+                    tooltip = tooltipMessage == null ? null : Component.text(tooltipMessage.getString());
+                }
+            }
+            suggestion.addEntry(new SuggestionEntry(entry.getText(), tooltip));
         }
+        suggestion.setStart(minStart);
     };
     private final CommandExecutor executor = (sender, context) -> {
         var commandLine = context.getInput();
@@ -78,7 +95,23 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
         } catch (CommandSyntaxException ex) {
             var failedCursor = ex.getCursor();
 
-            source.sendMessage(text(ex.getMessage(), NamedTextColor.RED));
+            eu.darkcube.system.libs.net.kyori.adventure.text.Component exMessage;
+            var style = Style.style(NamedTextColor.RED);
+            {
+                var raw = ex.getRawMessage();
+                if (raw instanceof Messages.MessageWrapper(var message, var components)) {
+                    exMessage = message.getMessage(source.sender(), components);
+                    var ctx = ex.getContext();
+                    if (ctx != null) {
+                        exMessage = exMessage.append(text(" at position " + ex.getCursor() + ": " + ctx));
+                    }
+                    exMessage = exMessage.applyFallbackStyle(style);
+                } else {
+                    exMessage = text(ex.getMessage(), style);
+                }
+            }
+
+            source.sendMessage(exMessage);
             if (failedCursor == 0) {
                 return; // Happens when someone tries to execute a command that requires a condition which is not met
             }

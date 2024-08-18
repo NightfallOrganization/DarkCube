@@ -7,17 +7,22 @@
 
 package eu.darkcube.minigame.woolbattle.common.command.arguments;
 
+import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import eu.darkcube.minigame.woolbattle.api.command.CommandSource;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.ToStringFunction;
 import eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleArguments;
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
+import eu.darkcube.minigame.woolbattle.common.command.arguments.entity.EntitySelectorOptions;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.ArgumentType;
 import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -29,6 +34,7 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     public CommonWoolBattleArguments(CommonWoolBattleApi woolbattle) {
         this.woolbattle = woolbattle;
+        EntitySelectorOptions.bootStrap();
     }
 
     @Override
@@ -114,5 +120,25 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
     @Override
     public @NotNull ArgumentType<@NotNull ?> entityArgument0(boolean player, boolean single) {
         return new CommonEntityArgument(woolbattle, player, single);
+    }
+
+    @Override
+    public @NotNull Collection<? extends Entity> entities0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return CommonEntityArgument.get(ctx, name).findEntities((CommandSource) ctx.getSource());
+    }
+
+    @Override
+    public @NotNull Entity entity0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return CommonEntityArgument.get(ctx, name).findSingleEntity((CommandSource) ctx.getSource());
+    }
+
+    @Override
+    public @NotNull Collection<? extends WBUser> players0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return CommonEntityArgument.get(ctx, name).findPlayers((CommandSource) ctx.getSource());
+    }
+
+    @Override
+    public @NotNull WBUser player0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return CommonEntityArgument.get(ctx, name).findSinglePlayer((CommandSource) ctx.getSource());
     }
 }

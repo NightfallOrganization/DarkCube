@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
@@ -151,6 +152,12 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         spawn = null;
     }
 
+    @Override
+    @Nullable
+    public CommonWorld world() {
+        return world;
+    }
+
     protected void transitionPlayers(@NotNull CommonIngame ingame) {
         for (var user : game.users()) {
             var team = user.team();
@@ -160,7 +167,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
                 woolbattle.logger().warn("No spawn configured for team {} on {}", team.key(), game.mapSize());
                 spawn = new Position.Directed.Simple(0.5, 100, 0.5, 0, 0);
             }
-            user.teleport(new Location(ingame.world(), spawn));
+            user.teleport(new Location(Objects.requireNonNull(ingame.world()), spawn));
         }
     }
 

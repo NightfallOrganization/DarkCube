@@ -12,7 +12,7 @@ import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public class CommonGameWorld extends CommonWorld implements GameWorld {
+public abstract class CommonGameWorld extends CommonWorld implements GameWorld {
     protected final @NotNull CommonGame game;
 
     public CommonGameWorld(@NotNull CommonGame game) {

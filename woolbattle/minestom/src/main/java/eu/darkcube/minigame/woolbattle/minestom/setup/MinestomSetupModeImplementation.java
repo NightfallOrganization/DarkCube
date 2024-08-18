@@ -68,7 +68,7 @@ public class MinestomSetupModeImplementation implements SetupMode.Implementation
         if (value == null) return false;
 
         var rawUser = oldUser.user();
-        var user = new CommonWBUser(woolbattle, rawUser, null);
+        var user = woolbattle.woolbattle().userFactory().create(rawUser.uniqueId(), null);
         woolbattle.woolbattle().player(user, player);
         enterSetupMode(user, (instance, pos) -> {
             event.getPlayer().setRespawnPoint(pos);

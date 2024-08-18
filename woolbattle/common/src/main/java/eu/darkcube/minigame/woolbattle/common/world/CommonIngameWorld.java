@@ -18,7 +18,7 @@ import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonIngameBloc
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public class CommonIngameWorld extends CommonGameWorld {
+public abstract class CommonIngameWorld extends CommonGameWorld {
     private final Set<CommonBlock> placedBlocks = ConcurrentHashMap.newKeySet();
     private final Map<CommonBlock, ColoredWool> brokenWool = new ConcurrentHashMap<>();
     private final Key blockDamageKey;

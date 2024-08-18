@@ -47,7 +47,7 @@ public class EntitySelectorParser {
     public static final char SYNTAX_OPTIONS_KEY_VALUE_SEPARATOR = '=';
     private static final char SYNTAX_OPTIONS_SEPARATOR = ',';
     public static final char SYNTAX_NOT = '!';
-    public static final char SYNTAX_TAG = '#';
+    // public static final char SYNTAX_TAG = '#';
     private static final char SELECTOR_NEAREST_PLAYER = 'p';
     private static final char SELECTOR_ALL_PLAYERS = 'a';
     private static final char SELECTOR_RANDOM_PLAYERS = 'r';
@@ -66,6 +66,7 @@ public class EntitySelectorParser {
     public static final BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> SUGGEST_NOTHING = (suggestionsbuilder, _) -> suggestionsbuilder.buildFuture();
     private final StringReader reader;
     private final boolean allowSelectors;
+    private final @Nullable CommandSource source;
     private int maxResults;
     private boolean includesEntities;
     private boolean worldLimited;
@@ -93,38 +94,43 @@ public class EntitySelectorParser {
     private int startPosition;
     @Nullable
     private UUID entityUUID;
-    private BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestions;
+    private SuggestionHandler suggestions;
     private boolean hasNameEquals;
     private boolean hasNameNotEquals;
     private boolean isLimited;
     private boolean isSorted;
-    private boolean hasGamemodeEquals;
-    private boolean hasGamemodeNotEquals;
+    // private boolean hasGamemodeEquals;
+    // private boolean hasGamemodeNotEquals;
     private boolean hasTeamEquals;
-    private boolean hasTeamNotEquals;
+    // private boolean hasTeamNotEquals;
     @Nullable
     private EntityType<?> type;
     private boolean typeInverse;
-    private boolean hasScores;
-    private boolean hasAdvancements;
+    // private boolean hasScores;
+    // private boolean hasAdvancements;
     private boolean usesSelectors;
     public boolean parsingEntityArgumentSuggestions; // Paper - tell clients to ask server for suggestions for EntityArguments
 
-    public EntitySelectorParser(StringReader reader, boolean atAllowed) {
-        // Paper start - tell clients to ask server for suggestions for EntityArguments
-        this(reader, atAllowed, false);
+    public interface SuggestionHandler {
+        CompletableFuture<Suggestions> suggest(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer, CommandSource source);
     }
 
-    public EntitySelectorParser(StringReader reader, boolean atAllowed, boolean parsingEntityArgumentSuggestions) {
+    public EntitySelectorParser(StringReader reader, boolean atAllowed, @Nullable CommandSource source) {
+        // Paper start - tell clients to ask server for suggestions for EntityArguments
+        this(reader, atAllowed, false, source);
+    }
+
+    public EntitySelectorParser(StringReader reader, boolean atAllowed, boolean parsingEntityArgumentSuggestions, @Nullable CommandSource source) {
         this.parsingEntityArgumentSuggestions = parsingEntityArgumentSuggestions;
         // Paper end - tell clients to ask server for suggestions for EntityArguments
+        this.source = source;
         this.distance = MinMaxBounds.Doubles.ANY;
         this.level = MinMaxBounds.Ints.ANY;
         this.rotX = MinMaxBounds.Doubles.ANY;
         this.rotY = MinMaxBounds.Doubles.ANY;
         this.predicates = new ArrayList<>();
         this.order = EntitySelector.ORDER_ARBITRARY;
-        this.suggestions = EntitySelectorParser.SUGGEST_NOTHING;
+        setSuggestions(EntitySelectorParser.SUGGEST_NOTHING);
         this.reader = reader;
         this.allowSelectors = atAllowed;
     }
@@ -138,7 +144,7 @@ public class EntitySelectorParser {
 
         if (this.deltaX == null && this.deltaY == null && this.deltaZ == null) {
             if (this.distance.max().isPresent()) {
-                double d0 = (Double) this.distance.max().get();
+                double d0 = this.distance.max().get();
 
                 axisalignedbb = new BoundingBox(-d0, -d0, -d0, d0 + 1.0D, d0 + 1.0D, d0 + 1.0D);
             } else {
@@ -160,15 +166,15 @@ public class EntitySelectorParser {
     }
 
     private BoundingBox createAabb(double x, double y, double z) {
-        boolean xstz = x < 0.0D;
-        boolean ystz = y < 0.0D;
-        boolean zstz = z < 0.0D;
-        double minX = xstz ? x : 0.0D;
-        double minY = ystz ? y : 0.0D;
-        double minZ = zstz ? z : 0.0D;
-        double maxX = (xstz ? 0.0D : x) + 1.0D;
-        double maxY = (ystz ? 0.0D : y) + 1.0D;
-        double maxZ = (zstz ? 0.0D : z) + 1.0D;
+        var xstz = x < 0.0D;
+        var ystz = y < 0.0D;
+        var zstz = z < 0.0D;
+        var minX = xstz ? x : 0.0D;
+        var minY = ystz ? y : 0.0D;
+        var minZ = zstz ? z : 0.0D;
+        var maxX = (xstz ? 0.0D : x) + 1.0D;
+        var maxY = (ystz ? 0.0D : y) + 1.0D;
+        var maxZ = (zstz ? 0.0D : z) + 1.0D;
 
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
@@ -188,12 +194,16 @@ public class EntitySelectorParser {
 
     }
 
+    public @Nullable CommandSource source() {
+        return source;
+    }
+
     private Predicate<Entity> createRotationPredicate(MinMaxBounds.Doubles angleRange, ToDoubleFunction<Entity> entityToAngle) {
-        double d0 = Mth.wrapDegrees(angleRange.min().isEmpty() ? 0.0F : angleRange.min().get());
-        double d1 = Mth.wrapDegrees(angleRange.max().isEmpty() ? 359.0F : angleRange.max().get());
+        var d0 = Mth.wrapDegrees(angleRange.min().isEmpty() ? 0.0F : angleRange.min().get());
+        var d1 = Mth.wrapDegrees(angleRange.max().isEmpty() ? 359.0F : angleRange.max().get());
 
         return (entity) -> {
-            double d2 = Mth.wrapDegrees(entityToAngle.applyAsDouble(entity));
+            var d2 = Mth.wrapDegrees(entityToAngle.applyAsDouble(entity));
 
             return d0 > d1 ? d2 >= d0 || d2 <= d1 : d2 >= d0 && d2 <= d1;
         };
@@ -203,12 +213,12 @@ public class EntitySelectorParser {
     protected void parseSelector(boolean overridePermissions) throws CommandSyntaxException {
         this.usesSelectors = !overridePermissions;
         // CraftBukkit end
-        this.suggestions = this::suggestSelector;
+        setSuggestions(this::suggestSelector);
         if (!this.reader.canRead()) {
             throw EntitySelectorParser.ERROR_MISSING_SELECTOR_TYPE.createWithContext(this.reader);
         } else {
-            int i = this.reader.getCursor();
-            char c0 = this.reader.read();
+            var i = this.reader.getCursor();
+            var c0 = this.reader.read();
             boolean aliveCheck;
 
             switch (c0) {
@@ -260,10 +270,10 @@ public class EntitySelectorParser {
                 this.predicates.add(Entity::isAlive);
             }
 
-            this.suggestions = this::suggestOpenOptions;
+            setSuggestions(this::suggestOpenOptions);
             if (this.reader.canRead() && this.reader.peek() == SYNTAX_OPTIONS_START) {
                 this.reader.skip();
-                this.suggestions = this::suggestOptionsKeyOrClose;
+                setSuggestions(this::suggestOptionsKeyOrClose);
                 this.parseOptions();
             }
 
@@ -272,11 +282,11 @@ public class EntitySelectorParser {
 
     protected void parseNameOrUUID() throws CommandSyntaxException {
         if (this.reader.canRead()) {
-            this.suggestions = this::suggestName;
+            setSuggestions(this::suggestName);
         }
 
-        int i = this.reader.getCursor();
-        String s = this.reader.readString();
+        var i = this.reader.getCursor();
+        var s = this.reader.readString();
 
         try {
             this.entityUUID = UUID.fromString(s);
@@ -295,15 +305,15 @@ public class EntitySelectorParser {
     }
 
     protected void parseOptions() throws CommandSyntaxException {
-        this.suggestions = this::suggestOptionsKey;
+        setSuggestions(this::suggestOptionsKey);
         this.reader.skipWhitespace();
 
         while (true) {
             if (this.reader.canRead() && this.reader.peek() != SYNTAX_OPTIONS_END) {
                 this.reader.skipWhitespace();
-                int i = this.reader.getCursor();
-                String s = this.reader.readString();
-                EntitySelectorOptions.Modifier playerselector_a = EntitySelectorOptions.get(this, s, i);
+                var i = this.reader.getCursor();
+                var s = this.reader.readString();
+                var playerselector_a = EntitySelectorOptions.get(this, s, i);
 
                 this.reader.skipWhitespace();
                 if (!this.reader.canRead() || this.reader.peek() != SYNTAX_OPTIONS_KEY_VALUE_SEPARATOR) {
@@ -313,17 +323,17 @@ public class EntitySelectorParser {
 
                 this.reader.skip();
                 this.reader.skipWhitespace();
-                this.suggestions = EntitySelectorParser.SUGGEST_NOTHING;
+                setSuggestions(EntitySelectorParser.SUGGEST_NOTHING);
                 playerselector_a.handle(this);
                 this.reader.skipWhitespace();
-                this.suggestions = this::suggestOptionsNextOrClose;
+                setSuggestions(this::suggestOptionsNextOrClose);
                 if (!this.reader.canRead()) {
                     continue;
                 }
 
                 if (this.reader.peek() == SYNTAX_OPTIONS_SEPARATOR) {
                     this.reader.skip();
-                    this.suggestions = this::suggestOptionsKey;
+                    setSuggestions(this::suggestOptionsKey);
                     continue;
                 }
 
@@ -334,7 +344,7 @@ public class EntitySelectorParser {
 
             if (this.reader.canRead()) {
                 this.reader.skip();
-                this.suggestions = EntitySelectorParser.SUGGEST_NOTHING;
+                setSuggestions(EntitySelectorParser.SUGGEST_NOTHING);
                 return;
             }
 
@@ -353,16 +363,16 @@ public class EntitySelectorParser {
         }
     }
 
-    public boolean isTag() {
-        this.reader.skipWhitespace();
-        if (this.reader.canRead() && this.reader.peek() == SYNTAX_TAG) {
-            this.reader.skip();
-            this.reader.skipWhitespace();
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // public boolean isTag() {
+    //     this.reader.skipWhitespace();
+    //     if (this.reader.canRead() && this.reader.peek() == SYNTAX_TAG) {
+    //         this.reader.skip();
+    //         this.reader.skipWhitespace();
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
     public StringReader getReader() {
         return this.reader;
@@ -470,10 +480,6 @@ public class EntitySelectorParser {
         this.includesEntities = includesNonPlayers;
     }
 
-    public BiConsumer<Position, List<? extends Entity>> getOrder() {
-        return this.order;
-    }
-
     public void setOrder(BiConsumer<Position, List<? extends Entity>> sorter) {
         this.order = sorter;
     }
@@ -486,7 +492,7 @@ public class EntitySelectorParser {
     public EntitySelector parse(boolean overridePermissions) throws CommandSyntaxException {
         // CraftBukkit end
         this.startPosition = this.reader.getCursor();
-        this.suggestions = this::suggestNameOrSelector;
+        setSuggestions(this::suggestNameOrSelector);
         if (this.reader.canRead() && this.reader.peek() == SYNTAX_SELECTOR_START) {
             if (!this.allowSelectors) {
                 throw EntitySelectorParser.ERROR_SELECTORS_NOT_ALLOWED.createWithContext(this.reader);
@@ -521,17 +527,17 @@ public class EntitySelectorParser {
     }
 
     private CompletableFuture<Suggestions> suggestName(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
-        SuggestionsBuilder suggestionsbuilder1 = builder.createOffset(this.startPosition);
+        var sb = builder.createOffset(this.startPosition);
 
-        consumer.accept(suggestionsbuilder1);
-        return builder.add(suggestionsbuilder1).buildFuture();
+        consumer.accept(sb);
+        return builder.add(sb).buildFuture();
     }
 
     private CompletableFuture<Suggestions> suggestSelector(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
-        SuggestionsBuilder suggestionsbuilder1 = builder.createOffset(builder.getStart() - 1);
+        var sb = builder.createOffset(builder.getStart() - 1);
 
-        EntitySelectorParser.fillSelectorSuggestions(suggestionsbuilder1);
-        builder.add(suggestionsbuilder1);
+        EntitySelectorParser.fillSelectorSuggestions(sb);
+        builder.add(sb);
         return builder.buildFuture();
     }
 
@@ -557,21 +563,25 @@ public class EntitySelectorParser {
         return builder.buildFuture();
     }
 
-    private CompletableFuture<Suggestions> suggestEquals(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
-        builder.suggest(String.valueOf(SYNTAX_OPTIONS_KEY_VALUE_SEPARATOR));
-        return builder.buildFuture();
-    }
+    // private CompletableFuture<Suggestions> suggestEquals(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
+    //     builder.suggest(String.valueOf(SYNTAX_OPTIONS_KEY_VALUE_SEPARATOR));
+    //     return builder.buildFuture();
+    // }
 
     public boolean isCurrentEntity() {
         return this.currentEntity;
     }
 
     public void setSuggestions(BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionProvider) {
-        this.suggestions = suggestionProvider;
+        setSuggestions((builder, consumer, _) -> suggestionProvider.apply(builder, consumer));
     }
 
-    public CompletableFuture<Suggestions> fillSuggestions(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer) {
-        return (CompletableFuture) this.suggestions.apply(builder.createOffset(this.reader.getCursor()), consumer);
+    public void setSuggestions(SuggestionHandler suggestions) {
+        this.suggestions = suggestions;
+    }
+
+    public CompletableFuture<Suggestions> fillSuggestions(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer, CommandSource source) {
+        return this.suggestions.suggest(builder.createOffset(this.reader.getCursor()), consumer, source);
     }
 
     public boolean hasNameEquals() {
@@ -606,21 +616,21 @@ public class EntitySelectorParser {
         this.isSorted = hasSorter;
     }
 
-    public boolean hasGamemodeEquals() {
-        return this.hasGamemodeEquals;
-    }
-
-    public void setHasGamemodeEquals(boolean selectsGameMode) {
-        this.hasGamemodeEquals = selectsGameMode;
-    }
-
-    public boolean hasGamemodeNotEquals() {
-        return this.hasGamemodeNotEquals;
-    }
-
-    public void setHasGamemodeNotEquals(boolean excludesGameMode) {
-        this.hasGamemodeNotEquals = excludesGameMode;
-    }
+    // public boolean hasGamemodeEquals() {
+    //     return this.hasGamemodeEquals;
+    // }
+    //
+    // public void setHasGamemodeEquals(boolean selectsGameMode) {
+    //     this.hasGamemodeEquals = selectsGameMode;
+    // }
+    //
+    // public boolean hasGamemodeNotEquals() {
+    //     return this.hasGamemodeNotEquals;
+    // }
+    //
+    // public void setHasGamemodeNotEquals(boolean excludesGameMode) {
+    //     this.hasGamemodeNotEquals = excludesGameMode;
+    // }
 
     public boolean hasTeamEquals() {
         return this.hasTeamEquals;
@@ -630,12 +640,12 @@ public class EntitySelectorParser {
         this.hasTeamEquals = selectsTeam;
     }
 
-    public boolean hasTeamNotEquals() {
-        return this.hasTeamNotEquals;
-    }
+    // public boolean hasTeamNotEquals() {
+    //     return this.hasTeamNotEquals;
+    // }
 
-    public void setHasTeamNotEquals(boolean excludesTeam) {
-        this.hasTeamNotEquals = excludesTeam;
+    public void setHasTeamNotEquals(boolean ignoredExcludesTeam) {
+        // this.hasTeamNotEquals = excludesTeam; // TODO NOOP???
     }
 
     public void limitToType(EntityType<?> entityType) {
@@ -653,20 +663,20 @@ public class EntitySelectorParser {
     public boolean isTypeLimitedInversely() {
         return this.typeInverse;
     }
-
-    public boolean hasScores() {
-        return this.hasScores;
-    }
-
-    public void setHasScores(boolean selectsScores) {
-        this.hasScores = selectsScores;
-    }
-
-    public boolean hasAdvancements() {
-        return this.hasAdvancements;
-    }
-
-    public void setHasAdvancements(boolean selectsAdvancements) {
-        this.hasAdvancements = selectsAdvancements;
-    }
+    //
+    // public boolean hasScores() {
+    //     return this.hasScores;
+    // }
+    //
+    // public void setHasScores(boolean selectsScores) {
+    //     this.hasScores = selectsScores;
+    // }
+    //
+    // public boolean hasAdvancements() {
+    //     return this.hasAdvancements;
+    // }
+    //
+    // public void setHasAdvancements(boolean selectsAdvancements) {
+    //     this.hasAdvancements = selectsAdvancements;
+    // }
 }

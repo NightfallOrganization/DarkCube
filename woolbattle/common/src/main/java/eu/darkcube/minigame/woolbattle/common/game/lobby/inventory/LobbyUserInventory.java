@@ -30,17 +30,17 @@ public class LobbyUserInventory {
     }
 
     public static LobbyUserInventory get(WBUser user) {
-        return user.metadata().get(KEY.apply(user.woolbattle()));
+        return user.metadata().get(KEY.apply(user.api()));
     }
 
     public static LobbyUserInventory create(WBUser user) {
         var inventory = new LobbyUserInventory(user);
-        user.metadata().set(KEY.apply(user.woolbattle()), inventory);
+        user.metadata().set(KEY.apply(user.api()), inventory);
         return inventory;
     }
 
     public static void destroy(WBUser user) {
-        var inventory = user.metadata().<LobbyUserInventory>remove(KEY.apply(user.woolbattle()));
+        var inventory = user.metadata().<LobbyUserInventory>remove(KEY.apply(user.api()));
         inventory.clearAllItems();
     }
 

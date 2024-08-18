@@ -59,7 +59,7 @@ public class MinestomEntity implements DefaultMinestomEntity {
     }
 
     @Override
-    public MinestomWoolBattle woolbattle() {
+    public @NotNull MinestomWoolBattle woolbattle() {
         return woolbattle;
     }
 }

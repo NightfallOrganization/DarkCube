@@ -35,4 +35,5 @@ public class MinestomWorldImpl extends CommonWorld implements MinestomWorld {
     public @Nullable Path worldDirectory() {
         return worldDirectory;
     }
+
 }

@@ -35,6 +35,7 @@ import eu.darkcube.minigame.woolbattle.minestom.perk.MinestomPerkItemImplementat
 import eu.darkcube.minigame.woolbattle.minestom.perk.MinestomUserPerkImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserFactory;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.minestom.util.MinestomSlotMappings;
@@ -58,6 +59,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     private final @NotNull Map<String, BasicMetaDataStorage> entityMetas = new ConcurrentHashMap<>();
     private final @NotNull Key playerKey;
     private final @NotNull MinestomSetupModeImplementation setupModeImplementation;
+    private final @NotNull MinestomUserFactory userFactory;
 
     public MinestomWoolBattle() {
         super();
@@ -67,6 +69,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         WoolBattleProvider.PROVIDER.register(DefaultUserPerk.Implementation.class, new MinestomUserPerkImplementation());
         WoolBattleProvider.PROVIDER.register(PerkItem.Implementation.class, new MinestomPerkItemImplementation(this));
         this.playerKey = Key.key(this.api, "minestom_player");
+        this.userFactory = new MinestomUserFactory(this);
         this.setupModeImplementation = new MinestomSetupModeImplementation(this.api);
     }
 
@@ -115,6 +118,11 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         } else if (newTeam != null) {
             logger().info("User {} joined team {}", user.playerName(), newTeam.key());
         }
+    }
+
+    @Override
+    public @NotNull MinestomUserFactory userFactory() {
+        return userFactory;
     }
 
     @Override

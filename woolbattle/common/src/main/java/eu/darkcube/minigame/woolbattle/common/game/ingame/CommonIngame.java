@@ -24,6 +24,7 @@ import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicReader;
 import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
 import eu.darkcube.system.util.GameState;
 
 public class CommonIngame extends CommonPhase implements Ingame {
@@ -100,6 +101,8 @@ public class CommonIngame extends CommonPhase implements Ingame {
         return mapIngameData;
     }
 
+    @Override
+    @UnknownNullability
     public CommonIngameWorld world() {
         return world;
     }

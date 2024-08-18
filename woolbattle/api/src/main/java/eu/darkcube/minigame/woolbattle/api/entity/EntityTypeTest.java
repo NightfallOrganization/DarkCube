@@ -5,10 +5,8 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.common.command.arguments.entity;
+package eu.darkcube.minigame.woolbattle.api.entity;
 
-import eu.darkcube.minigame.woolbattle.api.entity.Entity;
-import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 public interface EntityTypeTest<B, T extends B> {
@@ -40,10 +38,6 @@ public interface EntityTypeTest<B, T extends B> {
                 return cls;
             }
         };
-    }
-
-    static <B extends Entity, T extends B> EntityTypeTest<B, T> forType(EntityType<T> type) {
-        return forClass(type.entityTypeClass());
     }
 
     @Nullable

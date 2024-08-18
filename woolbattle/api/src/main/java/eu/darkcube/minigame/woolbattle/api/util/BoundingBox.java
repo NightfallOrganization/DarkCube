@@ -29,4 +29,13 @@ public record BoundingBox(double minX, double minY, double minZ, double maxX, do
     public boolean intersects(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         return this.minX < maxX && this.maxX > minX && this.minY < maxY && this.maxY > minY && this.minZ < maxZ && this.maxZ > minZ;
     }
+
+    public boolean contains(Position pos) {
+        return this.contains(pos.x(), pos.y(), pos.z());
+    }
+
+    public boolean contains(double x, double y, double z) {
+        return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
+    }
+
 }

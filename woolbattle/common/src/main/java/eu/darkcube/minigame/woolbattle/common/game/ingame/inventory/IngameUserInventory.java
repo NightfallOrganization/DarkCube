@@ -28,17 +28,17 @@ public class IngameUserInventory {
     }
 
     public static IngameUserInventory get(WBUser user) {
-        return user.metadata().get(KEY.apply(user.woolbattle()));
+        return user.metadata().get(KEY.apply(user.api()));
     }
 
     public static IngameUserInventory create(CommonWBUser user) {
         var inventory = new IngameUserInventory(user);
-        user.metadata().set(KEY.apply(user.woolbattle()), inventory);
+        user.metadata().set(KEY.apply(user.api()), inventory);
         return inventory;
     }
 
     public static void destroy(WBUser user) {
-        user.metadata().remove(KEY.apply(user.woolbattle()));
+        user.metadata().remove(KEY.apply(user.api()));
     }
 
     public void setAllItems() {
@@ -58,6 +58,6 @@ public class IngameUserInventory {
     }
 
     private void setSpectatorItems() {
-        
+
     }
 }

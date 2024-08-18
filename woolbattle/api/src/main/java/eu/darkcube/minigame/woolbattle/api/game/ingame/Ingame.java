@@ -8,6 +8,10 @@
 package eu.darkcube.minigame.woolbattle.api.game.ingame;
 
 import eu.darkcube.minigame.woolbattle.api.game.GamePhase;
+import eu.darkcube.minigame.woolbattle.api.world.World;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 public interface Ingame extends GamePhase {
+    @Nullable
+    World world();
 }

@@ -30,7 +30,7 @@ import eu.darkcube.system.util.data.MetaDataStorage;
 public interface WBUser extends CommandSender, Entity {
     @Api
     @NotNull
-    WoolBattleApi woolbattle();
+    WoolBattleApi api();
 
     /**
      * @return the user from the {@link UserAPI UserAPI}
@@ -218,4 +218,6 @@ public interface WBUser extends CommandSender, Entity {
      */
     @Api
     boolean canSee(WBUser other);
+
+    void kick();
 }

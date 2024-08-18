@@ -17,9 +17,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
-import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.MinMaxBounds;
+import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.system.commandapi.ISuggestionProvider;
 import eu.darkcube.system.libs.com.mojang.brigadier.StringReader;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -29,21 +29,21 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilde
 import eu.darkcube.system.libs.net.kyori.adventure.key.InvalidKeyException;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
-import eu.darkcube.system.libs.net.kyori.adventure.text.event.HoverEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class EntitySelectorOptions {
     private static final Map<String, Option> OPTIONS = new HashMap<>();
+    public static final DynamicCommandExceptionType ERROR_TEAM_UNKNOWN = Messages.TEAM_CONFIGURATION_NOT_FOUND.newDynamicCommandExceptionType();
     public static final DynamicCommandExceptionType ERROR_UNKNOWN_OPTION = new DynamicCommandExceptionType(option -> translatableEscape("argument.entity.options.unknown", option));
     public static final DynamicCommandExceptionType ERROR_INAPPLICABLE_OPTION = new DynamicCommandExceptionType(option -> translatableEscape("argument.entity.options.inapplicable", option));
     public static final SimpleCommandExceptionType ERROR_RANGE_NEGATIVE = new SimpleCommandExceptionType(translatable("argument.entity.options.distance.negative"));
     public static final SimpleCommandExceptionType ERROR_LEVEL_NEGATIVE = new SimpleCommandExceptionType(translatable("argument.entity.options.level.negative"));
     public static final SimpleCommandExceptionType ERROR_LIMIT_TOO_SMALL = new SimpleCommandExceptionType(translatable("argument.entity.options.limit.toosmall"));
     public static final DynamicCommandExceptionType ERROR_SORT_UNKNOWN = new DynamicCommandExceptionType(sortType -> translatableEscape("argument.entity.options.sort.irreversible", sortType));
-    public static final DynamicCommandExceptionType ERROR_GAME_MODE_INVALID = new DynamicCommandExceptionType(gameMode -> translatableEscape("argument.entity.options.mode.invalid", gameMode));
+    // public static final DynamicCommandExceptionType ERROR_GAME_MODE_INVALID = new DynamicCommandExceptionType(gameMode -> translatableEscape("argument.entity.options.mode.invalid", gameMode));
     public static final DynamicCommandExceptionType ERROR_ENTITY_TYPE_INVALID = new DynamicCommandExceptionType(entity -> translatableEscape("argument.entity.options.type.invalid", entity));
     // Paper start - tell clients to ask server for suggestions for EntityArguments
-    public static final DynamicCommandExceptionType ERROR_ENTITY_TAG_INVALID = new DynamicCommandExceptionType((object) -> text(Component.text("Invalid or unknown entity type tag '" + object + "'").hoverEvent(HoverEvent.showText(Component.text("You can disable this error in 'paper.yml'")))));
+    // public static final DynamicCommandExceptionType ERROR_ENTITY_TAG_INVALID = new DynamicCommandExceptionType((object) -> text(Component.text("Invalid or unknown entity type tag '" + object + "'").hoverEvent(HoverEvent.showText(Component.text("You can disable this error in 'paper.yml'")))));
     // Paper end - tell clients to ask server for suggestions for EntityArguments
 
     private static void register(String id, EntitySelectorOptions.Modifier handler, Predicate<EntitySelectorParser> condition, Component description) {
@@ -53,11 +53,11 @@ public class EntitySelectorOptions {
     public static void bootStrap() {
         if (OPTIONS.isEmpty()) {
             register("name", reader -> {
-                int i = reader.getReader().getCursor();
-                boolean bl = reader.shouldInvertValue();
-                String string = reader.getReader().readString();
+                var cursor = reader.getReader().getCursor();
+                var bl = reader.shouldInvertValue();
+                var string = reader.getReader().readString();
                 if (reader.hasNameNotEquals() && !bl) {
-                    reader.getReader().setCursor(i);
+                    reader.getReader().setCursor(cursor);
                     throw ERROR_INAPPLICABLE_OPTION.createWithContext(reader.getReader(), "name");
                 } else {
                     if (bl) {
@@ -72,9 +72,9 @@ public class EntitySelectorOptions {
                 }
             }, reader -> !reader.hasNameEquals(), Component.translatable("argument.entity.options.name.description"));
             register("distance", reader -> {
-                int i = reader.getReader().getCursor();
-                MinMaxBounds.Doubles doubles = MinMaxBounds.Doubles.fromReader(reader.getReader());
-                if ((!doubles.min().isPresent() || !(doubles.min().get() < 0.0)) && (!doubles.max().isPresent() || !(doubles.max().get() < 0.0))) {
+                var i = reader.getReader().getCursor();
+                var doubles = MinMaxBounds.Doubles.fromReader(reader.getReader());
+                if ((doubles.min().isEmpty() || !(doubles.min().get() < 0.0)) && (doubles.max().isEmpty() || !(doubles.max().get() < 0.0))) {
                     reader.setDistance(doubles);
                     reader.setWorldLimited();
                 } else {
@@ -83,9 +83,9 @@ public class EntitySelectorOptions {
                 }
             }, reader -> reader.getDistance().isAny(), Component.translatable("argument.entity.options.distance.description"));
             register("level", reader -> {
-                int i = reader.getReader().getCursor();
-                MinMaxBounds.Ints ints = MinMaxBounds.Ints.fromReader(reader.getReader());
-                if ((!ints.min().isPresent() || ints.min().get() >= 0) && (!ints.max().isPresent() || ints.max().get() >= 0)) {
+                var i = reader.getReader().getCursor();
+                var ints = MinMaxBounds.Ints.fromReader(reader.getReader());
+                if ((ints.min().isEmpty() || ints.min().get() >= 0) && (ints.max().isEmpty() || ints.max().get() >= 0)) {
                     reader.setLevel(ints);
                     reader.setIncludesEntities(false);
                 } else {
@@ -120,8 +120,8 @@ public class EntitySelectorOptions {
             register("x_rotation", reader -> reader.setRotX(MinMaxBounds.Doubles.fromReader(reader.getReader(), Mth::wrapDegrees)), reader -> reader.getRotX() == MinMaxBounds.Doubles.ANY, Component.translatable("argument.entity.options.x_rotation.description"));
             register("y_rotation", reader -> reader.setRotY(MinMaxBounds.Doubles.fromReader(reader.getReader(), Mth::wrapDegrees)), reader -> reader.getRotY() == MinMaxBounds.Doubles.ANY, Component.translatable("argument.entity.options.y_rotation.description"));
             register("limit", reader -> {
-                int i = reader.getReader().getCursor();
-                int j = reader.getReader().readInt();
+                var i = reader.getReader().getCursor();
+                var j = reader.getReader().readInt();
                 if (j < 1) {
                     reader.getReader().setCursor(i);
                     throw ERROR_LIMIT_TOO_SMALL.createWithContext(reader.getReader());
@@ -131,8 +131,8 @@ public class EntitySelectorOptions {
                 }
             }, reader -> !reader.isCurrentEntity() && !reader.isLimited(), Component.translatable("argument.entity.options.limit.description"));
             register("sort", reader -> {
-                int i = reader.getReader().getCursor();
-                String string = reader.getReader().readUnquotedString();
+                var i = reader.getReader().getCursor();
+                var string = reader.getReader().readUnquotedString();
                 reader.setSuggestions((builder, _) -> ISuggestionProvider.suggest(Arrays.asList("nearest", "furthest", "random", "arbitrary"), builder));
 
                 reader.setOrder(switch (string) {
@@ -205,17 +205,58 @@ public class EntitySelectorOptions {
             //     }
             // }, reader -> !reader.hasGamemodeEquals(), Component.translatable("argument.entity.options.gamemode.description"));
             register("team", reader -> {
-                boolean invert = reader.shouldInvertValue();
-                String string = reader.getReader().readUnquotedString();
+                var invert = reader.shouldInvertValue();
+                var cursor = reader.getReader().getCursor();
+                var string = reader.getReader().readUnquotedString();
                 reader.addPredicate(entity -> {
                     if (!(entity instanceof WBUser user)) {
                         return false;
                     } else {
-                        Team team = user.team();
-                        String string2 = team == null ? "" : team.key();
+                        var team = user.team();
+                        var string2 = team == null ? "" : team.key();
                         return string2.equals(string) != invert;
                     }
                 });
+                reader.setSuggestions((builder, _, source) -> {
+                    var game = source.game();
+                    if (game != null) {
+                        var input = builder.getRemainingLowerCase();
+                        for (var team : game.teamManager().teams()) {
+                            var key = team.key();
+                            if (ISuggestionProvider.test(input, key.toLowerCase(Locale.ROOT))) {
+                                builder.suggest(key, text(team.getName(source.audience())));
+                            }
+                        }
+                        if (ISuggestionProvider.test(input, "none")) {
+                            builder.suggest("none");
+                        }
+                    }
+                    return builder.buildFuture();
+                });
+
+                var source = reader.source();
+                if (source != null) {
+                    var game = source.game();
+                    if (game != null) {
+                        var found = false;
+                        for (var team : game.teamManager().teams()) {
+                            if (team.key().equals(string)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            reader.getReader().setCursor(cursor);
+                            throw ERROR_TEAM_UNKNOWN.createWithContext(reader.getReader(), string);
+                        }
+                    } else {
+                        if (!string.equals("none")) {
+                            reader.getReader().setCursor(cursor);
+                            throw ERROR_TEAM_UNKNOWN.createWithContext(reader.getReader(), string);
+                        }
+                    }
+                }
+
                 if (invert) {
                     reader.setHasTeamNotEquals(true);
                 } else {
@@ -233,13 +274,13 @@ public class EntitySelectorOptions {
 
                     return builder.buildFuture();
                 });
-                int i = reader.getReader().getCursor();
-                boolean bl = reader.shouldInvertValue();
-                if (reader.isTypeLimitedInversely() && !bl) {
-                    reader.getReader().setCursor(i);
+                var cursor = reader.getReader().getCursor();
+                var invert = reader.shouldInvertValue();
+                if (reader.isTypeLimitedInversely() && !invert) {
+                    reader.getReader().setCursor(cursor);
                     throw ERROR_INAPPLICABLE_OPTION.createWithContext(reader.getReader(), "type");
                 } else {
-                    if (bl) {
+                    if (invert) {
                         reader.setTypeLimitedInversely();
                     }
 
@@ -254,17 +295,17 @@ public class EntitySelectorOptions {
                     //     // Paper end - tell clients to ask server for suggestions for EntityArguments
                     //     reader.addPredicate(entity -> entity.type().is(tagKey) != bl);
                     // } else {
-                    Key resourceLocation = readKey(reader.getReader());
-                    EntityType<?> entityType = EntityType.REGISTRY.getOptional(resourceLocation).orElseThrow(() -> {
-                        reader.getReader().setCursor(i);
+                    var resourceLocation = readKey(reader.getReader());
+                    var entityType = EntityType.REGISTRY.getOptional(resourceLocation).orElseThrow(() -> {
+                        reader.getReader().setCursor(cursor);
                         return ERROR_ENTITY_TYPE_INVALID.createWithContext(reader.getReader(), resourceLocation.toString());
                     });
-                    if (Objects.equals(EntityType.PLAYER, entityType) && !bl) {
+                    if (Objects.equals(EntityType.PLAYER, entityType) && !invert) {
                         reader.setIncludesEntities(false);
                     }
 
-                    reader.addPredicate(entity -> Objects.equals(entityType, entity.type()) != bl);
-                    if (!bl) {
+                    reader.addPredicate(entity -> Objects.equals(entityType, entity.type()) != invert);
+                    if (!invert) {
                         reader.limitToType(entityType);
                     }
                     // } NO SUPPORT FOR TAGS
@@ -441,7 +482,7 @@ public class EntitySelectorOptions {
     }
 
     public static EntitySelectorOptions.Modifier get(EntitySelectorParser reader, String option, int restoreCursor) throws CommandSyntaxException {
-        EntitySelectorOptions.Option option2 = OPTIONS.get(option);
+        var option2 = OPTIONS.get(option);
         if (option2 != null) {
             if (option2.canUse.test(reader)) {
                 return option2.modifier;
@@ -455,9 +496,9 @@ public class EntitySelectorOptions {
     }
 
     public static void suggestNames(EntitySelectorParser reader, SuggestionsBuilder suggestionBuilder) {
-        String string = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
+        var string = suggestionBuilder.getRemaining().toLowerCase(Locale.ROOT);
 
-        for (Map.Entry<String, Option> entry : OPTIONS.entrySet()) {
+        for (var entry : OPTIONS.entrySet()) {
             if (entry.getValue().canUse.test(reader) && entry.getKey().toLowerCase(Locale.ROOT).startsWith(string)) {
                 suggestionBuilder.suggest(entry.getKey() + "=", text(entry.getValue().description));
             }
@@ -487,6 +528,6 @@ public class EntitySelectorOptions {
         void handle(EntitySelectorParser reader) throws CommandSyntaxException;
     }
 
-    static record Option(EntitySelectorOptions.Modifier modifier, Predicate<EntitySelectorParser> canUse, Component description) {
+    record Option(EntitySelectorOptions.Modifier modifier, Predicate<EntitySelectorParser> canUse, Component description) {
     }
 }

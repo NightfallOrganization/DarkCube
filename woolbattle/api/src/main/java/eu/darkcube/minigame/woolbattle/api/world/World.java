@@ -8,9 +8,11 @@
 package eu.darkcube.minigame.woolbattle.api.world;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
+import eu.darkcube.minigame.woolbattle.api.entity.EntityTypeTest;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
 import eu.darkcube.system.annotations.Api;
@@ -37,5 +39,13 @@ public interface World {
     @NotNull
     List<? extends WBUser> getPlayers(@NotNull Predicate<Entity> predicate, int limit);
 
-    void getEntities(eu.darkcube.minigame.woolbattle.common.command.arguments.entity.EntityTypeTest<Entity, ?> type, @Nullable BoundingBox box, Predicate<Entity> predicate, List<Entity> entities, int i);
+    void getEntities(@NotNull EntityTypeTest<Entity, ?> type, @Nullable BoundingBox box, @NotNull Predicate<Entity> filter, @NotNull List<Entity> into, int limit);
+
+    default void getEntities(@NotNull EntityTypeTest<Entity, ?> type, @NotNull Predicate<Entity> filter, @NotNull List<Entity> into, int limit) {
+        getEntities(type, null, filter, into, limit);
+    }
+
+    @Nullable
+    Entity getEntity(@NotNull UUID entityUUID);
+
 }

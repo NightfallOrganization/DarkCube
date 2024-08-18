@@ -5,18 +5,15 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.api.game.lobby;
+package eu.darkcube.minigame.woolbattle.common.user;
 
-import eu.darkcube.minigame.woolbattle.api.game.GamePhase;
-import eu.darkcube.minigame.woolbattle.api.world.Location;
-import eu.darkcube.minigame.woolbattle.api.world.World;
+import java.util.UUID;
+
+import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
-public interface Lobby extends GamePhase {
+public interface UserFactory {
     @NotNull
-    Location spawn();
-
-    @Nullable
-    World world();
+    CommonWBUser create(@NotNull UUID uniqueId, @Nullable CommonGame game);
 }

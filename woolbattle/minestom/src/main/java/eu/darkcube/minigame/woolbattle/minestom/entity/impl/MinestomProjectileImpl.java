@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 
 import java.util.Collection;
@@ -29,7 +36,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
-public class MinestomProjectileImpl extends Entity {
+public class MinestomProjectileImpl extends Entity implements EntityImpl {
 
     private final MinestomWoolBattle woolbattle;
     private final CommonWBUser shooter;
@@ -50,6 +57,11 @@ public class MinestomProjectileImpl extends Entity {
 
     public void handle(Projectile handle) {
         this.handle = handle;
+    }
+
+    @Override
+    public Projectile handle() {
+        return handle;
     }
 
     private void setup() {

@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.kyori.adventure.text.Component;
@@ -24,8 +25,9 @@ import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.network.packet.server.play.PlayerInfoRemovePacket;
 import net.minestom.server.network.packet.server.play.PlayerInfoUpdatePacket;
 import net.minestom.server.network.player.PlayerConnection;
+import net.minestom.server.thread.Acquirable;
 
-public class MinestomPlayer extends Player {
+public class MinestomPlayer extends Player implements EntityImpl {
     private static final VarHandle LATENCY;
     private static final VarHandle DISPLAY_NAME;
     private static boolean isIn_UNSAFE_init;
@@ -140,4 +142,14 @@ public class MinestomPlayer extends Player {
     }
 
     private @Nullable CommonWBUser user;
+
+    @Override
+    public CommonWBUser handle() {
+        return user;
+    }
+
+    @Override
+    public @NotNull Acquirable<? extends MinestomPlayer> acquirable() {
+        return (Acquirable<? extends MinestomPlayer>) super.acquirable();
+    }
 }

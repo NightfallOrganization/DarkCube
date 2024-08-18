@@ -8,7 +8,7 @@
 package eu.darkcube.minigame.woolbattle.common.command.arguments.entity;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -18,6 +18,10 @@ import java.util.function.Predicate;
 import eu.darkcube.minigame.woolbattle.api.command.CommandSource;
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
+import eu.darkcube.minigame.woolbattle.api.entity.EntityTypeTest;
+import eu.darkcube.minigame.woolbattle.api.game.endgame.Endgame;
+import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
+import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
 import eu.darkcube.minigame.woolbattle.api.util.MinMaxBounds;
@@ -25,15 +29,13 @@ import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.command.arguments.CommonEntityArgument;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
-import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 public class EntitySelector {
-    public static final int INFINITE = Integer.MAX_VALUE;
-    public static final BiConsumer<Position, List<? extends Entity>> ORDER_ARBITRARY = (vec3d, list) -> {
+    public static final BiConsumer<Position, List<? extends Entity>> ORDER_ARBITRARY = (_, _) -> {
     };
-    private static final EntityTypeTest<Entity, ?> ANY_TYPE = new EntityTypeTest<Entity, Entity>() {
+    private static final EntityTypeTest<Entity, ?> ANY_TYPE = new EntityTypeTest<>() {
         @Override
         public Entity tryCast(Entity obj) {
             return obj;
@@ -73,7 +75,7 @@ public class EntitySelector {
         this.currentEntity = senderOnly;
         this.playerName = playerName;
         this.entityUUID = uuid;
-        this.type = (EntityTypeTest<Entity, ?>) (type == null ? EntitySelector.ANY_TYPE : type);
+        this.type = type == null ? EntitySelector.ANY_TYPE : type;
         this.usesSelector = usesAt;
     }
 
@@ -93,10 +95,6 @@ public class EntitySelector {
         return this.sameWorldOnly;
     }
 
-    public boolean usesSelector() {
-        return this.usesSelector;
-    }
-
     private void checkPermissions(CommandSource source) throws CommandSyntaxException {
         if ((this.usesSelector && !source.hasPermission("minecraft.command.selector"))) { // CraftBukkit // Paper - add bypass for selector perms
             throw CommonEntityArgument.ERROR_SELECTORS_NOT_ALLOWED.create();
@@ -105,14 +103,14 @@ public class EntitySelector {
 
     public Entity findSingleEntity(CommandSource source) throws CommandSyntaxException {
         this.checkPermissions(source);
-        List<? extends Entity> list = this.findEntities(source);
+        var list = this.findEntities(source);
 
         if (list.isEmpty()) {
             throw CommonEntityArgument.NO_ENTITIES_FOUND.create();
         } else if (list.size() > 1) {
             throw CommonEntityArgument.ERROR_NOT_SINGLE_ENTITY.create();
         } else {
-            return (Entity) list.get(0);
+            return list.getFirst();
         }
     }
 
@@ -121,46 +119,37 @@ public class EntitySelector {
         if (!this.includesEntities) {
             return this.findPlayers(source);
         } else if (this.playerName != null) {
-            WBUser entityplayer = source.woolbattle().user(this.playerName);
+            var user = source.woolbattle().user(this.playerName);
 
-            return entityplayer == null ? List.of() : List.of(entityplayer);
+            return user == null ? List.of() : List.of(user);
         } else if (this.entityUUID != null) {
-            Iterator iterator = source.getServer().getAllLevels().iterator();
 
-            while (iterator.hasNext()) {
-                ServerLevel worldserver = (ServerLevel) iterator.next();
-                Entity entity = worldserver.getEntity(this.entityUUID);
-
+            for (var world : worlds(source)) {
+                var entity = world.getEntity(this.entityUUID);
                 if (entity != null) {
-                    if (entity.getType().isEnabled(source.enabledFeatures())) {
-                        return List.of(entity);
-                    }
-                    break;
+                    return List.of(entity);
                 }
             }
 
             return List.of();
         } else {
-            Position vec3d = this.position.apply(source.pos());
-            BoundingBox axisalignedbb = this.getAbsoluteAabb(vec3d);
-            Predicate predicate;
+            var vec3d = this.position.apply(source.pos());
+            var boundingBox = this.getAbsoluteAabb(vec3d);
+            Predicate<Entity> predicate;
 
             if (this.currentEntity) {
-                predicate = this.getPredicate(vec3d, axisalignedbb);
+                predicate = this.getPredicate(vec3d, boundingBox);
                 return source.entity() != null && predicate.test(source.entity()) ? List.of(source.entity()) : List.of();
             } else {
-                predicate = this.getPredicate(vec3d, axisalignedbb);
-                List<Entity> list = new ObjectArrayList();
+                predicate = this.getPredicate(vec3d, boundingBox);
+                List<Entity> list = new ObjectArrayList<>();
 
                 if (this.isSameWorldOnly()) {
-                    this.addEntities(list, source.world(), axisalignedbb, predicate);
+                    this.addEntities(list, source.world(), boundingBox, predicate);
                 } else {
-                    Iterator iterator1 = source.woolbattle().getServer().getAllLevels().iterator();
+                    for (var world : worlds(source)) {
 
-                    while (iterator1.hasNext()) {
-                        ServerLevel worldserver1 = (ServerLevel) iterator1.next();
-
-                        this.addEntities(list, worldserver1, axisalignedbb, predicate);
+                        this.addEntities(list, world, boundingBox, predicate);
                     }
                 }
 
@@ -169,8 +158,28 @@ public class EntitySelector {
         }
     }
 
+    private Collection<World> worlds(CommandSource source) {
+        var game = source.game();
+        World world;
+        if (game != null) {
+            var phase = game.phase();
+            world = switch (phase) {
+                case Lobby lobby -> lobby.world();
+                case Ingame ingame -> ingame.world();
+                case Endgame endgame -> endgame.world();
+                default -> null;
+            };
+        } else {
+            world = null;
+        }
+        if (world != null) {
+            return List.of(world);
+        }
+        return List.of();
+    }
+
     private void addEntities(List<Entity> entities, World world, @Nullable BoundingBox box, Predicate<Entity> predicate) {
-        int i = this.getResultLimit();
+        var i = this.getResultLimit();
 
         if (entities.size() < i) {
             if (box != null) {
@@ -187,7 +196,7 @@ public class EntitySelector {
 
     public WBUser findSinglePlayer(CommandSource source) throws CommandSyntaxException {
         this.checkPermissions(source);
-        List<WBUser> list = this.findPlayers(source);
+        var list = this.findPlayers(source);
 
         if (list.size() != 1) {
             throw CommonEntityArgument.NO_PLAYERS_FOUND.create();
@@ -207,40 +216,40 @@ public class EntitySelector {
             entityplayer = source.woolbattle().user(this.entityUUID);
             return entityplayer == null ? List.of() : List.of(entityplayer);
         } else {
-            Position pos = this.position.apply(source.pos());
-            BoundingBox axisalignedbb = this.getAbsoluteAabb(pos);
-            Predicate<Entity> predicate = this.getPredicate(pos, axisalignedbb);
+            var pos = this.position.apply(source.pos());
+            var boundingBox = this.getAbsoluteAabb(pos);
+            var filter = this.getPredicate(pos, boundingBox);
 
             if (this.currentEntity) {
-                Entity entity = source.entity();
+                var entity = source.entity();
 
-                if (entity instanceof WBUser entityplayer1) {
-                    if (predicate.test(entityplayer1)) {
-                        return List.of(entityplayer1);
+                if (entity instanceof WBUser user) {
+                    if (filter.test(user)) {
+                        return List.of(user);
                     }
                 }
 
                 return List.of();
             } else {
-                int i = this.getResultLimit();
-                List<WBUser> object;
+                var i = this.getResultLimit();
+                List<WBUser> list;
 
                 if (this.isSameWorldOnly()) {
-                    object = new ArrayList<>(source.world().getPlayers(predicate, i));
+                    list = new ArrayList<>(source.world().getPlayers(filter, i));
                 } else {
-                    object = new ObjectArrayList<>();
+                    list = new ObjectArrayList<>();
 
-                    for (WBUser player : source.getPlayers()) {
-                        if (predicate.test(player)) {
-                            (object).add(player);
-                            if ((object).size() >= i) {
-                                return object;
+                    for (var player : source.getPlayers()) {
+                        if (filter.test(player)) {
+                            (list).add(player);
+                            if ((list).size() >= i) {
+                                return list;
                             }
                         }
                     }
                 }
 
-                return this.sortAndLimit(pos, object);
+                return this.sortAndLimit(pos, list);
             }
         }
     }
@@ -251,13 +260,13 @@ public class EntitySelector {
     }
 
     private Predicate<Entity> getPredicate(Position pos, @Nullable BoundingBox box) {
-        boolean hasBox = box != null;
-        boolean hasRange = !this.range.isAny();
-        int i = (hasBox ? 1 : 0) + (hasRange ? 1 : 0);
-        List<? extends Predicate<Entity>> object;
+        var hasBox = box != null;
+        var hasRange = !this.range.isAny();
+        var i = (hasBox ? 1 : 0) + (hasRange ? 1 : 0);
+        List<? extends Predicate<Entity>> result;
 
         if (i == 0) {
-            object = this.contextFreePredicates;
+            result = this.contextFreePredicates;
         } else {
             List<Predicate<Entity>> list = new ObjectArrayList<>(this.contextFreePredicates.size() + i);
 
@@ -271,22 +280,22 @@ public class EntitySelector {
                 list.add((entity) -> this.range.matchesSqr(entity.distanceToSqr(pos)));
             }
 
-            object = list;
+            result = list;
         }
 
-        return allOf(object);
+        return allOf(result);
     }
 
     public static <T> Predicate<T> allOf(List<? extends Predicate<T>> predicates) {
         return switch (predicates.size()) {
-            case 0 -> object -> true;
-            case 1 -> (Predicate) predicates.get(0);
-            case 2 -> predicates.get(0).and((Predicate<? super T>) predicates.get(1));
+            case 0 -> _ -> true;
+            case 1 -> predicates.get(0);
+            case 2 -> predicates.get(0).and(predicates.get(1));
             default -> {
-                Predicate<T>[] predicates2 = predicates.toArray(Predicate[]::new);
+                Predicate<T>[] filters = predicates.toArray(Predicate[]::new);
                 yield object -> {
-                    for (Predicate<T> predicate : predicates2) {
-                        if (!predicate.test((T) object)) {
+                    for (var filter : filters) {
+                        if (!filter.test(object)) {
                             return false;
                         }
                     }
@@ -303,9 +312,5 @@ public class EntitySelector {
         }
 
         return entities.subList(0, Math.min(this.maxResults, entities.size()));
-    }
-
-    public static Component joinNames(List<? extends Entity> entities) {
-        return ComponentUtils.formatList(entities, Entity::getDisplayName);
     }
 }

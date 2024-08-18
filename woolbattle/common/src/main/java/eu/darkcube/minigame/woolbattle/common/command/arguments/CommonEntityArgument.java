@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+import eu.darkcube.minigame.woolbattle.api.command.CommandSource;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.command.arguments.entity.EntitySelector;
 import eu.darkcube.minigame.woolbattle.common.command.arguments.entity.EntitySelectorParser;
@@ -42,6 +43,10 @@ public class CommonEntityArgument implements ArgumentType<EntitySelector> {
         this.single = single;
     }
 
+    public static EntitySelector get(CommandContext<?> ctx, String name) {
+        return ctx.getArgument(name, EntitySelector.class);
+    }
+
     @Override
     public EntitySelector parse(StringReader reader) throws CommandSyntaxException {
         return this.parse(reader, true);
@@ -58,9 +63,8 @@ public class CommonEntityArgument implements ArgumentType<EntitySelector> {
 
     public EntitySelector parse(StringReader stringreader, boolean flag, boolean overridePermissions) throws CommandSyntaxException {
         // CraftBukkit end
-        boolean flag1 = false;
-        EntitySelectorParser argumentparserselector = new EntitySelectorParser(stringreader, flag);
-        EntitySelector entityselector = argumentparserselector.parse(overridePermissions); // CraftBukkit
+        var parser = new EntitySelectorParser(stringreader, flag, null);
+        var entityselector = parser.parse(overridePermissions); // CraftBukkit
 
         if (entityselector.getMaxResults() > 1 && this.single) {
             if (this.playerOnly) {
@@ -80,21 +84,21 @@ public class CommonEntityArgument implements ArgumentType<EntitySelector> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        if (context.getSource() instanceof ISuggestionProvider suggestionProvider) {
+        if (context.getSource() instanceof CommandSource source) {
             var reader = new StringReader(builder.getInput());
             reader.setCursor(builder.getStart());
-            var parser = new EntitySelectorParser(reader, true);
+            var parser = new EntitySelectorParser(reader, true, source);
 
             try {
                 parser.parse();
             } catch (CommandSyntaxException ignored) {
             }
 
-            return parser.fillSuggestions(builder, sbuilder -> {
-                var collection = suggestionProvider.getPlayerNames();
-                var iterable = this.playerOnly ? collection : concat(collection, suggestionProvider.getTargetedEntity());
+            return parser.fillSuggestions(builder.createOffset(reader.getCursor()), sbuilder -> {
+                var collection = source.getPlayerNames();
+                var iterable = this.playerOnly ? collection : concat(collection, source.getTargetedEntity());
                 ISuggestionProvider.suggest(iterable, sbuilder);
-            });
+            }, source);
         }
         return Suggestions.empty();
     }

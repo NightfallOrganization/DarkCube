@@ -18,7 +18,6 @@ import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.item.material.Material;
-import eu.darkcube.system.userapi.UserAPI;
 
 public class CommonEventHandler {
     private final CommonWoolBattle woolbattle;
@@ -36,8 +35,7 @@ public class CommonEventHandler {
             connectionRequests.invalidate(entry.getKey());
 
             var game = request.game();
-            var rawUser = UserAPI.instance().user(uniqueId);
-            var user = new CommonWBUser(woolbattle.api(), rawUser, game);
+            var user = woolbattle.userFactory().create(uniqueId, game);
             return new ConfigurationResult(user, game);
         }
         return null;

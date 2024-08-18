@@ -23,6 +23,7 @@ import eu.darkcube.minigame.woolbattle.common.perk.CommonActivationTypeItemProvi
 import eu.darkcube.minigame.woolbattle.common.setup.SetupMode;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.common.user.UserFactory;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
 import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.common.util.ChatHandler;
@@ -127,6 +128,8 @@ public abstract class CommonWoolBattle implements Namespaced {
      * @param newTeam the new team, may be null
      */
     public abstract void broadcastTeamUpdate(@NotNull CommonWBUser user, @Nullable CommonTeam oldTeam, @Nullable CommonTeam newTeam);
+
+    public abstract @NotNull UserFactory userFactory();
 
     public abstract @NotNull CommonWoolBattleApi api();
 
