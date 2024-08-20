@@ -25,7 +25,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
 import net.minestom.server.inventory.TransactionType;
@@ -45,8 +44,7 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
         var team = user.team();
         if (team == null) return;
         final var player = woolbattle.player(user);
-        player.acquirable().sync(e -> {
-            var p = (Player) e;
+        player.acquirable().sync(p -> {
             var inventory = p.getInventory();
             var wool = (MinestomColoredWool) team.wool();
 

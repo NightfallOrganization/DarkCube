@@ -14,10 +14,12 @@ import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.inventory.IngameUserInventory;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameBreakBlockListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserChatListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserLoginGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserQuitGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.CommonWoolResetScheduler;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMapIngameData;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicReader;
@@ -29,6 +31,7 @@ import eu.darkcube.system.util.GameState;
 
 public class CommonIngame extends CommonPhase implements Ingame {
 
+    private final CommonWoolResetScheduler woolResetScheduler = new CommonWoolResetScheduler(this);
     private CommonIngameWorld world;
     private CommonMapIngameData mapIngameData;
 
@@ -38,7 +41,9 @@ public class CommonIngame extends CommonPhase implements Ingame {
         this.listeners.addListener(new IngameUserChatListener(woolbattle).create());
         this.listeners.addListener(new IngameUserJoinGameListener(this).create());
         this.listeners.addListener(new IngameUserLoginGameListener(this).create());
+        this.listeners.addListener(new IngameBreakBlockListener(this).create());
         this.listeners.addChild(new IngameUserQuitGameListener(this).node());
+
     }
 
     @Override
@@ -60,6 +65,14 @@ public class CommonIngame extends CommonPhase implements Ingame {
         for (var user : game.users()) {
             join(user);
         }
+        woolResetScheduler.start();
+    }
+
+    @Override
+    public void disable(@Nullable CommonPhase newPhase) {
+        woolResetScheduler.stop();
+
+        super.disable(newPhase);
     }
 
     @Override
@@ -86,7 +99,7 @@ public class CommonIngame extends CommonPhase implements Ingame {
         var schematicPath = woolbattle.mapsDirectory().resolve(game.mapSize().toString()).resolve(game.map().name() + ".litematic");
         if (Files.exists(schematicPath)) {
             var schematic = SchematicReader.read(schematicPath);
-            world = game.woolbattle().worldHandler().loadIngameWorld(game, schematic);
+            world = game.api().worldHandler().loadIngameWorld(game, schematic);
         } else {
             try {
                 Files.createDirectories(schematicPath.getParent());

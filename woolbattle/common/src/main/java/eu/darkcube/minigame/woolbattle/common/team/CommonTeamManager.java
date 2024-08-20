@@ -31,7 +31,7 @@ public class CommonTeamManager implements TeamManager {
         this.game = game;
         var teams = new HashMap<UUID, CommonTeam>();
         CommonTeam spectator = null;
-        for (var configuration : game.woolbattle().teamRegistry().teamConfigurations(mapSize)) {
+        for (var configuration : game.api().teamRegistry().teamConfigurations(mapSize)) {
             UUID id;
             do {
                 id = UUID.randomUUID();

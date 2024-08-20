@@ -11,19 +11,30 @@ import java.util.Collection;
 
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
+import eu.darkcube.system.server.item.material.Material;
 
 @Api
 public interface ColoredWoolProvider {
     @Api
-    @NotNull ColoredWool defaultWool();
+    @NotNull
+    ColoredWool defaultWool();
 
     @Api
-    @NotNull String serializeToString(@NotNull ColoredWool wool);
+    @NotNull
+    String serializeToString(@NotNull ColoredWool wool);
 
     @Api
-    @NotNull ColoredWool deserializeFromString(@NotNull String serialized);
+    @NotNull
+    ColoredWool deserializeFromString(@NotNull String serialized);
 
     @Api
-    @NotNull @Unmodifiable Collection<? extends ColoredWool> woolColors();
+    @Nullable
+    ColoredWool woolFrom(@NotNull Material material);
+
+    @Api
+    @NotNull
+    @Unmodifiable
+    Collection<? extends ColoredWool> woolColors();
 }

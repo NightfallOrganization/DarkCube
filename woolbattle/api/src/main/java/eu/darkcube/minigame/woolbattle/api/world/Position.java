@@ -33,10 +33,18 @@ public interface Position extends Cloneable {
         return dx * dx + dy * dy + dz * dz;
     }
 
+    @NotNull
+    Position add(int x, double y, int z);
+
     record Simple(double x, double y, double z) implements Position {
         @Override
         public Position.@NotNull Simple clone() {
             return new Position.Simple(x, y, z);
+        }
+
+        @Override
+        public @NotNull Simple add(int x, double y, int z) {
+            return new Simple(this.x + x, this.y + y, this.z + z);
         }
     }
 
@@ -47,6 +55,10 @@ public interface Position extends Cloneable {
 
         @NotNull
         Directed aligned();
+
+        @Override
+        @NotNull
+        Position.Directed add(int x, double y, int z);
 
         default @NotNull Directed simple() {
             return simple(this);
@@ -101,6 +113,11 @@ public interface Position extends Cloneable {
             @Override
             public @NotNull Directed.Simple aligned() {
                 return new Directed.Simple(nice(x), nice(y), nice(z), getNiceYaw(yaw), getNicePitch(pitch));
+            }
+
+            @Override
+            public @NotNull Directed.Simple add(int x, double y, int z) {
+                return new Directed.Simple(this.x + x, this.y + y, this.z + z, yaw, pitch);
             }
 
             @Override

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.perk.perks.passive;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
@@ -25,7 +32,7 @@ public class BerserkerPerk extends Perk {
 
         public BerserkerUserPerk(WBUser owner, Perk perk, int id, int perkSlot, Game game) {
             super(owner, perk, id, perkSlot, game);
-            combo = Key.key(game.woolbattle(), "perk_berserker_combo");
+            combo = Key.key(game.api(), "perk_berserker_combo");
         }
 
         private int getHits() {

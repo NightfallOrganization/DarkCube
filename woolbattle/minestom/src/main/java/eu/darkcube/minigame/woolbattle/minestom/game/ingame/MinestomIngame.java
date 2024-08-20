@@ -18,6 +18,7 @@ import eu.darkcube.minigame.woolbattle.minestom.game.ingame.listeners.MinestomIn
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.attribute.Attribute;
 
 public class MinestomIngame extends CommonIngame {
     private final @NotNull MinestomWoolBattle woolbattle;
@@ -37,10 +38,10 @@ public class MinestomIngame extends CommonIngame {
     public void init(@Nullable CommonPhase oldPhase) {
         for (var user : game.users()) {
             var player = woolbattle.player(user);
-            player.acquirable().sync(p -> {
-                p.setGameMode(GameMode.SPECTATOR);
-                p.setFlyingSpeed(0);
-            });
+            var lock = player.acquirable().lock();
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setFlyingSpeed(0);
+            lock.unlock();
         }
         super.init(oldPhase);
     }
@@ -49,10 +50,13 @@ public class MinestomIngame extends CommonIngame {
     public void join(@NotNull CommonWBUser user) {
         super.join(user);
         var player = woolbattle.player(user);
-        player.acquirable().sync(p -> {
-            p.setGameMode(GameMode.CREATIVE);
-            p.setFlyingSpeed(0.05F);
-        });
+        var lock = player.acquirable().lock();
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setAllowFlying(true);
+        player.setFlyingSpeed(0.05F);
+        var attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+        attackSpeed.setBaseValue(1024.0);
+        lock.unlock();
         scoreboard.setupPlayer(player, user);
     }
 

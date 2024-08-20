@@ -24,7 +24,7 @@ public class MinestomEntity implements DefaultMinestomEntity {
 
     @ApiStatus.Experimental
     public MinestomEntity(Acquirable<? extends net.minestom.server.entity.Entity> entity, MinestomWoolBattle woolbattle) {
-        this(entity, EntityType.ENTITY, woolbattle);
+        this(entity, EntityType.UNKNOWN, woolbattle);
     }
 
     @ApiStatus.Experimental
@@ -54,7 +54,7 @@ public class MinestomEntity implements DefaultMinestomEntity {
     }
 
     @Override
-    public Acquired<? extends Entity> lock() {
+    public @NotNull Acquired<? extends Entity> lock() {
         return entity.lock();
     }
 

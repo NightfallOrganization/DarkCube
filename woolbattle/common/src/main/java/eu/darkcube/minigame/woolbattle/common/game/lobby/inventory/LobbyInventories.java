@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.game.lobby.inventory;
 
 import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
@@ -41,7 +48,7 @@ public class LobbyInventories {
 
     public LobbyInventories(CommonLobby lobby, CommonGame game) {
         this.lobby = lobby;
-        this.woolbattle = game.woolbattle().woolbattle();
+        this.woolbattle = game.api().woolbattle();
         this.game = game;
         this.teamKey = Key.key(woolbattle, "team");
     }
@@ -60,7 +67,7 @@ public class LobbyInventories {
         for (var team : game.teamManager().teams().stream().sorted(Comparator.comparing(CommonTeam::key)).toList()) {
             if (team.spectator()) continue;
             pagination.content().addStaticItem(user -> {
-                var wbUser = game.woolbattle().user(user);
+                var wbUser = game.api().user(user);
                 if (wbUser == null) return ItemBuilder.item();
                 var b = team.wool().createSingleItem();
                 b.displayname(team.getName(user));
@@ -82,7 +89,7 @@ public class LobbyInventories {
                 var uniqueId = UUID.fromString(uniqueIdString);
                 var team = game.teamManager().team(uniqueId);
                 if (team == null) return;
-                var wbUser = game.woolbattle().user(user);
+                var wbUser = game.api().user(user);
                 if (wbUser == null) return;
                 if (team.users().size() >= game.mapSize().teamSize()) {
                     wbUser.sendMessage(Messages.TEAM_IS_FULL, team.getName(user));
@@ -271,7 +278,7 @@ public class LobbyInventories {
             public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
                 var mapName = ItemManager.instance().getId(item, keyMap);
                 if (mapName == null) return;
-                var map = game.woolbattle().mapManager().map(mapName, game.mapSize());
+                var map = game.api().mapManager().map(mapName, game.mapSize());
                 if (map == null) return;
                 vote(lobby.mapPoll(), user, map);
             }

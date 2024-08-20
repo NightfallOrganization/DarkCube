@@ -64,7 +64,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         super(game, GameState.LOBBY);
 
         this.voteRegistry = new CommonVoteRegistry();
-        this.mapPoll = voteRegistry.<Map>pollBuilder().addPossibilities(game.woolbattle().mapManager().maps(game.mapSize()).stream().filter(Map::enabled).toList()).addToRegistry();
+        this.mapPoll = voteRegistry.<Map>pollBuilder().addPossibilities(game.api().mapManager().maps(game.mapSize()).stream().filter(Map::enabled).toList()).addToRegistry();
         this.mapPoll.onVote((user, vote) -> user.sendMessage(Messages.VOTED_FOR_MAP, vote.name()));
         this.mapPoll.onUpdate(_ -> {
             var winner = this.mapPoll.sortedWinners().getFirst();
@@ -147,7 +147,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
             transitionPlayers(ingame);
         }
         super.unload(newPhase);
-        game.woolbattle().worldHandler().unloadWorld(world);
+        game.api().worldHandler().unloadWorld(world);
         world = null;
         spawn = null;
     }
@@ -172,7 +172,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     }
 
     private void setupWorld() {
-        world = game.woolbattle().worldHandler().loadLobbyWorld(game);
+        world = game.api().worldHandler().loadLobbyWorld(game);
     }
 
     public void preJoin(@NotNull CommonWBUser user) {

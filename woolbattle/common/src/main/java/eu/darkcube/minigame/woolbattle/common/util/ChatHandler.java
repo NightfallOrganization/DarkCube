@@ -38,7 +38,7 @@ public class ChatHandler {
 
     private void broadcast(CommonGame game, CommonWBUser user, Channel channel, String message) {
         var targets = new ArrayList<CommandExecutor>(channel.targets(game, user));
-        targets.add(game.woolbattle().woolbattle().consoleSender());
+        targets.add(game.api().woolbattle().consoleSender());
         var team = user.team();
         var nameColor = team == null ? WHITE : team.nameColor();
         var ignorePrefix = channel.ignorePrefix(game, user);

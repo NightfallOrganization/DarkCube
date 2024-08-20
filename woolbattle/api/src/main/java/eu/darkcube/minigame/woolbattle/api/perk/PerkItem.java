@@ -68,7 +68,7 @@ public class PerkItem {
     }
 
     public static Key perkId(Game game) {
-        return Key.key(game.woolbattle(), "perk_id");
+        return Key.key(game.api(), "perk_id");
     }
 
     public interface Implementation {

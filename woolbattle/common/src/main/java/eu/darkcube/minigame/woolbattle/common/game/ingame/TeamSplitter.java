@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.game.ingame;
 
 import java.util.ArrayList;
@@ -23,7 +30,7 @@ public class TeamSplitter {
         }
         if (chosenPlayerCount == game.users().size()) {
             // All players have selected a team, but they might all be in the same team
-            if (chosenPlayerCount == 0) game.woolbattle().woolbattle().logger().warn("Starting game without players");
+            if (chosenPlayerCount == 0) game.api().woolbattle().logger().warn("Starting game without players");
 
             for (var team : teams) {
                 if (team.users().size() != chosenPlayerCount) {

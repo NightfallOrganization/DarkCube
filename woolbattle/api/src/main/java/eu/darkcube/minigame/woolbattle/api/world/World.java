@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityTypeTest;
+import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
 import eu.darkcube.system.annotations.Api;
@@ -32,7 +33,8 @@ public interface World {
     Block blockAt(int x, int y, int z);
 
     @Api
-    void dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count);
+    @NotNull
+    List<ItemEntity> dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count);
 
     @Api
     @Unmodifiable

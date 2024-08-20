@@ -15,7 +15,7 @@ import eu.darkcube.system.util.data.MetaDataStorage;
 import org.jetbrains.annotations.Contract;
 
 public class CommonBlock implements Block {
-    private final CommonWorld world;
+    protected final CommonWorld world;
     protected final int x;
     protected final int y;
     protected final int z;
@@ -50,6 +50,11 @@ public class CommonBlock implements Block {
     @Override
     public @NotNull MetaDataStorage metadata() {
         return world.blockMetadata(x, y, z);
+    }
+
+    @Override
+    public boolean isWoolGenerator() {
+        return false;
     }
 
     @Override

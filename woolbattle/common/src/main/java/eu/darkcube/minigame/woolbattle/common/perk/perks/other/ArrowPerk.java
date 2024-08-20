@@ -53,7 +53,7 @@ public class ArrowPerk extends Perk {
             if (event instanceof ProjectileHitBlockEvent hitBlockEvent) {
                 var block = hitBlockEvent.block();
                 var damage = (int) projectile.metadata().get(blockDamage(game));
-                if (game.woolbattle().materialProvider().isWool(block.material())) {
+                if (game.api().materialProvider().isWool(block.material())) {
                     block.incrementBlockDamage(damage);
                 }
             }
@@ -62,22 +62,22 @@ public class ArrowPerk extends Perk {
     }
 
     private static Key particles(Game game) {
-        return Key.key(game.woolbattle(), "particles");
+        return Key.key(game.api(), "particles");
     }
 
     private static Key user(Game game) {
-        return Key.key(game.woolbattle(), "user");
+        return Key.key(game.api(), "user");
     }
 
     private static Key perk(Game game) {
-        return Key.key(game.woolbattle(), "perk");
+        return Key.key(game.api(), "perk");
     }
 
     private static Key strength(Game game) {
-        return Key.key(game.woolbattle(), "strength");
+        return Key.key(game.api(), "strength");
     }
 
     private static Key blockDamage(Game game) {
-        return Key.key(game.woolbattle(), "blockDamage");
+        return Key.key(game.api(), "blockDamage");
     }
 }

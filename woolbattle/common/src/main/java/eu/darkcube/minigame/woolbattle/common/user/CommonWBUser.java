@@ -254,6 +254,14 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
         return location;
     }
 
+    public @Nullable Location eyeLocation() {
+        var location = this.location;
+        if (location == null) return null;
+        return location.add(0, eyeHeight(), 0);
+    }
+
+    public abstract double eyeHeight();
+
     @Override
     public void velocity(@NotNull Vector velocity) {
         platformAccess.velocity(velocity);
@@ -380,7 +388,7 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "WBUser{name=" + playerName() + ", id=" + uniqueId() + "}";
     }
 }

@@ -26,7 +26,7 @@ public abstract class CommonPhase implements GamePhase {
 
     public CommonPhase(@NotNull CommonGame game, @NotNull GameState gameState) {
         this.game = game;
-        this.woolbattleApi = game.woolbattle();
+        this.woolbattleApi = game.api();
         this.woolbattle = woolbattleApi.woolbattle();
         this.gameState = gameState;
         this.listeners = EventNode.all("phase-" + gameState.name().toLowerCase(Locale.ROOT));

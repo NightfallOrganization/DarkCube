@@ -25,7 +25,7 @@ public class MinestomUser extends CommonWBUser implements DefaultMinestomEntity 
     }
 
     @Override
-    public Acquired<? extends MinestomPlayer> lock() {
+    public @NotNull Acquired<? extends MinestomPlayer> lock() {
         var player = woolbattle.player(this);
         return player.acquirable().lock();
     }
@@ -40,5 +40,11 @@ public class MinestomUser extends CommonWBUser implements DefaultMinestomEntity 
         var lock = lock();
         lock.get().kick("You were kicked from WoolBattle");
         lock.unlock();
+    }
+
+    @Override
+    public double eyeHeight() {
+        var player = woolbattle.player(this);
+        return player.getEyeHeight();
     }
 }

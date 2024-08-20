@@ -46,7 +46,7 @@ public class CommonUserPerks implements UserPerks {
         byName.clear();
         var p = user.perksStorage();
         if (!p.verifyIntegrity(game.perkRegistry())) {
-            game.woolbattle().woolbattle().logger().warn("Perk integrity verification failed for {}, fix applied", user.playerName());
+            game.api().woolbattle().logger().warn("Perk integrity verification failed for {}, fix applied", user.playerName());
             user.perksStorage(p);
         }
         for (var entry : p.perks().entrySet()) {

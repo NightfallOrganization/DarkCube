@@ -31,7 +31,7 @@ public class IngameUserLoginGameListener extends ConfiguredListener<UserLoginGam
         event.result(UserLoginGameEvent.Result.USER_PLAYING);
         var spawn = ingame.mapIngameData().spawn(team.key());
         if (spawn == null) {
-            ingame.game().woolbattle().woolbattle().logger().warn("No spawn configured for team {} on {}", team.key(), ingame.game().mapSize());
+            ingame.game().api().woolbattle().logger().warn("No spawn configured for team {} on {}", team.key(), ingame.game().mapSize());
             spawn = new Position.Directed.Simple(0.5, 100, 0.5, 0, 0);
         }
 

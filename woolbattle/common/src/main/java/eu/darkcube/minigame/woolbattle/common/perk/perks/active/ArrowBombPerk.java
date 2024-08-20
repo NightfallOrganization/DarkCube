@@ -41,7 +41,7 @@ public class ArrowBombPerk extends Perk {
 
         @Override
         protected boolean activateRight(UserPerk perk) {
-            var snowball = game.woolbattle().entityImplementations().launchSnowball(perk.owner());
+            var snowball = game.api().entityImplementations().launchSnowball(perk.owner());
             snowball.metadata().set(perkKey, perk);
             return true;
         }
@@ -63,7 +63,7 @@ public class ArrowBombPerk extends Perk {
                     pitch = -pitch;
                 }
                 var dir = Vector.fromEuler(yaw, pitch);
-                var arrow = game.woolbattle().entityImplementations().spawnArrow(projectile.location(), dir, 0.9F, 0);
+                var arrow = game.api().entityImplementations().spawnArrow(projectile.location(), dir, 0.9F, 0);
                 ArrowPerk.particles(game, arrow, false);
                 ArrowPerk.claimArrow(game, user, arrow, 3, 2);
             }

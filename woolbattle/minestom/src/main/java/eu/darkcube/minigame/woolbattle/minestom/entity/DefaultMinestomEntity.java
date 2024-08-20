@@ -21,6 +21,7 @@ import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.thread.Acquired;
 
 public interface DefaultMinestomEntity extends Entity {
+    @NotNull
     Acquired<? extends net.minestom.server.entity.Entity> lock();
 
     @NotNull

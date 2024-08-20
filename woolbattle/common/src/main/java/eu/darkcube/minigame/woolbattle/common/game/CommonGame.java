@@ -95,7 +95,7 @@ public class CommonGame implements Game {
     }
 
     @Override
-    public @NotNull CommonWoolBattleApi woolbattle() {
+    public @NotNull CommonWoolBattleApi api() {
         return woolbattle;
     }
 

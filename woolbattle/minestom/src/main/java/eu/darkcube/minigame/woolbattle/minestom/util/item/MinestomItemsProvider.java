@@ -8,20 +8,28 @@
 package eu.darkcube.minigame.woolbattle.minestom.util.item;
 
 import static eu.darkcube.system.server.item.ItemBuilder.item;
-import static eu.darkcube.system.server.item.component.ItemComponent.ATTRIBUTE_MODIFIERS;
-import static eu.darkcube.system.server.item.component.ItemComponent.DYED_COLOR;
+import static eu.darkcube.system.server.item.component.ItemComponent.*;
 import static net.minestom.server.item.Material.*;
 import static net.minestom.server.item.enchant.Enchantment.*;
 
 import java.util.List;
 
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
+import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.component.components.AttributeList;
 import eu.darkcube.system.server.item.component.components.DyedItemColor;
+import eu.darkcube.system.server.item.component.components.Tool;
+import eu.darkcube.system.server.item.component.components.util.BlockTypeFilter;
 import eu.darkcube.system.util.Color;
 
 public class MinestomItemsProvider implements Items.Provider {
+    private final MinestomWoolBattle woolbattle;
+
+    public MinestomItemsProvider(MinestomWoolBattle woolbattle) {
+        this.woolbattle = woolbattle;
+    }
+
     @SuppressWarnings("DuplicateBranchesInSwitch")
     @Override
     public ItemBuilder builder(Items items) {
@@ -93,7 +101,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_STOMPER -> item(DIAMOND_BOOTS);
             case PERK_HOOK_ARROW, PERK_HOOK_ARROW_COOLDOWN -> item(REDSTONE_TORCH);
             case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5)/*.flag(HIDE_UNBREAKABLE)TODO*/.hiddenUnbreakable();
-            case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).hiddenUnbreakable().set(ATTRIBUTE_MODIFIERS, new AttributeList(List.of(), false));
+            case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).hiddenUnbreakable().set(ATTRIBUTE_MODIFIERS, new AttributeList(List.of(), false)).set(TOOL, new Tool(List.of(new Tool.Rule(new BlockTypeFilter.Blocks(woolbattle.api().woolProvider().woolMaterials()), 1000F, true)), 0, 0));
             case DEFAULT_PEARL -> item(ENDER_PEARL).glow(true);
             case DEFAULT_PEARL_COOLDOWN -> item(FIREWORK_STAR);
             case DEFAULT_ARROW -> item(ARROW);

@@ -7,6 +7,10 @@
 
 package eu.darkcube.minigame.woolbattle.common.world;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.world.metadata.CommonWorldBlockMetaDataStorage;
@@ -33,12 +37,15 @@ public abstract class CommonWorld implements World {
     }
 
     @Override
-    public void dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count) {
+    public @NotNull List<ItemEntity> dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count) {
+        var entities = new ArrayList<ItemEntity>();
         while (count > 0) {
             var amt = Math.min(64, count);
             count -= amt;
-            platform.dropAt(this, x, y, z, wool, amt);
+            var entity = platform.dropAt(this, x, y, z, wool, amt);
+            entities.add(entity);
         }
+        return entities;
     }
 
     public PlatformWorldHandler platform() {

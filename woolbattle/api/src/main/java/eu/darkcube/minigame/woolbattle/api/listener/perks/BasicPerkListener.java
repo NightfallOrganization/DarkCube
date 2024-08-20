@@ -24,7 +24,7 @@ public abstract class BasicPerkListener extends PerkListener {
 
     public BasicPerkListener(Game game, Perk perk) {
         super(game, perk);
-        this.perkKey = Key.key(game.woolbattle(), "perk");
+        this.perkKey = Key.key(game.api(), "perk");
         this.listeners.addListener(UserInteractEvent.class, event -> {
             if (!mayActivate()) return;
             var item = event.item();

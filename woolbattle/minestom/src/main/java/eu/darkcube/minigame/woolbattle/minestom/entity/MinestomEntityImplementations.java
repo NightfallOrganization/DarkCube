@@ -7,11 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.entity;
 
-import eu.darkcube.minigame.woolbattle.api.entity.EntityImplementations;
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityImplementations;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
@@ -19,7 +19,7 @@ import eu.darkcube.minigame.woolbattle.minestom.entity.impl.MinestomProjectileIm
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.entity.EntityType;
 
-public class MinestomEntityImplementations implements EntityImplementations {
+public class MinestomEntityImplementations extends CommonEntityImplementations {
     private final MinestomWoolBattle woolbattle;
 
     public MinestomEntityImplementations(MinestomWoolBattle woolbattle) {
@@ -39,7 +39,7 @@ public class MinestomEntityImplementations implements EntityImplementations {
             snowball.setInstance(p.getInstance(), pos);
             p.setNoGravity(true);
         });
-        var projectile = new MinestomProjectile(snowball.acquirable(), woolbattle);
+        var projectile = new MinestomArrow(snowball.acquirable(), woolbattle);
         snowball.handle(projectile);
         return projectile;
     }

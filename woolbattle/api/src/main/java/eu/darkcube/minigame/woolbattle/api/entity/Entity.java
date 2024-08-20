@@ -45,4 +45,7 @@ public interface Entity {
 
     @NotNull
     BoundingBox boundingBox();
+
+    @NotNull
+    String toString();
 }

@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
+import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.api.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
@@ -75,9 +76,13 @@ public class MinestomWoolBattle extends CommonWoolBattle {
 
     @Override
     public void start() {
-        WoolBattleProvider.PROVIDER.register(Items.Provider.class, new MinestomItemsProvider());
+        WoolBattleProvider.PROVIDER.register(Items.Provider.class, new MinestomItemsProvider(this));
 
         super.start();
+
+        var e = new MinestomEntity(new Entity(net.minestom.server.entity.EntityType.ARROW).acquirable(), this);
+        api.entityImplementations().createWrapped(EntityType.ITEM, e);
+        api.entityImplementations().createWrapped(EntityType.ARROW, e);
 
         var eventManager = MinecraftServer.getGlobalEventHandler();
         MinestomJoinListener.register(this, eventManager);

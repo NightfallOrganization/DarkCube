@@ -15,8 +15,9 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 public interface EntityType<T extends Entity> extends EntityTypeTest<Entity, T> {
     Registry<EntityType<?>> REGISTRY = Registry.create();
     EntityType<WBUser> PLAYER = new SimpleEntityType<>(WBUser.class, "woolbattle:player");
-    EntityType<Entity> ENTITY = new SimpleEntityType<>(Entity.class, "woolbattle:entity");
-    EntityType<Projectile> PROJECTILE = new SimpleEntityType<>(Projectile.class, "woolbattle:projectile");
+    EntityType<Entity> UNKNOWN = new SimpleEntityType<>(Entity.class, "woolbattle:unknown");
+    EntityType<ItemEntity> ITEM = new SimpleEntityType<>(ItemEntity.class, "woolbattle:item");
+    EntityType<Arrow> ARROW = new SimpleEntityType<>(Arrow.class, "woolbattle:arrow");
 
     @NotNull
     Class<T> entityTypeClass();

@@ -107,6 +107,6 @@ public class CommonPerks {
         perkRegistry.register(new ShearsPerk(game));
         perkRegistry.register(new DoubleJumpPerk(game));
 
-        game.woolbattle().eventManager().call(new RegisterPerksEvent(game, perkRegistry));
+        game.api().eventManager().call(new RegisterPerksEvent(game, perkRegistry));
     }
 }

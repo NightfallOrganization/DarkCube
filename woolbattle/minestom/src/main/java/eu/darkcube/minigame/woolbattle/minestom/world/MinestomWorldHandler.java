@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.zip.ZipInputStream;
 
+import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.world.CommonGameWorld;
@@ -180,11 +181,12 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     }
 
     @Override
-    public void dropAt(@NotNull CommonWorld world, double x, double y, double z, @NotNull ColoredWool wool, int amt) {
+    public @NotNull ItemEntity dropAt(@NotNull CommonWorld world, double x, double y, double z, @NotNull ColoredWool wool, int amt) {
         var instance = instance(world);
         var entity = new Entity(EntityType.ITEM);
         entity.editEntityMeta(ItemEntityMeta.class, meta -> meta.setItem(wool.createSingleItem().amount(amt).build()));
         entity.setInstance(instance, new Pos(x, y, z));
+        return null;
     }
 
     private @NotNull Path createDirectory(@Nullable CommonGame game, @NotNull String suffix) throws IOException {

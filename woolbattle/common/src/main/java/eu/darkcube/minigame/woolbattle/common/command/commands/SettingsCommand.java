@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.command.commands;
 
 import java.util.Objects;
@@ -17,7 +24,7 @@ public class SettingsCommand extends WoolBattleCommand {
         }).executes(ctx -> {
             var user = (CommonWBUser) ctx.getSource().source();
             @NotNull var game = Objects.requireNonNull(user.game());
-            game.woolbattle().woolbattle().settingsInventoryTemplate().open(user.user());
+            game.api().woolbattle().settingsInventoryTemplate().open(user.user());
             return 0;
         }));
     }

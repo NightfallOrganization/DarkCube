@@ -27,4 +27,9 @@ public record Location(@NotNull World world, double x, double y, double z, float
     public @NotNull Location aligned() {
         return new Location(world, simple().aligned());
     }
+
+    @Override
+    public @NotNull Location add(int x, double y, int z) {
+        return new Location(world, this.x + x, this.y + y, this.z + z, yaw, pitch);
+    }
 }

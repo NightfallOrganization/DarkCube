@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
 import java.time.Duration;
@@ -26,7 +33,7 @@ public class CommonLobbyTimer {
     }
 
     public void start() {
-        this.tick = this.lobby.game().woolbattle().tickUnit();
+        this.tick = this.lobby.game().api().tickUnit();
 
         this.task = this.lobby.game().scheduler().submit(() -> {
             var onlineCount = lobby.game().users().size();
@@ -78,7 +85,7 @@ public class CommonLobbyTimer {
 
     private void newTimer(@NotNull Duration timer) {
         this.timer = timer.isNegative() ? Duration.ZERO : timer;
-        lobby.game().woolbattle().eventManager().call(new LobbyTimerUpdateEvent(lobby.game(), this.timer));
+        lobby.game().api().eventManager().call(new LobbyTimerUpdateEvent(lobby.game(), this.timer));
         lobby.updateTimer();
         if (this.timer.isZero()) {
             lobby.game().enableNextPhase();

@@ -11,21 +11,30 @@ import static net.minestom.server.item.Material.*;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Objects;
 
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWoolProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.minestom.item.material.MinestomMaterial;
 import eu.darkcube.system.server.item.material.Material;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.gamedata.tags.Tag;
 
 public class MinestomColoredWoolProvider implements ColoredWoolProvider {
-    private final List<Material> woolMaterials = List.of(Stream.of(WHITE_WOOL, ORANGE_WOOL, MAGENTA_WOOL, LIGHT_BLUE_WOOL, YELLOW_WOOL, LIME_WOOL, PINK_WOOL, GRAY_WOOL, LIGHT_GRAY_WOOL, CYAN_WOOL, PURPLE_WOOL, BLUE_WOOL, BROWN_WOOL, GREEN_WOOL, RED_WOOL, BLACK_WOOL).map(Material::of).toArray(Material[]::new));
-    private final List<MinestomColoredWool> woolColors = List.of(woolMaterials.stream().map(MinestomColoredWool::new).toArray(MinestomColoredWool[]::new));
+    private final List<Material> woolMaterials;
+    private final List<MinestomColoredWool> woolColors;
+
+    public MinestomColoredWoolProvider() {
+        var tag = Objects.requireNonNull(MinecraftServer.getTagManager().getTag(Tag.BasicType.ITEMS, "minecraft:wool"));
+        woolMaterials = List.copyOf(tag.getValues().stream().map(Material::of).toList());
+        woolColors = List.copyOf(woolMaterials.stream().map(MinestomColoredWool::new).toList());
+    }
 
     @Override
     public @NotNull MinestomColoredWool defaultWool() {
-        return new MinestomColoredWool(woolMaterials.getFirst());
+        return woolColors.getFirst();
     }
 
     @Override
@@ -52,12 +61,20 @@ public class MinestomColoredWoolProvider implements ColoredWoolProvider {
                 default -> null;
             };
             if (wool != null) {
-                return new MinestomColoredWool(Material.of(wool));
+                return Objects.requireNonNull(woolFrom(Material.of(wool)));
             }
             return defaultWool();
         }
         var material = Material.of(minestomMaterial);
-        return new MinestomColoredWool(material);
+        return Objects.requireNonNull(woolFrom(material));
+    }
+
+    @Override
+    public @Nullable MinestomColoredWool woolFrom(@NotNull Material material) {
+        for (var woolColor : woolColors) {
+            if (woolColor.material() == material) return woolColor;
+        }
+        return null;
     }
 
     @Override
