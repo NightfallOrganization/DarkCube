@@ -31,7 +31,7 @@ public enum TeleportLocations {
 
     TeleportLocations(World world, double x, double y, double z, float yaw, float pitch) {
         this.world = world;
-        this.coordinates = new double[] {x, y, z};
+        this.coordinates = new double[]{x, y, z};
         this.yaw = yaw;
         this.x = x;
         this.y = y;
@@ -70,21 +70,4 @@ public enum TeleportLocations {
     public Location getLocation() {
         return new Location(world, getPositonX(), getPositonY(), getPositonZ(), getPositionYaw(), getPositionPitch());
     }
-
-    public static boolean isWithinBoundLocations(Location location, Location corner1, Location corner2) {
-
-        double x1 = Math.min(corner1.getX(), corner2.getX());
-        double y1 = Math.min(corner1.getY(), corner2.getY());
-        double z1 = Math.min(corner1.getZ(), corner2.getZ());
-        double x2 = Math.max(corner1.getX(), corner2.getX());
-        double y2 = Math.max(corner1.getY(), corner2.getY());
-        double z2 = Math.max(corner1.getZ(), corner2.getZ());
-
-        double x = location.getX();
-        double y = location.getY();
-        double z = location.getZ();
-
-        return x >= x1 && x <= x2 && y >= y1 && y <= y2 && z >= z1 && z <= z2;
-    }
-
 }

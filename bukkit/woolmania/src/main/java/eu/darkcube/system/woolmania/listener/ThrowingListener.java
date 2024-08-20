@@ -12,6 +12,9 @@ import static eu.darkcube.system.woolmania.enums.Sounds.THROW;
 import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
 import static eu.darkcube.system.woolmania.util.message.Message.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
@@ -22,13 +25,11 @@ import eu.darkcube.system.woolmania.items.WoolItem;
 import eu.darkcube.system.woolmania.items.gadgets.WoolGrenadeItem;
 import eu.darkcube.system.woolmania.registry.WoolRegistry;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
-import eu.darkcube.system.woolmania.util.message.CustomItemNames;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -111,48 +112,72 @@ public class ThrowingListener implements Listener {
 
         if (entity.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             Snowball snowball = (Snowball) event.getEntity();
-            if (snowball.getShooter() instanceof Player) {
-                Player player = (Player) snowball.getShooter();
+            if (snowball.getShooter() instanceof Player player) {
                 User user = UserAPI.instance().user(player.getUniqueId());
                 Hall hall = Hall.valueOf(entity.getPersistentDataContainer().get(key, PersistentDataType.STRING));
 
                 Location location = entity.getLocation();
                 WoolRegistry registry = WoolMania.getInstance().getWoolRegistry();
                 int radius = 5;
+                int radiusSquared = radius * radius;
+                int totalCount = 0;
+                World world = event.getEntity().getWorld();
+                Map<WoolRegistry.Entry, Integer> drops = new HashMap<>();
 
                 for (int x = -radius; x <= radius; x++) {
                     for (int y = -radius; y <= radius; y++) {
                         for (int z = -radius; z <= radius; z++) {
                             Location loc = location.clone().add(x, y, z);
-                            if (loc.distance(location) <= radius && hall.getPool().isWithinBounds(loc.getBlock().getLocation()) && loc.getBlock().getType() != Material.LIGHT) {
-                                Block block = loc.getBlock();
-                                Material material = block.getType();
+                            var block = loc.getBlock();
+                            var type = block.getType();
+                            if (loc.distanceSquared(location) <= radiusSquared && type != Material.LIGHT && hall.getPool().isWithinBounds(loc)) {
+                                if (registry.contains(type)) {
+                                    WoolRegistry.Entry entry = registry.get(type);
+                                    totalCount++;
 
-                                if (registry.contains(material)) {
-                                    WoolRegistry.Entry entry = registry.get(material);
-                                    CustomItemNames woolName = entry.name();
-                                    WoolItem woolItem = new WoolItem(user, block.getType(), entry.tier(), woolName);
-                                    World world = event.getEntity().getWorld();
-                                    world.spawnParticle(Particle.CLOUD, loc, 1, 1, 1, 1, 0);
-                                    dropBlocks(player, block, woolItem);
+                                    drops.compute(entry, (_, oldCount) -> {
+                                        if (oldCount == null) return 1;
+                                        return oldCount + 1;
+                                    });
 
                                     Light l = (Light) Material.LIGHT.createBlockData();
                                     l.setLevel(12);
-                                    block.setBlockData(l);
+                                    block.setBlockData(l, false);
                                 }
                             }
                         }
                     }
                 }
+                if (totalCount > 0) {
+                    world.spawnParticle(Particle.CLOUD, location, totalCount, radius / 2.5F, radius / 2.5F, radius / 2.5F, 0);
+                }
+                for (var entry : drops.entrySet()) {
+                    var e = entry.getKey();
+                    var count = entry.getValue();
+                    var woolItem = new WoolItem(user, e.material(), e.tier(), e.name());
+                    var itemStack = woolItem.getItemStack();
+
+                    int remaining = count;
+                    while (remaining > 0) {
+                        int subtract = Math.min(remaining, 64);
+                        remaining -= subtract;
+                        itemStack.setAmount(subtract);
+
+                        dropBlocks(player, location, itemStack.clone());
+                    }
+                }
+
                 WoolMania.getStaticPlayer(player).getFarmingSound().playSound(player);
             }
         }
     }
 
-    public void dropBlocks(Player player, Block block, CustomItem customItem) {
-        if (player.getInventory().addItem(customItem.getItemStack()).isEmpty()) {
-        } else {
-            block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
+    public void dropBlocks(Player player, Location dropLocation, ItemStack customItem) {
+        var failedToAdd = player.getInventory().addItem(customItem);
+        if (!failedToAdd.isEmpty()) {
+            for (var value : failedToAdd.values()) {
+                player.getWorld().dropItemNaturally(dropLocation, value);
+            }
         }
     }
 }

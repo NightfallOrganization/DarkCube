@@ -7,7 +7,6 @@
 
 package eu.darkcube.system.woolmania.util.area;
 
-import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -38,6 +37,26 @@ public interface Area {
         if (location.getWorld() != getWorld()) {
             return false;
         }
-        return TeleportLocations.isWithinBoundLocations(location, getFirstLocation(getWorld()), getSecondLocation(getWorld()));
+        return isWithinBoundLocations(location, getFirstLocation(getWorld()), getSecondLocation(getWorld()));
+    }
+
+    static boolean isWithinBoundLocations(Location location, Location corner1, Location corner2) {
+        double x = location.getX();
+        double minX = Math.min(corner1.getX(), corner2.getX());
+        if (x < minX) return false;
+        double maxX = Math.max(corner1.getX(), corner2.getX()) + 1;
+        if (x >= maxX) return false;
+
+        double y = location.getY();
+        double minY = Math.min(corner1.getY(), corner2.getY());
+        if (y < minY) return false;
+        double maxY = Math.max(corner1.getY(), corner2.getY()) + 1;
+        if (y >= maxY) return false;
+
+        double z = location.getZ();
+        double minZ = Math.min(corner1.getZ(), corner2.getZ());
+        if (z < minZ) return false;
+        double maxZ = Math.max(corner1.getZ(), corner2.getZ()) + 1;
+        return !(z >= maxZ);
     }
 }
