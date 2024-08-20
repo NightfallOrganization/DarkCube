@@ -7,11 +7,17 @@
 
 package eu.darkcube.system.woolmania.npc;
 
-import eu.darkcube.system.woolmania.npc.NPCCreator;
-
 public class NPCRemover {
     public static void destoryNPCs(NPCCreator creator){
         creator.zinus.destroy();
         creator.zina.destroy();
+
+        creator.zinus2.destroy();
+        creator.zina2.destroy();
+
+        creator.zinus3.destroy();
+        creator.zina3.destroy();
+
+        creator.varkas.destroy();
     }
 }

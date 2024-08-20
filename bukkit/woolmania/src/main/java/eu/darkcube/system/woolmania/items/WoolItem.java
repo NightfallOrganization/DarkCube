@@ -29,8 +29,4 @@ public class WoolItem extends CustomItem {
         updateItemLore();
     }
 
-    // @Override
-    // public int getDefaultDurability() {
-    //     return 100;
-    // }
 }

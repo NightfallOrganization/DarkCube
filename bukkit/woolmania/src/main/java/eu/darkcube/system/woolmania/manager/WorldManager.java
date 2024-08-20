@@ -14,12 +14,12 @@ import org.bukkit.WorldCreator;
 import org.bukkit.generator.ChunkGenerator;
 
 public class WorldManager {
-    public static World MAINWORLD;
+    public static World SPAWN;
     public static World WORLD;
     public static World HALLS;
 
     public static void loadWorlds() {
-        MAINWORLD = loadOrCreateWorldWithGenerator("Spawn", new VoidWorldGenerator());
+        SPAWN = loadOrCreateWorldWithGenerator("Spawn", new VoidWorldGenerator());
         WORLD = loadOrCreateWorld("world");
         HALLS = loadOrCreateWorldWithGenerator("Halls", new VoidWorldGenerator());
     }

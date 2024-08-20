@@ -31,8 +31,10 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
+import eu.darkcube.system.woolmania.enums.hall.Hall;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.gadgets.WoolGrenadeItem;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -83,15 +85,17 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
         if (clickedInventoryItem == null) return;
         Player player = Bukkit.getPlayer(user.uniqueId());
 
-        buyFood(clickedInventoryItem, new WoolGrenadeItem(user), INVENTORY_SHOP_GADGETS_GRENADE, user, player);
+        buyItems(clickedInventoryItem, new WoolGrenadeItem(user), INVENTORY_SHOP_GADGETS_GRENADE, user, player);
 
         inventory.pagedController().publishUpdatePage();
     }
 
-    private void buyFood(String clickedItem, CustomItem customItem, InventoryItems inventoryItems, User user, Player player) {
+    private void buyItems(String clickedItem, CustomItem customItem, InventoryItems inventoryItems, User user, Player player) {
         if (clickedItem.equals(inventoryItems.itemID())) {
             int cost = inventoryItems.getCost();
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
+            WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
+            Hall hall = woolManiaPlayer.getHall();
 
             if (cost > playerMoney) {
                 user.sendMessage(NO_MONEY);
@@ -99,8 +103,15 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
                 return;
             }
 
+            if (clickedItem.equals(inventoryItems.itemID())) {
+                player.sendMessage("§7Richtige ID");
+                customItem.setTier(hall.getTier());
+                customItem.setLevel(hall.getHallValue().getValue());
+                customItem.updateItemLore();
+            }
+
             WoolMania.getStaticPlayer(player).removeMoney(cost, player);
-            user.sendMessage(FOOD_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
+            user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
             BUY.playSound(player);
             player.getInventory().addItem(customItem.getItemStack());
         }

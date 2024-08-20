@@ -7,6 +7,11 @@
 
 package eu.darkcube.system.woolmania.listener;
 
+import static eu.darkcube.system.woolmania.enums.Sounds.NO;
+import static eu.darkcube.system.woolmania.util.message.Message.LEVEL_TO_LOW;
+import static eu.darkcube.system.woolmania.util.message.Message.NOT_ENOUGHT_DURABILITY;
+
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
@@ -24,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class BlockBreakListener implements Listener {
     @EventHandler
@@ -39,9 +45,43 @@ public class BlockBreakListener implements Listener {
             return;
         }
 
+        handleBlockBreakItem(player, user, event, woolManiaPlayer);
+        handleWool(block, user, player, event);
+    }
+
+    public void handleBlockBreakItem(Player player, User user, BlockBreakEvent event, WoolManiaPlayer woolManiaPlayer) {
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        ItemBuilder item = ItemBuilder.item(itemInHand);
+        CustomItem customItem = new CustomItem(item);
+        int itemLevel = customItem.getLevel();
+        int playerLevel = woolManiaPlayer.getLevel();
+
+        if (itemLevel > playerLevel) {
+            user.sendMessage(LEVEL_TO_LOW);
+            NO.playSound(player);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (customItem.getDurability() == 0) {
+            user.sendMessage(NOT_ENOUGHT_DURABILITY);
+            NO.playSound(player);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (customItem.hasItemID()) {
+            customItem.reduceDurability();
+            player.getInventory().setItemInMainHand(customItem.getItemStack());
+        }
+    }
+
+    public void handleWool(Block block, User user, Player player, BlockBreakEvent event) {
         WoolRegistry registry = WoolMania.getInstance().getWoolRegistry();
         Material material = block.getType();
 
+        if (event.isCancelled()) return;
+        
         if (registry.contains(material)) {
             WoolRegistry.Entry entry = registry.get(material);
 
@@ -67,4 +107,5 @@ public class BlockBreakListener implements Listener {
             block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
         }
     }
+
 }

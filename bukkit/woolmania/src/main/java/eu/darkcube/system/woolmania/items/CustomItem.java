@@ -27,6 +27,7 @@ public class CustomItem {
     private static final DataKey<Tiers> TIER = DataKey.ofImmutable(Key.key(WoolMania.getInstance(), "tier"), Tiers.class);
     private static final DataKey<Integer> DURABILITY = DataKey.of(Key.key(WoolMania.getInstance(), "durability"), PersistentDataTypes.INTEGER);
     private static final DataKey<Integer> MAX_DURABILITY = DataKey.of(Key.key(WoolMania.getInstance(), "max_durability"), PersistentDataTypes.INTEGER);
+    private static final DataKey<Integer> LEVEL = DataKey.of(Key.key(WoolMania.getInstance(), "level"), PersistentDataTypes.INTEGER);
     private static final DataKey<String> ID = DataKey.of(Key.key(WoolMania.getInstance(), "id"), PersistentDataTypes.STRING);
 
     private final ItemBuilder item;
@@ -42,6 +43,10 @@ public class CustomItem {
 
     public int getDurability() {
         return item.persistentDataStorage().get(DURABILITY, this::getDefaultDurability);
+    }
+
+    public int getLevel() {
+        return item.persistentDataStorage().get(LEVEL, this::getDefaultLevel);
     }
 
     // public int getMaxDurability() {
@@ -66,6 +71,10 @@ public class CustomItem {
 
     public int getDefaultDurability() {
         return 1;
+    }
+
+    public int getDefaultLevel() {
+        return 0;
     }
 
     public int getAmount() {
@@ -98,6 +107,15 @@ public class CustomItem {
         item.persistentDataStorage().set(MAX_DURABILITY, maxDurability);
     }
 
+    public void setLevel(int level) {
+        item.persistentDataStorage().set(LEVEL, level);
+    }
+
+    public void setWholeDurability(int durability) {
+        item.persistentDataStorage().set(DURABILITY, durability);
+        item.persistentDataStorage().set(MAX_DURABILITY, durability);
+    }
+
     public void setAmount(int amount) {
         item.amount(amount);
     }
@@ -116,15 +134,32 @@ public class CustomItem {
 
     //</editor-fold>
 
+    public Boolean hasItemID() {
+        return item.persistentDataStorage().has(ID);
+    }
+
+    public void reduceDurability() {
+        int currentDurability = getDurability();
+        if (currentDurability > 0) {
+            setDurability(currentDurability - 1);
+            updateItemLore();
+        }
+    }
+
+    public void addGlowing() {
+        item.glow();
+    }
+
     public void updateItemLore() {
         int itemDurability = getDurability();
         int itemMaxDurability = getMaxDurability();
         int tiers = getTierID();
+        int level = getLevel();
         // int itemBuffSlot = getBuffSlot();
-        setLore(itemDurability, itemMaxDurability, tiers);
+        setLore(itemDurability, itemMaxDurability, tiers, level);
     }
 
-    public void setLore(int itemdurability, int itemmaxDurability, long tiers) {
+    public void setLore(int itemdurability, int itemmaxDurability, long tiers, int level) {
         List<Component> lore = new ArrayList<>();
         boolean showStats = tiers > 0 || itemdurability != -2;
 
@@ -143,6 +178,13 @@ public class CustomItem {
                 lore.add(legacySection().deserialize("§7Durability: §a" + itemdurability + "§7/§a" + itemmaxDurability));
             }
 
+            lore.add(empty());
+        }
+
+        if (level > 0) {
+            lore.add(legacySection().deserialize("§7§m      §7« §dReqir §7»§7§m      "));
+            lore.add(empty());
+            lore.add(legacySection().deserialize("§7Level: §6" + level));
             lore.add(empty());
         }
 

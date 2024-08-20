@@ -8,13 +8,13 @@
 package eu.darkcube.system.woolmania.enums;
 
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
-import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
 
+import eu.darkcube.system.woolmania.manager.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 public enum TeleportLocations {
-    SPAWN(MAINWORLD, 15.5, 199, -3.5, 45, 0),
+    SPAWN(WorldManager.SPAWN, 15.5, 199, -3.5, 45, 0),
     HALL1(HALLS, 0.5, 111, 0.5, -90, 0),
     HALL2(HALLS, 0.5, 111, 1000.5, -90, 0),
     HALL3(HALLS, 0.5, 111, 2000.5, -90, 0),

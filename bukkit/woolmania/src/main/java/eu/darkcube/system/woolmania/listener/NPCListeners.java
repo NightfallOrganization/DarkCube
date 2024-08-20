@@ -65,53 +65,49 @@ public class NPCListeners {
     }
 
     private static void clickNpc(NPCCreator creator, Player player, User user, Npc<World, Player, ItemStack, Plugin> npc) {
-        if (npc == creator.zinus.npc()) {
-            zinusExecute(player, user);
-        } else if (npc == creator.zina.npc()) {
+        if (npc == creator.zinus.npc() || npc == creator.zinus2.npc() || npc == creator.zinus3.npc()) {
+            zinusExecute(player);
+        } else if (npc == creator.zina.npc() || npc == creator.zina2.npc() || npc == creator.zina3.npc()) {
             zinaExecute(player, user);
+        } else if (npc == creator.varkas.npc()) {
+            varkasExecute(player);
         }
     }
 
-    private static void zinusExecute(Player player, User user) {
-        if (player.hasPermission("woolmania.level.3")) {
-            WoolMania.getInstance().getShopInventory().openInventory(player);
-        } else {
-            user.sendMessage(Message.LEVEL_TO_LOW);
-        }
+    private static void zinusExecute(Player player) {
+        WoolMania.getInstance().getShopInventory().openInventory(player);
+    }
+
+    private static void varkasExecute(Player player) {
+        WoolMania.getInstance().getSmithInventory().openInventory(player);
     }
 
     private static void zinaExecute(Player player, User user) {
+        boolean hasWool = false;
+        int woolValue = 0;
 
-        if (player.hasPermission("woolmania.level.2")) {
-            boolean hasWool = false;
-            int woolValue = 0;
+        for (ItemStack item : player.getInventory().getContents()) {
 
-            for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null) {
+                CustomItem customItem = new CustomItem(ItemBuilder.item(item));
+                if (WoolItem.ITEM_ID.equals(customItem.getItemID())) {
 
-                if (item != null) {
-                    CustomItem customItem = new CustomItem(ItemBuilder.item(item));
-                    if (WoolItem.ITEM_ID.equals(customItem.getItemID())) {
+                    int tierLevel = customItem.getTierID();
+                    int itemAmount = item.getAmount();
+                    woolValue += tierLevel * itemAmount;
 
-                        int tierLevel = customItem.getTierID();
-                        int itemAmount = item.getAmount();
-                        woolValue += tierLevel * itemAmount;
-
-                        player.getInventory().remove(item);
-                        hasWool = true;
-                    }
+                    player.getInventory().remove(item);
+                    hasWool = true;
                 }
             }
+        }
 
-            if (hasWool) {
-                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 50f, 2f);
-                user.sendMessage(Message.ZINA_GET_MONEY, woolValue);
-                WoolMania.getStaticPlayer(player).addMoney(woolValue, player);
-            } else {
-                user.sendMessage(Message.ZINA_NO_WOOL);
-            }
+        if (hasWool) {
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 50f, 2f);
+            user.sendMessage(Message.ZINA_GET_MONEY, woolValue);
+            WoolMania.getStaticPlayer(player).addMoney(woolValue, player);
         } else {
-            user.sendMessage(Message.LEVEL_TO_LOW);
+            user.sendMessage(Message.ZINA_NO_WOOL);
         }
     }
-
 }

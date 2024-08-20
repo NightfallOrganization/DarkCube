@@ -52,11 +52,6 @@ public enum Tiers {
         return name;
     }
 
-    // NICHT TUN
-    // public void setName(ItemBuilder builder) {
-    //     builder.displayname(Component.text(name));
-    // }
-
     public int getDurability() {
         return durability;
     }

@@ -11,7 +11,6 @@ import static eu.darkcube.system.woolmania.util.message.CustomItemNames.GADGET_W
 
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.woolmania.enums.Tiers;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import org.bukkit.Material;
 
@@ -25,7 +24,6 @@ public class WoolGrenadeItem extends CustomItem {
         setDisplayName(GADGET_WOOLGRENADE.getMessage(user));
         setItemID(ITEM_ID);
         setAmount(15);
-        setTier(Tiers.TIER5);
         setDurability(-2);
         setUnbreakableHidden();
         updateItemLore();

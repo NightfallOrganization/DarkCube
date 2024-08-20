@@ -8,7 +8,7 @@
 package eu.darkcube.system.woolmania.util;
 
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
-import static eu.darkcube.system.woolmania.manager.WorldManager.MAINWORLD;
+import static eu.darkcube.system.woolmania.manager.WorldManager.SPAWN;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
@@ -54,7 +54,7 @@ public class Ruler implements Listener {
 
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
-        if (player.getWorld().equals(MAINWORLD)) {
+        if (player.getWorld().equals(SPAWN)) {
             event.setCancelled(true);
             return;
         }

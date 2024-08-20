@@ -32,7 +32,6 @@ import eu.darkcube.system.woolmania.enums.InventoryItems;
 import eu.darkcube.system.woolmania.enums.hall.Hall;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class TeleportHallsInventory implements TemplateInventoryListener {
@@ -79,28 +78,24 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
         String itemId = InventoryItems.getItemID(item);
         Player player = Bukkit.getPlayer(user.uniqueId());
-        WoolManiaPlayer woolmaniaPlayer = new WoolManiaPlayer(player);
-        Location location = player.getLocation();
+        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
         if (itemId == null) return;
 
         if (itemId.equals(INVENTORY_TELEPORT_HALLS_HALL_1.itemID())) {
             player.teleport(HALL1.getLocation());
-            for (var hall : Hall.values()) {
-                if (hall.getHallArea().isWithinBounds(location)) {
-                    woolmaniaPlayer.setHall(hall);
-                    break;
-                }
-            }
+            woolManiaPlayer.teleportTo(Hall.HALL1);
             TELEPORT.playSound(player);
         }
 
         if (itemId.equals(INVENTORY_TELEPORT_HALLS_HALL_2.itemID())) {
             player.teleport(HALL2.getLocation());
+            woolManiaPlayer.teleportTo(Hall.HALL2);
             TELEPORT.playSound(player);
         }
 
         if (itemId.equals(INVENTORY_TELEPORT_HALLS_HALL_3.itemID())) {
             player.teleport(HALL3.getLocation());
+            woolManiaPlayer.teleportTo(Hall.HALL3);
             TELEPORT.playSound(player);
         }
     }

@@ -25,6 +25,8 @@ import eu.darkcube.system.woolmania.inventory.shop.ShopInventory;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventoryFood;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventoryGadgets;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventorySound;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventory;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryShopItems;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportHallsInventory;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportInventory;
 import eu.darkcube.system.woolmania.listener.BlockBreakListener;
@@ -32,6 +34,7 @@ import eu.darkcube.system.woolmania.listener.JoinListener;
 import eu.darkcube.system.woolmania.listener.LeaveListener;
 import eu.darkcube.system.woolmania.listener.NPCListeners;
 import eu.darkcube.system.woolmania.listener.PlayerMoveListener;
+import eu.darkcube.system.woolmania.listener.PlayerTeleportListener;
 import eu.darkcube.system.woolmania.listener.ThrowingListener;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.manager.WorldManager;
@@ -57,6 +60,8 @@ public class WoolMania extends DarkCubePlugin {
     private ShopInventoryGadgets shopInventoryGadgets;
     private TeleportInventory teleportInventory;
     public TeleportHallsInventory teleportHallsInventory;
+    public SmithInventory smithInventory;
+    public SmithInventoryShopItems smithInventoryShopItems;
     private LevelXPHandler levelXPHandler;
     private WoolRegistry woolRegistry;
     private GameScoreboard gameScoreboard;
@@ -81,11 +86,14 @@ public class WoolMania extends DarkCubePlugin {
         shopInventoryGadgets = new ShopInventoryGadgets();
         teleportInventory = new TeleportInventory();
         teleportHallsInventory = new TeleportHallsInventory();
+        smithInventory = new SmithInventory();
+        smithInventoryShopItems = new SmithInventoryShopItems();
         woolRegistry = new WoolRegistry();
         levelXPHandler = new LevelXPHandler();
         NPCListeners.register(npcManager, npcCreator);
         npcCreator.createNPC();
 
+        var teleportListener = new PlayerTeleportListener();
         var joinListener = new JoinListener();
         var leaveListener = new LeaveListener();
         var blockBreakListener = new BlockBreakListener();
@@ -93,6 +101,7 @@ public class WoolMania extends DarkCubePlugin {
         var playerMoveListener = new PlayerMoveListener();
         var ruler = new Ruler();
 
+        instance.getServer().getPluginManager().registerEvents(teleportListener, this);
         instance.getServer().getPluginManager().registerEvents(throwingListener, this);
         instance.getServer().getPluginManager().registerEvents(playerMoveListener, this);
         instance.getServer().getPluginManager().registerEvents(blockBreakListener, this);
@@ -169,6 +178,14 @@ public class WoolMania extends DarkCubePlugin {
 
     public TeleportHallsInventory getTeleportHallsInventory() {
         return teleportHallsInventory;
+    }
+
+    public SmithInventory getSmithInventory() {
+        return smithInventory;
+    }
+
+    public SmithInventoryShopItems getSmithInventoryShopItems() {
+        return smithInventoryShopItems;
     }
 
     public LevelXPHandler getLevelXPHandler() {

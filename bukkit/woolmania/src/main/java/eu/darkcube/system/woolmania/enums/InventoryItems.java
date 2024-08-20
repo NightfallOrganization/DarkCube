@@ -31,7 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public enum InventoryItems implements ItemFactory {
-    //Shop-Inventar
+    //Shop
     INVENTORY_SHOP_FOOD(item(COOKED_BEEF)),
     INVENTORY_SHOP_GADGETS(item(FISHING_ROD)),
     INVENTORY_SHOP_SOUNDS(item(MUSIC_DISC_PIGSTEP).hideJukeboxPlayableTooltip()),
@@ -49,7 +49,7 @@ public enum InventoryItems implements ItemFactory {
     INVENTORY_SHOP_SOUNDS_STANDARD(item(MUSIC_DISC_WARD).hideJukeboxPlayableTooltip(), 0),
     INVENTORY_SHOP_SOUNDS_WOOLBATTLE(item(MUSIC_DISC_MALL).hideJukeboxPlayableTooltip(),15000),
 
-    //Teleport-Inventar
+    //Teleport
     INVENTORY_TELEPORT_SPAWN(item(NETHER_STAR)),
     INVENTORY_TELEPORT_HALLS(item(BARREL)),
     INVENTORY_TELEPORT_NONE(item(FIREWORK_STAR)),
@@ -58,6 +58,17 @@ public enum InventoryItems implements ItemFactory {
     INVENTORY_TELEPORT_HALLS_HALL_1(item(WHITE_SHULKER_BOX)),
     INVENTORY_TELEPORT_HALLS_HALL_2(item(ORANGE_SHULKER_BOX)),
     INVENTORY_TELEPORT_HALLS_HALL_3(item(MAGENTA_SHULKER_BOX)),
+
+    //Smith
+    INVENTORY_SMITH_UPGRADE(item(GRINDSTONE)),
+    INVENTORY_SMITH_REPAIR(item(ANVIL)),
+    INVENTORY_SMITH_SHOP(item(CAULDRON)),
+
+    //Smith-Shop
+    INVENTORY_SMITH_SHOP_ITEMS(item(CROSSBOW)),
+
+    //Smith-Shop-Items
+    INVENTORY_SMITH_SHOP_ITEMS_SHEARS(item(SHEARS), 0)
 
     ;
 

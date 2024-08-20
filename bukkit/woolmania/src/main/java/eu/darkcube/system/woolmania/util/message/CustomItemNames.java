@@ -41,6 +41,7 @@ public enum CustomItemNames implements BaseMessage {
     ITEM_NAME_RED_WOOL,
     ITEM_NAME_BLACK_WOOL,
     GADGET_WOOLGRENADE,
+    ITEM_SHEARS,
 
 
     ;

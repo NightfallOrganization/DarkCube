@@ -5,9 +5,10 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.inventory.shop;
+package eu.darkcube.system.woolmania.inventory.smith;
 
-import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
+import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_SMITH_SHOP_ITEMS;
+import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_SMITH_SHOP_ITEMS_SHEARS;
 import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
 import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
@@ -31,14 +32,11 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
 import eu.darkcube.system.woolmania.items.CustomItem;
-import eu.darkcube.system.woolmania.items.food.CarrotItem;
-import eu.darkcube.system.woolmania.items.food.DiamondItem;
-import eu.darkcube.system.woolmania.items.food.MelonItem;
-import eu.darkcube.system.woolmania.items.food.SteakItem;
+import eu.darkcube.system.woolmania.items.ShearItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ShopInventoryFood implements TemplateInventoryListener {
+public class SmithInventoryShopItems implements TemplateInventoryListener {
 
     private static final String MASK = """
             .........
@@ -58,47 +56,44 @@ public class ShopInventoryFood implements TemplateInventoryListener {
         inventoryTemplate.open(player);
     }
 
-    public ShopInventoryFood() {
-        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "shop_food"), 45);
+    public SmithInventoryShopItems() {
+        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_shop_items"), 45);
         inventoryTemplate.title(ZINUS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_5);
-        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SHOP_FOOD);
+        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SMITH_SHOP_ITEMS);
         PagedTemplateSettings pagination = inventoryTemplate.pagination();
         pagination.pageSlots(InventoryMask.slots(MASK, '#'));
         PagedInventoryContent content = pagination.content();
 
-        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_FOOD_CARROT, stack));
-        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_FOOD_MELON, stack));
-        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_FOOD_STEAK, stack));
-        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_FOOD_DIAMOND, stack));
+        content.addStaticItem(getDisplayItem(INVENTORY_SMITH_SHOP_ITEMS_SHEARS, 1));
 
         inventoryTemplate.addListener(this);
     }
 
     private Function<User, Object> getDisplayItem(InventoryItems item, int amount) {
         return user -> {
-            return item.getItem(user, amount, ITEM_BUY_COST.getMessage(user, item.getCost()));
+
+            if (item.getCost() == 0) {
+                return item.getItem(user, amount, ITEM_BUY_FREE.getMessage(user));
+            } else {
+                return item.getItem(user, amount, ITEM_BUY_COST.getMessage(user, item.getCost()));
+            }
         };
     }
 
     @Override
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
-        // CustomItem customItem = new CustomItem(user, item);
-        // String clickedItem = customItem.getItemID();
         String clickedInventoryItem = InventoryItems.getItemID(item);
         if (clickedInventoryItem == null) return;
         Player player = Bukkit.getPlayer(user.uniqueId());
 
-        buyFood(clickedInventoryItem, new CarrotItem(user), INVENTORY_SHOP_FOOD_CARROT, user, player);
-        buyFood(clickedInventoryItem, new MelonItem(user), INVENTORY_SHOP_FOOD_MELON, user, player);
-        buyFood(clickedInventoryItem, new SteakItem(user), INVENTORY_SHOP_FOOD_STEAK, user, player);
-        buyFood(clickedInventoryItem, new DiamondItem(user), INVENTORY_SHOP_FOOD_DIAMOND, user, player);
+        buyItem(clickedInventoryItem, new ShearItem(user), INVENTORY_SMITH_SHOP_ITEMS_SHEARS, user, player);
 
         inventory.pagedController().publishUpdatePage();
     }
 
-    private void buyFood(String clickedItem, CustomItem customItem, InventoryItems inventoryItems, User user, Player player) {
+    private void buyItem(String clickedItem, CustomItem customItem, InventoryItems inventoryItems, User user, Player player) {
         if (clickedItem.equals(inventoryItems.itemID())) {
             int cost = inventoryItems.getCost();
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
@@ -109,8 +104,13 @@ public class ShopInventoryFood implements TemplateInventoryListener {
                 return;
             }
 
+            if (cost == 0) {
+                user.sendMessage(ITEM_BUYED_FREE, inventoryItems.getItem(user, customItem.getAmount(), "").displayname());
+            } else {
+                user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
+            }
+
             WoolMania.getStaticPlayer(player).removeMoney(cost, player);
-            user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
             BUY.playSound(player);
             player.getInventory().addItem(customItem.getItemStack());
         }

@@ -5,13 +5,11 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.inventory.teleporter;
+package eu.darkcube.system.woolmania.inventory.smith;
 
 import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
-import static eu.darkcube.system.woolmania.enums.Names.TELEPORTER;
+import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
-import static eu.darkcube.system.woolmania.enums.Sounds.TELEPORT;
-import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -28,27 +26,23 @@ import eu.darkcube.system.woolmania.enums.InventoryItems;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class TeleportInventory implements TemplateInventoryListener {
+public class SmithInventory implements TemplateInventoryListener {
     private final InventoryTemplate inventoryTemplate;
-
-    public String getKeyValue() {
-        return inventoryTemplate.key().value();
-    }
 
     public void openInventory(Player player) {
         inventoryTemplate.open(player);
     }
 
-    public TeleportInventory() {
-        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "teleporter"), 27);
-        inventoryTemplate.title(TELEPORTER.getName());
+    public SmithInventory() {
+        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith"), 27);
+        inventoryTemplate.title(ZINUS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
         DarkCubeInventoryTemplates.Paged.configure3x9(inventoryTemplate);
 
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_3);
-        inventoryTemplate.setItem(1, 11, INVENTORY_TELEPORT_NONE);
-        inventoryTemplate.setItem(1, 13, INVENTORY_TELEPORT_SPAWN);
-        inventoryTemplate.setItem(1, 15, INVENTORY_TELEPORT_HALLS);
+        inventoryTemplate.setItem(1, 11, INVENTORY_SMITH_UPGRADE);
+        inventoryTemplate.setItem(1, 13, INVENTORY_SMITH_REPAIR);
+        inventoryTemplate.setItem(1, 15, INVENTORY_SMITH_SHOP);
 
         inventoryTemplate.addListener(this);
     }
@@ -60,13 +54,12 @@ public class TeleportInventory implements TemplateInventoryListener {
 
         if (itemId == null) return;
 
-        if (itemId.equals(INVENTORY_TELEPORT_NONE.itemID())) {
+        if (itemId.equals(INVENTORY_SMITH_UPGRADE.itemID())) {
             NO.playSound(player);
-        } else if (itemId.equals(INVENTORY_TELEPORT_SPAWN.itemID())) {
-            player.teleport(SPAWN.getLocation());
-            TELEPORT.playSound(player);
-        } else if (itemId.equals(INVENTORY_TELEPORT_HALLS.itemID())) {
-            WoolMania.getInstance().getTeleportHallsInventory().openInventory(player);
+        } else if (itemId.equals(INVENTORY_SMITH_REPAIR.itemID())) {
+            NO.playSound(player);
+        } else if (itemId.equals(INVENTORY_SMITH_SHOP.itemID())) {
+            WoolMania.getInstance().getSmithInventoryShopItems().openInventory(player);
         }
     }
 }

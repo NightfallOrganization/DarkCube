@@ -62,13 +62,18 @@ public enum Message implements BaseMessage {
     ITEM_BUY_SELECTED,
     SOUND_BUYED,
     SOUND_SELECTED,
-    FOOD_BUYED,
+    ITEM_BUYED,
+    ITEM_BUYED_FREE,
+    ITEM_BUY_FREE,
     NO_MONEY,
     SOUND_RESETTED,
     SOUND_RESET_OWN,
     SOUND_RESET,
     NOT_IN_HALL,
     NOT_OFFHAND,
+    NOT_AVAILABLE,
+    NOT_ENOUGHT_DURABILITY,
+    TIER_TO_LOW,
 
     ;
 

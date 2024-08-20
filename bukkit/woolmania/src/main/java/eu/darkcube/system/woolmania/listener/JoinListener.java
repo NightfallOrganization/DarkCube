@@ -7,8 +7,7 @@
 
 package eu.darkcube.system.woolmania.listener;
 
-import static eu.darkcube.system.woolmania.npc.NPCCreator.NAME_ZINA;
-import static eu.darkcube.system.woolmania.npc.NPCCreator.NAME_ZINUS;
+import static eu.darkcube.system.woolmania.npc.NPCCreator.*;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
@@ -66,6 +65,14 @@ public class JoinListener implements Listener {
 
         setupPrefix(scoreboard, "npc-1", NAME_ZINUS, empty(), text(" (", GRAY).append(text("SHOP", DARK_AQUA)).append(text(")", GRAY)), AQUA);
         setupPrefix(scoreboard, "npc-2", NAME_ZINA, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
+
+        setupPrefix(scoreboard, "npc-3", NAME_ZINUS, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
+        setupPrefix(scoreboard, "npc-4", NAME_ZINA, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
+
+        setupPrefix(scoreboard, "npc-5", NAME_ZINUS, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
+        setupPrefix(scoreboard, "npc-6", NAME_ZINA, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
+
+        setupPrefix(scoreboard, "npc-7", NAME_VARKAS, empty(), text(" (", GRAY).append(text("SMITH", DARK_AQUA)).append(text(")", GRAY)), AQUA);
 
         Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
             WoolMania.getInstance().getGameScoreboard().updateWorld(player);

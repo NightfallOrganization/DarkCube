@@ -52,25 +52,34 @@ public class WoolManiaPlayer {
         this.hall = hall;
     }
 
+    public void updateHallByWorldChange(@Nullable Hall hall) {
+        updateHall(hall);
+        woolMania.getGameScoreboard().updateWorld(player);
+    }
+
     //<editor-fold desc="Teleport">
     public void teleportTo(Hall hall) {
         updateHall(hall);
         player.teleportAsync(hall.getSpawn().getLocation());
+        woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void teleportSyncTo(Hall hall) {
         updateHall(hall);
         player.teleport(hall.getSpawn().getLocation());
+        woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void teleportToSpawn() {
         updateHall(hall);
         player.teleportAsync(TeleportLocations.SPAWN.getLocation());
+        woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void teleportSyncToSpawn() {
         updateHall(hall);
         player.teleport(TeleportLocations.SPAWN.getLocation());
+        woolMania.getGameScoreboard().updateWorld(player);
     }
     //</editor-fold>
 

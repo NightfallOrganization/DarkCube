@@ -10,8 +10,7 @@ package eu.darkcube.system.woolmania.listener;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 import static eu.darkcube.system.woolmania.enums.Sounds.THROW;
 import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
-import static eu.darkcube.system.woolmania.util.message.Message.NOT_IN_HALL;
-import static eu.darkcube.system.woolmania.util.message.Message.NOT_OFFHAND;
+import static eu.darkcube.system.woolmania.util.message.Message.*;
 
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
@@ -55,6 +54,13 @@ public class ThrowingListener implements Listener {
         if (item == null) return;
         CustomItem customItem = new CustomItem(ItemBuilder.item(item));
         String itemId = customItem.getItemID();
+        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
+        int itemLevel = customItem.getLevel();
+        int itemTier = customItem.getTierID();
+        int playerLevel = woolManiaPlayer.getLevel();
+        Hall hall = woolManiaPlayer.getHall();
+        String name = hall.name();
+        int hallValue = hall.getHallValue().getValue();
 
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) {
             return;
@@ -67,17 +73,26 @@ public class ThrowingListener implements Listener {
             return;
         }
 
+        if (hallValue > itemTier) {
+            user.sendMessage(TIER_TO_LOW);
+            NO.playSound(player);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (itemLevel > playerLevel) {
+            user.sendMessage(LEVEL_TO_LOW);
+            NO.playSound(player);
+            event.setCancelled(true);
+            return;
+        }
+
         if (player.getWorld().equals(SPAWN.getWorld()) && WoolGrenadeItem.ITEM_ID.equals(itemId)) {
             NO.playSound(player);
             user.sendMessage(NOT_IN_HALL);
             event.setCancelled(true);
             return;
         }
-
-        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-
-        Hall hall = woolManiaPlayer.getHall();
-        String name = hall.name();
 
         if (!WoolGrenadeItem.ITEM_ID.equals(itemId)) return;
         event.setCancelled(true);
