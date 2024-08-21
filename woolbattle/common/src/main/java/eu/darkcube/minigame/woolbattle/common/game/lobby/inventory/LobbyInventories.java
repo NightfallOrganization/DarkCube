@@ -126,6 +126,7 @@ public class LobbyInventories {
     public InventoryTemplate createPerksInventoryTemplate() {
         var template = woolbattle.createDefaultTemplate("lobby_perks_main", Messages.INVENTORY_PERKS, Items.LOBBY_PERKS);
         var content = template.pagination().content();
+        template.pagination().pageSlots(20, 22, 24);
         var perksType = Key.key(woolbattle, "perks_type");
         var perksTypeNumber = Key.key(woolbattle, "perks_type_number");
         for (var activationType : ActivationType.values()) {
