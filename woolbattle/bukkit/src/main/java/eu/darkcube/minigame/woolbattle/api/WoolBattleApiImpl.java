@@ -8,6 +8,7 @@
 package eu.darkcube.minigame.woolbattle.api;
 
 import java.time.temporal.TemporalUnit;
+import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.WoolBattleBukkit;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
@@ -106,6 +107,16 @@ public class WoolBattleApiImpl implements WoolBattleApi {
 
     @Override
     public @Nullable WBUser user(User user) {
+        return null;
+    }
+
+    @Override
+    public @Nullable WBUser user(String playerName) {
+        return null;
+    }
+
+    @Override
+    public @Nullable WBUser user(UUID uniqueId) {
         return null;
     }
 

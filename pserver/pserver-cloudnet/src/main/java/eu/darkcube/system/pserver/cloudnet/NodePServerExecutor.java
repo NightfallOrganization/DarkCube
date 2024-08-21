@@ -19,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import eu.cloudnetservice.common.concurrent.Task;
 import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.driver.provider.ServiceTaskProvider;
 import eu.cloudnetservice.driver.registry.ServiceRegistry;
@@ -127,7 +126,7 @@ public class NodePServerExecutor implements PServerExecutor {
 
     @Override
     public @NotNull CompletableFuture<Boolean> start() {
-        return Task.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 lock.lock();
 
@@ -224,7 +223,7 @@ public class NodePServerExecutor implements PServerExecutor {
 
     @Override
     public @NotNull CompletableFuture<Void> stop() {
-        return Task.supply(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 lock.lock();
                 if (state == State.STARTING) {
