@@ -5,12 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.api.event.world;
+package eu.darkcube.minigame.woolbattle.api.entity;
 
-import eu.darkcube.minigame.woolbattle.api.world.World;
-import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-
-public interface WorldEvent {
-    @NotNull
-    World world();
+public interface Snowball extends Projectile {
 }

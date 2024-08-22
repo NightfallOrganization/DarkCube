@@ -34,6 +34,7 @@ import eu.darkcube.system.util.data.PersistentDataStorage;
 
 public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
+    private final @NotNull CommonWoolBattle woolbattle;
     private final @NotNull String platformName;
     private final @NotNull CommonGameManager gameManager;
     private final @NotNull CommonMapManager mapManager;
@@ -45,7 +46,8 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
     private final @NotNull EventNode<Object> eventManager;
     private final @NotNull CommonWoolBattleArguments commandArguments;
 
-    public CommonWoolBattleApi(@NotNull String platformName) {
+    public CommonWoolBattleApi(@NotNull CommonWoolBattle woolbattle, @NotNull String platformName) {
+        this.woolbattle = woolbattle;
         this.platformName = platformName;
         this.gameManager = new CommonGameManager(this);
         this.mapManager = new CommonMapManager(this);
@@ -113,6 +115,10 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         return lobbyData;
     }
 
+    public @NotNull CommonWoolBattle woolbattle() {
+        return woolbattle;
+    }
+
     @Override
     public abstract @NotNull CommonWoolBattleCommands commands();
 
@@ -124,8 +130,6 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
     @Override
     public abstract @Nullable CommonWBUser user(String playerName);
-
-    public abstract @NotNull CommonWoolBattle woolbattle();
 
     public abstract @NotNull GamePhaseCreator gamePhaseCreator();
 

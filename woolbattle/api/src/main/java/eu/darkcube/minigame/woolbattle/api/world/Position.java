@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
+import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -59,6 +60,10 @@ public interface Position extends Cloneable {
         @Override
         @NotNull
         Position.Directed add(int x, double y, int z);
+
+        default @NotNull Vector direction() {
+            return Vector.fromEuler(yaw(), pitch());
+        }
 
         default @NotNull Directed simple() {
             return simple(this);

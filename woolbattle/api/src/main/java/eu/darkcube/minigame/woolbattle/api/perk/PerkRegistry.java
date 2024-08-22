@@ -38,6 +38,14 @@ public class PerkRegistry {
         return Collections.unmodifiableMap(perks);
     }
 
+    public void startLogic() {
+        perks.values().forEach(Perk::startLogic);
+    }
+
+    public void stopLogic() {
+        perks.values().forEach(Perk::stopLogic);
+    }
+
     @Nullable
     public Perk perk(@NotNull PerkName name) {
         return perks.get(name);

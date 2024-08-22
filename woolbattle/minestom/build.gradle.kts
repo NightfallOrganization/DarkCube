@@ -13,14 +13,20 @@ plugins {
 
 val woolbattleShadow by configurations.register("woolbattleShadow")
 
+repositories {
+    // Used for AtlasProjectiles
+    maven("https://reposilite.worldseed.online/public")
+}
+
 dependencies {
     implementation(darkcubesystem.minestom)
     implementation(projects.minestom.server)
     implementation(projects.woolbattle.provider)
     implementation(projects.woolbattle.common)
     implementation(libs.luckperms)
+    implementation("ca.atlasengine:atlas-projectiles:1.0.2")
     woolbattleShadow(libs.jctools.core)
-    woolbattleShadow(libs.fastutil)
+    woolbattleShadow("ca.atlasengine:atlas-projectiles:1.0.2")
     woolbattleShadow(projects.woolbattle.provider) { isTransitive = false }
     woolbattleShadow(projects.woolbattle.api) { isTransitive = false }
     woolbattleShadow(projects.woolbattle.common) { isTransitive = false }
@@ -43,7 +49,6 @@ tasks {
         archiveClassifier = null
         configurations = listOf(woolbattleShadow)
         minimize()
-        relocate("it.unimi.dsi.fastutil", "eu.darkcube.minigame.woolbattle.libs.fastutil")
         relocate("org.jctools", "eu.darkcube.minigame.woolbattle.libs.jctools")
     }
     assemble {

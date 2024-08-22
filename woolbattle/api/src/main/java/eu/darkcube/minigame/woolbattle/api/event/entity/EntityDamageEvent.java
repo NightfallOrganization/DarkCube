@@ -33,10 +33,6 @@ public class EntityDamageEvent extends EntityEvent.Cancellable implements Recurs
          */
         ENTITY_ATTACK,
         /**
-         * Damage caused when attacked by a projectile.
-         */
-        PROJECTILE,
-        /**
          * Damage caused by being put in a block
          */
         SUFFOCATION,

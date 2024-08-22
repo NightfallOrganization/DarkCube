@@ -8,7 +8,9 @@
 package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface EntityImpl {
+    @NotNull
     Entity handle();
 }

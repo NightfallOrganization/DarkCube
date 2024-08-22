@@ -15,6 +15,7 @@ import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.common.command.commands.KickCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.SettingsCommand;
+import eu.darkcube.minigame.woolbattle.common.command.commands.TeleportCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.TimerCommand;
 import eu.darkcube.minigame.woolbattle.common.command.commands.WoolBattleRootCommand;
 import eu.darkcube.system.libs.com.mojang.brigadier.CommandDispatcher;
@@ -32,6 +33,7 @@ public abstract class CommonWoolBattleCommands implements WoolBattleCommands {
         register(new SettingsCommand());
         register(new TimerCommand());
         register(new KickCommand());
+        register(new TeleportCommand());
     }
 
     @Override

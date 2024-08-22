@@ -100,7 +100,7 @@ public class MinestomItemsProvider implements Items.Provider {
             case PERK_ROPE, PERK_ROPE_COOLDOWN -> item(VINE);
             case PERK_STOMPER -> item(DIAMOND_BOOTS);
             case PERK_HOOK_ARROW, PERK_HOOK_ARROW_COOLDOWN -> item(REDSTONE_TORCH);
-            case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5)/*.flag(HIDE_UNBREAKABLE)TODO*/.hiddenUnbreakable();
+            case DEFAULT_BOW -> item(BOW).enchant(INFINITY, 1).enchant(PUNCH, 2).enchant(KNOCKBACK, 5).hiddenUnbreakable();
             case DEFAULT_SHEARS -> item(SHEARS).enchant(KNOCKBACK, 5).enchant(EFFICIENCY, 5).hiddenUnbreakable().set(ATTRIBUTE_MODIFIERS, new AttributeList(List.of(), false)).set(TOOL, new Tool(List.of(new Tool.Rule(new BlockTypeFilter.Blocks(woolbattle.api().woolProvider().woolMaterials()), 1000F, true)), 0, 0));
             case DEFAULT_PEARL -> item(ENDER_PEARL).glow(true);
             case DEFAULT_PEARL_COOLDOWN -> item(FIREWORK_STAR);

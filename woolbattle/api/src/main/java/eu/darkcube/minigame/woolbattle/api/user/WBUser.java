@@ -163,6 +163,11 @@ public interface WBUser extends CommandSender, Entity {
     @Nullable
     Location location();
 
+    @Override
+    @Api
+    @Nullable
+    Location eyeLocation();
+
     /**
      * @return a copy of this user's {@link PerksStorage}
      */
@@ -217,7 +222,7 @@ public interface WBUser extends CommandSender, Entity {
      * @return if this user can see the other user
      */
     @Api
-    boolean canSee(WBUser other);
+    boolean canSee(@NotNull WBUser other);
 
     void kick();
 }

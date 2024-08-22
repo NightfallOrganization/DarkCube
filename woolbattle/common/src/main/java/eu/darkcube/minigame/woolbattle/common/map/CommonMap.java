@@ -9,6 +9,8 @@ package eu.darkcube.minigame.woolbattle.common.map;
 
 import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 
+import java.nio.file.Path;
+
 import eu.cloudnetservice.driver.document.Document;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
@@ -39,6 +41,10 @@ public class CommonMap implements Map {
         this.deathHeight = deathHeight;
         this.icon = icon;
         this.enabled = enabled;
+    }
+
+    public Path schematicPath() {
+        return mapManager.api().woolbattle().mapsDirectory().resolve(size.toString()).resolve(name + ".litematica");
     }
 
     @Override

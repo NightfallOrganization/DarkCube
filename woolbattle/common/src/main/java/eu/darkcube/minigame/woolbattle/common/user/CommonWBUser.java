@@ -143,10 +143,16 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
 
     @Override
     public void woolCount(int woolCount) {
+        woolCount(woolCount, true);
+    }
+
+    public void woolCount(int woolCount, boolean updateInventory) {
         this.woolCount = woolCount;
         var event = new UserWoolCountUpdateEvent(this, woolCount);
         api.eventManager().call(event);
-        platformAccess.woolCount(woolCount);
+        if (updateInventory) {
+            platformAccess.woolCount(woolCount);
+        }
     }
 
     @Override
@@ -186,10 +192,7 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
         api.eventManager().call(event);
         if (event.cancelled()) return 0;
         var removeCount = Math.min(woolCount(), event.amount());
-        woolCount(woolCount() - removeCount);
-        if (updateInventory) {
-            platformAccess.woolCount(count);
-        }
+        woolCount(woolCount() - removeCount, updateInventory);
         return removeCount;
     }
 
@@ -254,13 +257,12 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
         return location;
     }
 
+    @Override
     public @Nullable Location eyeLocation() {
         var location = this.location;
         if (location == null) return null;
         return location.add(0, eyeHeight(), 0);
     }
-
-    public abstract double eyeHeight();
 
     @Override
     public void velocity(@NotNull Vector velocity) {
@@ -337,7 +339,7 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
     }
 
     @Override
-    public boolean canSee(WBUser other) {
+    public boolean canSee(@NotNull WBUser other) {
         var game = this.game;
         if (game != other.game()) return false;
         if (game == null) return true;

@@ -11,7 +11,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
 import eu.darkcube.system.event.RecursiveEvent;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public class ProjectileHitEvent implements ProjectileEvent, RecursiveEvent {
+public abstract class ProjectileHitEvent implements ProjectileEvent, RecursiveEvent {
     private final @NotNull Projectile entity;
 
     public ProjectileHitEvent(@NotNull Projectile entity) {

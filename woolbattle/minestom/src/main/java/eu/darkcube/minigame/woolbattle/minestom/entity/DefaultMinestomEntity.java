@@ -40,6 +40,23 @@ public interface DefaultMinestomEntity extends Entity {
     }
 
     @Override
+    default @NotNull Location eyeLocation() {
+        var lock = lock();
+        var location = location();
+        var eyeLocation = location.add(0, eyeHeight(), 0);
+        lock.unlock();
+        return eyeLocation;
+    }
+
+    @Override
+    default double eyeHeight() {
+        var lock = lock();
+        var eyeHeight = lock.get().getEyeHeight();
+        lock.unlock();
+        return eyeHeight;
+    }
+
+    @Override
     default boolean isAlive() {
         var lock = lock();
         var entity = lock.get();

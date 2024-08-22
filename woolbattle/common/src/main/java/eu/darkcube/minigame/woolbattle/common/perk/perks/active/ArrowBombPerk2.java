@@ -40,9 +40,9 @@ public class ArrowBombPerk2 extends Perk {
         }
 
         @Override
-        protected boolean activateRight(UserPerk perk) {
-            var snowball = game.api().entityImplementations().launchSnowball(perk.owner());
-            snowball.metadata().set(perkKey, perk);
+        protected boolean activateRight(@NotNull UserPerk perk) {
+            // var snowball = game.api().entityImplementations().launchSnowball(perk.owner());
+            // snowball.metadata().set(perkKey, perk);
             return true;
         }
 

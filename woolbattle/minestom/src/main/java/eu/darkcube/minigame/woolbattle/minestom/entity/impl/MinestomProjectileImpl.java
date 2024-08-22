@@ -7,52 +7,37 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
-import eu.darkcube.minigame.woolbattle.api.event.entity.EntityDamageByEntityEvent;
-import eu.darkcube.minigame.woolbattle.api.event.entity.EntityDamageEvent;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitBlockEvent;
-import eu.darkcube.minigame.woolbattle.api.team.Team;
-import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
-import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEntityEvent;
+import eu.darkcube.minigame.woolbattle.api.util.Vector;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
-import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.collision.Aerodynamics;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventDispatcher;
-import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
-import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.thread.Acquirable;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
-public class MinestomProjectileImpl extends Entity implements EntityImpl {
+public class MinestomProjectileImpl extends AbstractProjectile implements EntityImpl {
 
     private final MinestomWoolBattle woolbattle;
-    private final CommonWBUser shooter;
-    private final MinestomPlayer player;
-    // We store the team separately because the user's team might change while the projectile is flying
-    private final Team team;
     private Projectile handle;
-    private boolean wasStuck;
+    private boolean inBlock = false;
+    private boolean firstTick = true;
 
-    public MinestomProjectileImpl(@NotNull MinestomWoolBattle woolbattle, @NotNull CommonGame game, @NotNull CommonWBUser shooter, @NotNull MinestomPlayer player, @NotNull Team team, @NotNull EntityType entityType) {
-        super(entityType);
+    public MinestomProjectileImpl(@NotNull MinestomWoolBattle woolbattle, @NotNull EntityType entityType) {
+        super(entityType, null);
         this.woolbattle = woolbattle;
-        this.shooter = shooter;
-        this.player = player;
-        this.team = team;
-        setup();
+        super.hasPhysics = false;
     }
 
     public void handle(Projectile handle) {
@@ -60,131 +45,96 @@ public class MinestomProjectileImpl extends Entity implements EntityImpl {
     }
 
     @Override
-    public Projectile handle() {
+    public @NotNull Projectile handle() {
         return handle;
     }
 
-    private void setup() {
-        super.hasPhysics = false;
-    }
-
-    public @NotNull CommonWBUser shooter() {
-        return shooter;
-    }
-
-    public Player player() {
-        return player;
-    }
-
-    @Override
-    public void tick(long time) {
-        final var posBefore = getPosition();
-        super.tick(time);
-        if (super.isRemoved()) return;
-
-        final var posNow = getPosition();
-        if (isStuck(posBefore, posNow)) {
-            if (super.onGround) {
-                return;
-            }
-            super.onGround = true;
-            this.velocity = Vec.ZERO;
-            sendPacketToViewersAndSelf(getVelocityPacket());
-            setNoGravity(true);
-            wasStuck = true;
-        } else {
-            if (!wasStuck) return;
-            wasStuck = false;
-            setNoGravity(super.onGround);
-            super.onGround = false;
-            EventDispatcher.call(new ProjectileUncollideEvent(this));
-        }
-    }
-
-    private boolean collideWithEntity(Pos pos, LivingEntity target) {
-        var event = new EntityDamageByEntityEvent(new MinestomEntity(target.acquirable(), woolbattle), this.handle, EntityDamageEvent.DamageCause.PROJECTILE);
-        woolbattle.api().eventManager().call(event);
-        return event.cancelled();
-    }
-
-    private boolean collideWithBlock(Pos pos, Block block) {
-        var event = new ProjectileHitBlockEvent(this.handle, this.handle.location().world().blockAt(pos.blockX(), pos.blockY(), pos.blockZ()));
-        woolbattle.api().eventManager().call(event);
-        // if(!event.isCancelled()) {
-        teleport(pos);
-        return true;
-        // }
-        // return false;
-    }
-
-    private boolean filter(LivingEntity entity) {
+    private boolean filter(Entity entity) {
         if (!(entity instanceof MinestomPlayer player)) return false;
         var user = player.user();
         if (user == null) return false;
         var team = user.team();
         if (team == null) return false;
         if (!team.canPlay()) return false;
-        return team != this.team;
+        var shooter = this.handle().shooter();
+        if (shooter == null) return true;
+        var shooterTeam = shooter.team();
+        return team != shooterTeam;
     }
 
-    /**
-     * Checks whether an arrow is stuck in block / hit an entity.
-     *
-     * @param pos    position right before current tick.
-     * @param posNow position after current tick.
-     * @return if an arrow is stuck in block / hit an entity.
-     */
-    @SuppressWarnings("ConstantConditions")
-    private boolean isStuck(Pos pos, Pos posNow) {
-        final var instance = getInstance();
-        if (pos.samePoint(posNow)) {
-            return instance.getBlock(pos).isSolid();
+    @Override
+    public void tick(long time) {
+        if (removed || inBlock) return;
+
+        var posBefore = getPosition();
+        updatePosition(time);
+        var posNow = getPosition();
+
+        var diff = Vec.fromPoint(posNow.sub(posBefore));
+        var yaw = Vector.getYaw(diff.x(), diff.z());
+        var pitch = Vector.getPitch(diff.x(), diff.y(), diff.z());
+        this.position = posNow.withView(yaw, pitch);
+
+        if (firstTick) {
+            firstTick = false;
+            setView(yaw, pitch);
         }
+    }
 
-        Chunk chunk = null;
-        Collection<LivingEntity> entities = null;
-        final var bb = getBoundingBox();
+    @Override
+    protected void handleBlockCollision(Block hitBlock, Point hitPos, Pos posBefore) {
+        velocity = Vec.ZERO;
+        setNoGravity(true);
 
-        /*
-          What we're about to do is to discretely jump from a previous position to the new one.
-          For each point we will be checking blocks and entities we're in.
-         */
-        final var part = bb.width() / 2;
-        final var dir = posNow.sub(pos).asVec();
-        final var parts = (int) Math.ceil(dir.length() / part);
-        final var direction = dir.normalize().mul(part).asPosition();
-        final var aliveTicks = getAliveTicks();
-        Block block = null;
-        Point blockPos = null;
-        for (var i = 0; i < parts; ++i) {
-            // If we're at last part, we can't just add another direction-vector, because we can exceed the end point.
-            pos = (i == parts - 1) ? posNow : pos.add(direction);
-            if (block == null || !pos.sameBlock(blockPos)) {
-                block = instance.getBlock(pos);
-                blockPos = pos;
-            }
-            if (block.isSolid()) {
-                var collision = collideWithBlock(pos, block);
-                if (collision) {
-                    return true;
-                }
-            }
-            if (currentChunk != chunk) {
-                chunk = currentChunk;
-                entities = instance.getChunkEntities(chunk).stream().filter(entity -> entity instanceof LivingEntity).map(entity -> (LivingEntity) entity).collect(Collectors.toSet());
-            }
-            final Point currentPos = pos;
-            var victimsStream = entities.stream().filter(entity -> bb.intersectEntity(currentPos, entity)).filter(this::filter);
-            final var victimOptional = victimsStream.findAny();
-            if (victimOptional.isPresent()) {
-                final var target = victimOptional.get();
-                var cancelled = collideWithEntity(pos, target);
-                if (!cancelled) {
-                    return super.onGround;
-                }
-            }
+        inBlock = true;
+        velocity = Vec.fromPoint(hitPos.sub(posBefore));
+        var v = velocity.normalize().mul(0.01F); // Required so the entity is lit (just outside the block)
+        velocity = Vec.ZERO;
+
+        // if the value is zero, it will be unlit. If the value is more than 0.01, there will be noticeable pitch change visually
+        position = new Pos(hitPos.x() - v.x(), hitPos.y() - v.y(), hitPos.z() - v.z(), posBefore.yaw(), posBefore.pitch());
+        MinecraftServer.getSchedulerManager().scheduleNextTick(() -> {
+            synchronizePosition();
+            sendPacketToViewersAndSelf(getVelocityPacket());
+        });
+
+        collideWithBlock(hitPos);
+        System.out.println(hitPos.blockX() + " " + hitPos.blockY() + " " + hitPos.blockZ());
+    }
+
+    @Override
+    protected boolean handleEntityCollision(Entity hitEntity, Point hitPos, Pos posBefore) {
+        if (filter(hitEntity)) {
+            return collideWithEntity(hitPos, hitEntity);
         }
         return false;
+    }
+
+    @Override
+    protected @NotNull Vec updateVelocity(@NotNull Pos entityPosition, @NotNull Vec currentVelocity, @NotNull Block.Getter blockGetter, @NotNull Aerodynamics aerodynamics, boolean positionChanged, boolean entityFlying, boolean entityOnGround, boolean entityNoGravity) {
+        if (!positionChanged) {
+            return entityFlying ? Vec.ZERO : new Vec(0.0, entityNoGravity ? 0.0 : -aerodynamics.gravity() * aerodynamics.verticalAirResistance(), 0.0);
+        } else {
+            var drag = entityOnGround ? blockGetter.getBlock(entityPosition.sub(0.0, 0.5000001, 0.0)).registry().friction() * aerodynamics.horizontalAirResistance() : aerodynamics.horizontalAirResistance();
+            var gravity = entityFlying ? 0.0 : aerodynamics.gravity();
+            var gravityDrag = entityFlying ? 0.6 : aerodynamics.verticalAirResistance();
+            var x = currentVelocity.x() * drag;
+            var y = entityNoGravity ? currentVelocity.y() : (currentVelocity.y() - gravity) * gravityDrag;
+            var z = currentVelocity.z() * drag;
+            return new Vec(Math.abs(x) < 1.0E-6 ? 0.0 : x, Math.abs(y) < 1.0E-6 ? 0.0 : y, Math.abs(z) < 1.0E-6 ? 0.0 : z);
+        }
+    }
+
+    private boolean collideWithEntity(Point pos, Entity target) {
+        if (!(target instanceof EntityImpl impl)) throw new IllegalStateException("Invalid Entity: " + target);
+        var event = new ProjectileHitEntityEvent(this.handle, impl.handle(), new Position.Simple(pos.x(), pos.y(), pos.z()));
+        woolbattle.api().eventManager().call(event);
+        return !event.cancelled();
+    }
+
+    private void collideWithBlock(Point pos) {
+        var event = new ProjectileHitBlockEvent(this.handle, this.handle.location().world().blockAt(pos.blockX(), pos.blockY(), pos.blockZ()));
+        woolbattle.api().eventManager().call(event);
     }
 
     @ApiStatus.Experimental

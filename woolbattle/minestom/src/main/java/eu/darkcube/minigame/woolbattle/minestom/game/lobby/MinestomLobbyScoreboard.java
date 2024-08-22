@@ -63,7 +63,9 @@ public class MinestomLobbyScoreboard {
 
     public void update(@NotNull CommonWBUser user, @NotNull LobbySidebarTeam team) {
         var sidebar = (Sidebar) user.metadata().get(sidebarKey);
-        update(sidebar, user, team);
+        if (sidebar != null) {
+            update(sidebar, user, team);
+        }
     }
 
     private void createLine(Sidebar sidebar, CommonWBUser user, LobbySidebarTeam team) {

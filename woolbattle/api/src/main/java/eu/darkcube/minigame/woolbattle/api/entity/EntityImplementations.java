@@ -11,17 +11,18 @@ import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 public interface EntityImplementations {
     @NotNull
-    <T extends Entity, W extends Entity> T createWrapped(@NotNull EntityType<T> type, @NotNull W wrapped);
+    Arrow spawnArrow(@NotNull Location location, @NotNull Vector velocity, float speed, float spread);
 
     @NotNull
-    Projectile launchSnowball(@NotNull WBUser fromUser);
+    Arrow shootArrow(@Nullable WBUser shooter, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
 
     @NotNull
-    Projectile launchEgg(@NotNull WBUser fromUser);
+    <T extends Projectile> T spawnProjectile(@NotNull EntityType<T> type, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
 
     @NotNull
-    Projectile spawnArrow(@NotNull Location location, @NotNull Vector direction, float speed, float spread);
+    <T extends Projectile> T shootProjectile(@NotNull EntityType<T> type, @Nullable WBUser user, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
 }

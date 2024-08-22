@@ -27,7 +27,6 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.utils.time.TimeUnit;
 
 public class MinestomWoolBattleApi extends CommonWoolBattleApi {
-    private final MinestomWoolBattle woolbattle;
     private final MinestomColoredWoolProvider woolProvider = new MinestomColoredWoolProvider();
     private final MinestomMaterialProvider materialProvider = new MinestomMaterialProvider(woolProvider);
     private final MinestomEntityImplementations entityImplementations;
@@ -37,8 +36,7 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
     private final CompletableFuture<Void> fullyLoadedFuture = new CompletableFuture<>(); // TODO complete this
 
     public MinestomWoolBattleApi(MinestomWoolBattle woolbattle) {
-        super("minestom");
-        this.woolbattle = woolbattle;
+        super(woolbattle, "minestom");
         this.gamePhaseCreator = new MinestomGamePhaseCreator(woolbattle);
         this.entityImplementations = new MinestomEntityImplementations(woolbattle);
     }
@@ -104,6 +102,6 @@ public class MinestomWoolBattleApi extends CommonWoolBattleApi {
 
     @Override
     public @NotNull MinestomWoolBattle woolbattle() {
-        return woolbattle;
+        return (MinestomWoolBattle) super.woolbattle();
     }
 }

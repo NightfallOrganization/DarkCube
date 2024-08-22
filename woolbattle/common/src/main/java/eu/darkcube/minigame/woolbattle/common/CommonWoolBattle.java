@@ -15,6 +15,7 @@ import java.nio.file.Path;
 
 import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
+import eu.darkcube.minigame.woolbattle.api.util.PerkUtils;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskScheduleProvider;
 import eu.darkcube.minigame.woolbattle.api.util.translation.Message;
 import eu.darkcube.minigame.woolbattle.common.event.CommonEventHandler;
@@ -27,6 +28,7 @@ import eu.darkcube.minigame.woolbattle.common.user.UserFactory;
 import eu.darkcube.minigame.woolbattle.common.user.UserPermissions;
 import eu.darkcube.minigame.woolbattle.common.user.UserPlatformAccess;
 import eu.darkcube.minigame.woolbattle.common.util.ChatHandler;
+import eu.darkcube.minigame.woolbattle.common.util.PerkUtilsImplementation;
 import eu.darkcube.minigame.woolbattle.common.util.item.CommonItem;
 import eu.darkcube.minigame.woolbattle.common.util.item.DefaultInventorySettings;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
@@ -66,6 +68,7 @@ public abstract class CommonWoolBattle implements Namespaced {
         setupMode = new SetupMode(this);
         WoolBattleProvider.PROVIDER.register(TaskScheduleProvider.class, new TaskScheduleProviderImpl());
         WoolBattleProvider.PROVIDER.register(ActivationType.ItemProvider.class, new CommonActivationTypeItemProvider());
+        WoolBattleProvider.PROVIDER.register(PerkUtils.Implementation.class, new PerkUtilsImplementation());
         this.worldDataProvider = new SimpleWorldDataProvider();
         this.languageRegistry = new LanguageRegistry();
 

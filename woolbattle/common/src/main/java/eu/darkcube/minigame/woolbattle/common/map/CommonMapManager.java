@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.map;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,19 +32,32 @@ public class CommonMapManager implements MapManager {
     private static final ConcurrentMap<String, CommonMap> EMPTY = new ConcurrentHashMap<>(0);
     private final Database mapsDatabase;
     private final Database mapDataDatabase;
-    private final CommonWoolBattleApi woolbattle;
+    private final CommonWoolBattleApi api;
     private final ConcurrentMap<MapSize, ConcurrentMap<String, CommonMap>> maps = new ConcurrentHashMap<>();
 
-    public CommonMapManager(CommonWoolBattleApi woolbattle) {
-        this.woolbattle = woolbattle;
+    public CommonMapManager(CommonWoolBattleApi api) {
+        this.api = api;
         var databaseProvider = InjectionLayer.boot().instance(DatabaseProvider.class);
-        mapsDatabase = databaseProvider.database("woolbattle_maps_" + woolbattle.platformName());
+        mapsDatabase = databaseProvider.database("woolbattle_maps_" + api.platformName());
         mapDataDatabase = databaseProvider.database("woolbattle_map_data");
         for (var entry : mapsDatabase.entries().entrySet()) {
             var document = entry.getValue();
             var map = CommonMap.fromDocument(this, document);
             maps.computeIfAbsent(map.size(), _ -> new ConcurrentHashMap<>()).put(map.name(), map);
         }
+        init();
+    }
+
+    public void init() {
+        for (var map : maps()) {
+            if (!Files.exists(map.schematicPath())) {
+                api.woolbattle().logger().error("No schematic file for Map {}-{}", map.name(), map.size());
+            }
+        }
+    }
+
+    public CommonWoolBattleApi api() {
+        return api;
     }
 
     @Override
@@ -57,7 +71,7 @@ public class CommonMapManager implements MapManager {
         maps.compute(mapSize, (_, v) -> {
             if (v == null) v = new ConcurrentHashMap<>();
             mapRef.set(v.computeIfAbsent(name, n -> {
-                var map = new CommonMap(this, n, mapSize, ItemBuilder.item(woolbattle.materialProvider().grassBlock()));
+                var map = new CommonMap(this, n, mapSize, ItemBuilder.item(api.materialProvider().grassBlock()));
                 mapsDatabase.insert(databaseKey(map), map.toDocument());
                 return map;
             }));

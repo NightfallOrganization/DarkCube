@@ -8,7 +8,6 @@
 package eu.darkcube.minigame.woolbattle.minestom.game.lobby;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
-import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.LobbySidebarTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
@@ -18,7 +17,6 @@ import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLob
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyQuitGameListener;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyUserChangeTeamListener;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 public class MinestomLobby extends CommonLobby {
     private final @NotNull MinestomLobbyScoreboard scoreboard;
@@ -37,11 +35,6 @@ public class MinestomLobby extends CommonLobby {
     @Override
     protected void updateSidebar(@NotNull CommonWBUser user, LobbySidebarTeam team) {
         this.scoreboard.update(user, team);
-    }
-
-    @Override
-    public void disable(@Nullable CommonPhase newPhase) {
-        super.disable(newPhase);
     }
 
     @Override

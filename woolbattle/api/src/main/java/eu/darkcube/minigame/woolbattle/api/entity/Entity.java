@@ -20,6 +20,11 @@ public interface Entity {
     @UnknownNullability
     Location location();
 
+    @UnknownNullability
+    Location eyeLocation();
+
+    double eyeHeight();
+
     void velocity(@NotNull Vector velocity);
 
     @NotNull

@@ -74,7 +74,14 @@ public record Vector(double x, double y, double z) {
         return new Vector(x / length, y / length, z / length);
     }
 
-    // TODO move to constructor when Statements before super() is released
+    public float yaw() {
+        return getYaw(x, z);
+    }
+
+    public float pitch() {
+        return getPitch(x, y, z);
+    }
+
     public static Vector fromEuler(float yaw, float pitch) {
         var rx = Math.toRadians(yaw);
         var ry = Math.toRadians(pitch);
@@ -83,5 +90,18 @@ public record Vector(double x, double y, double z) {
         var x = -xz * Math.sin(rx);
         var z = xz * Math.cos(rx);
         return new Vector(x, y, z);
+    }
+
+    public static float getYaw(double vecX, double vecZ) {
+        var radians = Math.atan2(vecZ, vecX);
+        var degrees = (float) Math.toDegrees(radians) - 90;
+        if (degrees < -180) return degrees + 360;
+        if (degrees > 180) return degrees - 360;
+        return degrees;
+    }
+
+    public static float getPitch(double vecX, double vecY, double vecZ) {
+        var radians = -Math.atan2(vecY, Math.max(Math.abs(vecX), Math.abs(vecZ)));
+        return (float) Math.toDegrees(radians);
     }
 }

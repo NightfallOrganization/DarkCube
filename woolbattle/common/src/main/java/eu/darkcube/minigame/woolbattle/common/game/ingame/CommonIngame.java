@@ -19,7 +19,8 @@ import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserCha
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserLoginGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserQuitGameListener;
-import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.CommonWoolResetScheduler;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.PerkCooldownScheduler;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.WoolResetScheduler;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMapIngameData;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicReader;
@@ -31,7 +32,8 @@ import eu.darkcube.system.util.GameState;
 
 public class CommonIngame extends CommonPhase implements Ingame {
 
-    private final CommonWoolResetScheduler woolResetScheduler = new CommonWoolResetScheduler(this);
+    private final WoolResetScheduler woolResetScheduler = new WoolResetScheduler(this);
+    private final PerkCooldownScheduler perkCooldownScheduler = new PerkCooldownScheduler(this);
     private CommonIngameWorld world;
     private CommonMapIngameData mapIngameData;
 
@@ -65,12 +67,16 @@ public class CommonIngame extends CommonPhase implements Ingame {
         for (var user : game.users()) {
             join(user);
         }
+        game.perkRegistry().startLogic();
         woolResetScheduler.start();
+        perkCooldownScheduler.start();
     }
 
     @Override
     public void disable(@Nullable CommonPhase newPhase) {
+        game.perkRegistry().stopLogic();
         woolResetScheduler.stop();
+        perkCooldownScheduler.stop();
 
         super.disable(newPhase);
     }
@@ -96,7 +102,7 @@ public class CommonIngame extends CommonPhase implements Ingame {
     }
 
     private void loadWorld() {
-        var schematicPath = woolbattle.mapsDirectory().resolve(game.mapSize().toString()).resolve(game.map().name() + ".litematic");
+        var schematicPath = game.map().schematicPath();
         if (Files.exists(schematicPath)) {
             var schematic = SchematicReader.read(schematicPath);
             world = game.api().worldHandler().loadIngameWorld(game, schematic);

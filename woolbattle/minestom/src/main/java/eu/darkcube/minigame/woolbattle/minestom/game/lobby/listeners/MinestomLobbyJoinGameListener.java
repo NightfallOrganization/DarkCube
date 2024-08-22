@@ -36,9 +36,10 @@ public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGa
                 player.sendPacketDirect(p.getAddPlayerToList());
             }
         }
+        player.postJoin();
 
         player.setGameMode(GameMode.SURVIVAL);
         player.setFoodSaturation(0);
-        player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1024);
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024);
     }
 }

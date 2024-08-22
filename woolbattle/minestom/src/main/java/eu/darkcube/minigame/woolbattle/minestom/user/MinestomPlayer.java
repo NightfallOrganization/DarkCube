@@ -17,9 +17,11 @@ import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.network.packet.server.CachedPacket;
 import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.network.packet.server.play.PlayerInfoRemovePacket;
@@ -33,6 +35,7 @@ public class MinestomPlayer extends Player implements EntityImpl {
     private static boolean isIn_UNSAFE_init;
     private static boolean isIn_remove;
     private static boolean isIn_setGameMode;
+    private static boolean joining = true;
 
     public MinestomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
         super(uuid, username, playerConnection);
@@ -46,8 +49,7 @@ public class MinestomPlayer extends Player implements EntityImpl {
                 }
                 case CachedPacket c -> {
                     var p = c.packet(playerConnection.getConnectionState());
-                    if (p instanceof PlayerInfoUpdatePacket) {
-                    } else if (p instanceof PlayerInfoRemovePacket) {
+                    if (p instanceof PlayerInfoUpdatePacket || p instanceof PlayerInfoRemovePacket) {
                     } else {
                         super.sendPacket(c);
                     }
@@ -124,6 +126,22 @@ public class MinestomPlayer extends Player implements EntityImpl {
         super.spectate(entity);
     }
 
+    public void postJoin() {
+        joining = false;
+        this.instance.getEntityTracker().nearbyEntitiesByChunkRange(position, ServerFlag.ENTITY_VIEW_DISTANCE, EntityTracker.Target.PLAYERS, newEntity -> {
+            if (newEntity == this) return;
+            if (newEntity instanceof MinestomPlayer player) {
+                player.trackingUpdate.add(this);
+            }
+            this.trackingUpdate.add(newEntity);
+        });
+    }
+
+    // @Override
+    // public boolean isAutoViewable() {
+    //     return !joining;
+    // }
+
     @Nullable
     public Entity spectating() {
         return spectating;
@@ -144,7 +162,7 @@ public class MinestomPlayer extends Player implements EntityImpl {
     private @Nullable CommonWBUser user;
 
     @Override
-    public CommonWBUser handle() {
+    public @NotNull CommonWBUser handle() {
         return user;
     }
 

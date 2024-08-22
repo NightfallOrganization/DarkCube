@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.world;
 
 import eu.darkcube.minigame.woolbattle.common.util.math.AABBi;
@@ -6,6 +13,8 @@ import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicRegion;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 import net.minestom.server.instance.generator.Generator;
+import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.world.biome.Biome;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,13 +22,16 @@ import org.slf4j.LoggerFactory;
 public class VoidSchematicGenerator implements Generator {
     private static final Logger LOGGER = LoggerFactory.getLogger("SchematicGenerator");
     private final ParsedSchematic schematic;
+    private final DynamicRegistry.Key<Biome> biome;
 
-    public VoidSchematicGenerator(Schematic schematic) {
+    public VoidSchematicGenerator(Schematic schematic, DynamicRegistry.Key<Biome> biome) {
         this.schematic = new ParsedSchematic(schematic);
+        this.biome = biome;
     }
 
     @Override
     public void generate(@NotNull GenerationUnit unit) {
+        unit.modifier().fillBiome(biome);
         var start = System.nanoTime();
         var unitAABB = aabb(unit);
         var intersects = false;

@@ -11,29 +11,27 @@ import eu.darkcube.minigame.woolbattle.api.util.scheduler.SchedulerTask;
 import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskSchedule;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngame;
 
-public class CommonWoolResetScheduler {
-
+public class PerkCooldownScheduler {
     private final CommonIngame ingame;
     private SchedulerTask task;
 
-    public CommonWoolResetScheduler(CommonIngame ingame) {
+    public PerkCooldownScheduler(CommonIngame ingame) {
         this.ingame = ingame;
     }
 
     public void start() {
         task = this.ingame.game().scheduler().submit(() -> {
-            var world = ingame.world();
-            if (world == null) {
-                ingame.game().api().woolbattle().logger().error("World to regenerate wool in was null - stopping scheduler");
-                return TaskSchedule.stop();
+            for (var user : ingame.game().users()) {
+                for (var perk : user.perks().perks()) {
+                    if (perk.perk().autoCountdownCooldown()) {
+                        var cooldown = perk.cooldown();
+                        if (cooldown > 0) {
+                            perk.cooldown(cooldown - 1);
+                        }
+                    }
+                }
             }
-            for (var entry : world.brokenWool().entrySet()) {
-                var block = entry.getKey();
-                var wool = entry.getValue();
-                wool.apply(block);
-            }
-            world.brokenWool().clear();
-            return TaskSchedule.tick(16);
+            return TaskSchedule.nextTick();
         });
     }
 
