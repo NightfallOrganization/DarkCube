@@ -40,7 +40,7 @@ public class LevelXPHandler {
 
     public static int calculateXPRequiredForNextLevel(int currentLevel) {
         int baseXP = 50;
-        int maxXP = 50000;
+        int maxXP = 10000;
         int totalLevels = 99;
 
         int xpPerLevelIncrement = (maxXP - baseXP) / totalLevels;

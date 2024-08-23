@@ -19,5 +19,6 @@ public class NPCRemover {
         creator.zina3.destroy();
 
         creator.varkas.destroy();
+        creator.astaroth.destroy();
     }
 }

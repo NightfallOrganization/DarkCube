@@ -65,6 +65,10 @@ public class ShopInventorySound implements TemplateInventoryListener {
 
         content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_STANDARD, FARMING_SOUND_STANDARD));
         content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_WOOLBATTLE, FARMING_SOUND_WOOLBATTLE));
+        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_ARMADILLO, FARMING_SOUND_ARMADILLO));
+        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_ARMADILLO_HIGH, FARMING_SOUND_ARMADILLO_HIGH));
+        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_SCAFFOLDING, FARMING_SOUND_SCAFFOLDING));
+        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_SCAFFOLDING_HIGH, FARMING_SOUND_SCAFFOLDING_HIGH));
 
         inventoryTemplate.addListener(this);
     }
@@ -78,6 +82,10 @@ public class ShopInventorySound implements TemplateInventoryListener {
 
         soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_STANDARD, FARMING_SOUND_STANDARD, woolManiaPlayer, user);
         soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_WOOLBATTLE, FARMING_SOUND_WOOLBATTLE, woolManiaPlayer, user);
+        soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_ARMADILLO, FARMING_SOUND_ARMADILLO, woolManiaPlayer, user);
+        soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_ARMADILLO_HIGH, FARMING_SOUND_ARMADILLO_HIGH, woolManiaPlayer, user);
+        soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_SCAFFOLDING, FARMING_SOUND_SCAFFOLDING, woolManiaPlayer, user);
+        soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_SCAFFOLDING_HIGH, FARMING_SOUND_SCAFFOLDING_HIGH, woolManiaPlayer, user);
 
         inventory.pagedController().publishUpdatePage();
     }
@@ -87,7 +95,7 @@ public class ShopInventorySound implements TemplateInventoryListener {
             WoolManiaPlayer player = WoolMania.getStaticPlayer(Bukkit.getPlayer(user.uniqueId()));
 
             if (sound.equals(player.getFarmingSound())) {
-                return item.getItem(user,ITEM_BUY_SELECTED.getMessage(user));
+                return item.getItem(user,ITEM_BUY_SELECTED.getMessage(user)).glow(true);
             } else if (player.isSoundUnlocked(sound)) {
                 return item.getItem(user, ITEM_BUY_BOUGHT.getMessage(user));
             } else {

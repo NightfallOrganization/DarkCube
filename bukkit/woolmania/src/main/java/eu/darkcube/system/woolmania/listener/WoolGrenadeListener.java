@@ -43,7 +43,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-public class ThrowingListener implements Listener {
+public class WoolGrenadeListener implements Listener {
 
     private static final NamespacedKey key = new NamespacedKey(WoolMania.getInstance(), "woolgrenade");
 
@@ -59,9 +59,10 @@ public class ThrowingListener implements Listener {
         int itemLevel = customItem.getLevel();
         int itemTier = customItem.getTierID();
         int playerLevel = woolManiaPlayer.getLevel();
-        Hall hall = woolManiaPlayer.getHall();
-        String name = hall.name();
-        int hallValue = hall.getHallValue().getValue();
+
+        if (!WoolGrenadeItem.ITEM_ID.equals(itemId)) {
+            return;
+        }
 
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_AIR) {
             return;
@@ -74,23 +75,27 @@ public class ThrowingListener implements Listener {
             return;
         }
 
-        if (hallValue > itemTier) {
+        if (player.getWorld().equals(SPAWN.getWorld()) && WoolGrenadeItem.ITEM_ID.equals(itemId)) {
+            NO.playSound(player);
+            user.sendMessage(NOT_IN_HALL);
+            event.setCancelled(true);
+            return;
+        }
+
+        Hall hall = woolManiaPlayer.getHall();
+        String name = hall.name();
+        int hallValue = hall.getHallValue().getValue();
+
+        if (hallValue > itemTier && WoolGrenadeItem.ITEM_ID.equals(itemId)) {
             user.sendMessage(TIER_TO_LOW);
             NO.playSound(player);
             event.setCancelled(true);
             return;
         }
 
-        if (itemLevel > playerLevel) {
+        if (itemLevel > playerLevel && WoolGrenadeItem.ITEM_ID.equals(itemId)) {
             user.sendMessage(LEVEL_TO_LOW);
             NO.playSound(player);
-            event.setCancelled(true);
-            return;
-        }
-
-        if (player.getWorld().equals(SPAWN.getWorld()) && WoolGrenadeItem.ITEM_ID.equals(itemId)) {
-            NO.playSound(player);
-            user.sendMessage(NOT_IN_HALL);
             event.setCancelled(true);
             return;
         }

@@ -75,6 +75,15 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
 
     private Function<User, Object> getDisplayItem(InventoryItems item, int amount) {
         return user -> {
+            Player player = Bukkit.getPlayer(user.uniqueId());
+            WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
+            Hall hall = woolManiaPlayer.getHall();
+            int cost = item.getCost() * hall.getHallValue().getValue();
+
+            if(item == INVENTORY_SHOP_GADGETS_GRENADE) {
+                return item.getItem(user, amount, ITEM_BUY_COST.getMessage(user, cost));
+            }
+
             return item.getItem(user, amount, ITEM_BUY_COST.getMessage(user, item.getCost()));
         };
     }
@@ -92,10 +101,11 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
 
     private void buyItems(String clickedItem, CustomItem customItem, InventoryItems inventoryItems, User user, Player player) {
         if (clickedItem.equals(inventoryItems.itemID())) {
-            int cost = inventoryItems.getCost();
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
             Hall hall = woolManiaPlayer.getHall();
+            int cost = inventoryItems.getCost();
+            int multiplierCost = cost * hall.getHallValue().getValue();
 
             if (cost > playerMoney) {
                 user.sendMessage(NO_MONEY);
@@ -103,11 +113,16 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
                 return;
             }
 
-            if (clickedItem.equals(inventoryItems.itemID())) {
-                player.sendMessage("§7Richtige ID");
+            if (clickedItem.equals(INVENTORY_SHOP_GADGETS_GRENADE.itemID())) {
                 customItem.setTier(hall.getTier());
                 customItem.setLevel(hall.getHallValue().getValue());
                 customItem.updateItemLore();
+
+                WoolMania.getStaticPlayer(player).removeMoney(multiplierCost, player);
+                user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), multiplierCost);
+                BUY.playSound(player);
+                player.getInventory().addItem(customItem.getItemStack());
+                return;
             }
 
             WoolMania.getStaticPlayer(player).removeMoney(cost, player);

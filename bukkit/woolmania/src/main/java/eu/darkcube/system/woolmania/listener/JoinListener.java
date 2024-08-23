@@ -72,7 +72,8 @@ public class JoinListener implements Listener {
         setupPrefix(scoreboard, "npc-5", NAME_ZINUS, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
         setupPrefix(scoreboard, "npc-6", NAME_ZINA, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
 
-        setupPrefix(scoreboard, "npc-7", NAME_VARKAS, empty(), text(" (", GRAY).append(text("SMITH", DARK_AQUA)).append(text(")", GRAY)), AQUA);
+        setupPrefix(scoreboard, "npc-7", NAME_VARKAS, empty(), text(" (", GRAY).append(text("SMITH", GOLD)).append(text(")", GRAY)), YELLOW);
+        setupPrefix(scoreboard, "npc-8", NAME_ASTAROTH, empty(), text(" (", GRAY).append(text("ABILITYS", DARK_PURPLE)).append(text(")", GRAY)), LIGHT_PURPLE);
 
         Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
             WoolMania.getInstance().getGameScoreboard().updateWorld(player);

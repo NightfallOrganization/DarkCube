@@ -13,6 +13,7 @@ public class NPCCreator {
     public static final String NAME_ZINUS = "Zinus";
     public static final String NAME_ZINA = "Zina";
     public static final String NAME_VARKAS = "Varkas";
+    public static final String NAME_ASTAROTH = "Astaroth";
     public NPC zinus;
     public NPC zinus2;
     public NPC zinus3;
@@ -20,6 +21,7 @@ public class NPCCreator {
     public NPC zina2;
     public NPC zina3;
     public NPC varkas;
+    public NPC astaroth;
 
     public NPCCreator(NPCManager npcManager) {
         this.npcManager = npcManager;
@@ -36,6 +38,7 @@ public class NPCCreator {
         createZina3NPC(new Location(HALLS, 13.5, 111, 2021.5, -180, 0));
 
         createVarkasNPC(new Location(SPAWN, 15.5, 199, 1.5, -180, 0));
+        createAstarothNPC(new Location(SPAWN, 10.5, 199, -1.5, -90, 0));
     }
 
     private void createZinusNPC(Location location) {
@@ -71,5 +74,10 @@ public class NPCCreator {
     private void createVarkasNPC(Location location) {
         varkas = npcManager.createNPC(location, new NPCManager.Skin("ewogICJ0aW1lc3RhbXAiIDogMTYwMjcyMzkxNTMyMSwKICAicHJvZmlsZUlkIiA6ICJiMGQ0YjI4YmMxZDc0ODg5YWYwZTg2NjFjZWU5NmFhYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNaW5lU2tpbl9vcmciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmQzNWI4ZDc0NDE2NmQ1YTYzMmQxMTM5ZTc1ZjMzZjc5NmY0YTNjZTIyNzFlYWY3NDRlNDEwYmI5NTEyYTllMCIKICAgIH0KICB9Cn0=",
                 "tJGhwFUZNSrG8NHmkshiALcZ8NkaCPcm0Y4uyer9wnp+C3+TIPJjmA2BtqhtZ+Vnulja2xGHGhyC94huSSnXkJBShKexDmrUjgD4mXdBKt9PCFxTdNUp7yiFAL49V3D2kD/Sj5CGupBORYhbDMa4emwCnBgxtUK3tfrMyaX1ZHVbK1X5zDU3XDmYbT02LY3185xmLw0UohW0GwvwhEq97EjG30G5pbUH6E2ZZDlN0VqSA6zRNdwYN5SejALWzDSOG9cJ+KpLAogxHDGZsveOP08dZyqbECiUPamx5MUXQ8LHzkKKiunR18hFtjmSgSviMOLlnNMzxgn1oneFe/YRqBN8MyG6RHPWSh3s3gy0yKD33aiPLbJHWi9jmKTSC/0Cbt99biit9p/UAwtJJ7Hzf2m1/ue6JkP+hmFIxSVTjjHRymWTL2GX7CcAsq07HfHFHC5YjQCxY3QnAW/HfWzxjCoX34OBJa8snNwEaG70Kq/c86PuQaorcNdH4QRA6RWp7WAk3SaBpc93UYyDxpm4nDos2hQZxoIYxxyy6KKCTDTLcGo0OgRek/iKrDQHLLdLxl3jvnqbUgss9OU0ynuKfjzml9TCg4s1JYHEdgmNrmkQnonWkXvDpq5xOWPRoC0FAcJJtCgJv7UvUx5l+IqBR6Nyxv7rCxiyFE2K4UHeZbI="), NPCCreator.NAME_VARKAS, UUID.randomUUID());
+    }
+
+    private void createAstarothNPC(Location location) {
+        astaroth = npcManager.createNPC(location, new NPCManager.Skin("ewogICJ0aW1lc3RhbXAiIDogMTU4ODQzODIzMDA4NiwKICAicHJvZmlsZUlkIiA6ICI0NDAzZGM1NDc1YmM0YjE1YTU0OGNmZGE2YjBlYjdkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJGbGF3Q3JhQm90MDEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjA1OTc3MGU2ODc0ZjM0YTBkZmJjNTZkMTQ2MjQ2YzUxODY2YThmM2FjMmQ2NTAzMzJlZTlkY2Q2MmVlY2NhMyIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9",
+                "q+cXEv8LpZ+4EsWBqJ5lg5Ukn7r3UBHM8RgAtq4gQwzdBKgPITAsayJsuTggv7vE3iN5eeqCntRxnp3N6A3B40h1AeRuyS8irWywXv6ptXVxNv1tg6w3+hb4VhZhQLIqYP/fkFyYh5bOylyaDslyzfvGln4r7oNHswa7w/00g3nowOENFLsqhtlXwdeR92uQMjkWkbuHu1QnPGOTIQTvlaEWLeVj/WPZKkqPS5yu2vlI0VEXYHAQrJn1nmDUjp4y4av+szCvBtMgR7NKTPd0c1g2O8dAn/OrCLXuZa87tMdAgrqIHDqMNXWXRF9ZFctd19NtGd1o13nzFicIP3kMIY4dKQreKk7yaqIK1ddYkkpmqoffcqonQQk2YKDRYHhdCdL8eXODGwXshAA4nfABcj+RjG+VLaRjSF+f5O2rEupM8PrT+wvj6ESuqp22s+nPffKWdaFZVVCRZN07OoWCzbnbrRYJNG0pK259vyjXBQqXX9KolVyC7lxq3fwgPjQSSIFtmhJ1D/sT4oq68DKNzoJ1TNHZAL7OxD7SXJTsCIR2lnE2Dj08ZmLDCZwVD8tsvznXgY8fQZZtqpGwpxzyKiGT96at9cMF80BVHDE47uS+zmw5BA9AeuImEEoxgp1tslQ7l732DL0bdWiJUN1XH4FaA9heWAcH0RspzwthKYU="), NPCCreator.NAME_ASTAROTH, UUID.randomUUID());
     }
 }

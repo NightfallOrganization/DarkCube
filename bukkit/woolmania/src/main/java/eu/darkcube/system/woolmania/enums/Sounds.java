@@ -22,14 +22,18 @@ public enum Sounds {
     THROW(Sound.ENTITY_EGG_THROW, 1f, 1f),
 
     FARMING_SOUND_STANDARD(Sound.ENTITY_ITEM_PICKUP, 50f, 2f, false),
-    FARMING_SOUND_WOOLBATTLE(Sound.ENTITY_ITEM_PICKUP, 50f, 1f, true)
+    FARMING_SOUND_WOOLBATTLE(Sound.ENTITY_ITEM_PICKUP, 50f, 1f, true),
+    FARMING_SOUND_ARMADILLO(Sound.ENTITY_ARMADILLO_STEP, 50f, 1f, true),
+    FARMING_SOUND_ARMADILLO_HIGH(Sound.ENTITY_ARMADILLO_STEP, 50f, 2f, true),
+    FARMING_SOUND_SCAFFOLDING(Sound.ENTITY_ARMADILLO_STEP, 50f, 1f, true),
+    FARMING_SOUND_SCAFFOLDING_HIGH(Sound.ENTITY_ARMADILLO_STEP, 50f, 2f, true),
 
     ;
 
     private final Sound sound;
     private final float volume;
     private final float pitch;
-    private final Boolean locked;
+    private final boolean locked;
 
     Sounds(Sound sound, float volume, float pitch, boolean locked) {
         this.sound = sound;

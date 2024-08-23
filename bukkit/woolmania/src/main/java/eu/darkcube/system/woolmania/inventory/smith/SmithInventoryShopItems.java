@@ -9,7 +9,7 @@ package eu.darkcube.system.woolmania.inventory.smith;
 
 import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_SMITH_SHOP_ITEMS;
 import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_SMITH_SHOP_ITEMS_SHEARS;
-import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
+import static eu.darkcube.system.woolmania.enums.Names.VARKAS;
 import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 import static eu.darkcube.system.woolmania.util.message.Message.*;
@@ -58,7 +58,7 @@ public class SmithInventoryShopItems implements TemplateInventoryListener {
 
     public SmithInventoryShopItems() {
         inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_shop_items"), 45);
-        inventoryTemplate.title(ZINUS.getName());
+        inventoryTemplate.title(VARKAS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_5);
         DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SMITH_SHOP_ITEMS);

@@ -147,7 +147,7 @@ public class CustomItem {
     }
 
     public void addGlowing() {
-        item.glow();
+        item.glow(true);
     }
 
     public void updateItemLore() {

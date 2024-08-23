@@ -12,6 +12,7 @@ import java.util.Map;
 
 import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.woolmania.commands.OpenTeleporterCommand;
 import eu.darkcube.system.woolmania.commands.ResetHallsCommand;
 import eu.darkcube.system.woolmania.commands.ResetLevelCommand;
@@ -21,11 +22,14 @@ import eu.darkcube.system.woolmania.commands.StatsCommand;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
 import eu.darkcube.system.woolmania.enums.hall.Hall;
 import eu.darkcube.system.woolmania.handler.LevelXPHandler;
+import eu.darkcube.system.woolmania.inventory.ability.AbilityInventory;
+import eu.darkcube.system.woolmania.inventory.ability.AbilityInventoryShop;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventory;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventoryFood;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventoryGadgets;
 import eu.darkcube.system.woolmania.inventory.shop.ShopInventorySound;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventory;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryRepair;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryShopItems;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportHallsInventory;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportInventory;
@@ -35,7 +39,7 @@ import eu.darkcube.system.woolmania.listener.LeaveListener;
 import eu.darkcube.system.woolmania.listener.NPCListeners;
 import eu.darkcube.system.woolmania.listener.PlayerMoveListener;
 import eu.darkcube.system.woolmania.listener.PlayerTeleportListener;
-import eu.darkcube.system.woolmania.listener.ThrowingListener;
+import eu.darkcube.system.woolmania.listener.WoolGrenadeListener;
 import eu.darkcube.system.woolmania.manager.NPCManager;
 import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
@@ -62,6 +66,9 @@ public class WoolMania extends DarkCubePlugin {
     public TeleportHallsInventory teleportHallsInventory;
     public SmithInventory smithInventory;
     public SmithInventoryShopItems smithInventoryShopItems;
+    public SmithInventoryRepair smithInventoryRepair;
+    public AbilityInventory abilityInventory;
+    public AbilityInventoryShop abilityInventoryShop;
     private LevelXPHandler levelXPHandler;
     private WoolRegistry woolRegistry;
     private GameScoreboard gameScoreboard;
@@ -88,6 +95,9 @@ public class WoolMania extends DarkCubePlugin {
         teleportHallsInventory = new TeleportHallsInventory();
         smithInventory = new SmithInventory();
         smithInventoryShopItems = new SmithInventoryShopItems();
+        smithInventoryRepair = new SmithInventoryRepair();
+        abilityInventory = new AbilityInventory();
+        abilityInventoryShop = new AbilityInventoryShop();
         woolRegistry = new WoolRegistry();
         levelXPHandler = new LevelXPHandler();
         NPCListeners.register(npcManager, npcCreator);
@@ -97,7 +107,7 @@ public class WoolMania extends DarkCubePlugin {
         var joinListener = new JoinListener();
         var leaveListener = new LeaveListener();
         var blockBreakListener = new BlockBreakListener();
-        var throwingListener = new ThrowingListener();
+        var throwingListener = new WoolGrenadeListener();
         var playerMoveListener = new PlayerMoveListener();
         var ruler = new Ruler();
 
@@ -144,11 +154,11 @@ public class WoolMania extends DarkCubePlugin {
         return instance;
     }
 
-    public WoolManiaPlayer getPlayer(Player player) {
+    public WoolManiaPlayer getPlayer(@NotNull Player player) {
         return woolManiaPlayerMap.get(player);
     }
 
-    public static WoolManiaPlayer getStaticPlayer(Player player) {
+    public static WoolManiaPlayer getStaticPlayer(@NotNull Player player) {
         return WoolMania.getInstance().woolManiaPlayerMap.get(player);
     }
 
@@ -186,6 +196,18 @@ public class WoolMania extends DarkCubePlugin {
 
     public SmithInventoryShopItems getSmithInventoryShopItems() {
         return smithInventoryShopItems;
+    }
+
+    public SmithInventoryRepair getSmithInventoryRepair() {
+        return smithInventoryRepair;
+    }
+
+    public AbilityInventory getAbilityInventory() {
+        return abilityInventory;
+    }
+
+    public AbilityInventoryShop getAbilityInventoryShop() {
+        return abilityInventoryShop;
     }
 
     public LevelXPHandler getLevelXPHandler() {

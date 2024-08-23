@@ -71,7 +71,13 @@ public class NPCListeners {
             zinaExecute(player, user);
         } else if (npc == creator.varkas.npc()) {
             varkasExecute(player);
+        } else if (npc == creator.astaroth.npc()) {
+            astarothExecute(player);
         }
+    }
+
+    private static void astarothExecute(Player player) {
+        WoolMania.getInstance().getAbilityInventory().openInventory(player);
     }
 
     private static void zinusExecute(Player player) {

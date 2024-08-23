@@ -8,8 +8,7 @@
 package eu.darkcube.system.woolmania.listener;
 
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
-import static eu.darkcube.system.woolmania.util.message.Message.LEVEL_TO_LOW;
-import static eu.darkcube.system.woolmania.util.message.Message.NOT_ENOUGHT_DURABILITY;
+import static eu.darkcube.system.woolmania.util.message.Message.*;
 
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
@@ -55,9 +54,19 @@ public class BlockBreakListener implements Listener {
         CustomItem customItem = new CustomItem(item);
         int itemLevel = customItem.getLevel();
         int playerLevel = woolManiaPlayer.getLevel();
+        Hall hall = woolManiaPlayer.getHall();
+        int itemTier = customItem.getTierID();
+        int hallValue = hall.getHallValue().getValue();
 
         if (itemLevel > playerLevel) {
             user.sendMessage(LEVEL_TO_LOW);
+            NO.playSound(player);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (hallValue > itemTier) {
+            user.sendMessage(TIER_TO_LOW);
             NO.playSound(player);
             event.setCancelled(true);
             return;

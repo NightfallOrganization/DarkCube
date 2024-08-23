@@ -12,6 +12,7 @@ import java.util.List;
 
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Abilitys;
 import eu.darkcube.system.woolmania.enums.Sounds;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import eu.darkcube.system.woolmania.enums.hall.Hall;
@@ -27,6 +28,8 @@ public class WoolManiaPlayer {
     PersistentDataValue<Integer> privateBooster;
     PersistentDataValue<Sounds> farmingSound;
     PersistentDataValue<List<Sounds>> unlockedSounds;
+    PersistentDataValue<List<Abilitys>> boughtAbilities;
+    PersistentDataValue<List<Abilitys>> activeAbilities;
     Player player;
     WoolMania woolMania = WoolMania.getInstance();
     @Nullable
@@ -44,8 +47,9 @@ public class WoolManiaPlayer {
         farmedBlocks = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmedBlocks"), Integer.class, player.getPersistentDataContainer(), 0);
         privateBooster = new PersistentDataValue<>(new NamespacedKey(woolMania, "privateBooster"), Integer.class, player.getPersistentDataContainer(), 1);
         farmingSound = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmingSound"), Sounds.class, player.getPersistentDataContainer(), Sounds.FARMING_SOUND_STANDARD);
-        unlockedSounds = new PersistentDataValue<>(new NamespacedKey(woolMania, "unlockedSounds"), new TypeToken<List<Sounds>>() {
-        }.getType(), player.getPersistentDataContainer(),  Sounds.unlockedSounds());
+        unlockedSounds = new PersistentDataValue<>(new NamespacedKey(woolMania, "unlockedSounds"), new TypeToken<List<Sounds>>(){}.getType(), player.getPersistentDataContainer(),  Sounds.unlockedSounds());
+        boughtAbilities = new PersistentDataValue<>(new NamespacedKey(woolMania, "boughtAbilities"), new TypeToken<List<Abilitys>>(){}.getType(), player.getPersistentDataContainer(),  Abilitys.boughtAbilities());
+        activeAbilities = new PersistentDataValue<>(new NamespacedKey(woolMania, "activeAbilities"), new TypeToken<List<Abilitys>>(){}.getType(), player.getPersistentDataContainer(),  Abilitys.activeAbilities());
     }
 
     private void updateHall(@Nullable Hall hall) {
@@ -116,6 +120,15 @@ public class WoolManiaPlayer {
     public boolean isSoundUnlocked(Sounds sound) {
         return unlockedSounds.getOrDefault().contains(sound);
     }
+
+    public boolean isBoughtAbility(Abilitys ability) {
+        return boughtAbilities.getOrDefault().contains(ability);
+    }
+
+    public boolean isActiveAbility(Abilitys ability) {
+        return activeAbilities.getOrDefault().contains(ability);
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="Setter">
@@ -226,8 +239,28 @@ public class WoolManiaPlayer {
         unlockedSounds.set(sounds);
     }
 
+    public void buyAbility(Abilitys ability) {
+        List<Abilitys> abilitys = new ArrayList<>(boughtAbilities.getOrDefault());
+        abilitys.add(ability);
+        boughtAbilities.set(abilitys);
+    }
+
+    public void activateAbility(Abilitys ability) {
+        List<Abilitys> abilitys = new ArrayList<>(activeAbilities.getOrDefault());
+        abilitys.add(ability);
+        activeAbilities.set(abilitys);
+    }
+
     public void resetSounds() {
         unlockedSounds.reset();
+    }
+
+    public void resetBoughtAbilities() {
+        boughtAbilities.reset();
+    }
+
+    public void resetActiveAbility() {
+        activeAbilities.reset();
     }
 
     //</editor-fold>

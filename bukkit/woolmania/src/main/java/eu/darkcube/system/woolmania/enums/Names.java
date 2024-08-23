@@ -12,7 +12,9 @@ public enum Names {
     SYSTEM("§7[§bWool§3Mania§7]"),
     ZINUS("§bZinus §7(§3SHOP§7)"),
     ZINA("§bZina §7(§3TRADE§7)"),
-    TELEPORTER("§3Teleporter")
+    TELEPORTER("§3Teleporter"),
+    VARKAS("§eVarkas §7(§6SMITH§7)"),
+    ASTAROTH("§dAstaroth §7(§5ABILITYS§7)"),
 
     ;
 
