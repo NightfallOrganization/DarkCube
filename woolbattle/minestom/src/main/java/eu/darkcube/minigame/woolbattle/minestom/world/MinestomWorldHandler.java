@@ -135,7 +135,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             var path = createDirectory(game, "ingame");
             instance.setChunkLoader(new AnvilLoader(path));
             if (schematic != null) {
-                instance.setGenerator(new VoidSchematicGenerator(schematic, this.biome));
+                instance.setGenerator(new VoidSchematicGenerator(schematic, this.biome, this.woolbattle.mapManager().deathHeight()));
             }
             instance.setChunkSupplier(FullbrightChunk::new);
             instance.setTimeRate(0);

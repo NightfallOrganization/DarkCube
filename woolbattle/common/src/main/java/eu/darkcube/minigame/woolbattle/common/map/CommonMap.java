@@ -23,28 +23,23 @@ public class CommonMap implements Map {
     private final @NotNull CommonMapManager mapManager;
     private final @NotNull String name;
     private final @NotNull MapSize size;
-    private volatile int deathHeight;
     private volatile @NotNull ItemBuilder icon;
     private volatile boolean enabled;
 
     public CommonMap(@NotNull CommonMapManager mapManager, @NotNull String name, @NotNull MapSize size, @NotNull ItemBuilder icon) {
-        this.mapManager = mapManager;
-        this.name = name;
-        this.size = size;
-        this.icon = icon;
+        this(mapManager, name, size, icon, false);
     }
 
-    public CommonMap(@NotNull CommonMapManager mapManager, @NotNull String name, @NotNull MapSize size, int deathHeight, @NotNull ItemBuilder icon, boolean enabled) {
+    public CommonMap(@NotNull CommonMapManager mapManager, @NotNull String name, @NotNull MapSize size, @NotNull ItemBuilder icon, boolean enabled) {
         this.mapManager = mapManager;
         this.name = name;
         this.size = size;
-        this.deathHeight = deathHeight;
         this.icon = icon;
         this.enabled = enabled;
     }
 
     public Path schematicPath() {
-        return mapManager.api().woolbattle().mapsDirectory().resolve(size.toString()).resolve(name + ".litematica");
+        return mapManager.api().woolbattle().mapsDirectory().resolve(size.toString()).resolve(name + ".litematic");
     }
 
     @Override
@@ -55,17 +50,6 @@ public class CommonMap implements Map {
     @Override
     public void enabled(boolean enabled) {
         this.enabled = enabled;
-        save();
-    }
-
-    @Override
-    public int deathHeight() {
-        return deathHeight;
-    }
-
-    @Override
-    public void deathHeight(int deathHeight) {
-        this.deathHeight = deathHeight;
         save();
     }
 
@@ -92,7 +76,6 @@ public class CommonMap implements Map {
 
     public @NotNull Document toDocument() {
         var doc = Document.newJsonDocument();
-        doc.append("deathHeight", deathHeight());
         doc.append("enabled", enabled());
         doc.append("name", name());
         doc.append("icon", icon().serialize().toString());
@@ -104,10 +87,9 @@ public class CommonMap implements Map {
         try {
             var name = document.getString("name");
             var enabled = document.getBoolean("enabled");
-            var deathHeight = document.getInt("deathHeight");
             var size = document.readObject("mapSize", MapSize.class);
             var icon = ItemBuilder.item(GsonUtil.gson().fromJson(document.getString("icon"), JsonElement.class));
-            return new CommonMap(mapManager, name, size, deathHeight, icon, enabled);
+            return new CommonMap(mapManager, name, size, icon, enabled);
         } catch (RuntimeException | Error t) {
             LOGGER.error("Failed to load map {}", document.getString("name"), t);
             throw t;

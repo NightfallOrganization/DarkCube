@@ -23,10 +23,12 @@ public class VoidSchematicGenerator implements Generator {
     private static final Logger LOGGER = LoggerFactory.getLogger("SchematicGenerator");
     private final ParsedSchematic schematic;
     private final DynamicRegistry.Key<Biome> biome;
+    private final int deathHeight;
 
-    public VoidSchematicGenerator(Schematic schematic, DynamicRegistry.Key<Biome> biome) {
+    public VoidSchematicGenerator(Schematic schematic, DynamicRegistry.Key<Biome> biome, int deathHeight) {
         this.schematic = new ParsedSchematic(schematic);
         this.biome = biome;
+        this.deathHeight = deathHeight;
     }
 
     @Override
@@ -72,20 +74,20 @@ public class VoidSchematicGenerator implements Generator {
                     var relY = y - startY;
                     var index = region.blockBitArray().getAt(relX, relY, relZ);
                     var state = region.blockPalette().states()[index];
-                    var block = Block.fromNamespaceId(state.name());
+                    var block = Block.fromNamespaceId(state.name().asString());
                     if (block == null) {
                         LOGGER.error("Unknown Block: {}", state);
                         continue;
                     }
-                    modifier.setBlock(x, y, z, block);
+                    modifier.setBlock(x, y + deathHeight, z, block);
                 }
             }
         }
     }
 
-    private static AABBi aabb(GenerationUnit unit) {
-        var start = unit.absoluteStart();
-        var end = unit.absoluteEnd().sub(1, 1, 1);
+    private AABBi aabb(GenerationUnit unit) {
+        var start = unit.absoluteStart().sub(0, deathHeight, 0);
+        var end = unit.absoluteEnd().sub(1, 1 + deathHeight, 1);
         return new AABBi(start.blockX(), end.blockX(), start.blockY(), end.blockY(), start.blockZ(), end.blockZ());
     }
 

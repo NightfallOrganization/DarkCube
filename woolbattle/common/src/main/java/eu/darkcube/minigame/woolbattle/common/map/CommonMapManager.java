@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.common.map;
 
+import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
+
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,9 +29,12 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
 import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.util.data.DataKey;
+import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public class CommonMapManager implements MapManager {
     private static final ConcurrentMap<String, CommonMap> EMPTY = new ConcurrentHashMap<>(0);
+    private final DataKey<Integer> deathHeightKey;
     private final Database mapsDatabase;
     private final Database mapDataDatabase;
     private final CommonWoolBattleApi api;
@@ -37,19 +42,21 @@ public class CommonMapManager implements MapManager {
 
     public CommonMapManager(CommonWoolBattleApi api) {
         this.api = api;
+        this.deathHeightKey = DataKey.of(key(api, "death_height"), PersistentDataTypes.INTEGER);
         var databaseProvider = InjectionLayer.boot().instance(DatabaseProvider.class);
-        mapsDatabase = databaseProvider.database("woolbattle_maps_" + api.platformName());
-        mapDataDatabase = databaseProvider.database("woolbattle_map_data");
-        for (var entry : mapsDatabase.entries().entrySet()) {
+        this.mapsDatabase = databaseProvider.database("woolbattle_maps_" + api.platformName());
+        this.mapDataDatabase = databaseProvider.database("woolbattle_map_data");
+        for (var entry : this.mapsDatabase.entries().entrySet()) {
             var document = entry.getValue();
             var map = CommonMap.fromDocument(this, document);
-            maps.computeIfAbsent(map.size(), _ -> new ConcurrentHashMap<>()).put(map.name(), map);
+            this.maps.computeIfAbsent(map.size(), _ -> new ConcurrentHashMap<>()).put(map.name(), map);
         }
         init();
     }
 
     public void init() {
         for (var map : maps()) {
+            if (!map.enabled()) continue;
             if (!Files.exists(map.schematicPath())) {
                 api.woolbattle().logger().error("No schematic file for Map {}-{}", map.name(), map.size());
             }
@@ -80,8 +87,18 @@ public class CommonMapManager implements MapManager {
         return mapRef.get();
     }
 
+    @Override
+    public int deathHeight() {
+        return api.persistentDataStorage().get(deathHeightKey, () -> 100);
+    }
+
+    @Override
+    public void deathHeight(int deathHeight) {
+        api.persistentDataStorage().set(deathHeightKey, deathHeight);
+    }
+
     void save(CommonMap map) {
-        mapsDatabase.insert(databaseKey(map), map.toDocument());
+        this.mapsDatabase.insert(databaseKey(map), map.toDocument());
     }
 
     @Override

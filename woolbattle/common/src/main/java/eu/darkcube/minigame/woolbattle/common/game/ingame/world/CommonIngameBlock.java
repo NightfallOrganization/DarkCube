@@ -7,11 +7,14 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.ingame.world;
 
+import eu.darkcube.minigame.woolbattle.api.event.world.block.BuildBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.block.DamageBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.block.DestroyBlockEvent;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
 import eu.darkcube.minigame.woolbattle.common.world.CommonColoredWool;
 import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.material.Material;
 
 public class CommonIngameBlock extends CommonBlock {
@@ -35,6 +38,17 @@ public class CommonIngameBlock extends CommonBlock {
 
     public int maxBlockDamage() {
         return maxBlockDamage;
+    }
+
+    public boolean setWool(@NotNull ColoredWool wool) {
+        var event = new BuildBlockEvent(this);
+        world.game().eventManager().call(event);
+        if (event.cancelled()) {
+            return false;
+        }
+        ((CommonColoredWool) wool).unsafeApply(this);
+        world.placedBlocks().add(this);
+        return true;
     }
 
     @Override
@@ -94,12 +108,14 @@ public class CommonIngameBlock extends CommonBlock {
         var isWool = materialProvider.isWool(material);
         if (!world.placedBlocks().contains(this) && !isWool) {
             if (!force) {
+                // Can't destroy something other than wool (that isn't placed)
                 return false;
             }
         }
         var event = new DestroyBlockEvent(this);
         world.game().eventManager().call(event);
         if (event.cancelled() && !force) return false;
+        System.out.println("Check placed: " + this);
         if (!world.placedBlocks().remove(this) && isWool) {
             world.brokenWool().put(this, materialProvider.woolFrom(this));
         }
@@ -107,5 +123,11 @@ public class CommonIngameBlock extends CommonBlock {
         metadata().clear();
         material(Material.air());
         return true;
+    }
+
+    @Override
+    @NotNull
+    public CommonIngameWorld world() {
+        return world;
     }
 }

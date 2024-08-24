@@ -12,7 +12,6 @@ import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskSchedule;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngame;
 
 public class WoolResetScheduler {
-
     private final CommonIngame ingame;
     private SchedulerTask task;
 

@@ -17,7 +17,7 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.server.item.material.Material;
+import eu.darkcube.system.server.item.ItemBuilder;
 
 public class CommonEventHandler {
     private final CommonWoolBattle woolbattle;
@@ -41,8 +41,8 @@ public class CommonEventHandler {
         return null;
     }
 
-    public @NotNull PlaceResult blockPlace(@NotNull CommonWBUser user, @NotNull CommonBlock block, @NotNull Material material) {
-        var event = new PlaceBlockEvent(user, block, material);
+    public @NotNull PlaceResult blockPlace(@NotNull CommonWBUser user, @NotNull CommonBlock block, @NotNull ItemBuilder item) {
+        var event = new PlaceBlockEvent(user, block, item);
         woolbattle.api().eventManager().call(event);
         return new PlaceResult(event.cancelled());
     }

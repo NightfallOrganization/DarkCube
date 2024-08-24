@@ -25,6 +25,12 @@ public interface MapManager {
     Map createMap(@NotNull String name, @NotNull MapSize mapSize);
 
     @Api
+    int deathHeight();
+
+    @Api
+    void deathHeight(int deathHeight);
+
+    @Api
     @NotNull
     @UnmodifiableView
     Collection<? extends Map> maps();

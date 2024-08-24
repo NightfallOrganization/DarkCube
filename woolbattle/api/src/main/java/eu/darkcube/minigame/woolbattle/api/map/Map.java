@@ -20,20 +20,17 @@ public interface Map {
     void enabled(boolean enabled);
 
     @Api
-    int deathHeight();
-
-    @Api
-    void deathHeight(int deathHeight);
-
-    @Api
-    @NotNull ItemBuilder icon();
+    @NotNull
+    ItemBuilder icon();
 
     @Api
     void icon(@NotNull ItemBuilder icon);
 
     @Api
-    @NotNull MapSize size();
+    @NotNull
+    MapSize size();
 
     @Api
-    @NotNull String name();
+    @NotNull
+    String name();
 }

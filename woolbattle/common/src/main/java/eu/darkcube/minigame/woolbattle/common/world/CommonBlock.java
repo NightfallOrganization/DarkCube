@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.common.world;
 
+import java.util.Objects;
+
 import eu.darkcube.minigame.woolbattle.api.world.Block;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -89,5 +91,17 @@ public class CommonBlock implements Block {
 
     @Override
     public void incrementBlockDamage(int amount) {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CommonBlock that)) return false;
+        return x == that.x && y == that.y && z == that.z && Objects.equals(world, that.world);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(world, x, y, z);
     }
 }

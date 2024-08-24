@@ -38,7 +38,7 @@ include("bukkit:changepermissionmessage")
 
 includeSubProjects("minestom", "server")
 
-includeSubProjects("woolbattle", "provider", "api", "common", "bukkit", "minestom")
+includeSubProjects("woolbattle", "provider", "api", "common", "bukkit", "minestom", "converter")
 
 include("bukkit:darkessentials")
 //include "bukkit:holograms"
