@@ -7,12 +7,26 @@
 plugins {
     java
     alias(libs.plugins.shadow)
+    id("darkcube-parent")
     id("eu.darkcube.darkcube")
+}
+
+dependencies {
+    compileOnly(libs.paper.latest)
+    compileOnly(darkcubesystem.bukkit)
+    compileOnly(darkcubesystem.kyori.wrapper)
+    compileOnly("io.github.juliarn", "npc-lib-api", "3.0.0-beta7")
+    compileOnly("io.github.juliarn", "npc-lib-common", "3.0.0-beta7")
+    implementation("io.github.juliarn", "npc-lib-bukkit", "3.0.0-beta7")
 }
 
 tasks {
     jar {
         destinationDirectory = temporaryDir
+    }
+    register<UploadArtifacts>("uploadArtifact") {
+        dependsOn(shadowJar)
+        files.from(shadowJar.map { it.outputs.files.singleFile })
     }
     assemble {
         dependsOn(shadowJar)
@@ -35,13 +49,4 @@ tasks {
         exclude("net/kyori/adventure/**")
         exclude("net/kyori/examination/**")
     }
-}
-
-dependencies {
-    compileOnly(libs.paper.latest)
-    compileOnly(darkcubesystem.bukkit)
-    compileOnly(darkcubesystem.kyori.wrapper)
-    compileOnly("io.github.juliarn", "npc-lib-api", "3.0.0-beta7")
-    compileOnly("io.github.juliarn", "npc-lib-common", "3.0.0-beta7")
-    implementation("io.github.juliarn", "npc-lib-bukkit", "3.0.0-beta7")
 }

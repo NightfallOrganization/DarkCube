@@ -11,6 +11,7 @@ import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.util.message.Message;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,8 +47,8 @@ public class GameScoreboard implements Listener {
         Score space1 = objective.getScore(" ");
         space1.setScore(15);
 
-        Score levelnameTeam = objective.getScore("§7Dein Level:");
-        // levelnameTeam.customName(Message.BOOSTER_SET_NONE.getBukkit(player));
+        Score levelnameTeam = objective.getScore("§7Error 14:");
+        levelnameTeam.customName(Message.SCOREBOARD_LEVEL.getBukkit(player));
         levelnameTeam.setScore(14);
 
         Team levelTeam = scoreboard.registerNewTeam("level_team");
@@ -57,7 +58,8 @@ public class GameScoreboard implements Listener {
         Score space2 = objective.getScore("  ");
         space2.setScore(12);
 
-        Score moneynameTeam = objective.getScore("§7Deine Zenum:");
+        Score moneynameTeam = objective.getScore("§7Error 11:");
+        moneynameTeam.customName(Message.SCOREBOARD_ZENUM.getBukkit(player));
         moneynameTeam.setScore(11);
 
         Team moneyTeam = scoreboard.registerNewTeam("money_team");
@@ -67,7 +69,8 @@ public class GameScoreboard implements Listener {
         Score space3 = objective.getScore("   ");
         space3.setScore(9);
 
-        Score worldnameTeam = objective.getScore("§7Aktuelle Welt:");
+        Score worldnameTeam = objective.getScore("§7Error 8:");
+        worldnameTeam.customName(Message.SCOREBOARD_WORLD.getBukkit(player));
         worldnameTeam.setScore(8);
 
         Team worldTeam = scoreboard.registerNewTeam("world_team");
@@ -77,7 +80,8 @@ public class GameScoreboard implements Listener {
         Score space4 = objective.getScore("    ");
         space4.setScore(6);
 
-        Score farmednameTeam = objective.getScore("§7Abgebaute Blöcke: ");
+        Score farmednameTeam = objective.getScore("§7Error 5:");
+        farmednameTeam.customName(Message.SCOREBOARD_FARMED.getBukkit(player));
         farmednameTeam.setScore(5);
 
         Team farmedTeam = scoreboard.registerNewTeam("farmed_team");
@@ -87,7 +91,8 @@ public class GameScoreboard implements Listener {
         Score space5 = objective.getScore("     ");
         space5.setScore(3);
 
-        Score boosternameTeam = objective.getScore("§7Privater Booster:");
+        Score boosternameTeam = objective.getScore("§7Error 2:");
+        boosternameTeam.customName(Message.SCOREBOARD_BOOSTER.getBukkit(player));
         boosternameTeam.setScore(2);
 
         Team boosterTeam = scoreboard.registerNewTeam("booster_team");
@@ -141,6 +146,7 @@ public class GameScoreboard implements Listener {
         } else {
             team.setSuffix("§7» §b" + privateBooster + ".0x");
         }
+
     }
 
     public void deleteGameScoreboard(Player player) {

@@ -94,7 +94,7 @@ public class WoolGrenadeListener implements Listener {
         }
 
         if (itemLevel > playerLevel && WoolGrenadeItem.ITEM_ID.equals(itemId)) {
-            user.sendMessage(LEVEL_TO_LOW);
+            user.sendMessage(ITEM_LEVEL_TO_LOW);
             NO.playSound(player);
             event.setCancelled(true);
             return;

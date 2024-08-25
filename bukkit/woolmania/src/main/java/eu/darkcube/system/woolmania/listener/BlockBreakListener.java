@@ -59,7 +59,7 @@ public class BlockBreakListener implements Listener {
         int hallValue = hall.getHallValue().getValue();
 
         if (itemLevel > playerLevel) {
-            user.sendMessage(LEVEL_TO_LOW);
+            user.sendMessage(ITEM_LEVEL_TO_LOW);
             NO.playSound(player);
             event.setCancelled(true);
             return;

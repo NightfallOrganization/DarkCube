@@ -117,9 +117,9 @@ public class Ruler implements Listener {
     }
 
     @EventHandler
-    public void onEntityDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
-            event.setCancelled(true);
+    public void onEntityDamage(EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player) {
+            e.setCancelled(true);
         }
     }
 

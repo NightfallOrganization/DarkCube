@@ -74,6 +74,7 @@ public enum Message implements BaseMessage {
     NOT_AVAILABLE,
     NOT_ENOUGHT_DURABILITY,
     TIER_TO_LOW,
+    ITEM_LEVEL_TO_LOW,
 
     ;
 

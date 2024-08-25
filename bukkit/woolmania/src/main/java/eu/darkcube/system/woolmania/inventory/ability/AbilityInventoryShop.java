@@ -9,10 +9,14 @@ package eu.darkcube.system.woolmania.inventory.ability;
 
 import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_ABILITY_SHOP;
 import static eu.darkcube.system.woolmania.enums.Names.ASTAROTH;
+import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
+import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 import static eu.darkcube.system.woolmania.util.message.Message.ITEM_BUY_COST;
+import static eu.darkcube.system.woolmania.util.message.Message.NO_MONEY;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
@@ -33,7 +37,7 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Abilitys;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
-import eu.darkcube.system.woolmania.items.CustomItem;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -67,8 +71,6 @@ public class AbilityInventoryShop implements TemplateInventoryListener {
         PagedTemplateSettings pagination = inventoryTemplate.pagination();
         pagination.pageSlots(InventoryMask.slots(MASK, '#'));
 
-        // content.addStaticItem(getDisplayItem(INVENTORY_SHOP_FOOD_CARROT, stack));
-
         inventoryTemplate.addListener(this);
     }
 
@@ -84,17 +86,17 @@ public class AbilityInventoryShop implements TemplateInventoryListener {
     public void onPreOpen(@NotNull TemplateInventory inventory, @NotNull User user) {
         var bukkitPlayer = Bukkit.getPlayer(user.uniqueId());
         if (bukkitPlayer == null) return;
-        var player = WoolMania.getStaticPlayer(bukkitPlayer);
+        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(bukkitPlayer);
 
         var content = inventory.pagedController().staticContent();
-        var list = new ArrayList<ItemReference>();
+        var list = new ArrayList<Map.Entry<Abilitys, ItemReference>>();
 
         int position = 0;
         for (Abilitys ability : Abilitys.values()) {
-            if (player.isBoughtAbility(ability)) continue;
+            if (woolManiaPlayer.isBoughtAbility(ability)) continue;
 
             var reference = content.addItem(getDisplayItem(ability.getInventoryItems(), ability.getCost(), position));
-            list.add(reference);
+            list.add(Map.entry(ability, reference));
 
             position++;
         }
@@ -110,38 +112,32 @@ public class AbilityInventoryShop implements TemplateInventoryListener {
     @Override
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
         var content = inventory.pagedController().staticContent();
-        List<ItemReference> references = user.metadata().get(ITEM_REFERENCES_KEY);
+        List<Map.Entry<Abilitys, ItemReference>> references = user.metadata().get(ITEM_REFERENCES_KEY);
+        Player player = Bukkit.getPlayer(user.uniqueId());
+        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
         if (references == null) return;
         String clickedInventoryItem = InventoryItems.getItemID(item);
         if (clickedInventoryItem == null) return;
-        var position = item.persistentDataStorage().get(KEY_POSITION);
+        Integer position = item.persistentDataStorage().get(KEY_POSITION);
         if (position == null) return;
-        var reference = references.get(position);
+        var entry = references.get(position);
+        var reference = entry.getValue();
+        var ability = entry.getKey();
         content.removeItem(reference);
+        int abilityCost = ability.getCost();
+        int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
 
-        Player player = Bukkit.getPlayer(user.uniqueId());
+        if (abilityCost > playerMoney) {
+            user.sendMessage(NO_MONEY);
+            NO.playSound(player);
+            return;
+        }
 
-        // buyFood(clickedInventoryItem, new CarrotItem(user), INVENTORY_SHOP_FOOD_CARROT, user, player);
-
+        WoolMania.getStaticPlayer(player).removeMoney(abilityCost, player);
+        BUY.playSound(player);
+        woolManiaPlayer.buyAbility(ability);
+        // user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
         inventory.pagedController().publishUpdatePage();
-    }
-
-    private void buyFood(String clickedItem, CustomItem customItem, InventoryItems inventoryItems, User user, Player player) {
-        // if (clickedItem.equals(inventoryItems.itemID())) {
-        //     int cost = inventoryItems.getCost();
-        //     int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
-        //
-        //     if (cost > playerMoney) {
-        //         user.sendMessage(NO_MONEY);
-        //         NO.playSound(player);
-        //         return;
-        //     }
-        //
-        //     WoolMania.getStaticPlayer(player).removeMoney(cost, player);
-        //     user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
-        //     BUY.playSound(player);
-        //     player.getInventory().addItem(customItem.getItemStack());
-        // }
     }
 
 }
