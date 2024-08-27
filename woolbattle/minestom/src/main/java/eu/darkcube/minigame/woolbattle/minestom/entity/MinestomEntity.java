@@ -11,6 +11,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import eu.darkcube.system.util.data.MetaDataStorage;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.thread.Acquirable;
@@ -18,14 +19,10 @@ import net.minestom.server.thread.Acquired;
 
 @SuppressWarnings("UnstableApiUsage")
 public class MinestomEntity implements DefaultMinestomEntity {
-    private final Acquirable<? extends net.minestom.server.entity.Entity> entity;
-    private final EntityType<?> type;
-    private final MinestomWoolBattle woolbattle;
-
-    @ApiStatus.Experimental
-    public MinestomEntity(Acquirable<? extends net.minestom.server.entity.Entity> entity, MinestomWoolBattle woolbattle) {
-        this(entity, EntityType.UNKNOWN, woolbattle);
-    }
+    protected final Acquirable<? extends net.minestom.server.entity.Entity> entity;
+    protected final EntityType<?> type;
+    protected final MetaDataStorage metadata = new BasicMetaDataStorage();
+    protected final MinestomWoolBattle woolbattle;
 
     @ApiStatus.Experimental
     protected MinestomEntity(Acquirable<? extends net.minestom.server.entity.Entity> entity, EntityType<?> type, MinestomWoolBattle woolbattle) {
@@ -36,7 +33,7 @@ public class MinestomEntity implements DefaultMinestomEntity {
 
     @Override
     public @NotNull MetaDataStorage metadata() {
-        return woolbattle.entityMeta(this);
+        return metadata;
     }
 
     @Override
@@ -46,7 +43,9 @@ public class MinestomEntity implements DefaultMinestomEntity {
 
     @Override
     public void remove() {
-        woolbattle.removed(this);
+        var lock = entity.lock();
+        lock.get().remove();
+        lock.unlock();
     }
 
     public Acquirable<? extends net.minestom.server.entity.Entity> entity() {
@@ -61,5 +60,10 @@ public class MinestomEntity implements DefaultMinestomEntity {
     @Override
     public @NotNull MinestomWoolBattle woolbattle() {
         return woolbattle;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "Entity[type=" + type.key().asMinimalString() + "]";
     }
 }

@@ -5,14 +5,12 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
+package eu.darkcube.minigame.woolbattle.common.entity;
 
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public interface EntityImpl {
+public interface GeneratedEntity {
     @NotNull
-    Entity handle();
-
-    void handle(Entity handle);
+    Entity unwrapGeneratedEntity();
 }

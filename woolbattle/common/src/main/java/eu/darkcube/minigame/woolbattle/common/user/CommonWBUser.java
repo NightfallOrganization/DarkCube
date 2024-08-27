@@ -148,6 +148,7 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
 
     public void woolCount(int woolCount, boolean updateInventory) {
         this.woolCount = woolCount;
+        System.out.println("Count: " + woolCount);
         var event = new UserWoolCountUpdateEvent(this, woolCount);
         api.eventManager().call(event);
         if (updateInventory) {
@@ -178,8 +179,16 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
             var world = this.world();
             var location = this.location;
             var team = this.team;
-            if (world != null && location != null && team != null && world == location.world()) {
-                world.dropAt(location.x(), location.y(), location.z(), team.wool(), dropCount);
+            if (location != null && team != null && world == location.world()) {
+                var ranX = Math.random() * 0.7 - 0.3;
+                var ranZ = Math.random() * 0.7 - 0.3;
+                var items = world.dropAt(location.x(), location.y() + 0.5, location.z(), team.wool(), dropCount);
+                for (var item : items) {
+                    var motX = (double) ((float) (Math.random() * 0.2 - 0.1));
+                    var motY = 0.2;
+                    var motZ = (double) ((float) (Math.random() * 0.2 - 0.1));
+                    item.velocity(new Vector(motX, motY, motZ));
+                }
             }
         }
         return addCount;

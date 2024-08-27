@@ -20,12 +20,9 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.metadata.item.SnowballMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.utils.chunk.ChunkCache;
 import net.minestom.server.utils.chunk.ChunkUtils;
 
@@ -38,7 +35,7 @@ public abstract class AbstractProjectile extends Entity {
 
     public AbstractProjectile(EntityType type, Entity shooter) {
         super(type);
-        ((SnowballMeta) this.entityMeta).setItem(ItemStack.of(Material.NETHERITE_SWORD));
+        // ((SnowballMeta) this.entityMeta).setItem(ItemStack.of(Material.NETHERITE_SWORD));
         this.shooter = shooter;
     }
 
@@ -81,22 +78,26 @@ public abstract class AbstractProjectile extends Entity {
 
         if (blockResult.hasCollision()) {
             Block hitBlock = null;
+            Point hitBlockPos = null;
             Point hitPoint = null;
-            if (blockResult.collisionShapes()[0] instanceof ShapeImpl block) {
+            if (blockResult.collisionShapes()[0] instanceof ShapeImpl block) { // x
                 hitBlock = block.block();
+                hitBlockPos = blockResult.collisionShapePositions()[0];
                 hitPoint = blockResult.collisionPoints()[0];
             }
-            if (blockResult.collisionShapes()[1] instanceof ShapeImpl block) {
+            if (blockResult.collisionShapes()[1] instanceof ShapeImpl block) { // y
                 hitBlock = block.block();
+                hitBlockPos = blockResult.collisionShapePositions()[1];
                 hitPoint = blockResult.collisionPoints()[1];
             }
-            if (blockResult.collisionShapes()[2] instanceof ShapeImpl block) {
+            if (blockResult.collisionShapes()[2] instanceof ShapeImpl block) { // z
                 hitBlock = block.block();
+                hitBlockPos = blockResult.collisionShapePositions()[2];
                 hitPoint = blockResult.collisionPoints()[2];
             }
 
             if (hitBlock == null) return;
-            handleBlockCollision(hitBlock, hitPoint, position);
+            handleBlockCollision(hitBlock, hitBlockPos, hitPoint, position, blockResult);
             if (removed) return;
         } else {
             velocity = blockResult.newVelocity().mul(ServerFlag.SERVER_TICKS_PER_SECOND).mul(0.99);
@@ -136,7 +137,7 @@ public abstract class AbstractProjectile extends Entity {
         EventDispatcher.call(new EntityTickEvent(this));
     }
 
-    protected abstract void handleBlockCollision(Block hitBlock, Point hitPos, Pos posBefore);
+    protected abstract void handleBlockCollision(Block hitBlock, Point hitBlockPos, Point hitPos, Pos posBefore, PhysicsResult blockResult);
 
     protected abstract boolean handleEntityCollision(Entity hitEntity, Point hitPos, Pos posBefore);
 

@@ -87,7 +87,10 @@ tasks {
 }
 
 dependencies {
-    api(darkcubesystem.minestom) { exclude("org.jetbrains", "annotations") }
+    api(darkcubesystem.minestom) {
+        exclude("org.jetbrains", "annotations")
+        exclude("eu.darkcube", "minestom")
+    }
     api(darkcubesystem.api.cloudnet)
     api(darkcubesystem.server.cloudnet) { exclude("org.jetbrains", "annotations") }
     // libraries to be added

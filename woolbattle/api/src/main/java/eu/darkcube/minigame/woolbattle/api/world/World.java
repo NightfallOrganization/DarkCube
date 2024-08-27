@@ -34,7 +34,7 @@ public interface World {
 
     @Api
     @NotNull
-    List<ItemEntity> dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count);
+    List<? extends ItemEntity> dropAt(double x, double y, double z, @NotNull ColoredWool wool, int count);
 
     @Api
     @Unmodifiable

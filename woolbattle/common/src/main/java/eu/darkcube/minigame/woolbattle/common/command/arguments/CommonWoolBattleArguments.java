@@ -18,6 +18,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
+import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
@@ -30,16 +31,16 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class CommonWoolBattleArguments implements WoolBattleArguments {
-    private final CommonWoolBattleApi woolbattle;
+    private final CommonWoolBattleApi api;
 
-    public CommonWoolBattleArguments(CommonWoolBattleApi woolbattle) {
-        this.woolbattle = woolbattle;
+    public CommonWoolBattleArguments(CommonWoolBattleApi api) {
+        this.api = api;
         EntitySelectorOptions.bootStrap();
     }
 
     @Override
     public @NotNull ArgumentType<?> gameArgument0() {
-        return CommonGameArgument.gameArgument(woolbattle);
+        return CommonGameArgument.gameArgument(api);
     }
 
     @Override
@@ -49,12 +50,12 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument0() {
-        return CommonTeamConfigurationArgument.teamConfiguration(woolbattle);
+        return CommonTeamConfigurationArgument.teamConfiguration(api);
     }
 
     @Override
     public @NotNull <T extends TeamConfiguration> ArgumentType<@NotNull ?> teamConfigurationArgument0(@NotNull ToStringFunction<@NotNull T> toStringFunction) {
-        return CommonTeamConfigurationArgument.teamConfiguration(woolbattle, toStringFunction);
+        return CommonTeamConfigurationArgument.teamConfiguration(api, toStringFunction);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull ?> woolColorArgument0() {
-        return WoolColorArgument.woolColor(woolbattle.woolProvider());
+        return WoolColorArgument.woolColor(api.woolProvider());
     }
 
     @Override
@@ -94,12 +95,12 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull MapSize> mapSizeArgument0() {
-        return CommonMapSizeArgument.mapSize(woolbattle);
+        return CommonMapSizeArgument.mapSize(api);
     }
 
     @Override
     public @NotNull ArgumentType<@NotNull MapSize> mapSizeArgument0(@NotNull Predicate<@NotNull MapSize> validator) {
-        return CommonMapSizeArgument.mapSize(woolbattle, validator);
+        return CommonMapSizeArgument.mapSize(api, validator);
     }
 
     @Override
@@ -109,7 +110,7 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull ?> mapArgument0() {
-        return CommonMapArgument.map(woolbattle);
+        return CommonMapArgument.map(api);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
 
     @Override
     public @NotNull ArgumentType<@NotNull ?> entityArgument0(boolean player, boolean single) {
-        return new CommonEntityArgument(woolbattle, player, single);
+        return new CommonEntityArgument(api, player, single);
     }
 
     @Override
@@ -140,5 +141,15 @@ public class CommonWoolBattleArguments implements WoolBattleArguments {
     @Override
     public @NotNull WBUser player0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
         return CommonEntityArgument.get(ctx, name).findSinglePlayer((CommandSource) ctx.getSource());
+    }
+
+    @Override
+    public @NotNull ArgumentType<?> teamArgument0(boolean allowSpectator) {
+        return CommonTeamArgument.team(api, allowSpectator);
+    }
+
+    @Override
+    public @NotNull Team team0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
+        return CommonTeamArgument.team(ctx, name);
     }
 }

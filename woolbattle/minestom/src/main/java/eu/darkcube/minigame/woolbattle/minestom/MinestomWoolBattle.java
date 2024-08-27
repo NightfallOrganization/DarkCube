@@ -15,13 +15,12 @@ import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
 import eu.darkcube.minigame.woolbattle.api.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
-import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.Slot;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
-import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
+import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomChatListener;
@@ -45,7 +44,6 @@ import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.instance.Instance;
@@ -55,8 +53,6 @@ import net.minestom.server.timer.TaskSchedule;
 public class MinestomWoolBattle extends CommonWoolBattle {
     private final @NotNull MinestomWoolBattleApi api;
     private final @NotNull Map<Instance, MinestomWorld> worlds = new ConcurrentHashMap<>();
-    private final @NotNull Map<Entity, MinestomEntity> entities = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, BasicMetaDataStorage> entityMetas = new ConcurrentHashMap<>();
     private final @NotNull Key playerKey;
     private final @NotNull MinestomSetupModeImplementation setupModeImplementation;
     private final @NotNull MinestomUserFactory userFactory;
@@ -170,18 +166,9 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         return worlds;
     }
 
-    public CommonEntityMetaDataStorage entityMeta(MinestomEntity entity) {
-        return new CommonEntityMetaDataStorage(entityMetas, String.valueOf(entity.entity().unwrap().getEntityId()));
-    }
-
     public eu.darkcube.minigame.woolbattle.api.entity.Entity entity(Acquirable<Entity> entity) {
         if (entity.unwrap() instanceof MinestomPlayer player) return player.user();
-        return entities.computeIfAbsent(entity.unwrap(), k -> new MinestomEntity(k.acquirable(), this));
-    }
-
-    public void removed(MinestomEntity entity) {
-        entities.remove(entity.entity().unwrap());
-        entityMeta(entity).clear();
+        return ((EntityImpl) entity.unwrap()).handle();
     }
 
     @Override

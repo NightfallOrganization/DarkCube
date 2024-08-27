@@ -69,14 +69,17 @@ public class CommonEntityGenerator {
         }
         var CD_wrapped = ClassDesc.ofDescriptor(wrappedClass.descriptorString());
         var CD_EntityType = ClassDesc.ofDescriptor(EntityType.class.descriptorString());
+        var CD_GeneratedEntity = ClassDesc.ofDescriptor(GeneratedEntity.class.descriptorString());
         var CD_handle = ClassDesc.ofDescriptor(wrappedType.entityTypeClass().descriptorString());
+        var CD_Entity = ClassDesc.ofDescriptor(Entity.class.descriptorString());
+        var MTD_unwrapGeneratedEntity = MethodTypeDesc.of(CD_Entity);
         var MTD_init = MethodTypeDesc.of(CD_void, CD_EntityType, CD_handle);
         var MTD_type = MethodTypeDesc.of(CD_EntityType);
         var classFileBytes = of().build(CD_this, classBuilder -> {
             var FRE_handle = classBuilder.constantPool().fieldRefEntry(CD_this, "handle", CD_handle);
             var FRE_type = classBuilder.constantPool().fieldRefEntry(CD_this, "type", CD_EntityType);
 
-            classBuilder.withInterfaceSymbols(CD_wrapped);
+            classBuilder.withInterfaceSymbols(CD_wrapped, CD_GeneratedEntity);
             classBuilder.with(SourceFileAttribute.of("generated"));
             classBuilder.withField(FRE_type.name(), FRE_type.type(), ACC_PRIVATE | ACC_FINAL);
             classBuilder.withField(FRE_handle.name(), FRE_handle.type(), ACC_PRIVATE | ACC_FINAL);
@@ -96,6 +99,11 @@ public class CommonEntityGenerator {
                 code.aload(l_entity);
                 code.putfield(FRE_handle);
                 code.return_();
+            });
+            classBuilder.withMethodBody("unwrapGeneratedEntity", MTD_unwrapGeneratedEntity, ACC_PUBLIC | ACC_FINAL, code -> {
+                code.aload(0);
+                code.getfield(FRE_handle);
+                code.areturn();
             });
             Map<MethodType, Map.Entry<Method, MethodType>> methodMap = new HashMap<>();
             for (var method : wrappedClass.getMethods()) {

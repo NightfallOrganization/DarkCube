@@ -17,8 +17,10 @@ import eu.darkcube.minigame.woolbattle.common.game.ingame.inventory.IngameUserIn
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameBreakBlockListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngamePlaceBlockListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserChatListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserDropItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserLoginGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserPickupItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserQuitGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.PerkCooldownScheduler;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.WoolResetScheduler;
@@ -46,8 +48,9 @@ public class CommonIngame extends CommonPhase implements Ingame {
         this.listeners.addListener(new IngameUserLoginGameListener(this).create());
         this.listeners.addListener(new IngameBreakBlockListener(this).create());
         this.listeners.addListener(new IngamePlaceBlockListener(this).create());
+        this.listeners.addListener(new IngameUserDropItemListener(this).create());
+        this.listeners.addListener(new IngameUserPickupItemListener(this).create());
         this.listeners.addChild(new IngameUserQuitGameListener(this).node());
-
     }
 
     @Override

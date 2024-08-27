@@ -19,7 +19,9 @@ repositories {
 }
 
 dependencies {
-    implementation(darkcubesystem.minestom)
+    implementation(darkcubesystem.minestom) {
+        exclude("eu.darkcube", "minestom")
+    }
     implementation(projects.minestom.server)
     implementation(projects.woolbattle.provider)
     implementation(projects.woolbattle.common)

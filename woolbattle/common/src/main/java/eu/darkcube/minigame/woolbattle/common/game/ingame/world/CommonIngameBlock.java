@@ -115,7 +115,6 @@ public class CommonIngameBlock extends CommonBlock {
         var event = new DestroyBlockEvent(this);
         world.game().eventManager().call(event);
         if (event.cancelled() && !force) return false;
-        System.out.println("Check placed: " + this);
         if (!world.placedBlocks().remove(this) && isWool) {
             world.brokenWool().put(this, materialProvider.woolFrom(this));
         }

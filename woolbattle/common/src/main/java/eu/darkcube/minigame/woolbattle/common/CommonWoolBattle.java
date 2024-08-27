@@ -33,9 +33,9 @@ import eu.darkcube.minigame.woolbattle.common.util.item.CommonItem;
 import eu.darkcube.minigame.woolbattle.common.util.item.DefaultInventorySettings;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.TaskScheduleProviderImpl;
+import eu.darkcube.minigame.woolbattle.common.util.schematic.Schematic;
+import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicReader;
 import eu.darkcube.minigame.woolbattle.common.util.translation.LanguageRegistry;
-import eu.darkcube.minigame.woolbattle.common.world.SimpleWorldDataProvider;
-import eu.darkcube.minigame.woolbattle.common.world.WorldDataProvider;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Namespaced;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -51,7 +51,6 @@ public abstract class CommonWoolBattle implements Namespaced {
 
     private final @NotNull CommonEventHandler eventHandler;
     private final @NotNull SetupMode setupMode;
-    private final @NotNull WorldDataProvider worldDataProvider;
     private final @NotNull LanguageRegistry languageRegistry;
     private final @NotNull Path mapsDirectory = Path.of("maps");
     private final @NotNull ItemTemplate defaultItemTemplate;
@@ -61,6 +60,7 @@ public abstract class CommonWoolBattle implements Namespaced {
     private final @NotNull InventoryTemplate settingsHeightDisplayInventoryTemplate;
     private final @NotNull InventoryTemplate settingsHeightDisplayColorInventoryTemplate;
     private final @NotNull InventoryTemplate settingsWoolDirectionInventoryTemplate;
+    private final @NotNull Schematic lobbySchematic;
     private final @NotNull ChatHandler chatHandler;
 
     public CommonWoolBattle() {
@@ -69,7 +69,6 @@ public abstract class CommonWoolBattle implements Namespaced {
         WoolBattleProvider.PROVIDER.register(TaskScheduleProvider.class, new TaskScheduleProviderImpl());
         WoolBattleProvider.PROVIDER.register(ActivationType.ItemProvider.class, new CommonActivationTypeItemProvider());
         WoolBattleProvider.PROVIDER.register(PerkUtils.Implementation.class, new PerkUtilsImplementation());
-        this.worldDataProvider = new SimpleWorldDataProvider();
         this.languageRegistry = new LanguageRegistry();
 
         this.defaultItemTemplate = DefaultInventorySettings.create();
@@ -81,6 +80,7 @@ public abstract class CommonWoolBattle implements Namespaced {
         this.settingsHeightDisplayColorInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createHeightDisplayColor(this));
         this.settingsWoolDirectionInventoryTemplate = InventoryTemplate.lazy(() -> SettingsInventory.createWoolDirection(this));
         this.chatHandler = new ChatHandler();
+        this.lobbySchematic = SchematicReader.read(Path.of("lobby.litematic"));
     }
 
     public void start() {
@@ -117,8 +117,8 @@ public abstract class CommonWoolBattle implements Namespaced {
         return eventHandler;
     }
 
-    public @NotNull WorldDataProvider worldDataProvider() {
-        return worldDataProvider;
+    public @NotNull Schematic lobbySchematic() {
+        return lobbySchematic;
     }
 
     public abstract @NotNull SetupMode.Implementation setupModeImplementation();

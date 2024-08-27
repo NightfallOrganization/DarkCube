@@ -7,5 +7,20 @@
 
 package eu.darkcube.minigame.woolbattle.api.entity;
 
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.server.item.ItemBuilder;
+
 public interface ItemEntity extends Entity {
+    @NotNull
+    ItemBuilder item();
+
+    void item(@NotNull ItemBuilder item);
+
+    int pickupDelay();
+
+    void pickupDelay(int delay);
+
+    int mergeDelay();
+
+    void mergeDelay(int delay);
 }

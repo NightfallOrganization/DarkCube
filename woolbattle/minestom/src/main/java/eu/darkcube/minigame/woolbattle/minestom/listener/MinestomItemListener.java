@@ -7,13 +7,17 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.listener;
 
+import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.event.item.UserDropItemEvent;
+import eu.darkcube.minigame.woolbattle.api.event.item.UserPickupItemEvent;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.system.server.item.ItemBuilder;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.item.ItemDropEvent;
+import net.minestom.server.event.item.PickupItemEvent;
 
 public class MinestomItemListener {
     public static void register(MinestomWoolBattle woolbattle, EventNode<Event> node) {
@@ -26,6 +30,20 @@ public class MinestomItemListener {
             var userDropItemEvent = new UserDropItemEvent(user, item);
             woolbattle.api().eventManager().call(userDropItemEvent);
             if (userDropItemEvent.cancelled()) {
+                event.setCancelled(true);
+            }
+        });
+        node.addListener(PickupItemEvent.class, event -> {
+            var player = (MinestomPlayer) event.getLivingEntity();
+            var user = player.user();
+            if (user == null) return;
+            var itemEntity = event.getItemEntity();
+            var entity = (ItemEntity) ((EntityImpl) itemEntity).handle();
+            var itemStack = event.getItemStack();
+            var item = ItemBuilder.item(itemStack);
+            var userPickupItemEvent = new UserPickupItemEvent(user, entity, item);
+            woolbattle.api().eventManager().call(userPickupItemEvent);
+            if (userPickupItemEvent.cancelled()) {
                 event.setCancelled(true);
             }
         });

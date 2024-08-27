@@ -8,11 +8,13 @@
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
+import eu.darkcube.minigame.woolbattle.api.vote.Vote;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
@@ -45,6 +47,8 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     protected int maxPlayerCount;
     protected int deathLine;
     protected boolean enoughTeams;
+    protected int lifes;
+    protected int forcedLifes = -1;
     protected CommonWorld world;
     protected Location spawn;
     protected CommonVoteRegistry voteRegistry;
@@ -76,6 +80,10 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.epGlitchPoll.onUpdate(_ -> updateSidebar(LobbySidebarTeam.EP_GLITCH));
         this.lifesPoll = voteRegistry.<Integer>pollBuilder().addPossibilities(IntStream.range(3, 31).boxed().toArray(Integer[]::new)).addToRegistry();
         this.lifesPoll.onVote((user, vote) -> user.sendMessage(Messages.VOTED_LIFES, vote));
+        this.lifesPoll.onUpdate(_ -> {
+            computeLifes();
+            updateSidebar(LobbySidebarTeam.LIFES);
+        });
 
         var lobbyInventories = new LobbyInventories(this, game);
         this.teamsInventoryTemplate = lobbyInventories.createTeamsTemplate();
@@ -84,7 +92,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.votingEpGlitchInventoryTemplate = lobbyInventories.createVotingEpGlitchInventoryTemplate();
         this.votingMapsInventoryTemplate = lobbyInventories.createVotingMapsInventoryTemplate();
         this.votingLifesInventoryTemplate = lobbyInventories.createVotingLifesInventoryTemplate();
-        this.perkTemplates = createPerkTemplates(lobbyInventories);
+        this.perkTemplates = this.createPerkTemplates(lobbyInventories);
         this.timer = new CommonLobbyTimer(this);
         this.maxPlayerCount = game.mapSize().teams() * game.mapSize().teamSize();
         this.enoughTeams = game.teamManager().playingTeams().size() >= 2;
@@ -99,6 +107,8 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.listeners.addChild(new LobbyUserQuitGameListener(this).node());
         this.listeners.addChild(new LobbyItemListener(this).node());
         this.listeners.addChild(new LobbyInventoryListener(this).node());
+
+        this.computeLifes();
     }
 
     private InventoryTemplate[][] createPerkTemplates(LobbyInventories lobbyInventories) {
@@ -138,6 +148,9 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         for (var user : game.users()) {
             quit(user);
         }
+        for (var team : game.teamManager().playingTeams()) {
+            team.lifes(lifes);
+        }
     }
 
     @Override
@@ -171,8 +184,31 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         }
     }
 
+    private void computeLifes() {
+        var lifes = -1;
+        var votes = this.lifesPoll.votes();
+        if (!votes.isEmpty()) {
+            var sum = votes.stream().mapToInt(Vote::vote).sum();
+            lifes = Math.round((float) sum / (float) votes.size());
+        }
+        if (lifes == -1) {
+            var extra = 0;
+            var playerCount = this.game.users().size();
+            if (playerCount >= 3) {
+                playerCount = 3;
+                extra = ThreadLocalRandom.current().nextInt(4);
+            }
+            extra += playerCount;
+            lifes = 10 + extra;
+        }
+        if (this.forcedLifes != -1) {
+            this.forcedLifes = lifes;
+        }
+        this.lifes = lifes;
+    }
+
     private void setupWorld() {
-        world = game.api().worldHandler().loadLobbyWorld(game);
+        this.world = this.game.api().worldHandler().loadLobbyWorld(game);
     }
 
     public void preJoin(@NotNull CommonWBUser user) {
@@ -213,6 +249,17 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
 
     public CommonLobbyTimer timer() {
         return timer;
+    }
+
+    @Override
+    public void forceLifes(int lifes) {
+        this.forcedLifes = lifes;
+        this.computeLifes();
+    }
+
+    @Override
+    public int lifes() {
+        return lifes;
     }
 
     protected void updateTimer(@NotNull CommonWBUser user) {

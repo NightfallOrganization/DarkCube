@@ -95,7 +95,9 @@ public enum Messages implements Message {
     MAP_ICON_SET,
     AIR_IN_HAND,
     INGAME_SIDEBAR_TEAM_LINE,
-    AT_TEAM;
+    AT_TEAM,
+    NOT_IN_A_GAME,
+    CHANGED_LIFES_FOR_TEAM;
 
     public static final String KEY_PREFIX = "WOOLBATTLE_";
     public static final String ITEM_PREFIX = "ITEM_";

@@ -16,7 +16,7 @@ public abstract class CommonGameWorld extends CommonWorld implements GameWorld {
     protected final @NotNull CommonGame game;
 
     public CommonGameWorld(@NotNull CommonGame game) {
-        super(game.api().worldHandler());
+        super(game.api().woolbattle(), game.api().worldHandler());
         this.game = game;
     }
 

@@ -19,4 +19,8 @@ public interface Lobby extends GamePhase {
 
     @Nullable
     World world();
+
+    void forceLifes(int lifes);
+
+    int lifes();
 }

@@ -9,6 +9,8 @@ package eu.darkcube.minigame.woolbattle.minestom.user;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import java.time.Duration;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,6 +30,7 @@ import net.minestom.server.network.packet.server.play.PlayerInfoRemovePacket;
 import net.minestom.server.network.packet.server.play.PlayerInfoUpdatePacket;
 import net.minestom.server.network.player.PlayerConnection;
 import net.minestom.server.thread.Acquirable;
+import net.minestom.server.utils.time.Cooldown;
 
 public class MinestomPlayer extends Player implements EntityImpl {
     private static final VarHandle LATENCY;
@@ -39,6 +42,7 @@ public class MinestomPlayer extends Player implements EntityImpl {
 
     public MinestomPlayer(@NotNull UUID uuid, @NotNull String username, @NotNull PlayerConnection playerConnection) {
         super(uuid, username, playerConnection);
+        this.itemPickupCooldown = new Cooldown(Duration.ZERO);
     }
 
     @Override
@@ -163,7 +167,12 @@ public class MinestomPlayer extends Player implements EntityImpl {
 
     @Override
     public @NotNull CommonWBUser handle() {
-        return user;
+        return Objects.requireNonNull(user);
+    }
+
+    @Override
+    public void handle(eu.darkcube.minigame.woolbattle.api.entity.Entity handle) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

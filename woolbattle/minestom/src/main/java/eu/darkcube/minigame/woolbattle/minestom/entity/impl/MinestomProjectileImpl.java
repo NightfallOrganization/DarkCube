@@ -10,13 +10,14 @@ package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEntityEvent;
-import eu.darkcube.minigame.woolbattle.api.util.Vector;
+import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.Aerodynamics;
+import net.minestom.server.collision.PhysicsResult;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -32,7 +33,6 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
     private final MinestomWoolBattle woolbattle;
     private Projectile handle;
     private boolean inBlock = false;
-    private boolean firstTick = true;
 
     public MinestomProjectileImpl(@NotNull MinestomWoolBattle woolbattle, @NotNull EntityType entityType) {
         super(entityType, null);
@@ -40,8 +40,9 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
         super.hasPhysics = false;
     }
 
-    public void handle(Projectile handle) {
-        this.handle = handle;
+    @Override
+    public void handle(eu.darkcube.minigame.woolbattle.api.entity.Entity handle) {
+        this.handle = (Projectile) handle;
     }
 
     @Override
@@ -64,32 +65,47 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
 
     @Override
     public void tick(long time) {
-        if (removed || inBlock) return;
+        if (removed || inBlock) {
+            return;
+        }
 
         var posBefore = getPosition();
         updatePosition(time);
         var posNow = getPosition();
 
         var diff = Vec.fromPoint(posNow.sub(posBefore));
-        var yaw = Vector.getYaw(diff.x(), diff.z());
-        var pitch = Vector.getPitch(diff.x(), diff.y(), diff.z());
+        // var yaw = Vector.getYaw(diff.x(), diff.z());
+        // var pitch = Vector.getPitch(diff.x(), diff.y(), diff.z());
+        // for some reason projectile views are weird... Just use this calculation, it works
+        var yaw = (float) Math.toDegrees(Math.atan2(diff.x(), diff.z()));
+        var pitch = (float) Math.toDegrees(Math.atan2(diff.y(), Math.sqrt(diff.x() * diff.x() + diff.z() * diff.z())));
         this.position = posNow.withView(yaw, pitch);
 
-        if (firstTick) {
-            firstTick = false;
-            setView(yaw, pitch);
+        setView(yaw, pitch);
+    }
+
+    @Override
+    public void update(long time) {
+        super.update(time);
+        var world = woolbattle.worlds().get(instance);
+        if (!(world instanceof GameWorld)) {
+            remove();
+            return;
+        }
+        var deathHeight = woolbattle.api().mapManager().deathHeight();
+        if (position.y() < deathHeight) {
+            remove();
         }
     }
 
     @Override
-    protected void handleBlockCollision(Block hitBlock, Point hitPos, Pos posBefore) {
-        velocity = Vec.ZERO;
+    protected void handleBlockCollision(Block hitBlock, Point hitBlockPos, Point hitPos, Pos posBefore, PhysicsResult blockResult) {
         setNoGravity(true);
 
         inBlock = true;
-        velocity = Vec.fromPoint(hitPos.sub(posBefore));
+        var velocity = Vec.fromPoint(hitPos.sub(posBefore));
+        this.velocity = velocity.mul(Vec.EPSILON);
         var v = velocity.normalize().mul(0.01F); // Required so the entity is lit (just outside the block)
-        velocity = Vec.ZERO;
 
         // if the value is zero, it will be unlit. If the value is more than 0.01, there will be noticeable pitch change visually
         position = new Pos(hitPos.x() - v.x(), hitPos.y() - v.y(), hitPos.z() - v.z(), posBefore.yaw(), posBefore.pitch());
@@ -98,8 +114,8 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
             sendPacketToViewersAndSelf(getVelocityPacket());
         });
 
-        collideWithBlock(hitPos);
-        System.out.println(hitPos.blockX() + " " + hitPos.blockY() + " " + hitPos.blockZ());
+        collideWithBlock(hitBlockPos);
+        // System.out.println(hitPos.add(hitPos.sub(posBefore)));
     }
 
     @Override

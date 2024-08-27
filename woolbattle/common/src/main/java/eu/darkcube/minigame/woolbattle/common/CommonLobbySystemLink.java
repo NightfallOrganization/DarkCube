@@ -119,7 +119,7 @@ public class CommonLobbySystemLink implements LobbySystemLink {
                 doc.append(key, createEntry(game));
             }
             var maps = new HashMap<MapSize, CommonMap>();
-            for (var map : woolbattle.mapManager().maps().stream().filter(Map::enabled).toList()) {
+            for (var map : woolbattle.mapManager().maps().stream().filter(Map::enabled).unordered().toList()) {
                 maps.putIfAbsent(map.size(), map);
             }
             for (var entry : maps.entrySet()) {

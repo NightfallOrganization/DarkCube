@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.ServerFlag;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
@@ -124,7 +125,7 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
     public void velocity(@NotNull Vector velocity) {
         var player = woolbattle.player(user);
         var lock = player.acquirable().lock();
-        player.setVelocity(new Vec(velocity.x(), velocity.y(), velocity.z()));
+        player.setVelocity(new Vec(velocity.x(), velocity.y(), velocity.z()).mul(ServerFlag.SERVER_TICKS_PER_SECOND));
         lock.unlock();
     }
 

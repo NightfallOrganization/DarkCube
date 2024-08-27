@@ -48,11 +48,15 @@ public abstract class CommonEntityImplementations implements EntityImplementatio
     }
 
     public <T extends Entity, W extends Entity> @NotNull T createWrapped(@NotNull EntityType<T> type, @NotNull W wrapped) {
+        if (type.entityTypeClass().isInstance(wrapped)) return type.entityTypeClass().cast(wrapped);
         return generator.createWrapped(type, wrapped);
     }
 
     @NotNull
     public Entity unwrap(@NotNull Entity entity) {
+        while (entity instanceof GeneratedEntity generated) {
+            entity = generated.unwrapGeneratedEntity();
+        }
         return entity;
     }
 

@@ -30,8 +30,22 @@ public class IngameUserDropItemListener extends ConfiguredListener<UserDropItemE
             return;
         }
         var user = (CommonWBUser) event.user();
+        var team = user.team();
+        if (team == null) {
+            return;
+        }
         var location = user.eyeLocation();
         if (location == null) return;
         var world = location.world();
+        var removed = user.removeWool(item.amount(), false);
+        if (removed > 0) {
+            var wool = team.wool();
+            var items = world.dropAt(location.x(), location.y(), location.z(), wool, removed);
+            for (var itemEntity : items) {
+                itemEntity.velocity(location.direction().div(5));
+                itemEntity.pickupDelay(20);
+                itemEntity.mergeDelay(50);
+            }
+        }
     }
 }

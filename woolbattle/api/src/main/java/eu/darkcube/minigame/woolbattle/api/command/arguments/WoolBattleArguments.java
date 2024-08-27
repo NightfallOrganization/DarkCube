@@ -16,6 +16,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
+import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamConfiguration;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
@@ -86,6 +87,12 @@ public interface WoolBattleArguments {
 
     @NotNull
     WBUser player0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
+
+    @NotNull
+    ArgumentType<?> teamArgument0(boolean allowSpectator);
+
+    @NotNull
+    Team team0(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException;
 
     static @NotNull ArgumentType<@NotNull ?> teamConfigurationArgument() {
         return instance().teamConfigurationArgument0();
@@ -181,6 +188,18 @@ public interface WoolBattleArguments {
 
     static @NotNull WBUser player(@NotNull CommandContext<?> ctx, @NotNull String name) throws CommandSyntaxException {
         return instance().player0(ctx, name);
+    }
+
+    static @NotNull ArgumentType<?> teamArgument() {
+        return instance().teamArgument0(true);
+    }
+
+    static @NotNull ArgumentType<?> teamArgumentNoSpectator() {
+        return instance().teamArgument0(false);
+    }
+
+    static @NotNull Team team(@NotNull CommandContext<?> ctx, String name) throws CommandSyntaxException {
+        return instance().team0(ctx, name);
     }
 
     private static WoolBattleArguments instance() {

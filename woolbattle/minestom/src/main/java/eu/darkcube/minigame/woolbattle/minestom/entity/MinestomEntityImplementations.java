@@ -9,77 +9,72 @@ package eu.darkcube.minigame.woolbattle.minestom.entity;
 
 import java.util.function.Consumer;
 
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
+import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
+import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
-import eu.darkcube.minigame.woolbattle.api.entity.SimpleEntityType;
 import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityImplementations;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
-import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityTypeMappings;
+import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
+import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityMappings;
 import eu.darkcube.minigame.woolbattle.minestom.entity.impl.MinestomProjectileImpl;
 import eu.darkcube.minigame.woolbattle.minestom.util.MinestomUtil;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import net.minestom.server.entity.EntityType;
+import eu.darkcube.system.server.item.ItemBuilder;
+import it.unimi.dsi.fastutil.Pair;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.thread.Acquirable;
 
 public class MinestomEntityImplementations extends CommonEntityImplementations {
     private final MinestomWoolBattle woolbattle;
-    private final EntityTypeMappings mappings;
+    private final EntityMappings mappings;
 
     public MinestomEntityImplementations(MinestomWoolBattle woolbattle) {
         this.woolbattle = woolbattle;
-        this.mappings = new EntityTypeMappings();
+        this.mappings = new EntityMappings(woolbattle);
     }
 
     @Override
     protected <T extends Projectile> @NotNull T spawnProjectile0(@NotNull eu.darkcube.minigame.woolbattle.api.entity.EntityType<T> type, @Nullable CommonWBUser shooter, @NotNull Location location, @NotNull Vector velocity, float speed, float spread, @Nullable Consumer<T> preSpawnCallback) {
-        var mapping = findMapping(type);
-        var entity = new MinestomProjectileImpl(woolbattle, mapping);
-        var projectile = new MinestomProjectile(entity.acquirable(), woolbattle, shooter);
-        var wrapped = createWrapped(type, projectile);
+        var pair = mappings.create(type);
+        var entity = pair.first();
+        var custom = new MinestomProjectile((Acquirable<? extends MinestomProjectileImpl>) entity.acquirable(), woolbattle, shooter);
+        return configure(pair, custom, type, location, velocity, preSpawnCallback);
+    }
+
+    @Override
+    public <T extends ItemEntity> @NotNull T spawnItem(@NotNull Location location, @NotNull Vector velocity, @NotNull ItemBuilder item, @Nullable Consumer<T> preSpawnCallback) {
+        var pair = mappings.create(EntityType.ITEM, item.<ItemStack>build());
+        var entity = pair.first();
+        var custom = new MinestomItemEntity(entity.acquirable(), woolbattle);
+        return configure(pair, custom, (EntityType<T>) EntityType.ITEM, location, velocity, preSpawnCallback);
+    }
+
+    @Override
+    public <T extends Entity> @NotNull T spawn(@NotNull eu.darkcube.minigame.woolbattle.api.entity.EntityType<T> type, @NotNull Location location, @NotNull Vector velocity, @Nullable Consumer<T> preSpawnCallback) {
+        var pair = mappings.create(type);
+        var entity = pair.first();
+        var custom = new MinestomItemEntity(entity.acquirable(), woolbattle);
+        return configure(pair, custom, type, location, velocity, preSpawnCallback);
+    }
+
+    private <T extends Entity> T configure(Pair<net.minestom.server.entity.Entity, EntityImpl> pair, Entity custom, EntityType<T> type, Location location, Vector velocity, Consumer<T> preSpawnCallback) {
+        var entity = pair.first();
+        var wrapped = createWrapped(type, custom);
+        pair.second().handle(wrapped);
         if (preSpawnCallback != null) {
             preSpawnCallback.accept(wrapped);
         }
-        entity.handle(wrapped);
         var instance = ((MinestomWorld) location.world()).instance();
-        entity.acquirable().sync(e -> {
-            e.setInstance(instance, MinestomUtil.toPos(location));
-            e.setVelocity(MinestomUtil.toVec(velocity));
-        });
+        var lock = entity.acquirable().lock();
+        entity.setInstance(instance, MinestomUtil.toPos(location));
+        entity.setVelocity(MinestomUtil.toVec(velocity));
+        lock.unlock();
         return wrapped;
-    }
-
-    //
-    // @Override
-    // public @NotNull Projectile launchSnowball(@NotNull WBUser fromUser) {
-    //     var shooter = (CommonWBUser) fromUser;
-    //     var player = woolbattle.player(shooter);
-    //     var team = shooter.team();
-    //     if (team == null) throw new IllegalStateException("Player can only launch snowball while in a team");
-    //     var game = (CommonGame) team.game();
-    //     var snowball = new MinestomProjectileImpl(woolbattle, game, shooter, player, team, EntityType.SNOWBALL);
-    //     player.acquirable().sync(p -> {
-    //         var pos = p.getPosition().add(0, p.getEyeHeight(), 0);
-    //         snowball.setInstance(p.getInstance(), pos);
-    //         p.setNoGravity(true);
-    //     });
-    //     var projectile = new MinestomProjectile(snowball.acquirable(), woolbattle);
-    //     snowball.handle(projectile);
-    //     return projectile;
-    // }
-
-    @NotNull
-    private EntityType findMapping(eu.darkcube.minigame.woolbattle.api.entity.EntityType<?> type) {
-        var original = type;
-        do {
-            if (mappings.has(type)) {
-                return mappings.get(type);
-            }
-            var simpleType = (SimpleEntityType<?>) type;
-            type = simpleType.wrapping();
-        } while (type != null);
-        throw new IllegalArgumentException("Can't find mapping for " + original.key().asString());
     }
 }

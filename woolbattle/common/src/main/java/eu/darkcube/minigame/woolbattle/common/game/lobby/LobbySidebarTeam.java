@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
@@ -31,6 +38,13 @@ public enum LobbySidebarTeam {
         @Override
         public Component createContent(CommonGame game, CommonWBUser user) {
             return create(user, game.phase() instanceof CommonLobby lobby ? lobby.timer().timeRemaining().toSeconds() : -1);
+        }
+    },
+
+    LIFES("lifes") {
+        @Override
+        public Component createContent(CommonGame game, CommonWBUser user) {
+            return create(user, game.phase() instanceof CommonLobby lobby ? lobby.lifes() : -1);
         }
     },
 
