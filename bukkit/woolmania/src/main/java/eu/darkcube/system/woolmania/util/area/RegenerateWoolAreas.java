@@ -8,14 +8,14 @@
 package eu.darkcube.system.woolmania.util.area;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class RegenerateWoolAreas {
 
-    public static void regenerateWoolAreas(Hall hall) {
+    public static void regenerateWoolAreas(Halls hall) {
 
         WoolRegenerationArea woolRegenerationArea = new WoolRegenerationArea(hall);
 
@@ -31,7 +31,7 @@ public class RegenerateWoolAreas {
     }
 
     public static void regenerateWoolAreas() {
-        for (Hall hall : Hall.values()) {
+        for (Halls hall : Halls.values()) {
             regenerateWoolAreas(hall);
         }
     }

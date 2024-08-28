@@ -7,6 +7,8 @@
 
 package eu.darkcube.system.woolmania.util;
 
+import static eu.darkcube.system.woolmania.enums.Sounds.TELEPORT;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Abilitys;
 import eu.darkcube.system.woolmania.enums.Sounds;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -30,10 +32,11 @@ public class WoolManiaPlayer {
     PersistentDataValue<List<Sounds>> unlockedSounds;
     PersistentDataValue<List<Abilitys>> boughtAbilities;
     PersistentDataValue<List<Abilitys>> activeAbilities;
+    PersistentDataValue<List<Halls>> unlockedHalls;
     Player player;
     WoolMania woolMania = WoolMania.getInstance();
     @Nullable
-    Hall hall;
+    Halls hall;
 
     public WoolManiaPlayer(Player player) {
         this.player = player;
@@ -50,40 +53,35 @@ public class WoolManiaPlayer {
         unlockedSounds = new PersistentDataValue<>(new NamespacedKey(woolMania, "unlockedSounds"), new TypeToken<List<Sounds>>(){}.getType(), player.getPersistentDataContainer(),  Sounds.unlockedSounds());
         boughtAbilities = new PersistentDataValue<>(new NamespacedKey(woolMania, "boughtAbilities"), new TypeToken<List<Abilitys>>(){}.getType(), player.getPersistentDataContainer(),  Abilitys.boughtAbilities());
         activeAbilities = new PersistentDataValue<>(new NamespacedKey(woolMania, "activeAbilities"), new TypeToken<List<Abilitys>>(){}.getType(), player.getPersistentDataContainer(),  Abilitys.activeAbilities());
+        unlockedHalls = new PersistentDataValue<>(new NamespacedKey(woolMania, "unlockedHalls"), new TypeToken<List<Halls>>(){}.getType(), player.getPersistentDataContainer(),  Halls.unlockedHalls());
     }
 
-    private void updateHall(@Nullable Hall hall) {
+    private void updateHall(@Nullable Halls hall) {
         this.hall = hall;
     }
 
-    public void updateHallByWorldChange(@Nullable Hall hall) {
+    public void updateHallByWorldChange(@Nullable Halls hall) {
+        PlayerUtils.updateAbilitys(player);
         updateHall(hall);
         woolMania.getGameScoreboard().updateWorld(player);
+        TELEPORT.playSound(player);
     }
 
     //<editor-fold desc="Teleport">
-    public void teleportTo(Hall hall) {
-        updateHall(hall);
+    public void teleportTo(Halls hall) {
         player.teleportAsync(hall.getSpawn().getLocation());
-        woolMania.getGameScoreboard().updateWorld(player);
     }
 
-    public void teleportSyncTo(Hall hall) {
-        updateHall(hall);
+    public void teleportSyncTo(Halls hall) {
         player.teleport(hall.getSpawn().getLocation());
-        woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void teleportToSpawn() {
-        updateHall(hall);
         player.teleportAsync(TeleportLocations.SPAWN.getLocation());
-        woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void teleportSyncToSpawn() {
-        updateHall(hall);
         player.teleport(TeleportLocations.SPAWN.getLocation());
-        woolMania.getGameScoreboard().updateWorld(player);
     }
     //</editor-fold>
 
@@ -113,12 +111,16 @@ public class WoolManiaPlayer {
     }
 
     @Nullable
-    public Hall getHall() {
+    public Halls getHall() {
         return hall;
     }
 
     public boolean isSoundUnlocked(Sounds sound) {
         return unlockedSounds.getOrDefault().contains(sound);
+    }
+
+    public boolean isHallUnlocked(Halls hall) {
+        return unlockedHalls.getOrDefault().contains(hall);
     }
 
     public boolean isBoughtAbility(Abilitys ability) {
@@ -142,13 +144,14 @@ public class WoolManiaPlayer {
         WoolMania.getInstance().getGameScoreboard().updateMoney(player);
     }
 
-    public void setHall(Hall hall) {
+    public void setHall(Halls hall) {
         if (this.hall != null) throw new IllegalStateException();
         updateHall(hall);
         woolMania.getGameScoreboard().updateWorld(player);
     }
 
     public void setXP(Integer integer) {
+        PlayerUtils.updateExperienceBar(player);
         xp.set(integer);
     }
 
@@ -170,6 +173,17 @@ public class WoolManiaPlayer {
         farmingSound.reset();
     }
 
+    public void activateAbility(Abilitys ability) {
+        List<Abilitys> abilitys = new ArrayList<>(activeAbilities.getOrDefault());
+        abilitys.add(ability);
+        activeAbilities.set(abilitys);
+    }
+
+    public void deactivateAbility(Abilitys ability) {
+        List<Abilitys> abilitys = new ArrayList<>(activeAbilities.getOrDefault());
+        abilitys.remove(ability);
+        activeAbilities.set(abilitys);
+    }
     //</editor-fold>
 
     //<editor-fold desc="Adder">
@@ -186,6 +200,7 @@ public class WoolManiaPlayer {
     }
 
     public void addXP(Integer integer) {
+        PlayerUtils.updateExperienceBar(player);
         int currentXP = xp.getOrDefault();
         xp.set(currentXP + integer);
     }
@@ -217,6 +232,7 @@ public class WoolManiaPlayer {
     }
 
     public void removeXP(Integer integer, Player player) {
+        PlayerUtils.updateExperienceBar(player);
         int currentXP = xp.getOrDefault();
         xp.set(currentXP - integer);
     }
@@ -239,20 +255,24 @@ public class WoolManiaPlayer {
         unlockedSounds.set(sounds);
     }
 
+    public void unlockHall(Halls hall) {
+        List<Halls> halls = new ArrayList<>(unlockedHalls.getOrDefault());
+        halls.add(hall);
+        unlockedHalls.set(halls);
+    }
+
     public void buyAbility(Abilitys ability) {
         List<Abilitys> abilitys = new ArrayList<>(boughtAbilities.getOrDefault());
         abilitys.add(ability);
         boughtAbilities.set(abilitys);
     }
 
-    public void activateAbility(Abilitys ability) {
-        List<Abilitys> abilitys = new ArrayList<>(activeAbilities.getOrDefault());
-        abilitys.add(ability);
-        activeAbilities.set(abilitys);
-    }
-
     public void resetSounds() {
         unlockedSounds.reset();
+    }
+
+    public void lockAllHalls() {
+        unlockedHalls.reset();
     }
 
     public void resetBoughtAbilities() {

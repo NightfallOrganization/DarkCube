@@ -12,7 +12,7 @@ import static eu.darkcube.system.woolmania.manager.WorldManager.SPAWN;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,7 +50,7 @@ public class Ruler implements Listener {
         WoolManiaPlayer p = WoolMania.getStaticPlayer(player);
         Location location = event.getBlock().getLocation();
         Block block = event.getBlock();
-        Hall hall = p.getHall();
+        Halls hall = p.getHall();
 
         if (player.getGameMode() == GameMode.CREATIVE) return;
 

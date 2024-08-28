@@ -14,7 +14,7 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.WoolItem;
 import eu.darkcube.system.woolmania.registry.WoolRegistry;
@@ -38,7 +38,7 @@ public class BlockBreakListener implements Listener {
         User user = UserAPI.instance().user(player.getUniqueId());
         Location location = block.getLocation();
         WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-        Hall hall = woolManiaPlayer.getHall();
+        Halls hall = woolManiaPlayer.getHall();
 
         if (hall == null || !hall.getPool().isWithinBounds(location)) {
             return;
@@ -54,7 +54,7 @@ public class BlockBreakListener implements Listener {
         CustomItem customItem = new CustomItem(item);
         int itemLevel = customItem.getLevel();
         int playerLevel = woolManiaPlayer.getLevel();
-        Hall hall = woolManiaPlayer.getHall();
+        Halls hall = woolManiaPlayer.getHall();
         int itemTier = customItem.getTierID();
         int hallValue = hall.getHallValue().getValue();
 
@@ -101,6 +101,13 @@ public class BlockBreakListener implements Listener {
             CustomItemNames woolName = entry.name();
 
             WoolItem woolItem = new WoolItem(user, block.getType(), entry.tier(), woolName);
+            ItemStack itemStack = woolItem.getItemStack();
+            boolean newItemStack = itemStack.getAmount() == 1;
+
+            // if (newItemStack) {
+            //     checkInventoryFullWithOneSlotEmpty(player, user);
+            // }
+
             dropBlocks(player, block, woolItem);
 
             Light l = (Light) Material.LIGHT.createBlockData();
@@ -116,5 +123,27 @@ public class BlockBreakListener implements Listener {
             block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
         }
     }
-
+    //
+    // private boolean hasSentMessage = false;
+    //
+    // public void checkInventoryFullWithOneSlotEmpty(Player player, User user) {
+    //     Inventory inventory = player.getInventory();
+    //     int emptySlots = 0;
+    //
+    //     for (int i = 0; i < 36; i++) {
+    //         ItemStack item = inventory.getItem(i);
+    //         if (item == null || item.getType() == Material.AIR) {
+    //             emptySlots++;
+    //         }
+    //     }
+    //
+    //     if (emptySlots == 1 && !hasSentMessage) {
+    //         user.sendMessage(INVENTORY_ALMOST_FULL);
+    //         INVENTORY_ALMOST_FULL_SOUND.playSound(player);
+    //         hasSentMessage = true;
+    //     } else if (emptySlots > 1) {
+    //         hasSentMessage = false;
+    //     }
+    //
+    // }
 }

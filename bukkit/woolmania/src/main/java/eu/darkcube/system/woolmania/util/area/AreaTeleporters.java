@@ -8,7 +8,7 @@
 package eu.darkcube.system.woolmania.util.area;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -21,7 +21,7 @@ public class AreaTeleporters {
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent event) {
         WoolManiaPlayer p = WoolMania.getStaticPlayer(event.getPlayer());
-        Hall hall = p.getHall();
+        Halls hall = p.getHall();
         if (hall != null) {
             if(hall.getTeleportArea().isWithinBounds(event.getPlayer().getLocation())) {
                 // open inventory

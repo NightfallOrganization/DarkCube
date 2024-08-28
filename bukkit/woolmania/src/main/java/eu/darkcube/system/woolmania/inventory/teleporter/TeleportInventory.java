@@ -10,8 +10,6 @@ package eu.darkcube.system.woolmania.inventory.teleporter;
 import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.TELEPORTER;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
-import static eu.darkcube.system.woolmania.enums.Sounds.TELEPORT;
-import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -25,6 +23,7 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
+import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -57,14 +56,14 @@ public class TeleportInventory implements TemplateInventoryListener {
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
         String itemId = InventoryItems.getItemID(item);
         Player player = Bukkit.getPlayer(user.uniqueId());
+        WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
 
         if (itemId == null) return;
 
         if (itemId.equals(INVENTORY_TELEPORT_NONE.itemID())) {
             NO.playSound(player);
         } else if (itemId.equals(INVENTORY_TELEPORT_SPAWN.itemID())) {
-            player.teleport(SPAWN.getLocation());
-            TELEPORT.playSound(player);
+            woolManiaPlayer.teleportToSpawn();
         } else if (itemId.equals(INVENTORY_TELEPORT_HALLS.itemID())) {
             WoolMania.getInstance().getTeleportHallsInventory().openInventory(player);
         }

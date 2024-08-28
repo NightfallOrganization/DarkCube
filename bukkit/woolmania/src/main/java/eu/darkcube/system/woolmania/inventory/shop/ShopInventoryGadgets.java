@@ -31,7 +31,7 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.gadgets.WoolGrenadeItem;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
@@ -77,7 +77,7 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
         return user -> {
             Player player = Bukkit.getPlayer(user.uniqueId());
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-            Hall hall = woolManiaPlayer.getHall();
+            Halls hall = woolManiaPlayer.getHall();
             int cost = item.getCost() * hall.getHallValue().getValue();
 
             if(item == INVENTORY_SHOP_GADGETS_GRENADE) {
@@ -103,7 +103,7 @@ public class ShopInventoryGadgets implements TemplateInventoryListener {
         if (clickedItem.equals(inventoryItems.itemID())) {
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-            Hall hall = woolManiaPlayer.getHall();
+            Halls hall = woolManiaPlayer.getHall();
             int cost = inventoryItems.getCost();
             int multiplierCost = cost * hall.getHallValue().getValue();
 

@@ -13,7 +13,8 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
+import eu.darkcube.system.woolmania.util.PlayerUtils;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,11 +37,12 @@ public class JoinListener implements Listener {
         WoolMania.getInstance().woolManiaPlayerMap.put(player, woolmaniaPlayer);
         WoolMania.getInstance().getGameScoreboard().createGameScoreboard(player);
         setupScoreboardForNPCs(player);
+        PlayerUtils.updateAbilitys(player);
 
         Location location = player.getLocation();
         boolean isInBlockLocation = player.getLocation().getBlock().getType().isSolid();
 
-        for (var hall : Hall.values()) {
+        for (var hall : Halls.values()) {
             if (hall.getHallArea().isWithinBounds(location)) {
                 if (hall.getPool().isWithinBounds(location) && isInBlockLocation) {
                     woolmaniaPlayer.teleportSyncTo(hall);
@@ -73,7 +75,7 @@ public class JoinListener implements Listener {
         setupPrefix(scoreboard, "npc-6", NAME_ZINA, empty(), text(" (", GRAY).append(text("TRADE", DARK_AQUA)).append(text(")", GRAY)), AQUA);
 
         setupPrefix(scoreboard, "npc-7", NAME_VARKAS, empty(), text(" (", GRAY).append(text("SMITH", GOLD)).append(text(")", GRAY)), YELLOW);
-        setupPrefix(scoreboard, "npc-8", NAME_ASTAROTH, empty(), text(" (", GRAY).append(text("ABILITYS", DARK_PURPLE)).append(text(")", GRAY)), LIGHT_PURPLE);
+        setupPrefix(scoreboard, "npc-8", NAME_ASTAROTH, empty(), text(" (", GRAY).append(text("ABILITIES", DARK_PURPLE)).append(text(")", GRAY)), LIGHT_PURPLE);
 
         Bukkit.getScheduler().runTaskLater(WoolMania.getInstance(), () -> {
             WoolMania.getInstance().getGameScoreboard().updateWorld(player);
@@ -91,4 +93,5 @@ public class JoinListener implements Listener {
         team.suffix(suffix);
         team.color(color);
     }
+
 }

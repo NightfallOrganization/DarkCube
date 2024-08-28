@@ -10,7 +10,6 @@ package eu.darkcube.system.woolmania.inventory.ability;
 import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_ABILITY_OWN;
 import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_ABILITY_SHOP;
 import static eu.darkcube.system.woolmania.enums.Names.ASTAROTH;
-import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -55,7 +54,7 @@ public class AbilityInventory implements TemplateInventoryListener {
         if (itemId == null) return;
 
         if (itemId.equals(INVENTORY_ABILITY_OWN.itemID())) {
-            NO.playSound(player);
+            WoolMania.getInstance().getAbilityInventoryOwn().openInventory(user);
         } else if (itemId.equals(INVENTORY_ABILITY_SHOP.itemID())) {
             WoolMania.getInstance().getAbilityInventoryShop().openInventory(user);
         }

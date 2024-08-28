@@ -9,8 +9,6 @@ package eu.darkcube.system.woolmania.inventory.teleporter;
 
 import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
-import static eu.darkcube.system.woolmania.enums.Sounds.TELEPORT;
-import static eu.darkcube.system.woolmania.enums.TeleportLocations.*;
 
 import java.util.function.Function;
 
@@ -29,8 +27,9 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -61,16 +60,24 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
         // WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
         // Hall hall = woolManiaPlayer.getHall();
 
-        content.addStaticItem(INVENTORY_TELEPORT_HALLS_HALL_1);
-        content.addStaticItem(INVENTORY_TELEPORT_HALLS_HALL_2);
-        content.addStaticItem(INVENTORY_TELEPORT_HALLS_HALL_3);
+        content.addStaticItem(getDisplayItem(INVENTORY_TELEPORT_HALLS_HALL_1, Halls.HALL1));
+        content.addStaticItem(getDisplayItem(INVENTORY_TELEPORT_HALLS_HALL_2, Halls.HALL2));
+        content.addStaticItem(getDisplayItem(INVENTORY_TELEPORT_HALLS_HALL_3, Halls.HALL3));
 
         inventoryTemplate.addListener(this);
     }
 
-    private Function<User, Object> getDisplayItem(InventoryItems item, int number) {
+    private Function<User, Object> getDisplayItem(InventoryItems item, Halls hall) {
         return user -> {
-            return item.getItem(user, number);
+            Player player = Bukkit.getPlayer(user.uniqueId());
+            WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
+
+            if (woolManiaPlayer.isHallUnlocked(hall)) {
+                return item.getItem(user);
+            } else {
+                return item.getItem(user).lore(Message.HALL_COST.getMessage(user, item.getCost()));
+            }
+
         };
     }
 
@@ -82,21 +89,15 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
         if (itemId == null) return;
 
         if (itemId.equals(INVENTORY_TELEPORT_HALLS_HALL_1.itemID())) {
-            player.teleport(HALL1.getLocation());
-            woolManiaPlayer.teleportTo(Hall.HALL1);
-            TELEPORT.playSound(player);
+            woolManiaPlayer.teleportTo(Halls.HALL1);
         }
 
         if (itemId.equals(INVENTORY_TELEPORT_HALLS_HALL_2.itemID())) {
-            player.teleport(HALL2.getLocation());
-            woolManiaPlayer.teleportTo(Hall.HALL2);
-            TELEPORT.playSound(player);
+            woolManiaPlayer.teleportTo(Halls.HALL2);
         }
 
         if (itemId.equals(INVENTORY_TELEPORT_HALLS_HALL_3.itemID())) {
-            player.teleport(HALL3.getLocation());
-            woolManiaPlayer.teleportTo(Hall.HALL3);
-            TELEPORT.playSound(player);
+            woolManiaPlayer.teleportTo(Halls.HALL3);
         }
     }
 }

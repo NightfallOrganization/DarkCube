@@ -8,13 +8,14 @@
 package eu.darkcube.system.woolmania.listener;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerTeleportListener implements Listener {
 
@@ -23,12 +24,23 @@ public class PlayerTeleportListener implements Listener {
         Player player = event.getPlayer();
         WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
         Location location = event.getTo();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                boolean foundHall = false;
+                for (Halls hall : Halls.values()) {
+                    if (hall.getHallArea().isWithinBounds(location)) {
+                        woolManiaPlayer.updateHallByWorldChange(hall);
+                        foundHall = true;
+                        break;
+                    }
+                }
 
-        for (Hall hall : Hall.values()) {
-            if (hall.getHallArea().isWithinBounds(location)) {
-                woolManiaPlayer.updateHallByWorldChange(hall);
+                if (!foundHall) {
+                    woolManiaPlayer.updateHallByWorldChange(null);
+                }
             }
-        }
+        }.runTask(WoolMania.getInstance());
     }
 
 }

@@ -27,6 +27,7 @@ public class DiamondItem extends CustomItem {
         setDisplayName(FOOD_DIAMOND.getMessage(user));
         setItemID("Diamond");
         setAmount(64);
+        setFood(true);
         setTier(Tiers.TIER10);
         setDurability(-2);
         setUnbreakableHidden();

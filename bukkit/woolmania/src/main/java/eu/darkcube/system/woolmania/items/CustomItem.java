@@ -29,6 +29,7 @@ public class CustomItem {
     private static final DataKey<Integer> MAX_DURABILITY = DataKey.of(Key.key(WoolMania.getInstance(), "max_durability"), PersistentDataTypes.INTEGER);
     private static final DataKey<Integer> LEVEL = DataKey.of(Key.key(WoolMania.getInstance(), "level"), PersistentDataTypes.INTEGER);
     private static final DataKey<String> ID = DataKey.of(Key.key(WoolMania.getInstance(), "id"), PersistentDataTypes.STRING);
+    private static final DataKey<Boolean> FOOD = DataKey.of(Key.key(WoolMania.getInstance(), "food"), PersistentDataTypes.BOOLEAN);
 
     private final ItemBuilder item;
 
@@ -77,6 +78,10 @@ public class CustomItem {
         return 0;
     }
 
+    public boolean getDefaultFood() {
+        return false;
+    }
+
     public int getAmount() {
         return item.amount();
     }
@@ -84,6 +89,15 @@ public class CustomItem {
     public Component getDisplayName() {
         return item.displayname();
     }
+
+    public void getNutrition() {
+
+    }
+
+    public boolean isFood() {
+        return item.persistentDataStorage().get(FOOD, this::getDefaultFood);
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="Setter">
@@ -109,6 +123,10 @@ public class CustomItem {
 
     public void setLevel(int level) {
         item.persistentDataStorage().set(LEVEL, level);
+    }
+
+    public void setFood(boolean isFood) {
+        item.persistentDataStorage().set(FOOD, isFood);
     }
 
     public void setWholeDurability(int durability) {
@@ -187,31 +205,6 @@ public class CustomItem {
             lore.add(legacySection().deserialize("§7Level: §6" + level));
             lore.add(empty());
         }
-
-        // List<Buff> buffs = getBuffList();
-        // if (itemBuffSlot > 0 || !buffs.isEmpty()) {
-        //     lore.add(" ");
-        //     lore.add("§7§m      §7« §aBuff §7»§m      ");
-        //     lore.add(" ");
-        // }
-
-        // if (!buffs.isEmpty()) {
-        //     for (Buff buff : buffs) {
-        //         String buffValue = buff.getType().getPrefix() + " §7+" + Math.round(buff.getValue());
-        //         if (buff.isPercentage()) {
-        //             buffValue += "%";
-        //         }
-        //         lore.add(buffValue);
-        //     }
-        // }
-
-        // for (int i = 0; i < itemBuffSlot; i++) {
-        //     lore.add("§7[ §8Empty §7]");
-        // }
-        //
-        // if (itemBuffSlot > 0 || !buffs.isEmpty()) {
-        //     lore.add(" ");
-        // }
 
         item.setLore(lore);
     }

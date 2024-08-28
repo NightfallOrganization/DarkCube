@@ -7,16 +7,19 @@
 
 package eu.darkcube.system.woolmania.enums.hall;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.darkcube.system.woolmania.enums.TeleportAreas;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import eu.darkcube.system.woolmania.enums.Tiers;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Material;
 
-public enum Hall {
-    HALL1(Message.HALL, TeleportLocations.HALL1, PoolAreas.HALL1, HallAreas.HALL1, TeleportAreas.HALL1, Material.WHITE_WOOL, HallValue.HALL_VALUE_1, Tiers.TIER1),
-    HALL2(Message.HALL, TeleportLocations.HALL2, PoolAreas.HALL2, HallAreas.HALL2, TeleportAreas.HALL2, Material.ORANGE_WOOL, HallValue.HALL_VALUE_2, Tiers.TIER2),
-    HALL3(Message.HALL, TeleportLocations.HALL3, PoolAreas.HALL3, HallAreas.HALL3, TeleportAreas.HALL3, Material.MAGENTA_WOOL, HallValue.HALL_VALUE_3, Tiers.TIER3),
+public enum Halls {
+    HALL1(Message.HALL, TeleportLocations.HALL1, PoolAreas.HALL1, HallAreas.HALL1, TeleportAreas.HALL1, Material.WHITE_WOOL, HallValue.HALL_VALUE_1, Tiers.TIER1, true),
+    HALL2(Message.HALL, TeleportLocations.HALL2, PoolAreas.HALL2, HallAreas.HALL2, TeleportAreas.HALL2, Material.ORANGE_WOOL, HallValue.HALL_VALUE_2, Tiers.TIER2, true),
+    HALL3(Message.HALL, TeleportLocations.HALL3, PoolAreas.HALL3, HallAreas.HALL3, TeleportAreas.HALL3, Material.MAGENTA_WOOL, HallValue.HALL_VALUE_3, Tiers.TIER3, true),
 
     ;
 
@@ -28,8 +31,9 @@ public enum Hall {
     private final Material wool;
     private final HallValue hallValue;
     private final Tiers tier;
+    private final boolean locked;
 
-    Hall(Message name, TeleportLocations spawn, PoolAreas pool, HallAreas area, TeleportAreas teleportArea, Material wool, HallValue hallValue, Tiers tier) {
+    Halls(Message name, TeleportLocations spawn, PoolAreas pool, HallAreas area, TeleportAreas teleportArea, Material wool, HallValue hallValue, Tiers tier, boolean locked) {
         this.name = name;
         this.spawn = spawn;
         this.pool = pool;
@@ -38,6 +42,7 @@ public enum Hall {
         this.wool = wool;
         this.hallValue = hallValue;
         this.tier = tier;
+        this.locked = locked;
     }
 
     public Message getName() {
@@ -70,6 +75,20 @@ public enum Hall {
 
     public Tiers getTier() {
         return tier;
+    }
+
+    public static List<Halls> unlockedHalls() {
+        List<Halls> unlockedHalls = new ArrayList<>();
+        for (Halls hall : Halls.values()) {
+            if (!hall.isLocked()) {
+                unlockedHalls.add(hall);
+            }
+        }
+        return List.copyOf(unlockedHalls);
+    }
+
+    public boolean isLocked() {
+        return locked;
     }
 
 }

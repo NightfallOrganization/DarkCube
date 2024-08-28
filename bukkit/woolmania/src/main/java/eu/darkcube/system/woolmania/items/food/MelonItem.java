@@ -27,6 +27,7 @@ public class MelonItem extends CustomItem {
         setDisplayName(FOOD_MELON.getMessage(user));
         setItemID("Melon");
         setAmount(64);
+        setFood(true);
         setTier(Tiers.TIER5);
         setDurability(-2);
         setUnbreakableHidden();

@@ -23,6 +23,7 @@ public class CarrotItem extends CustomItem {
         setDisplayName(FOOD_CARROT.getMessage(user));
         setItemID("Carrot");
         setAmount(64);
+        setFood(true);
         setTier(Tiers.TIER1);
         setDurability(-2);
         setUnbreakableHidden();

@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.woolmania.util.area;
 
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -16,7 +16,7 @@ public class WoolRegenerationArea {
     private final World world;
     private final int x1, y1, z1, x2, y2, z2;
 
-    public WoolRegenerationArea(Hall hall) {
+    public WoolRegenerationArea(Halls hall) {
         this(hall.getPool().getWorld(), hall.getPool().getX1(), hall.getPool().getY1(), hall.getPool().getZ1(), hall.getPool().getX2(), hall.getPool().getY2(), hall.getPool().getZ2());
     }
 

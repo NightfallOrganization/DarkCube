@@ -12,8 +12,8 @@ import static eu.darkcube.system.woolmania.util.message.Message.LEVEL_UP;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.Sounds;
 import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class LevelXPHandler {
@@ -31,7 +31,7 @@ public class LevelXPHandler {
             int extantXP = playerXP - xpRequired;
             woolManiaPlayer.addLevel(1, player);
             woolManiaPlayer.setXP(extantXP + privateBoosterValue);
-            player.playSound(player.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 100f, 1f);
+            Sounds.LEVEL_UP.playSound(player);
             user.sendMessage(LEVEL_UP,(currentLevel + 1));
         } else {
             woolManiaPlayer.addXP(privateBoosterValue);

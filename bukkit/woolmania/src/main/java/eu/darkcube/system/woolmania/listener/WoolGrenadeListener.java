@@ -19,7 +19,7 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.hall.Hall;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.WoolItem;
 import eu.darkcube.system.woolmania.items.gadgets.WoolGrenadeItem;
@@ -82,7 +82,7 @@ public class WoolGrenadeListener implements Listener {
             return;
         }
 
-        Hall hall = woolManiaPlayer.getHall();
+        Halls hall = woolManiaPlayer.getHall();
         String name = hall.name();
         int hallValue = hall.getHallValue().getValue();
 
@@ -119,7 +119,7 @@ public class WoolGrenadeListener implements Listener {
             Snowball snowball = (Snowball) event.getEntity();
             if (snowball.getShooter() instanceof Player player) {
                 User user = UserAPI.instance().user(player.getUniqueId());
-                Hall hall = Hall.valueOf(entity.getPersistentDataContainer().get(key, PersistentDataType.STRING));
+                Halls hall = Halls.valueOf(entity.getPersistentDataContainer().get(key, PersistentDataType.STRING));
 
                 Location location = entity.getLocation();
                 WoolRegistry registry = WoolMania.getInstance().getWoolRegistry();

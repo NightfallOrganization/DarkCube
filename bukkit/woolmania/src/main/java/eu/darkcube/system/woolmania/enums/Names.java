@@ -14,7 +14,7 @@ public enum Names {
     ZINA("§bZina §7(§3TRADE§7)"),
     TELEPORTER("§3Teleporter"),
     VARKAS("§eVarkas §7(§6SMITH§7)"),
-    ASTAROTH("§dAstaroth §7(§5ABILITYS§7)"),
+    ASTAROTH("§dAstaroth §7(§5ABILITIES§7)"),
 
     ;
 

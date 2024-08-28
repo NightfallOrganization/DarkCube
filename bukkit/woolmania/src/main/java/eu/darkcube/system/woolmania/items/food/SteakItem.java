@@ -22,6 +22,7 @@ public class SteakItem extends CustomItem {
 
         setDisplayName(FOOD_STEAK.getMessage(user));
         setItemID("Steak");
+        setFood(true);
         setAmount(64);
         setTier(Tiers.TIER10);
         setDurability(-2);

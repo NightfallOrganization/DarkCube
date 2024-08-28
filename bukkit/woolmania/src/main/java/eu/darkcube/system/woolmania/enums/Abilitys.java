@@ -7,15 +7,15 @@
 
 package eu.darkcube.system.woolmania.enums;
 
-import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_ABILITY_ITEM_FLY;
-import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_ABILITY_ITEM_SPEED;
+import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum Abilitys {
-    FLY(false, false, INVENTORY_ABILITY_ITEM_FLY, 15000),
-    SPEED(false, false, INVENTORY_ABILITY_ITEM_SPEED, 15000),
+    FLY("fly",false, false, INVENTORY_ABILITY_ITEM_FLY, 2500000),
+    SPEED("speed",false, false, INVENTORY_ABILITY_ITEM_SPEED, 15000),
+    AUTO_EAT("auto_eat",false, false, INVENTORY_ABILITY_ITEM_AUTO_EAT, 1500000),
 
     ;
 
@@ -23,8 +23,10 @@ public enum Abilitys {
     private final boolean active;
     private final InventoryItems inventoryItems;
     private final int cost;
+    private final String id;
 
-    Abilitys(boolean buyed, boolean active, InventoryItems inventoryItems, int cost) {
+    Abilitys(String id,boolean buyed, boolean active, InventoryItems inventoryItems, int cost) {
+        this.id = id;
         this.buyed = buyed;
         this.active = active;
         this.inventoryItems = inventoryItems;
@@ -34,7 +36,7 @@ public enum Abilitys {
     public static List<Abilitys> boughtAbilities() {
         List<Abilitys> boughtAbilities = new ArrayList<>();
         for (Abilitys ability : Abilitys.values()) {
-            if (ability.isBuyed()) {
+            if (ability.isDefaultBuyed()) {
                 boughtAbilities.add(ability);
             }
         }
@@ -44,18 +46,18 @@ public enum Abilitys {
     public static List<Abilitys> activeAbilities() {
         List<Abilitys> activeAbilities = new ArrayList<>();
         for (Abilitys ability : Abilitys.values()) {
-            if (ability.isActive()) {
+            if (ability.isDefaultActive()) {
                 activeAbilities.add(ability);
             }
         }
         return List.copyOf(activeAbilities);
     }
 
-    public boolean isActive() {
+    public boolean isDefaultActive() {
         return active;
     }
 
-    public boolean isBuyed() {
+    public boolean isDefaultBuyed() {
         return buyed;
     }
 
@@ -65,5 +67,9 @@ public enum Abilitys {
 
     public int getCost() {
         return cost;
+    }
+
+    public String getId() {
+        return id;
     }
 }
