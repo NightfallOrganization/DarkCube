@@ -1,0 +1,16 @@
+main:
+  colors: 
+    # GREEN, DARK_GREEN, RED, DARK_RED, BLUE, DARK_BLUE, AQUA, DARK_AQUA, GRAY, DARK_GRAY, LIGHT_PURPLE, DARK_PURPLE, GOLD, YELLOW, BLACK, WHITE
+    confirmColor: GREEN
+    failColor: RED
+    valueColor: DARK_PURPLE
+command:
+  burn:
+    enabled: true
+  day:
+    enabled: true
+  warp:
+    enabled: true
+    teleportDelay: 5	#Teleport-Delay in Sekunden. 0 zum Deaktivieren
+    disallowMove: true	#Tritt nur in Kraft wenn teleportDelay>0
+warps: 
