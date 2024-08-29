@@ -29,7 +29,7 @@ public interface DefaultMinestomEntity extends Entity {
     MinestomWoolBattle woolbattle();
 
     @Override
-    default @NotNull Location location() {
+    default Location location() {
         var lock = lock();
         var entity = lock.get();
         var pos = entity.getPosition();
@@ -41,7 +41,7 @@ public interface DefaultMinestomEntity extends Entity {
     }
 
     @Override
-    default @NotNull Location eyeLocation() {
+    default Location eyeLocation() {
         var lock = lock();
         var location = location();
         var eyeLocation = location.add(0, eyeHeight(), 0);

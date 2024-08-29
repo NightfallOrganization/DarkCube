@@ -37,6 +37,18 @@ public interface Position extends Cloneable {
     @NotNull
     Position add(int x, double y, int z);
 
+    default int blockX() {
+        return (int) Math.floor(x());
+    }
+
+    default int blockY() {
+        return (int) Math.floor(y());
+    }
+
+    default int blockZ() {
+        return (int) Math.floor(z());
+    }
+
     record Simple(double x, double y, double z) implements Position {
         @Override
         public Position.@NotNull Simple clone() {

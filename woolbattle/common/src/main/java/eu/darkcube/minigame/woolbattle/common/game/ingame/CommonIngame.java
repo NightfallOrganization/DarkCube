@@ -20,8 +20,10 @@ import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserCha
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserDropItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserLoginGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserMoveListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserPickupItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.listener.IngameUserQuitGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.HeightDisplayScheduler;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.PerkCooldownScheduler;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.scheduler.WoolResetScheduler;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMapIngameData;
@@ -37,6 +39,7 @@ public class CommonIngame extends CommonPhase implements Ingame {
 
     private final WoolResetScheduler woolResetScheduler = new WoolResetScheduler(this);
     private final PerkCooldownScheduler perkCooldownScheduler = new PerkCooldownScheduler(this);
+    private final HeightDisplayScheduler heightDisplayScheduler = new HeightDisplayScheduler(this);
     private CommonIngameWorld world;
     private CommonMapIngameData mapIngameData;
 
@@ -50,6 +53,7 @@ public class CommonIngame extends CommonPhase implements Ingame {
         this.listeners.addListener(new IngamePlaceBlockListener(this).create());
         this.listeners.addListener(new IngameUserDropItemListener(this).create());
         this.listeners.addListener(new IngameUserPickupItemListener(this).create());
+        this.listeners.addListener(new IngameUserMoveListener(this).create());
         this.listeners.addChild(new IngameUserQuitGameListener(this).node());
     }
 
@@ -75,6 +79,7 @@ public class CommonIngame extends CommonPhase implements Ingame {
         game.perkRegistry().startLogic();
         woolResetScheduler.start();
         perkCooldownScheduler.start();
+        heightDisplayScheduler.start();
     }
 
     @Override
@@ -82,6 +87,7 @@ public class CommonIngame extends CommonPhase implements Ingame {
         game.perkRegistry().stopLogic();
         woolResetScheduler.stop();
         perkCooldownScheduler.stop();
+        heightDisplayScheduler.stop();
 
         super.disable(newPhase);
     }
@@ -123,6 +129,10 @@ public class CommonIngame extends CommonPhase implements Ingame {
 
     public CommonMapIngameData mapIngameData() {
         return mapIngameData;
+    }
+
+    public @NotNull HeightDisplayScheduler heightDisplayScheduler() {
+        return heightDisplayScheduler;
     }
 
     @Override

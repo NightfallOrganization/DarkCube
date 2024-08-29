@@ -27,6 +27,7 @@ import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.event.EventNode;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.KeyPattern;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
@@ -61,6 +62,7 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         WoolBattleProvider.PROVIDER.register(ItemManager.class, new ItemManager(this));
     }
 
+    @KeyPattern.Namespace
     @Override
     public @NotNull String namespace() {
         return "woolbattle_" + this.platformName;

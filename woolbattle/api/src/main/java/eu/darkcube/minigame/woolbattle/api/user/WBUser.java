@@ -16,6 +16,7 @@ import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -163,6 +164,12 @@ public interface WBUser extends CommandSender, Entity {
     @Nullable
     Location location();
 
+    @Api
+    void teleport(@NotNull Position.Directed position);
+
+    @Api
+    void teleport(@NotNull Location location);
+
     @Override
     @Api
     @Nullable
@@ -225,4 +232,25 @@ public interface WBUser extends CommandSender, Entity {
     boolean canSee(@NotNull WBUser other);
 
     void kick();
+
+    @Nullable
+    WBUser getLastHit();
+
+    void setLastHit(@NotNull WBUser other);
+
+    int ticksAfterLastHit();
+
+    void ticksAfterLastHit(int ticks);
+
+    /**
+     * Attacks another user
+     *
+     * @param other the user to attack
+     */
+    void attack(@NotNull WBUser other);
+
+    /**
+     * Simulates the user moving into the void. Basically respawns the user
+     */
+    void applyVoid();
 }

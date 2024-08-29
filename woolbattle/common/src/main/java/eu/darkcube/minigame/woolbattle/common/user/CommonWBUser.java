@@ -22,6 +22,7 @@ import eu.darkcube.minigame.woolbattle.api.event.user.UserGetMaxWoolSizeEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserGetWoolBreakAmountEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserParticlesUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserRemoveWoolEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserTeleportEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolCountUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolSubtractDirectionUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
@@ -68,6 +69,8 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
     protected volatile @Nullable Location location;
     protected volatile int woolCount;
     protected volatile @Nullable CommonTeam team;
+    protected volatile @Nullable WBUser lastHit;
+    protected volatile int ticksAfterLastHit;
 
     public CommonWBUser(@NotNull CommonWoolBattleApi api, @NotNull User user, @Nullable CommonGame game) {
         this.api = api;
@@ -148,7 +151,6 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
 
     public void woolCount(int woolCount, boolean updateInventory) {
         this.woolCount = woolCount;
-        System.out.println("Count: " + woolCount);
         var event = new UserWoolCountUpdateEvent(this, woolCount);
         api.eventManager().call(event);
         if (updateInventory) {
@@ -174,14 +176,14 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
         }
         var addCount = Math.min(event.amount(), maxAdd);
         var dropCount = event.amount() - addCount;
-        woolCount(woolCount + addCount);
+        if (addCount != 0) {
+            woolCount(woolCount + addCount);
+        }
         if (event.dropRemaining()) {
             var world = this.world();
             var location = this.location;
             var team = this.team;
             if (location != null && team != null && world == location.world()) {
-                var ranX = Math.random() * 0.7 - 0.3;
-                var ranZ = Math.random() * 0.7 - 0.3;
                 var items = world.dropAt(location.x(), location.y() + 0.5, location.z(), team.wool(), dropCount);
                 for (var item : items) {
                     var motX = (double) ((float) (Math.random() * 0.2 - 0.1));
@@ -283,11 +285,16 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
         this.location = location;
     }
 
+    @Override
     public void teleport(@NotNull Location location) {
+        var event = new UserTeleportEvent(this, location);
+        api.eventManager().call(event);
+        if (event.cancelled()) return;
         location(location);
         platformAccess.teleport(location);
     }
 
+    @Override
     public void teleport(@NotNull Position.Directed position) {
         if (position instanceof Location location) {
             teleport(location);
@@ -296,6 +303,16 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
             if (l == null) throw new IllegalStateException("Can't perform teleport: location is null");
             teleport(new Location(l.world(), position));
         }
+    }
+
+    @Override
+    public void attack(@NotNull WBUser other) {
+
+    }
+
+    @Override
+    public void applyVoid() {
+        // TODO
     }
 
     @Override

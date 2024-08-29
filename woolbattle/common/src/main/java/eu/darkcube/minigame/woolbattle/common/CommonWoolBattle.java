@@ -37,6 +37,7 @@ import eu.darkcube.minigame.woolbattle.common.util.schematic.Schematic;
 import eu.darkcube.minigame.woolbattle.common.util.schematic.SchematicReader;
 import eu.darkcube.minigame.woolbattle.common.util.translation.LanguageRegistry;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
+import eu.darkcube.system.libs.net.kyori.adventure.key.KeyPattern;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Namespaced;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -184,7 +185,7 @@ public abstract class CommonWoolBattle implements Namespaced {
         configurePaged(template);
     }
 
-    public InventoryTemplate createDefaultTemplate(String key, Message title, @Nullable CommonItem displayItem) {
+    public InventoryTemplate createDefaultTemplate(@KeyPattern.Value String key, Message title, @Nullable CommonItem displayItem) {
         var template = createChestTemplate(key(this, key), 5 * 9);
         template.title(title);
         configureDefaultSinglePagedInventory(template);

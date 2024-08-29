@@ -42,6 +42,7 @@ import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.KeyPattern;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.MinecraftServer;
@@ -171,6 +172,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         return ((EntityImpl) entity.unwrap()).handle();
     }
 
+    @KeyPattern.Namespace
     @Override
     public @NotNull String namespace() {
         return this.api.namespace();

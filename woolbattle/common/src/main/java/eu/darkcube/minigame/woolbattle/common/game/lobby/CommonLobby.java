@@ -30,6 +30,7 @@ import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserChat
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserDropItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserLoginGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserMoveListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserParticlesUpdateListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserQuitGameListener;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
@@ -104,6 +105,7 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.listeners.addListener(new LobbyUserLoginGameListener(this).create());
         this.listeners.addListener(new LobbyUserDropItemListener().create());
         this.listeners.addListener(new LobbyUserChatListener(woolbattle).create());
+        this.listeners.addListener(new LobbyUserMoveListener(this).create());
         this.listeners.addChild(new LobbyUserQuitGameListener(this).node());
         this.listeners.addChild(new LobbyItemListener(this).node());
         this.listeners.addChild(new LobbyInventoryListener(this).node());
