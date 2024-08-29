@@ -85,6 +85,9 @@ public enum Message implements BaseMessage {
     HALL_UNLOCKED,
     HALL_LOCKED,
     HALL_COST,
+    HALL_COST_ENOUGH,
+    HALL_BOUGHT,
+    HALL_LEVEL_COST,
 
     ;
 

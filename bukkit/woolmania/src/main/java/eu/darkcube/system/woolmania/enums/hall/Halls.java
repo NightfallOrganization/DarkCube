@@ -17,10 +17,13 @@ import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Material;
 
 public enum Halls {
-    HALL1(Message.HALL, TeleportLocations.HALL1, PoolAreas.HALL1, HallAreas.HALL1, TeleportAreas.HALL1, Material.WHITE_WOOL, HallValue.HALL_VALUE_1, Tiers.TIER1, true),
-    HALL2(Message.HALL, TeleportLocations.HALL2, PoolAreas.HALL2, HallAreas.HALL2, TeleportAreas.HALL2, Material.ORANGE_WOOL, HallValue.HALL_VALUE_2, Tiers.TIER2, true),
-    HALL3(Message.HALL, TeleportLocations.HALL3, PoolAreas.HALL3, HallAreas.HALL3, TeleportAreas.HALL3, Material.MAGENTA_WOOL, HallValue.HALL_VALUE_3, Tiers.TIER3, true),
+    HALL1(Message.HALL, TeleportLocations.HALL1, PoolAreas.HALL1, HallAreas.HALL1, TeleportAreas.HALL1, Material.WHITE_WOOL, HallValue.HALL_VALUE_1, Tiers.TIER1, true, 0, 1),
+    HALL2(Message.HALL, TeleportLocations.HALL2, PoolAreas.HALL2, HallAreas.HALL2, TeleportAreas.HALL2, Material.ORANGE_WOOL, HallValue.HALL_VALUE_2, Tiers.TIER2, true, 15000, 20),
+    HALL3(Message.HALL, TeleportLocations.HALL3, PoolAreas.HALL3, HallAreas.HALL3, TeleportAreas.HALL3, Material.MAGENTA_WOOL, HallValue.HALL_VALUE_3, Tiers.TIER3, true, 45000, 50),
+    // HALL4(Message.HALL, TeleportLocations.HALL4, PoolAreas.HALL4, HallAreas.HALL4, TeleportAreas.HALL4, Material.MAGENTA_WOOL, HallValue.HALL_VALUE_3, Tiers.TIER3, true, 45000, 50),
 
+
+    // Halle 4 cost: 135000
     ;
 
     private final Message name;
@@ -32,8 +35,10 @@ public enum Halls {
     private final HallValue hallValue;
     private final Tiers tier;
     private final boolean locked;
+    private final int cost;
+    private final int level;
 
-    Halls(Message name, TeleportLocations spawn, PoolAreas pool, HallAreas area, TeleportAreas teleportArea, Material wool, HallValue hallValue, Tiers tier, boolean locked) {
+    Halls(Message name, TeleportLocations spawn, PoolAreas pool, HallAreas area, TeleportAreas teleportArea, Material wool, HallValue hallValue, Tiers tier, boolean locked, int cost, int level) {
         this.name = name;
         this.spawn = spawn;
         this.pool = pool;
@@ -43,6 +48,16 @@ public enum Halls {
         this.hallValue = hallValue;
         this.tier = tier;
         this.locked = locked;
+        this.cost = cost;
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getCost() {
+        return cost;
     }
 
     public Message getName() {

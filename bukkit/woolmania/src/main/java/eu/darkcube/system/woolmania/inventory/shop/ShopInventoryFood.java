@@ -84,8 +84,6 @@ public class ShopInventoryFood implements TemplateInventoryListener {
 
     @Override
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
-        // CustomItem customItem = new CustomItem(user, item);
-        // String clickedItem = customItem.getItemID();
         String clickedInventoryItem = InventoryItems.getItemID(item);
         if (clickedInventoryItem == null) return;
         Player player = Bukkit.getPlayer(user.uniqueId());

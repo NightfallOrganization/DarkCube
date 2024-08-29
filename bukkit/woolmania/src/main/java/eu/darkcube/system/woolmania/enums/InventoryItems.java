@@ -31,6 +31,7 @@ import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.DataKey;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
+import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -64,9 +65,16 @@ public enum InventoryItems implements ItemFactory {
     INVENTORY_TELEPORT_NONE(item(FIREWORK_STAR)),
 
     // Teleport-Halls
-    INVENTORY_TELEPORT_HALLS_HALL_1(item(WHITE_SHULKER_BOX), 15000),
-    INVENTORY_TELEPORT_HALLS_HALL_2(item(ORANGE_SHULKER_BOX), 45000),
-    INVENTORY_TELEPORT_HALLS_HALL_3(item(MAGENTA_SHULKER_BOX), 135000),
+    INVENTORY_TELEPORT_HALLS_HALL_1(item(WHITE_SHULKER_BOX), Halls.HALL1),
+    INVENTORY_TELEPORT_HALLS_HALL_2(item(ORANGE_SHULKER_BOX), Halls.HALL2),
+    INVENTORY_TELEPORT_HALLS_HALL_3(item(MAGENTA_SHULKER_BOX), Halls.HALL3),
+    // INVENTORY_TELEPORT_HALLS_HALL_4(item(MAGENTA_SHULKER_BOX), Halls.HALL4),
+    // INVENTORY_TELEPORT_HALLS_HALL_5(item(MAGENTA_SHULKER_BOX), Halls.HALL3),
+    // INVENTORY_TELEPORT_HALLS_HALL_6(item(MAGENTA_SHULKER_BOX), Halls.HALL3),
+    // INVENTORY_TELEPORT_HALLS_HALL_7(item(MAGENTA_SHULKER_BOX), Halls.HALL3),
+    // INVENTORY_TELEPORT_HALLS_HALL_8(item(MAGENTA_SHULKER_BOX), Halls.HALL3),
+    // INVENTORY_TELEPORT_HALLS_HALL_9(item(MAGENTA_SHULKER_BOX), Halls.HALL3),
+
 
     // Smith
     INVENTORY_SMITH_UPGRADE(item(GRINDSTONE)),
@@ -113,6 +121,13 @@ public enum InventoryItems implements ItemFactory {
     private final String key;
     private final ItemBuilder builder;
     private Integer cost;
+    private Halls hall;
+
+    InventoryItems(ItemBuilder builder, Halls hall) {
+        this.builder = builder;
+        this.hall = hall;
+        key = this.name();
+    }
 
     InventoryItems(ItemBuilder builder, Integer cost) {
         this.builder = builder;
@@ -131,6 +146,10 @@ public enum InventoryItems implements ItemFactory {
 
     public @NotNull String key() {
         return key;
+    }
+
+    public Halls getHall() {
+        return hall;
     }
 
     public String itemID() {
