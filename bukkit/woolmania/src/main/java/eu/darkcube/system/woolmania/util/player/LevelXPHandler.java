@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.handler;
+package eu.darkcube.system.woolmania.util.player;
 
 import static eu.darkcube.system.woolmania.util.message.Message.LEVEL_UP;
 
@@ -13,7 +13,6 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Sounds;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import org.bukkit.entity.Player;
 
 public class LevelXPHandler {
@@ -33,6 +32,8 @@ public class LevelXPHandler {
             woolManiaPlayer.setXP(extantXP + privateBoosterValue);
             Sounds.LEVEL_UP.playSound(player);
             user.sendMessage(LEVEL_UP,(currentLevel + 1));
+
+            player.sendTitle("§6Level: §e" + currentLevel, "", 10, 70, 20);
         } else {
             woolManiaPlayer.addXP(privateBoosterValue);
         }

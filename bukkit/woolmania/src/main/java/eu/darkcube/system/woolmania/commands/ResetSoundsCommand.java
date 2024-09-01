@@ -18,7 +18,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

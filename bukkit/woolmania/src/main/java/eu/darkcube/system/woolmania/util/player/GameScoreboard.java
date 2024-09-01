@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.util;
+package eu.darkcube.system.woolmania.util.player;
 
 import static eu.darkcube.system.woolmania.enums.TeleportLocations.SPAWN;
 

@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.woolmania.listener;
 
-import static eu.darkcube.system.woolmania.enums.Sounds.NO;
+import static eu.darkcube.system.woolmania.enums.Sounds.*;
 import static eu.darkcube.system.woolmania.util.message.Message.*;
 
 import eu.darkcube.system.server.item.ItemBuilder;
@@ -18,8 +18,8 @@ import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.WoolItem;
 import eu.darkcube.system.woolmania.registry.WoolRegistry;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
-import eu.darkcube.system.woolmania.util.message.CustomItemNames;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockBreakListener implements Listener {
@@ -43,9 +44,10 @@ public class BlockBreakListener implements Listener {
         if (hall == null || !hall.getPool().isWithinBounds(location)) {
             return;
         }
+        if (player.getGameMode() == GameMode.CREATIVE) return;
 
         handleBlockBreakItem(player, user, event, woolManiaPlayer);
-        handleWool(block, user, player, event);
+        handleBreakedItem(block, user, player, event);
     }
 
     public void handleBlockBreakItem(Player player, User user, BlockBreakEvent event, WoolManiaPlayer woolManiaPlayer) {
@@ -58,24 +60,24 @@ public class BlockBreakListener implements Listener {
         int itemTier = customItem.getTierID();
         int hallValue = hall.getHallValue().getValue();
 
-        if (itemLevel > playerLevel) {
-            user.sendMessage(ITEM_LEVEL_TO_LOW);
-            NO.playSound(player);
-            event.setCancelled(true);
+        if (itemLevel > playerLevel && itemInHand.getType() != Material.AIR) {
+            user.sendMessage (ITEM_LEVEL_TO_LOW);
+            NO.playSound (player);
+            event.setCancelled (true);
             return;
         }
 
-        if (hallValue > itemTier) {
-            user.sendMessage(TIER_TO_LOW);
-            NO.playSound(player);
-            event.setCancelled(true);
+        if (hallValue > itemTier && itemInHand.getType() != Material.AIR) {
+            user.sendMessage (TIER_TO_LOW);
+            NO.playSound (player);
+            event.setCancelled (true);
             return;
         }
 
-        if (customItem.getDurability() == 0) {
-            user.sendMessage(NOT_ENOUGHT_DURABILITY);
-            NO.playSound(player);
-            event.setCancelled(true);
+        if (customItem.getDurability () == 0 && itemInHand.getType() != Material.AIR) {
+            user.sendMessage (NOT_ENOUGHT_DURABILITY);
+            NO.playSound (player);
+            event.setCancelled (true);
             return;
         }
 
@@ -85,34 +87,33 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    public void handleWool(Block block, User user, Player player, BlockBreakEvent event) {
+    public void handleBreakedItem(Block block, User user, Player player, BlockBreakEvent event) {
         WoolRegistry registry = WoolMania.getInstance().getWoolRegistry();
-        Material material = block.getType();
 
         if (event.isCancelled()) return;
         
-        if (registry.contains(material)) {
-            WoolRegistry.Entry entry = registry.get(material);
+        if (registry.contains(block)) {
+            WoolRegistry.Entry entry = registry.get(block);
 
             event.setDropItems(false);
             WoolMania.getInstance().getLevelXPHandler().manageLevelXP(player);
             WoolMania.getStaticPlayer(player).addFarmedBlocks(1, player);
 
-            CustomItemNames woolName = entry.name();
-
-            WoolItem woolItem = new WoolItem(user, block.getType(), entry.tier(), woolName);
+            WoolItem woolItem = new WoolItem(user, entry);
             ItemStack itemStack = woolItem.getItemStack();
-            boolean newItemStack = itemStack.getAmount() == 1;
 
-            // if (newItemStack) {
-            //     checkInventoryFullWithOneSlotEmpty(player, user);
-            // }
+            if (itemStack.getType() != Material.COPPER_BULB || itemStack.getType() == Material.COPPER_GRATE) {
+                WOOL_BREAK.playSound(player);
+            }
 
+            checkInventoryFullWithOneSlotEmpty(player, user);
             dropBlocks(player, block, woolItem);
 
-            Light l = (Light) Material.LIGHT.createBlockData();
-            l.setLevel(12);
-            block.setBlockData(l);
+            Light lightBlock = (Light) Material.LIGHT.createBlockData();
+            lightBlock.setLevel(12);
+            block.setBlockData(lightBlock);
+
+
         }
     }
 
@@ -123,27 +124,27 @@ public class BlockBreakListener implements Listener {
             block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
         }
     }
-    //
-    // private boolean hasSentMessage = false;
-    //
-    // public void checkInventoryFullWithOneSlotEmpty(Player player, User user) {
-    //     Inventory inventory = player.getInventory();
-    //     int emptySlots = 0;
-    //
-    //     for (int i = 0; i < 36; i++) {
-    //         ItemStack item = inventory.getItem(i);
-    //         if (item == null || item.getType() == Material.AIR) {
-    //             emptySlots++;
-    //         }
-    //     }
-    //
-    //     if (emptySlots == 1 && !hasSentMessage) {
-    //         user.sendMessage(INVENTORY_ALMOST_FULL);
-    //         INVENTORY_ALMOST_FULL_SOUND.playSound(player);
-    //         hasSentMessage = true;
-    //     } else if (emptySlots > 1) {
-    //         hasSentMessage = false;
-    //     }
-    //
-    // }
+
+    private boolean hasSentMessage = false;
+
+    public void checkInventoryFullWithOneSlotEmpty(Player player, User user) {
+        Inventory inventory = player.getInventory();
+        int emptySlots = 0;
+
+        for (int i = 0; i < 36; i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR) {
+                emptySlots++;
+            }
+        }
+
+        if (emptySlots == 1 && !hasSentMessage) {
+            user.sendMessage(INVENTORY_ALMOST_FULL);
+            INVENTORY_ALMOST_FULL_SOUND.playSound(player);
+            hasSentMessage = true;
+        } else if (emptySlots > 1) {
+            hasSentMessage = false;
+        }
+
+    }
 }

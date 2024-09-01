@@ -12,17 +12,17 @@ import static eu.darkcube.system.woolmania.enums.Names.SYSTEM;
 import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.woolmania.util.area.WoolAreas;
 import eu.darkcube.system.woolmania.util.message.Message;
-import eu.darkcube.system.woolmania.util.area.RegenerateWoolAreas;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ResetHallsCommand extends WoolManiaCommand {
 
     public ResetHallsCommand() {
-        super("resethalls",builder -> builder.executes(context -> {
+        super("resethalls", new String[]{"regeneratehalls"},builder -> builder.executes(context -> {
 
-            RegenerateWoolAreas.regenerateWoolAreas();
+            WoolAreas.regenerateWoolAreas();
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
 

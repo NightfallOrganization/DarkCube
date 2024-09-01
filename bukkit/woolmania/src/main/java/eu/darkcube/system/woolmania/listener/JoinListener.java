@@ -14,8 +14,8 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
-import eu.darkcube.system.woolmania.util.PlayerUtils;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.PlayerUtils;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

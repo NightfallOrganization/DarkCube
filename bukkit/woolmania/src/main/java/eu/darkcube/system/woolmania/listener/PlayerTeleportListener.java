@@ -9,7 +9,7 @@ package eu.darkcube.system.woolmania.listener;
 
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

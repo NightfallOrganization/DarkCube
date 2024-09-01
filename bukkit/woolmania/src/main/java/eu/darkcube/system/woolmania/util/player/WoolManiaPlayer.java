@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.util;
+package eu.darkcube.system.woolmania.util.player;
 
 import static eu.darkcube.system.woolmania.enums.Sounds.TELEPORT;
 
@@ -18,6 +18,7 @@ import eu.darkcube.system.woolmania.enums.Abilitys;
 import eu.darkcube.system.woolmania.enums.Sounds;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
+import eu.darkcube.system.woolmania.util.PersistentDataValue;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -151,8 +152,8 @@ public class WoolManiaPlayer {
     }
 
     public void setXP(Integer integer) {
-        PlayerUtils.updateExperienceBar(player);
         xp.set(integer);
+        PlayerUtils.updateExperienceBar(player);
     }
 
     public void setFarmedBlocks(Integer integer, Player player) {
@@ -200,9 +201,9 @@ public class WoolManiaPlayer {
     }
 
     public void addXP(Integer integer) {
-        PlayerUtils.updateExperienceBar(player);
         int currentXP = xp.getOrDefault();
         xp.set(currentXP + integer);
+        PlayerUtils.updateExperienceBar(player);
     }
 
     public void addFarmedBlocks(Integer integer, Player player) {
@@ -232,9 +233,9 @@ public class WoolManiaPlayer {
     }
 
     public void removeXP(Integer integer, Player player) {
-        PlayerUtils.updateExperienceBar(player);
         int currentXP = xp.getOrDefault();
         xp.set(currentXP - integer);
+        PlayerUtils.updateExperienceBar(player);
     }
 
     public void removeFarmedBlocks(Integer integer, Player player) {

@@ -13,6 +13,7 @@ import static eu.darkcube.system.woolmania.manager.WorldManager.SPAWN;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,8 +24,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -36,6 +39,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -68,7 +72,7 @@ public class Ruler implements Listener {
 
         var registry = WoolMania.getInstance().getWoolRegistry();
 
-        if (registry.contains(block.getType()) && hall.getPool().isWithinBounds(location)) {
+        if (registry.contains(block) && hall.getPool().isWithinBounds(location)) {
             // Allow
         } else {
             event.setCancelled(true);
@@ -85,6 +89,13 @@ public class Ruler implements Listener {
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent event) {
         if (event.toWeatherState()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
             event.setCancelled(true);
         }
     }
@@ -174,8 +185,12 @@ public class Ruler implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        if (event.getBlock().getType() == Material.WATER) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(true);
     }
+
+    @EventHandler
+    public void BlockFormEvent(BlockFormEvent event) {
+        event.setCancelled(true);
+    }
+
 }

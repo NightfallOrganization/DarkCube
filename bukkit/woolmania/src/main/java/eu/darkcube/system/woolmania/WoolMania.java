@@ -14,15 +14,18 @@ import eu.darkcube.system.bukkit.DarkCubePlugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.woolmania.commands.CheckStatusCommand;
+import eu.darkcube.system.woolmania.commands.ClearHallsCommand;
 import eu.darkcube.system.woolmania.commands.OpenTeleporterCommand;
 import eu.darkcube.system.woolmania.commands.ResetHallsCommand;
 import eu.darkcube.system.woolmania.commands.ResetLevelCommand;
 import eu.darkcube.system.woolmania.commands.ResetSoundsCommand;
 import eu.darkcube.system.woolmania.commands.SetBoosterCommand;
 import eu.darkcube.system.woolmania.commands.StatsCommand;
+import eu.darkcube.system.woolmania.commands.UltraShearItemCommand;
+import eu.darkcube.system.woolmania.commands.texturepack.TexturePackCommand;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
-import eu.darkcube.system.woolmania.handler.LevelXPHandler;
+import eu.darkcube.system.woolmania.util.player.LevelXPHandler;
 import eu.darkcube.system.woolmania.inventory.ability.AbilityInventory;
 import eu.darkcube.system.woolmania.inventory.ability.AbilityInventoryOwn;
 import eu.darkcube.system.woolmania.inventory.ability.AbilityInventoryShop;
@@ -48,10 +51,11 @@ import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.npc.NPCRemover;
 import eu.darkcube.system.woolmania.registry.WoolRegistry;
-import eu.darkcube.system.woolmania.util.GameScoreboard;
-import eu.darkcube.system.woolmania.util.PlayerUtils;
+import eu.darkcube.system.woolmania.util.player.GameScoreboard;
+import eu.darkcube.system.woolmania.util.player.PlayerUtils;
+import eu.darkcube.system.woolmania.util.player.ResourcePackUtil;
 import eu.darkcube.system.woolmania.util.Ruler;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.WoolRegenerationTimer;
 import eu.darkcube.system.woolmania.util.message.LanguageHelper;
 import org.bukkit.Bukkit;
@@ -87,6 +91,7 @@ public class WoolMania extends DarkCubePlugin {
     @Override
     public void onEnable() {
         WorldManager.loadWorlds();
+        woolRegistry = new WoolRegistry();
         gameScoreboard = new GameScoreboard();
         LanguageHelper.initialize();
         WoolRegenerationTimer.startFirstTimer();
@@ -104,11 +109,11 @@ public class WoolMania extends DarkCubePlugin {
         abilityInventory = new AbilityInventory();
         abilityInventoryShop = new AbilityInventoryShop();
         abilityInventoryOwn = new AbilityInventoryOwn();
-        woolRegistry = new WoolRegistry();
         levelXPHandler = new LevelXPHandler();
         NPCListeners.register(npcManager, npcCreator);
         npcCreator.createNPC();
 
+        var resourcePackUtil = new ResourcePackUtil();
         var teleportListener = new PlayerTeleportListener();
         var joinListener = new JoinListener();
         var leaveListener = new LeaveListener();
@@ -118,6 +123,7 @@ public class WoolMania extends DarkCubePlugin {
         var foodLevelListener = new FoodLevelListener();
         var ruler = new Ruler();
 
+        instance.getServer().getPluginManager().registerEvents(resourcePackUtil, this);
         instance.getServer().getPluginManager().registerEvents(foodLevelListener, this);
         instance.getServer().getPluginManager().registerEvents(teleportListener, this);
         instance.getServer().getPluginManager().registerEvents(throwingListener, this);
@@ -127,6 +133,9 @@ public class WoolMania extends DarkCubePlugin {
         instance.getServer().getPluginManager().registerEvents(leaveListener, this);
         instance.getServer().getPluginManager().registerEvents(ruler, this);
 
+        CommandAPI.instance().register(new ClearHallsCommand());
+        CommandAPI.instance().register(new TexturePackCommand());
+        CommandAPI.instance().register(new UltraShearItemCommand());
         CommandAPI.instance().register(new CheckStatusCommand());
         CommandAPI.instance().register(new ResetHallsCommand());
         CommandAPI.instance().register(new ZenumCommand());

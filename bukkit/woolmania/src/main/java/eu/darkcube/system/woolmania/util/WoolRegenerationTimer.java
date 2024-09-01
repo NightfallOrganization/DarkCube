@@ -9,11 +9,10 @@ package eu.darkcube.system.woolmania.util;
 
 import static eu.darkcube.system.woolmania.enums.Names.SYSTEM;
 
-import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.util.area.RegenerateWoolAreas;
+import eu.darkcube.system.woolmania.util.area.WoolAreas;
 import eu.darkcube.system.woolmania.util.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -72,7 +71,7 @@ public class WoolRegenerationTimer extends BukkitRunnable {
                 cancel();
                 isRunning = false;
                 timer = 60;
-                RegenerateWoolAreas.regenerateWoolAreas();
+                WoolAreas.regenerateWoolAreas();
 
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     User user = UserAPI.instance().user(onlinePlayer.getUniqueId());

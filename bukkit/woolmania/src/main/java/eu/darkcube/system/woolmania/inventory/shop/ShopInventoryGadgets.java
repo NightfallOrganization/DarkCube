@@ -34,7 +34,7 @@ import eu.darkcube.system.woolmania.enums.InventoryItems;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.gadgets.WoolGrenadeItem;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

@@ -7,7 +7,10 @@
 
 package eu.darkcube.system.woolmania.util.area;
 
+import java.util.List;
+
 import eu.darkcube.system.woolmania.enums.hall.Halls;
+import eu.darkcube.system.woolmania.registry.WoolRegistry;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -30,7 +33,31 @@ public class WoolRegenerationArea {
         this.z2 = z2;
     }
 
-    public void replaceAirAndLightWithWool(Material material) {
+    public void replaceAirAndLight(List<WoolRegistry.Entry> entries) {
+        int minX = Math.min(x1, x2);
+        int minY = Math.min(y1, y2);
+        int minZ = Math.min(z1, z2);
+        int maxX = Math.max(x1, x2);
+        int maxY = Math.max(y1, y2);
+        int maxZ = Math.max(z1, z2);
+        int size = entries.size();
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    Block block = world.getBlockAt(x, y, z);
+                    if ((block.getType() == Material.AIR) || (block.getType() == Material.LIGHT)) {
+
+                        int index = (int) (Math.random() * size);
+                        WoolRegistry.Entry entry = entries.get(index);
+                        entry.handler().apply(block);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeBlocks() {
         int minX = Math.min(x1, x2);
         int minY = Math.min(y1, y2);
         int minZ = Math.min(z1, z2);
@@ -42,12 +69,11 @@ public class WoolRegenerationArea {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Block block = world.getBlockAt(x, y, z);
-                    if ((block.getType() == Material.AIR) || (block.getType() == Material.LIGHT)) {
-                        block.setType(material, false);
+                    if (block.getType() != Material.BLACK_CONCRETE) {
+                        block.setType(Material.AIR);
                     }
                 }
             }
         }
     }
-
 }

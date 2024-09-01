@@ -7,22 +7,19 @@
 
 package eu.darkcube.system.woolmania.items;
 
-import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.woolmania.enums.Tiers;
-import eu.darkcube.system.woolmania.util.message.CustomItemNames;
-import org.bukkit.Material;
+import eu.darkcube.system.woolmania.registry.WoolRegistry;
 
 public class WoolItem extends CustomItem {
 
     public static final String ITEM_ID = "wool";
 
-    public WoolItem(User user, Material material, Tiers tier, CustomItemNames name) {
-        super(ItemBuilder.item(material));
+    public WoolItem(User user, WoolRegistry.Entry entry) {
+        super(entry.handler().createItem());
 
-        setDisplayName(name.getMessage(user));
+        setDisplayName(entry.name().getMessage(user));
         setAmount(1);
-        setTier(tier);
+        setTier(entry.tier());
         setItemID(ITEM_ID);
         setDurability(-2);
         setUnbreakableHidden();

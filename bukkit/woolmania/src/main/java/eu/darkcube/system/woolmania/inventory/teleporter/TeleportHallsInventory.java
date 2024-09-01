@@ -7,7 +7,7 @@
 
 package eu.darkcube.system.woolmania.inventory.teleporter;
 
-import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
+import static eu.darkcube.system.woolmania.enums.InventoryItems.INVENTORY_TELEPORT_HALLS;
 import static eu.darkcube.system.woolmania.enums.Names.ZINUS;
 import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
@@ -31,9 +31,8 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.DataKey;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.enums.InventoryItems;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -42,8 +41,8 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
     private static final String MASK = """
             .........
             .........
-            .#######.
-            .#######.
+            .###.###.
+            .###.###.
             .........
             """;
 
@@ -63,29 +62,28 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
         pagination.pageSlots(InventoryMask.slots(MASK, '#'));
         PagedInventoryContent content = pagination.content();
 
-        content.addStaticItem(getDisplayItem(INVENTORY_TELEPORT_HALLS_HALL_1));
-        content.addStaticItem(getDisplayItem(INVENTORY_TELEPORT_HALLS_HALL_2));
-        content.addStaticItem(getDisplayItem(INVENTORY_TELEPORT_HALLS_HALL_3));
+        for (Halls hall : Halls.values()) {
+            content.addStaticItem(getDisplayItem(hall));
+        }
 
         inventoryTemplate.addListener(this);
     }
 
-    private Function<User, Object> getDisplayItem(InventoryItems item) {
+    private Function<User, Object> getDisplayItem(Halls hall) {
         return user -> {
+
             Player player = Bukkit.getPlayer(user.uniqueId());
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
-            ItemBuilder itemBuilder = item.getItem(user);
-            Halls hall = item.getHall();
+            ItemBuilder itemBuilder = hall.getWoolEntries().getFirst().handler().createItem();
             itemBuilder.persistentDataStorage().set(HALL, hall);
+            itemBuilder.displayname(TO_HALL.getMessage(user, hall.getHallValue().getValue()));
 
             if (woolManiaPlayer.isHallUnlocked(hall)) {
                 return itemBuilder;
             } else if (woolManiaPlayer.getMoney() < hall.getCost()) {
-                return itemBuilder.lore(HALL_COST.getMessage(user, hall.getCost()))
-                        .lore(HALL_LEVEL_COST.getMessage(user, hall.getLevel()));
+                return itemBuilder.lore(HALL_COST.getMessage(user, hall.getCost())).lore(HALL_LEVEL_COST.getMessage(user, hall.getLevel()));
             } else {
-                return itemBuilder.lore(HALL_COST_ENOUGH.getMessage(user, hall.getCost()))
-                        .lore(HALL_LEVEL_COST.getMessage(user, hall.getLevel()));
+                return itemBuilder.lore(HALL_COST_ENOUGH.getMessage(user, hall.getCost())).lore(HALL_LEVEL_COST.getMessage(user, hall.getLevel()));
             }
 
         };
@@ -101,7 +99,7 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
 
             if(woolManiaPlayer.isHallUnlocked(hall)) {
                 woolManiaPlayer.teleportTo(hall);
-            } else if (woolManiaPlayer.getMoney() > hall.getCost() && hall.getLevel() < woolManiaPlayer.getLevel()) {
+            } else if (woolManiaPlayer.getMoney() > hall.getCost() && hall.getLevel() <= woolManiaPlayer.getLevel()) {
                 woolManiaPlayer.unlockHall(hall);
                 woolManiaPlayer.removeMoney(hall.getCost(), player);
                 BUY.playSound(player);

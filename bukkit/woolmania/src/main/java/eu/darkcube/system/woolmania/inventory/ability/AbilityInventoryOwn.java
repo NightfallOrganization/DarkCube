@@ -35,8 +35,8 @@ import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Abilitys;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
-import eu.darkcube.system.woolmania.util.PlayerUtils;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.PlayerUtils;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

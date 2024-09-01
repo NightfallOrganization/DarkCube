@@ -24,7 +24,7 @@ import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.items.WoolItem;
 import eu.darkcube.system.woolmania.items.gadgets.WoolGrenadeItem;
 import eu.darkcube.system.woolmania.registry.WoolRegistry;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -136,8 +136,8 @@ public class WoolGrenadeListener implements Listener {
                             var block = loc.getBlock();
                             var type = block.getType();
                             if (loc.distanceSquared(location) <= radiusSquared && type != Material.LIGHT && hall.getPool().isWithinBounds(loc)) {
-                                if (registry.contains(type)) {
-                                    WoolRegistry.Entry entry = registry.get(type);
+                                if (registry.contains(block)) {
+                                    WoolRegistry.Entry entry = registry.get(block);
                                     totalCount++;
 
                                     drops.compute(entry, (_, oldCount) -> {
@@ -159,7 +159,7 @@ public class WoolGrenadeListener implements Listener {
                 for (var entry : drops.entrySet()) {
                     var e = entry.getKey();
                     var count = entry.getValue();
-                    var woolItem = new WoolItem(user, e.material(), e.tier(), e.name());
+                    var woolItem = new WoolItem(user, e);
                     var itemStack = woolItem.getItemStack();
 
                     int remaining = count;

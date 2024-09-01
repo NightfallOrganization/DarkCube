@@ -5,13 +5,12 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.woolmania.util;
+package eu.darkcube.system.woolmania.util.player;
 
 import static eu.darkcube.system.woolmania.enums.Abilitys.FLY;
 import static eu.darkcube.system.woolmania.enums.Abilitys.SPEED;
 
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.handler.LevelXPHandler;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
