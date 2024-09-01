@@ -22,8 +22,8 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
-import eu.darkcube.system.woolmania.util.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.message.Message;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -32,7 +32,8 @@ public class SetBoosterCommand extends WoolManiaCommand {
     public SetBoosterCommand() {
         //@formatter:off
         super("setbooster",builder -> {
-            builder.then(Commands.argument("player", EntityArgument.players())
+            builder
+                    .then(Commands.argument("player", EntityArgument.players())
                     .then(Commands.argument("amount", IntegerArgumentType.integer())
                             .executes(context -> executeCommand(context, EntityArgument.getPlayers(context, "player"), IntegerArgumentType.getInteger(context, "amount")))
                     )
