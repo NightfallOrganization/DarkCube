@@ -10,6 +10,7 @@ package eu.darkcube.system.woolmania.commands;
 import static eu.darkcube.system.woolmania.util.message.Message.*;
 
 import java.util.Collection;
+import java.util.List;
 
 import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
@@ -32,9 +33,10 @@ public class SetBoosterCommand extends WoolManiaCommand {
     public SetBoosterCommand() {
         //@formatter:off
         super("setbooster",builder -> {
-            builder
+            builder.then(Commands.argument("amount", IntegerArgumentType.integer(0))
+                    .executes(context -> executeCommand(context, List.of(context.getSource().asPlayer()), IntegerArgumentType.getInteger(context, "amount")))
+
                     .then(Commands.argument("player", EntityArgument.players())
-                    .then(Commands.argument("amount", IntegerArgumentType.integer())
                             .executes(context -> executeCommand(context, EntityArgument.getPlayers(context, "player"), IntegerArgumentType.getInteger(context, "amount")))
                     )
             );

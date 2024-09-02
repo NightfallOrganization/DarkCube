@@ -34,10 +34,10 @@ public enum Halls {
     HALL11(Message.HALL, TeleportLocations.HALL11, PoolAreas.HALL11, HallAreas.HALL11, TeleporterAreas.HALL11, List.of(11, 10), HallValue.HALL_VALUE_11, Tiers.TIER11, true, 285000, 290),
     HALL12(Message.HALL, TeleportLocations.HALL12, PoolAreas.HALL12, HallAreas.HALL12, TeleporterAreas.HALL12, List.of(12, 10), HallValue.HALL_VALUE_12, Tiers.TIER12, true, 315000, 320),
 
-    // HALL13(Message.HALL, TeleportLocations.HALL13, PoolAreas.HALL13, HallAreas.HALL13, TeleporterAreas.HALL13, List.of(9, 3), HallValue.HALL_VALUE_14, Tiers.TIER13, true, 345000, 350),
-    // HALL14(Message.HALL, TeleportLocations.HALL14, PoolAreas.HALL14, HallAreas.HALL14, TeleporterAreas.HALL14, List.of(10, 4), HallValue.HALL_VALUE_15, Tiers.TIER14, true, 375000, 380),
-    // HALL15(Message.HALL, TeleportLocations.HALL15, PoolAreas.HALL15, HallAreas.HALL15, TeleporterAreas.HALL15, List.of(11, 5), HallValue.HALL_VALUE_16, Tiers.TIER15, true, 405000, 410),
-    //
+    HALL13(Message.HALL, TeleportLocations.HALL13, PoolAreas.HALL13, HallAreas.HALL13, TeleporterAreas.HALL13, List.of(9, 3), HallValue.HALL_VALUE_14, Tiers.TIER13, true, 345000, 350),
+    HALL14(Message.HALL, TeleportLocations.HALL14, PoolAreas.HALL14, HallAreas.HALL14, TeleporterAreas.HALL14, List.of(10, 4), HallValue.HALL_VALUE_15, Tiers.TIER14, true, 375000, 380),
+    HALL15(Message.HALL, TeleportLocations.HALL15, PoolAreas.HALL15, HallAreas.HALL15, TeleporterAreas.HALL15, List.of(11, 5), HallValue.HALL_VALUE_16, Tiers.TIER15, true, 405000, 410),
+
     // HALL16(Message.HALL, TeleportLocations.HALL16, PoolAreas.HALL16, HallAreas.HALL16, TeleporterAreas.HALL16, List.of(12, 6), HallValue.HALL_VALUE_17, Tiers.TIER16, true, 435000, 440),
     // HALL17(Message.HALL, TeleportLocations.HALL17, PoolAreas.HALL17, HallAreas.HALL17, TeleporterAreas.HALL17, List.of(13, 7), HallValue.HALL_VALUE_18, Tiers.TIER17, true, 465000, 470),
     // HALL18(Message.HALL, TeleportLocations.HALL18, PoolAreas.HALL18, HallAreas.HALL18, TeleporterAreas.HALL18, List.of(14, 8), HallValue.HALL_VALUE_19, Tiers.TIER18, true, 495000, 500),

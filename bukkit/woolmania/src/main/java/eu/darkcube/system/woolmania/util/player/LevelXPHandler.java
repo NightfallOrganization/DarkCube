@@ -32,8 +32,7 @@ public class LevelXPHandler {
             woolManiaPlayer.setXP(extantXP + privateBoosterValue);
             Sounds.LEVEL_UP.playSound(player);
             user.sendMessage(LEVEL_UP,(currentLevel + 1));
-
-            player.sendTitle("§6Level: §e" + currentLevel, "", 10, 70, 20);
+            player.sendTitle("", "§7" + currentLevel + " §8» §b" + (currentLevel +1), 10, 70, 20);
         } else {
             woolManiaPlayer.addXP(privateBoosterValue);
         }

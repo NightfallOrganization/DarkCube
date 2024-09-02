@@ -89,6 +89,7 @@ public enum Message implements BaseMessage {
     HALL_BOUGHT,
     HALL_LEVEL_COST,
     TO_HALL,
+    ITEM_COOLDOWN,
 
     ;
 

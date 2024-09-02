@@ -61,6 +61,8 @@ public class TeleportHallsInventory implements TemplateInventoryListener {
         PagedTemplateSettings pagination = inventoryTemplate.pagination();
         pagination.pageSlots(InventoryMask.slots(MASK, '#'));
         PagedInventoryContent content = pagination.content();
+        pagination.previousButton().slots(new int[]{18, 27});
+        pagination.nextButton().slots(new int[]{26, 35});
 
         for (Halls hall : Halls.values()) {
             content.addStaticItem(getDisplayItem(hall));

@@ -14,6 +14,8 @@ import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 import static eu.darkcube.system.woolmania.util.message.Message.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Function;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
@@ -97,6 +99,11 @@ public class SmithInventoryShopItems implements TemplateInventoryListener {
         if (clickedItem.equals(inventoryItems.itemID())) {
             int cost = inventoryItems.getCost();
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
+            Instant lastBuyTime = Instant.now();
+            user.metadata().set();
+
+            Duration addTime = Duration.ofMinutes(5);
+            Instant compareTime = lastBuyTime.plus(addTime);
 
             if (cost > playerMoney) {
                 user.sendMessage(NO_MONEY);
@@ -104,15 +111,21 @@ public class SmithInventoryShopItems implements TemplateInventoryListener {
                 return;
             }
 
-            if (cost == 0) {
+            if (cost == 0 && Instant.now().compareTo(compareTime) > 0) {
                 user.sendMessage(ITEM_BUYED_FREE, inventoryItems.getItem(user, customItem.getAmount(), "").displayname());
-            } else {
+            } else if (cost > 0 && Instant.now().compareTo(compareTime) > 0) {
                 user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
+            } else {
+                user.sendMessage(ITEM_COOLDOWN, compareTime);
             }
 
             WoolMania.getStaticPlayer(player).removeMoney(cost, player);
             BUY.playSound(player);
-            player.getInventory().addItem(customItem.getItemStack());
+
+            if (Instant.now().compareTo(compareTime) > 0) {
+                player.getInventory().addItem(customItem.getItemStack());
+            }
+
         }
     }
 
