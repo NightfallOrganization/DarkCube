@@ -7,10 +7,14 @@
 
 package eu.darkcube.system.woolmania.bootstrap;
 
-// public class WoolManiaBootstrap implements PluginBootstrap {
-//     // @Override
-//     // public void bootstrap(@NotNull BootstrapContext context) {
-//     //     // context.getLifecycleManager().registerEventHandler(RegistryEvents.);
-//     //     TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("sad")).
-//     // }
-// }
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import io.papermc.paper.plugin.bootstrap.BootstrapContext;
+import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
+
+public class WoolManiaBootstrap implements PluginBootstrap {
+    @Override
+    public void bootstrap(@NotNull BootstrapContext context) {
+        // context.getLifecycleManager().registerEventHandler(RegistryEvents.);
+        // TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("sad")).
+    }
+}
