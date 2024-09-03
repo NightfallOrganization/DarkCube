@@ -9,6 +9,7 @@ package eu.darkcube.system.woolmania.commands;
 
 import java.util.Collection;
 import java.util.List;
+
 import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.bukkit.commandapi.Commands;
@@ -43,7 +44,7 @@ public class StatsCommand extends WoolManiaCommand {
             CommandSender sender = ((BukkitCommandExecutor) context.getSource().getSource()).sender();
             WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
             int level = woolManiaPlayer.getLevel();
-            int xp = woolManiaPlayer.getXP();
+            double xp = woolManiaPlayer.getXP();
             int xpRequired = LevelXPHandler.calculateXPRequiredForNextLevel(level);
             int money = woolManiaPlayer.getMoney();
             int farmedBlocks = woolManiaPlayer.getFarmedBlocks();

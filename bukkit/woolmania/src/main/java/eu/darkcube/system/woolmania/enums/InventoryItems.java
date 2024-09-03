@@ -57,6 +57,7 @@ public enum InventoryItems implements ItemFactory {
     INVENTORY_SHOP_SOUNDS_ARMADILLO_HIGH(item(MUSIC_DISC_13).hideJukeboxPlayableTooltip(), 15000),
     INVENTORY_SHOP_SOUNDS_SCAFFOLDING(item(MUSIC_DISC_CREATOR_MUSIC_BOX).hideJukeboxPlayableTooltip(), 500000),
     INVENTORY_SHOP_SOUNDS_SCAFFOLDING_HIGH(item(MUSIC_DISC_CREATOR_MUSIC_BOX).hideJukeboxPlayableTooltip(), 50000),
+    INVENTORY_SHOP_SOUNDS_CRYSTAL(item(MUSIC_DISC_5).hideJukeboxPlayableTooltip(), 2500000),
 
     // Teleport
     INVENTORY_TELEPORT_SPAWN(item(NETHER_STAR)),

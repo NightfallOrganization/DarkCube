@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 public class WoolManiaPlayer {
     PersistentDataValue<Integer> level;
     PersistentDataValue<Integer> money;
-    PersistentDataValue<Integer> xp;
+    PersistentDataValue<Double> xp;
     PersistentDataValue<Integer> farmedBlocks;
     PersistentDataValue<Integer> privateBooster;
     PersistentDataValue<Sounds> farmingSound;
@@ -47,7 +47,7 @@ public class WoolManiaPlayer {
     private void initializePersistentData(Player player) {
         level = new PersistentDataValue<>(new NamespacedKey(woolMania, "level"), Integer.class, player.getPersistentDataContainer(), 1);
         money = new PersistentDataValue<>(new NamespacedKey(woolMania, "money"), Integer.class, player.getPersistentDataContainer(), 0);
-        xp = new PersistentDataValue<>(new NamespacedKey(woolMania, "xp"), Integer.class, player.getPersistentDataContainer(), 0);
+        xp = new PersistentDataValue<>(new NamespacedKey(woolMania, "xp"), Double.class, player.getPersistentDataContainer(), 0.0);
         farmedBlocks = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmedBlocks"), Integer.class, player.getPersistentDataContainer(), 0);
         privateBooster = new PersistentDataValue<>(new NamespacedKey(woolMania, "privateBooster"), Integer.class, player.getPersistentDataContainer(), 1);
         farmingSound = new PersistentDataValue<>(new NamespacedKey(woolMania, "farmingSound"), Sounds.class, player.getPersistentDataContainer(), Sounds.FARMING_SOUND_STANDARD);
@@ -95,7 +95,7 @@ public class WoolManiaPlayer {
         return money.getOrDefault();
     }
 
-    public Integer getXP() {
+    public double getXP() {
         return xp.getOrDefault();
     }
 
@@ -151,8 +151,8 @@ public class WoolManiaPlayer {
         woolMania.getGameScoreboard().updateWorld(player);
     }
 
-    public void setXP(Integer integer) {
-        xp.set(integer);
+    public void setXP(double xpValue) {
+        xp.set(xpValue);
         PlayerUtils.updateExperienceBar(player);
     }
 
@@ -200,9 +200,9 @@ public class WoolManiaPlayer {
         WoolMania.getInstance().getGameScoreboard().updateMoney(player);
     }
 
-    public void addXP(Integer integer) {
-        int currentXP = xp.getOrDefault();
-        xp.set(currentXP + integer);
+    public void addXP(double xpValue) {
+        double currentXP = xp.getOrDefault();
+        xp.set(currentXP + xpValue);
         PlayerUtils.updateExperienceBar(player);
     }
 
@@ -232,9 +232,9 @@ public class WoolManiaPlayer {
         WoolMania.getInstance().getGameScoreboard().updateMoney(player);
     }
 
-    public void removeXP(Integer integer, Player player) {
-        int currentXP = xp.getOrDefault();
-        xp.set(currentXP - integer);
+    public void removeXP(double xpValue, Player player) {
+        double currentXP = xp.getOrDefault();
+        xp.set(currentXP - xpValue);
         PlayerUtils.updateExperienceBar(player);
     }
 

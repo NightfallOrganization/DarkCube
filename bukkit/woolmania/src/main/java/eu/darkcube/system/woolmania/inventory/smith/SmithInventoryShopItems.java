@@ -14,8 +14,8 @@ import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 import static eu.darkcube.system.woolmania.util.message.Message.*;
 
-import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
@@ -39,6 +39,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class SmithInventoryShopItems implements TemplateInventoryListener {
+    public static Key playerBuyedItemKey = Key.key(WoolMania.getInstance(), "player_buyed_item_key");
 
     private static final String MASK = """
             .........
@@ -49,6 +50,7 @@ public class SmithInventoryShopItems implements TemplateInventoryListener {
             """;
     private final InventoryTemplate inventoryTemplate;
     private final Integer stack = 64;
+    private boolean firstBuy = false;
 
     public void openInventory(User user) {
         inventoryTemplate.open(user);
@@ -99,34 +101,51 @@ public class SmithInventoryShopItems implements TemplateInventoryListener {
         if (clickedItem.equals(inventoryItems.itemID())) {
             int cost = inventoryItems.getCost();
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
-            Instant lastBuyTime = Instant.now();
-            user.metadata().set();
+            boolean freeItem = cost == 0;
+            if (freeItem) {
+                Instant now = Instant.now();
 
-            Duration addTime = Duration.ofMinutes(5);
-            Instant compareTime = lastBuyTime.plus(addTime);
+                if (checkCooldown(user, now, player)) return;
 
-            if (cost > playerMoney) {
-                user.sendMessage(NO_MONEY);
-                NO.playSound(player);
-                return;
-            }
-
-            if (cost == 0 && Instant.now().compareTo(compareTime) > 0) {
+                BUY.playSound(player);
                 user.sendMessage(ITEM_BUYED_FREE, inventoryItems.getItem(user, customItem.getAmount(), "").displayname());
-            } else if (cost > 0 && Instant.now().compareTo(compareTime) > 0) {
-                user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
+                player.getInventory().addItem(customItem.getItemStack());
+                user.metadata().set(playerBuyedItemKey, now);
+
             } else {
-                user.sendMessage(ITEM_COOLDOWN, compareTime);
-            }
-
-            WoolMania.getStaticPlayer(player).removeMoney(cost, player);
-            BUY.playSound(player);
-
-            if (Instant.now().compareTo(compareTime) > 0) {
+                if (cost > playerMoney) {
+                    user.sendMessage(NO_MONEY);
+                    NO.playSound(player);
+                    return;
+                }
+                BUY.playSound(player);
+                WoolMania.getStaticPlayer(player).removeMoney(cost, player);
+                user.sendMessage(ITEM_BUYED, inventoryItems.getItem(user, customItem.getAmount(), "").displayname(), cost);
                 player.getInventory().addItem(customItem.getItemStack());
             }
-
         }
+    }
+
+    private boolean checkCooldown(User user, Instant now, Player player) {
+        if (user.metadata().has(playerBuyedItemKey)) {
+            Instant lastBuyTime = user.metadata().get(playerBuyedItemKey);
+            Instant nextBuyTime = lastBuyTime.plus(5, ChronoUnit.MINUTES);
+            boolean hasCooldown = nextBuyTime.isAfter(now);
+
+            if (hasCooldown) {
+                long remainingMinutes = now.until(nextBuyTime, ChronoUnit.MINUTES);
+                long remainingSeconds = now.until(nextBuyTime, ChronoUnit.SECONDS);
+                NO.playSound(player);
+
+                if (remainingSeconds > 60) {
+                    user.sendMessage(ITEM_COOLDOWN, (remainingMinutes + 1));
+                } else {
+                    user.sendMessage(ITEM_COOLDOWN_SECONDS, remainingSeconds);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
 }

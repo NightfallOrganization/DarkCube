@@ -10,9 +10,11 @@ package eu.darkcube.system.woolmania.util;
 import static eu.darkcube.system.woolmania.manager.WorldManager.HALLS;
 import static eu.darkcube.system.woolmania.manager.WorldManager.SPAWN;
 
+import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.TeleportLocations;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
+import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -21,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -40,6 +43,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -96,6 +100,15 @@ public class Ruler implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            event.setUseInteractedBlock(Event.Result.DENY);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerConsume(PlayerItemConsumeEvent event) {
+        ItemBuilder itemBuilder = ItemBuilder.item(event.getItem());
+        CustomItem customItem = new CustomItem(itemBuilder);
+        if (!customItem.isFood()) {
             event.setCancelled(true);
         }
     }

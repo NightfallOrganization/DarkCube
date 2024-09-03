@@ -47,7 +47,7 @@ public class BlockBreakListener implements Listener {
         if (player.getGameMode() == GameMode.CREATIVE) return;
 
         handleBlockBreakItem(player, user, event, woolManiaPlayer);
-        handleBreakedItem(block, user, player, event);
+        handleBreakedWool(block, user, player, event, woolManiaPlayer);
     }
 
     public void handleBlockBreakItem(Player player, User user, BlockBreakEvent event, WoolManiaPlayer woolManiaPlayer) {
@@ -87,7 +87,7 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    public void handleBreakedItem(Block block, User user, Player player, BlockBreakEvent event) {
+    public void handleBreakedWool(Block block, User user, Player player, BlockBreakEvent event, WoolManiaPlayer woolManiaPlayer) {
         WoolRegistry registry = WoolMania.getInstance().getWoolRegistry();
 
         if (event.isCancelled()) return;
@@ -96,18 +96,12 @@ public class BlockBreakListener implements Listener {
             WoolRegistry.Entry entry = registry.get(block);
 
             event.setDropItems(false);
-            WoolMania.getInstance().getLevelXPHandler().manageLevelXP(player);
+            WoolItem woolItem = new WoolItem(user, entry);
+            WoolMania.getInstance().getLevelXPHandler().manageLevelXP(player, woolItem);
             WoolMania.getStaticPlayer(player).addFarmedBlocks(1, player);
 
-            WoolItem woolItem = new WoolItem(user, entry);
-            ItemStack itemStack = woolItem.getItemStack();
-
-            if (itemStack.getType() != Material.COPPER_BULB || itemStack.getType() == Material.COPPER_GRATE) {
-                WOOL_BREAK.playSound(player);
-            }
-
             checkInventoryFullWithOneSlotEmpty(player, user);
-            dropBlocks(player, block, woolItem);
+            dropBlocks(player, block, woolItem, woolManiaPlayer);
 
             Light lightBlock = (Light) Material.LIGHT.createBlockData();
             lightBlock.setLevel(12);
@@ -117,9 +111,14 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    public void dropBlocks(Player player, Block block, CustomItem customItem) {
+    public void dropBlocks(Player player, Block block, CustomItem customItem, WoolManiaPlayer woolManiaPlayer) {
         if (player.getInventory().addItem(customItem.getItemStack()).isEmpty()) {
-            WoolMania.getStaticPlayer(player).getFarmingSound().playSound(player);
+            if (woolManiaPlayer.getFarmingSound() == FARMING_SOUND_CRYSTAL) {
+                FARMING_SOUND_WOOLBATTLE.playSound(player);
+                FARMING_SOUND_CRYSTAL.playSound(player);
+            } else {
+                woolManiaPlayer.getFarmingSound().playSound(player);
+            }
         } else {
             block.getWorld().dropItemNaturally(block.getLocation(), customItem.getItemStack());
         }

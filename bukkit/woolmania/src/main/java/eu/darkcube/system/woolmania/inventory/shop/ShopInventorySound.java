@@ -69,6 +69,7 @@ public class ShopInventorySound implements TemplateInventoryListener {
         content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_ARMADILLO_HIGH, FARMING_SOUND_ARMADILLO_HIGH));
         content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_SCAFFOLDING, FARMING_SOUND_SCAFFOLDING));
         content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_SCAFFOLDING_HIGH, FARMING_SOUND_SCAFFOLDING_HIGH));
+        content.addStaticItem(getDisplayItem(INVENTORY_SHOP_SOUNDS_CRYSTAL, FARMING_SOUND_CRYSTAL));
 
         inventoryTemplate.addListener(this);
     }
@@ -86,6 +87,7 @@ public class ShopInventorySound implements TemplateInventoryListener {
         soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_ARMADILLO_HIGH, FARMING_SOUND_ARMADILLO_HIGH, woolManiaPlayer, user);
         soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_SCAFFOLDING, FARMING_SOUND_SCAFFOLDING, woolManiaPlayer, user);
         soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_SCAFFOLDING_HIGH, FARMING_SOUND_SCAFFOLDING_HIGH, woolManiaPlayer, user);
+        soudBuyOrSelect(clickedItem, player, INVENTORY_SHOP_SOUNDS_CRYSTAL, FARMING_SOUND_CRYSTAL, woolManiaPlayer, user);
 
         inventory.pagedController().publishUpdatePage();
     }

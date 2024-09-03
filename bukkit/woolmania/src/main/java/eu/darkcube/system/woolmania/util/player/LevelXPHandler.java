@@ -13,28 +13,32 @@ import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.Sounds;
+import eu.darkcube.system.woolmania.items.WoolItem;
 import org.bukkit.entity.Player;
 
 public class LevelXPHandler {
 
-    public void manageLevelXP(Player player) {
+    public void manageLevelXP(Player player, WoolItem woolItem) {
         WoolManiaPlayer woolManiaPlayer = WoolMania.getStaticPlayer(player);
         User user = UserAPI.instance().user(player.getUniqueId());
-        int playerXP = woolManiaPlayer.getXP();
+        double playerXP = woolManiaPlayer.getXP();
         int currentLevel = woolManiaPlayer.getLevel();
         int xpRequired = calculateXPRequiredForNextLevel(currentLevel);
         int privateBooster = WoolMania.getStaticPlayer(player).getPrivateBooster();
-        int privateBoosterValue = (privateBooster <= 0) ? 1 : privateBooster;
 
-        if (playerXP + privateBoosterValue > xpRequired) {
-            int extantXP = playerXP - xpRequired;
+        int tierXP = woolItem.getTier().getId();
+        int privatBoosterXP = (privateBooster <= 0) ? 1 : privateBooster;
+        int addXP = tierXP * privatBoosterXP;
+
+        if (playerXP + addXP > xpRequired) {
+            double finalXP = playerXP + addXP - xpRequired;
             woolManiaPlayer.addLevel(1, player);
-            woolManiaPlayer.setXP(extantXP + privateBoosterValue);
+            woolManiaPlayer.setXP(finalXP);
             Sounds.LEVEL_UP.playSound(player);
             user.sendMessage(LEVEL_UP,(currentLevel + 1));
             player.sendTitle("", "§7" + currentLevel + " §8» §b" + (currentLevel +1), 10, 70, 20);
         } else {
-            woolManiaPlayer.addXP(privateBoosterValue);
+            woolManiaPlayer.addXP(addXP);
         }
     }
 
