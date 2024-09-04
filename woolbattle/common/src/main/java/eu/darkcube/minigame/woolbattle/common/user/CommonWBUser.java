@@ -381,6 +381,26 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
     }
 
     @Override
+    public @Nullable WBUser getLastHit() {
+        return lastHit;
+    }
+
+    @Override
+    public void setLastHit(@NotNull WBUser other) {
+        lastHit = other;
+    }
+
+    @Override
+    public int ticksAfterLastHit() {
+        return ticksAfterLastHit;
+    }
+
+    @Override
+    public void ticksAfterLastHit(int ticksAfterLastHit) {
+        this.ticksAfterLastHit = ticksAfterLastHit;
+    }
+
+    @Override
     public void language(@NotNull Language language) {
         user.language(language);
     }
