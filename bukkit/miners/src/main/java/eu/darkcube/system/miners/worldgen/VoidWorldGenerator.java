@@ -27,7 +27,7 @@ public class VoidWorldGenerator extends ChunkGenerator {
 
     @Override
     public @Nullable BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
-        return new eu.darkcube.system.miners.worldgen.DefaultProvider();
+        return new DefaultProvider();
     }
 
 }
