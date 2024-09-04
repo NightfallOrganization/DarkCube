@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.user;
 
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
@@ -40,6 +41,26 @@ public class MinestomUser extends CommonWBUser implements DefaultMinestomEntity 
         var lock = lock();
         lock.get().kick("You were kicked from WoolBattle");
         lock.unlock();
+    }
+
+    @Override
+    public @Nullable WBUser getLastHit() {
+        return null;
+    }
+
+    @Override
+    public void setLastHit(@NotNull WBUser other) {
+
+    }
+
+    @Override
+    public int ticksAfterLastHit() {
+        return 0;
+    }
+
+    @Override
+    public void ticksAfterLastHit(int ticks) {
+
     }
 
     @Override

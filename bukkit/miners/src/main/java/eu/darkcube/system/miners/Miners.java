@@ -7,190 +7,66 @@
 
 package eu.darkcube.system.miners;
 
-import eu.darkcube.system.bukkit.DarkCubePlugin;
-import eu.darkcube.system.bukkit.commandapi.BukkitCommandExecutor;
-import eu.darkcube.system.bukkit.commandapi.CommandAPI;
-import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
-import eu.darkcube.system.miners.command.CommandTeam;
-import eu.darkcube.system.miners.command.CommandTest;
-import eu.darkcube.system.miners.command.CommandTimer;
-import eu.darkcube.system.miners.gamephase.GameUpdater;
-import eu.darkcube.system.miners.gamephase.end.EndPhase;
-import eu.darkcube.system.miners.gamephase.lobbyphase.Lobbyphase;
-import eu.darkcube.system.miners.gamephase.miningphase.Miningphase;
-import eu.darkcube.system.miners.gamephase.pvpphase.PVPPhase;
-import eu.darkcube.system.miners.listener.*;
-import eu.darkcube.system.miners.player.Message;
-import eu.darkcube.system.miners.player.PlayerManager;
-import eu.darkcube.system.miners.player.TNTManager;
-import eu.darkcube.system.miners.player.TeamManager;
-import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.userapi.UserAPI;
-import eu.darkcube.system.util.AdventureSupport;
-import eu.darkcube.system.util.Language;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.miners.listener.PlayerJoinListener;
+import eu.darkcube.system.miners.listener.PlayerLeaveListener;
+import eu.darkcube.system.miners.manager.WorldManager;
+import eu.darkcube.system.miners.utils.GameScoreboard;
+import eu.darkcube.system.miners.utils.MinersPlayer;
+import eu.darkcube.system.miners.utils.message.LanguageHelper;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class Miners extends DarkCubePlugin {
-
-    public static final String MINING_WORLD_NAME = "MinersCubes";
-    public static final String PVP_WORLD_NAME = "MinersPVP";
-    public static final String PREFIX = ChatColor.GRAY + "[" + ChatColor.DARK_AQUA + "Miners" + ChatColor.GRAY + "] " + ChatColor.RESET;
     private static Miners instance;
-    private static int gamephase = 0;
-    private static PlayerManager playerManager;
-    private static TeamManager teamManager;
-    private static Lobbyphase gamephaseLobby;
-    private static Miningphase gamephaseMining;
-    private static PVPPhase gamephasePVP;
-    private static EndPhase gamephaseEnd;
-    private static GameUpdater gameUpdater;
-    private static MinersConfig minersConfig;
+    private GameScoreboard gameScoreboard;
+    public Map<Player, MinersPlayer> minersPlayerMap = new HashMap<>();
 
     public Miners() {
         super("miners");
         instance = this;
     }
 
+    @Override
+    public void onEnable() {
+        WorldManager.loadWorlds();
+        gameScoreboard = new GameScoreboard();
+        LanguageHelper.initialize();
+        var joinListener = new PlayerJoinListener();
+        var leaveListener = new PlayerLeaveListener();
+
+        instance.getServer().getPluginManager().registerEvents(joinListener, this);
+        instance.getServer().getPluginManager().registerEvents(leaveListener, this);
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            gameScoreboard.createGameScoreboard(onlinePlayer);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            Miners.getInstance().getGameScoreboard().deleteGameScoreboard(onlinePlayer);
+        }
+    }
+
+    //<editor-fold desc="Getter">
     public static Miners getInstance() {
         return instance;
     }
 
-    public static MinersConfig getMinersConfig() {
-        return minersConfig;
+    public GameScoreboard getGameScoreboard() {
+        return gameScoreboard;
     }
 
-    public static int getGamephase() {
-        return gamephase;
+    public MinersPlayer getPlayer(@NotNull Player player) {
+        return minersPlayerMap.get(player);
     }
 
-    public static PlayerManager getPlayerManager() {
-        return playerManager;
-    }
-
-    public static TeamManager getTeamManager() {
-        return teamManager;
-    }
-
-    public static Lobbyphase getLobbyPhase() {
-        return gamephaseLobby;
-    }
-
-    public static Miningphase getMiningPhase() {
-        return gamephaseMining;
-    }
-
-    public static PVPPhase getPVPPhase() {
-        return gamephasePVP;
-    }
-
-    public static EndPhase getEndPhase() {
-        return gamephaseEnd;
-    }
-
-    public static void nextGamephase() {
-        switch (gamephase) {
-            case 0:
-                gamephaseLobby.disable();
-                gamephaseMining.enable();
-                gameUpdater.start();
-                break;
-            case 1:
-                gamephaseMining.disable();
-                gamephasePVP.enable();
-                break;
-            case 2:
-                gamephaseEnd.enable();
-                gameUpdater.stop();
-                break;
-        }
-        gamephase++;
-    }
-
-    public static void endGame() {
-        gamephase = 3;
-        gamephaseLobby.disable();
-        gamephaseMining.disable();
-        gamephasePVP.disable();
-        gamephaseEnd.enable();
-        gameUpdater.stop();
-    }
-
-    private static void registerListeners(Listener... listeners) {
-        for (Listener l : listeners)
-            Miners.getInstance().getServer().getPluginManager().registerEvents(l, Miners.getInstance());
-    }
-
-    public static ArrayList<Player> getOnlinePlayers() {
-        return new ArrayList<>(Bukkit.getOnlinePlayers());
-    }
-
-    public static void sendTranslatedMessage(Player player, Message message, Object... replacements) {
-        User user = UserAPI.instance().user(player.getUniqueId());
-        user.sendMessage(message, replacements);
-        //        player.sendMessage(PREFIX + message.getMessage(player, replacements));
-    }
-
-    public static void sendTranslatedMessageAll(Message message, Object... replacements) {
-        Bukkit.getOnlinePlayers().forEach(p -> sendTranslatedMessage(p, message, replacements));
-        Audience console = AdventureSupport.adventureSupport().audienceProvider().console();
-        console.sendMessage(message.getMessage(BukkitCommandExecutor.create(Bukkit.getConsoleSender()), replacements));
-    }
-
-    public static void log(Object o) {
-        System.out.println("[Miners] " + o.toString());
-    }
-
-    @Override public void onLoad() {
-        this.saveDefaultConfig("config");
-        this.createConfig("config");
-        minersConfig = new MinersConfig();
-
-        try {
-            Language.GERMAN.registerLookup(this.getClassLoader(), "messages_de.properties", Message.KEY_MODIFIER);
-            Language.ENGLISH.registerLookup(this.getClassLoader(), "messages_en.properties", Message.KEY_MODIFIER);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    @Override public void onDisable() {
-        Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(""));
-    }
-
-    @Override public void onEnable() {
-        playerManager = new PlayerManager();
-        teamManager = new TeamManager();
-
-        CommandAPI api = CommandAPI.instance();
-        api.register(new CommandTest());
-        api.register(new CommandTimer());
-        api.register(new CommandTeam());
-
-        registerListeners(new ListenerPlayerQuit(), new ListenerPlayerLogin(), new ListenerPlayerJoin(), new ListenerBlockBreak(), new ListenerPlaceBlock(), new ListenerItemInteract(), new ListenerPlayerDamage(), new ListenerChatMessage(), new ListenerCrafting(), new ListenerItemPickup());
-        registerListeners(new TNTManager());
-
-        Bukkit.createWorld(new WorldCreator(MINING_WORLD_NAME));
-        Bukkit.createWorld(new WorldCreator(PVP_WORLD_NAME));
-
-        gamephaseLobby = new Lobbyphase();
-        gamephaseMining = new Miningphase();
-        gamephasePVP = new PVPPhase();
-        gamephaseEnd = new EndPhase();
-        gameUpdater = new GameUpdater();
-
-        Bukkit.getWorlds().forEach(w -> {
-            w.setGameRuleValue("doMobSpawning", "false");
-            w.setGameRuleValue("doTileDrops", "false");
-            w.setGameRuleValue("naturalRegeneration", "false");
-        });
-
-    }
+    //</editor-fold>
 
 }
