@@ -17,6 +17,7 @@ import eu.darkcube.system.miners.listener.PlayerLeaveListener;
 import eu.darkcube.system.miners.manager.WorldManager;
 import eu.darkcube.system.miners.utils.GameScoreboard;
 import eu.darkcube.system.miners.utils.MinersPlayer;
+import eu.darkcube.system.miners.utils.Ruler;
 import eu.darkcube.system.miners.utils.message.LanguageHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -36,9 +37,11 @@ public class Miners extends DarkCubePlugin {
         WorldManager.loadWorlds();
         gameScoreboard = new GameScoreboard();
         LanguageHelper.initialize();
+        var ruler = new Ruler();
         var joinListener = new PlayerJoinListener();
         var leaveListener = new PlayerLeaveListener();
 
+        instance.getServer().getPluginManager().registerEvents(ruler, this);
         instance.getServer().getPluginManager().registerEvents(joinListener, this);
         instance.getServer().getPluginManager().registerEvents(leaveListener, this);
 
