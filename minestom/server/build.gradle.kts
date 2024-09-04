@@ -5,6 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
+import eu.darkcube.build.UploadArtifacts
 import org.gradle.api.internal.file.FileOperations
 
 plugins {
