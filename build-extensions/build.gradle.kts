@@ -14,13 +14,6 @@ repositories {
     gradlePluginPortal()
 }
 
-dependencies {
-    implementation("com.github.mwiede:jsch:0.2.19")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    implementation("net.java.dev.jna:jna:5.14.0")
-    implementation("net.java.dev.jna:jna-platform:5.14.0")
-}
-
 gradlePlugin {
     plugins {
         register("glyphWidthLoader") {
