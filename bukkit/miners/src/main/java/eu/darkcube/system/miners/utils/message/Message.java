@@ -25,6 +25,22 @@ public enum Message implements BaseMessage {
     SCOREBOARD_ONLINE,
 
     ABILITY_DIGGER,
+    ABILITY_SPEEDSTER,
+
+    ITEM_IS_ACTIVE,
+    ITEM_IS_INACTIVE,
+    ACTIVATE_ABILITY,
+    DEACTIVATE_ABILITY,
+    SECOUND_LEFT,
+
+    TEAM_RED,
+    TEAM_BLUE,
+    TEAM_GREEN,
+    TEAM_YELLOW,
+    TEAM_WHITE,
+    TEAM_BLACK,
+    TEAM_PURPLE,
+    TEAM_ORANGE,
 
     ;
 

@@ -8,7 +8,14 @@
 package eu.darkcube.system.miners.listener;
 
 import eu.darkcube.system.miners.Miners;
+import eu.darkcube.system.miners.gamephase.GamePhase;
+import eu.darkcube.system.miners.gamephase.endphase.EndPhase;
+import eu.darkcube.system.miners.gamephase.lobbyphase.LobbyPhase;
+import eu.darkcube.system.miners.gamephase.miningphase.MiningPhase;
+import eu.darkcube.system.miners.utils.ItemUtil;
 import eu.darkcube.system.miners.utils.MinersPlayer;
+import eu.darkcube.system.miners.utils.Timer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,10 +27,26 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         MinersPlayer minersPlayer = new MinersPlayer(player);
-        event.joinMessage(null);
+        GamePhase currentPhase = Miners.getInstance().getCurrentPhase();
         Miners.getInstance().minersPlayerMap.put(player, minersPlayer);
         Miners.getInstance().getGameScoreboard().createGameScoreboard(player);
         minersPlayer.teleportToLobby();
-    }
 
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            Miners.getInstance().getGameScoreboard().updateOnline(onlinePlayer);
+        }
+
+        if(currentPhase instanceof LobbyPhase) {
+            ItemUtil.setLobbyPhaseItems(player);
+
+            if (Bukkit.getOnlinePlayers().size() > 1 && !Timer.isTimerRunning) {
+                new Timer().runTaskTimer(Miners.getInstance(), 0L, 20L);
+            }
+
+        } else if(currentPhase instanceof MiningPhase) {
+            ItemUtil.setMiningPhaseItems(player);
+        } else if(currentPhase instanceof EndPhase) {
+            ItemUtil.setEndPhaseItems(player);
+        }
+    }
 }

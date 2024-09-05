@@ -10,6 +10,7 @@ package eu.darkcube.system.miners.enums;
 public enum Names {
 
     SYSTEM("§7[§bWool§3Mania§7]"),
+    ABILITIES("§7[§dAbilities§7]"),
 
     ;
 

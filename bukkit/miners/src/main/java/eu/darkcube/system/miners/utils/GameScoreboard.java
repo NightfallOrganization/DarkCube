@@ -109,13 +109,13 @@ public class GameScoreboard implements Listener {
 
     public void updateTime(Player player) {
         var team = player.getScoreboard().getTeam("time_team");
-        team.setSuffix("§7» §e0");
+        team.setSuffix("§7» §e" + Timer.time);
     }
 
     public void updateAbility(Player player) {
         var team = player.getScoreboard().getTeam("ability_team");
         MinersPlayer minersPlayer = new MinersPlayer(player);
-        team.setSuffix("§7» §e" + minersPlayer.getActiveAbility().getName());
+        team.suffix(minersPlayer.getActiveAbility().getName().getBukkit(player));
     }
 
     public void updateNeeded(Player player) {

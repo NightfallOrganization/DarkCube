@@ -1,0 +1,8 @@
+main: eu.darkcube.system.miners.Miners
+name: Miners
+version: 1.0
+api-version: 1.21.1
+dependencies:
+  server:
+    DarkCubeSystem:
+      required: true

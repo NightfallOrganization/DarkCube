@@ -68,9 +68,24 @@ public class MinersPlayer {
     public Abilities getActiveAbility() {
         return activeAbility.getOrDefault();
     }
+
+    public boolean isBoughtAbility(Abilities ability) {
+        return boughtAbilities.getOrDefault().contains(ability);
+    }
+
+    public boolean isActiveAbility(Abilities ability) {
+        return activeAbility.getOrDefault() == ability;
+    }
     //</editor-fold>
 
     //<editor-fold desc="Setter">
+    public void activateAbility(Abilities ability) {
+        activeAbility.set(ability);
+    }
+
+    public void deactivateAbility(Abilities ability) {
+        activeAbility.reset();
+    }
     //</editor-fold>
 
     //<editor-fold desc="Adder">

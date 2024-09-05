@@ -8,7 +8,6 @@
 package eu.darkcube.system.miners.enums;
 
 import static eu.darkcube.system.server.item.ItemBuilder.item;
-import static eu.darkcube.system.server.item.component.ItemComponent.ATTRIBUTE_MODIFIERS;
 import static eu.darkcube.system.util.Language.lastStyle;
 import static org.bukkit.Material.*;
 
@@ -23,7 +22,6 @@ import eu.darkcube.system.miners.Miners;
 import eu.darkcube.system.miners.utils.message.Message;
 import eu.darkcube.system.server.inventory.item.ItemFactory;
 import eu.darkcube.system.server.item.ItemBuilder;
-import eu.darkcube.system.server.item.component.components.AttributeList;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
@@ -33,18 +31,21 @@ import org.bukkit.entity.Player;
 
 public enum InventoryItems implements ItemFactory {
 
-    // Shop-Sound
-    // INVENTORY_SHOP_SOUNDS_STANDARD(item(MUSIC_DISC_WARD).hideJukeboxPlayableTooltip(), 0),
-    // INVENTORY_SHOP_SOUNDS_WOOLBATTLE(item(MUSIC_DISC_MALL).hideJukeboxPlayableTooltip(), 1500000),
-    // INVENTORY_SHOP_SOUNDS_ARMADILLO(item(MUSIC_DISC_13).hideJukeboxPlayableTooltip(), 15000),
-    // INVENTORY_SHOP_SOUNDS_ARMADILLO_HIGH(item(MUSIC_DISC_13).hideJukeboxPlayableTooltip(), 15000),
-    // INVENTORY_SHOP_SOUNDS_SCAFFOLDING(item(MUSIC_DISC_CREATOR_MUSIC_BOX).hideJukeboxPlayableTooltip(), 500000),
-    // INVENTORY_SHOP_SOUNDS_SCAFFOLDING_HIGH(item(MUSIC_DISC_CREATOR_MUSIC_BOX).hideJukeboxPlayableTooltip(), 50000),
+    // Lobby-Hotbar
+    HOTBAR_ITEM_ABILITIES(item(OMINOUS_BOTTLE).hideAdditionalTooltip(), "hotbar_item_abilities"),
+    HOTBAR_ITEM_TEAMS(item(BOOK), "hotbar_item_teams"),
+    HOTBAR_ITEM_SETTINGS(item(COMPARATOR), "hotbar_item_settings"),
+    HOTBAR_ITEM_SHOP(item(ENDER_CHEST), "hotbar_item_shop"),
+    HOTBAR_ITEM_VOTING(item(PAPER), "hotbar_item_voting"),
+
+    //Teams
+    INVENTORY_TEAM(item(), "inventory_team"),
 
     // Ability
-    INVENTORY_ABILITY_ITEM_AUTO_EAT(item(RABBIT_STEW)),
-    INVENTORY_ABILITY_ITEM_FLY(item(FEATHER)),
-    INVENTORY_ABILITY_ITEM_SPEED(item(DIAMOND_BOOTS).set(ATTRIBUTE_MODIFIERS, AttributeList.EMPTY.withTooltip(false))),
+    INVENTORY_ABILITY_ITEM_DIGGER(item(IRON_PICKAXE), "inventory_ability_item_digger"),
+    INVENTORY_ABILITY_ITEM_SPEEDSTER(item(LEATHER_BOOTS), "inventory_ability_item_speedster"),
+    // INVENTORY_ABILITY_ITEM_FLY(item(FEATHER)),
+    // INVENTORY_ABILITY_ITEM_SPEED(item(DIAMOND_BOOTS).set(ATTRIBUTE_MODIFIERS, AttributeList.EMPTY.withTooltip(false))),
 
     ;
 
@@ -52,6 +53,7 @@ public enum InventoryItems implements ItemFactory {
     private final String key;
     private final ItemBuilder builder;
     private Integer cost;
+    private String id;
 
     InventoryItems(ItemBuilder builder, Integer cost) {
         this.builder = builder;
@@ -59,9 +61,19 @@ public enum InventoryItems implements ItemFactory {
         key = this.name();
     }
 
+    InventoryItems(ItemBuilder builder, String id) {
+        this.builder = builder;
+        key = this.name();
+        this.id = id;
+    }
+
     InventoryItems(ItemBuilder builder) {
         this.builder = builder;
         key = this.name();
+    }
+
+    public String getID() {
+        return id;
     }
 
     public Integer getCost() {

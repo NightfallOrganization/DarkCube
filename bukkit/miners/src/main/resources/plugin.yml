@@ -1,5 +1,0 @@
-main: eu.darkcube.system.miners.Miners
-name: Miners
-version: 1.0
-depend: [System]
-api-version: 1.13

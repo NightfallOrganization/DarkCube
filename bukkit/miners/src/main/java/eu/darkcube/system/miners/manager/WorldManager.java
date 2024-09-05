@@ -21,9 +21,12 @@ public class WorldManager {
 
     public static void loadWorlds() {
         LOBBY = loadOrCreateWorldWithGenerator("MinersWartelobby", new VoidWorldGenerator());
-        WORLD = loadOrCreateWorld("world");
+        LOBBY.setViewDistance(4);
+        LOBBY.setSimulationDistance(4);
         ARENA = loadOrCreateWorldWithGenerator("Arena", new VoidWorldGenerator());
         MINE = loadOrCreateWorldWithGenerator("Mine", new VoidWorldGenerator());
+        MINE.setViewDistance(4);
+        MINE.setSimulationDistance(4);
     }
 
     private static World loadOrCreateWorld(String worldName) {

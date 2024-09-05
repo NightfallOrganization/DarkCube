@@ -8,6 +8,7 @@
 package eu.darkcube.system.miners.listener;
 
 import eu.darkcube.system.miners.Miners;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,8 +19,13 @@ public class PlayerLeaveListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        event.quitMessage(null);
         Miners.getInstance().minersPlayerMap.remove(player);
-    }
 
+        Bukkit.getScheduler().runTaskLater(Miners.getInstance(), () -> {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                Miners.getInstance().getGameScoreboard().updateOnline(onlinePlayer);
+            }
+        }, 1L);
+
+    }
 }
