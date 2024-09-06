@@ -109,7 +109,7 @@ public class GameScoreboard implements Listener {
 
     public void updateTime(Player player) {
         var team = player.getScoreboard().getTeam("time_team");
-        team.setSuffix("§7» §e" + Timer.time);
+        team.setSuffix("§7» §e" + LobbyTimer.lobbyTime);
     }
 
     public void updateAbility(Player player) {

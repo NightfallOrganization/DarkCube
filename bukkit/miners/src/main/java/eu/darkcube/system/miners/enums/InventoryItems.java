@@ -39,7 +39,14 @@ public enum InventoryItems implements ItemFactory {
     HOTBAR_ITEM_VOTING(item(PAPER), "hotbar_item_voting"),
 
     //Teams
-    INVENTORY_TEAM(item(), "inventory_team"),
+    INVENTORY_TEAM_RED(item(RED_WOOL), "inventory_team_red"),
+    INVENTORY_TEAM_BLUE(item(BLUE_WOOL), "inventory_team_blue"),
+    INVENTORY_TEAM_GREEN(item(GREEN_WOOL), "inventory_team_green"),
+    INVENTORY_TEAM_YELLOW(item(YELLOW_WOOL), "inventory_team_yellow"),
+    INVENTORY_TEAM_WHITE(item(WHITE_WOOL), "inventory_team_white"),
+    INVENTORY_TEAM_BLACK(item(BLACK_WOOL), "inventory_team_black"),
+    INVENTORY_TEAM_PURPLE(item(PURPLE_WOOL), "inventory_team_purple"),
+    INVENTORY_TEAM_ORANGE(item(ORANGE_WOOL), "inventory_team_orange"),
 
     // Ability
     INVENTORY_ABILITY_ITEM_DIGGER(item(IRON_PICKAXE), "inventory_ability_item_digger"),

@@ -19,6 +19,7 @@ import eu.darkcube.system.miners.gamephase.fightphase.FightPhase;
 import eu.darkcube.system.miners.gamephase.lobbyphase.LobbyPhase;
 import eu.darkcube.system.miners.gamephase.miningphase.MiningPhase;
 import eu.darkcube.system.miners.inventorys.lobby.OwnAbilitiesInventory;
+import eu.darkcube.system.miners.inventorys.lobby.TeamInventory;
 import eu.darkcube.system.miners.listener.PlayerJoinListener;
 import eu.darkcube.system.miners.listener.PlayerLeaveListener;
 import eu.darkcube.system.miners.manager.WorldManager;
@@ -36,6 +37,7 @@ public class Miners extends DarkCubePlugin {
     public Map<Player, MinersPlayer> minersPlayerMap = new HashMap<>();
     private GamePhase currentPhase;
     private OwnAbilitiesInventory ownAbilitiesInventory;
+    private TeamInventory teamInventory;
     private Team teamRed;
     private Team teamBlue;
     private Team teamGreen;
@@ -59,6 +61,7 @@ public class Miners extends DarkCubePlugin {
         var joinListener = new PlayerJoinListener();
         var leaveListener = new PlayerLeaveListener();
         ownAbilitiesInventory = new OwnAbilitiesInventory();
+        teamInventory = new TeamInventory();
 
         teamRed = new Team(Message.TEAM_RED, true);
         teamBlue = new Team(Message.TEAM_BLUE, true);
@@ -122,6 +125,10 @@ public class Miners extends DarkCubePlugin {
 
     public OwnAbilitiesInventory getOwnAbilitiesInventory() {
         return ownAbilitiesInventory;
+    }
+
+    public TeamInventory getTeamInventory() {
+        return teamInventory;
     }
 
     public Team getTeamOrange() {

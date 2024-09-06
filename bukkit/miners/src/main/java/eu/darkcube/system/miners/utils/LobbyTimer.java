@@ -16,27 +16,27 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class Timer extends BukkitRunnable {
-    public static int time = 30;
+public class LobbyTimer extends BukkitRunnable {
+    public static int lobbyTime = 30;
     public static boolean isTimerRunning = false;
 
     @Override
     public void run() {
-        time--;
+        lobbyTime--;
         isTimerRunning = true;
 
-        if (time <= 3 && time != 0) {
+        if (lobbyTime <= 3 && lobbyTime != 0) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 User user = UserAPI.instance().user(onlinePlayer.getUniqueId());
                 onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, (float) 1.0, (float) 2.0);
-                user.sendMessage(Message.SECOUND_LEFT, time);
+                user.sendMessage(Message.SECOUND_LEFT, lobbyTime);
             }
         }
 
-        if (time <= 0 || Bukkit.getOnlinePlayers().size() <= 1) {
+        if (lobbyTime <= 0 || Bukkit.getOnlinePlayers().size() <= 1) {
             cancel();
             isTimerRunning = false;
-            time = 30;
+            lobbyTime = 30;
         }
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

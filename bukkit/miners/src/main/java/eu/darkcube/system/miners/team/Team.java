@@ -8,6 +8,7 @@
 package eu.darkcube.system.miners.team;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import eu.darkcube.system.miners.utils.message.Message;
@@ -17,11 +18,13 @@ public class Team {
     private Message name;
     private Set<Player> players;
     private boolean isActive;
+    private List<Team> teams;
 
     public Team(Message name, boolean active) {
         this.name = name;
         this.isActive = active;
         this.players = new HashSet<>();
+        teams.add(this);
     }
 
     public boolean isActive() {
@@ -50,5 +53,13 @@ public class Team {
 
     public int getSize() {
         return players.size();
+    }
+
+    public static boolean isPlayerInTeam(Team team, Player player) {
+        return team.hasPlayer(player);
+    }
+
+    public List<Team> getTeams() {
+        return teams;
     }
 }

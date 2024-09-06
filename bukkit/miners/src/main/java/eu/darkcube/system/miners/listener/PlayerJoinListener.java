@@ -13,8 +13,8 @@ import eu.darkcube.system.miners.gamephase.endphase.EndPhase;
 import eu.darkcube.system.miners.gamephase.lobbyphase.LobbyPhase;
 import eu.darkcube.system.miners.gamephase.miningphase.MiningPhase;
 import eu.darkcube.system.miners.utils.ItemUtil;
+import eu.darkcube.system.miners.utils.LobbyTimer;
 import eu.darkcube.system.miners.utils.MinersPlayer;
-import eu.darkcube.system.miners.utils.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,8 +39,8 @@ public class PlayerJoinListener implements Listener {
         if(currentPhase instanceof LobbyPhase) {
             ItemUtil.setLobbyPhaseItems(player);
 
-            if (Bukkit.getOnlinePlayers().size() > 1 && !Timer.isTimerRunning) {
-                new Timer().runTaskTimer(Miners.getInstance(), 0L, 20L);
+            if (Bukkit.getOnlinePlayers().size() > 1 && !LobbyTimer.isTimerRunning) {
+                new LobbyTimer().runTaskTimer(Miners.getInstance(), 0L, 20L);
             }
 
         } else if(currentPhase instanceof MiningPhase) {

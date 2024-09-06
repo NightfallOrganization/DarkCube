@@ -11,6 +11,7 @@ public enum Names {
 
     SYSTEM("§7[§bWool§3Mania§7]"),
     ABILITIES("§7[§dAbilities§7]"),
+    TEAMS("§7[§9Teams§7]"),
 
     ;
 

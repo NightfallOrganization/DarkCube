@@ -28,7 +28,7 @@ public class LobbyRightClick implements Listener {
         if (event.getMaterial() == Material.OMINOUS_BOTTLE) {
             Miners.getInstance().getOwnAbilitiesInventory().openInventory(player);
         } else if (event.getMaterial() == Material.BOOK) {
-            NO.playSound(player);
+            Miners.getInstance().getTeamInventory().openInventory(player);
         } else if (event.getMaterial() == Material.COMPARATOR) {
             NO.playSound(player);
         } else if (event.getMaterial() == Material.ENDER_CHEST) {
