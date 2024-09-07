@@ -14,7 +14,16 @@ import org.bukkit.World;
 public enum TeleportLocations {
     LOBBY(WorldManager.LOBBY, -116.5, 45, -100.5, 0, 0),
     ARENA(WorldManager.ARENA, 0.5, 111, 0.5, -90, 0),
-    MINE(WorldManager.MINE, 0.5, 111, 1000.5, -90, 0),
+
+
+    MINE_RED(WorldManager.MINE, 0.5, 80, 0.5, 0, 0),
+    MINE_BLUE(WorldManager.MINE, 0.5, 80, 10000.5, 0, 0),
+    MINE_GREEN(WorldManager.MINE, 0.5, 80, 20000.5, 0, 0),
+    MINE_YELLOW(WorldManager.MINE, 0.5, 80, 30000.5, 0, 0),
+    MINE_WHITE(WorldManager.MINE, 0.5, 80, 40000.5, 0, 0),
+    MINE_BLACK(WorldManager.MINE, 0.5, 80, 50000.5, 0, 0),
+    MINE_PURPLE(WorldManager.MINE, 0.5, 80, 60000.5, 0, 0),
+    MINE_ORANGE(WorldManager.MINE, 0.5, 80, 70000.5, 0, 0),
 
     ;
 

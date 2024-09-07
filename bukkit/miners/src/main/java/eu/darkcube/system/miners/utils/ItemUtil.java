@@ -10,6 +10,7 @@ package eu.darkcube.system.miners.utils;
 import static eu.darkcube.system.miners.enums.InventoryItems.*;
 
 import eu.darkcube.system.miners.enums.InventoryItems;
+import eu.darkcube.system.miners.items.StarterPickaxeItem;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.userapi.UserAPI;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 public class ItemUtil {
 
     public static void setLobbyPhaseItems(Player player) {
+        player.getInventory().clear();
         setItem(HOTBAR_ITEM_ABILITIES, player, 0);
         setItem(HOTBAR_ITEM_TEAMS, player, 1);
         setItem(HOTBAR_ITEM_SETTINGS, player, 4);
@@ -26,11 +28,13 @@ public class ItemUtil {
     }
 
     public static void setMiningPhaseItems(Player player) {
-
+        User user = UserAPI.instance().user(player.getUniqueId());
+        player.getInventory().clear();
+        player.getInventory().setItem(0, new StarterPickaxeItem(user).getItemStack());
     }
 
     public static void setEndPhaseItems(Player player) {
-
+        player.getInventory().clear();
     }
 
     private static void setItem(InventoryItems item, Player player, int slot) {

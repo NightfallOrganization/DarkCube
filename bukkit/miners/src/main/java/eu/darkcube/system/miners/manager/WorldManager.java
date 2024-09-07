@@ -7,7 +7,8 @@
 
 package eu.darkcube.system.miners.manager;
 
-import eu.darkcube.system.miners.worldgen.VoidWorldGenerator;
+import eu.darkcube.system.miners.worldgen.defaultgen.VoidWorldGenerator;
+import eu.darkcube.system.miners.worldgen.minegen.MineGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -24,7 +25,7 @@ public class WorldManager {
         LOBBY.setViewDistance(4);
         LOBBY.setSimulationDistance(4);
         ARENA = loadOrCreateWorldWithGenerator("Arena", new VoidWorldGenerator());
-        MINE = loadOrCreateWorldWithGenerator("Mine", new VoidWorldGenerator());
+        MINE = loadOrCreateWorldWithGenerator("Mine", new MineGenerator());
         MINE.setViewDistance(4);
         MINE.setSimulationDistance(4);
     }

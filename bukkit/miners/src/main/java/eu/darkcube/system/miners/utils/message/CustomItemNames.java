@@ -19,6 +19,7 @@ import eu.darkcube.system.util.Language;
 import org.bukkit.entity.Player;
 
 public enum CustomItemNames implements BaseMessage {
+    ITEM_STARTER_PICKAXE
 
     ;
 

@@ -5,8 +5,9 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.miners.utils;
+package eu.darkcube.system.miners.gamephase.lobbyphase;
 
+import eu.darkcube.system.miners.utils.MinersPlayer;
 import eu.darkcube.system.miners.utils.message.Message;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
@@ -20,7 +21,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
-public class GameScoreboard implements Listener {
+public class LobbyScoreboard implements Listener {
     private static final String ENTRY_HARDCORE = "§1";
     private static final String ENTRY_TIME = "§2";
     private static final String ENTRY_ABILITY = "§3";

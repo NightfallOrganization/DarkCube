@@ -7,25 +7,30 @@
 
 package eu.darkcube.system.miners;
 
+import static eu.darkcube.system.miners.enums.TeleportLocations.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import eu.darkcube.system.bukkit.DarkCubePlugin;
+import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.miners.commands.SetTeamCommand;
+import eu.darkcube.system.miners.commands.StartCommand;
 import eu.darkcube.system.miners.gamephase.GamePhase;
 import eu.darkcube.system.miners.gamephase.Ruler;
 import eu.darkcube.system.miners.gamephase.endphase.EndPhase;
 import eu.darkcube.system.miners.gamephase.fightphase.FightPhase;
 import eu.darkcube.system.miners.gamephase.lobbyphase.LobbyPhase;
+import eu.darkcube.system.miners.gamephase.lobbyphase.LobbyScoreboard;
 import eu.darkcube.system.miners.gamephase.miningphase.MiningPhase;
 import eu.darkcube.system.miners.inventorys.lobby.OwnAbilitiesInventory;
 import eu.darkcube.system.miners.inventorys.lobby.TeamInventory;
 import eu.darkcube.system.miners.listener.PlayerJoinListener;
 import eu.darkcube.system.miners.listener.PlayerLeaveListener;
 import eu.darkcube.system.miners.manager.WorldManager;
-import eu.darkcube.system.miners.team.Team;
-import eu.darkcube.system.miners.utils.GameScoreboard;
 import eu.darkcube.system.miners.utils.MinersPlayer;
+import eu.darkcube.system.miners.utils.Team;
 import eu.darkcube.system.miners.utils.message.LanguageHelper;
 import eu.darkcube.system.miners.utils.message.Message;
 import org.bukkit.Bukkit;
@@ -33,11 +38,9 @@ import org.bukkit.entity.Player;
 
 public class Miners extends DarkCubePlugin {
     private static Miners instance;
-    private GameScoreboard gameScoreboard;
+    private LobbyScoreboard lobbyScoreboard;
     public Map<Player, MinersPlayer> minersPlayerMap = new HashMap<>();
     private GamePhase currentPhase;
-    private OwnAbilitiesInventory ownAbilitiesInventory;
-    private TeamInventory teamInventory;
     private Team teamRed;
     private Team teamBlue;
     private Team teamGreen;
@@ -46,6 +49,8 @@ public class Miners extends DarkCubePlugin {
     private Team teamBlack;
     private Team teamPurple;
     private Team teamOrange;
+    private OwnAbilitiesInventory ownAbilitiesInventory;
+    private TeamInventory teamInventory;
 
     public Miners() {
         super("miners");
@@ -55,29 +60,33 @@ public class Miners extends DarkCubePlugin {
     @Override
     public void onEnable() {
         WorldManager.loadWorlds();
-        gameScoreboard = new GameScoreboard();
+        lobbyScoreboard = new LobbyScoreboard();
         LanguageHelper.initialize();
+
+        teamRed = new Team(Message.TEAM_RED, MINE_RED, true);
+        teamBlue = new Team(Message.TEAM_BLUE, MINE_BLUE,true);
+        teamGreen = new Team(Message.TEAM_GREEN, MINE_GREEN,true);
+        teamYellow = new Team(Message.TEAM_YELLOW, MINE_YELLOW,true);
+        teamWhite = new Team(Message.TEAM_WHITE, MINE_WHITE,true);
+        teamBlack = new Team(Message.TEAM_BLACK, MINE_BLACK,true);
+        teamPurple = new Team(Message.TEAM_PURPLE, MINE_PURPLE,true);
+        teamOrange = new Team(Message.TEAM_ORANGE, MINE_ORANGE,true);
+
         var ruler = new Ruler();
         var joinListener = new PlayerJoinListener();
         var leaveListener = new PlayerLeaveListener();
         ownAbilitiesInventory = new OwnAbilitiesInventory();
         teamInventory = new TeamInventory();
 
-        teamRed = new Team(Message.TEAM_RED, true);
-        teamBlue = new Team(Message.TEAM_BLUE, true);
-        teamGreen = new Team(Message.TEAM_GREEN, true);
-        teamYellow = new Team(Message.TEAM_YELLOW, true);
-        teamWhite = new Team(Message.TEAM_WHITE, true);
-        teamBlack = new Team(Message.TEAM_BLACK, true);
-        teamPurple = new Team(Message.TEAM_PURPLE, true);
-        teamOrange = new Team(Message.TEAM_ORANGE, true);
-
         instance.getServer().getPluginManager().registerEvents(ruler, this);
         instance.getServer().getPluginManager().registerEvents(joinListener, this);
         instance.getServer().getPluginManager().registerEvents(leaveListener, this);
 
+        CommandAPI.instance().register(new SetTeamCommand());
+        CommandAPI.instance().register(new StartCommand());
+
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            gameScoreboard.createGameScoreboard(onlinePlayer);
+            lobbyScoreboard.createGameScoreboard(onlinePlayer);
         }
 
         currentPhase = new LobbyPhase();
@@ -94,7 +103,7 @@ public class Miners extends DarkCubePlugin {
     public void enableNextPhase() {
         currentPhase.disable();
         currentPhase = switch (currentPhase) {
-            case LobbyPhase lobby -> new MiningPhase(lobby);
+            case LobbyPhase _ -> new MiningPhase();
             case MiningPhase _ -> new FightPhase();
             case FightPhase _ -> new EndPhase();
             case null, default -> throw new IllegalStateException("Invalid phase");
@@ -107,8 +116,8 @@ public class Miners extends DarkCubePlugin {
         return instance;
     }
 
-    public GameScoreboard getGameScoreboard() {
-        return gameScoreboard;
+    public LobbyScoreboard getGameScoreboard() {
+        return lobbyScoreboard;
     }
 
     public MinersPlayer getPlayer(@NotNull Player player) {

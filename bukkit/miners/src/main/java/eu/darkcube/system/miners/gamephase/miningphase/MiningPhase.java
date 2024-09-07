@@ -7,17 +7,11 @@
 
 package eu.darkcube.system.miners.gamephase.miningphase;
 
-import java.util.Map;
-
 import eu.darkcube.system.miners.gamephase.GamePhase;
-import eu.darkcube.system.miners.gamephase.lobbyphase.LobbyPhase;
-import org.bukkit.scoreboard.Team;
 
 public class MiningPhase extends GamePhase {
-    private final Map<String, Team> teams;
-
-    public MiningPhase(LobbyPhase lobbyPhase) {
-        teams = lobbyPhase.getTeams();
+    public MiningPhase() {
+        listeners.add(new MiningPhaseBlockBreak());
     }
 
     @Override

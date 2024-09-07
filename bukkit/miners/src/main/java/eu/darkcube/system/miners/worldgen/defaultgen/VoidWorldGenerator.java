@@ -5,7 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
-package eu.darkcube.system.miners.worldgen;
+package eu.darkcube.system.miners.worldgen.defaultgen;
 
 import java.util.Random;
 

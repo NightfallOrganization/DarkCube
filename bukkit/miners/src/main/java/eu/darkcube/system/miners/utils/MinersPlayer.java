@@ -76,6 +76,10 @@ public class MinersPlayer {
     public boolean isActiveAbility(Abilities ability) {
         return activeAbility.getOrDefault() == ability;
     }
+
+    public Sounds getFarmingSound() {
+        return farmingSound.getOrDefault();
+    }
     //</editor-fold>
 
     //<editor-fold desc="Setter">

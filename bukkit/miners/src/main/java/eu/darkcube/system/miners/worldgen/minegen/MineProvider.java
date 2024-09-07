@@ -1,11 +1,4 @@
-/*
- * Copyright (c) 2024. [DarkCube]
- * All rights reserved.
- * You may not use or redistribute this software or any associated files without permission.
- * The above copyright notice shall be included in all copies of this software.
- */
-
-package eu.darkcube.system.miners.worldgen;
+package eu.darkcube.system.miners.worldgen.minegen;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,11 +8,11 @@ import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
 
-public class DefaultProvider extends BiomeProvider {
+public class MineProvider extends BiomeProvider {
 
     public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
 
-        return Biome.PLAINS;
+        return Biome.JUNGLE;
     }
 
     @Override
