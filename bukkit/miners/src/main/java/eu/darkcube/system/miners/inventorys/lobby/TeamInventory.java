@@ -9,6 +9,7 @@ package eu.darkcube.system.miners.inventorys.lobby;
 
 import static eu.darkcube.system.miners.enums.InventoryItems.*;
 import static eu.darkcube.system.miners.enums.Names.TEAMS;
+import static eu.darkcube.system.miners.enums.Sounds.SELECT;
 import static eu.darkcube.system.miners.utils.message.Message.TEAM_JOIN;
 
 import java.util.function.Function;
@@ -24,6 +25,8 @@ import eu.darkcube.system.server.inventory.Inventory;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.server.inventory.TemplateInventory;
 import eu.darkcube.system.server.inventory.listener.TemplateInventoryListener;
+import eu.darkcube.system.server.inventory.paged.PagedInventoryContent;
+import eu.darkcube.system.server.inventory.paged.PagedTemplateSettings;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Bukkit;
@@ -44,8 +47,12 @@ public class TeamInventory implements TemplateInventoryListener {
         inventoryTemplate = Inventory.createChestTemplate(Key.key(Miners.getInstance(), "teams"), 45);
         inventoryTemplate.title(TEAMS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
-        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, HOTBAR_ITEM_TEAMS);
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_5);
+        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, HOTBAR_ITEM_TEAMS);
+        PagedTemplateSettings pagination = inventoryTemplate.pagination();
+        pagination.specialPageSlots(21, 23);
+        pagination.specialPageSlots(20, 21, 23, 24);
+        pagination.specialPageSlots(20, 21, 23, 24, 30, 32, 33, 29);
 
         Team teamRed = Miners.getInstance().getTeamRed();
         Team teamBlue = Miners.getInstance().getTeamBlue();
@@ -56,21 +63,23 @@ public class TeamInventory implements TemplateInventoryListener {
         Team teamPurple = Miners.getInstance().getTeamPurple();
         Team teamOrange = Miners.getInstance().getTeamOrange();
 
-        setTeamItem(21, teamRed, getDisplayItem(INVENTORY_TEAM_RED, teamRed));
-        setTeamItem(23, teamBlue, getDisplayItem(INVENTORY_TEAM_BLUE, teamBlue));
-        setTeamItem(24, teamGreen, getDisplayItem(INVENTORY_TEAM_GREEN, teamGreen));
-        setTeamItem(20, teamYellow, getDisplayItem(INVENTORY_TEAM_YELLOW, teamYellow));
-        setTeamItem(30, teamWhite, getDisplayItem(INVENTORY_TEAM_WHITE, teamWhite));
-        setTeamItem(32, teamBlack, getDisplayItem(INVENTORY_TEAM_BLACK, teamBlack));
-        setTeamItem(33, teamPurple, getDisplayItem(INVENTORY_TEAM_PURPLE, teamPurple));
-        setTeamItem(29, teamOrange, getDisplayItem(INVENTORY_TEAM_ORANGE, teamOrange));
+        setTeamItem(teamRed, INVENTORY_TEAM_RED);
+        setTeamItem(teamBlue, INVENTORY_TEAM_BLUE);
+        setTeamItem(teamGreen, INVENTORY_TEAM_GREEN);
+        setTeamItem(teamYellow, INVENTORY_TEAM_YELLOW);
+        setTeamItem(teamWhite, INVENTORY_TEAM_WHITE);
+        setTeamItem(teamBlack, INVENTORY_TEAM_BLACK);
+        setTeamItem(teamPurple, INVENTORY_TEAM_PURPLE);
+        setTeamItem(teamOrange, INVENTORY_TEAM_ORANGE);
 
         inventoryTemplate.addListener(this);
     }
 
-    private void setTeamItem(int slot, Team team, Function<User, Object> item) {
+    private void setTeamItem(Team team, InventoryItems item) {
         if (team.isActive()) {
-            inventoryTemplate.setItem(1, slot, item);
+            PagedTemplateSettings pagination = inventoryTemplate.pagination();
+            PagedInventoryContent content = pagination.content();
+            content.addStaticItem(getDisplayItem(item, team));
         }
     }
 
@@ -88,28 +97,26 @@ public class TeamInventory implements TemplateInventoryListener {
     @Override
     public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item) {
         String clickedInventoryItem = InventoryItems.getItemID(item);
-        if (clickedInventoryItem == null) return;
         Player player = Bukkit.getPlayer(user.uniqueId());
-        player.sendMessage("§7onClick");
+        if (clickedInventoryItem == null) return;
 
         onClickTeam(INVENTORY_TEAM_RED, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_BLUE, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_GREEN, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_YELLOW, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_WHITE, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_BLACK, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_PURPLE, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
-        onClickTeam(INVENTORY_TEAM_ORANGE, Miners.getInstance().getTeamRed(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_BLUE, Miners.getInstance().getTeamBlue(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_GREEN, Miners.getInstance().getTeamGreen(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_YELLOW, Miners.getInstance().getTeamYellow(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_WHITE, Miners.getInstance().getTeamWhite(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_BLACK, Miners.getInstance().getTeamBlack(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_PURPLE, Miners.getInstance().getTeamPurple(), clickedInventoryItem, player, user);
+        onClickTeam(INVENTORY_TEAM_ORANGE, Miners.getInstance().getTeamOrange(), clickedInventoryItem, player, user);
 
         inventory.pagedController().publishUpdatePage();
     }
 
     private void onClickTeam(InventoryItems inventoryItems, Team team, String clickedInventoryItem, Player player, User user) {
-        player.sendMessage("§7onClickTeam");
         if (clickedInventoryItem.equals(inventoryItems.itemID())) {
             team.addPlayer(player);
+            SELECT.playSound(player);
             user.sendMessage(TEAM_JOIN, team.getName());
         }
-
     }
 }

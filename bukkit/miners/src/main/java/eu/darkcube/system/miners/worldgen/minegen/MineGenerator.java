@@ -27,21 +27,19 @@ public class MineGenerator extends ChunkGenerator {
                 Material.EMERALD_ORE,
                 Material.REDSTONE_ORE,
                 Material.TNT,
-                Material.OAK_PLANKS,
                 Material.COAL_ORE,
         };
 
         // Wahrscheinlichkeiten in Promille (10000 für 100%, 1 für 0,1%, etc.)
         int[] probabilities = {
-                9525,  // STONE
+                9550,  // STONE
                 50,    // GOLD_ORE
-                50,    // IRON_ORE
+                75,    // IRON_ORE
                 15,    // DIAMOND_ORE
                 40,    // EMERALD_ORE
                 100,    // REDSTONE_ORE
                 20,    // TNT
-                50,    // OAK_PLANKS
-                50,    // COAL_ORE
+                150,    // COAL_ORE
         };
 
         int[] cumulativeProbabilities = new int[probabilities.length];

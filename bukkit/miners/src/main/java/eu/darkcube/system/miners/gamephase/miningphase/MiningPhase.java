@@ -11,6 +11,7 @@ import eu.darkcube.system.miners.gamephase.GamePhase;
 
 public class MiningPhase extends GamePhase {
     public MiningPhase() {
+        listeners.add(new MiningPhaseRuler());
         listeners.add(new MiningPhaseBlockBreak());
     }
 

@@ -17,6 +17,7 @@ import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.miners.commands.SetTeamCommand;
 import eu.darkcube.system.miners.commands.StartCommand;
+import eu.darkcube.system.miners.commands.TimerCommand;
 import eu.darkcube.system.miners.gamephase.GamePhase;
 import eu.darkcube.system.miners.gamephase.Ruler;
 import eu.darkcube.system.miners.gamephase.endphase.EndPhase;
@@ -82,6 +83,7 @@ public class Miners extends DarkCubePlugin {
         instance.getServer().getPluginManager().registerEvents(joinListener, this);
         instance.getServer().getPluginManager().registerEvents(leaveListener, this);
 
+        CommandAPI.instance().register(new TimerCommand());
         CommandAPI.instance().register(new SetTeamCommand());
         CommandAPI.instance().register(new StartCommand());
 

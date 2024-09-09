@@ -24,7 +24,6 @@ public class ItemUtil {
         setItem(HOTBAR_ITEM_SETTINGS, player, 4);
         setItem(HOTBAR_ITEM_SHOP, player, 7);
         setItem(HOTBAR_ITEM_VOTING, player, 8);
-        System.out.println("setLobbyPhaseItems");
     }
 
     public static void setMiningPhaseItems(Player player) {
@@ -34,7 +33,7 @@ public class ItemUtil {
     }
 
     public static void setEndPhaseItems(Player player) {
-        player.getInventory().clear();
+
     }
 
     private static void setItem(InventoryItems item, Player player, int slot) {

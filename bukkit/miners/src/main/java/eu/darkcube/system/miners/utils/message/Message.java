@@ -42,6 +42,7 @@ public enum Message implements BaseMessage {
     DEACTIVATE_ABILITY,
     SECOUND_LEFT,
     TEAM_JOIN,
+    TIME_SET,
 
     ;
 

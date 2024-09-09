@@ -96,6 +96,8 @@ public class OwnAbilitiesInventory implements TemplateInventoryListener {
 
     private Function<User, ItemBuilder> getDisplayItem(InventoryItems item, int position, Abilities ability, MinersPlayer minersPlayer) {
         return user -> {
+            // Player player = Bukkit.getPlayer(user.uniqueId());
+            // player.sendMessage("§7getDisplayItem");
             if (minersPlayer.isActiveAbility(ability)) {
                 ItemBuilder itemBuilder = item.getItem(user, ITEM_IS_ACTIVE.getMessage(user));
                 itemBuilder.persistentDataStorage().set(KEY_POSITION, position);
