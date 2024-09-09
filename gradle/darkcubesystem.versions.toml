@@ -10,4 +10,3 @@ minestom = { group = "eu.darkcube.system", name = "darkcubesystem-minestom", ver
 proxy = { group = "eu.darkcube.system", name = "darkcubesystem-proxy", version.ref = "darkcubesystem" }
 server = { group = "eu.darkcube.system", name = "darkcubesystem-server", version.ref = "darkcubesystem" }
 server-cloudnet = { group = "eu.darkcube.system", name = "darkcubesystem-server-cloudnet", version.ref = "darkcubesystem" }
-kyori-wrapper = { group = "eu.darkcube.system", name = "darkcubesystem-kyori-wrapper", version.ref = "darkcubesystem" }

@@ -1,5 +1,0 @@
-main: eu.darkcube.system.woolmania.WoolMania
-name: WoolMania
-version: 1.0
-depend: [System]
-api-version: 1.13

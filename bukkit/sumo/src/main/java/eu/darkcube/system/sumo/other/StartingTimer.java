@@ -102,7 +102,7 @@ public class StartingTimer implements Listener {
         }
 
         timer = 15;
-        task = new TimerRunnable().runTaskTimer(sumo, 0L, 20L);
+        task = new TimerRunnable().runTaskTimer(sumo, 20L, 20L);
         running = true;
     }
 

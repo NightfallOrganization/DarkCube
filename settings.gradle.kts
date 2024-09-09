@@ -54,7 +54,6 @@ include("bukkit:miners")
 include("bukkit:skyland")
 include("bukkit:vanillaaddons")
 include("bukkit:sumo")
-include("bukkit:woolmania")
 //include "bukkit:smash"
 include("bukkit:statsapi")
 //include("bungee")
