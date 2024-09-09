@@ -37,12 +37,14 @@ public class SetupMode {
     }
 
     public synchronized void playerJoined(@NotNull CommonWBUser user) {
-        woolbattle.logger().info("Player {} entered SetupMode", user.playerName());
-        woolbattle.api().eventManager().call(new UserEnterSetupEvent(user));
-        var world = getOrCreateWorld();
-        var implementation = implementation();
-        implementation.joinWorld(user, world);
-        users.add(user);
+        if (!users.contains(user)) {
+            woolbattle.logger().info("Player {} entered SetupMode", user.playerName());
+            woolbattle.api().eventManager().call(new UserEnterSetupEvent(user));
+            var world = getOrCreateWorld();
+            var implementation = implementation();
+            implementation.joinWorld(user, world);
+            users.add(user);
+        }
     }
 
     public synchronized void playerQuit(@NotNull CommonWBUser user) {

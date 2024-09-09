@@ -7,15 +7,31 @@
 
 package eu.darkcube.minigame.woolbattle.api.entity;
 
+import java.util.function.Consumer;
+
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.server.item.ItemBuilder;
 
 public interface EntityImplementations {
-    @NotNull Projectile launchSnowball(@NotNull WBUser fromUser);
+    @NotNull
+    Arrow spawnArrow(@NotNull Location location, @NotNull Vector velocity, float speed, float spread);
 
-    @NotNull Projectile launchEgg(@NotNull WBUser fromUser);
+    @NotNull
+    Arrow shootArrow(@Nullable WBUser shooter, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
 
-    @NotNull Projectile spawnArrow(@NotNull Location location, @NotNull Vector direction, float speed, float spread);
+    @NotNull
+    <T extends Projectile> T spawnProjectile(@NotNull EntityType<T> type, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
+
+    @NotNull
+    <T extends Projectile> T shootProjectile(@NotNull EntityType<T> type, @Nullable WBUser user, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
+
+    @NotNull
+    <T extends ItemEntity> T spawnItem(@NotNull Location location, @NotNull Vector velocity, @NotNull ItemBuilder item, @Nullable Consumer<T> preSpawnCallback);
+
+    @NotNull
+    <T extends Entity> T spawn(@NotNull EntityType<T> type, @NotNull Location location, @NotNull Vector velocity, @Nullable Consumer<T> preSpawnCallback);
 }

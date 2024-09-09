@@ -7,5 +7,12 @@
 
 package eu.darkcube.minigame.woolbattle.api.entity;
 
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+
 public interface Projectile extends Entity {
+    @Nullable
+    WBUser shooter();
+
+    void shooter(@Nullable WBUser shooter);
 }

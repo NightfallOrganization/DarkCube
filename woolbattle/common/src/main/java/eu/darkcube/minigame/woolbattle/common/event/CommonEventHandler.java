@@ -17,8 +17,7 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.server.item.material.Material;
-import eu.darkcube.system.userapi.UserAPI;
+import eu.darkcube.system.server.item.ItemBuilder;
 
 public class CommonEventHandler {
     private final CommonWoolBattle woolbattle;
@@ -27,7 +26,7 @@ public class CommonEventHandler {
         this.woolbattle = woolbattle;
     }
 
-    public @Nullable JoinResult playerJoined(UUID uniqueId) {
+    public @Nullable CommonEventHandler.ConfigurationResult playerConfiguration(UUID uniqueId) {
         var lobbySystemLink = woolbattle.api().lobbySystemLink();
         var connectionRequests = lobbySystemLink.connectionRequests();
         for (var entry : connectionRequests.asMap().entrySet()) {
@@ -36,15 +35,14 @@ public class CommonEventHandler {
             connectionRequests.invalidate(entry.getKey());
 
             var game = request.game();
-            var rawUser = UserAPI.instance().user(uniqueId);
-            var user = new CommonWBUser(woolbattle.api(), rawUser, game);
-            return new JoinResult(user, game);
+            var user = woolbattle.userFactory().create(uniqueId, game);
+            return new ConfigurationResult(user, game);
         }
         return null;
     }
 
-    public @NotNull PlaceResult blockPlace(@NotNull CommonWBUser user, @NotNull CommonBlock block, @NotNull Material material) {
-        var event = new PlaceBlockEvent(user, block, material);
+    public @NotNull PlaceResult blockPlace(@NotNull CommonWBUser user, @NotNull CommonBlock block, @NotNull ItemBuilder item) {
+        var event = new PlaceBlockEvent(user, block, item);
         woolbattle.api().eventManager().call(event);
         return new PlaceResult(event.cancelled());
     }
@@ -61,6 +59,6 @@ public class CommonEventHandler {
     public record PlaceResult(boolean cancel) {
     }
 
-    public record JoinResult(@NotNull CommonWBUser user, @Nullable CommonGame game) {
+    public record ConfigurationResult(@NotNull CommonWBUser user, @Nullable CommonGame game) {
     }
 }

@@ -13,7 +13,6 @@ import java.util.List;
 
 import dev.derklaro.aerogel.Inject;
 import dev.derklaro.aerogel.Singleton;
-import eu.cloudnetservice.common.log.Logger;
 import eu.cloudnetservice.driver.document.Document;
 import eu.cloudnetservice.driver.event.EventListener;
 import eu.cloudnetservice.driver.provider.CloudServiceProvider;
@@ -26,9 +25,12 @@ import eu.cloudnetservice.driver.service.ServiceTask;
 import eu.cloudnetservice.node.event.instance.CloudNetTickServiceStartEvent;
 import eu.darkcube.system.cloudnet.DarkCubeServiceProperty;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class ServiceListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceListener.class);
     private final ServiceHelper woolbattle;
     private final ServiceTaskProvider serviceTaskProvider;
     private final CloudServiceProvider cloudServiceProvider;
@@ -76,7 +78,7 @@ public class ServiceListener {
     private void startService(ServiceTask task) {
         ServiceCreateResult result = ServiceConfiguration.builder(task).retryConfiguration(ServiceCreateRetryConfiguration.NO_RETRY).build().createNewService();
         if (result.state() != ServiceCreateResult.State.CREATED) {
-            Logger.getLogger("ServiceHelper").info("Failed to create service for task " + task.name());
+            LOGGER.info("Failed to create service for task {}", task.name());
             return;
         }
         result.serviceInfo().provider().start();

@@ -16,12 +16,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamType;
-import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.translation.Messages;
 import eu.darkcube.system.commandapi.CommandExecutor;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 
@@ -30,17 +31,17 @@ public class CommonTeam implements Team {
     private final @NotNull UUID uniqueId;
     private final @NotNull String key;
     private final @NotNull TeamType teamType;
-    private final @NotNull Style nameStyle;
+    private final @NotNull TextColor nameColor;
     private final @NotNull ColoredWool woolColor;
-    private final @NotNull Collection<WBUser> users = new CopyOnWriteArraySet<>();
+    private final @NotNull Collection<CommonWBUser> users = new CopyOnWriteArraySet<>();
     private volatile int lifes;
 
-    public CommonTeam(@NotNull Game game, @NotNull UUID uniqueId, @NotNull String key, @NotNull TeamType teamType, @NotNull Style nameStyle, @NotNull ColoredWool woolColor) {
+    public CommonTeam(@NotNull Game game, @NotNull UUID uniqueId, @NotNull String key, @NotNull TeamType teamType, @NotNull TextColor nameColor, @NotNull ColoredWool woolColor) {
         this.game = game;
         this.uniqueId = uniqueId;
         this.key = key;
         this.teamType = teamType;
-        this.nameStyle = nameStyle;
+        this.nameColor = nameColor;
         this.woolColor = woolColor;
     }
 
@@ -56,16 +57,16 @@ public class CommonTeam implements Team {
 
     @Override
     public @NotNull Component getName(@NotNull CommandExecutor executor) {
-        return Messages.getMessage(Messages.TEAM_PREFIX + key.toUpperCase(Locale.ROOT), executor.language()).style(nameStyle());
+        return Messages.getMessage(Messages.TEAM_PREFIX + key.toUpperCase(Locale.ROOT), executor.language()).style(Style.style(nameColor()));
     }
 
     @Override
-    public @NotNull Style nameStyle() {
-        return nameStyle;
+    public @NotNull TextColor nameColor() {
+        return nameColor;
     }
 
     @Override
-    public @Unmodifiable @NotNull Collection<WBUser> users() {
+    public @Unmodifiable @NotNull Collection<CommonWBUser> users() {
         return Set.copyOf(users);
     }
 
@@ -103,11 +104,17 @@ public class CommonTeam implements Team {
         return uniqueId;
     }
 
-    public String key() {
+    @Override
+    public @NotNull String key() {
         return key;
     }
 
-    public @NotNull Collection<WBUser> usersModifiable() {
+    public @NotNull Collection<CommonWBUser> usersModifiable() {
         return users;
+    }
+
+    @Override
+    public String toString() {
+        return "CommonTeam{" + "key='" + key + '\'' + ", lifes=" + lifes + ", game=" + game.id() + '}';
     }
 }

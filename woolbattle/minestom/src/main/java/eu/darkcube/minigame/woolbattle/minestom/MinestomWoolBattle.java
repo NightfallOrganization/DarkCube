@@ -12,32 +12,39 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
+import eu.darkcube.minigame.woolbattle.api.perk.PerkItem;
+import eu.darkcube.minigame.woolbattle.api.perk.user.DefaultUserPerk;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
-import eu.darkcube.minigame.woolbattle.common.entity.CommonEntityMetaDataStorage;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeam;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
+import eu.darkcube.minigame.woolbattle.common.util.Slot;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
-import eu.darkcube.minigame.woolbattle.minestom.entity.MinestomEntity;
+import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomChatListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInteractListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInventoryListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomItemListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomJoinListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomMoveListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomQuitListener;
+import eu.darkcube.minigame.woolbattle.minestom.perk.MinestomPerkItemImplementation;
+import eu.darkcube.minigame.woolbattle.minestom.perk.MinestomUserPerkImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.setup.MinestomSetupModeImplementation;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserFactory;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPermissions;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUserPlatformAccess;
+import eu.darkcube.minigame.woolbattle.minestom.util.MinestomSlotMappings;
 import eu.darkcube.minigame.woolbattle.minestom.util.item.MinestomItemsProvider;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.KeyPattern;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
-import eu.darkcube.system.util.data.BasicMetaDataStorage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.instance.Instance;
@@ -47,24 +54,31 @@ import net.minestom.server.timer.TaskSchedule;
 public class MinestomWoolBattle extends CommonWoolBattle {
     private final @NotNull MinestomWoolBattleApi api;
     private final @NotNull Map<Instance, MinestomWorld> worlds = new ConcurrentHashMap<>();
-    private final @NotNull Map<Entity, MinestomEntity> entities = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, BasicMetaDataStorage> entityMetas = new ConcurrentHashMap<>();
     private final @NotNull Key playerKey;
     private final @NotNull MinestomSetupModeImplementation setupModeImplementation;
+    private final @NotNull MinestomUserFactory userFactory;
 
     public MinestomWoolBattle() {
         super();
         this.api = new MinestomWoolBattleApi(this);
         WoolBattleProvider.PROVIDER.register(WoolBattleApi.class, this.api);
+        WoolBattleProvider.PROVIDER.register(Slot.Mappings.class, new MinestomSlotMappings());
+        WoolBattleProvider.PROVIDER.register(DefaultUserPerk.Implementation.class, new MinestomUserPerkImplementation());
+        WoolBattleProvider.PROVIDER.register(PerkItem.Implementation.class, new MinestomPerkItemImplementation(this));
         this.playerKey = Key.key(this.api, "minestom_player");
+        this.userFactory = new MinestomUserFactory(this);
         this.setupModeImplementation = new MinestomSetupModeImplementation(this.api);
     }
 
     @Override
     public void start() {
-        WoolBattleProvider.PROVIDER.register(Items.Provider.class, new MinestomItemsProvider());
+        WoolBattleProvider.PROVIDER.register(Items.Provider.class, new MinestomItemsProvider(this));
 
         super.start();
+
+        // var e = new MinestomEntity(new Entity(net.minestom.server.entity.EntityType.ARROW).acquirable(), this);
+        // api.entityImplementations().createWrapped(EntityType.ITEM, e);
+        // api.entityImplementations().createWrapped(EntityType.ARROW, e);
 
         var eventManager = MinecraftServer.getGlobalEventHandler();
         MinestomJoinListener.register(this, eventManager);
@@ -75,6 +89,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         MinestomInventoryListener.register(this, eventManager);
         MinestomAnimationListener.register(this, eventManager);
         MinestomInteractListener.register(this, eventManager);
+        MinestomChatListener.register(this, eventManager);
 
         MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
@@ -107,8 +122,18 @@ public class MinestomWoolBattle extends CommonWoolBattle {
     }
 
     @Override
+    public @NotNull MinestomUserFactory userFactory() {
+        return userFactory;
+    }
+
+    @Override
     public @NotNull MinestomWoolBattleApi api() {
         return api;
+    }
+
+    @Override
+    public @NotNull CommandSender consoleSender() {
+        return wrapCommandSender(MinecraftServer.getCommandManager().getConsoleSender());
     }
 
     @Override
@@ -142,19 +167,12 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         return worlds;
     }
 
-    public CommonEntityMetaDataStorage entityMeta(MinestomEntity entity) {
-        return new CommonEntityMetaDataStorage(entityMetas, String.valueOf(entity.entity().unwrap().getEntityId()));
+    public eu.darkcube.minigame.woolbattle.api.entity.Entity entity(Acquirable<Entity> entity) {
+        if (entity.unwrap() instanceof MinestomPlayer player) return player.user();
+        return ((EntityImpl) entity.unwrap()).handle();
     }
 
-    public MinestomEntity entity(Acquirable<Entity> entity) {
-        return entities.computeIfAbsent(entity.unwrap(), k -> new MinestomEntity(k.getAcquirable(), this));
-    }
-
-    public void removed(MinestomEntity entity) {
-        entities.remove(entity.entity().unwrap());
-        entityMeta(entity).clear();
-    }
-
+    @KeyPattern.Namespace
     @Override
     public @NotNull String namespace() {
         return this.api.namespace();

@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.listener;
 
+import eu.darkcube.minigame.woolbattle.api.event.user.UserMoveEvent;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
@@ -23,7 +24,14 @@ public class MinestomMoveListener {
             if (user != null) {
                 var instance = event.getInstance();
                 var world = woolbattle.worlds().get(instance);
-                user.location(new Location(world, pos.x(), pos.y(), pos.z(), pos.yaw(), pos.pitch()));
+                var newLocation = new Location(world, pos.x(), pos.y(), pos.z(), pos.yaw(), pos.pitch());
+                var moveEvent = new UserMoveEvent(user, newLocation);
+                woolbattle.api().eventManager().call(moveEvent);
+                if (moveEvent.cancelled()) {
+                    event.setCancelled(true);
+                    return;
+                }
+                user.location(newLocation);
             }
         });
     }

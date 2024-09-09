@@ -9,12 +9,12 @@ package eu.darkcube.minigame.woolbattle.common.team;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.map.MapSize;
-import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.team.TeamManager;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -24,22 +24,23 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 public class CommonTeamManager implements TeamManager {
     private final @NotNull Game game;
     private final @NotNull Map<UUID, CommonTeam> teams;
-    private final @NotNull Team spectator;
+    private final @NotNull List<CommonTeam> playingTeams;
+    private final @NotNull CommonTeam spectator;
 
     public CommonTeamManager(@NotNull CommonGame game, @NotNull MapSize mapSize) {
         this.game = game;
         var teams = new HashMap<UUID, CommonTeam>();
-        Team spectator = null;
-        for (var configuration : game.woolbattle().teamRegistry().teamConfigurations(mapSize)) {
+        CommonTeam spectator = null;
+        for (var configuration : game.api().teamRegistry().teamConfigurations(mapSize)) {
             UUID id;
             do {
                 id = UUID.randomUUID();
             } while (teams.containsKey(id));
-            var nameStyle = configuration.nameStyle();
+            var nameColor = configuration.nameColor();
             var woolColor = configuration.woolColor();
             var teamType = configuration.type();
             var key = configuration.key();
-            var team = new CommonTeam(game, id, key, teamType, nameStyle, woolColor);
+            var team = new CommonTeam(game, id, key, teamType, nameColor, woolColor);
             teams.put(id, team);
             if (team.spectator()) {
                 spectator = team;
@@ -47,6 +48,7 @@ public class CommonTeamManager implements TeamManager {
         }
         if (spectator == null) throw new IllegalArgumentException("No spectator team configured for " + mapSize);
         this.teams = Map.copyOf(teams);
+        this.playingTeams = this.teams.values().stream().filter(CommonTeam::canPlay).toList();
         this.spectator = spectator;
     }
 
@@ -66,7 +68,12 @@ public class CommonTeamManager implements TeamManager {
     }
 
     @Override
-    public @NotNull Team spectator() {
+    public @NotNull @Unmodifiable List<CommonTeam> playingTeams() {
+        return playingTeams;
+    }
+
+    @Override
+    public @NotNull CommonTeam spectator() {
         return spectator;
     }
 }

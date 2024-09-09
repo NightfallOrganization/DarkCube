@@ -12,6 +12,7 @@ import static eu.darkcube.minigame.woolbattle.api.util.LogUtil.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import eu.cloudnetservice.driver.database.Database;
@@ -25,9 +26,8 @@ import eu.darkcube.minigame.woolbattle.api.team.TeamRegistry;
 import eu.darkcube.minigame.woolbattle.api.team.TeamType;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
-import eu.darkcube.minigame.woolbattle.common.util.AdventureUtil;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
-import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextColor;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -36,7 +36,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
 public class CommonTeamRegistry implements TeamRegistry {
     private final CommonWoolBattleApi woolbattle;
     private final DocProperty<ColoredWool> woolColor;
-    private final DocProperty<Style> nameColor;
+    private final DocProperty<TextColor> nameColor;
     private final Database database;
     private final Map<MapSize, Map<String, CommonTeamConfiguration>> teams = new ConcurrentHashMap<>();
 
@@ -44,7 +44,7 @@ public class CommonTeamRegistry implements TeamRegistry {
         this.woolbattle = woolbattle;
         this.database = InjectionLayer.boot().instance(DatabaseProvider.class).database("woolbattle_teams");
         this.woolColor = DocProperty.property("woolColor", String.class).withReadWriteRewrite(serialized -> this.woolbattle.woolProvider().deserializeFromString(serialized), woolColor -> this.woolbattle.woolProvider().serializeToString(woolColor));
-        this.nameColor = DocProperty.property("nameColor", String.class).withReadWriteRewrite(AdventureUtil::deserialize, AdventureUtil::serialize);
+        this.nameColor = DocProperty.property("nameColor", Integer.class).withReadWriteRewrite(TextColor::color, TextColor::value);
     }
 
     @ApiStatus.Internal
@@ -57,10 +57,11 @@ public class CommonTeamRegistry implements TeamRegistry {
             }
             for (var key : entry.getValue().keys()) {
                 var doc = entry.getValue().readDocument(key);
-                var nameStyle = doc.readProperty(this.nameColor);
+                var legacyNameColor = doc.getString("nameColor");
+                var nameColor = legacyNameColor != null ? Objects.requireNonNullElse(NamedTextColor.NAMES.value(legacyNameColor), NamedTextColor.WHITE) : doc.readProperty(this.nameColor);
                 var woolColor = doc.readProperty(this.woolColor);
                 var teamType = key.equals(SPECTATOR_KEY) ? TeamType.SPECTATOR : TeamType.PLAYER;
-                var configuration = new CommonTeamConfiguration(key, mapSize, teamType, nameStyle, woolColor);
+                var configuration = new CommonTeamConfiguration(key, mapSize, teamType, nameColor, woolColor);
 
                 var map = teams.computeIfAbsent(mapSize, _ -> new ConcurrentHashMap<>());
                 map.put(key, configuration);
@@ -73,7 +74,7 @@ public class CommonTeamRegistry implements TeamRegistry {
         var map = teams.get(mapSize);
         if (map != null) {
             if (!map.containsKey(SPECTATOR_KEY)) {
-                var configuration = new CommonTeamConfiguration(SPECTATOR_KEY, mapSize, TeamType.SPECTATOR, Style.style(NamedTextColor.GRAY), woolbattle.woolProvider().defaultWool());
+                var configuration = new CommonTeamConfiguration(SPECTATOR_KEY, mapSize, TeamType.SPECTATOR, NamedTextColor.GRAY, woolbattle.woolProvider().defaultWool());
                 updateConfiguration(configuration);
             }
         }
@@ -92,7 +93,7 @@ public class CommonTeamRegistry implements TeamRegistry {
     @Override
     public synchronized @NotNull CommonTeamConfiguration createConfiguration(@NotNull MapSize mapSize, @NotNull String key) {
         var woolColor = woolbattle.woolProvider().defaultWool();
-        var configuration = new CommonTeamConfiguration(key, mapSize, TeamType.PLAYER, Style.empty(), woolColor);
+        var configuration = new CommonTeamConfiguration(key, mapSize, TeamType.PLAYER, NamedTextColor.WHITE, woolColor);
         updateConfiguration(configuration);
         return configuration;
     }
@@ -112,7 +113,7 @@ public class CommonTeamRegistry implements TeamRegistry {
         for (var configuration : map.values()) {
             var entry = Document.newJsonDocument();
             entry.writeProperty(woolColor, configuration.woolColor());
-            entry.writeProperty(nameColor, configuration.nameStyle());
+            entry.writeProperty(nameColor, configuration.nameColor());
 
             doc.append(configuration.key(), entry);
         }

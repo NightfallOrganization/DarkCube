@@ -20,14 +20,17 @@ import java.util.concurrent.ExecutionException;
 
 import eu.darkcube.minigame.woolbattle.api.command.CommandSource;
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommand;
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
+import eu.darkcube.minigame.woolbattle.api.world.Rotation;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
-import eu.darkcube.system.commandapi.util.Vector2f;
-import eu.darkcube.system.commandapi.util.Vector3d;
+import eu.darkcube.system.commandapi.util.Messages;
+import eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
 import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
@@ -36,6 +39,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.ClickEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.event.HoverEvent;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
@@ -63,10 +67,24 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
         }
         var parse = dispatcher.parse(commandLine, source);
         var suggestions = getTabCompletionsSync(parse);
-        for (var s : suggestions.getList()) {
-            Component tooltip = s.getTooltip() != null ? Component.text(s.getTooltip().getString()) : null;
-            suggestion.addEntry(new SuggestionEntry(s.getText(), tooltip));
+        var minStart = Integer.MAX_VALUE;
+        for (var entry : suggestions.getList()) {
+            var entryStart = entry.getRange().getStart() + 1;
+            if (minStart > entryStart) {
+                minStart = entryStart;
+            }
+            Component tooltip;
+            {
+                var tooltipMessage = entry.getTooltip();
+                if (tooltipMessage instanceof Messages.MessageWrapper(var message, var components)) {
+                    tooltip = KyoriAdventureSupport.adventureSupport().convert(message.getMessage(source.sender(), components));
+                } else {
+                    tooltip = tooltipMessage == null ? null : Component.text(tooltipMessage.getString());
+                }
+            }
+            suggestion.addEntry(new SuggestionEntry(entry.getText(), tooltip));
         }
+        suggestion.setStart(minStart);
     };
     private final CommandExecutor executor = (sender, context) -> {
         var commandLine = context.getInput();
@@ -76,14 +94,30 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
             dispatcher.execute(parse);
         } catch (CommandSyntaxException ex) {
             var failedCursor = ex.getCursor();
+
+            eu.darkcube.system.libs.net.kyori.adventure.text.Component exMessage;
+            var style = Style.style(NamedTextColor.RED);
+            {
+                var raw = ex.getRawMessage();
+                if (raw instanceof Messages.MessageWrapper(var message, var components)) {
+                    exMessage = message.getMessage(source.sender(), components);
+                    var ctx = ex.getContext();
+                    if (ctx != null) {
+                        exMessage = exMessage.append(text(" at position " + ex.getCursor() + ": " + ctx));
+                    }
+                    exMessage = exMessage.applyFallbackStyle(style);
+                } else {
+                    exMessage = text(ex.getMessage(), style);
+                }
+            }
+
+            source.sendMessage(exMessage);
             if (failedCursor == 0) {
                 return; // Happens when someone tries to execute a command that requires a condition which is not met
             }
             if (failedCursor == -1) {
                 return; // When there is no context to the exception. Use #createWithContext to work around this
             }
-
-            source.sendMessage(text(ex.getMessage(), NamedTextColor.RED));
 
             if (failedCursor == commandLine.length()) {
                 var commandLineNext = commandLine + " ";
@@ -196,23 +230,25 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
 
     private CommandSource sourceFor(CommandSender sender) {
         @Nullable Game game = null;
-        @UnknownNullability Vector3d pos = null;
-        @UnknownNullability Vector2f rotation = null;
+        @UnknownNullability Position pos = null;
+        @UnknownNullability Rotation rotation = null;
         @UnknownNullability World world = null;
         @NotNull String name = "unknown";
         @UnknownNullability String displayName = null;
         @NotNull String commandPrefix = "";
+        @Nullable Entity entity = null;
         @NotNull Map<String, Object> extra = new HashMap<>();
         @NotNull eu.darkcube.minigame.woolbattle.api.command.CommandSender customSender;
         if (sender instanceof MinestomPlayer player) {
             name = player.getUsername();
             var playerPos = player.getPosition();
-            pos = new Vector3d(playerPos.x(), playerPos.y(), playerPos.z());
-            rotation = new Vector2f(playerPos.yaw(), playerPos.pitch());
+            pos = new Position.Simple(playerPos.x(), playerPos.y(), playerPos.z());
+            rotation = new Rotation.Simple(playerPos.yaw(), playerPos.pitch());
             world = woolbattle.woolbattle().worlds().get(player.getInstance());
             player.get(Pointer.pointer(CommandSource.class, Key.key("asd")));
             commandPrefix = "/";
             customSender = Objects.requireNonNullElseGet(player.user(), () -> woolbattle.woolbattle().wrapCommandSender(sender));
+            entity = player.user();
             var displayNameComponent = player.getDisplayName();
             if (world instanceof GameWorld gameWorld) game = gameWorld.game();
             if (displayNameComponent != null) displayName = PlainTextComponentSerializer.plainText().serialize(displayNameComponent);
@@ -222,7 +258,7 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
         } else {
             customSender = woolbattle.woolbattle().wrapCommandSender(sender);
         }
-        return new CommandSource(woolbattle, game, customSender, pos, rotation, world, name, displayName, extra, commandPrefix);
+        return new CommandSource(woolbattle, game, customSender, pos, rotation, world, entity, name, displayName, extra, commandPrefix);
     }
 
     @Override

@@ -11,15 +11,19 @@ import java.util.Map;
 
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
+import eu.darkcube.minigame.woolbattle.api.perk.PerkRegistry;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface PerksStorage extends Cloneable {
+    @NotNull
     PerksStorage clone();
 
     /**
      * @param type the {@link ActivationType} to get the perks from
      * @return the perks for the {@link ActivationType}
      */
-    PerkName[] perks(ActivationType type);
+    @NotNull
+    PerkName @NotNull [] perks(@NotNull ActivationType type);
 
     /**
      * @param type     the {@link ActivationType} to get the perk from
@@ -28,7 +32,8 @@ public interface PerksStorage extends Cloneable {
      * @return the perk at the given index
      * @throws ArrayIndexOutOfBoundsException perkSlot out of range
      */
-    PerkName perk(ActivationType type, int perkSlot);
+    @NotNull
+    PerkName perk(@NotNull ActivationType type, int perkSlot);
 
     /**
      * Sets the perk at the given index
@@ -39,13 +44,13 @@ public interface PerksStorage extends Cloneable {
      * @param perk     the new perk
      * @throws ArrayIndexOutOfBoundsException perkSlot out of range
      */
-    void perk(ActivationType type, int perkSlot, PerkName perk);
+    void perk(@NotNull ActivationType type, int perkSlot, @NotNull PerkName perk);
 
     /**
      * @param type the {@link ActivationType} to get the perk slots from
      * @return the perk inventory slots for the {@link ActivationType}
      */
-    int[] perkInvSlots(ActivationType type);
+    int @NotNull [] perkInvSlots(@NotNull ActivationType type);
 
     /**
      * @param type     the {@link ActivationType} to get the perk slot from
@@ -54,7 +59,7 @@ public interface PerksStorage extends Cloneable {
      * @return the perk inventory slot at the given index
      * @throws ArrayIndexOutOfBoundsException perkSlot out of range
      */
-    int perkInvSlot(ActivationType type, int perkSlot);
+    int perkInvSlot(@NotNull ActivationType type, int perkSlot);
 
     /**
      * Sets the perk inventory slot at the given index
@@ -65,11 +70,12 @@ public interface PerksStorage extends Cloneable {
      * @param slot     the new perk inventory slot
      * @throws ArrayIndexOutOfBoundsException perkSlot out of range
      */
-    void perkInvSlot(ActivationType type, int perkSlot, int slot);
+    void perkInvSlot(@NotNull ActivationType type, int perkSlot, int slot);
 
-    Map<ActivationType, PerkName[]> perks();
+    @NotNull
+    Map<@NotNull ActivationType, @NotNull PerkName @NotNull []> perks();
 
-    void perks(Map<ActivationType, PerkName[]> perks);
+    void perks(@NotNull Map<@NotNull ActivationType, @NotNull PerkName @NotNull []> perks);
 
-    void reset();
+    void reset(@NotNull PerkRegistry perkRegistry);
 }

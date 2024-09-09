@@ -41,6 +41,8 @@ public enum Items implements CommonItem {
     PERK_WOOL_BOMB,
     PERK_WOOL_BOMB_COOLDOWN,
     PERK_EXTRA_WOOL,
+    PERK_PIERCING_ARROW,
+    PERK_KNOCKBACK_ARROW,
     PERK_LONGJUMP,
     PERK_ROCKETJUMP,
     PERK_ARROW_RAIN,
@@ -61,6 +63,8 @@ public enum Items implements CommonItem {
     PERK_MINE_COOLDOWN,
     PERK_MINIGUN,
     PERK_MINIGUN_COOLDOWN,
+    PERK_POD,
+    PERK_POD_COOLDOWN,
     PERK_GRABBER,
     PERK_GRABBER_GRABBED,
     PERK_GRABBER_COOLDOWN,
@@ -112,9 +116,12 @@ public enum Items implements CommonItem {
     PERK_FREEZE_ARROW,
     PERK_FREEZE_ARROW_COOLDOWN,
     PERK_BERSERKER,
+    PERK_DOUBLE_JUMP,
+    PERK_DOUBLE_JUMP_COOLDOWN,
     GRAY_GLASS_PANE,
     BLACK_GLASS_PANE,
-    HEIGHT_DISPLAY_COLOR_ENTRY;
+    HEIGHT_DISPLAY_COLOR_ENTRY,
+    ;
 
     private final String key;
     private ItemBuilder builder;

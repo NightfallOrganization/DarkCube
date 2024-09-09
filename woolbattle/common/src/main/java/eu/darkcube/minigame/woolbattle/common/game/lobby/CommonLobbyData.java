@@ -27,9 +27,11 @@ public class CommonLobbyData implements LobbyData {
         minPlayerCount = woolbattle.persistentDataStorage().get(minPlayerCount(woolbattle), PersistentDataTypes.INTEGER, () -> 2);
     }
 
-    public CommonLobbyData(@NotNull CommonWoolBattleApi woolbattle, @NotNull Directed spawn) {
+    public CommonLobbyData(@NotNull CommonWoolBattleApi woolbattle, @NotNull Directed spawn, int deathLine, int minPlayerCount) {
         this.woolbattle = woolbattle;
         this.spawn = spawn;
+        this.deathLine = deathLine;
+        this.minPlayerCount = minPlayerCount;
     }
 
     @Override
@@ -67,7 +69,7 @@ public class CommonLobbyData implements LobbyData {
 
     @Override
     public @NotNull CommonLobbyData clone() {
-        return new CommonLobbyData(woolbattle, spawn);
+        return new CommonLobbyData(woolbattle, spawn, deathLine, minPlayerCount);
     }
 
     /**

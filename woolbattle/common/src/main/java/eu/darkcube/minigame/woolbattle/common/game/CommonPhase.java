@@ -14,6 +14,7 @@ import eu.darkcube.minigame.woolbattle.common.CommonWoolBattle;
 import eu.darkcube.minigame.woolbattle.common.CommonWoolBattleApi;
 import eu.darkcube.system.event.EventNode;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.util.GameState;
 
 public abstract class CommonPhase implements GamePhase {
@@ -25,17 +26,24 @@ public abstract class CommonPhase implements GamePhase {
 
     public CommonPhase(@NotNull CommonGame game, @NotNull GameState gameState) {
         this.game = game;
-        this.woolbattleApi = game.woolbattle();
+        this.woolbattleApi = game.api();
         this.woolbattle = woolbattleApi.woolbattle();
         this.gameState = gameState;
         this.listeners = EventNode.all("phase-" + gameState.name().toLowerCase(Locale.ROOT));
     }
 
-    public void enable() {
+    public void init(@Nullable CommonPhase oldPhase) {
+    }
+
+    public void unload(@Nullable CommonPhase newPhase) {
+
+    }
+
+    public void enable(@Nullable CommonPhase oldPhase) {
         this.game.eventManager().addChild(this.listeners);
     }
 
-    public void disable() {
+    public void disable(@Nullable CommonPhase newPhase) {
         this.game.eventManager().removeChild(this.listeners);
     }
 

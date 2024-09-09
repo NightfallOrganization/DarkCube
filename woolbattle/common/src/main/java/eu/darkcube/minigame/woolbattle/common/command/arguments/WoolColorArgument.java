@@ -15,7 +15,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
-public class WoolColorArgument implements ArgumentType<ColoredWool> {
+class WoolColorArgument implements ArgumentType<ColoredWool> {
     private static final DynamicCommandExceptionType INVALID_COLOR = Messages.INVALID_WOOL_COLOR.newDynamicCommandExceptionType();
     private final ColoredWoolProvider provider;
 

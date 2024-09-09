@@ -7,14 +7,18 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.ingame.world;
 
+import eu.darkcube.minigame.woolbattle.api.event.world.block.BuildBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.block.DamageBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.world.block.DestroyBlockEvent;
+import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
+import eu.darkcube.minigame.woolbattle.common.world.CommonColoredWool;
 import eu.darkcube.minigame.woolbattle.common.world.CommonIngameWorld;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.material.Material;
 
 public class CommonIngameBlock extends CommonBlock {
-    private final CommonIngameWorld world;
+    protected final CommonIngameWorld world;
     protected final int maxBlockDamage;
 
     public CommonIngameBlock(CommonIngameWorld world, int x, int y, int z, int maxBlockDamage) {
@@ -32,11 +36,35 @@ public class CommonIngameBlock extends CommonBlock {
         metadata().set(world.blockDamageKey(), blockDamage);
     }
 
+    public int maxBlockDamage() {
+        return maxBlockDamage;
+    }
+
+    public boolean setWool(@NotNull ColoredWool wool) {
+        var event = new BuildBlockEvent(this);
+        world.game().eventManager().call(event);
+        if (event.cancelled()) {
+            return false;
+        }
+        ((CommonColoredWool) wool).unsafeApply(this);
+        world.placedBlocks().add(this);
+        return true;
+    }
+
     @Override
     public void incrementBlockDamage(int amount) {
         if (amount <= 0) throw new IllegalArgumentException("Block Damage <= 0");
         var currentDamage = blockDamage();
         var newDamage = currentDamage + amount;
+        changeBlockDamage(currentDamage, newDamage);
+    }
+
+    public void changeBlockDamage(int newDamage) {
+        if (newDamage <= 0) throw new IllegalArgumentException("Block Damage <= 0");
+        changeBlockDamage(blockDamage(), newDamage);
+    }
+
+    private void changeBlockDamage(int currentDamage, int newDamage) {
         var event = new DamageBlockEvent(this, currentDamage, newDamage);
         world.game().eventManager().call(event);
         if (event.cancelled()) {
@@ -50,26 +78,55 @@ public class CommonIngameBlock extends CommonBlock {
         blockDamage(newDamage);
     }
 
+    @Override
+    public boolean isWoolGenerator() {
+        var playerPlaced = world.placedBlocks().contains(this);
+        if (playerPlaced) return false;
+        if (world.brokenWool().containsKey(this)) {
+            return true;
+        }
+        return world.game.api().materialProvider().isWool(material());
+    }
+
+    public void regenerateTo(CommonColoredWool wool) {
+        wool.unsafeApply(this);
+        // A user could have placed a block into the generator
+        world.placedBlocks().remove(this);
+        var metadata = metadata();
+        // Reset metadata to clear any perk-specific data, or similar.
+        // Blank wool blocks count as generators, which is what we need
+        metadata.clear();
+    }
+
     private boolean destroy() {
         return destroy(false);
     }
 
     private boolean destroy(boolean force) {
-        if (!world.placedBlocks().contains(this)) {
+        var materialProvider = world.game().api().materialProvider();
+        var material = material();
+        var isWool = materialProvider.isWool(material);
+        if (!world.placedBlocks().contains(this) && !isWool) {
             if (!force) {
+                // Can't destroy something other than wool (that isn't placed)
                 return false;
             }
         }
         var event = new DestroyBlockEvent(this);
         world.game().eventManager().call(event);
         if (event.cancelled() && !force) return false;
-        var materialProvider = world.game().woolbattle().materialProvider();
-        if (!world.placedBlocks().remove(this) && materialProvider.isWool(material())) {
+        if (!world.placedBlocks().remove(this) && isWool) {
             world.brokenWool().put(this, materialProvider.woolFrom(this));
         }
 
         metadata().clear();
         material(Material.air());
         return true;
+    }
+
+    @Override
+    @NotNull
+    public CommonIngameWorld world() {
+        return world;
     }
 }

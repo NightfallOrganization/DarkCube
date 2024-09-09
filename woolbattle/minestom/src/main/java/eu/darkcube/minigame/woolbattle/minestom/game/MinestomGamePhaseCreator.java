@@ -13,6 +13,7 @@ import eu.darkcube.minigame.woolbattle.common.game.endgame.CommonEndgame;
 import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngame;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.game.ingame.MinestomIngame;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.MinestomLobby;
 
 public class MinestomGamePhaseCreator implements GamePhaseCreator {
@@ -29,7 +30,7 @@ public class MinestomGamePhaseCreator implements GamePhaseCreator {
 
     @Override
     public CommonIngame createIngame(CommonGame game) {
-        return new CommonIngame(game);
+        return new MinestomIngame(game, woolbattle);
     }
 
     @Override

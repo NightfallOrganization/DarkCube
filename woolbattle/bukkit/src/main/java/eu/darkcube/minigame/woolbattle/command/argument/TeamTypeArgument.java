@@ -44,7 +44,11 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
     }
 
     public static TeamTypeArgument teamTypeArgument(WoolBattleBukkit woolbattle, MapSize mapSize) {
-        return new TeamTypeArgument(woolbattle, () -> woolbattle.teamManager().teamTypes(mapSize).toArray(new TeamType[0]), null);
+        return new TeamTypeArgument(woolbattle, () -> {
+            var types = new ArrayList<>(woolbattle.teamManager().teamTypes(mapSize));
+            types.add(woolbattle.teamManager().getSpectator().getType());
+            return types.toArray(TeamType[]::new);
+        }, null);
     }
 
     public static TeamTypeArgument teamTypeArgument(WoolBattleBukkit woolbattle, ToStringFunction toStringFunction) {
@@ -55,13 +59,15 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
         return context.getArgument(name, TeamTypeSpec.class).parse(context);
     }
 
-    @Override public TeamTypeSpec parse(StringReader reader) throws CommandSyntaxException {
+    @Override
+    public TeamTypeSpec parse(StringReader reader) throws CommandSyntaxException {
         var clone = new StringReader(reader);
         var in = reader.readString();
         return new TeamTypeSpec(in, clone);
     }
 
-    @Override public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    @Override
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         List<String> suggestions = new ArrayList<>();
         for (var t : values.get()) {
             suggestions.addAll(Arrays.asList(toStringFunction.toString(context, t)));
@@ -72,7 +78,8 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
     public interface ToStringFunction {
         static ToStringFunction function() {
             return new ToStringFunction() {
-                @Override public <S> String[] toString(CommandContext<S> context, TeamType teamType) {
+                @Override
+                public <S> String[] toString(CommandContext<S> context, TeamType teamType) {
                     return new String[]{teamType.getDisplayNameKey()};
                 }
             };
@@ -84,7 +91,8 @@ public class TeamTypeArgument implements ArgumentType<TeamTypeArgument.TeamTypeS
     public interface FromStringFunction {
         static FromStringFunction of(Supplier<TeamType[]> teams, ToStringFunction f) {
             return new FromStringFunction() {
-                @Override public <S> TeamType fromString(CommandContext<S> context, String string) {
+                @Override
+                public <S> TeamType fromString(CommandContext<S> context, String string) {
                     var a = teams.get();
                     for (var teamType : a) {
                         var sa = f.toString(context, teamType);

@@ -10,8 +10,8 @@ package eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserJoinGameEvent;
 import eu.darkcube.minigame.woolbattle.common.game.ConfiguredListener;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
-import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.attribute.Attribute;
 
 public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGameEvent> {
@@ -26,7 +26,20 @@ public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGa
     public void accept(UserJoinGameEvent event) {
         var user = (CommonWBUser) event.user();
         var player = woolbattle.player(user);
+        var packet = player.getAddPlayerToList();
+        for (var wbUser : event.game().users()) {
+            var u = (CommonWBUser) wbUser;
+            var p = woolbattle.player(u);
+            p.sendPacketDirect(packet);
+
+            if (u != user) {
+                player.sendPacketDirect(p.getAddPlayerToList());
+            }
+        }
+        player.postJoin();
+
+        player.setGameMode(GameMode.SURVIVAL);
         player.setFoodSaturation(0);
-        player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(1024);
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024);
     }
 }

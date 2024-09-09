@@ -32,7 +32,7 @@ public class MinestomInventoryListener {
                 default -> -1;
             };
             if (slot == -1) {
-                woolbattle.logger().info("Ignoring clicktype slot {}", clickType);
+                woolbattle.logger().info("Ignoring ClickType {}", clickType);
                 return;
             }
 

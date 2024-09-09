@@ -14,7 +14,6 @@ import java.util.List;
 import eu.darkcube.minigame.woolbattle.api.util.MaterialProvider;
 import eu.darkcube.minigame.woolbattle.api.world.Block;
 import eu.darkcube.minigame.woolbattle.api.world.ColoredWool;
-import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWoolProvider;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -23,8 +22,10 @@ import eu.darkcube.system.server.item.material.Material;
 
 public class MinestomMaterialProvider implements MaterialProvider {
     private final List<Material> wool;
+    private final MinestomColoredWoolProvider provider;
 
     public MinestomMaterialProvider(MinestomColoredWoolProvider provider) {
+        this.provider = provider;
         this.wool = provider.woolMaterials();
     }
 
@@ -35,12 +36,12 @@ public class MinestomMaterialProvider implements MaterialProvider {
 
     @Override
     public @Nullable ColoredWool woolFrom(@NotNull Block block) {
-        return new MinestomColoredWool(block.material());
+        return provider.woolFrom(block.material());
     }
 
     @Override
     public @Nullable ColoredWool woolFrom(@NotNull ItemBuilder item) {
-        return new MinestomColoredWool(item.material());
+        return provider.woolFrom(item.material());
     }
 
     @Override

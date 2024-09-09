@@ -16,7 +16,11 @@ public class CooldownUserPerk extends DefaultUserPerk {
     private final Item cooldownItem;
 
     public CooldownUserPerk(WBUser owner, int id, int perkSlot, Perk perk, Item cooldownItem, Game game) {
-        super(owner, id, perkSlot, perk, game);
+        this(owner, perk, id, perkSlot, game, cooldownItem);
+    }
+
+    public CooldownUserPerk(WBUser owner, Perk perk, int id, int perkSlot, Game game, Item cooldownItem) {
+        super(owner, perk, id, perkSlot, game);
         this.cooldownItem = cooldownItem;
     }
 

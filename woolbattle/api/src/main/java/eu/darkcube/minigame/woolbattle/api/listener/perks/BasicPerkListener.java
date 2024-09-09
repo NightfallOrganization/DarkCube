@@ -11,35 +11,45 @@ import static eu.darkcube.minigame.woolbattle.api.event.user.UserInteractEvent.A
 import static eu.darkcube.minigame.woolbattle.api.event.user.UserInteractEvent.Action.LEFT_CLICK_BLOCK;
 import static eu.darkcube.minigame.woolbattle.api.util.PerkUtils.*;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
 
 import eu.darkcube.minigame.woolbattle.api.event.user.UserInteractEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public abstract class BasicPerkListener extends PerkListener {
     protected final Key perkKey;
 
     public BasicPerkListener(Game game, Perk perk) {
         super(game, perk);
-        this.perkKey = Key.key(game.woolbattle(), "perk");
+        this.perkKey = Key.key(game.api(), "perk");
         this.listeners.addListener(UserInteractEvent.class, event -> {
             if (!mayActivate()) return;
             var item = event.item();
             if (item == null) return;
             var user = event.user();
 
-            var refUserPerk = new AtomicReference<UserPerk>();
-            if (!checkUsable(user, item, perk(), userPerk -> {
-                refUserPerk.set(userPerk);
+            var checkResult = checkUsable(user, item, perk(), game);
+            var userPerk = checkResult.userPerk();
+            if (userPerk != null) {
                 event.cancel();
-            }, game)) {
-                playSoundNotEnoughWool(user);
+            }
+            var usability = checkResult.usability();
+            // var usability = checkUsable(user, item, perk(), userPerk -> {
+            //     refUserPerk.set(userPerk);
+            //     event.cancel();
+            // }, game);
+            if (!usability.booleanValue()) {
+                if (usability == Usability.NOT_ENOUGH_WOOL || usability == Usability.ON_COOLDOWN) {
+                    playSoundNotEnoughWool(user);
+                    event.cancel();
+                }
                 return;
             }
-            var userPerk = refUserPerk.get();
+            Objects.requireNonNull(userPerk);
 
             var left = event.action() == LEFT_CLICK_AIR || event.action() == LEFT_CLICK_BLOCK;
             if (!activate(userPerk)) {
@@ -57,7 +67,7 @@ public abstract class BasicPerkListener extends PerkListener {
      * @param perk the perk
      * @return if the perk was activated and cooldown should start
      */
-    protected boolean activate(UserPerk perk) {
+    protected boolean activate(@NotNull UserPerk perk) {
         return false;
     }
 
@@ -67,7 +77,7 @@ public abstract class BasicPerkListener extends PerkListener {
      * @param perk the perk
      * @return if the perk was activated and cooldown should start
      */
-    protected boolean activateRight(UserPerk perk) {
+    protected boolean activateRight(@NotNull UserPerk perk) {
         return false;
     }
 
@@ -77,7 +87,7 @@ public abstract class BasicPerkListener extends PerkListener {
      * @param perk the perk
      * @return if the perk was activated and cooldown should start
      */
-    protected boolean activateLeft(UserPerk perk) {
+    protected boolean activateLeft(@NotNull UserPerk perk) {
         return false;
     }
 
@@ -87,7 +97,7 @@ public abstract class BasicPerkListener extends PerkListener {
      *
      * @param perk the perk
      */
-    protected void activated(UserPerk perk) {
+    protected void activated(@NotNull UserPerk perk) {
         payForPerk(perk);
         perk.cooldown(perk.perk().cooldown().cooldown());
     }

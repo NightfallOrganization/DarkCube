@@ -7,6 +7,9 @@
 
 package eu.darkcube.minigame.woolbattle.common;
 
+import static eu.darkcube.system.util.data.PluginPersistentDataProvider.pluginPersistentDataProvider;
+
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
@@ -24,15 +27,16 @@ import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.event.EventNode;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.key.KeyPattern;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.data.PersistentDataStorage;
-import eu.darkcube.system.util.data.PluginPersistentDataProvider;
 
 public abstract class CommonWoolBattleApi implements WoolBattleApi {
 
-    private final @NotNull String databaseNameSuffixMaps;
+    private final @NotNull CommonWoolBattle woolbattle;
+    private final @NotNull String platformName;
     private final @NotNull CommonGameManager gameManager;
     private final @NotNull CommonMapManager mapManager;
     private final @NotNull CommonLobbySystemLink lobbySystemLink;
@@ -43,13 +47,14 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
     private final @NotNull EventNode<Object> eventManager;
     private final @NotNull CommonWoolBattleArguments commandArguments;
 
-    public CommonWoolBattleApi(@NotNull String databaseNameSuffixMaps) {
-        this.databaseNameSuffixMaps = databaseNameSuffixMaps;
+    public CommonWoolBattleApi(@NotNull CommonWoolBattle woolbattle, @NotNull String platformName) {
+        this.woolbattle = woolbattle;
+        this.platformName = platformName;
         this.gameManager = new CommonGameManager(this);
         this.mapManager = new CommonMapManager(this);
         this.lobbySystemLink = new CommonLobbySystemLink(this);
         this.scheduler = new CommonSchedulerManager();
-        this.persistentDataStorage = PluginPersistentDataProvider.pluginPersistentDataProvider().persistentData(Key.key(this, "woolbattle"));
+        this.persistentDataStorage = pluginPersistentDataProvider().persistentData(Key.key(this, "woolbattle"));
         this.teamRegistry = new CommonTeamRegistry(this);
         this.eventManager = EventNode.all("woolbattle");
         this.lobbyData = new CommonLobbyData(this);
@@ -57,9 +62,10 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         WoolBattleProvider.PROVIDER.register(ItemManager.class, new ItemManager(this));
     }
 
+    @KeyPattern.Namespace
     @Override
     public @NotNull String namespace() {
-        return "woolbattle";
+        return "woolbattle_" + this.platformName;
     }
 
     @Override
@@ -102,13 +108,17 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
         return teamRegistry;
     }
 
-    public @NotNull String databaseNameSuffixMaps() {
-        return databaseNameSuffixMaps;
+    public @NotNull String platformName() {
+        return platformName;
     }
 
     @Override
     public @NotNull CommonLobbyData lobbyData() {
         return lobbyData;
+    }
+
+    public @NotNull CommonWoolBattle woolbattle() {
+        return woolbattle;
     }
 
     @Override
@@ -117,7 +127,11 @@ public abstract class CommonWoolBattleApi implements WoolBattleApi {
     @Override
     public abstract @Nullable CommonWBUser user(User user);
 
-    public abstract @NotNull CommonWoolBattle woolbattle();
+    @Override
+    public abstract @Nullable CommonWBUser user(UUID uniqueId);
+
+    @Override
+    public abstract @Nullable CommonWBUser user(String playerName);
 
     public abstract @NotNull GamePhaseCreator gamePhaseCreator();
 

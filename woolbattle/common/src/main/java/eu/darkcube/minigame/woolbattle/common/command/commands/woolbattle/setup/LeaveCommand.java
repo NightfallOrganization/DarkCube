@@ -22,8 +22,8 @@ public class LeaveCommand extends WoolBattleCommand {
             var source = ctx.getSource();
             var user = (CommonWBUser) source.sender();
             var woolbattle = woolbattleApi.woolbattle();
-            woolbattle.setupMode().leave(user);
             source.sendMessage(Messages.LEFT_SETUP_MODE);
+            woolbattle.setupMode().leave(user);
             return 0;
         }));
     }

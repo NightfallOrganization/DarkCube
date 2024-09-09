@@ -11,5 +11,6 @@ import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface WorldEvent {
-    @NotNull World world();
+    @NotNull
+    World world();
 }

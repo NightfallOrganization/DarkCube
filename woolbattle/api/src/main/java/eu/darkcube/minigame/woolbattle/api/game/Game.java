@@ -28,50 +28,68 @@ import eu.darkcube.system.util.GameState;
 @Api
 public interface Game {
     @Api
-    @NotNull WoolBattleApi woolbattle();
+    @NotNull
+    WoolBattleApi api();
 
     @Api
-    @NotNull MapSize mapSize();
+    @NotNull
+    MapSize mapSize();
 
     @Api
-    @NotNull Map map();
+    @NotNull
+    Map map();
 
     @Api
     void map(@NotNull Map map);
 
     @Api
-    @NotNull UUID id();
+    @NotNull
+    UUID id();
 
     @Api
-    @NotNull GamePhase phase();
+    @NotNull
+    GamePhase phase();
 
     @Api
-    @UnmodifiableView @NotNull Collection<@NotNull ? extends WBUser> users();
+    @UnmodifiableView
+    @NotNull
+    Collection<@NotNull ? extends WBUser> users();
 
     @Api
-    @UnmodifiableView @NotNull Collection<@NotNull ? extends WBUser> playingPlayers();
+    @UnmodifiableView
+    @NotNull
+    Collection<@NotNull ? extends WBUser> playingPlayers();
 
     @Api
-    @UnmodifiableView @NotNull Collection<@NotNull ? extends WBUser> spectatingPlayers();
+    @UnmodifiableView
+    @NotNull
+    Collection<@NotNull ? extends WBUser> spectatingPlayers();
 
     @Api
-    @NotNull PerkRegistry perkRegistry();
+    @NotNull
+    PerkRegistry perkRegistry();
 
     @Api
-    @NotNull SchedulerManager scheduler();
+    @NotNull
+    SchedulerManager scheduler();
 
     @Api
-    @NotNull EventNode<Object> eventManager();
+    @NotNull
+    EventNode<Object> eventManager();
 
     @Api
-    @NotNull GameState gameState();
+    @NotNull
+    GameState gameState();
 
     @Api
-    @NotNull LobbyData lobbyData();
+    @NotNull
+    LobbyData lobbyData();
 
     @Api
-    @NotNull TeamManager teamManager();
+    @NotNull
+    TeamManager teamManager();
 
     @Api
-    @NotNull IngameData ingameData();
+    @NotNull
+    IngameData ingameData();
 }

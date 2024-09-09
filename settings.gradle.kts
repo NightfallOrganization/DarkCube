@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("eu.darkcube.darkcube.settings") version "1.2.9"
+    id("eu.darkcube.darkcube.settings") version "1.3.1"
 }
 
 rootProject.name = "DarkCube"
@@ -38,7 +38,7 @@ include("bukkit:changepermissionmessage")
 
 includeSubProjects("minestom", "server")
 
-includeSubProjects("woolbattle", "provider", "api", "common", "bukkit", "minestom")
+includeSubProjects("woolbattle", "provider", "api", "common", "bukkit", "minestom", "converter")
 
 include("bukkit:darkessentials")
 //include "bukkit:holograms"

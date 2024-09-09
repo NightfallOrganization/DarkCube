@@ -9,7 +9,7 @@ package eu.darkcube.minigame.woolbattle.minestom.listener;
 
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
-import eu.darkcube.system.server.item.material.Material;
+import eu.darkcube.system.server.item.ItemBuilder;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerBlockBreakEvent;
@@ -40,14 +40,8 @@ public class MinestomBlockListener {
             if (world == null) return;
             var pos = event.getBlockPosition();
             var block = world.blockAt(pos.blockX(), pos.blockY(), pos.blockZ());
-            var placingBlock = event.getBlock();
-            var minestomMaterial = placingBlock.registry().material();
-            if (minestomMaterial == null) {
-                woolbattle.logger().error("No corresponding material for block {}", placingBlock);
-                return;
-            }
-            var material = Material.of(minestomMaterial);
-            var placeResult = woolbattle.eventHandler().blockPlace(user, block, material);
+            var item = ItemBuilder.item(event.getPlayer().getInventory().getItemInHand(event.getHand()));
+            var placeResult = woolbattle.eventHandler().blockPlace(user, block, item);
             if (placeResult.cancel()) {
                 event.setCancelled(true);
             }

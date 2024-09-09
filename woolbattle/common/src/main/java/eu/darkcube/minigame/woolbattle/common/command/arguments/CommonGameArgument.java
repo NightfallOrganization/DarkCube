@@ -23,7 +23,7 @@ import eu.darkcube.system.libs.com.mojang.brigadier.exceptions.DynamicCommandExc
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.Suggestions;
 import eu.darkcube.system.libs.com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-public class CommonGameArgument implements ArgumentType<CommonGame> {
+class CommonGameArgument implements ArgumentType<CommonGame> {
     private static final DynamicCommandExceptionType GAME_NOT_FOUND = Messages.GAME_NOT_FOUND.newDynamicCommandExceptionType();
     private final CommonGameManager gameManager;
 

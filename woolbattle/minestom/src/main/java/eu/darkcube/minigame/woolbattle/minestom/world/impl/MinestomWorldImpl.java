@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
+import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -20,8 +21,8 @@ public class MinestomWorldImpl extends CommonWorld implements MinestomWorld {
     private final @NotNull Instance instance;
     private final @Nullable Path worldDirectory;
 
-    public MinestomWorldImpl(@NotNull PlatformWorldHandler worldHandler, @NotNull Instance instance, @Nullable Path worldDirectory) {
-        super(worldHandler);
+    public MinestomWorldImpl(MinestomWoolBattle woolbattle, @NotNull PlatformWorldHandler worldHandler, @NotNull Instance instance, @Nullable Path worldDirectory) {
+        super(woolbattle, worldHandler);
         this.instance = instance;
         this.worldDirectory = worldDirectory;
     }
@@ -35,4 +36,5 @@ public class MinestomWorldImpl extends CommonWorld implements MinestomWorld {
     public @Nullable Path worldDirectory() {
         return worldDirectory;
     }
+
 }

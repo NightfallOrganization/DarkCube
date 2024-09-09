@@ -8,7 +8,6 @@
 package eu.darkcube.minigame.woolbattle.common.perk.user;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,17 +45,16 @@ public class CommonUserPerks implements UserPerks {
         byType.clear();
         byName.clear();
         var p = user.perksStorage();
-        for (var type : ActivationType.values()) {
-            var perks = p.perks(type);
-            for (var i = 0; i < perks.length; i++) {
-                var perk = game.perkRegistry().perks().get(perks[i]);
-                if (perk == null) {
-                    var listPerks = Arrays.asList(perks);
-                    perk = java.util.Arrays.stream(game.perkRegistry().perks(type)).filter(pe -> !listPerks.contains(pe.perkName())).findAny().orElseThrow(Error::new);
-                    p.perk(type, i, perk.perkName());
-                    user.perksStorage(p);
-                    System.out.println("Fixing perk: " + perks[i] + " -> " + perk.perkName());
-                }
+        if (!p.verifyIntegrity(game.perkRegistry())) {
+            game.api().woolbattle().logger().warn("Perk integrity verification failed for {}, fix applied", user.playerName());
+            user.perksStorage(p);
+        }
+        for (var entry : p.perks().entrySet()) {
+            var names = entry.getValue();
+            for (var i = 0; i < names.length; i++) {
+                var name = names[i];
+                var perk = game.perkRegistry().perk(name);
+                if (perk == null) throw new IllegalStateException("Unknown perk " + name + " - Not registered, even after verification");
                 perk(perk, i);
             }
         }
@@ -72,8 +70,8 @@ public class CommonUserPerks implements UserPerks {
         var id = CommonUserPerks.id.getAndIncrement();
         UserPerk up;
         perks.put(id, up = perk.perkCreator().create(user, perk, id, perkSlot, game));
-        byType.computeIfAbsent(perk.activationType(), (a) -> new ArrayList<>());
-        byName.computeIfAbsent(perk.perkName(), (a) -> new ArrayList<>());
+        byType.computeIfAbsent(perk.activationType(), _ -> new ArrayList<>());
+        byName.computeIfAbsent(perk.perkName(), _ -> new ArrayList<>());
         byType.get(perk.activationType()).add(up);
         byName.get(perk.perkName()).add(up);
         if (game.phase() instanceof Ingame) {

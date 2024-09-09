@@ -14,7 +14,7 @@
           <option value="--user=development" />
           <option value="--host=darkcube.eu" />
           <option value="--remoteDir=/home/development/CloudNet/local/templates/wb-minestom/default/" />
-          <option value="--fingerprint=AAAAC3NzaC1lZDI1NTE5AAAAIAw8qQ7NjnD01YvjivyF68/p+zw0z4YYQgZPLgqOgzRw" />
+          <option value="--fingerprint=AAAAC3NzaC1lZDI1NTE5AAAAIJBV0CboRsi4dZ6wssmeS4fmdOr89Ezh6PjHWW5bm0yV" />
         </list>
       </option>
       <option name="vmOptions" />

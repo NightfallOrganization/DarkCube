@@ -7,9 +7,12 @@
 
 package eu.darkcube.minigame.woolbattle.common.perk.perks.active;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
+import eu.darkcube.minigame.woolbattle.api.entity.Snowball;
 import eu.darkcube.minigame.woolbattle.api.event.entity.EntityDamageByEntityEvent;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
@@ -26,6 +29,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class ArrowBombPerk extends Perk {
     public static final PerkName ARROW_BOMB = new PerkName("ARROW_BOMB");
+    public static final EntityType<Snowball> ENTITY_TYPE = EntityType.SNOWBALL.createWrapped(Snowball.class, "snowball");
 
     public ArrowBombPerk(@NotNull Game game) {
         super(ActivationType.ACTIVE, ARROW_BOMB, 9, 7, Items.PERK_ARROW_BOMB, (user, perk, id, perkSlot, g) -> new CooldownUserPerk(user, id, perkSlot, perk, Items.PERK_ARROW_BOMB_COOLDOWN, g));
@@ -40,14 +44,17 @@ public class ArrowBombPerk extends Perk {
         }
 
         @Override
-        protected boolean activateRight(UserPerk perk) {
-            var snowball = game.woolbattle().entityImplementations().launchSnowball(perk.owner());
-            snowball.metadata().set(perkKey, perk);
+        protected boolean activateRight(@NotNull UserPerk perk) {
+            var shooter = perk.owner();
+            var location = Objects.requireNonNull(shooter.eyeLocation());
+            var velocity = location.direction().mul(15);
+            var entity = game.api().entityImplementations().shootProjectile(ENTITY_TYPE, shooter, location, velocity, 1, 0);
             return true;
         }
 
         private void handle(ProjectileHitEvent event) {
             var projectile = event.entity();
+
             var o = projectile.metadata().get(perkKey);
             if (o == null) return;
             if (!(o instanceof UserPerk perk)) return;
@@ -63,7 +70,7 @@ public class ArrowBombPerk extends Perk {
                     pitch = -pitch;
                 }
                 var dir = Vector.fromEuler(yaw, pitch);
-                var arrow = game.woolbattle().entityImplementations().spawnArrow(projectile.location(), dir, 0.9F, 0);
+                var arrow = game.api().entityImplementations().spawnArrow(projectile.location(), dir, 0.9F, 0);
                 ArrowPerk.particles(game, arrow, false);
                 ArrowPerk.claimArrow(game, user, arrow, 3, 2);
             }

@@ -8,6 +8,10 @@
 package eu.darkcube.minigame.woolbattle.api.game.endgame;
 
 import eu.darkcube.minigame.woolbattle.api.game.GamePhase;
+import eu.darkcube.minigame.woolbattle.api.world.World;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 
 public interface Endgame extends GamePhase {
+    @Nullable
+    World world();
 }

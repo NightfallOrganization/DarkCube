@@ -4,7 +4,6 @@ import static eu.darkcube.minigame.woolbattle.api.command.arguments.WoolBattleAr
 import static eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands.argument;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import eu.darkcube.minigame.woolbattle.api.command.WoolBattleCommand;
@@ -34,7 +33,7 @@ public class TeamCommand extends WoolBattleCommand {
                                 .executes(ctx -> {
                                     // @formatter:on
                                     var team = teamConfiguration(ctx, TEAM_ARGUMENT_NAME);
-                                    ctx.getSource().sendMessage(Messages.TEAM_INFO, team.key(), text(Objects.requireNonNull(team.nameStyle().color()).asHexString(), team.nameStyle()), team.woolColor().name(), "???", team.mapSize().teamSize(), "true");
+                                    ctx.getSource().sendMessage(Messages.TEAM_INFO, team.key(), text(team.nameColor().asHexString(), team.nameColor()), team.woolColor().name(), "???", team.mapSize().teamSize(), "true");
                                     return 0;
                                     // @formatter:off
                                 })

@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
+import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.system.libs.com.google.gson.JsonElement;
 import eu.darkcube.system.libs.com.google.gson.JsonObject;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -19,26 +20,62 @@ public interface Position extends Cloneable {
 
     double z();
 
+    @NotNull
     Position clone();
+
+    default double distanceTo(@NotNull Position pos) {
+        return Math.sqrt(distanceToSqr(pos));
+    }
+
+    default double distanceToSqr(@NotNull Position pos) {
+        var dx = x() - pos.x();
+        var dy = y() - pos.y();
+        var dz = z() - pos.z();
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    @NotNull
+    Position add(int x, double y, int z);
+
+    default int blockX() {
+        return (int) Math.floor(x());
+    }
+
+    default int blockY() {
+        return (int) Math.floor(y());
+    }
+
+    default int blockZ() {
+        return (int) Math.floor(z());
+    }
 
     record Simple(double x, double y, double z) implements Position {
         @Override
-        public Position.Simple clone() {
+        public Position.@NotNull Simple clone() {
             return new Position.Simple(x, y, z);
+        }
+
+        @Override
+        public @NotNull Simple add(int x, double y, int z) {
+            return new Simple(this.x + x, this.y + y, this.z + z);
         }
     }
 
-    interface Directed extends Position {
-        float yaw();
-
-        float pitch();
-
+    interface Directed extends Position, Rotation {
         @Override
         @NotNull
         Directed clone();
 
         @NotNull
         Directed aligned();
+
+        @Override
+        @NotNull
+        Position.Directed add(int x, double y, int z);
+
+        default @NotNull Vector direction() {
+            return Vector.fromEuler(yaw(), pitch());
+        }
 
         default @NotNull Directed simple() {
             return simple(this);
@@ -50,7 +87,7 @@ public interface Position extends Cloneable {
 
         PersistentDataType<Directed> TYPE = new PersistentDataType<>() {
             @Override
-            public Directed deserialize(JsonElement json) {
+            public @NotNull Directed deserialize(JsonElement json) {
                 var d = json.getAsJsonObject();
                 var x = d.get("x").getAsDouble();
                 var y = d.get("y").getAsDouble();
@@ -61,7 +98,7 @@ public interface Position extends Cloneable {
             }
 
             @Override
-            public JsonElement serialize(Directed data) {
+            public @NotNull JsonElement serialize(Directed data) {
                 var d = new JsonObject();
                 d.addProperty("x", data.x());
                 d.addProperty("y", data.y());
@@ -72,7 +109,7 @@ public interface Position extends Cloneable {
             }
 
             @Override
-            public Directed clone(Directed object) {
+            public @NotNull Directed clone(Directed object) {
                 return object.clone();
             }
         };
@@ -80,6 +117,10 @@ public interface Position extends Cloneable {
         record Simple(double x, double y, double z, float yaw, float pitch) implements Directed {
             private static final float F360 = 360f;
             private static final float F180 = 180f;
+
+            public Simple(double x, double y, double z, @NotNull Rotation rotation) {
+                this(x, y, z, rotation.yaw(), rotation.pitch());
+            }
 
             @Override
             public @NotNull Directed.Simple clone() {
@@ -92,12 +133,17 @@ public interface Position extends Cloneable {
             }
 
             @Override
+            public @NotNull Directed.Simple add(int x, double y, int z) {
+                return new Directed.Simple(this.x + x, this.y + y, this.z + z, yaw, pitch);
+            }
+
+            @Override
             public @NotNull Directed simple() {
                 return this;
             }
 
             private static double nice(double c) {
-                return ((int) (c * 2)) / 2D;
+                return ((int) (c * 2 + 0.5D)) / 2D;
             }
 
             private static float getNicePitch(float y) {

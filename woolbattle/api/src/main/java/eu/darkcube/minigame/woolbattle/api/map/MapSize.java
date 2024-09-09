@@ -28,7 +28,7 @@ public record MapSize(int teams, int teamSize) {
     }
 
     @Api
-    public static @NotNull MapSize parseString(String s) {
+    public static @NotNull MapSize parseString(String s) throws IllegalArgumentException {
         var a = s.split("x");
         if (a.length != 2) throw new IllegalArgumentException("Not a valid MapSize: " + s);
         try {

@@ -11,10 +11,12 @@ import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.api.WoolBattleApi;
 import eu.darkcube.minigame.woolbattle.api.command.CommandSender;
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerks;
 import eu.darkcube.minigame.woolbattle.api.team.Team;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.system.annotations.Api;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
@@ -26,10 +28,10 @@ import eu.darkcube.system.userapi.UserAPI;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.MetaDataStorage;
 
-public interface WBUser extends CommandSender {
+public interface WBUser extends CommandSender, Entity {
     @Api
     @NotNull
-    WoolBattleApi woolbattle();
+    WoolBattleApi api();
 
     /**
      * @return the user from the {@link UserAPI UserAPI}
@@ -38,6 +40,7 @@ public interface WBUser extends CommandSender {
     @NotNull
     User user();
 
+    @Override
     @Api
     @NotNull
     MetaDataStorage metadata();
@@ -156,9 +159,21 @@ public interface WBUser extends CommandSender {
     @Nullable
     World world();
 
+    @Override
     @Api
     @Nullable
     Location location();
+
+    @Api
+    void teleport(@NotNull Position.Directed position);
+
+    @Api
+    void teleport(@NotNull Location location);
+
+    @Override
+    @Api
+    @Nullable
+    Location eyeLocation();
 
     /**
      * @return a copy of this user's {@link PerksStorage}
@@ -206,4 +221,36 @@ public interface WBUser extends CommandSender {
 
     @Api
     void particles(boolean particles);
+
+    /**
+     * Checks whether the user can see another user. This state should be aware of game state and team.
+     *
+     * @param other the other user
+     * @return if this user can see the other user
+     */
+    @Api
+    boolean canSee(@NotNull WBUser other);
+
+    void kick();
+
+    @Nullable
+    WBUser getLastHit();
+
+    void setLastHit(@NotNull WBUser other);
+
+    int ticksAfterLastHit();
+
+    void ticksAfterLastHit(int ticks);
+
+    /**
+     * Attacks another user
+     *
+     * @param other the user to attack
+     */
+    void attack(@NotNull WBUser other);
+
+    /**
+     * Simulates the user moving into the void. Basically respawns the user
+     */
+    void applyVoid();
 }

@@ -14,11 +14,12 @@ import eu.darkcube.minigame.woolbattle.api.perk.user.UserPerk;
 import eu.darkcube.minigame.woolbattle.api.util.item.Item;
 import eu.darkcube.minigame.woolbattle.provider.WoolBattleProvider;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public class PerkItem {
-    private final Implementation implementation = WoolBattleProvider.PROVIDER.service(Implementation.class);
+    public static final Implementation IMPLEMENTATION = WoolBattleProvider.PROVIDER.service(Implementation.class);
 
     private final Key perkId;
     private final Supplier<Item> itemSupplier;
@@ -38,14 +39,17 @@ public class PerkItem {
      * Sets the item in the perk's owner's inventory
      */
     public void setItem() {
-        implementation.setItem(this);
+        var team = perk.owner().team();
+        if (team == null) return;
+        if (!team.canPlay()) return;
+        IMPLEMENTATION.setItem(this);
     }
 
-    public ItemBuilder calculateItem() {
+    public @Nullable ItemBuilder calculateItem() {
         var item = itemSupplier.get();
         if (item == null) return null;
         var b = item.getItem(perk.owner());
-        var amt = b.amount();
+        var amt = itemAmount();
         if (amt > 0) {
             b.amount(Math.min(amt, 64));
         } else if (amt == 0) {
@@ -57,14 +61,14 @@ public class PerkItem {
     }
 
     protected int itemAmount() {
-        return perk.perk().cooldown().unit() == Perk.Cooldown.Unit.TICKS ? (perk.cooldown() + 19) / 20 : perk.cooldown();
+        return perk.perk().cooldown().unit().itemCount(perk.cooldown());
     }
 
     protected void modify(ItemBuilder item) {
     }
 
     public static Key perkId(Game game) {
-        return Key.key(game.woolbattle(), "perk_id");
+        return Key.key(game.api(), "perk_id");
     }
 
     public interface Implementation {

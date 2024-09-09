@@ -13,7 +13,8 @@ import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface EntityEvent extends WorldEvent {
-    @NotNull Entity entity();
+    @NotNull
+    Entity entity();
 
     @Override
     default @NotNull World world() {

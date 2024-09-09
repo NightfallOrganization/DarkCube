@@ -43,6 +43,9 @@ public interface Block {
     MetaDataStorage metadata();
 
     @Api
+    boolean isWoolGenerator();
+
+    @Api
     int blockDamage();
 
     @Api

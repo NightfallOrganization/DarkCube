@@ -5,6 +5,7 @@
  * The above copyright notice shall be included in all copies of this software.
  */
 
+import eu.darkcube.build.UploadArtifacts
 import org.gradle.api.internal.file.FileOperations
 
 plugins {
@@ -77,7 +78,7 @@ tasks {
     }
     jar {
         manifest {
-            attributes["Main-Class"] = "eu.darkcube.system.minestom.Start"
+            attributes["Main-Class"] = "eu.darkcube.server.minestom.Start"
             attributes["Class-Path"] = minestomLibrary.files.joinToString(separator = " ") { "libraries/" + it.name }
         }
     }
@@ -87,12 +88,19 @@ tasks {
 }
 
 dependencies {
-    api(darkcubesystem.minestom) { exclude("org.jetbrains", "annotations") }
+    api(darkcubesystem.minestom) {
+        exclude("org.jetbrains", "annotations")
+        exclude("eu.darkcube", "minestom")
+    }
     api(darkcubesystem.api.cloudnet)
     api(darkcubesystem.server.cloudnet) { exclude("org.jetbrains", "annotations") }
     // libraries to be added
     minestomLibrary("org.slf4j:jul-to-slf4j:2.0.16")
     minestomLibrary(libs.kotlin.stdlib)
+    minestomLibrary("me.lucko.luckperms:minestom:5.4-SNAPSHOT")
+    minestomLibrary("ninja.leaping.configurate:configurate-yaml:3.7.1")
+    minestomLibrary("com.zaxxer:HikariCP:5.1.0")
+    minestomLibrary("org.mariadb.jdbc:mariadb-java-client:3.4.1")
     minestomLibrary("org.apache.logging.log4j:log4j-core:2.23.1")
     minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1")
     minestomLibrary(libs.jline)

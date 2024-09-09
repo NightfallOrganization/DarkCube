@@ -14,16 +14,20 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyInventoryClickListener;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyJoinGameListener;
+import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyQuitGameListener;
 import eu.darkcube.minigame.woolbattle.minestom.game.lobby.listeners.MinestomLobbyUserChangeTeamListener;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public class MinestomLobby extends CommonLobby {
     private final @NotNull MinestomLobbyScoreboard scoreboard;
+    private final @NotNull MinestomWoolBattle woolbattle;
 
     public MinestomLobby(@NotNull CommonGame game, @NotNull MinestomWoolBattle woolbattle) {
         super(game);
+        this.woolbattle = woolbattle;
         this.listeners.addListener(new MinestomLobbyInventoryClickListener().create());
         this.listeners.addListener(new MinestomLobbyJoinGameListener(woolbattle).create());
+        this.listeners.addListener(new MinestomLobbyQuitGameListener(woolbattle).create());
         this.listeners.addListener(new MinestomLobbyUserChangeTeamListener(woolbattle, this).create());
         this.scoreboard = new MinestomLobbyScoreboard(woolbattle, game);
     }
@@ -31,6 +35,23 @@ public class MinestomLobby extends CommonLobby {
     @Override
     protected void updateSidebar(@NotNull CommonWBUser user, LobbySidebarTeam team) {
         this.scoreboard.update(user, team);
+    }
+
+    @Override
+    public void join(@NotNull CommonWBUser user) {
+        super.join(user);
+        var player = this.woolbattle.player(user);
+        scoreboard.setupPlayer(player, user);
+    }
+
+    @Override
+    public void quit(@NotNull CommonWBUser user) {
+        var player = this.woolbattle.player(user);
+        var oldTeam = user.team();
+        if (oldTeam != null) {
+            scoreboard.cleanupPlayer(player, oldTeam);
+        }
+        super.quit(user);
     }
 
     public @NotNull MinestomLobbyScoreboard scoreboard() {

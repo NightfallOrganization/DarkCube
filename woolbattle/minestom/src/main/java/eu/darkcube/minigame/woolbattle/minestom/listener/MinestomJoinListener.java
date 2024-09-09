@@ -14,7 +14,6 @@ import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.minestom.util.adventure.MinestomAdventureSupport;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.GameMode;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
@@ -24,7 +23,15 @@ public class MinestomJoinListener {
     public static void register(MinestomWoolBattle woolbattle, EventNode<Event> node) {
         node.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             var player = (MinestomPlayer) event.getPlayer();
-            var joinResult = woolbattle.eventHandler().playerJoined(player.getUuid());
+            if (!event.isFirstConfig()) {
+                // could be coming from SetupMode#enter
+                if (woolbattle.setupModeImplementation().configurationEvent(player, event)) {
+                    // This is here for the future. Might want to do some other operations, but if setup mode succeeds, we stop processing
+                    return;
+                }
+                return;
+            }
+            var joinResult = woolbattle.eventHandler().playerConfiguration(player.getUuid());
             if (joinResult == null) {
                 // denied
                 player.kick("Bad request");
@@ -37,6 +44,7 @@ public class MinestomJoinListener {
                 woolbattle.logger().info("Player {} connecting to SetupMode", user.playerName());
                 // setup mode
                 woolbattle.setupModeImplementation().enterSetupMode(user, (instance, point) -> {
+                    user.sendMessage(Messages.ENTERED_SETUP_MODE);
                     event.setSpawningInstance(instance);
                     player.setRespawnPoint(point);
                 });
@@ -51,6 +59,7 @@ public class MinestomJoinListener {
                 if (result.location() == null && result.result() == UserLoginGameEvent.Result.CANNOT_JOIN) {
                     // no spawn location found, enter setup mode
                     woolbattle.setupModeImplementation().enterSetupMode(user, (instance, point) -> {
+                        user.sendMessage(Messages.ENTERED_SETUP_MODE);
                         event.setSpawningInstance(instance);
                         player.setRespawnPoint(point);
                     });
@@ -67,12 +76,11 @@ public class MinestomJoinListener {
             var user = player.user();
             if (user == null) return;
             if (event.isFirstSpawn()) {
-                player.setGameMode(GameMode.SURVIVAL);
                 // now it is safe to interact with the player. In AsyncPlayerConfigurationEvent only setRespawnPoint and setSpawningInstance can be done.
                 // gotta do things like set the inventory
                 var game = user.game();
                 if (game == null) {
-                    // user is in setup mode. We do not do anything here at this time
+                    woolbattle.setupModeImplementation().playerJoined(user);
                     return;
                 }
                 game.playerJoin(user);

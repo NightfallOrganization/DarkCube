@@ -30,11 +30,13 @@ import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngameData;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobby;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.CommonLobbyData;
 import eu.darkcube.minigame.woolbattle.common.map.CommonMap;
+import eu.darkcube.minigame.woolbattle.common.perk.CommonPerks;
 import eu.darkcube.minigame.woolbattle.common.team.CommonTeamManager;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.util.scheduler.CommonSchedulerManager;
 import eu.darkcube.system.event.EventFilter;
 import eu.darkcube.system.event.EventNode;
+import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.UnmodifiableView;
@@ -56,7 +58,8 @@ public class CommonGame implements Game {
     private volatile CommonPhase phase;
     private volatile @NotNull CommonMap map;
 
-    CommonGame(@NotNull CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull Map map) {
+    @ApiStatus.Internal
+    public CommonGame(@NotNull CommonWoolBattleApi woolbattle, @NotNull UUID id, @NotNull Map map) {
         this.woolbattle = woolbattle;
         this.id = id;
         this.eventManager = EventNode.type("game-" + id, EventFilter.ALL, (event, _) -> {
@@ -85,12 +88,14 @@ public class CommonGame implements Game {
     }
 
     void init() {
+        CommonPerks.register(this);
         this.phase = woolbattle.gamePhaseCreator().createLobby(this);
-        this.phase.enable();
+        this.phase.init(null);
+        this.phase.enable(null);
     }
 
     @Override
-    public @NotNull CommonWoolBattleApi woolbattle() {
+    public @NotNull CommonWoolBattleApi api() {
         return woolbattle;
     }
 
@@ -120,15 +125,20 @@ public class CommonGame implements Game {
     }
 
     public void enableNextPhase() {
-        phase.disable();
-        if (phase instanceof CommonLobby) {
-            phase = woolbattle.gamePhaseCreator().createIngame(this);
-        } else if (phase instanceof CommonIngame) {
-            phase = woolbattle.gamePhaseCreator().createEndgame(this);
+        var oldPhase = phase;
+        CommonPhase newPhase;
+        if (oldPhase instanceof CommonLobby) {
+            newPhase = woolbattle.gamePhaseCreator().createIngame(this);
+        } else if (oldPhase instanceof CommonIngame) {
+            newPhase = woolbattle.gamePhaseCreator().createEndgame(this);
         } else {
-            throw new IllegalStateException("Invalid phase: " + phase);
+            throw new IllegalStateException("Invalid phase: " + oldPhase);
         }
-        phase.enable();
+        newPhase.init(oldPhase);
+        oldPhase.disable(newPhase);
+        phase = newPhase;
+        newPhase.enable(oldPhase);
+        oldPhase.unload(newPhase);
     }
 
     @Override
@@ -190,7 +200,8 @@ public class CommonGame implements Game {
     }
 
     void unload0() {
-        phase.disable();
+        phase.disable(null);
+        phase.unload(null);
         phase = null;
     }
 
@@ -218,13 +229,17 @@ public class CommonGame implements Game {
         return new LoginResult(location, result);
     }
 
+    public void quietRemove(CommonWBUser user) {
+        users.remove(user);
+    }
+
     public void playerQuit(@NotNull CommonWBUser user) {
-        var event = new UserQuitGameEvent(user, this);
-        woolbattle.eventManager().call(event);
+        woolbattle.eventManager().call(new UserQuitGameEvent(user, this));
         users.remove(user);
         user.clearTeam();
         removeFromPlaying(user);
         removeFromSpectating(user);
+        woolbattle.eventManager().call(new UserQuitGameEvent.Post(user, this));
         checkUnload();
         woolbattle.lobbySystemLink().update();
     }

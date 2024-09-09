@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2024. [DarkCube]
+ * All rights reserved.
+ * You may not use or redistribute this software or any associated files without permission.
+ * The above copyright notice shall be included in all copies of this software.
+ */
+
 package eu.darkcube.minigame.woolbattle.minestom.game.lobby;
 
 import static eu.darkcube.system.minestom.util.adventure.MinestomAdventureSupport.adventureSupport;
@@ -56,7 +63,9 @@ public class MinestomLobbyScoreboard {
 
     public void update(@NotNull CommonWBUser user, @NotNull LobbySidebarTeam team) {
         var sidebar = (Sidebar) user.metadata().get(sidebarKey);
-        update(sidebar, user, team);
+        if (sidebar != null) {
+            update(sidebar, user, team);
+        }
     }
 
     private void createLine(Sidebar sidebar, CommonWBUser user, LobbySidebarTeam team) {
@@ -77,13 +86,22 @@ public class MinestomLobbyScoreboard {
         }
     }
 
-    public void cleanupPlayer(@NotNull MinestomPlayer player, @NotNull WBUser user) {
-        var team = user.team();
-        if (team != null) {
-            var removePacket = removePlayerPacket(team, player);
-            for (var u : this.game.users()) {
-                var p = this.woolbattle.player(u);
-                p.sendPacket(removePacket);
+    public void cleanupPlayer(@NotNull MinestomPlayer player, @NotNull Team oldTeam) {
+        var removePacket = removePlayerPacket(oldTeam, player);
+        for (var u : this.game.users()) {
+            var p = this.woolbattle.player(u);
+            p.sendPacket(removePacket);
+        }
+        var user = player.user();
+        if (user != null) {
+            var sidebar = user.metadata().<Sidebar>remove(sidebarKey);
+            if (sidebar != null) {
+                // Minestom doesn't send this packet
+                player.sendPacket(sidebar.getDisplayScoreboardPacket((byte) 1));
+                sidebar.removeViewer(player);
+            }
+            for (var team : this.game.teamManager().teams()) {
+                player.sendPacket(deletePacket(team));
             }
         }
     }
@@ -103,12 +121,17 @@ public class MinestomLobbyScoreboard {
         return new TeamsPacket(team.uniqueId().toString(), action);
     }
 
+    private TeamsPacket deletePacket(Team team) {
+        var action = new TeamsPacket.RemoveTeamAction();
+        return new TeamsPacket(team.uniqueId().toString(), action);
+    }
+
     private TeamsPacket createPacket(Team team) {
-        var displayName = adventureSupport().convert(Component.text(team.uniqueId().toString(), team.nameStyle()));
+        var customColor = team.nameColor();
+        var displayName = adventureSupport().convert(Component.text(team.uniqueId().toString(), customColor));
         var nameTagVisibility = TeamsPacket.NameTagVisibility.ALWAYS;
         var collisionRule = TeamsPacket.CollisionRule.NEVER;
-        var customColor = team.nameStyle().color();
-        var teamColor = NamedTextColor.nearestTo(adventureSupport().convert(customColor == null ? eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor.WHITE : customColor));
+        var teamColor = NamedTextColor.nearestTo(adventureSupport().convert(customColor));
         var teamPrefix = adventureSupport().convert(Component.empty());
         var teamSuffix = adventureSupport().convert(Component.empty());
         var entities = team.users().stream().map(WBUser::playerName).toList();

@@ -43,7 +43,7 @@ public class LobbyItemListener implements ConfiguredListeners {
         } else if (itemId.equals(Items.LOBBY_PARTICLES_ON.itemId())) {
             user.particles(false);
         } else if (itemId.equals(Items.SETTINGS.itemId())) {
-            lobby.game().woolbattle().woolbattle().settingsInventoryTemplate().open(user.user());
+            lobby.game().api().woolbattle().settingsInventoryTemplate().open(user.user());
         }
     }
 

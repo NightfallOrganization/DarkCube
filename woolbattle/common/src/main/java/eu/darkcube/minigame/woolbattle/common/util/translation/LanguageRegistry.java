@@ -10,9 +10,9 @@ package eu.darkcube.minigame.woolbattle.common.util.translation;
 import static eu.darkcube.minigame.woolbattle.common.util.translation.Messages.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
@@ -24,19 +24,16 @@ public class LanguageRegistry {
             register(Language.GERMAN);
             register(Language.ENGLISH);
 
-            var entries = new ArrayList<String>();
-            entries.addAll(Arrays.stream(Messages.values()).map(Messages::key).toList());
-            entries.addAll(Arrays.stream(Items.values()).flatMap(this::names).toList());
-
-            Language.validateEntries(entries.toArray(String[]::new), KEY_MODIFIER);
+            Language.validateEntries(Arrays.stream(Messages.values()).map(Messages::key).toArray(String[]::new), KEY_MODIFIER);
+            Language.validateEntries(Arrays.stream(Items.values()).flatMap(this::names).toArray(String[]::new), Function.identity());
         } catch (Throwable throwable) {
             throw new Error(throwable);
         }
     }
 
     private Stream<String> names(Items item) {
-        var name = ITEM_PREFIX + item.key();
-        var lore = ITEM_PREFIX + LORE_PREFIX + item.key();
+        var name = ITEM_MODIFIER.apply(item.key());
+        var lore = LORE_MODIFIER.apply(item.key());
         switch (item) {
             case NEXT_PAGE, NEXT_PAGE_UNUSABLE, PREV_PAGE, PREV_PAGE_UNUSABLE, GRAY_GLASS_PANE, BLACK_GLASS_PANE -> lore = null;
         }

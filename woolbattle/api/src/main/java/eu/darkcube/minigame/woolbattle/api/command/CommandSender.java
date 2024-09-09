@@ -14,9 +14,11 @@ import eu.darkcube.system.libs.net.kyori.adventure.audience.Audience;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public interface CommandSender extends Audience, CommandExecutor {
-    boolean hasPermission(String permission);
+    @Override
+    boolean hasPermission(@NotNull String permission);
 
     boolean isPlayer();
 
-    @NotNull UUID playerUniqueId();
+    @NotNull
+    UUID playerUniqueId();
 }

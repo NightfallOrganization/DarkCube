@@ -22,14 +22,14 @@ public class WoolBattleCommand {
     private final @NotNull String[] names;
     private final @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder;
 
-    @ApiStatus.Experimental
-    public WoolBattleCommand(@NotNull String name, @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder, @NotNull String @NotNull ... aliases) {
-        this(name, aliases, builder);
-    }
-
     @Api
     public WoolBattleCommand(@NotNull String name, @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder) {
         this(name, new String[0], builder);
+    }
+
+    @ApiStatus.Experimental
+    public WoolBattleCommand(@NotNull String name, @NotNull Consumer<LiteralArgumentBuilder<CommandSource>> builder, @NotNull String @NotNull ... aliases) {
+        this(name, aliases, builder);
     }
 
     @Api

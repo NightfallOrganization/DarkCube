@@ -7,25 +7,30 @@
 
 package eu.darkcube.minigame.woolbattle.common.game.lobby;
 
-import static eu.darkcube.system.libs.net.kyori.adventure.key.Key.key;
-
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import eu.darkcube.minigame.woolbattle.api.game.lobby.Lobby;
 import eu.darkcube.minigame.woolbattle.api.map.Map;
 import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
+import eu.darkcube.minigame.woolbattle.api.vote.Vote;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.game.CommonPhase;
+import eu.darkcube.minigame.woolbattle.common.game.ingame.CommonIngame;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.inventory.LobbyInventories;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.inventory.LobbyUserInventory;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyBreakBlockListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyInventoryListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyPlaceBlockListener;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserChatListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserDropItemListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserJoinGameListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserLoginGameListener;
+import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserMoveListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserParticlesUpdateListener;
 import eu.darkcube.minigame.woolbattle.common.game.lobby.listeners.LobbyUserQuitGameListener;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
@@ -34,14 +39,17 @@ import eu.darkcube.minigame.woolbattle.common.vote.CommonPoll;
 import eu.darkcube.minigame.woolbattle.common.vote.CommonVoteRegistry;
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
 import eu.darkcube.system.util.GameState;
-import eu.darkcube.system.util.data.PersistentDataTypes;
 
 public abstract class CommonLobby extends CommonPhase implements Lobby {
     protected int minPlayerCount;
     protected int maxPlayerCount;
     protected int deathLine;
+    protected boolean enoughTeams;
+    protected int lifes;
+    protected int forcedLifes = -1;
     protected CommonWorld world;
     protected Location spawn;
     protected CommonVoteRegistry voteRegistry;
@@ -59,11 +67,9 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
 
     public CommonLobby(@NotNull CommonGame game) {
         super(game, GameState.LOBBY);
-        this.minPlayerCount = game.woolbattle().persistentDataStorage().get(key(game.woolbattle(), "min_player_count"), PersistentDataTypes.INTEGER, () -> 2);
-        this.deathLine = game.woolbattle().persistentDataStorage().get(key(game.woolbattle(), "lobby_death_line"), PersistentDataTypes.INTEGER, () -> 50);
 
         this.voteRegistry = new CommonVoteRegistry();
-        this.mapPoll = voteRegistry.<Map>pollBuilder().addPossibilities(game.woolbattle().mapManager().maps(game.mapSize())).addToRegistry();
+        this.mapPoll = voteRegistry.<Map>pollBuilder().addPossibilities(game.api().mapManager().maps(game.mapSize()).stream().filter(Map::enabled).toList()).addToRegistry();
         this.mapPoll.onVote((user, vote) -> user.sendMessage(Messages.VOTED_FOR_MAP, vote.name()));
         this.mapPoll.onUpdate(_ -> {
             var winner = this.mapPoll.sortedWinners().getFirst();
@@ -75,6 +81,10 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.epGlitchPoll.onUpdate(_ -> updateSidebar(LobbySidebarTeam.EP_GLITCH));
         this.lifesPoll = voteRegistry.<Integer>pollBuilder().addPossibilities(IntStream.range(3, 31).boxed().toArray(Integer[]::new)).addToRegistry();
         this.lifesPoll.onVote((user, vote) -> user.sendMessage(Messages.VOTED_LIFES, vote));
+        this.lifesPoll.onUpdate(_ -> {
+            computeLifes();
+            updateSidebar(LobbySidebarTeam.LIFES);
+        });
 
         var lobbyInventories = new LobbyInventories(this, game);
         this.teamsInventoryTemplate = lobbyInventories.createTeamsTemplate();
@@ -83,9 +93,10 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.votingEpGlitchInventoryTemplate = lobbyInventories.createVotingEpGlitchInventoryTemplate();
         this.votingMapsInventoryTemplate = lobbyInventories.createVotingMapsInventoryTemplate();
         this.votingLifesInventoryTemplate = lobbyInventories.createVotingLifesInventoryTemplate();
-        this.perkTemplates = createPerkTemplates(lobbyInventories);
+        this.perkTemplates = this.createPerkTemplates(lobbyInventories);
         this.timer = new CommonLobbyTimer(this);
         this.maxPlayerCount = game.mapSize().teams() * game.mapSize().teamSize();
+        this.enoughTeams = game.teamManager().playingTeams().size() >= 2;
 
         this.listeners.addListener(new LobbyBreakBlockListener().create());
         this.listeners.addListener(new LobbyPlaceBlockListener().create());
@@ -93,9 +104,13 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         this.listeners.addListener(new LobbyUserParticlesUpdateListener().create());
         this.listeners.addListener(new LobbyUserLoginGameListener(this).create());
         this.listeners.addListener(new LobbyUserDropItemListener().create());
+        this.listeners.addListener(new LobbyUserChatListener(woolbattle).create());
+        this.listeners.addListener(new LobbyUserMoveListener(this).create());
         this.listeners.addChild(new LobbyUserQuitGameListener(this).node());
         this.listeners.addChild(new LobbyItemListener(this).node());
         this.listeners.addChild(new LobbyInventoryListener(this).node());
+
+        this.computeLifes();
     }
 
     private InventoryTemplate[][] createPerkTemplates(LobbyInventories lobbyInventories) {
@@ -111,29 +126,91 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
     }
 
     @Override
-    public void enable() {
+    public void init(@Nullable CommonPhase oldPhase) {
+        super.init(oldPhase);
+        if (!enoughTeams) {
+            woolbattle.logger().error("Not enough teams for {}", game.mapSize());
+        }
+    }
+
+    @Override
+    public void enable(@Nullable CommonPhase oldPhase) {
         setupWorld();
         spawn = new Location(world, game.lobbyData().spawn());
         deathLine = game.lobbyData().deathLine();
         minPlayerCount = game.lobbyData().minPlayerCount();
-        super.enable();
-        timer.start();
+        super.enable(oldPhase);
+        if (enoughTeams) timer.start();
     }
 
     @Override
-    public void disable() {
-        super.disable();
-        timer.stop();
+    public void disable(@Nullable CommonPhase newPhase) {
+        super.disable(newPhase);
+        if (enoughTeams) timer.stop();
         for (var user : game.users()) {
             quit(user);
         }
-        game.woolbattle().worldHandler().unloadWorld(world);
+        for (var team : game.teamManager().playingTeams()) {
+            team.lifes(lifes);
+        }
+    }
+
+    @Override
+    public void unload(@Nullable CommonPhase newPhase) {
+        var ingame = (CommonIngame) newPhase;
+        if (ingame != null) {
+            transitionPlayers(ingame);
+        }
+        super.unload(newPhase);
+        game.api().worldHandler().unloadWorld(world);
         world = null;
         spawn = null;
     }
 
+    @Override
+    @Nullable
+    public CommonWorld world() {
+        return world;
+    }
+
+    protected void transitionPlayers(@NotNull CommonIngame ingame) {
+        for (var user : game.users()) {
+            var team = user.team();
+            if (team == null) throw new IllegalStateException("User team can't be null when game starts");
+            var spawn = ingame.mapIngameData().spawn(team.key());
+            if (spawn == null) {
+                woolbattle.logger().warn("No spawn configured for team {} on {}", team.key(), game.mapSize());
+                spawn = new Position.Directed.Simple(0.5, 100, 0.5, 0, 0);
+            }
+            user.teleport(new Location(Objects.requireNonNull(ingame.world()), spawn));
+        }
+    }
+
+    private void computeLifes() {
+        var lifes = -1;
+        var votes = this.lifesPoll.votes();
+        if (!votes.isEmpty()) {
+            var sum = votes.stream().mapToInt(Vote::vote).sum();
+            lifes = Math.round((float) sum / (float) votes.size());
+        }
+        if (lifes == -1) {
+            var extra = 0;
+            var playerCount = this.game.users().size();
+            if (playerCount >= 3) {
+                playerCount = 3;
+                extra = ThreadLocalRandom.current().nextInt(4);
+            }
+            extra += playerCount;
+            lifes = 10 + extra;
+        }
+        if (this.forcedLifes != -1) {
+            this.forcedLifes = lifes;
+        }
+        this.lifes = lifes;
+    }
+
     private void setupWorld() {
-        world = game.woolbattle().worldHandler().loadLobbyWorld(game);
+        this.world = this.game.api().worldHandler().loadLobbyWorld(game);
     }
 
     public void preJoin(@NotNull CommonWBUser user) {
@@ -176,10 +253,21 @@ public abstract class CommonLobby extends CommonPhase implements Lobby {
         return timer;
     }
 
+    @Override
+    public void forceLifes(int lifes) {
+        this.forcedLifes = lifes;
+        this.computeLifes();
+    }
+
+    @Override
+    public int lifes() {
+        return lifes;
+    }
+
     protected void updateTimer(@NotNull CommonWBUser user) {
         var millis = this.timer.timer().toMillis();
         var maxMillis = this.timer.maxTimer().toMillis();
-        var xp = (double) millis / (double) maxMillis;
+        var xp = Math.min((double) millis / (double) maxMillis, 0.999999);
         user.platformAccess().xp((float) xp);
         updateSidebar(user, LobbySidebarTeam.TIME);
     }
