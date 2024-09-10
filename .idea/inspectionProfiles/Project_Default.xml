@@ -22,16 +22,6 @@
     <inspection_tool class="ClassCanBeRecord" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <scope name="DarkCubeLibraries" level="INFORMATION" enabled="true" editorAttributes="INFORMATION_ATTRIBUTES" />
     </inspection_tool>
-    <inspection_tool class="CodeBlock2Expr" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="WARNING_ATTRIBUTES" />
-    <inspection_tool class="DataFlowIssue" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
-      <scope name="DarkCubeLibraries" level="WEAK WARNING" enabled="false">
-        <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="false" />
-        <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
-      </scope>
-      <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="false" />
-      <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
-    </inspection_tool>
-    <inspection_tool class="DeconstructionCanBeUsed" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES" />
     <inspection_tool class="Deprecation" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="DarkCubeLibraries" level="INFORMATION" enabled="true" editorAttributes="INFORMATION_ATTRIBUTES" />
     </inspection_tool>
@@ -51,7 +41,6 @@
       <scope name="DarkCubeLibraries" level="INFORMATION" enabled="true" editorAttributes="INFORMATION_ATTRIBUTES" />
     </inspection_tool>
     <inspection_tool class="JavadocReference" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="LeakingThis" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MismatchedJavadocCode" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
       <option name="ignoreObjectMethods" value="true" />
@@ -60,38 +49,11 @@
     <inspection_tool class="NotNullFieldNotInitialized" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
       <scope name="DarkCubeLibraries" level="WARNING" enabled="false" />
     </inspection_tool>
-    <inspection_tool class="NullableProblems" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
-      <scope name="DarkCubeLibraries" level="INFORMATION" enabled="false" editorAttributes="INFORMATION_ATTRIBUTES">
-        <option name="REPORT_NULLABLE_METHOD_OVERRIDES_NOTNULL" value="true" />
-        <option name="REPORT_NOT_ANNOTATED_METHOD_OVERRIDES_NOTNULL" value="true" />
-        <option name="REPORT_NOTNULL_PARAMETER_OVERRIDES_NULLABLE" value="true" />
-        <option name="REPORT_NOT_ANNOTATED_PARAMETER_OVERRIDES_NOTNULL" value="true" />
-        <option name="REPORT_NOT_ANNOTATED_GETTER" value="true" />
-        <option name="REPORT_NOTNULL_PARAMETERS_OVERRIDES_NOT_ANNOTATED" value="true" />
-        <option name="REPORT_NOT_ANNOTATED_SETTER_PARAMETER" value="true" />
-        <option name="REPORT_ANNOTATION_NOT_PROPAGATED_TO_OVERRIDERS" value="true" />
-        <option name="REPORT_NULLS_PASSED_TO_NON_ANNOTATED_METHOD" value="true" />
-      </scope>
-      <option name="REPORT_NULLABLE_METHOD_OVERRIDES_NOTNULL" value="true" />
-      <option name="REPORT_NOT_ANNOTATED_METHOD_OVERRIDES_NOTNULL" value="true" />
-      <option name="REPORT_NOTNULL_PARAMETER_OVERRIDES_NULLABLE" value="true" />
-      <option name="REPORT_NOT_ANNOTATED_PARAMETER_OVERRIDES_NOTNULL" value="true" />
-      <option name="REPORT_NOT_ANNOTATED_GETTER" value="true" />
-      <option name="REPORT_NOTNULL_PARAMETERS_OVERRIDES_NOT_ANNOTATED" value="true" />
-      <option name="REPORT_NOT_ANNOTATED_SETTER_PARAMETER" value="true" />
-      <option name="REPORT_ANNOTATION_NOT_PROPAGATED_TO_OVERRIDERS" value="true" />
-      <option name="REPORT_NULLS_PASSED_TO_NON_ANNOTATED_METHOD" value="true" />
-    </inspection_tool>
     <inspection_tool class="OptionalOfNullableMisuse" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <scope name="DarkCubeLibraries" level="WEAK WARNING" enabled="false" />
     </inspection_tool>
     <inspection_tool class="OptionalUsedAsFieldOrParameterType" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PackageUpdate" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
-    <inspection_tool class="PatternVariableHidesField" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="PreviewFeature" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES" />
-    <inspection_tool class="RedundantExplicitVariableType" enabled="true" level="TYPO" enabled_by_default="true" editorAttributes="TYPO">
-      <scope name="DarkCubeLibraries" level="INFORMATION" enabled="true" editorAttributes="INFORMATION_ATTRIBUTES" />
-    </inspection_tool>
     <inspection_tool class="RefusedBequest" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="ignoreEmptySuperMethods" value="false" />
       <option name="onlyReportWhenAnnotated" value="true" />
@@ -109,61 +71,12 @@
       <option name="m_ignorePrivateMethods" value="false" />
     </inspection_tool>
     <inspection_tool class="SameReturnValue" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
-      <scope name="DarkCubeLibraries" level="INFORMATION" enabled="true" editorAttributes="INFORMATION_ATTRIBUTES">
-        <option name="processCode" value="true" />
-        <option name="processLiterals" value="true" />
-        <option name="processComments" value="true" />
-      </scope>
-      <option name="processCode" value="true" />
-      <option name="processLiterals" value="true" />
-      <option name="processComments" value="true" />
-    </inspection_tool>
-    <inspection_tool class="StringBufferReplaceableByString" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StringTemplateMigration" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES" />
-    <inspection_tool class="TextBlockBackwardMigration" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="ThrowablePrintStackTrace" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="TrailingSpacesInProperty" enabled="false" level="WARNING" enabled_by_default="false" ignoreVisibleSpaces="true" />
     <inspection_tool class="UNCHECKED_WARNING" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UnsatisfiedRange" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
       <scope name="DarkCubeLibraries" level="WARNING" enabled="false" />
-    </inspection_tool>
-    <inspection_tool class="UnstableApiUsage" enabled="true" level="WEAK WARNING" enabled_by_default="true" editorAttributes="RUNTIME_ERROR">
-      <scope name="DarkCubeLibraries" level="WEAK WARNING" enabled="false" editorAttributes="INFO_ATTRIBUTES">
-        <option name="unstableApiAnnotations">
-          <set>
-            <option value="com.google.common.annotations.Beta" />
-            <option value="eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.Experimental" />
-            <option value="eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.ScheduledForRemoval" />
-            <option value="io.reactivex.annotations.Beta" />
-            <option value="io.reactivex.annotations.Experimental" />
-            <option value="org.apache.http.annotation.Beta" />
-            <option value="org.gradle.api.Incubating" />
-            <option value="org.jetbrains.annotations.ApiStatus.Experimental" />
-            <option value="org.jetbrains.annotations.ApiStatus.Internal" />
-            <option value="org.jetbrains.annotations.ApiStatus.ScheduledForRemoval" />
-            <option value="rx.annotations.Beta" />
-            <option value="rx.annotations.Experimental" />
-          </set>
-        </option>
-        <option name="myIgnoreApiDeclaredInThisProject" value="false" />
-      </scope>
-      <option name="unstableApiAnnotations">
-        <set>
-          <option value="com.google.common.annotations.Beta" />
-          <option value="eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.Experimental" />
-          <option value="eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus.ScheduledForRemoval" />
-          <option value="io.reactivex.annotations.Beta" />
-          <option value="io.reactivex.annotations.Experimental" />
-          <option value="org.apache.http.annotation.Beta" />
-          <option value="org.gradle.api.Incubating" />
-          <option value="org.jetbrains.annotations.ApiStatus.Experimental" />
-          <option value="org.jetbrains.annotations.ApiStatus.Internal" />
-          <option value="org.jetbrains.annotations.ApiStatus.ScheduledForRemoval" />
-          <option value="rx.annotations.Beta" />
-          <option value="rx.annotations.Experimental" />
-        </set>
-      </option>
     </inspection_tool>
     <inspection_tool class="UnstableTypeUsedInSignature" enabled="true" level="TYPO" enabled_by_default="true" editorAttributes="TYPO">
       <scope name="DarkCubeLibraries" level="INFORMATION" enabled="false" editorAttributes="INFORMATION_ATTRIBUTES">
@@ -201,37 +114,5 @@
       </option>
     </inspection_tool>
     <inspection_tool class="UnusedLibrary" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="UnusedReturnValue" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="IGNORE_BUILDER_PATTERN" value="true" />
-    </inspection_tool>
-    <inspection_tool class="VariableTypeCanBeExplicit" enabled="false" level="INFORMATION" enabled_by_default="false" />
-    <inspection_tool class="unused" enabled="true" level="WARNING" enabled_by_default="true" checkParameterExcludingHierarchy="false">
-      <scope name="DarkCubeLibraries" level="INFORMATION" enabled="true" editorAttributes="INFORMATION_ATTRIBUTES" checkParameterExcludingHierarchy="false">
-        <option name="LOCAL_VARIABLE" value="true" />
-        <option name="FIELD" value="true" />
-        <option name="METHOD" value="true" />
-        <option name="CLASS" value="true" />
-        <option name="PARAMETER" value="true" />
-        <option name="REPORT_PARAMETER_FOR_PUBLIC_METHODS" value="true" />
-        <option name="ADD_MAINS_TO_ENTRIES" value="true" />
-        <option name="ADD_APPLET_TO_ENTRIES" value="true" />
-        <option name="ADD_SERVLET_TO_ENTRIES" value="true" />
-        <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
-        <option name="selected" value="true" />
-        <option name="mixinEntryPoint" value="true" />
-      </scope>
-      <option name="LOCAL_VARIABLE" value="true" />
-      <option name="FIELD" value="true" />
-      <option name="METHOD" value="true" />
-      <option name="CLASS" value="true" />
-      <option name="PARAMETER" value="true" />
-      <option name="REPORT_PARAMETER_FOR_PUBLIC_METHODS" value="true" />
-      <option name="ADD_MAINS_TO_ENTRIES" value="true" />
-      <option name="ADD_APPLET_TO_ENTRIES" value="true" />
-      <option name="ADD_SERVLET_TO_ENTRIES" value="true" />
-      <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
-      <option name="selected" value="true" />
-      <option name="mixinEntryPoint" value="true" />
-    </inspection_tool>
   </profile>
 </component>
