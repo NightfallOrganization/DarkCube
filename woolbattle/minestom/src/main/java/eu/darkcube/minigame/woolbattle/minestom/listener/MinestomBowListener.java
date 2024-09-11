@@ -7,6 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.listener;
 
+import static eu.darkcube.system.server.item.ItemBuilder.item;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+import eu.darkcube.minigame.woolbattle.api.event.user.UserShootBowEvent;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
@@ -32,9 +37,28 @@ public class MinestomBowListener {
             var player = (MinestomPlayer) event.getPlayer();
             var user = player.user();
             if (user == null) return;
+            var eyeLocation = user.eyeLocation();
+            if (eyeLocation == null) return;
             if (!user.metadata().has(chargeSinceKey)) return;
-            var nanoChargeTime = System.nanoTime() - user.metadata().<Long>remove(chargeSinceKey);
+            var chargeTimeNanos = System.nanoTime() - user.metadata().<Long>remove(chargeSinceKey);
+            var chargeTimeMillis = (double) chargeTimeNanos / 1000D;
+            var chargeTimeSeconds = chargeTimeMillis / 1000D;
+            var power = (float) calculatePower(chargeTimeSeconds);
+            var itemBuilder = item(item);
+            var shootEvent = new UserShootBowEvent(user, itemBuilder, power);
+            woolbattle.api().eventManager().call(shootEvent);
+            var arrow = woolbattle.api().entityImplementations().shootArrow(user, eyeLocation, power * 3F, 1F);
 
         });
+    }
+
+    private static float getRandomPitchFromPower(double power) {
+        return (float) (1F / (ThreadLocalRandom.current().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+    }
+
+    private static double calculatePower(double chargeTimeSeconds) {
+        var power = (chargeTimeSeconds * chargeTimeSeconds + chargeTimeSeconds * 2F) / 3F;
+        if (power > 1D) power = 1D;
+        return power;
     }
 }

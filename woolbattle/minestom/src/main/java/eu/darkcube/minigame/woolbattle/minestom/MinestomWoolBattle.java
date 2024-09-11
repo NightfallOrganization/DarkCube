@@ -23,6 +23,7 @@ import eu.darkcube.minigame.woolbattle.minestom.command.MinestomCommandSender;
 import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomAnimationListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBlockListener;
+import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomBowListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomChatListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInteractListener;
 import eu.darkcube.minigame.woolbattle.minestom.listener.MinestomInventoryListener;
@@ -90,6 +91,7 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         MinestomAnimationListener.register(this, eventManager);
         MinestomInteractListener.register(this, eventManager);
         MinestomChatListener.register(this, eventManager);
+        MinestomBowListener.register(this, eventManager);
 
         MinecraftServer.getConnectionManager().setPlayerProvider(MinestomPlayer::new);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
