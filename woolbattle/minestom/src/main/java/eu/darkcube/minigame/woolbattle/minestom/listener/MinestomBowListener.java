@@ -9,8 +9,6 @@ package eu.darkcube.minigame.woolbattle.minestom.listener;
 
 import static eu.darkcube.system.server.item.ItemBuilder.item;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import eu.darkcube.minigame.woolbattle.api.event.user.UserShootBowEvent;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
@@ -47,13 +45,7 @@ public class MinestomBowListener {
             var itemBuilder = item(item);
             var shootEvent = new UserShootBowEvent(user, itemBuilder, power);
             woolbattle.api().eventManager().call(shootEvent);
-            var arrow = woolbattle.api().entityImplementations().shootArrow(user, eyeLocation, power * 3F, 1F);
-
         });
-    }
-
-    private static float getRandomPitchFromPower(double power) {
-        return (float) (1F / (ThreadLocalRandom.current().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
     }
 
     private static double calculatePower(double chargeTimeSeconds) {

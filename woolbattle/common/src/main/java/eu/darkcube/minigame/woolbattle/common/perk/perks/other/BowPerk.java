@@ -10,6 +10,7 @@ package eu.darkcube.minigame.woolbattle.common.perk.perks.other;
 import static eu.darkcube.minigame.woolbattle.api.util.PerkUtils.playSoundNotEnoughWool;
 
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 import eu.darkcube.minigame.woolbattle.api.event.perk.BowShootArrowEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserShootBowEvent;
@@ -47,7 +48,7 @@ public class BowPerk extends Perk {
             if (eyeLocation == null) return false;
             var arrow = game.api().entityImplementations().shootArrow(user, eyeLocation, power * 3F, 1F);
             ArrowPerk.claimArrow(game, user, arrow, 2, 1);
-            eyeLocation.world().playSound(eyeLocation, Sound.sound(Key.key("minecraft:entity.arrow.shoot"), Sound.Source.PLAYER, 1, 1));
+            eyeLocation.world().playSound(eyeLocation, Sound.sound(Key.key("minecraft:entity.arrow.shoot"), Sound.Source.PLAYER, 1, getRandomPitchFromPower(power)));
             game.api().eventManager().call(new BowShootArrowEvent(user, arrow));
             return true;
         }
@@ -75,6 +76,10 @@ public class BowPerk extends Perk {
                 return;
             }
             activated(userPerk);
+        }
+
+        private static float getRandomPitchFromPower(double power) {
+            return (float) (1F / (ThreadLocalRandom.current().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
         }
     }
 }

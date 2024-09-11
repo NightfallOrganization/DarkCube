@@ -7,6 +7,8 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.world;
 
+import static eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport.adventureSupport;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +19,13 @@ import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityTypeTest;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
+import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.common.world.CommonBlock;
 import eu.darkcube.minigame.woolbattle.minestom.entity.impl.EntityImpl;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.system.libs.net.kyori.adventure.sound.Sound;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -41,6 +45,11 @@ public interface MinestomWorld extends World {
     @Override
     @NotNull
     CommonBlock blockAt(int x, int y, int z);
+
+    @Override
+    default void playSound(Position position, Sound sound) {
+        instance().playSound(adventureSupport().convert(sound), position.x(), position.y(), position.z());
+    }
 
     @Override
     default @Unmodifiable @NotNull List<? extends WBUser> getPlayers(@NotNull Predicate<Entity> predicate, int limit) {
