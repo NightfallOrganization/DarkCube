@@ -35,7 +35,10 @@ public interface Position extends Cloneable {
     }
 
     @NotNull
-    Position add(int x, double y, int z);
+    Position add(double x, double y, double z);
+
+    @NotNull
+    Position sub(double x, double y, double z);
 
     default int blockX() {
         return (int) Math.floor(x());
@@ -49,6 +52,21 @@ public interface Position extends Cloneable {
         return (int) Math.floor(z());
     }
 
+    @NotNull
+    default Position add(@NotNull Vector vec) {
+        return add(vec.x(), vec.y(), vec.z());
+    }
+
+    @NotNull
+    default Position sub(@NotNull Vector vec) {
+        return sub(vec.x(), vec.y(), vec.z());
+    }
+
+    @NotNull
+    default Directed withDirection(@NotNull Vector dir) {
+        return new Directed.Simple(x(), y(), z(), dir);
+    }
+
     record Simple(double x, double y, double z) implements Position {
         @Override
         public Position.@NotNull Simple clone() {
@@ -56,8 +74,13 @@ public interface Position extends Cloneable {
         }
 
         @Override
-        public @NotNull Simple add(int x, double y, int z) {
+        public @NotNull Simple add(double x, double y, double z) {
             return new Simple(this.x + x, this.y + y, this.z + z);
+        }
+
+        @Override
+        public @NotNull Simple sub(double x, double y, double z) {
+            return new Simple(this.x - x, this.y - y, this.z - z);
         }
     }
 
@@ -71,7 +94,23 @@ public interface Position extends Cloneable {
 
         @Override
         @NotNull
-        Position.Directed add(int x, double y, int z);
+        Directed add(double x, double y, double z);
+
+        @Override
+        @NotNull
+        Directed sub(double x, double y, double z);
+
+        @Override
+        @NotNull
+        default Directed add(@NotNull Vector vec) {
+            return (Directed) Position.super.add(vec);
+        }
+
+        @Override
+        @NotNull
+        default Directed sub(@NotNull Vector vec) {
+            return (Directed) Position.super.sub(vec);
+        }
 
         default @NotNull Vector direction() {
             return Vector.fromEuler(yaw(), pitch());
@@ -133,8 +172,13 @@ public interface Position extends Cloneable {
             }
 
             @Override
-            public @NotNull Directed.Simple add(int x, double y, int z) {
+            public @NotNull Directed.Simple add(double x, double y, double z) {
                 return new Directed.Simple(this.x + x, this.y + y, this.z + z, yaw, pitch);
+            }
+
+            @Override
+            public @NotNull Directed.Simple sub(double x, double y, double z) {
+                return new Directed.Simple(this.x - x, this.y - y, this.z - z, yaw, pitch);
             }
 
             @Override

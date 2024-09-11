@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.api.world;
 
+import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 
 public record Location(@NotNull World world, double x, double y, double z, float yaw, float pitch) implements Position.Directed {
@@ -29,7 +30,27 @@ public record Location(@NotNull World world, double x, double y, double z, float
     }
 
     @Override
-    public @NotNull Location add(int x, double y, int z) {
+    public @NotNull Location add(double x, double y, double z) {
         return new Location(world, this.x + x, this.y + y, this.z + z, yaw, pitch);
+    }
+
+    @Override
+    public @NotNull Location sub(double x, double y, double z) {
+        return new Location(world, this.x - x, this.y - y, this.z - z, yaw, pitch);
+    }
+
+    @Override
+    public @NotNull Location add(@NotNull Vector vec) {
+        return (Location) Directed.super.add(vec);
+    }
+
+    @Override
+    public @NotNull Location sub(@NotNull Vector vec) {
+        return (Location) Directed.super.sub(vec);
+    }
+
+    @Override
+    public @NotNull Location withDirection(@NotNull Vector dir) {
+        return new Location(world, Directed.super.withDirection(dir));
     }
 }

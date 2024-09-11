@@ -17,6 +17,7 @@ import eu.darkcube.minigame.woolbattle.minestom.util.MinestomUtil;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomColoredWool;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.server.item.material.Material;
 import it.unimi.dsi.fastutil.Pair;
@@ -24,8 +25,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.ServerFlag;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
 import net.minestom.server.inventory.TransactionType;
@@ -125,8 +124,17 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
     public void velocity(@NotNull Vector velocity) {
         var player = woolbattle.player(user);
         var lock = player.acquirable().lock();
-        player.setVelocity(new Vec(velocity.x(), velocity.y(), velocity.z()).mul(ServerFlag.SERVER_TICKS_PER_SECOND));
+        player.setVelocity(MinestomUtil.toVelocity(velocity));
         lock.unlock();
+    }
+
+    @Override
+    public @UnknownNullability Vector velocity() {
+        var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
+        var vec = player.getVelocity();
+        lock.unlock();
+        return MinestomUtil.toVelocity(vec);
     }
 
     @Override

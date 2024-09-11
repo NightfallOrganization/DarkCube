@@ -13,11 +13,11 @@ import eu.darkcube.minigame.woolbattle.api.util.Vector;
 import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.util.MinestomUtil;
 import eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
-import net.minestom.server.ServerFlag;
-import net.minestom.server.coordinate.Vec;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.thread.Acquired;
 
@@ -69,8 +69,17 @@ public interface DefaultMinestomEntity extends Entity {
     @Override
     default void velocity(@NotNull Vector velocity) {
         var lock = lock();
-        lock.get().setVelocity(new Vec(velocity.x(), velocity.y(), velocity.z()).mul(ServerFlag.SERVER_TICKS_PER_SECOND));
+        lock.get().setVelocity(MinestomUtil.toVelocity(velocity));
         lock.unlock();
+    }
+
+    @Override
+    @UnknownNullability
+    default Vector velocity() {
+        var lock = lock();
+        var vec = lock.get().getVelocity();
+        lock.unlock();
+        return MinestomUtil.toVelocity(vec);
     }
 
     @Override

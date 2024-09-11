@@ -79,6 +79,11 @@ public class VoidSchematicGenerator implements Generator {
                         LOGGER.error("Unknown Block: {}", state);
                         continue;
                     }
+                    if (state.properties() != null) {
+                        for (var entry : state.properties().entrySet()) {
+                            block = block.withProperty(entry.getKey(), entry.getValue());
+                        }
+                    }
                     modifier.setBlock(x, y + deathHeight, z, block);
                 }
             }

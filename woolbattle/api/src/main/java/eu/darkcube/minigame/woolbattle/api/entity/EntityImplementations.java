@@ -18,16 +18,13 @@ import eu.darkcube.system.server.item.ItemBuilder;
 
 public interface EntityImplementations {
     @NotNull
-    Arrow spawnArrow(@NotNull Location location, @NotNull Vector velocity, float speed, float spread);
+    Arrow spawnArrow(@NotNull Location location, float speed, float spread);
 
     @NotNull
-    Arrow shootArrow(@Nullable WBUser shooter, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
+    Arrow shootArrow(@Nullable WBUser shooter, @NotNull Location location, float speed, float spread);
 
     @NotNull
-    <T extends Projectile> T spawnProjectile(@NotNull EntityType<T> type, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
-
-    @NotNull
-    <T extends Projectile> T shootProjectile(@NotNull EntityType<T> type, @Nullable WBUser user, @NotNull Location location, @NotNull Vector velocity, float speed, float spread);
+    <T extends Projectile> T shootProjectile(@NotNull EntityType<T> type, @Nullable WBUser user, @NotNull Location location, float speed, float spread);
 
     @NotNull
     <T extends ItemEntity> T spawnItem(@NotNull Location location, @NotNull Vector velocity, @NotNull ItemBuilder item, @Nullable Consumer<T> preSpawnCallback);

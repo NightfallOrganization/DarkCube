@@ -48,6 +48,7 @@ import eu.darkcube.system.libs.net.kyori.adventure.text.format.TextDecoration;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.util.Language;
 import eu.darkcube.system.util.data.BasicMetaDataStorage;
@@ -278,6 +279,11 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
     @Override
     public void velocity(@NotNull Vector velocity) {
         platformAccess.velocity(velocity);
+    }
+
+    @Override
+    public @UnknownNullability Vector velocity() {
+        return platformAccess.velocity();
     }
 
     @ApiStatus.Internal

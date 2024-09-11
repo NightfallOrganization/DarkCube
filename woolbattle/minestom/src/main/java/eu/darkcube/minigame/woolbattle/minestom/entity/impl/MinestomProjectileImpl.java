@@ -10,7 +10,6 @@ package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEntityEvent;
-import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
@@ -32,10 +31,13 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
 
     private final MinestomWoolBattle woolbattle;
     private Projectile handle;
+    private boolean frozen = false;
     private boolean inBlock = false;
+    private Vec freezeVelocity = null;
+    private boolean freezeNoGravity = false;
 
     public MinestomProjectileImpl(@NotNull MinestomWoolBattle woolbattle, @NotNull EntityType entityType) {
-        super(entityType, null);
+        super(entityType, null, woolbattle);
         this.woolbattle = woolbattle;
         super.hasPhysics = false;
     }
@@ -48,6 +50,30 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
     @Override
     public @NotNull Projectile handle() {
         return handle;
+    }
+
+    public boolean frozen() {
+        return frozen;
+    }
+
+    public void freeze() {
+        freezeVelocity = velocity;
+        freezeNoGravity = hasNoGravity();
+        velocity = Vec.ZERO;
+        sendPacketToViewers(getVelocityPacket());
+        refreshPosition(position, true, true);
+        setNoGravity(true);
+        frozen = true;
+    }
+
+    public void unfreeze() {
+        velocity = freezeVelocity;
+        freezeVelocity = null;
+        sendPacketToViewers(getVelocityPacket());
+        refreshPosition(position, true, true);
+        setNoGravity(freezeNoGravity);
+        freezeNoGravity = false;
+        frozen = false;
     }
 
     private boolean filter(Entity entity) {
@@ -68,6 +94,9 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
         if (removed || inBlock) {
             return;
         }
+        if (frozen) {
+            return;
+        }
 
         var posBefore = getPosition();
         updatePosition(time);
@@ -85,25 +114,11 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
     }
 
     @Override
-    public void update(long time) {
-        super.update(time);
-        var world = woolbattle.worlds().get(instance);
-        if (!(world instanceof GameWorld)) {
-            remove();
-            return;
-        }
-        var deathHeight = woolbattle.api().mapManager().deathHeight();
-        if (position.y() < deathHeight) {
-            remove();
-        }
-    }
-
-    @Override
     protected void handleBlockCollision(Block hitBlock, Point hitBlockPos, Point hitPos, Pos posBefore, PhysicsResult blockResult) {
         setNoGravity(true);
 
         inBlock = true;
-        var velocity = Vec.fromPoint(hitPos.sub(posBefore));
+        var velocity = Vec.fromPoint(hitPos.sub(posBefore)).normalize();
         this.velocity = velocity.mul(Vec.EPSILON);
         var v = velocity.normalize().mul(0.01F); // Required so the entity is lit (just outside the block)
 

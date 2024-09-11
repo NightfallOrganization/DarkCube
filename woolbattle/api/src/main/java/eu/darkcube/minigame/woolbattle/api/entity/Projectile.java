@@ -15,4 +15,10 @@ public interface Projectile extends Entity {
     WBUser shooter();
 
     void shooter(@Nullable WBUser shooter);
+
+    boolean frozen();
+
+    void freeze();
+
+    void unfreeze();
 }
