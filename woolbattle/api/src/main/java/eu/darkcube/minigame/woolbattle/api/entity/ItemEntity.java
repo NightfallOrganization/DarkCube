@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.api.entity;
 
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 
@@ -23,4 +24,6 @@ public interface ItemEntity extends Entity {
     int mergeDelay();
 
     void mergeDelay(int delay);
+
+    void sendPickupPacket(@NotNull WBUser collector, int amount);
 }

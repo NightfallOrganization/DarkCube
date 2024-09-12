@@ -11,15 +11,19 @@ import java.time.Duration;
 
 import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
+import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.entity.impl.MinestomItemEntityImpl;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.server.item.ItemBuilder;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.network.packet.server.play.CollectItemPacket;
 import net.minestom.server.thread.Acquirable;
 import net.minestom.server.utils.time.Tick;
 
+@SuppressWarnings("UnstableApiUsage")
 public class MinestomItemEntity extends MinestomEntity implements ItemEntity {
     public MinestomItemEntity(Acquirable<? extends Entity> entity, MinestomWoolBattle woolbattle) {
         super(entity, EntityType.ITEM, woolbattle);
@@ -75,5 +79,11 @@ public class MinestomItemEntity extends MinestomEntity implements ItemEntity {
         var entity = (MinestomItemEntityImpl) lock.get();
         entity.setMergeDelay0(Duration.of(delay, Tick.SERVER_TICKS));
         lock.unlock();
+    }
+
+    @Override
+    public void sendPickupPacket(@NotNull WBUser collector, int amount) {
+        var player = woolbattle.player((CommonWBUser) collector);
+        player.sendPacketToViewersAndSelf(new CollectItemPacket(entity.unwrap().getEntityId(), player.getEntityId(), amount));
     }
 }

@@ -47,9 +47,11 @@ public class IngameUserPickupItemListener extends ConfiguredListener<UserPickupI
         var missed = tryadd - added;
         if (missed > 0) {
             item.amount(missed);
+            entity.sendPickupPacket(user, added);
             entity.item(item);
             entity.pickupDelay(4);
         } else {
+            entity.sendPickupPacket(user, tryadd);
             entity.remove();
         }
         event.cancel();

@@ -39,7 +39,8 @@ public class MinestomBowListener {
             if (eyeLocation == null) return;
             if (!user.metadata().has(chargeSinceKey)) return;
             var chargeTimeNanos = System.nanoTime() - user.metadata().<Long>remove(chargeSinceKey);
-            var chargeTimeMillis = (double) chargeTimeNanos / 1000D;
+            var chargeTimeMicros = (double) chargeTimeNanos / 1000D;
+            var chargeTimeMillis = chargeTimeMicros / 1000D;
             var chargeTimeSeconds = chargeTimeMillis / 1000D;
             var power = (float) calculatePower(chargeTimeSeconds);
             var itemBuilder = item(item);

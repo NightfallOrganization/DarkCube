@@ -18,6 +18,7 @@ import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.sound.Sound;
 
 public class ArrowPerk extends Perk {
     public static final PerkName ARROW = new PerkName("ARROW");
@@ -57,6 +58,7 @@ public class ArrowPerk extends Perk {
                     block.incrementBlockDamage(damage);
                 }
             }
+            event.world().playSound(projectile.location(), Sound.sound(Key.key("minecraft:entity.arrow.hit"), Sound.Source.PLAYER, 1, 1));
             projectile.remove();
         }
     }
