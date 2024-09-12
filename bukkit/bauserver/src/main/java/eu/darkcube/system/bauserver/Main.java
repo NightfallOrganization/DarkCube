@@ -7,8 +7,11 @@
 
 package eu.darkcube.system.bauserver;
 
-import eu.darkcube.system.bauserver.command.CommandBauserver;
+import eu.darkcube.system.bauserver.command.BauserverCommand;
+import eu.darkcube.system.bauserver.command.HeadsCommand;
+import eu.darkcube.system.bauserver.heads.HeadStorage;
 import eu.darkcube.system.bauserver.listener.WorldEventListener;
+import eu.darkcube.system.bauserver.util.Message;
 import eu.darkcube.system.bukkit.Plugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import org.bukkit.Bukkit;
@@ -18,6 +21,8 @@ import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends Plugin {
+    private final HeadStorage headStorage = new HeadStorage();
+
     public Main() {
         super("bauserver");
     }
@@ -28,7 +33,9 @@ public class Main extends Plugin {
 
     @Override
     public void onEnable() {
-        CommandAPI.instance().register(new CommandBauserver());
+        Message.register();
+        CommandAPI.instance().register(new BauserverCommand());
+        CommandAPI.instance().register(new HeadsCommand());
         Bukkit.getPluginManager().registerEvents(new WorldEventListener(), this);
         new BukkitRunnable() {
             @Override
@@ -38,6 +45,12 @@ public class Main extends Plugin {
                 }
             }
         }.runTask(this);
+        headStorage.load();
+    }
+
+    @Override
+    public void onDisable() {
+        headStorage.save();
     }
 
     public void setupWorld(World world) {
@@ -48,10 +61,17 @@ public class Main extends Plugin {
         world.setThundering(false);
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         world.setGameRule(GameRule.MOB_GRIEFING, false);
+        world.setGameRule(GameRule.RANDOM_TICK_SPEED, 0);
+        world.setGameRule(GameRule.DO_FIRE_TICK, false);
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
     }
 
     @Override
     public String getCommandPrefix() {
         return "BauServer";
+    }
+
+    public HeadStorage headStorage() {
+        return headStorage;
     }
 }
