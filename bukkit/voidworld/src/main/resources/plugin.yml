@@ -1,0 +1,5 @@
+name: VoidWorld
+main: eu.darkcube.voidworld.VoidWorld
+version: 1.0
+api-version: 1.21.1
+load: STARTUP

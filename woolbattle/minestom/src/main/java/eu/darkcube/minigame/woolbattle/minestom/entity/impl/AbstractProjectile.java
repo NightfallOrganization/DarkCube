@@ -7,6 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 
+import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.ServerFlag;
@@ -27,14 +28,14 @@ import net.minestom.server.utils.chunk.ChunkCache;
 import net.minestom.server.utils.chunk.ChunkUtils;
 
 @SuppressWarnings("UnstableApiUsage")
-public abstract class AbstractProjectile extends Entity {
+public abstract class AbstractProjectile extends MinestomEntityImpl {
     protected final Entity shooter;
     protected PhysicsResult previousPhysicsResult;
     protected boolean isInEntity;
     protected boolean isInBlock;
 
-    public AbstractProjectile(EntityType type, Entity shooter) {
-        super(type);
+    public AbstractProjectile(EntityType type, Entity shooter, MinestomWoolBattle woolbattle) {
+        super(type, woolbattle);
         // ((SnowballMeta) this.entityMeta).setItem(ItemStack.of(Material.NETHERITE_SWORD));
         this.shooter = shooter;
     }
@@ -133,7 +134,7 @@ public abstract class AbstractProjectile extends Entity {
         if (instance == null || isRemoved() || !ChunkUtils.isLoaded(currentChunk)) return;
 
         movementTick();
-        super.update(time);
+        update(time);
         EventDispatcher.call(new EntityTickEvent(this));
     }
 

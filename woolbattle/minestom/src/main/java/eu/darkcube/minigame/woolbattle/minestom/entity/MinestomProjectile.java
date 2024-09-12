@@ -14,8 +14,10 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.entity.impl.MinestomProjectileImpl;
 import eu.darkcube.system.libs.org.jetbrains.annotations.ApiStatus;
+import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.thread.Acquirable;
+import net.minestom.server.thread.Acquired;
 
 @SuppressWarnings("UnstableApiUsage")
 public class MinestomProjectile extends MinestomEntity implements Projectile {
@@ -35,5 +37,32 @@ public class MinestomProjectile extends MinestomEntity implements Projectile {
     @Override
     public void shooter(@Nullable WBUser shooter) {
         this.shooter = (CommonWBUser) shooter;
+    }
+
+    @Override
+    public boolean frozen() {
+        var lock = lock();
+        var frozen = lock.get().frozen();
+        lock.unlock();
+        return frozen;
+    }
+
+    @Override
+    public void freeze() {
+        var lock = lock();
+        lock.get().freeze();
+        lock.unlock();
+    }
+
+    @Override
+    public void unfreeze() {
+        var lock = lock();
+        lock.get().unfreeze();
+        lock.unlock();
+    }
+
+    @Override
+    public @NotNull Acquired<? extends MinestomProjectileImpl> lock() {
+        return (Acquired<? extends MinestomProjectileImpl>) super.lock();
     }
 }

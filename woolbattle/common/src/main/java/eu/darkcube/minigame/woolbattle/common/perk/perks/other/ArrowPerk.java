@@ -7,7 +7,7 @@
 
 package eu.darkcube.minigame.woolbattle.common.perk.perks.other;
 
-import eu.darkcube.minigame.woolbattle.api.entity.Projectile;
+import eu.darkcube.minigame.woolbattle.api.entity.Arrow;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitBlockEvent;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
@@ -27,11 +27,11 @@ public class ArrowPerk extends Perk {
         addListeners(new ArrowPerkListener(game, this));
     }
 
-    public static void particles(Game game, Projectile arrow, boolean particles) {
+    public static void particles(Game game, Arrow arrow, boolean particles) {
         arrow.metadata().set(particles(game), particles);
     }
 
-    public static void claimArrow(Game game, WBUser user, Projectile arrow, float strength, float blockDamage) {
+    public static void claimArrow(Game game, WBUser user, Arrow arrow, float strength, int blockDamage) {
         arrow.metadata().set(user(game), user);
         arrow.metadata().set(perk(game), ARROW);
         arrow.metadata().set(strength(game), strength);
@@ -78,6 +78,6 @@ public class ArrowPerk extends Perk {
     }
 
     private static Key blockDamage(Game game) {
-        return Key.key(game.api(), "blockDamage");
+        return Key.key(game.api(), "block_damage");
     }
 }

@@ -21,6 +21,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,8 +31,11 @@ import java.util.concurrent.ConcurrentMap;
 import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommonEntityGenerator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonEntityGenerator.class);
     private final MethodHandles.Lookup lookup = MethodHandles.lookup();
     private final ConcurrentMap<EntityType<?>, WrappedClass<?>> wrappedClasses = new ConcurrentHashMap<>();
 
@@ -67,6 +72,8 @@ public class CommonEntityGenerator {
         if (!wrappedClass.isInterface()) {
             throw new IllegalArgumentException("EntityType base class must be an interface for wrapped generation");
         }
+        LOGGER.debug("Map {} as {}", wrappedType.key(), type.key());
+
         var CD_wrapped = ClassDesc.ofDescriptor(wrappedClass.descriptorString());
         var CD_EntityType = ClassDesc.ofDescriptor(EntityType.class.descriptorString());
         var CD_GeneratedEntity = ClassDesc.ofDescriptor(GeneratedEntity.class.descriptorString());
@@ -105,7 +112,7 @@ public class CommonEntityGenerator {
                 code.getfield(FRE_handle);
                 code.areturn();
             });
-            Map<MethodType, Map.Entry<Method, MethodType>> methodMap = new HashMap<>();
+            Map<Map.Entry<Method, MethodType>, MethodType> methodMap = new HashMap<>();
             for (var method : wrappedClass.getMethods()) {
                 var mod = method.getModifiers();
                 if (Modifier.isStatic(mod)) continue;
@@ -114,15 +121,15 @@ public class CommonEntityGenerator {
                 try {
                     var wrappedMethod = wrappedType.entityTypeClass().getMethod(method.getName(), method.getParameterTypes());
                     var wrappedMethodType = MethodType.methodType(wrappedMethod.getReturnType(), wrappedMethod.getParameterTypes());
-                    methodMap.put(methodType, Map.entry(wrappedMethod, wrappedMethodType));
+                    methodMap.put(Map.entry(wrappedMethod, wrappedMethodType), methodType);
                 } catch (NoSuchMethodException e) {
                     throw new Error(e);
                 }
             }
 
             for (var entry : methodMap.entrySet()) {
-                var key = entry.getKey();
-                var value = entry.getValue();
+                var key = entry.getValue();
+                var value = entry.getKey();
                 var MTD_invoke = MethodTypeDesc.ofDescriptor(key.descriptorString());
                 var MTD_handle_invoke = MethodTypeDesc.ofDescriptor(value.getValue().descriptorString());
                 var CD_target = ClassDesc.ofDescriptor(value.getKey().getDeclaringClass().descriptorString());
@@ -137,6 +144,13 @@ public class CommonEntityGenerator {
                 });
             }
         });
+        try {
+            var path = Path.of("generatedclassbytes").resolve(CD_this.displayName());
+            Files.createDirectories(path.getParent());
+            Files.write(path, classFileBytes);
+        } catch (Throwable t) {
+            LOGGER.error("Failed to save generated class bytes", t);
+        }
         Class<?> cls;
         try {
             cls = lookup.defineClass(classFileBytes);

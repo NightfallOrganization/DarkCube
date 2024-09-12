@@ -19,7 +19,7 @@ public interface EntityType<T extends Entity> extends EntityTypeTest<Entity, T> 
     EntityType<ItemEntity> ITEM = new SimpleEntityType<>(ItemEntity.class, "item");
     EntityType<Projectile> PROJECTILE = new SimpleEntityType<>(Projectile.class, "projectile", false);
     EntityType<Snowball> SNOWBALL = PROJECTILE.createWrapped(Snowball.class, "snowball", false);
-    EntityType<Arrow> ARROW = PROJECTILE.createWrapped(Arrow.class, "projectile");
+    EntityType<Arrow> ARROW = PROJECTILE.createWrapped(Arrow.class, "arrow");
 
     @NotNull
     Class<T> entityTypeClass();

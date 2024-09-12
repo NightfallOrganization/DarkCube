@@ -27,6 +27,9 @@ public interface Entity {
 
     void velocity(@NotNull Vector velocity);
 
+    @UnknownNullability
+    Vector velocity();
+
     @NotNull
     MetaDataStorage metadata();
 

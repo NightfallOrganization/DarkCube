@@ -24,6 +24,7 @@ public class MinestomEntityImpl extends Entity implements EntityImpl {
 
     @Override
     public void update(long time) {
+        if (instance == null) return;
         var world = woolbattle.worlds().get(instance);
         if (!(world instanceof GameWorld)) {
             remove();

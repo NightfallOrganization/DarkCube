@@ -7,15 +7,21 @@
 
 package eu.darkcube.minigame.woolbattle.api.util;
 
-public record Vector(double x, double y, double z) {
+import eu.darkcube.minigame.woolbattle.api.world.Rotation;
+
+public record Vector(double x, double y, double z) implements Rotation {
     public static final Vector ZERO = new Vector(0, 0, 0);
 
     public Vector() {
         this(0, 0, 0);
     }
 
+    public Vector plus(double x, double y, double z) {
+        return new Vector(this.x + x, this.y + y, this.z + z);
+    }
+
     public Vector plus(Vector vec) {
-        return new Vector(x + vec.x, y + vec.y, z + vec.z);
+        return plus(vec.x, vec.y, vec.z);
     }
 
     public Vector minus(Vector vec) {
@@ -76,10 +82,12 @@ public record Vector(double x, double y, double z) {
         return new Vector(x / length, y / length, z / length);
     }
 
+    @Override
     public float yaw() {
         return getYaw(x, z);
     }
 
+    @Override
     public float pitch() {
         return getPitch(x, y, z);
     }

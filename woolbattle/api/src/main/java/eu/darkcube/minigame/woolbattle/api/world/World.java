@@ -17,6 +17,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.net.kyori.adventure.sound.Sound;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Unmodifiable;
@@ -49,5 +50,7 @@ public interface World {
 
     @Nullable
     Entity getEntity(@NotNull UUID entityUUID);
+
+    void playSound(Position position, Sound sound);
 
 }

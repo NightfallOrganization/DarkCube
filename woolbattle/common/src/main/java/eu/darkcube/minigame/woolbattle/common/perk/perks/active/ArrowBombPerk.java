@@ -37,6 +37,7 @@ public class ArrowBombPerk extends Perk {
     }
 
     private static class ArrowBombListener extends BasicPerkListener {
+
         public ArrowBombListener(Game game, Perk perk) {
             super(game, perk);
             listeners.addListener(ProjectileHitEvent.class, this::handle);
@@ -47,19 +48,23 @@ public class ArrowBombPerk extends Perk {
         protected boolean activateRight(@NotNull UserPerk perk) {
             var shooter = perk.owner();
             var location = Objects.requireNonNull(shooter.eyeLocation());
-            var velocity = location.direction().mul(15);
-            var entity = game.api().entityImplementations().shootProjectile(ENTITY_TYPE, shooter, location, velocity, 1, 0);
+            var entity = game.api().entityImplementations().shootProjectile(ENTITY_TYPE, shooter, location, 1.5F, 1F);
+            entity.metadata().set(perkKey, perk);
             return true;
         }
 
         private void handle(ProjectileHitEvent event) {
             var projectile = event.entity();
+            var random = ThreadLocalRandom.current();
 
             var o = projectile.metadata().get(perkKey);
             if (o == null) return;
             if (!(o instanceof UserPerk perk)) return;
+            var location = projectile.location();
+            var direction = projectile.velocity();
+            projectile.remove();
+            var startLocation = location.sub(direction.normalized()).add(0, 1, 0);
             var user = perk.owner();
-            var random = ThreadLocalRandom.current();
             var count = 30;
             for (var i = 0; i < count; i++) {
                 var pitch = random.nextFloat() * 50 + 10;
@@ -70,7 +75,7 @@ public class ArrowBombPerk extends Perk {
                     pitch = -pitch;
                 }
                 var dir = Vector.fromEuler(yaw, pitch);
-                var arrow = game.api().entityImplementations().spawnArrow(projectile.location(), dir, 0.9F, 0);
+                var arrow = game.api().entityImplementations().spawnArrow(startLocation.withDirection(dir), 0.9F, 0);
                 ArrowPerk.particles(game, arrow, false);
                 ArrowPerk.claimArrow(game, user, arrow, 3, 2);
             }

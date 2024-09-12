@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.thread.Acquirable;
 
+@SuppressWarnings("UnstableApiUsage")
 public class MinestomEntityImplementations extends CommonEntityImplementations {
     private final MinestomWoolBattle woolbattle;
     private final EntityMappings mappings;
@@ -40,7 +41,7 @@ public class MinestomEntityImplementations extends CommonEntityImplementations {
     }
 
     @Override
-    protected <T extends Projectile> @NotNull T spawnProjectile0(@NotNull eu.darkcube.minigame.woolbattle.api.entity.EntityType<T> type, @Nullable CommonWBUser shooter, @NotNull Location location, @NotNull Vector velocity, float speed, float spread, @Nullable Consumer<T> preSpawnCallback) {
+    protected <T extends Projectile> @NotNull T spawnProjectile0(@NotNull eu.darkcube.minigame.woolbattle.api.entity.EntityType<T> type, @Nullable CommonWBUser shooter, @NotNull Location location, @NotNull Vector velocity, @Nullable Consumer<T> preSpawnCallback) {
         var pair = mappings.create(type);
         var entity = pair.first();
         var custom = new MinestomProjectile((Acquirable<? extends MinestomProjectileImpl>) entity.acquirable(), woolbattle, shooter);
@@ -59,7 +60,7 @@ public class MinestomEntityImplementations extends CommonEntityImplementations {
     public <T extends Entity> @NotNull T spawn(@NotNull eu.darkcube.minigame.woolbattle.api.entity.EntityType<T> type, @NotNull Location location, @NotNull Vector velocity, @Nullable Consumer<T> preSpawnCallback) {
         var pair = mappings.create(type);
         var entity = pair.first();
-        var custom = new MinestomItemEntity(entity.acquirable(), woolbattle);
+        var custom = new MinestomEntity(entity.acquirable(), type, woolbattle);
         return configure(pair, custom, type, location, velocity, preSpawnCallback);
     }
 
@@ -73,7 +74,7 @@ public class MinestomEntityImplementations extends CommonEntityImplementations {
         var instance = ((MinestomWorld) location.world()).instance();
         var lock = entity.acquirable().lock();
         entity.setInstance(instance, MinestomUtil.toPos(location));
-        entity.setVelocity(MinestomUtil.toVec(velocity));
+        entity.setVelocity(MinestomUtil.toVelocity(velocity));
         lock.unlock();
         return wrapped;
     }

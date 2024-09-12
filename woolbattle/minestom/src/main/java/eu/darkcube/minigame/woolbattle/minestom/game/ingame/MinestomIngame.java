@@ -47,6 +47,11 @@ public class MinestomIngame extends CommonIngame {
     }
 
     @Override
+    public void enable(@Nullable CommonPhase oldPhase) {
+        super.enable(oldPhase);
+    }
+
+    @Override
     public void join(@NotNull CommonWBUser user) {
         super.join(user);
         var player = woolbattle.player(user);

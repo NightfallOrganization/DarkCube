@@ -10,7 +10,6 @@ package eu.darkcube.minigame.woolbattle.common.perk;
 import eu.darkcube.minigame.woolbattle.api.event.perk.RegisterPerksEvent;
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
 import eu.darkcube.minigame.woolbattle.common.perk.perks.active.ArrowBombPerk;
-import eu.darkcube.minigame.woolbattle.common.perk.perks.active.ArrowBombPerk2;
 import eu.darkcube.minigame.woolbattle.common.perk.perks.active.BlinkPerk;
 import eu.darkcube.minigame.woolbattle.common.perk.perks.active.BoosterPerk;
 import eu.darkcube.minigame.woolbattle.common.perk.perks.active.CapsulePerk;
@@ -59,8 +58,6 @@ public class CommonPerks {
         var perkRegistry = game.perkRegistry();
         perkRegistry.register(new ArrowBombPerk(game));
         perkRegistry.register(new ArrowPerk(game));
-
-        perkRegistry.register(new ArrowBombPerk2(game)); // TODO REMOVE THIS AGAIN
 
         // TODO
         perkRegistry.register(new SlimePlatformPerk(game));

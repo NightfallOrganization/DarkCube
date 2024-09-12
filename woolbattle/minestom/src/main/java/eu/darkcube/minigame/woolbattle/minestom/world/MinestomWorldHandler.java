@@ -37,6 +37,7 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.anvil.AnvilLoader;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.world.DimensionType;
 import net.minestom.server.world.biome.Biome;
@@ -67,7 +68,8 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     @Override
     public void material(@NotNull CommonWorld world, int x, int y, int z, @NotNull Material material) {
         var minestomType = ((MinestomMaterial) material).minestomType();
-        instance(world).setBlock(x, y, z, minestomType.block());
+        var block = minestomType == net.minestom.server.item.Material.AIR ? Block.AIR : minestomType.block();
+        instance(world).setBlock(x, y, z, block);
     }
 
     @Override
@@ -77,9 +79,6 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             var instance = new NoSaveInstanceContainer(UUID.randomUUID(), dimensionType);
             var biome = biomeRegistry.get(this.biome);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
-            // var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
-            // var path = extractWorld(null, "setup", zip, null);
-            // instance.setChunkLoader(new AnvilLoader(path));
             var path = createDirectory(null, "setup");
             instance.setGenerator(new VoidSchematicGenerator(api.woolbattle().lobbySchematic(), this.biome, (int) this.api.lobbyData().spawn().y()));
             instance.setChunkSupplier(FullbrightChunk::new);
