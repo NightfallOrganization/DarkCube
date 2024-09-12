@@ -2,6 +2,6 @@ main: eu.darkcube.system.bauserver.Main
 version: 1.0
 name: BauServer
 author: DasBabyPixel
-api-version: 1.13
+api-version: 1.21.1
 softdepend:
   - System

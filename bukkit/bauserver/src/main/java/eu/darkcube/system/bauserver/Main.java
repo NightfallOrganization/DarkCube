@@ -4,6 +4,7 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
+
 package eu.darkcube.system.bauserver;
 
 import eu.darkcube.system.bauserver.command.CommandBauserver;
@@ -12,6 +13,7 @@ import eu.darkcube.system.bukkit.Plugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -24,11 +26,13 @@ public class Main extends Plugin {
         return Main.getPlugin(Main.class);
     }
 
-    @Override public void onEnable() {
+    @Override
+    public void onEnable() {
         CommandAPI.instance().register(new CommandBauserver());
         Bukkit.getPluginManager().registerEvents(new WorldEventListener(), this);
         new BukkitRunnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (World world : Bukkit.getWorlds()) {
                     setupWorld(world);
                 }
@@ -39,15 +43,15 @@ public class Main extends Plugin {
     public void setupWorld(World world) {
         world.setFullTime(6000);
         world.setDifficulty(Difficulty.PEACEFUL);
-        world.setKeepSpawnInMemory(false);
+        world.setGameRule(GameRule.SPAWN_RADIUS, 0);
         world.setStorm(false);
         world.setThundering(false);
-        world.setGameRuleValue("doDaylightCycle", "false");
-        world.setGameRuleValue("mobGriefing", "false");
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setGameRule(GameRule.MOB_GRIEFING, false);
     }
 
-    @Override public String getCommandPrefix() {
+    @Override
+    public String getCommandPrefix() {
         return "BauServer";
     }
-
 }
