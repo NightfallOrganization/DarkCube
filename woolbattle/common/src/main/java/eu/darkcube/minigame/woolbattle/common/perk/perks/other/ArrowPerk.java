@@ -16,6 +16,7 @@ import eu.darkcube.minigame.woolbattle.api.perk.ActivationType;
 import eu.darkcube.minigame.woolbattle.api.perk.Perk;
 import eu.darkcube.minigame.woolbattle.api.perk.PerkName;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
+import eu.darkcube.minigame.woolbattle.api.util.scheduler.TaskSchedule;
 import eu.darkcube.minigame.woolbattle.common.util.item.Items;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.sound.Sound;
@@ -57,9 +58,11 @@ public class ArrowPerk extends Perk {
                 if (game.api().materialProvider().isWool(block.material())) {
                     block.incrementBlockDamage(damage);
                 }
+                game.scheduler().schedule(projectile::remove, TaskSchedule.tick(100), TaskSchedule.stop());
+            } else {
+                projectile.remove();
             }
             event.world().playSound(projectile.location(), Sound.sound(Key.key("minecraft:entity.arrow.hit"), Sound.Source.PLAYER, 1, 1));
-            projectile.remove();
         }
     }
 
