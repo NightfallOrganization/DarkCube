@@ -19,7 +19,10 @@ public enum Message implements BaseMessage {
     SPECIFY_HEAD_NAME,
     NO_TEXTURE,
     SHIFT_RIGHT_TO_REMOVE,
-    ADDED_HEAD;
+    ADDED_HEAD,
+    DATABASE_UPDATED,
+    DATABASE_UPDATE_FAILED,
+    DATABASE_UPDATING;
 
     private static final String PREFIX = "BAUSERVER_";
     private static final Function<String, String> KEY_MODIFIER = s -> PREFIX + s;

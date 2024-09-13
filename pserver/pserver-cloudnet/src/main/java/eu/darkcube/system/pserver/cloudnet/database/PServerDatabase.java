@@ -4,14 +4,8 @@
  * You may not use or redistribute this software or any associated files without permission.
  * The above copyright notice shall be included in all copies of this software.
  */
-package eu.darkcube.system.pserver.cloudnet.database;
 
-import eu.cloudnetservice.driver.inject.InjectionLayer;
-import eu.cloudnetservice.driver.registry.ServiceRegistry;
-import eu.cloudnetservice.node.database.NodeDatabaseProvider;
-import eu.cloudnetservice.node.database.sql.SQLDatabaseProvider;
-import eu.darkcube.system.pserver.cloudnet.PServerModule;
-import eu.darkcube.system.pserver.common.UniqueId;
+package eu.darkcube.system.pserver.cloudnet.database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +13,14 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
+import eu.cloudnetservice.node.database.NodeDatabaseProvider;
+import eu.cloudnetservice.node.database.sql.SQLDatabaseProvider;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.pserver.cloudnet.PServerModule;
+import eu.darkcube.system.pserver.common.UniqueId;
 
 public class PServerDatabase extends Database {
 
@@ -131,7 +133,7 @@ public class PServerDatabase extends Database {
         });
     }
 
-    private <T> T executeQuery(String query, ExceptionalFunction<ResultSet, T> func) {
+    private <T> @Nullable T executeQuery(String query, ExceptionalFunction<ResultSet, T> func) {
         try {
             Connection con = getConnection();
             PreparedStatement prep = con.prepareStatement(query);

@@ -7,22 +7,32 @@
 
 package eu.darkcube.system.bauserver;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
 import eu.darkcube.system.bauserver.command.BauserverCommand;
 import eu.darkcube.system.bauserver.command.HeadsCommand;
 import eu.darkcube.system.bauserver.heads.HeadStorage;
+import eu.darkcube.system.bauserver.heads.database.DatabaseConfig;
+import eu.darkcube.system.bauserver.heads.database.DatabaseStorage;
 import eu.darkcube.system.bauserver.listener.WorldEventListener;
 import eu.darkcube.system.bauserver.util.Message;
 import eu.darkcube.system.bukkit.Plugin;
 import eu.darkcube.system.bukkit.commandapi.CommandAPI;
+import eu.darkcube.system.libs.com.google.gson.Gson;
+import eu.darkcube.system.libs.com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.mariadb.jdbc.message.client.QuitPacket;
 
 public class Main extends Plugin {
     private static Main instance;
     private final HeadStorage headStorage;
+    private DatabaseStorage databaseStorage;
 
     public Main() {
         super("bauserver");
@@ -49,11 +59,40 @@ public class Main extends Plugin {
             }
         }.runTask(this);
         headStorage.load();
+        databaseStorage = new DatabaseStorage(loadDatabaseConfig());
+        try {
+            databaseStorage.load();
+            QuitPacket.class.accessFlags(); // To load class - fixes ClassNotFoundException during reload
+        } catch (Throwable t) {
+            getSLF4JLogger().error("Failed to load head database", t);
+        }
     }
 
     @Override
     public void onDisable() {
         headStorage.save();
+        databaseStorage.close();
+    }
+
+    private DatabaseConfig loadDatabaseConfig() {
+        var path = getDataPath().resolve("mysql.json");
+        if (Files.exists(path)) {
+            getSLF4JLogger().info("Loading mysql.json from {}", path);
+            try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+                return new Gson().fromJson(reader, DatabaseConfig.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        try {
+            Files.createDirectories(path.getParent());
+            try (var writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                new GsonBuilder().setPrettyPrinting().create().toJson(DatabaseConfig.DEFAULT, writer);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return DatabaseConfig.DEFAULT;
     }
 
     public void setupWorld(World world) {
@@ -72,6 +111,10 @@ public class Main extends Plugin {
     @Override
     public String getCommandPrefix() {
         return "BauServer";
+    }
+
+    public DatabaseStorage databaseStorage() {
+        return databaseStorage;
     }
 
     public HeadStorage headStorage() {

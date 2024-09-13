@@ -16,7 +16,7 @@ import java.util.Objects;
 import eu.darkcube.system.bauserver.Main;
 import eu.darkcube.system.bauserver.heads.Head;
 import eu.darkcube.system.bauserver.heads.inventory.HeadInventories;
-import eu.darkcube.system.bauserver.heads.inventory.StoredHeadProvider;
+import eu.darkcube.system.bauserver.heads.inventory.HeadProvider;
 import eu.darkcube.system.bauserver.util.Message;
 import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
@@ -59,7 +59,7 @@ public class HeadsCommand extends BaseCommand {
                                     // @formatter:on
                                     var player = ctx.getSource().asPlayer();
                                     var playerName = StringArgumentType.getString(ctx, "player");
-                                    var item = StoredHeadProvider.headItem(playerName + "'s Head");
+                                    var item = HeadProvider.headItem(playerName + "'s Head");
                                     item.set(ItemComponent.PROFILE, new HeadProfile(playerName, null, List.of()));
                                     player.getInventory().addItem(item.<ItemStack>build());
                                     return 0;
@@ -71,14 +71,31 @@ public class HeadsCommand extends BaseCommand {
                         .then(literal("update")
                                 .executes(HeadsCommand::databaseUpdate)
                         )
+                        .executes(ctx -> {
+                            // @formatter:on
+                            HeadInventories.DATABASE_ROOT.open(ctx.getSource().asPlayer());
+                            return 0;
+                            // @formatter:off
+                        })
                 )
         );
         // @formatter:on
     }
 
     private static int databaseUpdate(CommandContext<CommandSource> ctx) {
-        var source = ctx.getSource();
-
+        Thread.ofVirtual().start(() -> {
+            var source = ctx.getSource();
+            try {
+                source.sendMessage(Message.DATABASE_UPDATING);
+                var storage = Main.getInstance().databaseStorage();
+                storage.clear();
+                storage.fetchFromProviders();
+                source.sendMessage(Message.DATABASE_UPDATED);
+            } catch (Throwable t) {
+                source.sendMessage(Message.DATABASE_UPDATE_FAILED);
+                t.printStackTrace();
+            }
+        });
         return 0;
     }
 
@@ -117,7 +134,7 @@ public class HeadsCommand extends BaseCommand {
             return 0;
         }
         name = name.trim();
-        var head = new Head(name, skin.textures());
+        var head = new Head(name, skin.textures(), Head.CATEGORY_MANUAL, Head.PROVIDER_MANUAL, List.of());
         Main.getInstance().headStorage().addHead(head);
         user.sendMessage(Message.ADDED_HEAD);
         return 0;

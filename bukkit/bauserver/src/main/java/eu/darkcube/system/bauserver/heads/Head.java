@@ -7,5 +7,16 @@
 
 package eu.darkcube.system.bauserver.heads;
 
-public record Head(String name, String texture) {
+import java.util.List;
+
+public record Head(String name, String texture, String category, String provider, List<String> tags) {
+    public static final String CATEGORY_MANUAL = "manual";
+    public static final String PROVIDER_MANUAL = "manual";
+
+    public Head {
+        if (tags == null) tags = List.of();
+        if (category == null) category = CATEGORY_MANUAL;
+        if (provider == null) provider = PROVIDER_MANUAL;
+        tags = List.copyOf(tags);
+    }
 }
