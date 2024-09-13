@@ -21,14 +21,17 @@ import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends Plugin {
-    private final HeadStorage headStorage = new HeadStorage();
+    private static Main instance;
+    private final HeadStorage headStorage;
 
     public Main() {
         super("bauserver");
+        instance = this;
+        headStorage = new HeadStorage();
     }
 
     public static Main getInstance() {
-        return Main.getPlugin(Main.class);
+        return instance;
     }
 
     @Override

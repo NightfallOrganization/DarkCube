@@ -18,7 +18,9 @@ import eu.darkcube.system.bauserver.heads.Head;
 import eu.darkcube.system.bauserver.heads.inventory.HeadInventories;
 import eu.darkcube.system.bauserver.heads.inventory.StoredHeadProvider;
 import eu.darkcube.system.bauserver.util.Message;
+import eu.darkcube.system.bukkit.commandapi.CommandSource;
 import eu.darkcube.system.libs.com.mojang.brigadier.arguments.StringArgumentType;
+import eu.darkcube.system.libs.com.mojang.brigadier.context.CommandContext;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -65,8 +67,19 @@ public class HeadsCommand extends BaseCommand {
                                 })
                         )
                 )
+                .then(literal("database")
+                        .then(literal("update")
+                                .executes(HeadsCommand::databaseUpdate)
+                        )
+                )
         );
         // @formatter:on
+    }
+
+    private static int databaseUpdate(CommandContext<CommandSource> ctx) {
+        var source = ctx.getSource();
+
+        return 0;
     }
 
     private static int storeHead(Player player, @Nullable String name) {
@@ -90,6 +103,13 @@ public class HeadsCommand extends BaseCommand {
         if (name == null) {
             if (item.has(ItemComponent.CUSTOM_NAME)) {
                 name = PlainTextComponentSerializer.plainText().serialize(item.get(ItemComponent.CUSTOM_NAME, Component.empty()));
+            }
+            if ((name == null || name.isBlank()) && item.has(ItemComponent.ITEM_NAME)) {
+                name = PlainTextComponentSerializer.plainText().serialize(item.get(ItemComponent.ITEM_NAME, Component.empty()));
+            }
+            if ((name == null || name.isBlank())) {
+                var playerName = profile.name();
+                if (playerName != null) name = playerName + "'s Head";
             }
         }
         if (name == null || name.isBlank()) {

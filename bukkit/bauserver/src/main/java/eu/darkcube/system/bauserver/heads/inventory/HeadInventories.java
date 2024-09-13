@@ -7,6 +7,7 @@
 
 package eu.darkcube.system.bauserver.heads.inventory;
 
+import java.util.List;
 import java.util.Objects;
 
 import eu.darkcube.system.bauserver.Main;
@@ -20,6 +21,7 @@ import eu.darkcube.system.server.inventory.TemplateInventory;
 import eu.darkcube.system.server.inventory.listener.ClickData;
 import eu.darkcube.system.server.inventory.listener.TemplateInventoryListener;
 import eu.darkcube.system.server.item.ItemBuilder;
+import eu.darkcube.system.server.item.component.ItemComponent;
 import eu.darkcube.system.userapi.User;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -50,6 +52,8 @@ public class HeadInventories {
                 }
                 var player = Bukkit.getPlayer(user.uniqueId());
                 if (player == null) return;
+                item.set(ItemComponent.LORE, List.of());
+                item.remove(ItemComponent.CUSTOM_DATA);
                 player.getInventory().addItem(item.<ItemStack>build());
             }
         });
