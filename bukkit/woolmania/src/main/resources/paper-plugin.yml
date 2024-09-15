@@ -1,9 +1,0 @@
-main: eu.darkcube.system.woolmania.WoolMania
-name: WoolMania
-version: "1.0"
-api-version: 1.21.1
-bootstrapper: eu.darkcube.woolmania.bootstrap.WoolManiaBootstrap
-dependencies:
-  server:
-    DarkCubeSystem:
-      required: true

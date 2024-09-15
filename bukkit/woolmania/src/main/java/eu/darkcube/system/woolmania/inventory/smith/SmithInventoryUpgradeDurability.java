@@ -11,7 +11,6 @@ import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.VARKAS;
 import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
-import static eu.darkcube.system.woolmania.util.message.Message.ITEM_REPAIR;
 import static eu.darkcube.system.woolmania.util.message.Message.NO_MONEY;
 
 import java.util.Objects;
@@ -30,8 +29,6 @@ import eu.darkcube.system.server.inventory.listener.ClickData;
 import eu.darkcube.system.server.inventory.listener.TemplateInventoryListener;
 import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
-import eu.darkcube.system.util.data.DataKey;
-import eu.darkcube.system.util.data.PersistentDataTypes;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
 import eu.darkcube.system.woolmania.items.CustomItem;
@@ -39,9 +36,8 @@ import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class SmithInventoryRepair implements TemplateInventoryListener {
+public class SmithInventoryUpgradeDurability implements TemplateInventoryListener {
 
-    private static final DataKey<Double> REPAIR_PERCENT = DataKey.of(Key.key(WoolMania.getInstance(), "repair_percent"), PersistentDataTypes.DOUBLE);
     private final InventoryTemplate inventoryTemplate;
 
     public void openInventory(User user) {
@@ -52,21 +48,20 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
         inventoryTemplate.open(player);
     }
 
-    public SmithInventoryRepair() {
-        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_repair"), 36);
+    public SmithInventoryUpgradeDurability() {
+        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_upgrade_durability"), 36);
         inventoryTemplate.title(VARKAS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_4);
-        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SMITH_REPAIR);
-
-        inventoryTemplate.pagination().pageSlots(19, 20, 24, 25);
+        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SMITH_UPGRADE_DURABILITY);
+        inventoryTemplate.pagination().pageSlots(22, 23, 24, 25);
         inventoryTemplate.addListener(this);
     }
 
-    private static class ContainerSpecificListenerRepair implements TemplateInventoryListener {
+    private static class ContainerSpecificListenerUpgradeDurability implements TemplateInventoryListener {
         private final Container container;
 
-        public ContainerSpecificListenerRepair(Container container) {
+        public ContainerSpecificListenerUpgradeDurability(Container container) {
             this.container = container;
         }
 
@@ -78,32 +73,31 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
             ItemBuilder itemBuilder = container.getAt(0);
             if (itemBuilder == null) return;
 
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_25, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_50, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_75, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_100, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_25_NONE, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_50_NONE, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_75_NONE, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_100_NONE, user, player, item);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1, 1, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_10, 10, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_100, 100, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1000, 1000, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1_NONE, 1, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_10_NONE, 10, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_100_NONE, 100, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1000_NONE, 1000, user, player);
 
             inventory.pagedController().publishUpdatePage();
         }
 
-        private void repairItem(ItemBuilder itemBuilder, String clickedItem, InventoryItems inventoryItems, User user, Player player, ItemBuilder item) {
+        private void upgradeItem(ItemBuilder itemBuilder, String clickedItem, InventoryItems inventoryItems, int amount, User user, Player player) {
             if (!clickedItem.equals(inventoryItems.itemID())) return;
 
             WoolManiaPlayer woolManiaPlayer = new WoolManiaPlayer(player);
             itemBuilder = itemBuilder.clone();
             CustomItem customItem = new CustomItem(itemBuilder);
 
-            if (!item.persistentDataStorage().has(REPAIR_PERCENT)) {
+            if (!customItem.hasMaxDurability()) {
                 NO.playSound(player);
                 return;
             }
 
-            double percent = Objects.requireNonNull(item.persistentDataStorage().get(REPAIR_PERCENT));
-            var cost = getCost(customItem, percent);
+            var cost = getCost(customItem, amount);
             int playerMoney = WoolMania.getStaticPlayer(player).getMoney();
 
             if (cost > playerMoney) {
@@ -112,15 +106,11 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
                 return;
             }
 
-            int missingDurability = customItem.getMaxDurability() - customItem.getDurability();
-            int repairValue = (int) Math.ceil(missingDurability * percent);
-            int newDurability = customItem.getDurability() + repairValue;
-            customItem.setDurability(newDurability);
+            customItem.setMaxDurability(customItem.getMaxDurability() + amount);
             customItem.updateItemLore();
             woolManiaPlayer.removeMoney(cost, player);
             BUY.playSound(player);
-            int finalPercent = (int) (percent * 100);
-            user.sendMessage(ITEM_REPAIR, finalPercent, cost);
+            // user.sendMessage(ITEM_REPAIR, durability, cost);
             container.setAt(0, itemBuilder);
         }
     }
@@ -129,21 +119,14 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
         var item = container.getAt(0);
         if (item == null) return false;
         CustomItem customItem = new CustomItem(item);
-
-        if (customItem.getMaxDurability() == customItem.getDurability()) {
-            return false;
-        }
-
         return customItem.hasMaxDurability();
     }
 
-    private ItemBuilder skullItem(InventoryItems items, Container container, User user, double percent) {
+    private ItemBuilder skullItem(InventoryItems items, Container container, User user, int amount) {
         var containerItem = Objects.requireNonNull(container.getAt(0));
         var customItem = new CustomItem(containerItem);
-        var amount = getCost(customItem, percent);
-        var item = items.getItem(user, amount);
-        item.persistentDataStorage().set(REPAIR_PERCENT, percent);
-        return item;
+        var cost = getCost(customItem, amount);
+        return items.getItem(user, cost);
     }
 
     @Override
@@ -152,16 +135,16 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
         var content = inventory.pagedController().staticContent();
 
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_25, container, u, 0.25) : INVENTORY_SMITH_REPAIR_25_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_1, container, u, 1) : INVENTORY_SMITH_UPGRADE_DURABILITY_1_NONE;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_50, container, u, 0.5) : INVENTORY_SMITH_REPAIR_50_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_10, container, u, 10) : INVENTORY_SMITH_UPGRADE_DURABILITY_10_NONE;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_75, container, u, 0.75) : INVENTORY_SMITH_REPAIR_75_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_100, container, u, 100) : INVENTORY_SMITH_UPGRADE_DURABILITY_100_NONE;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_100, container, u, 1.0) : INVENTORY_SMITH_REPAIR_100_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_1000, container, u, 1000) : INVENTORY_SMITH_UPGRADE_DURABILITY_1000_NONE;
         });
 
         container.addListener(new ContainerListener() {
@@ -183,15 +166,15 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
         });
 
         inventory.addContainer(1, container, (u, view) -> {
-            view.slots(22);
+            view.slots(20);
             view.dropItemsOnClose(true);
         });
-        inventory.addListener(new ContainerSpecificListenerRepair(container));
+        inventory.addListener(new ContainerSpecificListenerUpgradeDurability(container));
     }
 
-    private static int getCost(@NotNull CustomItem customItem, double percent) {
-        var missingDurability = customItem.getMaxDurability() - customItem.getDurability();
-        return (int) Math.ceil(missingDurability * 3 * percent);
+    private static int getCost(@NotNull CustomItem customItem, int amount) {
+        int maxDurability = customItem.getMaxDurability();
+        int ab = (int) (maxDurability * 0.7);
+        return (int) Math.ceil(amount * (0.13 * ab));
     }
-
 }

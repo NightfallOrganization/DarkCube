@@ -152,7 +152,14 @@ public class CustomItem {
 
     //</editor-fold>
 
-    public Boolean hasItemID() {
+    public boolean hasMaxDurability() {
+        if (item.persistentDataStorage().has(MAX_DURABILITY)) {
+            return item.persistentDataStorage().get(MAX_DURABILITY, this::getDefaultDurability) != 1;
+        }
+        return false;
+    }
+
+    public boolean hasItemID() {
         return item.persistentDataStorage().has(ID);
     }
 

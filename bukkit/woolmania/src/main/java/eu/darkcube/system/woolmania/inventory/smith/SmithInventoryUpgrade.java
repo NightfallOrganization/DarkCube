@@ -9,6 +9,7 @@ package eu.darkcube.system.woolmania.inventory.smith;
 
 import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.VARKAS;
+import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -26,23 +27,23 @@ import eu.darkcube.system.woolmania.enums.InventoryItems;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class SmithInventory implements TemplateInventoryListener {
+public class SmithInventoryUpgrade implements TemplateInventoryListener {
     private final InventoryTemplate inventoryTemplate;
 
     public void openInventory(Player player) {
         inventoryTemplate.open(player);
     }
 
-    public SmithInventory() {
-        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith"), 27);
+    public SmithInventoryUpgrade() {
+        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_upgrade"), 27);
         inventoryTemplate.title(VARKAS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
-        DarkCubeInventoryTemplates.Paged.configure3x9(inventoryTemplate);
+        DarkCubeInventoryTemplates.Paged.configure3x9(inventoryTemplate, INVENTORY_SMITH_UPGRADE);
 
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_3);
-        inventoryTemplate.setItem(1, 11, INVENTORY_SMITH_UPGRADE);
-        inventoryTemplate.setItem(1, 13, INVENTORY_SMITH_REPAIR);
-        inventoryTemplate.setItem(1, 15, INVENTORY_SMITH_SHOP);
+        inventoryTemplate.setItem(1, 11, INVENTORY_SMITH_UPGRADE_SHARPNESS);
+        inventoryTemplate.setItem(1, 13, INVENTORY_SMITH_UPGRADE_DURABILITY);
+        inventoryTemplate.setItem(1, 15, INVENTORY_SMITH_UPGRADE_TIER);
 
         inventoryTemplate.addListener(this);
     }
@@ -54,12 +55,12 @@ public class SmithInventory implements TemplateInventoryListener {
 
         if (itemId == null) return;
 
-        if (itemId.equals(INVENTORY_SMITH_UPGRADE.itemID())) {
-            WoolMania.getInstance().getSmithInventoryUpgrade().openInventory(player);
-        } else if (itemId.equals(INVENTORY_SMITH_REPAIR.itemID())) {
-            WoolMania.getInstance().getSmithInventoryRepair().openInventory(player);
-        } else if (itemId.equals(INVENTORY_SMITH_SHOP.itemID())) {
-            WoolMania.getInstance().getSmithInventoryShopItems().openInventory(player);
+        if (itemId.equals(INVENTORY_SMITH_UPGRADE_SHARPNESS.itemID())) {
+            NO.playSound(player);
+        } else if (itemId.equals(INVENTORY_SMITH_UPGRADE_DURABILITY.itemID())) {
+            WoolMania.getInstance().getSmithInventoryUpgradeDurability().openInventory(player);
+        } else if (itemId.equals(INVENTORY_SMITH_UPGRADE_TIER.itemID())) {
+            WoolMania.getInstance().getSmithInventoryUpgradeTier().openInventory(player);
         }
     }
 }

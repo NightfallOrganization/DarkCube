@@ -1,3 +1,5 @@
+import eu.darkcube.build.UploadArtifacts
+
 /*
  * Copyright (c) 2023-2024. [DarkCube]
  * All rights reserved.

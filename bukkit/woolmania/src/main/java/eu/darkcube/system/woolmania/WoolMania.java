@@ -25,7 +25,6 @@ import eu.darkcube.system.woolmania.commands.UltraShearItemCommand;
 import eu.darkcube.system.woolmania.commands.texturepack.TexturePackCommand;
 import eu.darkcube.system.woolmania.commands.zenum.ZenumCommand;
 import eu.darkcube.system.woolmania.enums.hall.Halls;
-import eu.darkcube.system.woolmania.util.player.LevelXPHandler;
 import eu.darkcube.system.woolmania.inventory.ability.AbilityInventory;
 import eu.darkcube.system.woolmania.inventory.ability.AbilityInventoryOwn;
 import eu.darkcube.system.woolmania.inventory.ability.AbilityInventoryShop;
@@ -36,6 +35,9 @@ import eu.darkcube.system.woolmania.inventory.shop.ShopInventorySound;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventory;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryRepair;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryShopItems;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgrade;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgradeDurability;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgradeTier;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportHallsInventory;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportInventory;
 import eu.darkcube.system.woolmania.listener.BlockBreakListener;
@@ -51,13 +53,14 @@ import eu.darkcube.system.woolmania.manager.WorldManager;
 import eu.darkcube.system.woolmania.npc.NPCCreator;
 import eu.darkcube.system.woolmania.npc.NPCRemover;
 import eu.darkcube.system.woolmania.registry.WoolRegistry;
-import eu.darkcube.system.woolmania.util.player.GameScoreboard;
-import eu.darkcube.system.woolmania.util.player.PlayerUtils;
-import eu.darkcube.system.woolmania.util.player.ResourcePackUtil;
 import eu.darkcube.system.woolmania.util.Ruler;
-import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import eu.darkcube.system.woolmania.util.WoolRegenerationTimer;
 import eu.darkcube.system.woolmania.util.message.LanguageHelper;
+import eu.darkcube.system.woolmania.util.player.GameScoreboard;
+import eu.darkcube.system.woolmania.util.player.LevelXPHandler;
+import eu.darkcube.system.woolmania.util.player.PlayerUtils;
+import eu.darkcube.system.woolmania.util.player.ResourcePackUtil;
+import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -73,6 +76,9 @@ public class WoolMania extends DarkCubePlugin {
     private TeleportInventory teleportInventory;
     public TeleportHallsInventory teleportHallsInventory;
     public SmithInventory smithInventory;
+    private SmithInventoryUpgrade smithInventoryUpgrade;
+    private SmithInventoryUpgradeDurability smithInventoryUpgradeDurability;
+    private SmithInventoryUpgradeTier smithInventoryUpgradeTier;
     public SmithInventoryShopItems smithInventoryShopItems;
     public SmithInventoryRepair smithInventoryRepair;
     public AbilityInventory abilityInventory;
@@ -104,6 +110,9 @@ public class WoolMania extends DarkCubePlugin {
         teleportInventory = new TeleportInventory();
         teleportHallsInventory = new TeleportHallsInventory();
         smithInventory = new SmithInventory();
+        smithInventoryUpgrade = new SmithInventoryUpgrade();
+        smithInventoryUpgradeDurability = new SmithInventoryUpgradeDurability();
+        smithInventoryUpgradeTier = new SmithInventoryUpgradeTier();
         smithInventoryShopItems = new SmithInventoryShopItems();
         smithInventoryRepair = new SmithInventoryRepair();
         abilityInventory = new AbilityInventory();
@@ -211,6 +220,18 @@ public class WoolMania extends DarkCubePlugin {
 
     public SmithInventory getSmithInventory() {
         return smithInventory;
+    }
+
+    public SmithInventoryUpgrade getSmithInventoryUpgrade() {
+        return smithInventoryUpgrade;
+    }
+
+    public SmithInventoryUpgradeDurability getSmithInventoryUpgradeDurability() {
+        return smithInventoryUpgradeDurability;
+    }
+
+    public SmithInventoryUpgradeTier getSmithInventoryUpgradeTier() {
+        return smithInventoryUpgradeTier;
     }
 
     public SmithInventoryShopItems getSmithInventoryShopItems() {

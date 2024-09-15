@@ -91,6 +91,7 @@ public enum Message implements BaseMessage {
     TO_HALL,
     ITEM_COOLDOWN,
     ITEM_COOLDOWN_SECONDS,
+    ITEM_REPAIR,
 
     ;
 
