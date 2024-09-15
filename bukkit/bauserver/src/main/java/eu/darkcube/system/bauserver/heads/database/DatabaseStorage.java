@@ -8,10 +8,12 @@
 package eu.darkcube.system.bauserver.heads.database;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -26,6 +28,7 @@ public class DatabaseStorage {
     private static final String CONNECT_URL_FORMAT = "jdbc:mariadb://%s:%d/%s?serverTimezone=UTC";
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseStorage.class);
     private volatile HikariDataSource hikariDataSource;
+    private ScheduledThreadPoolExecutor executor;
     private final DatabaseConfig config;
 
     public DatabaseStorage(DatabaseConfig config) {
@@ -35,6 +38,15 @@ public class DatabaseStorage {
     public void load() throws HikariPool.PoolInitializationException {
         var hikariConfig = new HikariConfig();
         var endpoint = config.endpoint();
+
+        executor = new ScheduledThreadPoolExecutor(1, r -> {
+            var thread = new Thread(r);
+            thread.setName("CustomThread");
+            System.out.println("Create thread with runnable " + r);
+            Thread.dumpStack();
+            return thread;
+        });
+        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
         hikariConfig.setJdbcUrl(CONNECT_URL_FORMAT.formatted(endpoint.address().host(), endpoint.address().port(), endpoint.database()));
         hikariConfig.setDriverClassName(Driver.class.getName());
@@ -51,6 +63,7 @@ public class DatabaseStorage {
         hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
         hikariConfig.addDataSourceProperty("elideSetAutoCommits", "true");
         hikariConfig.addDataSourceProperty("maintainTimeStats", "false");
+        hikariConfig.setScheduledExecutor(executor);
 
         hikariConfig.setMinimumIdle(1);
         hikariConfig.setMaximumPoolSize(100);
@@ -274,5 +287,19 @@ public class DatabaseStorage {
     public void close() {
         this.hikariDataSource.close();
         this.hikariDataSource = null;
+        executor.shutdownNow();
+        var e = DriverManager.getDrivers();
+        while (e.hasMoreElements()) {
+            var driver = e.nextElement();
+            if (driver.getClass() == Driver.class) {
+                try {
+                    DriverManager.deregisterDriver(driver);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                return;
+            }
+        }
+        LOGGER.error("Failed to unregister driver");
     }
 }
