@@ -9,9 +9,16 @@ package eu.darkcube.system.bauserver.heads.inventory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 import eu.darkcube.system.bauserver.Main;
+import eu.darkcube.system.bauserver.heads.Head;
+import eu.darkcube.system.bauserver.heads.database.DatabaseStorage;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
+import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
+import eu.darkcube.system.libs.net.kyori.adventure.text.JoinConfiguration;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
+import eu.darkcube.system.libs.net.kyori.adventure.text.format.Style;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.item.ItemReference;
@@ -27,6 +34,7 @@ public class DatabaseHeadProvider implements PagedInventoryContentProvider {
     public static final DataKey<Boolean> IS_HEAD = DataKey.of(Key.key(Main.getInstance(), "head"), PersistentDataTypes.BOOLEAN);
     private final @NotNull String provider;
     private final @Nullable String category;
+    private DatabaseStorage.Token[] tokens = null;
 
     public DatabaseHeadProvider(@NotNull String provider) {
         this.provider = provider;
@@ -38,10 +46,13 @@ public class DatabaseHeadProvider implements PagedInventoryContentProvider {
         this.category = category;
     }
 
+    public void tokens(DatabaseStorage.Token[] tokens) {
+        this.tokens = tokens;
+    }
+
     @Override
     public @NotNull BigInteger size() {
-        if (category == null) return BigInteger.valueOf(Main.getInstance().databaseStorage().size(provider));
-        return BigInteger.valueOf(Main.getInstance().databaseStorage().size(provider, category));
+        return SIZE_UNKNOWN;
     }
 
     @Override
@@ -49,10 +60,26 @@ public class DatabaseHeadProvider implements PagedInventoryContentProvider {
         var index = bigIndex.intValueExact();
         var refs = new ArrayList<ItemReference>();
         var storage = Main.getInstance().databaseStorage();
-        var heads = category == null ? storage.select(provider, index, length) : storage.select(provider, category, index, length);
+        List<Head> heads;
+        if (tokens == null) {
+            if (category == null) {
+                heads = storage.select(provider, index, length);
+            } else {
+                heads = storage.select(provider, category, index, length);
+            }
+        } else {
+            if (category == null) {
+                heads = storage.search(provider, index, length, tokens);
+            } else {
+                heads = storage.search(provider, category, index, length, tokens);
+            }
+        }
         for (var head : heads) {
             var item = HeadProvider.headItem(head.name());
             item.set(ItemComponent.PROFILE, new HeadProfile(new PlayerSkin(head.texture(), null)));
+            if (!head.tags().isEmpty()) {
+                item.lore(Component.text("Tags: ").append(Component.join(JoinConfiguration.arrayLike(), head.tags().stream().map(t -> Component.text(t, NamedTextColor.GOLD)).toList())).applyFallbackStyle(Style.style(NamedTextColor.GRAY)));
+            }
             item.persistentDataStorage().set(IS_HEAD, true);
             refs.add(itemReferenceProvider.createFor(item));
         }

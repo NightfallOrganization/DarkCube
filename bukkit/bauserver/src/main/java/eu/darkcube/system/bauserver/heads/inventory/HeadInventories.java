@@ -7,17 +7,21 @@
 
 package eu.darkcube.system.bauserver.heads.inventory;
 
+import static eu.darkcube.system.bauserver.heads.database.DatabaseStorage.tokenize;
 import static eu.darkcube.system.libs.net.kyori.adventure.text.Component.text;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import eu.darkcube.system.BaseMessage;
 import eu.darkcube.system.bauserver.Main;
+import eu.darkcube.system.bauserver.heads.database.DatabaseStorage;
 import eu.darkcube.system.bauserver.heads.remote.Providers;
 import eu.darkcube.system.bauserver.heads.remote.RemoteHeadProvider;
+import eu.darkcube.system.bauserver.util.Message;
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.net.kyori.adventure.text.format.NamedTextColor;
@@ -26,7 +30,9 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import eu.darkcube.system.server.inventory.DarkCubeInventoryTemplates;
 import eu.darkcube.system.server.inventory.DarkCubeItemTemplates;
 import eu.darkcube.system.server.inventory.Inventory;
+import eu.darkcube.system.server.inventory.InventoryCapabilities;
 import eu.darkcube.system.server.inventory.InventoryTemplate;
+import eu.darkcube.system.server.inventory.InventoryType;
 import eu.darkcube.system.server.inventory.TemplateInventory;
 import eu.darkcube.system.server.inventory.listener.ClickData;
 import eu.darkcube.system.server.inventory.listener.TemplateInventoryListener;
@@ -44,6 +50,10 @@ import org.bukkit.inventory.ItemStack;
 public class HeadInventories {
     public static final InventoryTemplate STORED_LIST;
     public static final InventoryTemplate DATABASE_ROOT;
+
+    private static final DataKey<Boolean> BACK = DataKey.of(Key.key(Main.getInstance(), "back"), PersistentDataTypes.BOOLEAN);
+    private static final DataKey<Boolean> SEARCH = DataKey.of(Key.key(Main.getInstance(), "search"), PersistentDataTypes.BOOLEAN);
+    private static final DataKey<String> LAST_SEARCH = DataKey.of(Key.key(Main.getInstance(), "head_database_last_search"), PersistentDataTypes.STRING);
 
     static {
         STORED_LIST = Inventory.createChestTemplate(Key.key(Main.getInstance(), "stored_list"), 6 * 9);
@@ -87,14 +97,16 @@ public class HeadInventories {
 
             var template = Inventory.createChestTemplate(Key.key(Main.getInstance(), "provider"), 6 * 9);
             template.setItems(-1, DarkCubeItemTemplates.Gray.TEMPLATE_6);
+            template.setItem(0, 6 * 9 - 1, back());
+            template.addListener(back(DATABASE_ROOT));
             DarkCubeInventoryTemplates.Paged.configure6x9(template);
 
             var categoryKey = DataKey.of(Key.key(Main.getInstance(), "category"), PersistentDataTypes.STRING);
             var content = template.pagination().content();
             var categoryTemplates = new HashMap<String, InventoryTemplate>();
-            addCategory(content, provider, null, categoryKey, categoryTemplates);
+            addCategory(template, content, provider, null, categoryKey, categoryTemplates);
             for (var category : provider.categories()) {
-                addCategory(content, provider, category, categoryKey, categoryTemplates);
+                addCategory(template, content, provider, category, categoryKey, categoryTemplates);
             }
 
             template.addListener(new TemplateInventoryListener() {
@@ -121,15 +133,68 @@ public class HeadInventories {
         });
     }
 
-    private static void addCategory(PagedInventoryContent content, RemoteHeadProvider provider, @Nullable String category, DataKey<String> categoryKey, Map<String, InventoryTemplate> categoryTemplates) {
-        add(content, category, categoryKey);
+    private static Object back() {
+        return (Function<User, Object>) user -> ItemBuilder.item(Material.RED_BED).set(ItemComponent.ITEM_NAME, Message.BACK.getMessage(user)).persistentDataStorage().iset(BACK.key(), BACK.dataType(), true).builder();
+    }
 
-        var categoryTemplate = Inventory.createChestTemplate(Key.key(Main.getInstance(), "category"), 6 * 9);
-        categoryTemplate.setItems(-1, DarkCubeItemTemplates.Gray.TEMPLATE_6);
-        DarkCubeInventoryTemplates.Paged.configure6x9(categoryTemplate);
+    private static Object search() {
+        return (Function<User, Object>) user -> ItemBuilder.item(Material.COMPASS).set(ItemComponent.ITEM_NAME, Message.SEARCH.getMessage(user)).persistentDataStorage().iset(SEARCH.key(), SEARCH.dataType(), true).builder();
+    }
+
+    private static TemplateInventoryListener back(InventoryTemplate prev) {
+        return new TemplateInventoryListener() {
+            @Override
+            public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item, @NotNull ClickData clickData) {
+                if (!item.persistentDataStorage().has(BACK)) return;
+                prev.open(user);
+            }
+        };
+    }
+
+    private static void addCategory(InventoryTemplate prev, PagedInventoryContent content, RemoteHeadProvider provider, @Nullable String category, DataKey<String> categoryKey, Map<String, InventoryTemplate> categoryTemplates) {
+        add(content, category, categoryKey);
+        var searchTemplate = Inventory.createTemplate(Key.key(Main.getInstance(), "search"), InventoryType.of(org.bukkit.event.inventory.InventoryType.ANVIL));
+        searchTemplate.setItem(0, 0, user -> {
+            var item = ItemBuilder.item(Material.PAPER).set(ItemComponent.CUSTOM_NAME, Component.empty()).hideTooltip();
+            if (user.persistentData().has(LAST_SEARCH)) {
+                item.set(ItemComponent.CUSTOM_NAME, Component.text(Objects.requireNonNull(user.persistentData().get(LAST_SEARCH))));
+            }
+            return item;
+        });
+        searchTemplate.addListener(new TemplateInventoryListener() {
+            @Override
+            public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item, @NotNull ClickData clickData) {
+                var searchText = ((InventoryCapabilities.Anvil) inventory.capabilities()).renameText();
+                try {
+                    if (searchText != null) {
+                        user.persistentData().set(LAST_SEARCH, searchText);
+                    } else {
+                        user.persistentData().remove(LAST_SEARCH);
+                    }
+                    var tokens = tokenize(searchText);
+                    var t = createSearchInventory(prev, provider, category, searchTemplate, tokens.toArray(DatabaseStorage.Token[]::new));
+                    t.open(user);
+                } catch (DatabaseStorage.BadInputException e) {
+                    user.sendMessage(Component.text("Bad input: " + e.getMessage()));
+                } catch (DatabaseStorage.InvalidTypeException e) {
+                    user.sendMessage(Component.text("Invalid type: " + e.getMessage()));
+                } catch (DatabaseStorage.TokenizerException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        var categoryTemplate = createSearchInventory(prev, provider, category, searchTemplate, null);
+        categoryTemplates.put(category == null ? "all" : category, categoryTemplate);
+    }
+
+    private static InventoryTemplate createSearchInventory(InventoryTemplate prev, RemoteHeadProvider provider, String category, InventoryTemplate searchTemplate, @Nullable DatabaseStorage.Token[] tokens) {
+        var template = Inventory.createChestTemplate(Key.key(Main.getInstance(), "category"), 6 * 9);
         var dp = category == null ? new DatabaseHeadProvider(provider.name()) : new DatabaseHeadProvider(provider.name(), category);
-        categoryTemplate.pagination().content().provider(dp);
-        categoryTemplate.title(new BaseMessage() {
+        if (tokens != null) {
+            dp.tokens(tokens);
+        }
+        template.pagination().content().provider(dp);
+        template.title(new BaseMessage() {
             @Override
             public @NotNull String key() {
                 return "";
@@ -138,11 +203,36 @@ public class HeadInventories {
             @Override
             public @NotNull Component getMessage(@NotNull Language language, @NotNull String @NotNull [] prefixes, Object @NotNull ... args) {
                 var storage = Main.getInstance().databaseStorage();
-                var size = category == null ? storage.size(provider.name()) : storage.size(provider.name(), category);
+                int size;
+                if (tokens == null) {
+                    if (category == null) {
+                        size = storage.size(provider.name());
+                    } else {
+                        size = storage.size(provider.name(), category);
+                    }
+                } else {
+                    if (category == null) {
+                        size = storage.size(provider.name(), tokens);
+                    } else {
+                        size = storage.size(provider.name(), category, tokens);
+                    }
+                }
                 return text(category == null ? "All" : category, NamedTextColor.GOLD).append(text(" (" + size + ")", NamedTextColor.GRAY));
             }
         });
-        categoryTemplate.addListener(new TemplateInventoryListener() {
+        template.setItems(-1, DarkCubeItemTemplates.Gray.TEMPLATE_6);
+        template.setItem(0, 53, back());
+        template.setItem(0, 8, search());
+        DarkCubeInventoryTemplates.Paged.configure6x9(template);
+        template.pagination().content().makeAsync();
+        template.addListener(new TemplateInventoryListener() {
+            @Override
+            public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item, @NotNull ClickData clickData) {
+                if (!item.persistentDataStorage().has(SEARCH)) return;
+                searchTemplate.open(user);
+            }
+        });
+        template.addListener(new TemplateInventoryListener() {
             @Override
             public void onClick(@NotNull TemplateInventory inventory, @NotNull User user, int slot, @NotNull ItemBuilder item, @NotNull ClickData clickData) {
                 if (!item.persistentDataStorage().has(DatabaseHeadProvider.IS_HEAD)) return;
@@ -152,8 +242,8 @@ public class HeadInventories {
                 player.getInventory().addItem(item.<ItemStack>build());
             }
         });
-
-        categoryTemplates.put(category == null ? "all" : category, categoryTemplate);
+        template.addListener(back(prev));
+        return template;
     }
 
     private static void add(PagedInventoryContent content, @Nullable String category, DataKey<String> categoryKey) {

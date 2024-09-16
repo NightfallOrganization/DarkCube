@@ -22,6 +22,8 @@ public enum Message implements BaseMessage {
     ADDED_HEAD,
     DATABASE_UPDATED,
     DATABASE_UPDATE_FAILED,
+    BACK,
+    SEARCH,
     DATABASE_UPDATING;
 
     private static final String PREFIX = "BAUSERVER_";
