@@ -12,7 +12,7 @@ annotations = "24.1.0"
 hologramlib = "2.6.0-SNAPSHOT"
 velocity = "3.1.1"
 jline = "3.26.3"
-shadow = "8.1.8"
+shadow = "8.3.1"
 blossom = "2.1.0"
 minestom = "719953a981"
 minestom-extensions = "1.2.0"
@@ -21,6 +21,8 @@ jctools-core = "4.0.5"
 fastutil = "8.5.14"
 lombok-plugin = "8.10"
 kotlin = "2.0.20"
+hikaricp = "5.1.0"
+mariadb-java-client = "3.4.1"
 
 paper-latest = "1.21-R0.1-SNAPSHOT"
 paper-legacy = "1.8.8-R0.1-SNAPSHOT"
@@ -46,6 +48,8 @@ minestom-extensions = { group = "dev.hollowcube", name = "minestom-ce-extensions
 jline = { group = "org.jline", name = "jline", version.ref = "jline" }
 jctools-core = { group = "org.jctools", name = "jctools-core", version.ref = "jctools-core" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+hikaricp = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikaricp" }
+mariadb-java-client = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-java-client" }
 
 cloudnet-driver = { group = "eu.cloudnetservice.cloudnet", name = "driver", version.ref = "cloudnet" }
 cloudnet-bridge = { group = "eu.cloudnetservice.cloudnet", name = "bridge", version.ref = "cloudnet" }
@@ -61,7 +65,7 @@ minestom = [
 ]
 
 [plugins]
-shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }
 lombok = { id = "io.freefair.lombok", version.ref = "lombok-plugin" }

@@ -56,6 +56,7 @@
     <inspection_tool class="PackageUpdate" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="PatternVariableHidesField" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PreviewFeature" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="RedundantExplicitVariableType" enabled="true" level="TEXT ATTRIBUTES" enabled_by_default="true" editorAttributes="TYPO" />
     <inspection_tool class="RefusedBequest" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="ignoreEmptySuperMethods" value="false" />
       <option name="onlyReportWhenAnnotated" value="true" />
@@ -80,6 +81,7 @@
     <inspection_tool class="UnsatisfiedRange" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="INFO_ATTRIBUTES">
       <scope name="DarkCubeLibraries" level="WARNING" enabled="false" />
     </inspection_tool>
+    <inspection_tool class="UnstableApiUsage" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UnstableTypeUsedInSignature" enabled="true" level="TYPO" enabled_by_default="true" editorAttributes="TYPO">
       <scope name="DarkCubeLibraries" level="INFORMATION" enabled="false" editorAttributes="INFORMATION_ATTRIBUTES">
         <option name="unstableApiAnnotations">
