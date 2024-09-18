@@ -11,7 +11,7 @@ import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.VARKAS;
 import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
-import static eu.darkcube.system.woolmania.util.message.Message.NO_MONEY;
+import static eu.darkcube.system.woolmania.util.message.Message.*;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -77,10 +77,10 @@ public class SmithInventoryUpgradeDurability implements TemplateInventoryListene
             upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_10, 10, user, player);
             upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_100, 100, user, player);
             upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1000, 1000, user, player);
-            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1_NONE, 1, user, player);
-            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_10_NONE, 10, user, player);
-            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_100_NONE, 100, user, player);
-            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_DURABILITY_1000_NONE, 1000, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_25, 1, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_50, 10, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_75, 100, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_100, 1000, user, player);
 
             inventory.pagedController().publishUpdatePage();
         }
@@ -92,7 +92,7 @@ public class SmithInventoryUpgradeDurability implements TemplateInventoryListene
             itemBuilder = itemBuilder.clone();
             CustomItem customItem = new CustomItem(itemBuilder);
 
-            if (!customItem.hasMaxDurability()) {
+            if (!customItem.hasMaxDurability() || customItem.isFood()) {
                 NO.playSound(player);
                 return;
             }
@@ -119,14 +119,25 @@ public class SmithInventoryUpgradeDurability implements TemplateInventoryListene
         var item = container.getAt(0);
         if (item == null) return false;
         CustomItem customItem = new CustomItem(item);
-        return customItem.hasMaxDurability();
+        return customItem.hasMaxDurability() && !customItem.isFood() && customItem.getMaxDurability() != -1;
     }
 
     private ItemBuilder skullItem(InventoryItems items, Container container, User user, int amount) {
         var containerItem = Objects.requireNonNull(container.getAt(0));
         var customItem = new CustomItem(containerItem);
-        var cost = getCost(customItem, amount);
-        return items.getItem(user, cost);
+        int cost = getCost(customItem, amount);
+        Player player = Bukkit.getPlayer(user.uniqueId());
+        WoolManiaPlayer woolManiaPlayer = new WoolManiaPlayer(player);
+        int durability = customItem.getMaxDurability();
+        int durabilityUpgrade = customItem.getMaxDurability() + amount;
+
+        ItemBuilder item = items.getItem(user, durability, durabilityUpgrade, amount);
+
+        if (woolManiaPlayer.getMoney() < cost) {
+            return item.lore(SEPARATION.getMessage(user)).lore(COST_NOT_ENOUGH.getMessage(user, cost));
+        } else {
+            return item.lore(SEPARATION.getMessage(user)).lore(COST_ENOUGH.getMessage(user, cost));
+        }
     }
 
     @Override
@@ -135,16 +146,16 @@ public class SmithInventoryUpgradeDurability implements TemplateInventoryListene
         var content = inventory.pagedController().staticContent();
 
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_1, container, u, 1) : INVENTORY_SMITH_UPGRADE_DURABILITY_1_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_1, container, u, 1) : INVENTORY_ICON_HEAD_NONE_25;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_10, container, u, 10) : INVENTORY_SMITH_UPGRADE_DURABILITY_10_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_10, container, u, 10) : INVENTORY_ICON_HEAD_NONE_50;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_100, container, u, 100) : INVENTORY_SMITH_UPGRADE_DURABILITY_100_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_100, container, u, 100) : INVENTORY_ICON_HEAD_NONE_75;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_1000, container, u, 1000) : INVENTORY_SMITH_UPGRADE_DURABILITY_1000_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_UPGRADE_DURABILITY_1000, container, u, 1000) : INVENTORY_ICON_HEAD_NONE_100;
         });
 
         container.addListener(new ContainerListener() {

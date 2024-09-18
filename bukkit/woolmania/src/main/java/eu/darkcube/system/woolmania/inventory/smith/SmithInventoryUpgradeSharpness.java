@@ -31,13 +31,12 @@ import eu.darkcube.system.server.item.ItemBuilder;
 import eu.darkcube.system.userapi.User;
 import eu.darkcube.system.woolmania.WoolMania;
 import eu.darkcube.system.woolmania.enums.InventoryItems;
-import eu.darkcube.system.woolmania.enums.Tiers;
 import eu.darkcube.system.woolmania.items.CustomItem;
 import eu.darkcube.system.woolmania.util.player.WoolManiaPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
+public class SmithInventoryUpgradeSharpness implements TemplateInventoryListener {
 
     private final InventoryTemplate inventoryTemplate;
 
@@ -49,12 +48,12 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
         inventoryTemplate.open(player);
     }
 
-    public SmithInventoryUpgradeTier() {
-        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_upgrade_tier"), 36);
+    public SmithInventoryUpgradeSharpness() {
+        inventoryTemplate = Inventory.createChestTemplate(Key.key(WoolMania.getInstance(), "smith_upgrade_sharpness"), 36);
         inventoryTemplate.title(VARKAS.getName());
         inventoryTemplate.animation().calculateManifold(4, 1);
         inventoryTemplate.setItems(0, DarkCubeItemTemplates.Gray.TEMPLATE_4);
-        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SMITH_UPGRADE_TIER);
+        DarkCubeInventoryTemplates.Paged.configure5x9(inventoryTemplate, INVENTORY_SMITH_UPGRADE_SHARPNESS);
         inventoryTemplate.pagination().pageSlots(23);
         inventoryTemplate.addListener(this);
     }
@@ -74,7 +73,7 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
             ItemBuilder itemBuilder = container.getAt(0);
             if (itemBuilder == null) return;
 
-            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_TIER_ICON, user, player);
+            upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_UPGRADE_SHARPNESS_ICON, user, player);
             upgradeItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_100, user, player);
 
             inventory.pagedController().publishUpdatePage();
@@ -87,7 +86,7 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
             itemBuilder = itemBuilder.clone();
             CustomItem customItem = new CustomItem(itemBuilder);
 
-            if (!customItem.hasTier() || customItem.isFood()) {
+            if (!customItem.hasSharpness() || customItem.isFood()) {
                 NO.playSound(player);
                 return;
             }
@@ -101,8 +100,8 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
                 return;
             }
 
-            customItem.setTier(Tiers.getTierByID(customItem.getTierID() + 1));
-            customItem.setLevel(customItem.getTier().getPlayerLevel());
+            customItem.setSharpness(customItem.getSharpness() + 1);
+            customItem.updateSharpness();
             customItem.updateItemLore();
             woolManiaPlayer.removeMoney(cost, player);
             BUY.playSound(player);
@@ -115,7 +114,7 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
         var item = container.getAt(0);
         if (item == null) return false;
         CustomItem customItem = new CustomItem(item);
-        return customItem.hasTier() && !customItem.isFood();
+        return customItem.hasSharpness() && !customItem.isFood() && customItem.getSharpness() != -1;
     }
 
     private ItemBuilder skullItem(Container container, User user) {
@@ -124,10 +123,10 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
         Player player = Bukkit.getPlayer(user.uniqueId());
         WoolManiaPlayer woolManiaPlayer = new WoolManiaPlayer(player);
         int cost = getCost(customItem);
-        String tierName = Objects.requireNonNull(customItem.getTier().getName());
-        String tierNamePlusOne = Objects.requireNonNull(Tiers.getTierByID(customItem.getTierID() + 1)).getName();
+        int sharpness = customItem.getSharpness();
+        int sharpnessUpgrade = customItem.getSharpness() + 1;
 
-        ItemBuilder item = INVENTORY_SMITH_UPGRADE_TIER_ICON.getItem(user, tierName, tierNamePlusOne);
+        ItemBuilder item = INVENTORY_SMITH_UPGRADE_SHARPNESS_ICON.getItem(user, sharpness, sharpnessUpgrade);
 
         if (woolManiaPlayer.getMoney() < cost) {
             return item.lore(SEPARATION.getMessage(user)).lore(COST_NOT_ENOUGH.getMessage(user, cost));
@@ -171,7 +170,7 @@ public class SmithInventoryUpgradeTier implements TemplateInventoryListener {
     }
 
     private static int getCost(@NotNull CustomItem customItem) {
-        int tier = customItem.getTierID();
-        return tier * 10000;
+        int sharpness = customItem.getSharpness();
+        return (sharpness + 1) * 10000;
     }
 }

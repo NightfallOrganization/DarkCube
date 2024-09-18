@@ -37,6 +37,7 @@ import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryRepair;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryShopItems;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgrade;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgradeDurability;
+import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgradeSharpness;
 import eu.darkcube.system.woolmania.inventory.smith.SmithInventoryUpgradeTier;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportHallsInventory;
 import eu.darkcube.system.woolmania.inventory.teleporter.TeleportInventory;
@@ -77,6 +78,7 @@ public class WoolMania extends DarkCubePlugin {
     public TeleportHallsInventory teleportHallsInventory;
     public SmithInventory smithInventory;
     private SmithInventoryUpgrade smithInventoryUpgrade;
+    private SmithInventoryUpgradeSharpness smithInventoryUpgradeSharpness;
     private SmithInventoryUpgradeDurability smithInventoryUpgradeDurability;
     private SmithInventoryUpgradeTier smithInventoryUpgradeTier;
     public SmithInventoryShopItems smithInventoryShopItems;
@@ -111,6 +113,7 @@ public class WoolMania extends DarkCubePlugin {
         teleportHallsInventory = new TeleportHallsInventory();
         smithInventory = new SmithInventory();
         smithInventoryUpgrade = new SmithInventoryUpgrade();
+        smithInventoryUpgradeSharpness = new SmithInventoryUpgradeSharpness();
         smithInventoryUpgradeDurability = new SmithInventoryUpgradeDurability();
         smithInventoryUpgradeTier = new SmithInventoryUpgradeTier();
         smithInventoryShopItems = new SmithInventoryShopItems();
@@ -224,6 +227,10 @@ public class WoolMania extends DarkCubePlugin {
 
     public SmithInventoryUpgrade getSmithInventoryUpgrade() {
         return smithInventoryUpgrade;
+    }
+
+    public SmithInventoryUpgradeSharpness getSmithInventoryUpgradeSharpness() {
+        return smithInventoryUpgradeSharpness;
     }
 
     public SmithInventoryUpgradeDurability getSmithInventoryUpgradeDurability() {

@@ -105,7 +105,7 @@ public class SmithInventoryShopItems implements TemplateInventoryListener {
             if (freeItem) {
                 Instant now = Instant.now();
 
-                if (checkCooldown(user, now, player)) return;
+                if (!player.hasPermission("woolmania.item.free") && checkCooldown(user, now, player)) return;
 
                 BUY.playSound(player);
                 user.sendMessage(ITEM_BUYED_FREE, inventoryItems.getItem(user, customItem.getAmount(), "").displayname());

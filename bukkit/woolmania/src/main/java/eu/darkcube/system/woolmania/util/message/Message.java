@@ -92,6 +92,9 @@ public enum Message implements BaseMessage {
     ITEM_COOLDOWN,
     ITEM_COOLDOWN_SECONDS,
     ITEM_REPAIR,
+    COST_NOT_ENOUGH,
+    COST_ENOUGH,
+    SEPARATION,
 
     ;
 

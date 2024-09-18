@@ -11,8 +11,7 @@ import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.VARKAS;
 import static eu.darkcube.system.woolmania.enums.Sounds.BUY;
 import static eu.darkcube.system.woolmania.enums.Sounds.NO;
-import static eu.darkcube.system.woolmania.util.message.Message.ITEM_REPAIR;
-import static eu.darkcube.system.woolmania.util.message.Message.NO_MONEY;
+import static eu.darkcube.system.woolmania.util.message.Message.*;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -82,10 +81,10 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
             repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_50, user, player, item);
             repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_75, user, player, item);
             repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_100, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_25_NONE, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_50_NONE, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_75_NONE, user, player, item);
-            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_SMITH_REPAIR_100_NONE, user, player, item);
+            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_25, user, player, item);
+            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_50, user, player, item);
+            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_75, user, player, item);
+            repairItem(itemBuilder, clickedInventoryItem, INVENTORY_ICON_HEAD_NONE_100, user, player, item);
 
             inventory.pagedController().publishUpdatePage();
         }
@@ -140,10 +139,17 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
     private ItemBuilder skullItem(InventoryItems items, Container container, User user, double percent) {
         var containerItem = Objects.requireNonNull(container.getAt(0));
         var customItem = new CustomItem(containerItem);
-        var amount = getCost(customItem, percent);
-        var item = items.getItem(user, amount);
+        int cost = getCost(customItem, percent);
+        var item = items.getItem(user, cost);
         item.persistentDataStorage().set(REPAIR_PERCENT, percent);
-        return item;
+        Player player = Bukkit.getPlayer(user.uniqueId());
+        WoolManiaPlayer woolManiaPlayer = new WoolManiaPlayer(player);
+
+        if (woolManiaPlayer.getMoney() < cost) {
+            return item.lore(SEPARATION.getMessage(user)).lore(COST_NOT_ENOUGH.getMessage(user, cost));
+        } else {
+            return item.lore(SEPARATION.getMessage(user)).lore(COST_ENOUGH.getMessage(user, cost));
+        }
     }
 
     @Override
@@ -152,16 +158,16 @@ public class SmithInventoryRepair implements TemplateInventoryListener {
         var content = inventory.pagedController().staticContent();
 
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_25, container, u, 0.25) : INVENTORY_SMITH_REPAIR_25_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_25, container, u, 0.25) : INVENTORY_ICON_HEAD_NONE_25;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_50, container, u, 0.5) : INVENTORY_SMITH_REPAIR_50_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_50, container, u, 0.5) : INVENTORY_ICON_HEAD_NONE_50;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_75, container, u, 0.75) : INVENTORY_SMITH_REPAIR_75_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_75, container, u, 0.75) : INVENTORY_ICON_HEAD_NONE_75;
         });
         content.addItem((Function<User, Object>) u -> {
-            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_100, container, u, 1.0) : INVENTORY_SMITH_REPAIR_100_NONE;
+            return showSkulls(container) ? skullItem(INVENTORY_SMITH_REPAIR_100, container, u, 1.0) : INVENTORY_ICON_HEAD_NONE_100;
         });
 
         container.addListener(new ContainerListener() {

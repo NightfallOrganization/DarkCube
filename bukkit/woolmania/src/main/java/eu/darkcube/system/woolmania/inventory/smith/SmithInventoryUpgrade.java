@@ -9,7 +9,6 @@ package eu.darkcube.system.woolmania.inventory.smith;
 
 import static eu.darkcube.system.woolmania.enums.InventoryItems.*;
 import static eu.darkcube.system.woolmania.enums.Names.VARKAS;
-import static eu.darkcube.system.woolmania.enums.Sounds.NO;
 
 import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -56,7 +55,7 @@ public class SmithInventoryUpgrade implements TemplateInventoryListener {
         if (itemId == null) return;
 
         if (itemId.equals(INVENTORY_SMITH_UPGRADE_SHARPNESS.itemID())) {
-            NO.playSound(player);
+            WoolMania.getInstance().getSmithInventoryUpgradeSharpness().openInventory(player);
         } else if (itemId.equals(INVENTORY_SMITH_UPGRADE_DURABILITY.itemID())) {
             WoolMania.getInstance().getSmithInventoryUpgradeDurability().openInventory(player);
         } else if (itemId.equals(INVENTORY_SMITH_UPGRADE_TIER.itemID())) {

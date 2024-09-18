@@ -45,6 +45,7 @@ public class UltraShearItem extends CustomItem {
         ), 0, 1)));
 
         setDisplayName(ITEM_SHEARS.getMessage(user));
+        setSharpness(-1);
         setAmount(1);
         setTier(Tiers.TIER16);
         setItemID(ITEM_ID);

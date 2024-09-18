@@ -53,15 +53,30 @@ public class WoolRegistry {
         registerCopperBulb(11, ITEM_NAME_GREEN_WOOL_CRYSTAL, WEATHERED_COPPER_BULB, false, false, TIER11);
         registerBasic(12, ITEM_NAME_GREEN_WOOL_STAR, WEATHERED_COPPER_GRATE, TIER12);
 
-        // registerBasic(13, ITEM_NAME_WHITE_WOOL, WHITE_WOOL, TIER12);
-        // register(14, ITEM_NAME_WHITE_WOOL_CRYSTAL, COPPER_BULB, TIER13);
-        // register(15, ITEM_NAME_WHITE_WOOL_STAR, COPPER_GRATE, TIER14);
+        registerBasic(13, ITEM_NAME_WHITE_WOOL, WHITE_WOOL, TIER13);
+        registerCopperBulb(14, ITEM_NAME_WHITE_WOOL_CRYSTAL, COPPER_BULB, true, false, TIER14);
+        registerCopperBulb(15, ITEM_NAME_WHITE_WOOL_STAR, COPPER_BULB, false, true, TIER15);
 
-        // register(ITEM_NAME_ORANGE_WOOL, ORANGE_WOOL, TIER2);
-        // register(ITEM_NAME_LIGHT_BLUE_WOOL, LIGHT_BLUE_WOOL, TIER4);
-        // register(ITEM_NAME_YELLOW_WOOL, YELLOW_WOOL, TIER5);
-        // register(ITEM_NAME_GRAY_WOOL, GRAY_WOOL, TIER8);
-        // register(ITEM_NAME_LIME_WOOL, LIME_WOOL, TIER6);
+        registerBasic(16, ITEM_NAME_ORANGE_WOOL, ORANGE_WOOL, TIER16);
+        registerCopperBulb(17, ITEM_NAME_ORANGE_WOOL_CRYSTAL, COPPER_BULB, true, true, TIER17);
+        registerCopperBulb(18, ITEM_NAME_ORANGE_WOOL_STAR, EXPOSED_COPPER_BULB, true, false, TIER18);
+
+        registerBasic(19, ITEM_NAME_LIGHT_BLUE_WOOL, LIGHT_BLUE_WOOL, TIER19);
+        registerCopperBulb(20, ITEM_NAME_LIGHT_BLUE_WOOL_CRYSTAL, EXPOSED_COPPER_BULB, false, true, TIER20);
+        registerCopperBulb(21, ITEM_NAME_LIGHT_BLUE_WOOL_STAR, EXPOSED_COPPER_BULB, true, true, TIER21);
+
+        registerBasic(22, ITEM_NAME_YELLOW_WOOL, YELLOW_WOOL, TIER22);
+        registerCopperBulb(23, ITEM_NAME_YELLOW_WOOL_CRYSTAL, OXIDIZED_COPPER_BULB, false, true, TIER23);
+        registerCopperBulb(24, ITEM_NAME_YELLOW_WOOL_STAR, OXIDIZED_COPPER_BULB, true, false, TIER24);
+
+        registerBasic(25, ITEM_NAME_GRAY_WOOL, GRAY_WOOL, TIER25);
+        registerCopperBulb(26, ITEM_NAME_GRAY_WOOL_CRYSTAL, OXIDIZED_COPPER_BULB, true, true, TIER26);
+        registerCopperBulb(27, ITEM_NAME_GRAY_WOOL_STAR, WEATHERED_COPPER_BULB, true, false, TIER27);
+
+        registerBasic(28, ITEM_NAME_LIME_WOOL, LIME_WOOL, TIER28);
+        registerCopperBulb(29, ITEM_NAME_LIME_WOOL_CRYSTAL, WEATHERED_COPPER_BULB, false, true, TIER29);
+        registerCopperBulb(30, ITEM_NAME_LIME_WOOL_STAR, WEATHERED_COPPER_BULB, true, true, TIER30);
+
         // register(ITEM_NAME_PINK_WOOL, PINK_WOOL, TIER7);
         // register(ITEM_NAME_LIGHT_GRAY_WOOL, LIGHT_GRAY_WOOL, TIER9);
         // register(ITEM_NAME_CYAN_WOOL, CYAN_WOOL, TIER10);

@@ -24,18 +24,20 @@ public class ShearItem extends CustomItem {
     public static final String ITEM_ID = "shear";
 
     public ShearItem(User user) {
-        super(ItemBuilder.item(Material.SHEARS).set(ItemComponent.TOOL, new Tool(List.of(new Tool.Rule(new BlockTypeFilter.Tag("wool"), 3f, true),
-                newToolRule(Material.COPPER_BULB),
-                newToolRule(Material.EXPOSED_COPPER_BULB),
-                newToolRule(Material.OXIDIZED_COPPER_BULB),
-                newToolRule(Material.WAXED_COPPER_BULB),
-                newToolRule(Material.WAXED_EXPOSED_COPPER_BULB),
-                newToolRule(Material.WAXED_WEATHERED_COPPER_BULB),
-                newToolRule(Material.WAXED_OXIDIZED_COPPER_BULB),
-                newToolRule(Material.WEATHERED_COPPER_BULB)
+        float speed = 0.5f;
+        super(ItemBuilder.item(Material.SHEARS).set(ItemComponent.TOOL, new Tool(List.of(new Tool.Rule(new BlockTypeFilter.Tag("wool"), speed, true),
+                newToolRule(Material.COPPER_BULB, speed),
+                newToolRule(Material.EXPOSED_COPPER_BULB, speed),
+                newToolRule(Material.OXIDIZED_COPPER_BULB,speed),
+                newToolRule(Material.WAXED_COPPER_BULB,speed),
+                newToolRule(Material.WAXED_EXPOSED_COPPER_BULB,speed),
+                newToolRule(Material.WAXED_WEATHERED_COPPER_BULB,speed),
+                newToolRule(Material.WAXED_OXIDIZED_COPPER_BULB,speed),
+                newToolRule(Material.WEATHERED_COPPER_BULB,speed)
         ), 0, 1)));
 
         setDisplayName(ITEM_SHEARS.getMessage(user));
+        setSharpness(1);
         setAmount(1);
         setTier(Tiers.TIER1);
         setItemID(ITEM_ID);
@@ -45,7 +47,11 @@ public class ShearItem extends CustomItem {
         updateItemLore();
     }
 
-    private static Tool.Rule newToolRule(Material material) {
-        return new Tool.Rule(new BlockTypeFilter.Blocks(eu.darkcube.system.server.item.material.Material.of(material)), 3f, true);
+    private static Tool.Rule newToolRule(Material material, float baseSpeed) {
+        float woolHardness = Material.WHITE_WOOL.getHardness(); // Härte von Wolle (0.8)
+        float materialHardness = material.getHardness();
+        float adjustedSpeed = baseSpeed * (materialHardness / woolHardness);
+        return new Tool.Rule(new BlockTypeFilter.Blocks(eu.darkcube.system.server.item.material.Material.of(material)), adjustedSpeed, true);
     }
+
 }
