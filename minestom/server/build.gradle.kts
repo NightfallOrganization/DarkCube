@@ -101,8 +101,8 @@ dependencies {
     minestomLibrary("ninja.leaping.configurate:configurate-yaml:3.7.1")
     minestomLibrary("com.zaxxer:HikariCP:5.1.0")
     minestomLibrary("org.mariadb.jdbc:mariadb-java-client:3.4.1")
-    minestomLibrary("org.apache.logging.log4j:log4j-core:2.23.1")
-    minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1")
+    minestomLibrary("org.apache.logging.log4j:log4j-core:2.24.1")
+    minestomLibrary("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.1")
     minestomLibrary(libs.jline)
     minestomLibrary(libs.bundles.minestom) {
         exclude("org.jetbrains", "annotations")
