@@ -75,7 +75,7 @@ public class ArrowBombPerk extends Perk {
                     pitch = -pitch;
                 }
                 var dir = Vector.fromEuler(yaw, pitch);
-                var arrow = game.api().entityImplementations().spawnArrow(startLocation.withDirection(dir), 0.9F, 0);
+                var arrow = game.api().entityImplementations().shootArrow(user, startLocation.withDirection(dir), 0.9F, 0);
                 ArrowPerk.particles(game, arrow, false);
                 ArrowPerk.claimArrow(game, user, arrow, 3, 2);
             }
