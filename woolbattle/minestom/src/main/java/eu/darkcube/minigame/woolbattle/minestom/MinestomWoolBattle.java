@@ -165,10 +165,6 @@ public class MinestomWoolBattle extends CommonWoolBattle {
         player.user(user);
     }
 
-    public @NotNull Map<@NotNull Instance, @NotNull MinestomWorld> worlds() {
-        return worlds;
-    }
-
     public eu.darkcube.minigame.woolbattle.api.entity.Entity entity(Acquirable<Entity> entity) {
         if (entity.unwrap() instanceof MinestomPlayer player) return player.user();
         return ((EntityImpl) entity.unwrap()).handle();

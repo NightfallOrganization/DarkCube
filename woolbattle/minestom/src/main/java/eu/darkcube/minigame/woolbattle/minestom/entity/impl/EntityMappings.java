@@ -16,6 +16,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.entity.EntityType;
 import eu.darkcube.minigame.woolbattle.api.entity.SimpleEntityType;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUser;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import it.unimi.dsi.fastutil.Pair;
 import net.minestom.server.item.ItemStack;
@@ -26,7 +27,7 @@ public class EntityMappings {
 
     public EntityMappings(MinestomWoolBattle woolbattle) {
         this.defaultConstructor = (type, _) -> cast(new MinestomEntityImpl(type, woolbattle));
-        Constructor projectileConstructor = (type, _) -> cast(new MinestomProjectileImpl(woolbattle, type));
+        Constructor projectileConstructor = (type, args) -> cast(new MinestomProjectileImpl(woolbattle, type, (MinestomUser) args[0]));
         Constructor itemConstructor = (_, args) -> cast(new MinestomItemEntityImpl((ItemStack) args[0], woolbattle));
 
         register(EntityType.PLAYER, PLAYER);

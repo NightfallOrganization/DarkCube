@@ -249,6 +249,8 @@ public interface WBUser extends CommandSender, Entity {
      */
     void attack(@NotNull WBUser other);
 
+    void simulateDamage();
+
     /**
      * Simulates the user moving into the void. Basically respawns the user
      */

@@ -29,6 +29,7 @@ import eu.darkcube.minigame.woolbattle.api.world.World;
 import eu.darkcube.minigame.woolbattle.common.command.CommonWoolBattleCommands;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattleApi;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomInstance;
 import eu.darkcube.system.commandapi.util.Messages;
 import eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport;
 import eu.darkcube.system.libs.com.mojang.brigadier.ParseResults;
@@ -244,7 +245,7 @@ public class MinestomWoolBattleCommands extends CommonWoolBattleCommands {
             var playerPos = player.getPosition();
             pos = new Position.Simple(playerPos.x(), playerPos.y(), playerPos.z());
             rotation = new Rotation.Simple(playerPos.yaw(), playerPos.pitch());
-            world = woolbattle.woolbattle().worlds().get(player.getInstance());
+            world = ((MinestomInstance) player.getInstance()).world();
             player.get(Pointer.pointer(CommandSource.class, Key.key("asd")));
             commandPrefix = "/";
             customSender = Objects.requireNonNullElseGet(player.user(), () -> woolbattle.woolbattle().wrapCommandSender(sender));

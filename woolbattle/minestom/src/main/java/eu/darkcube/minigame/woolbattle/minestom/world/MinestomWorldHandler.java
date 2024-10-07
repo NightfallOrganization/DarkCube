@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import eu.darkcube.minigame.woolbattle.common.game.CommonGame;
@@ -31,6 +32,7 @@ import eu.darkcube.minigame.woolbattle.minestom.world.impl.MinestomWorldImpl;
 import eu.darkcube.server.minestom.instance.DoNotSave;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
+import eu.darkcube.system.libs.org.jetbrains.annotations.UnknownNullability;
 import eu.darkcube.system.minestom.item.material.MinestomMaterial;
 import eu.darkcube.system.server.item.material.Material;
 import net.minestom.server.instance.Instance;
@@ -39,6 +41,7 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.world.DimensionType;
 import net.minestom.server.world.biome.Biome;
 
@@ -86,7 +89,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             instance.setTime(6000);
             instanceManager.registerInstance(instance);
             var world = new MinestomWorldImpl(api.woolbattle(), worldHandler, instance, path);
-            api.woolbattle().worlds().put(instance, world);
+            instance.world(world);
             logLoadWorld(world);
             return world;
         } catch (IOException e) {
@@ -110,7 +113,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             instance.setTime(6000);
             instanceManager.registerInstance(instance);
             var world = new MinestomGameWorldImpl(game, instance, path);
-            api.woolbattle().worlds().put(instance, world);
+            instance.world(world);
             logLoadWorld(world);
             return world;
         } catch (IOException e) {
@@ -121,7 +124,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     @Override
     public @NotNull CommonIngameWorld loadIngameWorld(@NotNull CommonGame game, @Nullable Schematic schematic) {
         try {
-            var instance = new InstanceContainer(UUID.randomUUID(), dimensionType);
+            var instance = new WBMinestomInstance(UUID.randomUUID(), dimensionType);
             var biome = biomeRegistry.get(this.biome);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var path = createDirectory(game, "ingame");
@@ -134,7 +137,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
             instance.setTime(6000);
             instanceManager.registerInstance(instance);
             var world = new MinestomIngameWorldImpl(game, instance, path);
-            api.woolbattle().worlds().put(instance, world);
+            instance.world(world);
             logLoadWorld(world);
             return world;
         } catch (IOException e) {
@@ -187,9 +190,34 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
         return ((MinestomWorld) world).instance();
     }
 
-    private static class NoSaveInstanceContainer extends InstanceContainer implements DoNotSave {
+    private static class WBMinestomInstance extends InstanceContainer implements MinestomInstance {
+        private @UnknownNullability MinestomWorld world;
+
+        public WBMinestomInstance(@NotNull UUID uniqueId, @NotNull DynamicRegistry.Key<DimensionType> dimensionType, @NotNull NamespaceID dimensionName) {
+            super(uniqueId, dimensionType, dimensionName);
+        }
+
+        public WBMinestomInstance(@NotNull UUID uniqueId, @NotNull DynamicRegistry.Key<DimensionType> dimensionType) {
+            this(uniqueId, dimensionType, NamespaceID.from("woolbattle", uniqueId.toString().toLowerCase(Locale.ROOT)));
+        }
+
+        @Override
+        public @NotNull MinestomWorld world() {
+            return world;
+        }
+
+        public void world(@UnknownNullability MinestomWorld world) {
+            this.world = world;
+        }
+    }
+
+    private static class NoSaveInstanceContainer extends WBMinestomInstance implements DoNotSave {
+        public NoSaveInstanceContainer(@NotNull UUID uniqueId, @NotNull DynamicRegistry.Key<DimensionType> dimensionType, @NotNull NamespaceID dimensionName) {
+            super(uniqueId, dimensionType, dimensionName);
+        }
+
         public NoSaveInstanceContainer(@NotNull UUID uniqueId, @NotNull DynamicRegistry.Key<DimensionType> dimensionType) {
-            super(uniqueId, dimensionType);
+            this(uniqueId, dimensionType, NamespaceID.from("woolbattle", uniqueId.toString().toLowerCase(Locale.ROOT)));
         }
     }
 }

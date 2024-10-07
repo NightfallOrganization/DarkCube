@@ -7,8 +7,11 @@
 
 package eu.darkcube.minigame.woolbattle.common.perk.perks.other;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import eu.darkcube.minigame.woolbattle.api.entity.Arrow;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitBlockEvent;
+import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEntityEvent;
 import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEvent;
 import eu.darkcube.minigame.woolbattle.api.game.Game;
 import eu.darkcube.minigame.woolbattle.api.listener.perks.PerkListener;
@@ -52,17 +55,32 @@ public class ArrowPerk extends Perk {
             var o = projectile.metadata().get(ArrowPerk.perk(game));
             if (!(o instanceof PerkName perkName)) return;
             if (!perkName.equals(perk.perkName())) return;
+            var location = projectile.location();
             if (event instanceof ProjectileHitBlockEvent hitBlockEvent) {
                 var block = hitBlockEvent.block();
                 var damage = (int) projectile.metadata().get(blockDamage(game));
                 if (game.api().materialProvider().isWool(block.material())) {
                     block.incrementBlockDamage(damage);
                 }
-                game.scheduler().schedule(projectile::remove, TaskSchedule.tick(100), TaskSchedule.stop());
-            } else {
-                projectile.remove();
+            } else if (event instanceof ProjectileHitEntityEvent hitEntityEvent) {
+                var shooter = projectile.shooter();
+                if (shooter != null) {
+                    shooter.playSound(Sound.sound(Key.key("minecraft:entity.arrow.hit_player"), Sound.Source.PLAYER, 1, 0));
+                }
+                var target = hitEntityEvent.target();
+                if (target instanceof WBUser targetUser) {
+                    if (shooter != null) {
+                        shooter.attack(targetUser);
+                    }
+                    var strength = projectile.metadata().<Float>getOr(strength(game), 0F);
+                    var projectileVelocity = projectile.velocity();
+                    var velocity = (projectileVelocity.lengthSquared() == 0.0 ? projectileVelocity : projectileVelocity.withY(0).normalized().mul(.47 + ThreadLocalRandom.current().nextDouble() / 70 + strength / 1.42)).withY(.400023);
+                    target.velocity(velocity);
+                }
+                // TODO block damage around player
             }
-            event.world().playSound(projectile.location(), Sound.sound(Key.key("minecraft:entity.arrow.hit"), Sound.Source.PLAYER, 1, 1));
+            game.scheduler().schedule(projectile::remove, TaskSchedule.nextTick(), TaskSchedule.stop());
+            location.world().playSound(location, Sound.sound(Key.key("minecraft:entity.arrow.hit"), Sound.Source.PLAYER, 1, 1));
         }
     }
 

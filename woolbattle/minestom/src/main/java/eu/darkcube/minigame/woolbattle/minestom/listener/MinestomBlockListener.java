@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.minestom.listener;
 
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomInstance;
 import eu.darkcube.system.server.item.ItemBuilder;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventNode;
@@ -22,8 +23,7 @@ public class MinestomBlockListener {
             var user = player.user();
             if (user == null) return;
             var instance = event.getInstance();
-            var world = woolbattle.worlds().get(instance);
-            if (world == null) return;
+            var world = ((MinestomInstance) instance).world();
             var pos = event.getBlockPosition();
             var block = world.blockAt(pos.blockX(), pos.blockY(), pos.blockZ());
             var breakResult = woolbattle.eventHandler().blockBreak(user, block);
@@ -36,8 +36,7 @@ public class MinestomBlockListener {
             var user = player.user();
             if (user == null) return;
             var instance = event.getInstance();
-            var world = woolbattle.worlds().get(instance);
-            if (world == null) return;
+            var world = ((MinestomInstance) instance).world();
             var pos = event.getBlockPosition();
             var block = world.blockAt(pos.blockX(), pos.blockY(), pos.blockZ());
             var item = ItemBuilder.item(event.getPlayer().getInventory().getItemInHand(event.getHand()));

@@ -30,6 +30,10 @@ public class MinestomUser extends CommonWBUser implements DefaultMinestomEntity 
         return player.acquirable().lock();
     }
 
+    public MinestomPlayer player() {
+        return woolbattle.player(this);
+    }
+
     @Override
     public @NotNull MinestomWoolBattle woolbattle() {
         return woolbattle;

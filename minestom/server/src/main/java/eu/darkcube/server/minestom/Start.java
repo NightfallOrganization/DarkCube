@@ -35,8 +35,8 @@ public class Start {
     public static void main(String[] args) {
         System.setProperty("org.jline.terminal.dumb", "true");
         // System.setProperty("minestom.extension.enabled", "true");
-        System.setProperty("minestom.chunk-view-distance", "4");
-        System.setProperty("minestom.entity-view-distance", "4");
+        System.setProperty("minestom.chunk-view-distance", "12");
+        System.setProperty("minestom.entity-view-distance", "8");
         System.setProperty("minestom.experiment.pose-updates", "true");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();

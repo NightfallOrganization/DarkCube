@@ -35,4 +35,6 @@ public interface UserPlatformAccess {
 
     @UnknownNullability
     Vector velocity();
+
+    void simulateDamage();
 }

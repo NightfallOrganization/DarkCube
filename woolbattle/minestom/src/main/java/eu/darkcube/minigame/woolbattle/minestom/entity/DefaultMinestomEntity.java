@@ -14,6 +14,7 @@ import eu.darkcube.minigame.woolbattle.api.world.Location;
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.util.MinestomUtil;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomInstance;
 import eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport;
 import eu.darkcube.system.libs.net.kyori.adventure.text.Component;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public interface DefaultMinestomEntity extends Entity {
         var pos = entity.getPosition();
         var instance = entity.getInstance();
         lock.unlock();
-        var world = woolbattle().worlds().get(instance);
+        var world = ((MinestomInstance) instance).world();
         var position = new Position.Directed.Simple(pos.x(), pos.y(), pos.z(), pos.yaw(), pos.pitch());
         return new Location(world, position);
     }

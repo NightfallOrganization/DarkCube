@@ -9,9 +9,11 @@ package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 
 import java.time.Duration;
 
+import eu.darkcube.minigame.woolbattle.api.entity.Entity;
 import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomInstance;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.time.TimeUnit;
@@ -38,7 +40,7 @@ public class MinestomItemEntityImpl extends net.minestom.server.entity.ItemEntit
             return;
         }
         if (instance == null) return;
-        var world = woolbattle.worlds().get(instance);
+        var world = ((MinestomInstance) instance).world();
         if (!(world instanceof GameWorld)) {
             remove();
             return;
@@ -69,7 +71,7 @@ public class MinestomItemEntityImpl extends net.minestom.server.entity.ItemEntit
     }
 
     @Override
-    public void handle(eu.darkcube.minigame.woolbattle.api.entity.Entity handle) {
+    public void handle(Entity handle) {
         this.handle = (ItemEntity) handle;
     }
 }

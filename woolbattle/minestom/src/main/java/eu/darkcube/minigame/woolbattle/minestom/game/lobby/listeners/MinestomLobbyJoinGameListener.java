@@ -13,6 +13,8 @@ import eu.darkcube.minigame.woolbattle.common.user.CommonWBUser;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.attribute.AttributeModifier;
+import net.minestom.server.entity.attribute.AttributeOperation;
 
 public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGameEvent> {
     private final MinestomWoolBattle woolbattle;
@@ -41,5 +43,10 @@ public class MinestomLobbyJoinGameListener extends ConfiguredListener<UserJoinGa
         player.setGameMode(GameMode.SURVIVAL);
         player.setFoodSaturation(0);
         player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024);
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier("test", 1000, AttributeOperation.MULTIPLY_BASE));
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier("test2", 1000, AttributeOperation.MULTIPLY_BASE));
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier("test3", 1000, AttributeOperation.MULTIPLY_BASE));
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier("test4", 1000, AttributeOperation.MULTIPLY_BASE));
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier("test5", 1000, AttributeOperation.MULTIPLY_BASE));
     }
 }

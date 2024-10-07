@@ -46,7 +46,7 @@ public class BowPerk extends Perk {
             var user = perk.owner();
             var eyeLocation = user.eyeLocation();
             if (eyeLocation == null) return false;
-            var arrow = game.api().entityImplementations().shootArrow(user, eyeLocation, power * 3F, 1F);
+            var arrow = game.api().entityImplementations().shootArrow(user, eyeLocation.sub(0, 0.10000000149011612, 0), power * 3F, 0.3F);
             ArrowPerk.claimArrow(game, user, arrow, 2, 1);
             eyeLocation.world().playSound(eyeLocation, Sound.sound(Key.key("minecraft:entity.arrow.shoot"), Sound.Source.PLAYER, 1, getRandomPitchFromPower(power)));
             game.api().eventManager().call(new BowShootArrowEvent(user, arrow));

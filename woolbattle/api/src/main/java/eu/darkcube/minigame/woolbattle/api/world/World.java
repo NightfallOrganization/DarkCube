@@ -17,6 +17,7 @@ import eu.darkcube.minigame.woolbattle.api.entity.ItemEntity;
 import eu.darkcube.minigame.woolbattle.api.user.WBUser;
 import eu.darkcube.minigame.woolbattle.api.util.BoundingBox;
 import eu.darkcube.system.annotations.Api;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.net.kyori.adventure.sound.Sound;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
@@ -28,6 +29,10 @@ public interface World {
     @Api
     @NotNull
     MetaDataStorage metadata();
+
+    @Api
+    @NotNull
+    Key key();
 
     @Api
     @NotNull
@@ -47,6 +52,11 @@ public interface World {
     default void getEntities(@NotNull EntityTypeTest<Entity, ?> type, @NotNull Predicate<Entity> filter, @NotNull List<Entity> into, int limit) {
         getEntities(type, null, filter, into, limit);
     }
+
+    @Api
+    @Unmodifiable
+    @NotNull
+    List<? extends Entity> getEntities();
 
     @Nullable
     Entity getEntity(@NotNull UUID entityUUID);

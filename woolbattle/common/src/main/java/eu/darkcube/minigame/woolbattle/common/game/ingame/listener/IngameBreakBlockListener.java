@@ -41,7 +41,7 @@ public class IngameBreakBlockListener extends ConfiguredListener<BreakBlockEvent
         }
         block.changeBlockDamage(block.maxBlockDamage());
         var tryAdd = user.woolBreakAmount();
-        var added = user.addWool(tryAdd, true);
+        var added = user.addWool(tryAdd, false);
         if (added != 0) {
             user.playSound(sound(key("entity.item.pickup"), BLOCK, 1, 1));
         }

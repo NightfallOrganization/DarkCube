@@ -42,7 +42,7 @@ public class MinestomEntityImplementations extends CommonEntityImplementations {
 
     @Override
     protected <T extends Projectile> @NotNull T spawnProjectile0(@NotNull eu.darkcube.minigame.woolbattle.api.entity.EntityType<T> type, @Nullable CommonWBUser shooter, @NotNull Location location, @NotNull Vector velocity, @Nullable Consumer<T> preSpawnCallback) {
-        var pair = mappings.create(type);
+        var pair = mappings.create(type, shooter);
         var entity = pair.first();
         var custom = new MinestomProjectile((Acquirable<? extends MinestomProjectileImpl>) entity.acquirable(), woolbattle, shooter);
         return configure(pair, custom, type, location, velocity, preSpawnCallback);

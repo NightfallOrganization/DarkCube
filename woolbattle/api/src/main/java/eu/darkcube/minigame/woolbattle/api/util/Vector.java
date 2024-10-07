@@ -36,6 +36,18 @@ public record Vector(double x, double y, double z) implements Rotation {
         return new Vector(x / vec.x, y / vec.y, z / vec.z);
     }
 
+    public Vector withX(double x) {
+        return new Vector(x, y, z);
+    }
+
+    public Vector withY(double y) {
+        return new Vector(x, y, z);
+    }
+
+    public Vector withZ(double z) {
+        return new Vector(x, y, z);
+    }
+
     public double length() {
         return Math.sqrt(lengthSquared());
     }

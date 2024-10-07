@@ -38,21 +38,25 @@ public class IngameUserPickupItemListener extends ConfiguredListener<UserPickupI
         if (team == null) {
             return;
         }
+        if (!team.canPlay()) {
+            event.cancel();
+            return;
+        }
         var tryadd = item.amount();
         var added = user.addWool(tryadd, false);
         if (added != 0) {
             user.playSound(sound(key("entity.item.pickup"), BLOCK, 1, 1));
-        }
-        var entity = event.entity();
-        var missed = tryadd - added;
-        if (missed > 0) {
-            item.amount(missed);
-            entity.sendPickupPacket(user, added);
-            entity.item(item);
-            entity.pickupDelay(4);
-        } else {
-            entity.sendPickupPacket(user, tryadd);
-            entity.remove();
+            var entity = event.entity();
+            var missed = tryadd - added;
+            if (missed > 0) {
+                item.amount(missed);
+                entity.sendPickupPacket(user, added);
+                entity.item(item);
+                entity.pickupDelay(4);
+            } else {
+                entity.sendPickupPacket(user, tryadd);
+                entity.remove();
+            }
         }
         event.cancel();
     }

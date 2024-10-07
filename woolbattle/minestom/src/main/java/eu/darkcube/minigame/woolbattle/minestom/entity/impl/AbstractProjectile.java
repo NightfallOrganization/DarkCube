@@ -12,6 +12,7 @@ import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.ServerFlag;
 import net.minestom.server.collision.Aerodynamics;
+import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.collision.CollisionUtils;
 import net.minestom.server.collision.EntityCollisionResult;
 import net.minestom.server.collision.PhysicsResult;
@@ -21,6 +22,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.metadata.projectile.ArrowMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.instance.block.Block;
@@ -31,19 +33,26 @@ import net.minestom.server.utils.chunk.ChunkUtils;
 public abstract class AbstractProjectile extends MinestomEntityImpl {
     protected final Entity shooter;
     protected PhysicsResult previousPhysicsResult;
+    protected BoundingBox blockBoundingBox = new BoundingBox(0.05, 0.05, 0.05);
+    protected BoundingBox entityBoundingBox;
     protected boolean isInEntity;
     protected boolean isInBlock;
 
     public AbstractProjectile(EntityType type, Entity shooter, MinestomWoolBattle woolbattle) {
         super(type, woolbattle);
-        // ((SnowballMeta) this.entityMeta).setItem(ItemStack.of(Material.NETHERITE_SWORD));
         this.shooter = shooter;
+        if (shooter != null) {
+            if (this.entityMeta instanceof ArrowMeta meta) {
+                meta.setShooter(shooter);
+            }
+        }
+        this.entityBoundingBox = type.registry().boundingBox();
     }
 
     protected PhysicsResult computePhysics(@NotNull Pos entityPosition, @NotNull Vec currentVelocity, @NotNull Block.Getter blockGetter, @NotNull Aerodynamics aerodynamics) {
         var newVelocity = updateVelocity(entityPosition, currentVelocity, blockGetter, aerodynamics, true, false, onGround, false);
 
-        var newPhysicsResult = CollisionUtils.handlePhysics(blockGetter, this.boundingBox, entityPosition, newVelocity, previousPhysicsResult, true);
+        var newPhysicsResult = CollisionUtils.handlePhysics(blockGetter, blockBoundingBox, entityPosition, newVelocity, previousPhysicsResult, true);
 
         previousPhysicsResult = newPhysicsResult;
         return newPhysicsResult;
@@ -56,8 +65,9 @@ public abstract class AbstractProjectile extends MinestomEntityImpl {
         if (removed) return;
 
         final Block.Getter chunkCache = new ChunkCache(instance, currentChunk, Block.STONE);
-        var blockResult = computePhysics(position, velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND), chunkCache, getAerodynamics());
-        var collidedWithEntity = checkEntityCollision(this.position, blockResult.newPosition());
+        var posBefore = this.position;
+        var blockResult = computePhysics(posBefore, velocity.div(ServerFlag.SERVER_TICKS_PER_SECOND), chunkCache, getAerodynamics());
+        var collidedWithEntity = checkEntityCollision(posBefore, blockResult.newPosition());
         if (removed) return;
         if (collidedWithEntity != null) {
             velocity = Vec.ZERO;
@@ -98,22 +108,24 @@ public abstract class AbstractProjectile extends MinestomEntityImpl {
             }
 
             if (hitBlock == null) return;
-            handleBlockCollision(hitBlock, hitBlockPos, hitPoint, position, blockResult);
+            refreshPosition(blockResult.newPosition(), true, false);
+            isInBlock = true;
+            onGround = blockResult.isOnGround();
+            handleBlockCollision(hitBlock, hitBlockPos, hitPoint, posBefore, blockResult);
             if (removed) return;
         } else {
-            velocity = blockResult.newVelocity().mul(ServerFlag.SERVER_TICKS_PER_SECOND).mul(0.99);
+            onGround = blockResult.isOnGround();
+            velocity = blockResult.newVelocity().mul(ServerFlag.SERVER_TICKS_PER_SECOND);
+            refreshPosition(blockResult.newPosition(), true, false);
         }
 
-        onGround = blockResult.isOnGround();
-
-        refreshPosition(blockResult.newPosition(), true, false);
         if (hasVelocity()) sendPacketToViewers(getVelocityPacket());
     }
 
     protected @Nullable EntityCollisionResult checkEntityCollision(@NotNull Pos previousPos, @NotNull Pos currentPos) {
         var diff = currentPos.sub(previousPos).asVec();
 
-        var results = CollisionUtils.checkEntityCollisions(this, diff, diff.length() + 1.8, entity -> entity != shooter && entity != this, previousPhysicsResult);
+        var results = CollisionUtils.checkEntityCollisions(this.instance, this.entityBoundingBox, previousPos, diff, diff.length() + 1.8, entity -> entity != shooter && entity != this, previousPhysicsResult);
 
         if (results.isEmpty()) {
             return null;

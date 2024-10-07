@@ -9,6 +9,7 @@ package eu.darkcube.minigame.woolbattle.minestom.entity.impl;
 
 import eu.darkcube.minigame.woolbattle.api.world.GameWorld;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
+import eu.darkcube.minigame.woolbattle.minestom.world.MinestomInstance;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -25,7 +26,7 @@ public class MinestomEntityImpl extends Entity implements EntityImpl {
     @Override
     public void update(long time) {
         if (instance == null) return;
-        var world = woolbattle.worlds().get(instance);
+        var world = ((MinestomInstance) instance).world();
         if (!(world instanceof GameWorld)) {
             remove();
             return;

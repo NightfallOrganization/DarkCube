@@ -69,6 +69,18 @@ public interface MinestomWorld extends World {
     }
 
     @Override
+    @Unmodifiable
+    @NotNull
+    default List<? extends Entity> getEntities() {
+        var list = new ArrayList<Entity>();
+        for (var entity : instance().getEntities()) {
+            var unwrapped = unwrap(entity);
+            if (unwrapped != null) list.add(unwrapped);
+        }
+        return list;
+    }
+
+    @Override
     @Nullable
     default Entity getEntity(@NotNull UUID entityUUID) {
         var entity = instance().getEntityByUuid(entityUUID);

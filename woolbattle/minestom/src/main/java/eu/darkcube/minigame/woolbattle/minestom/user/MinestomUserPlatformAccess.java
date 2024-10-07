@@ -25,6 +25,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.entity.damage.Damage;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.TransactionOption;
 import net.minestom.server.inventory.TransactionType;
@@ -135,6 +137,14 @@ public class MinestomUserPlatformAccess implements UserPlatformAccess {
         var vec = player.getVelocity();
         lock.unlock();
         return MinestomUtil.toVelocity(vec);
+    }
+
+    @Override
+    public void simulateDamage() {
+        var player = woolbattle.player(user);
+        var lock = player.acquirable().lock();
+        player.damage(new Damage(DamageType.GENERIC, null, null, null, 0));
+        lock.unlock();
     }
 
     @Override

@@ -53,4 +53,9 @@ public record Location(@NotNull World world, double x, double y, double z, float
     public @NotNull Location withDirection(@NotNull Vector dir) {
         return new Location(world, Directed.super.withDirection(dir));
     }
+
+    @Override
+    public String toString() {
+        return "Location{" + "world=" + world.key() + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
+    }
 }

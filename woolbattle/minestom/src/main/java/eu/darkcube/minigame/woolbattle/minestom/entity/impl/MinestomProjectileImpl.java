@@ -13,7 +13,9 @@ import eu.darkcube.minigame.woolbattle.api.event.entity.ProjectileHitEntityEvent
 import eu.darkcube.minigame.woolbattle.api.world.Position;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.user.MinestomPlayer;
+import eu.darkcube.minigame.woolbattle.minestom.user.MinestomUser;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
+import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.Aerodynamics;
 import net.minestom.server.collision.PhysicsResult;
@@ -32,12 +34,11 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
     private final MinestomWoolBattle woolbattle;
     private Projectile handle;
     private boolean frozen = false;
-    private boolean inBlock = false;
     private Vec freezeVelocity = null;
     private boolean freezeNoGravity = false;
 
-    public MinestomProjectileImpl(@NotNull MinestomWoolBattle woolbattle, @NotNull EntityType entityType) {
-        super(entityType, null, woolbattle);
+    public MinestomProjectileImpl(@NotNull MinestomWoolBattle woolbattle, @NotNull EntityType entityType, @Nullable MinestomUser shooter) {
+        super(entityType, shooter == null ? null : shooter.player(), woolbattle);
         this.woolbattle = woolbattle;
         super.hasPhysics = false;
     }
@@ -91,7 +92,7 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
 
     @Override
     public void tick(long time) {
-        if (removed || inBlock) {
+        if (removed || isInBlock || isInEntity) {
             return;
         }
         if (frozen) {
@@ -115,19 +116,17 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
 
     @Override
     protected void handleBlockCollision(Block hitBlock, Point hitBlockPos, Point hitPos, Pos posBefore, PhysicsResult blockResult) {
+        velocity = Vec.ZERO;
         setNoGravity(true);
 
-        inBlock = true;
-        var velocity = Vec.fromPoint(hitPos.sub(posBefore)).normalize();
-        this.velocity = velocity.mul(Vec.EPSILON);
+        var velocity = Vec.fromPoint(hitPos.sub(posBefore));
+        this.velocity = velocity;
         var v = velocity.normalize().mul(0.01F); // Required so the entity is lit (just outside the block)
 
         // if the value is zero, it will be unlit. If the value is more than 0.01, there will be noticeable pitch change visually
         position = new Pos(hitPos.x() - v.x(), hitPos.y() - v.y(), hitPos.z() - v.z(), posBefore.yaw(), posBefore.pitch());
-        MinecraftServer.getSchedulerManager().scheduleNextTick(() -> {
-            synchronizePosition();
-            sendPacketToViewersAndSelf(getVelocityPacket());
-        });
+        MinecraftServer.getSchedulerManager().scheduleNextTick(this::synchronizePosition);
+        this.synchronizePosition();
 
         collideWithBlock(hitBlockPos);
         // System.out.println(hitPos.add(hitPos.sub(posBefore)));
@@ -146,13 +145,23 @@ public class MinestomProjectileImpl extends AbstractProjectile implements Entity
         if (!positionChanged) {
             return entityFlying ? Vec.ZERO : new Vec(0.0, entityNoGravity ? 0.0 : -aerodynamics.gravity() * aerodynamics.verticalAirResistance(), 0.0);
         } else {
-            var drag = entityOnGround ? blockGetter.getBlock(entityPosition.sub(0.0, 0.5000001, 0.0)).registry().friction() * aerodynamics.horizontalAirResistance() : aerodynamics.horizontalAirResistance();
-            var gravity = entityFlying ? 0.0 : aerodynamics.gravity();
-            var gravityDrag = entityFlying ? 0.6 : aerodynamics.verticalAirResistance();
-            var x = currentVelocity.x() * drag;
-            var y = entityNoGravity ? currentVelocity.y() : (currentVelocity.y() - gravity) * gravityDrag;
-            var z = currentVelocity.z() * drag;
-            return new Vec(Math.abs(x) < 1.0E-6 ? 0.0 : x, Math.abs(y) < 1.0E-6 ? 0.0 : y, Math.abs(z) < 1.0E-6 ? 0.0 : z);
+            // var drag = entityOnGround ? blockGetter.getBlock(entityPosition.sub(0.0, 0.5000001, 0.0)).registry().friction() * aerodynamics.horizontalAirResistance() : aerodynamics.horizontalAirResistance();
+            // var gravity = entityFlying ? 0.0 : aerodynamics.gravity();
+            // var gravityDrag = entityFlying ? 0.6 : aerodynamics.verticalAirResistance();
+            // var x = currentVelocity.x() * drag;
+            // var y = entityNoGravity ? currentVelocity.y() : (currentVelocity.y() - gravity) * gravityDrag;
+            // var z = currentVelocity.z() * drag;
+            // return new Vec(Math.abs(x) < 1.0E-6 ? 0.0 : x, Math.abs(y) < 1.0E-6 ? 0.0 : y, Math.abs(z) < 1.0E-6 ? 0.0 : z);
+            var vx = currentVelocity.x();
+            var vy = currentVelocity.y();
+            var vz = currentVelocity.z();
+            var slow = 0.99D;
+
+            vx *= slow;
+            vy *= slow;
+            vz *= slow;
+            vy -= 0.045F;
+            return new Vec(vx, vy, vz);
         }
     }
 

@@ -141,6 +141,18 @@ public class MinestomPlayer extends Player implements EntityImpl {
         });
     }
 
+    @Override
+    public boolean isPreventBlockPlacement() {
+        var user = this.user;
+        if (user != null) {
+            var team = user.team();
+            if (team != null && team.spectator()) {
+                return true;
+            }
+        }
+        return super.isPreventBlockPlacement();
+    }
+
     // @Override
     // public boolean isAutoViewable() {
     //     return !joining;

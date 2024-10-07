@@ -7,12 +7,15 @@
 
 package eu.darkcube.minigame.woolbattle.minestom.world.impl;
 
+import static eu.darkcube.system.kyori.wrapper.KyoriAdventureSupport.adventureSupport;
+
 import java.nio.file.Path;
 
 import eu.darkcube.minigame.woolbattle.common.world.CommonWorld;
 import eu.darkcube.minigame.woolbattle.common.world.PlatformWorldHandler;
 import eu.darkcube.minigame.woolbattle.minestom.MinestomWoolBattle;
 import eu.darkcube.minigame.woolbattle.minestom.world.MinestomWorld;
+import eu.darkcube.system.libs.net.kyori.adventure.key.Key;
 import eu.darkcube.system.libs.org.jetbrains.annotations.NotNull;
 import eu.darkcube.system.libs.org.jetbrains.annotations.Nullable;
 import net.minestom.server.instance.Instance;
@@ -37,4 +40,8 @@ public class MinestomWorldImpl extends CommonWorld implements MinestomWorld {
         return worldDirectory;
     }
 
+    @Override
+    public @NotNull Key key() {
+        return adventureSupport().convert(instance.getDimensionType().key());
+    }
 }

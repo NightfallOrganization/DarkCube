@@ -38,5 +38,6 @@ public class MinestomIngameJoinGameListener extends ConfiguredListener<UserJoinG
                 }
             }
         }
+        player.postJoin();
     }
 }

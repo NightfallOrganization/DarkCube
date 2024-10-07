@@ -313,7 +313,13 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
 
     @Override
     public void attack(@NotNull WBUser other) {
+        other.simulateDamage();
+        other.ticksAfterLastHit(0);
+    }
 
+    @Override
+    public void simulateDamage() {
+        this.platformAccess.simulateDamage();
     }
 
     @Override

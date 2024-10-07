@@ -9,6 +9,7 @@ package eu.darkcube.server.minestom.listener;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
@@ -35,7 +36,7 @@ public class ChunkUnloader {
 
     public static void entityDespawn(EntityDespawnEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        lastChunk.put(player, player.getChunk());
+        lastChunk.put(player, Objects.requireNonNull(player.getChunk()));
     }
 
     public static void playerSpawn(PlayerSpawnEvent event) {
@@ -73,25 +74,25 @@ public class ChunkUnloader {
             System.out.println("Something went wrong when unloading chunks");
             return;
         }
-        var playerChunk = event.getPlayer().getChunk();
+        var player = event.getPlayer();
+        var playerChunk = player.getChunk();
         var chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
         if (chunk != null) {
             if (!chunk.getViewers().isEmpty()) {
-                for (var player : instance.getPlayers()) {
-                    if (player != event.getPlayer() && chunk.getViewers().contains(player)) {
+                for (var instancePlayer : instance.getPlayers()) {
+                    if (instancePlayer != player && chunk.getViewers().contains(instancePlayer)) {
                         return;
                     }
                 }
             }
             if (playerChunk != chunk) {
-                saveAndUnload(instance, chunk, event.getPlayer());
+                saveAndUnload(instance, chunk, player);
             } else {
                 if (shouldUnload(playerChunk)) {
-                    var player = event.getPlayer();
                     saveAndUnload(instance, playerChunk, player);
                     MinecraftServer.getSchedulerManager().scheduleNextProcess(() -> lastChunk.remove(player));
                 } else {
-                    lastChunk.put(event.getPlayer(), playerChunk);
+                    lastChunk.put(player, playerChunk);
                 }
             }
         }
@@ -134,24 +135,26 @@ public class ChunkUnloader {
             }
             pool.execute(() -> {
                 try {
-                    loader.saveChunk(chunk).whenComplete((_, t) -> {
-                        if (t != null) {
+                    synchronized (chunk) {
+                        loader.saveChunk(chunk).whenComplete((_, t) -> {
+                            if (t != null) {
+                                tasks.tasks.remove(future);
+                                tasks.saving.remove(idx);
+                                future.completeExceptionally(t);
+                                return;
+                            }
+                            MinecraftServer.getSchedulerManager().scheduleNextProcess(() -> {
+                                synchronized (chunk) {
+                                    if (shouldUnload(chunk)) {
+                                        instance.unloadChunk(chunk);
+                                    }
+                                }
+                            });
                             tasks.tasks.remove(future);
                             tasks.saving.remove(idx);
-                            future.completeExceptionally(t);
-                            return;
-                        }
-                        MinecraftServer.getSchedulerManager().scheduleNextProcess(() -> {
-                            synchronized (chunk) {
-                                if (shouldUnload(chunk)) {
-                                    instance.unloadChunk(chunk);
-                                }
-                            }
+                            future.complete(null);
                         });
-                        tasks.tasks.remove(future);
-                        tasks.saving.remove(idx);
-                        future.complete(null);
-                    });
+                    }
                 } catch (Throwable t) {
                     System.out.println("Failed to save chunk: " + t.getClass().getName() + ": " + t.getMessage());
                 }
