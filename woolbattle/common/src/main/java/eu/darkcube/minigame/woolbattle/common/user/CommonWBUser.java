@@ -23,6 +23,7 @@ import eu.darkcube.minigame.woolbattle.api.event.user.UserGetWoolBreakAmountEven
 import eu.darkcube.minigame.woolbattle.api.event.user.UserParticlesUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserRemoveWoolEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserTeleportEvent;
+import eu.darkcube.minigame.woolbattle.api.event.user.UserVoidEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolCountUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.event.user.UserWoolSubtractDirectionUpdateEvent;
 import eu.darkcube.minigame.woolbattle.api.game.ingame.Ingame;
@@ -71,7 +72,7 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
     protected volatile int woolCount;
     protected volatile @Nullable CommonTeam team;
     protected volatile @Nullable WBUser lastHit;
-    protected volatile int ticksAfterLastHit;
+    protected volatile int ticksAfterLastHit = -1;
 
     public CommonWBUser(@NotNull CommonWoolBattleApi api, @NotNull User user, @Nullable CommonGame game) {
         this.api = api;
@@ -324,6 +325,28 @@ public abstract class CommonWBUser implements WBUser, ForwardingAudience.Single 
 
     @Override
     public void applyVoid() {
+        var killer = this.lastHit;
+        var game = this.game;
+        var countAsDeath = killer != null && this.ticksAfterLastHit <= 200 && this.ticksAfterLastHit != -1 && game != null;
+        var voidEvent = new UserVoidEvent(this, countAsDeath);
+        if (voidEvent.cancelled()) return;
+        killer = this.lastHit;
+        countAsDeath = voidEvent.countAsDeath() && killer != null && game != null;
+
+        if (countAsDeath) {
+            game.ingameData().incrementKillStreak(killer);
+            game.ingameData().addKill(killer);
+            game.ingameData().resetKillStreak(this);
+            game.ingameData().addDeath(this);
+
+            var killStreak = game.ingameData().killStreak(killer);
+            var printKillStreakMessage = killStreak > 0 && killStreak % game.ingameData().killsForOneLife() == 0;
+            if(printKillStreakMessage) {
+                var killerTeam = killer.team();
+                if(killerTeam )
+            }
+        }
+
         // TODO
     }
 

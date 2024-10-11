@@ -100,12 +100,9 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     @Override
     public @NotNull CommonGameWorld loadLobbyWorld(@NotNull CommonGame game) {
         try {
-            var instance = new NoSaveInstanceContainer(UUID.randomUUID(), dimensionType);
+            var instance = new NoSaveInstanceContainer(UUID.randomUUID(), dimensionType, NamespaceID.from("woolbattle", "lobby"));
             var biome = biomeRegistry.get(this.biome);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
-            // var zip = woolbattle.woolbattle().worldDataProvider().loadLobbyZip().join();
-            // var path = extractWorld(game, "lobby", zip, null);
-            // instance.setChunkLoader(new AnvilLoader(path));
             var path = createDirectory(game, "lobby");
             instance.setGenerator(new VoidSchematicGenerator(api.woolbattle().lobbySchematic(), this.biome, (int) this.api.lobbyData().spawn().y()));
             instance.setChunkSupplier(FullbrightChunk::new);
@@ -124,7 +121,7 @@ public class MinestomWorldHandler implements PlatformWorldHandler {
     @Override
     public @NotNull CommonIngameWorld loadIngameWorld(@NotNull CommonGame game, @Nullable Schematic schematic) {
         try {
-            var instance = new WBMinestomInstance(UUID.randomUUID(), dimensionType);
+            var instance = new WBMinestomInstance(UUID.randomUUID(), dimensionType, NamespaceID.from("woolbattle", game.map().name().toLowerCase(Locale.ROOT)));
             var biome = biomeRegistry.get(this.biome);
             if (biome == null) throw new IllegalStateException("Biome plains not registered");
             var path = createDirectory(game, "ingame");
